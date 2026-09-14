@@ -75,7 +75,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
   ): Promise<void> {}
 
   protected override async prepare(): Promise<void> {
-    this.optionsPart.state.properties = await this.getPropertiesConfig();
+    this.optionsPart.state.properties = this.isChanged ? await this.getPropertiesConfig() : toJS(this.state);
   }
 
   protected override format(): void {

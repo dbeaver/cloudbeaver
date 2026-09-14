@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, formSubmitContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { DriverConfigurationType, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
@@ -88,8 +88,10 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
     const urlType = this.optionsPart.state.configurationType === DriverConfigurationType.Url;
+    const requiresCredentials = this.state.enabled && !this.state.savePassword;
+    const testCredentials = contexts.getContext(formSubmitContext).type !== 'submit' && requiresCredentials;
 
-    if (urlType || this.isReadOnly) {
+    if (urlType || this.isReadOnly || (!this.isChanged && !testCredentials)) {
       return;
     }
 
