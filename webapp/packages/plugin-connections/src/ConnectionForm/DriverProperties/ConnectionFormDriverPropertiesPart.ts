@@ -14,6 +14,7 @@ import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptions
 import type { schema } from '@cloudbeaver/core-utils';
 import { getObjectPropertyDefaultValue, getObjectPropertyOptionValue, getObjectPropertyValue } from '@cloudbeaver/core-sdk';
 import type { CONNECTION_PROPERTIES_SCHEMA } from '../CONNECTION_CONFIG_SCHEMA.js';
+import { trimConnectionConfig } from '../Options/trimConnectionConfig.js';
 
 type ConnectionProperties = schema.infer<typeof CONNECTION_PROPERTIES_SCHEMA>;
 
@@ -81,10 +82,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     this.optionsPart.state.properties = await this.getPropertiesConfig();
   }
 
-  protected override async format(
-    data: IFormState<IConnectionFormState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): Promise<void> {
+  protected override format(): void {
     runInAction(() => {
       this.state = trimProperties(this.state);
     });
@@ -97,11 +95,10 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
       return config;
     }
 
-    const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
+    const properties = await this.getDriverProperties();
 
-    /* Default property values must not be returned. If they are included in the request, the backend will send them back with modified values (e.g., null converted to an empty string).
-    To avoid this behavior, only properties that were explicitly changed should be sent. Any properties that still contain default values must be removed from the object before sending the request
-    */
+    // Omit defaults: the backend can otherwise return modified values (e.g. null as an empty string).
+    // Keep only explicitly changed properties in the outgoing config.
     for (const [key, value] of Object.entries(config)) {
       const property = properties?.find(property => property.id === key);
       if (property && value === getObjectPropertyOptionValue(property.defaultValue)) {
@@ -114,7 +111,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
 
   private async getDefaultConfig() {
     const config: ConnectionProperties = {};
-    const properties = await this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, this.optionsPart.state);
+    const properties = await this.getDriverProperties();
 
     for (const property of properties) {
       const value = getObjectPropertyValue(property);
@@ -130,6 +127,12 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     }
 
     return config;
+  }
+
+  private getDriverProperties() {
+    const options = { ...toJS(this.optionsPart.state) };
+    trimConnectionConfig(options);
+    return this.connectionInfoResource.getConnectionDriverProperties(this.formState.state.projectId, options);
   }
 }
 

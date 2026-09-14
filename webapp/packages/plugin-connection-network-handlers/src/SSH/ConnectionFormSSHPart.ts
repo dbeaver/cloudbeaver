@@ -14,7 +14,6 @@ import {
   getNetworkHandlerDefaultProperties,
   getSSHHandlerConfig,
   NetworkHandlerResource,
-  prepareSSHHandlerConfig,
   SSH_DEFAULT_HANDLER_CONFIG,
   SSH_TUNNEL_ID,
   trimSSHConfig,
@@ -98,7 +97,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const config = prepareSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
+    const config = this.getConfig();
 
     if (this.state.enabled && !this.state.savePassword) {
       this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
@@ -110,11 +109,11 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override format(): void {
-    this.state = trimSSHConfig(this.state);
-
-    const index = this.optionsPart.state.networkHandlersConfig?.findIndex(config => config.id === this.state.id) ?? -1;
-    if (index >= 0) {
-      this.optionsPart.state.networkHandlersConfig![index] = trimSSHConfig(this.optionsPart.state.networkHandlersConfig![index]!);
+    const externalState = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
+    for (const state of [this.state, externalState]) {
+      if (state) {
+        Object.assign(state, trimSSHConfig(state));
+      }
     }
   }
 

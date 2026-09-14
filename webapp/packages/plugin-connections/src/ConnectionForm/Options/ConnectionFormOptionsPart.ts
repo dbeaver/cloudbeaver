@@ -40,6 +40,7 @@ import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
+import { trimConnectionConfig } from './trimConnectionConfig.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
@@ -436,9 +437,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   protected override format(): void {
-    this.state.name = this.state.name?.trim();
-    this.state.description = this.state.description?.trim();
-    this.state.url = this.state.url?.trim();
+    trimConnectionConfig(this.state);
   }
 
   private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<IObjectPropertyInfo[]> {
