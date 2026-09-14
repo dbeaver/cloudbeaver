@@ -28,6 +28,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
@@ -321,6 +322,59 @@ public class WebSQLUtils {
     }
 
     @NotNull
+    public static Map<String, Object> makeDocumentValueMap(
+        @NotNull DBDAttributeBinding documentAttribute,
+        @NotNull DBDAttributeBinding[] attributes,
+        @NotNull Object[] values
+    ) {
+        if (attributes.length != values.length) {
+            throw new IllegalArgumentException("Document attributes and values have different sizes");
+        }
+        Map<String, Object> document = new LinkedHashMap<>();
+        for (int i = 0; i < attributes.length; i++) {
+            putDocumentValue(document, documentAttribute, attributes[i], values[i]);
+        }
+        return document;
+    }
+
+    private static void putDocumentValue(
+        @NotNull Map<String, Object> document,
+        @NotNull DBDAttributeBinding documentAttribute,
+        @NotNull DBDAttributeBinding attribute,
+        @Nullable Object value
+    ) {
+        LinkedList<String> path = new LinkedList<>();
+        for (DBDAttributeBinding current = attribute; current != null && current != documentAttribute;
+             current = current.getParentObject()) {
+            path.addFirst(current.getName());
+        }
+        if (path.isEmpty() || attribute.getTopParent() != documentAttribute) {
+            return;
+        }
+        Map<String, Object> target = document;
+        while (path.size() > 1) {
+            String name = path.removeFirst();
+            Object nestedValue = target.get(name);
+            if (nestedValue instanceof Map<?, ?> nestedMap) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> typedNestedMap = (Map<String, Object>) nestedMap;
+                target = typedNestedMap;
+            } else if (nestedValue != null) {
+                throw new IllegalArgumentException("Conflicting document attribute path at '" + name + "'");
+            } else {
+                Map<String, Object> nestedMap = new LinkedHashMap<>();
+                target.put(name, nestedMap);
+                target = nestedMap;
+            }
+        }
+        String name = path.getFirst();
+        if (target.containsKey(name)) {
+            throw new IllegalArgumentException("Duplicate document attribute path at '" + name + "'");
+        }
+        target.put(name, value);
+    }
+
+    @NotNull
     public static WebAsyncTaskInfo createAsyncTaskExecuteSqlQuery(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
@@ -479,5 +533,72 @@ public class WebSQLUtils {
                 sourceIdx, sourceAttr.getName(), targetIdx, targetAttr.getName()));
         }
         return mapping;
+    }
+
+    @Nullable
+    public static Object convertInputCellValue(
+        @NotNull DBCSession session,
+        @NotNull DBDAttributeBinding updateAttribute,
+        @NotNull Object cellRawValue,
+        boolean justGenerateScript
+    ) throws DBCException {
+        Object plainCellValue = makePlainCellValue(session, updateAttribute, cellRawValue);
+        Object realCellValue = plainCellValue;
+        // In some cases we already have final value here
+        if (!(realCellValue instanceof DBDValue)) {
+            try {
+                realCellValue = updateAttribute.getValueHandler().getValueFromObject(
+                    session,
+                    updateAttribute,
+                    plainCellValue,
+                    false,
+                    true
+                );
+                //FIXME: fix array editing for nosql databases
+                if (realCellValue == null && plainCellValue != null && updateAttribute.getDataKind() == DBPDataKind.ARRAY) {
+                    throw new DBCException("Array update is not supported");
+                }
+            } catch (DBCException e) {
+                //checks if this function is used only for script generation
+                if (justGenerateScript) {
+                    return null;
+                } else {
+                    throw e;
+                }
+            }
+        }
+        return realCellValue;
+    }
+
+    @NotNull
+    public static DBDDocument makeDocumentInputValue(
+        @NotNull DBCSession session,
+        @NotNull DBSDocumentLocator dataContainer,
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull WebSQLResultsRow row,
+        @Nullable Map<String, Object> metaData
+    ) throws DBException {
+        // Document reference
+        DBDDocument document = null;
+        Map<String, Object> keyMap = new LinkedHashMap<>();
+        DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+        for (int j = 0; j < attributes.length; j++) {
+            DBDAttributeBinding attr = attributes[j];
+            Object plainValue = makePlainCellValue(session, attr, row.getValues()[j]);
+            if (plainValue instanceof DBDDocument dbdDocument && dataContainer.isDocumentValid(dbdDocument)) {
+                // FIXME: Hack for DynamoDB. We pass entire document as a key
+                // FIXME: Let's just return it back for now
+                document = dbdDocument;
+                break;
+            }
+            keyMap.put(attr.getName(), plainValue);
+        }
+        if (document == null) {
+            document = dataContainer.findDocument(session, keyMap, metaData);
+            if (document == null) {
+                throw new DBCException("Error finding document by key " + keyMap);
+            }
+        }
+        return document;
     }
 }
