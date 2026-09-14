@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,8 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
     private DBDAttributeBinding[] bindings;
+    private DBDAttributeBinding documentAttribute;
+    private String documentIdAttributeName;
     private DBCTrace trace;
     private List<WebSQLQueryResultSetRow> rows = new ArrayList<>();
     private final Number rowLimit;
@@ -82,12 +84,36 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
     @Override
     public void fetchStart(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, long offset, long maxRows) throws DBCException {
+        documentAttribute = null;
+        documentIdAttributeName = null;
         DBCResultSetMetaData meta = dbResult.getMeta();
         List<? extends DBCAttributeMetaData> attributes = meta.getAttributes();
+
+        // Detect document attribute
+        // It has to be only one attribute in list (excluding pseudo attributes).
+        DBDAttributeBinding realAttr = null;
+        boolean hasMultipleRealAttributes = false;
+
         bindings = new DBDAttributeBindingMeta[attributes.size()];
         for (int i = 0; i < attributes.size(); i++) {
+
             DBCAttributeMetaData attrMeta = attributes.get(i);
             bindings[i] = new DBDAttributeBindingMeta(dataContainer, dbResult.getSession(), attrMeta);
+            if (attributes.size() == 1) {
+                realAttr = bindings[i];
+            } else if (!bindings[i].isPseudoAttribute()) {
+                if (realAttr == null && !hasMultipleRealAttributes) {
+                    realAttr = bindings[i];
+                } else {
+                    hasMultipleRealAttributes = true;
+                    realAttr = null;
+                }
+            }
+        }
+        if (realAttr != null &&
+            (realAttr.getDataKind() == DBPDataKind.DOCUMENT || realAttr.getDataKind() == DBPDataKind.CONTENT)
+        ) {
+            documentAttribute = realAttr;
         }
         if (dbResult instanceof DBCResultSetTrace resultSetTrace) {
             this.trace = resultSetTrace.getExecutionTrace();
@@ -109,6 +135,12 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                     binding.getMetaAttribute(),
                     i);
                 row[i] = cellValue;
+                if (documentIdAttributeName == null && cellValue instanceof DBDDocument document) {
+                    Object idAttributeName = document.getDocumentProperty(DBDDocument.PROP_ID_ATTRIBUTE_NAME);
+                    if (idAttributeName instanceof String name) {
+                        documentIdAttributeName = name;
+                    }
+                }
                 if (cellValue != null) {
                     Method[] methods = cellValue.getClass().getMethods();
                     for (Method method : methods) {
@@ -150,7 +182,6 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         if (dataFormat != WebDataFormat.document) {
             convertComplexValuesToRelationalView(session);
         }
-
         // Set proper order position
         for (int i = 0; i < bindings.length; i++) {
             DBDAttributeBinding binding = bindings[i];
@@ -177,7 +208,8 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setHasDynamicTrace(trace instanceof DBCTraceDynamic);
         webResultSet.setReadOnlyInfo(contextInfo.getProcessor().getExecutionContext());
 
-        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, rows.size() == 1);
+        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, documentAttribute, rows.size() == 1);
+        resultsInfo.setDocumentIdAttributeName(documentIdAttributeName);
         resultsInfo.setDataFilter(dataFilter);
         resultsInfo.setQueryText(resultSet.getSourceStatement().getQueryString());
         webResultSet.setResultsInfo(resultsInfo);
@@ -193,7 +225,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             webResultSet.setHasRowIdentifier(true);
             webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.PRIMARY_KEY);
             List<WebSQLResultSetRowIdentifierAttribute> attributes = rowIdentifier.getAttributes().stream()
-                .map(a -> new WebSQLResultSetRowIdentifierAttribute(a.getName(), a.getOrdinalPosition()))
+                .map(a -> new WebSQLResultSetRowIdentifierAttribute(a.getName(), resultsInfo.getAttributePosition(a)))
                 .toList();
             String constraintTypeName = rowIdentifier.getUniqueKey().getConstraintType().getName();
             webResultSet.setRowIdentifier(
