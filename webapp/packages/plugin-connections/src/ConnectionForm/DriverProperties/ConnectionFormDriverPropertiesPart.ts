@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
-import { executionExceptionContext, executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionInfoPropertiesResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { runInAction, toJS } from 'mobx';
@@ -31,13 +31,6 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     super(formState, getDefaultState());
 
     this.optionsPart.onDriverIdChange.addHandler(this.onDriverIdChangeHandler.bind(this));
-    // Driver defaults depend on the complete config, including other parts' prepared values.
-    formState.prepareTask.addPostHandler(
-      executorHandlerFilter(
-        (_, contexts) => !ExecutorInterrupter.isInterrupted(contexts) && !contexts.getContext(executionExceptionContext).exception && this.isLoaded(),
-        this.prepareProperties.bind(this),
-      ),
-    );
   }
 
   private async onDriverIdChangeHandler(driverId: string | undefined) {
@@ -81,7 +74,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 
-  private async prepareProperties(): Promise<void> {
+  protected override async prepare(): Promise<void> {
     this.optionsPart.state.properties = await this.getPropertiesConfig();
   }
 
