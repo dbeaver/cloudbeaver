@@ -55,10 +55,13 @@ import org.junit.platform.suite.api.Suite;
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
         GenerateSQLResultSetTest.class,
+        WebSQLDataUpdateTest.class,
+        WebSQLResultsInfoTest.class,
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,
         ForeignKeyNavigationEndpointTest.class,
-        DataFilterConstraintsTest.class
+        DataFilterConstraintsTest.class,
+        DataTransferImportTest.class
     }
 )
 public class CEServerTestSuite {

@@ -97,7 +97,7 @@ const extensionMap = {
         svg.style.maxHeight = '100%';
 
         const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', GlobalConstants.absoluteUrl('/icons/preload/icons.svg#angle'));
+        use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `${GlobalConstants.iconSpriteUrl}#angle`);
         svg.appendChild(use);
 
         const element = document.createElement('div');
