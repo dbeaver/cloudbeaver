@@ -1,23 +1,15 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import {
-  expectDeprecatedSettingMessage,
-  expectNoDeprecatedSettingMessage,
-  addDeprecatedSettingPattern,
-} from './__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { SettingsResolverSource } from './SettingsResolverSource.js';
 import { createSettingsLayer, ROOT_SETTINGS_LAYER } from './SettingsLayer.js';
-import { createSettingsAliasResolver, DEPRECATED_SETTINGS } from './createSettingsAliasResolver.js';
-import { schema } from '@cloudbeaver/core-utils';
 import { EditableSettingsSource } from './EditableSettingsSource.js';
-import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
 
 export class MemorySettingsService extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
@@ -72,16 +64,7 @@ export class MemorySettingsService extends EditableSettingsSource {
 
 const MEMORY_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'memory');
 
-function resetDeprecatedSettings() {
-  beforeEach(() => {
-    DEPRECATED_SETTINGS.clear();
-  });
-}
-
 describe('SettingsResolverSource', () => {
-  initKnownConsoleMessages(addDeprecatedSettingPattern);
-  resetDeprecatedSettings();
-
   test('resolves setting from source', () => {
     const memorySettingsSource = new MemorySettingsService();
     const settingsResolver = new SettingsResolverSource();
@@ -96,62 +79,5 @@ describe('SettingsResolverSource', () => {
 
     expect(settingsResolver.has('unknown_value')).toBe(false);
     expect(settingsResolver.getValue('unknown_value')).toBe(undefined);
-    expectNoDeprecatedSettingMessage();
-  });
-
-  test('resolves deprecated settings', () => {
-    const settingsSchema = schema.object({
-      value: schema.string().default(''),
-    });
-    const memorySettingsSource = new MemorySettingsService();
-    const settingsResolver = new SettingsResolverSource();
-    settingsResolver.addResolver(MEMORY_SETTINGS_LAYER, memorySettingsSource);
-    settingsResolver.addResolver(
-      ROOT_SETTINGS_LAYER,
-      createSettingsAliasResolver<typeof settingsSchema>(settingsResolver, {
-        value: 'deprecated',
-      }),
-    );
-
-    expect(settingsResolver.has('value')).toBe(false);
-
-    memorySettingsSource.setSettings({
-      deprecated: 'value',
-    });
-
-    expect(settingsResolver.has('value')).toBe(true);
-    expect(settingsResolver.getValue('value')).toBe('value');
-
-    expectDeprecatedSettingMessage('deprecated', 'value');
-  });
-
-  test('resolves multiple deprecated settings', () => {
-    const settingsSchema = schema.object({
-      value: schema.string().default(''),
-    });
-    const memorySettingsSource = new MemorySettingsService();
-    const settingsResolver = new SettingsResolverSource();
-    settingsResolver.addResolver(MEMORY_SETTINGS_LAYER, memorySettingsSource);
-    settingsResolver.addResolver(
-      ROOT_SETTINGS_LAYER,
-      createSettingsAliasResolver<typeof settingsSchema>(settingsResolver, {
-        value: 'deprecated',
-      }),
-      createSettingsAliasResolver<typeof settingsSchema>(settingsResolver, {
-        value: 'deprecated2',
-      }),
-    );
-
-    expect(settingsResolver.has('value')).toBe(false);
-
-    memorySettingsSource.setSettings({
-      deprecated: 'value',
-      deprecated2: 'value2',
-    });
-
-    expect(settingsResolver.has('value')).toBe(true);
-    expect(settingsResolver.getValue('value')).toBe('value2');
-
-    expectDeprecatedSettingMessage('deprecated2', 'value');
   });
 });

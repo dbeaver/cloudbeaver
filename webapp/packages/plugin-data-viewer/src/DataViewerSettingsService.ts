@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,11 +8,9 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { HIGHEST_SETTINGS_LAYER, ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
 import {
-  createSettingsAliasResolver,
   createSettingsOverrideResolver,
   ESettingsValueType,
   type ISettingDescription,
-  ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
   SettingsProviderService,
@@ -79,25 +77,6 @@ export class DataViewerSettingsService {
   ) {
     // Some settings registered in plugin-data-editor-public-settings & permissions
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
-    this.settingsResolverService.addResolver(
-      ROOT_SETTINGS_LAYER,
-      /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
-        'plugin.data-viewer.disableEdit': 'core.app.dataViewer.disableEdit',
-        'plugin.data-viewer.disableCopyData': 'core.app.dataViewer.disableCopyData',
-        'plugin.data-viewer.fetchMax': 'core.app.dataViewer.fetchMax',
-        'plugin.data-viewer.export.disabled': 'plugin.data-export.disabled',
-        'resultset.maxrows': 'core.app.dataViewer.fetchDefault',
-      }),
-      /** @deprecated Use settings instead, will be removed in 25.0.0 */
-      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
-        'resultset.maxrows': 'plugin.data-viewer.fetchDefault',
-      }),
-      /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
-        'plugin.data-viewer.export.disabled': 'plugin_data_export.disabled',
-      }),
-    );
 
     this.settingsResolverService.addResolver(
       HIGHEST_SETTINGS_LAYER,
