@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,7 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
         const navNode = this.connectionSchemaManagerService.activeNavNode;
-        const nodeInTree = navNode?.path.includes(tree.baseRoot);
-        return !nodeInTree;
+        return !navNode?.nodeId.startsWith(tree.baseRoot);
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -82,7 +81,7 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
         const navNode = this.connectionSchemaManagerService.activeNavNode;
 
         if (navNode) {
-          await this.navigationTreeService.showNode(navNode.nodeId, navNode.path);
+          await this.navigationTreeService.showNode(navNode.nodeId);
         }
 
         break;
