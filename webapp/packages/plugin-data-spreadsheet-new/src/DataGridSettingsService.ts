@@ -6,15 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  createSettingsAliasResolver,
-  ESettingsValueType,
-  ROOT_SETTINGS_LAYER,
-  SettingsManagerService,
-  SettingsProvider,
-  SettingsProviderService,
-  SettingsResolverService,
-} from '@cloudbeaver/core-settings';
+import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 import { COMMON_LOCALES } from './commonLocales.js';
@@ -43,7 +35,7 @@ const defaultSettings = schema.object({
 export type DataGridSettingsSchema = typeof defaultSettings;
 export type DataGridSettings = schema.infer<DataGridSettingsSchema>;
 
-@injectable(() => [SettingsProviderService, SettingsManagerService, SettingsResolverService])
+@injectable(() => [SettingsProviderService, SettingsManagerService])
 export class DataGridSettingsService {
   get hidden(): boolean {
     return this.settings.getValue('plugin.data-spreadsheet.hidden');
@@ -65,18 +57,10 @@ export class DataGridSettingsService {
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly settingsResolverService: SettingsResolverService,
   ) {
     this.supportedLocales = getSupportedLocalesWithRegions();
     this.osLocale = null;
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
-    this.settingsResolverService.addResolver(
-      ROOT_SETTINGS_LAYER,
-      /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<DataGridSettingsSchema>(this.settingsProviderService.settingsResolver, {
-        'plugin.data-spreadsheet.hidden': 'plugin_data_spreadsheet_new.hidden',
-      }),
-    );
 
     this.registerSettings();
   }
