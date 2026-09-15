@@ -6,4 +6,4 @@ if [[ $# -eq 0 ]] ;
 fi
 set -- "$@" -cli-mode
 
-source run-cloudbeaver-server.sh "$@"
+exec java CloudBeaverLauncher.java "$@"
