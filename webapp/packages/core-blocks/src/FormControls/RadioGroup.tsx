@@ -6,10 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useContext, useId, useState } from 'react';
 
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { Field } from './Field.js';
+import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
 import { RadioGroup as UiKitRadioGroup } from '@dbeaver/ui-kit';
+import styles from './RadioGroup.module.css';
 
 type BaseProps = React.PropsWithChildren<React.ComponentProps<typeof UiKitRadioGroup>> & {
   name: string;
@@ -41,9 +46,15 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
   state,
   onChange,
   children,
+  label,
+  labelledBy,
+  'aria-label': ariaLabel,
+  required,
   ...rest
 }: ControlledProps<string | number> | ObjectProps<any, any>) {
   const formContext = useContext(FormContext);
+  const labelId = useId();
+  const style = useS(styles);
   const [selfValue, setValue] = useState<string | number>();
 
   const handleChange = useCallback(
@@ -71,8 +82,29 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
 
   const value = state ? state[name] : (controlledValue ?? selfValue);
 
+  if (label) {
+    return (
+      <Field>
+        <FieldLabel id={labelId} className={s(style, { fieldLabel: true })} required={required}>
+          {label}
+        </FieldLabel>
+        <UiKitRadioGroup {...rest} value={value} setValue={handleChange} labelledBy={labelId} required={required}>
+          {children}
+        </UiKitRadioGroup>
+      </Field>
+    );
+  }
+
+  if (labelledBy) {
+    return (
+      <UiKitRadioGroup {...rest} value={value} setValue={handleChange} labelledBy={labelledBy} required={required}>
+        {children}
+      </UiKitRadioGroup>
+    );
+  }
+
   return (
-    <UiKitRadioGroup value={value} setValue={handleChange} {...rest}>
+    <UiKitRadioGroup {...rest} value={value} setValue={handleChange} aria-label={ariaLabel!} required={required}>
       {children}
     </UiKitRadioGroup>
   );

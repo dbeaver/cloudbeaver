@@ -8,9 +8,9 @@
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { AISettingsResource } from '@cloudbeaver/plugin-ai';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
-import { AIProfilesResource } from '../AIProfiles/AIProfilesResource.js';
-import type { AISettingsResource } from '../AISettingsResource.js';
 import { LANGUAGE_VALIDATION_REGEX } from './getLanguageOptions.js';
 import type { IAdministrationAIInfoState } from './IAdministrationAIInfoState.js';
 
