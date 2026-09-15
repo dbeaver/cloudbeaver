@@ -99,6 +99,7 @@ interface IOptions extends IElementsTreeOptions {
   baseRoot: string;
   root: string;
   folderExplorer: IFolderExplorerContext;
+  limit?: (nodeId: string) => number;
 }
 
 export interface IElementsTree extends ILoadableState {
@@ -236,10 +237,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       if (pageInfo) {
         const lastOffset = getNextPageOffset(pageInfo);
-        for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
-          await navTreeResource.load(
-            CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
-          );
+        const limit = options.limit ? options.limit(nodeId) : navTreeResource.childrenLimit;
+        for (let offset = 0; offset < lastOffset; offset += limit) {
+          await navTreeResource.load(CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(nodeId)));
         }
       }
 
