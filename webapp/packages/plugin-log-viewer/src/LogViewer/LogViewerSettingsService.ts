@@ -1,20 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  createSettingsAliasResolver,
-  ESettingsValueType,
-  ROOT_SETTINGS_LAYER,
-  SettingsManagerService,
-  SettingsProvider,
-  SettingsProviderService,
-  SettingsResolverService,
-} from '@cloudbeaver/core-settings';
+import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { TOOLS_PANEL_SETTINGS_GROUP } from '@cloudbeaver/plugin-tools-panel';
 
@@ -27,7 +19,7 @@ const defaultSettings = schema.object({
 export type LogViewerSettingsSchema = typeof defaultSettings;
 export type LogViewerSettings = schema.infer<LogViewerSettingsSchema>;
 
-@injectable(() => [SettingsProviderService, SettingsManagerService, SettingsResolverService])
+@injectable(() => [SettingsProviderService, SettingsManagerService])
 export class LogViewerSettingsService {
   get disabled(): boolean {
     return this.settings.getValue('plugin.log-viewer.disabled');
@@ -46,18 +38,8 @@ export class LogViewerSettingsService {
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly settingsResolverService: SettingsResolverService,
   ) {
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
-    this.settingsResolverService.addResolver(
-      ROOT_SETTINGS_LAYER,
-      /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<LogViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
-        'plugin.log-viewer.disabled': 'core.app.logViewer.disabled',
-        'plugin.log-viewer.logBatchSize': 'core.app.logViewer.logBatchSize',
-        'plugin.log-viewer.maxLogRecords': 'core.app.logViewer.maxLogRecords',
-      }),
-    );
 
     this.registerSettings();
   }
