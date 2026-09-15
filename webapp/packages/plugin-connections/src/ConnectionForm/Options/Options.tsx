@@ -222,7 +222,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
         </section>
 
         {authenticationVisible && (
-          <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-t tw:pt-6">
+          <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-t tw:py-6">
             <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
             {serverConfigResource.resource.distributed && isSharedProject && (
               <FieldCheckbox

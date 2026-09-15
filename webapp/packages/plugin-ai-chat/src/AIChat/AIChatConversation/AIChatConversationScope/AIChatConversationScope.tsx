@@ -104,7 +104,7 @@ export const AIChatConversationScope = observer<Props>(function AIChatConversati
   return (
     <MenuProvider placement="bottom-end">
       <MenuButton render={<ActionIconButton disabled={disabled} title={translate('plugin_ai_chat_scope_change')} name="/icons/scope.svg" img />} />
-      <Menu modal>
+      <Menu modal fitViewport>
         <MenuGroup className="tw:flex tw:flex-col tw:gap-1">
           <MenuGroupLabel>{translate('plugin_ai_chat_scope_change')}</MenuGroupLabel>
 

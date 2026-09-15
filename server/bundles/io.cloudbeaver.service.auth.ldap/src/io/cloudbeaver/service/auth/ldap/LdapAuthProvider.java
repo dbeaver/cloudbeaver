@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.ldap.auth;
+package io.cloudbeaver.service.auth.ldap;
 
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.auth.SMAuthProviderAssigner;
@@ -24,8 +24,8 @@ import io.cloudbeaver.auth.SMBruteForceProtected;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
-import io.cloudbeaver.service.ldap.auth.ssl.LdapSslSetting;
-import io.cloudbeaver.service.ldap.auth.ssl.LdapSslSocketFactory;
+import io.cloudbeaver.service.auth.ldap.ssl.LdapSslSetting;
+import io.cloudbeaver.service.auth.ldap.ssl.LdapSslSocketFactory;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;

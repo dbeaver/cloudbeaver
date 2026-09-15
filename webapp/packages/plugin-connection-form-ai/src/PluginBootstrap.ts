@@ -84,6 +84,7 @@ export class PluginBootstrap extends Bootstrap {
     this.connectionFormService.parts.add({
       key: this.key,
       name: 'plugin_connection_form_ai_name',
+      title: 'plugin_connection_form_ai_name',
       icon: '/icons/plugin_connection_sparkles.svg',
       order: 7,
       stateGetter: context => () => getConnectionAiPart(context.formState),

@@ -186,6 +186,11 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
         dataSourceRegistry.updateDataSource(dataSource);
     }
 
+    @Override
+    public void updateDataSources(@NotNull List<? extends DBPDataSourceContainer> dataSources) throws DBException {
+        dataSourceRegistry.updateDataSources(dataSources);
+    }
+
     @NotNull
     @Override
     public List<? extends DBPDataSourceFolder> getAllFolders() {

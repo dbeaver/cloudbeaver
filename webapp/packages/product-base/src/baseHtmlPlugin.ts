@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,13 +9,21 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { PluginOption } from 'vite';
 
+import { getIconSpriteAsset } from './copy-assets/copyAssetsPlugin.js';
+
 interface IHtmlPluginOptions {
   rootUri: string;
   version: string;
   title: string;
+  iconSpriteUri?: string;
 }
 
-export const baseHtmlPlugin = ({ rootUri, version, title }: IHtmlPluginOptions): PluginOption => {
+export const baseHtmlPlugin = ({
+  rootUri,
+  version,
+  title,
+  iconSpriteUri = getIconSpriteAsset().uri,
+}: IHtmlPluginOptions): PluginOption => {
   const indexTemplate = fs.readFileSync(fileURLToPath(import.meta.resolve('#html/index.html')), 'utf-8');
   const headTemplate = fs.readFileSync(fileURLToPath(import.meta.resolve('#html/head.html')), 'utf-8');
   const loadingScreenTemplate = fs.readFileSync(fileURLToPath(import.meta.resolve('#html/loading-screen.html')), 'utf-8');
@@ -55,6 +63,7 @@ export const baseHtmlPlugin = ({ rootUri, version, title }: IHtmlPluginOptions):
               .replaceAll('src="/', 'src="{ROOT_URI}')
               .replaceAll('href="/', 'href="{ROOT_URI}')
               .replaceAll('{ROOT_URI}', rootUri)
+              .replaceAll('{ICON_SPRITE_URI}', iconSpriteUri)
               .replaceAll('{VERSION}', version)
               .replaceAll('{TITLE}', title),
             tags: [

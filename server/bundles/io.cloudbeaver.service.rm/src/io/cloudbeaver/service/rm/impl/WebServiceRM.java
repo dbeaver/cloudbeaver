@@ -122,7 +122,7 @@ public class WebServiceRM implements DBWServiceRM {
                                       @NotNull String projectId,
                                       @NotNull String resourcePath,
                                       @NotNull String propertyName,
-                                      @Nullable Object propertyValue
+                                      @Nullable String propertyValue
     ) throws DBException {
         checkIsRmEnabled(webSession);
         try {
