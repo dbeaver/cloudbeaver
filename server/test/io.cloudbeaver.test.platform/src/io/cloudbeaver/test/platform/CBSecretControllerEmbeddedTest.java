@@ -53,8 +53,11 @@ public class CBSecretControllerEmbeddedTest {
     };
 
     @Test
-    public void doesNotAdvertisePlaintextSecretStorage() throws DBException {
-        Assertions.assertEquals(0, createController(TEST_USER_ID).getSupportedFeatures());
+    public void advertisesPrivateSecretStorage() throws DBException {
+        Assertions.assertEquals(
+            DBSSecretController.FEATURE_PRIVATE_SECRETS_VIEW | DBSSecretController.FEATURE_PRIVATE_SECRETS_EDIT,
+            createController(TEST_USER_ID).getSupportedFeatures()
+        );
     }
 
     @Test

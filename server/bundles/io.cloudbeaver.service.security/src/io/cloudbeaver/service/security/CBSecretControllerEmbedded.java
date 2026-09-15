@@ -48,7 +48,8 @@ public class CBSecretControllerEmbedded implements DBSSecretControllerAuthorized
 
     @Override
     public long getSupportedFeatures() {
-        return 0;
+        return DBSSecretController.FEATURE_PRIVATE_SECRETS_VIEW |
+            DBSSecretController.FEATURE_PRIVATE_SECRETS_EDIT;
     }
 
     @Nullable
