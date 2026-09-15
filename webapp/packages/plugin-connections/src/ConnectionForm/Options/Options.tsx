@@ -19,6 +19,7 @@ import {
   InputField,
   Link,
   ObjectPropertyInfoForm,
+  Placeholder,
   Radio,
   RadioGroup,
   useAdministrationSettings,
@@ -48,6 +49,7 @@ import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 
 import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
 import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
 import { isConnectionFormReadOnly } from '../isConnectionFormReadOnly.js';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
@@ -78,6 +80,7 @@ const driverConfiguration: IDriverConfiguration[] = [
 
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState }) {
   const isAdmin = usePermission(EAdminPermission.admin);
+  const connectionFormService = useService(ConnectionFormService);
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
   const projectInfoResource = useService(ProjectInfoResource);
   const formRef = useRef<HTMLFormElement>(null);
@@ -220,6 +223,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               />
             ))}
         </section>
+
+        <Placeholder container={connectionFormService.mainPropertiesContainer} formState={formState} />
 
         {authenticationVisible && (
           <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-t tw:py-6">
