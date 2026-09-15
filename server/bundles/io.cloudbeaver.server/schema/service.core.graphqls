@@ -23,6 +23,8 @@ type ObjectPropertyInfo {
     value: Object
     "List of allowed values (for enumerable properties)"
     validValues: [ Object ]
+    "Whether values outside validValues may be entered"
+    allowCustomValue: Boolean! @since(version: "26.2.2")
     "Default property value"
     defaultValue: Object
     "Constraints for the property value"

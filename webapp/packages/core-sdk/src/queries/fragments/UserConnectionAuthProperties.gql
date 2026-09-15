@@ -6,6 +6,7 @@ fragment UserConnectionAuthProperties on ObjectPropertyInfo {
   dataType
   value
   validValues
+  allowCustomValue
   defaultValue
   length
   features

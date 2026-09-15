@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import {
@@ -21,6 +22,7 @@ import { EMPTY_ARRAY, getTextFileReadingProcess, removeMetadataFromDataURL } fro
 import { clsx } from '@dbeaver/ui-kit';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox.js';
+import { Combobox } from '../../FormControls/Combobox.js';
 import { Select } from '../../FormControls/Select.js';
 import { FormFieldDescription } from '../../FormControls/FormFieldDescription.js';
 import { InputField } from '../../FormControls/InputField/InputField.js';
@@ -161,6 +163,39 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   const placeholder = getPlaceholder();
 
   if (controlType === 'selector') {
+    if (property.allowCustomValue && state !== undefined) {
+      const customState = state;
+
+      function setCustomValue(value: unknown) {
+        runInAction(() => {
+          customState[property.id!] = value;
+        });
+      }
+
+      return (
+        <Combobox
+          required={required}
+          name={property.id!}
+          value={customState[property.id!] ?? defaultValue}
+          items={property.validValues!}
+          keySelector={getObjectPropertyOptionValue}
+          valueSelector={getObjectPropertyOptionName}
+          titleSelector={getObjectPropertyOptionName}
+          placeholder={placeholder}
+          title={property.description}
+          disabled={disabled}
+          readOnly={readonly}
+          description={property.hint}
+          className={className}
+          allowCustomValue
+          onChange={setCustomValue}
+          onSelect={setCustomValue}
+        >
+          {property.displayName ?? ''}
+        </Combobox>
+      );
+    }
+
     if (state !== undefined) {
       return (
         <Select

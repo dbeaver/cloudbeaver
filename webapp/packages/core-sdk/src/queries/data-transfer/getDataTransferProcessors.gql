@@ -17,6 +17,7 @@ query getDataTransferProcessors {
       dataType
       defaultValue
       validValues
+      allowCustomValue
       length
       features
       order
