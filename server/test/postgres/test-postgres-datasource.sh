@@ -2,8 +2,9 @@
 
 set -Eeuo pipefail
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd -P)"
+MAVEN_WRAPPER="$REPO_ROOT/../dbeaver-common/mvnw"
 COMPOSE_FILE="$SCRIPT_DIR/compose.yml"
 PROJECT_NAME="cloudbeaver-pg-${UID:-0}-$$-${RANDOM}"
 LOG_DIR="${CLOUDBEAVER_TEST_POSTGRES_LOG_DIR:-$SCRIPT_DIR/target}"
@@ -26,7 +27,10 @@ cleanup() {
 }
 
 command -v docker >/dev/null 2>&1 || { printf '%s\n' "docker is required" >&2; exit 1; }
-command -v mvn >/dev/null 2>&1 || { printf '%s\n' "mvn is required" >&2; exit 1; }
+[[ -x "$MAVEN_WRAPPER" ]] || {
+  printf 'DBeaver Common Maven wrapper not found or not executable: %s\n' "$MAVEN_WRAPPER" >&2
+  exit 1
+}
 docker compose version >/dev/null
 
 trap cleanup EXIT
@@ -61,7 +65,7 @@ export CLOUDBEAVER_TEST_POSTGRES_DATABASE=cloudbeaver_test
 export CLOUDBEAVER_TEST_POSTGRES_USER=cloudbeaver_test
 export CLOUDBEAVER_TEST_POSTGRES_PASSWORD=cloudbeaver_test
 
-mvn verify \
+"$MAVEN_WRAPPER" verify \
   --file "$REPO_ROOT/server/product/aggregate/pom.xml" \
   --define headless-platform \
   --activate-profiles ce-postgres-datasource-tests
