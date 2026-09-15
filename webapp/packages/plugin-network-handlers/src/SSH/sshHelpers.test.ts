@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 
-import { getSSHHandlerConfig, prepareSSHHandlerConfig, SSH_DEFAULT_HANDLER_CONFIG } from './sshHelpers.js';
+import { prepareSSHHandlerConfig, SSH_DEFAULT_HANDLER_CONFIG } from './sshHelpers.js';
 
 describe('SSH config preparation', () => {
   const state = {
@@ -29,14 +29,6 @@ describe('SSH config preparation', () => {
       userName: ' user ',
       password: ' password ',
       properties: { host: ' host ' },
-    });
-  });
-
-  it('preserves formatting in getSSHHandlerConfig', () => {
-    expect(getSSHHandlerConfig(state)).toMatchObject({
-      userName: 'user',
-      password: 'password',
-      properties: { host: 'host' },
     });
   });
 });

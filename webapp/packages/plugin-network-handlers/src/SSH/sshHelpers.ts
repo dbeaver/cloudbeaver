@@ -43,14 +43,6 @@ export function isSSHKeyChanged(handler: NetworkHandlerConfigInput, initial?: Ne
   return (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '') || !!handler.key?.length;
 }
 
-export function getSSHHandlerConfig(
-  state: NetworkHandlerConfigInput,
-  initialState?: NetworkHandlerConfigInput | null,
-  savePassword?: boolean,
-): NetworkHandlerConfigInput {
-  return trimSSHConfig(prepareSSHHandlerConfig(state, initialState, savePassword));
-}
-
 export function prepareSSHHandlerConfig(
   state: NetworkHandlerConfigInput,
   initialState?: NetworkHandlerConfigInput | null,
@@ -72,7 +64,10 @@ export function prepareSSHHandlerConfig(
 }
 
 export function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
-  const trimmedInput = toJS(input);
+  const trimmedInput = {
+    ...toJS(input),
+    properties: input.properties ? { ...toJS(input.properties) } : input.properties,
+  };
   const attributesToTrim = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
 
   for (const key of attributesToTrim) {
@@ -81,7 +76,7 @@ export function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerC
     }
   }
 
-  for (const key in (trimmedInput.properties ?? {})) {
+  for (const key in trimmedInput.properties ?? {}) {
     if (typeof trimmedInput.properties[key] === 'string') {
       trimmedInput.properties[key] = trimmedInput.properties[key]?.trim();
     }

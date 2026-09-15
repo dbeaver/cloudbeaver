@@ -99,7 +99,8 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    if (!this.optionsPart.state.driverId) {
+    const testCredentials = contexts.getContext(formSubmitContext).type !== 'submit' && this.state.enabled && !this.state.savePassword;
+    if (!this.optionsPart.state.driverId || (!this.isChanged && !testCredentials)) {
       return;
     }
 
@@ -109,7 +110,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     const handlerConfig: NetworkHandlerConfigInput = toJS(this.state);
     handlerConfig.savePassword = this.state.savePassword || this.optionsPart.state.sharedCredentials;
 
-    if (this.isChanged && descriptor) {
+    if (descriptor) {
       for (const descriptorProperty of descriptor.properties) {
         if (!descriptorProperty.id) {
           continue;
@@ -161,10 +162,19 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
   }
 
-  protected override format(): void {
-    const handlerConfig = this.optionsPart.state.networkHandlersConfig?.find(config => config.id === this.state.id);
-    if (handlerConfig) {
-      trimSSLConfig(handlerConfig);
+  protected override async format(): Promise<void> {
+    const properties = this.state.properties;
+    if (!properties) {
+      return;
+    }
+
+    const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
+    const descriptor = handlers.find(handler => handler.id === this.state.id);
+
+    for (const property of descriptor?.properties ?? []) {
+      if (property.id && property.features.includes(PROPERTY_FEATURE_SECURED) && typeof properties[property.id] === 'string') {
+        properties[property.id] = properties[property.id].trim();
+      }
     }
   }
 
@@ -172,24 +182,4 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
-}
-
-function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
-  const { secureProperties } = input;
-
-  if (!secureProperties) {
-    return input;
-  }
-
-  if (!Object.keys(secureProperties).length) {
-    return input;
-  }
-
-  for (const key in secureProperties) {
-    if (typeof secureProperties[key] === 'string') {
-      secureProperties[key] = secureProperties[key]?.trim();
-    }
-  }
-
-  return input;
 }
