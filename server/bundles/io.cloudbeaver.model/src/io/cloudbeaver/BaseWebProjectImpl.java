@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.rm.*;
+import org.jkiss.utils.ArrayUtils;
 
 import java.nio.file.Path;
 
@@ -107,6 +108,20 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
     @Override
     public boolean isPrivateProject() {
         return RMProjectType.USER.equals(getRMProject().getType());
+    }
+
+    @Override
+    public boolean hasRealmPermission(@NotNull String permission) {
+        if (getWorkspace().hasRealmPermission(permission)) {
+            return true;
+        }
+        for (String projectPermissionId : ArrayUtils.safeArray(getRMProject().getProjectPermissions())) {
+            RMProjectPermission projectPermission = RMProjectPermission.fromPermission(projectPermissionId);
+            if (projectPermission != null && projectPermission.getAllPermissions().contains(permission)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
