@@ -2171,7 +2171,6 @@ __metadata:
     "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
-    "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
