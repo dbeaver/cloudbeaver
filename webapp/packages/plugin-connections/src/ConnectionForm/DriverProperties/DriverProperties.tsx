@@ -9,49 +9,40 @@ import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 
-import {
-  type IProperty,
-  PropertiesTable,
-  PropertiesTableStyles,
-  s,
-  SContext,
-  type StyleRegistry,
-  useAutoLoad,
-  useExecutor,
-  useS,
-} from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useExecutor } from '@cloudbeaver/core-blocks';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import styles from './DriverProperties.module.css';
 import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
 import { getConnectionFormDriverPropertiesPart } from './getConnectionFormDriverPropertiesPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { DriverPropertiesTable } from './DriverPropertiesTable/DriverPropertiesTable.js';
+import type { IDriverProperty } from './DriverPropertiesTable/IDriverProperty.js';
 import { useDriverProperties } from './useDriverProperties.js';
-
-const registry: StyleRegistry = [[PropertiesTableStyles, { mode: 'append', styles: [styles] }]];
 
 export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({ tabId, formState }) {
   const { selected } = useTab(tabId);
-  const style = useS(styles);
   const driverPropertiesPart = getConnectionFormDriverPropertiesPart(formState);
   const optionsPart = getConnectionFormOptionsPart(formState);
 
   const [state] = useState(() => {
-    const propertiesList: IProperty[] = observable([]);
+    const propertiesList: IDriverProperty[] = observable([]);
 
     function add(key?: string, value?: string) {
+      const id = uuid();
       propertiesList.unshift({
-        id: uuid(),
+        id,
         key: key ?? '',
         defaultValue: value ?? '',
         keyPlaceholder: 'property',
         new: key === undefined,
+        custom: true,
       });
+      return id;
     }
 
-    function remove(property: IProperty) {
+    function remove(property: IDriverProperty) {
       propertiesList.splice(propertiesList.indexOf(property), 1);
     }
 
@@ -87,10 +78,10 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
 
   const joinedProperties = useMemo(
     () =>
-      computed<IProperty[]>(() => [
+      computed<IDriverProperty[]>(() => [
         ...state.propertiesList,
         ...(propertiesState.properties
-          ? propertiesState.properties.map<IProperty>(property => ({
+          ? propertiesState.properties.map<IDriverProperty>(property => ({
               id: property.id!,
               key: property.id!,
               keyPlaceholder: property.id,
@@ -99,29 +90,26 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
               defaultValue: property.defaultValue,
               description: property.description,
               validValues: property.validValues,
+              custom: false,
             }))
           : []),
       ]),
-    [propertiesState.properties],
+    [propertiesState.properties, state.propertiesList],
   );
 
   useAutoLoad(DriverProperties, driverPropertiesPart, selected);
   useAutoLoad(DriverProperties, propertiesState, selected, undefined, true);
 
   return (
-    <div className="tw:flex tw:flex-1 tw:overflow-auto">
-      <ConnectionSectionWrapper className="tw:max-w-3xl!">
-        <SContext registry={registry}>
-          <PropertiesTable
-            className={s(style, { propertiesTable: true })}
-            properties={joinedProperties.get()}
-            propertiesState={driverPropertiesPart.state}
-            readOnly={formState.isDisabled || formState.isReadOnly}
-            filterable
-            onAdd={state.add}
-            onRemove={state.remove}
-          />
-        </SContext>
+    <div className="tw:flex tw:min-h-0 tw:flex-1 tw:overflow-hidden">
+      <ConnectionSectionWrapper className="tw:max-w-3xl! tw:min-h-0 tw:flex-1">
+        <DriverPropertiesTable
+          properties={joinedProperties.get()}
+          propertiesState={driverPropertiesPart.state}
+          readOnly={formState.isDisabled || formState.isReadOnly}
+          onAdd={state.add}
+          onRemove={state.remove}
+        />
       </ConnectionSectionWrapper>
     </div>
   );
