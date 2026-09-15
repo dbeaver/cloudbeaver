@@ -192,6 +192,9 @@ type ServerConfig {
     "Defines is it is possible to save global database credentials"
     adminCredentialsSaveEnabled: Boolean!
 
+    "Enables database user password changes."
+    dbUserPasswordChangeEnabled: Boolean! @since(version: "26.2.1")
+
     "Defines if the server requires a license"
     licenseRequired: Boolean!
     "Defines if the server license is valid"
@@ -901,6 +904,18 @@ extend type Mutation {
 
     "Test connection configuration. Returns remote server version"
     testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
+
+    """
+    Change the DB user password for this connection.
+    The caller MUST have PERMISSION_PROJECT_DATASOURCES_EDIT on the connection's project.
+    Driver exceptions propagate to the caller when the database rejects the change.
+    """
+    changeConnectionUserPassword(
+        projectId: ID,
+        connectionId: ID!,
+        oldPassword: String!,
+        newPassword: String!
+    ): Boolean! @since(version: "26.2.1")
 
     "Test network handler connectivity"
     testNetworkHandler(projectId: ID, connectionId: ID, config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!

@@ -78,7 +78,7 @@ public class WebConnectionInfo {
     private static final String FEATURE_RESTRICT_METADATA_EDIT = "restrictMetadataEdit";
 
     private static final String TOOL_SESSION_MANAGER = "sessionManager";
-    
+
     private final WebSession session;
     private final DBPDataSourceContainer dataSourceContainer;
     private WebServerError connectError;
