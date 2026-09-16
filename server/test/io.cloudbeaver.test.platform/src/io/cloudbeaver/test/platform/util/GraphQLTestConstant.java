@@ -132,8 +132,20 @@ public class GraphQLTestConstant {
         """;
 
     public static final String GQL_ASYNC_SQL_EXECUTE = """
-        mutation asyncSqlExecuteQuery($projectId: ID, $connectionId: ID!, $contextId: ID!, $sql: String!) {
-          result: asyncSqlExecuteQuery(projectId: $projectId, connectionId: $connectionId, contextId: $contextId, sql: $sql) {
+        mutation asyncSqlExecuteQuery(
+          $projectId: ID,
+          $connectionId: ID!,
+          $contextId: ID!,
+          $sql: String!,
+          $filter: SQLDataFilter
+        ) {
+          result: asyncSqlExecuteQuery(
+            projectId: $projectId,
+            connectionId: $connectionId,
+            contextId: $contextId,
+            sql: $sql,
+            filter: $filter
+          ) {
             id
           }
         }
