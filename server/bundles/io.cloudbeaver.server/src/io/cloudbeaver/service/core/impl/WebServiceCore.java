@@ -769,8 +769,28 @@ public class WebServiceCore implements DBWServiceCore {
         @Nullable Throwable initialFailure,
         boolean interrupted
     ) {
-        Throwable cleanupFailure = initialFailure;
+        Throwable cleanupFailure = cancelCleanupJobs(jobs, initialFailure);
+        CleanupResult joinResult = joinCleanupJobs(jobs, cleanupFailure);
+        cleanupFailure = joinResult.failure();
+        boolean shouldRestoreInterrupt = consumeInterrupt(interrupted || joinResult.interrupted());
+        cleanupFailure = disconnectTemporaryDataSource(dataSource, cleanupFailure);
+        shouldRestoreInterrupt = consumeInterrupt(shouldRestoreInterrupt);
+        cleanupFailure = removeTemporaryConnection(project, dataSource, cleanupFailure);
+        shouldRestoreInterrupt = consumeInterrupt(shouldRestoreInterrupt);
+        cleanupFailure = removeTemporaryDataSource(dataSource, cleanupFailure);
+        shouldRestoreInterrupt = consumeInterrupt(shouldRestoreInterrupt);
+        if (shouldRestoreInterrupt) {
+            Thread.currentThread().interrupt();
+        }
+        return cleanupFailure == null ? null : new DBWebException(
+            "Failed to clean up temporary connection",
+            cleanupFailure
+        );
+    }
 
+    @Nullable
+    private static Throwable cancelCleanupJobs(@NotNull Job[] jobs, @Nullable Throwable initialFailure) {
+        Throwable cleanupFailure = initialFailure;
         for (Job job : jobs) {
             try {
                 if (job.getState() != Job.NONE) {
@@ -780,6 +800,13 @@ public class WebServiceCore implements DBWServiceCore {
                 cleanupFailure = appendCleanupFailure(cleanupFailure, e);
             }
         }
+        return cleanupFailure;
+    }
+
+    @NotNull
+    private static CleanupResult joinCleanupJobs(@NotNull Job[] jobs, @Nullable Throwable initialFailure) {
+        Throwable cleanupFailure = initialFailure;
+        boolean interrupted = false;
         for (Job job : jobs) {
             boolean joined = false;
             while (!joined) {
@@ -796,7 +823,15 @@ public class WebServiceCore implements DBWServiceCore {
                 }
             }
         }
-        interrupted |= Thread.interrupted();
+        return new CleanupResult(cleanupFailure, interrupted);
+    }
+
+    @Nullable
+    private static Throwable disconnectTemporaryDataSource(
+        @NotNull DataSourceDescriptor dataSource,
+        @Nullable Throwable initialFailure
+    ) {
+        Throwable cleanupFailure = initialFailure;
         try {
             if (!dataSource.disconnect(new VoidProgressMonitor())) {
                 throw new DBWebException("Failed to disconnect temporary connection");
@@ -804,7 +839,16 @@ public class WebServiceCore implements DBWServiceCore {
         } catch (Throwable e) {
             cleanupFailure = appendCleanupFailure(cleanupFailure, e);
         }
-        interrupted |= Thread.interrupted();
+        return cleanupFailure;
+    }
+
+    @Nullable
+    private static Throwable removeTemporaryConnection(
+        @NotNull WebSessionProjectImpl project,
+        @NotNull DataSourceDescriptor dataSource,
+        @Nullable Throwable initialFailure
+    ) {
+        Throwable cleanupFailure = initialFailure;
         try {
             WebConnectionInfo cachedConnection = project.findWebConnectionInfo(dataSource.getId());
             if (cachedConnection != null && cachedConnection.getDataSourceContainer() == dataSource) {
@@ -817,7 +861,15 @@ public class WebServiceCore implements DBWServiceCore {
         } catch (Throwable e) {
             cleanupFailure = appendCleanupFailure(cleanupFailure, e);
         }
-        interrupted |= Thread.interrupted();
+        return cleanupFailure;
+    }
+
+    @Nullable
+    private static Throwable removeTemporaryDataSource(
+        @NotNull DataSourceDescriptor dataSource,
+        @Nullable Throwable initialFailure
+    ) {
+        Throwable cleanupFailure = initialFailure;
         try {
             DBPDataSourceRegistry registry = dataSource.getRegistry();
             if (registry.getDataSource(dataSource.getId()) == dataSource) {
@@ -835,14 +887,12 @@ public class WebServiceCore implements DBWServiceCore {
         } catch (Throwable e) {
             cleanupFailure = appendCleanupFailure(cleanupFailure, e);
         }
-        interrupted |= Thread.interrupted();
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-        return cleanupFailure == null ? null : new DBWebException(
-            "Failed to clean up temporary connection",
-            cleanupFailure
-        );
+        return cleanupFailure;
+    }
+
+    private static boolean consumeInterrupt(boolean interrupted) {
+        boolean currentInterrupt = Thread.interrupted();
+        return interrupted || currentInterrupt;
     }
 
     @NotNull
@@ -850,10 +900,13 @@ public class WebServiceCore implements DBWServiceCore {
         if (current == null) {
             return next;
         }
-        if (current != next) {
+        if (!Objects.equals(current, next)) {
             current.addSuppressed(next);
         }
         return current;
+    }
+
+    private record CleanupResult(@Nullable Throwable failure, boolean interrupted) {
     }
 
     @Override
