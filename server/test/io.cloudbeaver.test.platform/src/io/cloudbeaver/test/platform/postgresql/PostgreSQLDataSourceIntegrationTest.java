@@ -91,7 +91,8 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
             "parent_table",
             "child_table",
             "edit_rows",
-            "type_values"
+            "type_values",
+            "complex_values"
         )));
         Assertions.assertTrue(childNames(tables).stream()
             .noneMatch(name -> name.chars().anyMatch(Character::isUpperCase)));
@@ -296,6 +297,26 @@ public class PostgreSQLDataSourceIntegrationTest extends CloudbeaverMockTest {
         Assertions.assertEquals("PostgreSQL text", cell(row, 6));
         Assertions.assertEquals(List.of(10, 20, 30), integerElements(cell(row, 7).toString()));
         Assertions.assertNull(cell(row, 8));
+    }
+
+    @Test
+    public void compositeTypeIsExpandedIntoTypedColumns() throws Exception {
+        String contextId = fixture.createSqlContext();
+        Map<String, Object> resultSet = fixture.executeQuery(
+            contextId,
+            "SELECT details FROM complex_values WHERE id = 1"
+        );
+
+        Map<String, Map<String, Object>> columns = columnsByName(resultSet);
+        Assertions.assertEquals(3, columns.size());
+        assertType(columns, "details.display_name", "text", "STRING");
+        assertType(columns, "details.priority_level", "int4", "NUMERIC");
+        assertType(columns, "details.enabled", "bool", "BOOLEAN");
+
+        Map<String, Object> row = rows(resultSet).getFirst();
+        Assertions.assertEquals("Primary, office", cell(row, 0));
+        Assertions.assertEquals("7", cell(row, 1));
+        Assertions.assertEquals(Boolean.TRUE, cell(row, 2));
     }
 
     @Test
