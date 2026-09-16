@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { clsx } from '@dbeaver/ui-kit';
+import { useMergeRefs, useTreeKeyboardActions } from '@cloudbeaver/core-blocks';
 
 import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
 import { TreeContext } from './contexts/TreeContext.js';
@@ -61,6 +62,8 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
     getNodeHeight,
   });
   const mountOptimization = useTreeVirtualization();
+  const keyboardRef = useTreeKeyboardActions();
+  const rootRef = useMergeRefs(mountOptimization.setRootRef, keyboardRef);
   const elementsSizeCache = useNodeSizeCache(tree, data);
   return (
     <NodeSizeCacheContext.Provider value={elementsSizeCache}>
@@ -70,7 +73,7 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
             <TreeDnDContext.Provider value={dnd ?? null}>
               <TreeMenuContextProvider menu={menu ?? null}>
                 {children}
-                <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
+                <div ref={rootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
                   <TreeVirtualizationContext.Provider value={mountOptimization}>
                     <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
                   </TreeVirtualizationContext.Provider>

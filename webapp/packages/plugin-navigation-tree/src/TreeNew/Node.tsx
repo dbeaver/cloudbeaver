@@ -72,6 +72,7 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
     <TreeNode
       selected={selected}
       expanded={expanded}
+      leaf={isNodeLeaf}
       className={clsx({
         'tree-node--dnd-drop-target': isValidDropTarget,
         'tree-node--dnd-dragging': dnd.state.isDragging,

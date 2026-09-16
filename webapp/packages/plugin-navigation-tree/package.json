@@ -51,6 +51,7 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "@dbeaver/react-tests": "workspace:*",
+    "@testing-library/react": "^16",
     "@types/react": "^19",
     "rimraf": "^6",
     "typescript": "^5",

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import {
   TreeNodeNested,
   TreeNodeNestedMessage,
   useListKeyboardNavigation,
+  useTreeKeyboardActions,
   useMergeRefs,
   useS,
 } from '@cloudbeaver/core-blocks';
@@ -97,7 +98,8 @@ export const ElementsTree = observer(
     const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
     const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
     const listRef = useListKeyboardNavigation('[data-tree-node-control][tabindex]:not(:disabled)');
-    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef);
+    const keyboardRef = useTreeKeyboardActions();
+    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef, keyboardRef);
 
     const root = folderExplorer.state.folder;
 
