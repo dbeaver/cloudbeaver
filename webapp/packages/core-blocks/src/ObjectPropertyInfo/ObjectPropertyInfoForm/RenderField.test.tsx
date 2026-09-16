@@ -6,16 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 import { observable } from 'mobx';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type IObjectPropertyInfo, ObjectPropertyLength } from '@cloudbeaver/core-sdk';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
 import { ObjectPropertyInfoForm } from './ObjectPropertyInfoForm.js';
+import * as localization from '../../localization/useTranslate.js';
 
-vi.mock('../../localization/useTranslate.js', () => ({
-  useTranslate: () => (key: string) => key,
-}));
+beforeEach(() => {
+  vi.spyOn(localization, 'useTranslate').mockReturnValue(key => key);
+});
+
+afterEach(() => vi.restoreAllMocks());
 
 const property: IObjectPropertyInfo = {
   id: 'divider',

@@ -1,27 +1,29 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { fireEvent } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { IconOrImage, type IconOrImageProps } from './IconOrImage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
+import * as icon from './Icon.js';
+import * as staticImage from './StaticImage.js';
 
-vi.mock('./Icon.js', () => ({
-  Icon: vi.fn(({ ...props }) => (
+beforeEach(() => {
+  vi.spyOn(icon, 'Icon').mockImplementation(props => (
     <svg {...props} role="svg">
       <use href={`/icons/preload/icons.svg#${props.name}`} />
     </svg>
-  )),
-}));
+  ));
 
-vi.mock('./StaticImage.js', () => ({
-  StaticImage: vi.fn(({ ...props }) => <img {...props} />),
-}));
+  vi.spyOn(staticImage, 'StaticImage').mockImplementation(props => <img {...props} />);
+});
+
+afterEach(() => vi.restoreAllMocks());
 
 describe('IconOrImage', () => {
   test('should render StaticImage for platform: prefixed icon', () => {
