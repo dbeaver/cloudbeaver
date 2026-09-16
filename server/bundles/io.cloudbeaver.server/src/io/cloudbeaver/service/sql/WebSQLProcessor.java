@@ -395,7 +395,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             deletedRows,
             addedRows
         );
-        validateRowIdentifiers(resultsInfo, rowIdentifierList, updatedRows, deletedRows, addedRows);
+        validateRowIdentifiers(resultsInfo, rowIdentifierList, updatedRows, deletedRows);
 
         DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
 
@@ -454,10 +454,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLResultsInfo resultsInfo,
         @NotNull Set<DBDRowIdentifier> rowIdentifiers,
         @Nullable List<WebSQLResultsRow> updatedRows,
-        @Nullable List<WebSQLResultsRow> deletedRows,
-        @Nullable List<WebSQLResultsRow> addedRows
+        @Nullable List<WebSQLResultsRow> deletedRows
     ) throws DBCException {
-        if (!CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
+        if (!CommonUtils.isEmpty(deletedRows)) {
             for (DBDRowIdentifier identifier : rowIdentifiers) {
                 if (identifier == null || !identifier.isValidIdentifier()) {
                     throw new DBCException("Can't detect a valid row identifier for data update");
@@ -611,7 +610,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             deletedRows,
             addedRows
         );
-        validateRowIdentifiers(resultsInfo, rowIdentifierList, updatedRows, deletedRows, addedRows);
+        validateRowIdentifiers(resultsInfo, rowIdentifierList, updatedRows, deletedRows);
 
         DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
         WebDBDResultSetDataModel dataProvider = new WebDBDResultSetDataModel(
