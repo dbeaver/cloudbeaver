@@ -2,6 +2,11 @@
 <?eclipse version="3.2"?>
 
 <plugin>
+    <extension point="com.dbeaver.secretController">
+        <controller id="cb-embedded" class="io.cloudbeaver.service.security.CBSecretControllerEmbedded"
+                    label="Embedded secret controller" description="Stores secrets in the embedded database"/>
+    </extension>
+
     <extension point="org.jkiss.dbeaver.auth.provider">
         <authProvider id="local" label="Local"
                 caseInsensitive="true"
