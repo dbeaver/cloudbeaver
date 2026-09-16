@@ -27,8 +27,8 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
-import { AIProfilesResource } from './AIProfiles/AIProfilesResource.js';
 import { getAdministrationAISettingsFormInfoPart } from './AISettingsForm/getAdministrationAISettingsFormInfoPart.js';
 import { LANGUAGE_OPTIONS } from './AISettingsForm/getLanguageOptions.js';
 import type { AdministrationAISettingsFormState } from './AISettingsForm/AdministrationAISettingsFormState.js';

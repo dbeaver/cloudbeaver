@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,17 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 
-class WebExecutionSource extends AbstractExecutionSource {
-    public WebExecutionSource(DBSDataContainer dataContainer, DBCExecutionContext executionContext, Object controller) {
+public class WebExecutionSource extends AbstractExecutionSource {
+    public WebExecutionSource(
+        @NotNull DBSDataContainer dataContainer,
+        @NotNull DBCExecutionContext executionContext,
+        @NotNull Object controller
+    ) {
         super(dataContainer, executionContext, controller);
     }
 }

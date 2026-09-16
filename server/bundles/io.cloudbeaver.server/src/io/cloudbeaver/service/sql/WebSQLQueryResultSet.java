@@ -70,7 +70,7 @@ public class WebSQLQueryResultSet {
     public void setColumns(@NotNull DBDAttributeBinding[] bindings) {
         WebSQLQueryResultColumn[] columns = new WebSQLQueryResultColumn[bindings.length];
         for (int i = 0; i < bindings.length; i++) {
-            columns[i] = new WebSQLQueryResultColumn(bindings[i]);
+            columns[i] = new WebSQLQueryResultColumn(bindings[i], i);
         }
         this.columns = columns;
     }
