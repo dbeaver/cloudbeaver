@@ -22,7 +22,6 @@ import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletSystemInformationCollector;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.registry.WebConnectionTestConfiguratorRegistry;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.WebAppUtils;
@@ -562,10 +561,29 @@ public class WebServiceCore implements DBWServiceCore {
         WebConnectionConfig configInput = project.getConnectionConfigInput(connectionConfig);
         configInput.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
-        WebConnectionTestConfiguratorRegistry configuratorRegistry =
-            WebConnectionTestConfiguratorRegistry.getInstance();
-        List<WebConnectionTestConfiguratorRegistry.ResolvedConfiguration> extensionConfigurations =
-            configuratorRegistry.resolveConfigurations(extensions);
+        Map<String, Map<String, Object>> extensionConfigurations = new LinkedHashMap<>();
+        if (!CommonUtils.isEmpty(extensions)) {
+            for (Map<String, Object> extension : extensions) {
+                if (extension == null) {
+                    throw new DBWebException("Connection test extension must be an object");
+                }
+                Object idValue = extension.get("id");
+                if (!(idValue instanceof String id) || CommonUtils.isEmpty(id)) {
+                    throw new DBWebException("Connection test extension ID must be specified");
+                }
+                Object configurationValue = extension.get("configuration");
+                if (!(configurationValue instanceof Map<?, ?> configuration)) {
+                    throw new DBWebException(
+                        "Configuration for connection test extension '" + id + "' must be an object"
+                    );
+                }
+                @SuppressWarnings("unchecked")
+                Map<String, Object> typedConfiguration = (Map<String, Object>) configuration;
+                if (extensionConfigurations.putIfAbsent(id, typedConfiguration) != null) {
+                    throw new DBWebException("Duplicate connection test extension '" + id + "'");
+                }
+            }
+        }
         DataSourceDescriptor originalDataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
 
@@ -575,7 +593,9 @@ public class WebServiceCore implements DBWServiceCore {
             testDataSource = createTestDataSourceDescriptor(originalDataSource, configInput, project);
             testDataSource.setTemporary(true);
             configureTestDataSourceDescriptor(webSession, originalDataSource, testDataSource, configInput, project);
-            configuratorRegistry.configure(extensionConfigurations, project, originalDataSource, testDataSource);
+            for (Map.Entry<String, Map<String, Object>> extension : extensionConfigurations.entrySet()) {
+                testDataSource.setExtension(extension.getKey(), extension.getValue());
+            }
 
             WebConnectionInfo connectionInfo = project.addTemporaryConnection(testDataSource);
             connectionInfo.setSavedCredentials(configInput.getCredentials(), configInput.getNetworkHandlersConfig());

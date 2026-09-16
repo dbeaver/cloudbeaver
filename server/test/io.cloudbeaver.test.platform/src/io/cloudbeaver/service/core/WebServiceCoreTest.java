@@ -17,28 +17,20 @@
 package io.cloudbeaver.service.core;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebConnectionConfigInputHandler;
 import io.cloudbeaver.WebObjectId;
 import io.cloudbeaver.WebParameterSecure;
 import io.cloudbeaver.WebProjectAction;
 import io.cloudbeaver.WebSessionProjectImpl;
-import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.registry.DBWConnectionTestConfigurator;
-import io.cloudbeaver.registry.WebConnectionTestConfiguratorDescriptor;
-import io.cloudbeaver.registry.WebConnectionTestConfiguratorRegistry;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
-import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
@@ -51,7 +43,6 @@ import org.mockito.Mockito;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
@@ -61,16 +52,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class WebServiceCoreTest {
     private static final String DATA_SOURCE_ID = "temporary-id";
-
-    @Test
-    public void testNoExtensionsPreserveCompatibilityWithoutDispatch() throws DBWebException {
-        DBWConnectionTestConfigurator configurator = Mockito.mock(DBWConnectionTestConfigurator.class);
-        WebConnectionTestConfiguratorRegistry registry = registry("extension", configurator);
-
-        Assertions.assertTrue(registry.resolveConfigurations(null).isEmpty());
-        Assertions.assertTrue(registry.resolveConfigurations(List.of()).isEmpty());
-        Mockito.verifyNoInteractions(configurator);
-    }
 
     @Test
     public void testExplicitUnknownProjectDoesNotFallBackToActiveProject() {
@@ -84,102 +65,6 @@ public class WebServiceCoreTest {
 
         Assertions.assertTrue(error.getMessage().contains("missing-project"));
         Mockito.verify(webSession, Mockito.never()).getProjectById(Mockito.any());
-    }
-
-    @Test
-    public void testExtensionsDispatchInRequestOrder() throws DBWebException {
-        List<String> calls = new ArrayList<>();
-        DBWConnectionTestConfigurator first = (project, original, test, configuration) -> calls.add("first");
-        DBWConnectionTestConfigurator second = (project, original, test, configuration) -> calls.add("second");
-        WebConnectionTestConfiguratorRegistry registry = new WebConnectionTestConfiguratorRegistry(List.of(
-            new WebConnectionTestConfiguratorDescriptor("first", first),
-            new WebConnectionTestConfiguratorDescriptor("second", second)
-        ));
-        DBPProject project = Mockito.mock(DBPProject.class);
-        DataSourceDescriptor original = Mockito.mock(DataSourceDescriptor.class);
-        DataSourceDescriptor temporary = Mockito.mock(DataSourceDescriptor.class);
-
-        var resolved = registry.resolveConfigurations(List.of(
-            extension("second", Map.of("value", 2)),
-            extension("first", Map.of("value", 1))
-        ));
-        registry.configure(resolved, project, original, temporary);
-
-        Assertions.assertEquals(List.of("second", "first"), calls);
-    }
-
-    @Test
-    public void testDuplicateUnknownAndMalformedExtensionsAreRejected() {
-        WebConnectionTestConfiguratorRegistry registry = registry(
-            "known",
-            Mockito.mock(DBWConnectionTestConfigurator.class)
-        );
-
-        assertResolutionFails(registry, List.of(extension("missing", Map.of())), "Unknown");
-        assertResolutionFails(
-            registry,
-            List.of(extension("known", Map.of()), extension("known", Map.of())),
-            "Duplicate"
-        );
-        assertResolutionFails(
-            registry,
-            List.of(Map.of("id", "known", "configuration", "not-an-object")),
-            "must be an object"
-        );
-    }
-
-    @Test
-    public void testConfiguratorFailureOccursBeforeConnect() throws Exception {
-        DBWConnectionTestConfigurator configurator = (project, original, test, configuration) -> {
-            throw new DBWebException("configuration failed");
-        };
-        WebConnectionTestConfiguratorRegistry registry = registry("failing", configurator);
-        DataSourceDescriptor temporary = Mockito.mock(DataSourceDescriptor.class);
-
-        DBWebException error = Assertions.assertThrows(DBWebException.class, () -> registry.configure(
-            registry.resolveConfigurations(List.of(extension("failing", Map.of()))),
-            Mockito.mock(DBPProject.class),
-            null,
-            temporary
-        ));
-
-        Assertions.assertEquals("configuration failed", error.getMessage());
-        Mockito.verify(temporary, Mockito.never()).connect(Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-    }
-
-    @Test
-    public void testConfiguratorInitializationFailureIsWrapped() throws DBException {
-        WebConnectionTestConfiguratorDescriptor descriptor = Mockito.mock(WebConnectionTestConfiguratorDescriptor.class);
-        Mockito.when(descriptor.getId()).thenReturn("broken");
-        IllegalStateException failure = new IllegalStateException("initialization failed");
-        Mockito.when(descriptor.getInstance()).thenThrow(failure);
-        WebConnectionTestConfiguratorRegistry registry = new WebConnectionTestConfiguratorRegistry(List.of(descriptor));
-
-        DBWebException error = Assertions.assertThrows(DBWebException.class, () -> registry.configure(
-            registry.resolveConfigurations(List.of(extension("broken", Map.of()))),
-            Mockito.mock(DBPProject.class),
-            null,
-            Mockito.mock(DataSourceDescriptor.class)
-        ));
-
-        Assertions.assertTrue(error.getMessage().startsWith("Cannot initialize connection test extension 'broken'"));
-        Assertions.assertSame(failure, error.getCause());
-    }
-
-    @Test
-    public void testFailedNewDescriptorSetupDisposesDescriptor() {
-        WebSession webSession = Mockito.mock(WebSession.class);
-        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
-        WebConnectionConfig input = Mockito.mock(WebConnectionConfig.class);
-        DBPDriver driver = Mockito.mock(DBPDriver.class);
-        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
-        Mockito.when(registry.createDataSource(Mockito.eq(driver), Mockito.any())).thenReturn(dataSource);
-        Mockito.doThrow(new IllegalStateException("setup failed")).when(dataSource).setName(Mockito.anyString());
-        TestConnectionConfigInputHandler handler = new TestConnectionConfigInputHandler(webSession, registry, input);
-
-        Assertions.assertThrows(IllegalStateException.class, () -> handler.createDataSource(driver));
-
-        Mockito.verify(dataSource).dispose();
     }
 
     @Test
@@ -403,10 +288,6 @@ public class WebServiceCoreTest {
         Assertions.assertNotNull(testConnection.getParameters()[1].getAnnotation(WebObjectId.class));
         Assertions.assertNotNull(testConnection.getParameters()[2].getAnnotation(WebParameterSecure.class));
         Assertions.assertNotNull(testConnection.getParameters()[3].getAnnotation(WebParameterSecure.class));
-        Method configure = DBWConnectionTestConfigurator.class.getMethod(
-            "configure", DBPProject.class, DataSourceDescriptor.class, DataSourceDescriptor.class, Map.class
-        );
-        Assertions.assertNotNull(configure.getParameters()[3].getAnnotation(WebParameterSecure.class));
     }
 
     @Test
@@ -417,36 +298,6 @@ public class WebServiceCoreTest {
 
         Assertions.assertEquals("125 ms", connectionInfo.getConnectTime());
         Mockito.verify(dataSource, Mockito.never()).getConnectTime();
-    }
-
-    private static void assertResolutionFails(
-        @NotNull WebConnectionTestConfiguratorRegistry registry,
-        @NotNull List<Map<String, Object>> extensions,
-        @NotNull String expectedMessage
-    ) {
-        DBWebException error = Assertions.assertThrows(
-            DBWebException.class,
-            () -> registry.resolveConfigurations(extensions)
-        );
-        Assertions.assertTrue(error.getMessage().contains(expectedMessage), error.getMessage());
-    }
-
-    @NotNull
-    private static WebConnectionTestConfiguratorRegistry registry(
-        @NotNull String id,
-        @NotNull DBWConnectionTestConfigurator configurator
-    ) {
-        return new WebConnectionTestConfiguratorRegistry(List.of(
-            new WebConnectionTestConfiguratorDescriptor(id, configurator)
-        ));
-    }
-
-    @NotNull
-    private static Map<String, Object> extension(
-        @NotNull String id,
-        @NotNull Map<String, Object> configuration
-    ) {
-        return Map.of("id", id, "configuration", configuration);
     }
 
     @NotNull
@@ -485,21 +336,5 @@ public class WebServiceCoreTest {
         DBPDataSourceRegistryCache registryCache,
         DataSourceDescriptor dataSource
     ) {
-    }
-
-    private static final class TestConnectionConfigInputHandler
-        extends WebConnectionConfigInputHandler<WebConnectionConfig, DataSourceDescriptor> {
-        private TestConnectionConfigInputHandler(
-            @NotNull WebSession webSession,
-            @NotNull DBPDataSourceRegistry registry,
-            @NotNull WebConnectionConfig input
-        ) {
-            super(webSession, registry, input);
-        }
-
-        @NotNull
-        private DataSourceDescriptor createDataSource(@NotNull DBPDriver driver) {
-            return createDataSourceContainerFromInput(driver);
-        }
     }
 }
