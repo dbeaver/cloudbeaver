@@ -26,7 +26,6 @@ import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
-import io.cloudbeaver.server.events.WSSecurityAuditEvent;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
@@ -87,42 +86,6 @@ import java.util.stream.Collectors;
 public class WebServiceCore implements DBWServiceCore {
 
     private static final Log log = Log.getLog(WebServiceCore.class);
-
-    private static final int MAX_PASSWORD_LENGTH = 128;
-    // ASCII space (0x20) is the first printable character. Anything below is a control character.
-    private static final int FIRST_PRINTABLE_ASCII = 0x20;
-
-    private static boolean containsBlockedPasswordChar(String password) {
-        for (int i = 0; i < password.length(); i++) {
-            if (password.charAt(i) < FIRST_PRINTABLE_ASCII) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void emitPasswordChangeAudit(
-        @NotNull WebSession webSession,
-        @Nullable DBPDataSourceContainer container,
-        @Nullable String projectId,
-        @NotNull String connectionId,
-        @NotNull WSSecurityAuditEvent.Kind kind,
-        @Nullable String reasonCode,
-        @Nullable String errorClass
-    ) {
-        String driverId = container == null ? null : container.getDriver().getFullId();
-        WSSecurityAuditEvent event = new WSSecurityAuditEvent(
-            webSession.getSessionId(),
-            webSession.getUserId(),
-            projectId,
-            connectionId,
-            driverId,
-            kind,
-            reasonCode,
-            errorClass
-        );
-        ServletAppUtils.getServletApplication().getEventController().addEvent(event);
-    }
 
     @Override
     public WebServerConfig getServerConfig(@Nullable WebSession webSession) {
@@ -691,39 +654,28 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         DBPDataSourceContainer container = null;
         try {
-            requireServerFlagEnabled(webSession, projectId, connectionId);
+            requireServerFlagEnabled();
             container = resolveContainer(webSession, projectId, connectionId);
-            validateNewPassword(webSession, container, projectId, connectionId, newPassword);
-            ensureConnected(webSession, container, projectId, connectionId);
-            DBAUserPasswordManager manager = resolveUserPasswordManager(webSession, container, projectId, connectionId);
-            String userName = resolveUserName(webSession, container, projectId, connectionId);
-            applyPasswordChange(webSession, container, projectId, connectionId, manager, userName, oldPassword, newPassword);
+            ensureConnected(webSession, container);
+            DBAUserPasswordManager manager = resolveUserPasswordManager(container);
+            String userName = resolveUserName(container);
+            applyPasswordChange(webSession, projectId, connectionId, manager, userName, oldPassword, newPassword);
             persistNewPassword(webSession, container, projectId, connectionId, newPassword);
             WebDataSourceUtils.disconnectDataSource(webSession, container, true);
-            emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-                WSSecurityAuditEvent.Kind.SUCCEEDED, null, null);
+            log.info("changeConnectionUserPassword: succeeded " + formatPasswordChangeLogContext(webSession, projectId, connectionId));
             return true;
         } catch (DBWebException e) {
-            // Inner stages emit their own audits. Pass through so the Throwable branch below does not
-            // re-audit the same failure as UNEXPECTED_ERROR.
             throw e;
         } catch (Throwable t) {
-            emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-                WSSecurityAuditEvent.Kind.FAILED, "UNEXPECTED_ERROR", t.getClass().getName());
+            log.error("changeConnectionUserPassword: unexpected error " + formatPasswordChangeLogContext(webSession, projectId, connectionId), t);
             throw new DBWebException("Password change failed", t);
         }
     }
 
-    private void requireServerFlagEnabled(
-        @NotNull WebSession webSession,
-        @Nullable String projectId,
-        @NotNull String connectionId
-    ) throws DBWebException {
+    private void requireServerFlagEnabled() throws DBWebException {
         if (WebAppUtils.getWebApplication().getAppConfiguration().isDbUserPasswordChangeEnabled()) {
             return;
         }
-        emitPasswordChangeAudit(webSession, null, projectId, connectionId,
-            WSSecurityAuditEvent.Kind.GATE_REJECTED, "SERVER_FLAG_DISABLED", null);
         throw new DBWebException("Password change is disabled by the administrator.");
     }
 
@@ -734,45 +686,19 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String connectionId
     ) throws DBWebException {
         DBPDataSourceContainer container = null;
-        String lookupErrorClass = null;
         try {
             container = WebDataSourceUtils.getLocalOrGlobalDataSource(webSession, projectId, connectionId);
-        } catch (DBWebException e) {
-            lookupErrorClass = e.getClass().getName();
+        } catch (DBWebException ignored) {
         }
         if (container != null) {
             return container;
         }
-        emitPasswordChangeAudit(webSession, null, projectId, connectionId,
-            WSSecurityAuditEvent.Kind.GATE_REJECTED, "CONNECTION_NOT_FOUND", lookupErrorClass);
         throw new DBWebException("Connection not found.");
-    }
-
-    private void validateNewPassword(
-        @NotNull WebSession webSession,
-        @NotNull DBPDataSourceContainer container,
-        @Nullable String projectId,
-        @NotNull String connectionId,
-        @NotNull String newPassword
-    ) throws DBWebException {
-        if (newPassword.length() > MAX_PASSWORD_LENGTH) {
-            emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-                WSSecurityAuditEvent.Kind.GATE_REJECTED, "PASSWORD_TOO_LONG", null);
-            throw new DBWebException(
-                "Password exceeds the maximum length of " + MAX_PASSWORD_LENGTH + " characters.");
-        }
-        if (containsBlockedPasswordChar(newPassword)) {
-            emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-                WSSecurityAuditEvent.Kind.GATE_REJECTED, "INVALID_PASSWORD_CHARACTER", null);
-            throw new DBWebException("Password contains characters that are not allowed.");
-        }
     }
 
     private void ensureConnected(
         @NotNull WebSession webSession,
-        @NotNull DBPDataSourceContainer container,
-        @Nullable String projectId,
-        @NotNull String connectionId
+        @NotNull DBPDataSourceContainer container
     ) throws DBWebException {
         if (container.isConnected()) {
             return;
@@ -780,18 +706,13 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             container.connect(webSession.getProgressMonitor(), true, false);
         } catch (Exception e) {
-            emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-                WSSecurityAuditEvent.Kind.GATE_REJECTED, "CONNECT_FAILED", e.getClass().getName());
             throw new DBWebException("Cannot connect to database.", e);
         }
     }
 
     @NotNull
     private DBAUserPasswordManager resolveUserPasswordManager(
-        @NotNull WebSession webSession,
-        @NotNull DBPDataSourceContainer container,
-        @Nullable String projectId,
-        @NotNull String connectionId
+        @NotNull DBPDataSourceContainer container
     ) throws DBWebException {
         DBAUserPasswordManager manager = null;
         DBPDataSource dataSource = container.getDataSource();
@@ -801,17 +722,12 @@ public class WebServiceCore implements DBWServiceCore {
         if (manager != null) {
             return manager;
         }
-        emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-            WSSecurityAuditEvent.Kind.GATE_REJECTED, "DIALECT_UNSUPPORTED", null);
         throw new DBWebException("This driver does not support password change from CloudBeaver.");
     }
 
     @NotNull
     private String resolveUserName(
-        @NotNull WebSession webSession,
-        @NotNull DBPDataSourceContainer container,
-        @Nullable String projectId,
-        @NotNull String connectionId
+        @NotNull DBPDataSourceContainer container
     ) throws DBWebException {
         String userName = container.getActualConnectionConfiguration().getUserName();
         if (CommonUtils.isEmpty(userName)) {
@@ -820,14 +736,11 @@ public class WebServiceCore implements DBWServiceCore {
         if (!CommonUtils.isEmpty(userName)) {
             return userName;
         }
-        emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-            WSSecurityAuditEvent.Kind.GATE_REJECTED, "USERNAME_MISSING", null);
         throw new DBWebException("Connection has no user name configured.");
     }
 
     private void applyPasswordChange(
         @NotNull WebSession webSession,
-        @NotNull DBPDataSourceContainer container,
         @Nullable String projectId,
         @NotNull String connectionId,
         @NotNull DBAUserPasswordManager manager,
@@ -835,13 +748,11 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String oldPassword,
         @NotNull String newPassword
     ) throws DBWebException {
-        emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-            WSSecurityAuditEvent.Kind.ATTEMPTED, null, null);
+        log.info("changeConnectionUserPassword: attempting " + formatPasswordChangeLogContext(webSession, projectId, connectionId));
         try {
             manager.changeUserPassword(webSession.getProgressMonitor(), userName, newPassword, oldPassword);
         } catch (DBException e) {
-            emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-                WSSecurityAuditEvent.Kind.FAILED, "HANDLER_ERROR", e.getClass().getName());
+            log.info("changeConnectionUserPassword: handler error " + formatPasswordChangeLogContext(webSession, projectId, connectionId) + " error=" + e.getClass().getName());
             throw new DBWebException("Password change failed", e);
         }
     }
@@ -870,11 +781,19 @@ public class WebServiceCore implements DBWServiceCore {
         if (persisted) {
             return;
         }
-        emitPasswordChangeAudit(webSession, container, projectId, connectionId,
-            WSSecurityAuditEvent.Kind.FAILED, "PERSIST_FAILED", failureClass);
+        log.info("changeConnectionUserPassword: persist failed " + formatPasswordChangeLogContext(webSession, projectId, connectionId) + " error=" + failureClass);
         throw new DBWebException(
             "Database password was changed but CloudBeaver failed to persist the new credential. "
                 + "The connection will require re-entry of the new password.");
+    }
+
+    private static String formatPasswordChangeLogContext(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId
+    ) {
+        return String.format("sessionId=%s userId=%s projectId=%s connectionId=%s",
+            webSession.getSessionId(), webSession.getUserId(), projectId, connectionId);
     }
 
     @Override

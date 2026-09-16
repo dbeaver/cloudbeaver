@@ -193,7 +193,7 @@ type ServerConfig {
     adminCredentialsSaveEnabled: Boolean!
 
     "Enables database user password changes."
-    dbUserPasswordChangeEnabled: Boolean! @since(version: "26.2.1")
+    dbUserPasswordChangeEnabled: Boolean! @since(version: "26.2.2")
 
     "Defines if the server requires a license"
     licenseRequired: Boolean!
@@ -915,7 +915,7 @@ extend type Mutation {
         connectionId: ID!,
         oldPassword: String!,
         newPassword: String!
-    ): Boolean! @since(version: "26.2.1")
+    ): Boolean! @since(version: "26.2.2")
 
     "Test network handler connectivity"
     testNetworkHandler(projectId: ID, connectionId: ID, config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
