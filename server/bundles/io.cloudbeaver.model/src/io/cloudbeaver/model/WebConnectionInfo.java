@@ -223,6 +223,7 @@ public class WebConnectionInfo {
         return dsNode == null ? null : dsNode.getNodeUri();
     }
 
+    @Nullable
     @Property
     public String getConnectTime() {
         return connectTime != null ? connectTime : dataSourceContainer.getConnectTime() == null ? null :
