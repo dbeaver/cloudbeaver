@@ -72,7 +72,7 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
             StandardConstants.ENV_JAVA_VENDOR) + " (" + System.getProperty(StandardConstants.ENV_JAVA_ARCH) + "bit)";
         this.javaParameters = System.getProperty("sun.java.command");
         this.productName = GeneralUtils.getProductName();
-        this.productVersion = GeneralUtils.getProductVersion().toString();
+        this.productVersion = GeneralUtils.getPlainVersion();
         this.installPath = SystemVariablesResolver.getInstallPath();
         this.memoryAvailable = "%dMb/%dMb".formatted(
             Runtime.getRuntime().totalMemory() / (1024 * 1024),

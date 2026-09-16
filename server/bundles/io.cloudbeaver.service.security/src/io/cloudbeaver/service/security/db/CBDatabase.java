@@ -438,7 +438,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         instanceId = getCurrentInstanceId();
 
         String productName = CommonUtils.truncateString(GeneralUtils.getProductName(), 100);
-        String versionName = CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 32);
+        String versionName = CommonUtils.truncateString(GeneralUtils.getPlainVersion(), 32);
 
         boolean hasInstanceRecord = JDBCUtils.queryString(connection,
             "SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?",

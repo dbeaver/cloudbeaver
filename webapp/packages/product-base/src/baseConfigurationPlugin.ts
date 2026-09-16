@@ -18,10 +18,18 @@ import { manualChunks } from './manualChunks.js';
 import tailwindcss from '@tailwindcss/vite';
 import legacy from '@vitejs/plugin-legacy';
 
-export function baseConfigurationPlugin(mode: string, packageJson: any): PluginOption {
+interface IProductPackageJson {
+  product: {
+    name?: string;
+    version: string;
+  };
+}
+
+export function baseConfigurationPlugin(mode: string, packageJson: IProductPackageJson): PluginOption {
   const isProduction = mode === 'production';
   const envServer = process.env['server'];
-  const productVersion = isProduction ? withTimestamp(packageJson.version) : packageJson.version;
+  const publicVersion = process.env['PRODUCT_VERSION'] ?? packageJson.product.version;
+  const productVersion = isProduction ? withTimestamp(publicVersion) : publicVersion;
   const iconSprite = getIconSpriteAsset();
 
   return [
@@ -141,5 +149,5 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
 }
 
 function withTimestamp(version: string) {
-  return `${version}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`;
+  return `${version}+${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`;
 }

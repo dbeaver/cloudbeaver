@@ -38,7 +38,8 @@
     "vite": "^7"
   },
   "product": {
-    "name": "CloudBeaver Community"
+    "name": "CloudBeaver Community",
+    "version": "26.2.2.0"
   },
   "devDependencies": {
     "@cloudbeaver/browserslist-config": "workspace:*",
