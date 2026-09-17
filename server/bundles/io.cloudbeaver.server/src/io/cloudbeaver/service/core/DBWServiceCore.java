@@ -169,10 +169,12 @@ public interface DBWServiceCore extends DBWService {
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
+    @NotNull
     WebConnectionInfo testConnection(
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
-        @NotNull Map<String, Object> connectionConfig
+        @WebParameterSecure @NotNull Map<String, Object> connectionConfig,
+        @WebParameterSecure @Nullable List<Map<String, Object>> extensions
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})

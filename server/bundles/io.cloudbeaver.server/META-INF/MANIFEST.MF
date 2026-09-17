@@ -26,6 +26,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.server.websockets,
  io.cloudbeaver.service,
  io.cloudbeaver.service.core,
+ io.cloudbeaver.service.core.impl,
  io.cloudbeaver.service.navigator,
  io.cloudbeaver.service.sql,
  io.cloudbeaver.service.sql.resultset

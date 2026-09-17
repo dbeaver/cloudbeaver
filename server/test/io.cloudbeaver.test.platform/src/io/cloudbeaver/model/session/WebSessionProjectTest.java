@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,12 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         var fetched = project.findWebConnectionInfo("ds1");
         Assertions.assertNotNull(fetched);
         Assertions.assertEquals("ds1", fetched.getDataSourceContainer().getId());
+
+        DataSourceDescriptor collidingDataSource = Mockito.mock(DataSourceDescriptor.class);
+        Mockito.when(collidingDataSource.getId()).thenReturn("ds1");
+        Assertions.assertThrows(DBWebException.class, () -> project.addTemporaryConnection(collidingDataSource));
+        project.removeConnection(collidingDataSource);
+        Assertions.assertSame(info, project.findWebConnectionInfo("ds1"));
 
         // remove connection
         project.removeConnection(ds);

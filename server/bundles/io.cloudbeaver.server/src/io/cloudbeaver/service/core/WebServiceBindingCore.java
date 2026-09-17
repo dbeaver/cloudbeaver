@@ -130,25 +130,28 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 )
             )
             .dataFetcher("initConnection", env -> {
-                    List<Map<String, Object>> networkCredentials = getArgument(env, "networkCredentials");
-                    List<WebNetworkHandlerConfigInput> nhc = null;
-                    if (networkCredentials != null) {
-                        nhc = networkCredentials.stream().map(WebNetworkHandlerConfigInput::new).collect(Collectors.toList());
-                    }
-                    return getService(env).initConnection(
-                        getWebSession(env),
-                        getProjectReference(env),
-                        getArgumentVal(env, "id"),
-                        getArgument(env, "credentials"),
-                        nhc,
-                        CommonUtils.toBoolean(getArgument(env, "saveCredentials")),
-                        CommonUtils.toBoolean(getArgument(env, "sharedCredentials")),
-                        getArgument(env, "selectedSecretId")
-                    );
+                List<Map<String, Object>> networkCredentials = getArgument(env, "networkCredentials");
+                List<WebNetworkHandlerConfigInput> nhc = null;
+                if (networkCredentials != null) {
+                    nhc = networkCredentials.stream().map(WebNetworkHandlerConfigInput::new).collect(Collectors.toList());
                 }
+                return getService(env).initConnection(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    getArgumentVal(env, "id"),
+                    getArgument(env, "credentials"),
+                    nhc,
+                    CommonUtils.toBoolean(getArgument(env, "saveCredentials")),
+                    CommonUtils.toBoolean(getArgument(env, "sharedCredentials")),
+                    getArgument(env, "selectedSecretId")
+                );
+            }
             )
             .dataFetcher("testConnection", env -> getService(env).testConnection(
-                getWebSession(env), getProjectReference(env), getArgumentVal(env, "config")
+                getWebSession(env),
+                getProjectReference(env),
+                getArgumentVal(env, "config"),
+                getArgument(env, "extensions")
             ))
             .dataFetcher("testNetworkHandler", env -> getService(env).testNetworkHandler(
                 getWebSession(env),
