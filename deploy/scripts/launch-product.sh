@@ -11,9 +11,8 @@ if [ "$(id -u)" -eq 0 ]; then
     TARGET_UID=${TARGET_UID:-$DBEAVER_UID}
     TARGET_GID=${TARGET_GID:-$DBEAVER_GID}
 
-    chown -R $DBEAVER_UID:$DBEAVER_GID $PWD/workspace
-    # Execute run-cloudbeaver-server.sh as the dbeaver user with the JAVA_HOME and PATH environment variables
-    exec su "$TARGET_USER" -c "JAVA_HOME=$JAVA_HOME PATH=$PATH ./run-cloudbeaver-server.sh $*"
+    chown -R "$DBEAVER_UID":"$DBEAVER_GID" "$PWD/workspace"
+    exec su "$TARGET_USER" -s /bin/bash -c 'exec "$JAVA_HOME/bin/java" -cp /opt/cloudbeaver CloudBeaverLauncher "$@"' -- "$@"
 else
-    exec ./run-cloudbeaver-server.sh "$@"
+    exec "$JAVA_HOME/bin/java" -cp /opt/cloudbeaver CloudBeaverLauncher "$@"
 fi
