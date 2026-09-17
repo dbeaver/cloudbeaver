@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -37,17 +37,21 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const observer = useRef<IntersectionObserver | null>(null);
 
-    const setElementRef = useCallback((ref: HTMLDivElement | null) => {
-      if (elementRef.current) {
-        observer.current?.unobserve(elementRef.current);
-      }
+    const setElementRef = useCallback(
+      (ref: HTMLDivElement | null) => {
+        if (elementRef.current) {
+          observer.current?.unobserve(elementRef.current);
+        }
 
-      elementRef.current = ref;
+        elementRef.current = ref;
 
-      if (elementRef.current) {
-        observer.current?.observe(elementRef.current);
-      }
-    }, []);
+        if (elementRef.current) {
+          elementRef.current.dataset['navigationNodeId'] = node.uri;
+          observer.current?.observe(elementRef.current);
+        }
+      },
+      [node.uri],
+    );
     const mergedRef = useMergeRefs(setElementRef, ref);
 
     if (!contextRef.context) {

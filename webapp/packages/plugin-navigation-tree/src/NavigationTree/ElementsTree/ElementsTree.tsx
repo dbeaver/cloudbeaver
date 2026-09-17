@@ -38,6 +38,7 @@ import type { IElementsTreeSettingsProps } from './ElementsTreeTools/NavigationT
 import type { NavTreeControlComponent } from './NavigationNodeComponent.js';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested.js';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement.js';
+import { isLeaf } from './NavigationTreeNode/useNavigationNode.js';
 import type { NavNodeFilterCompareFn } from './NavNodeFilterCompareFn.js';
 import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter.js';
 import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer.js';
@@ -135,7 +136,9 @@ export const ElementsTree = observer(
       onClick,
     });
 
-    const hotkeysRef = useElementsTreeHotkeys(tree, navNodeInfoResource);
+    const hotkeysRef = useElementsTreeHotkeys(tree, navNodeInfoResource, node =>
+      isLeaf(node, navTreeResource.get(node.uri), tree, navNodeInfoResource.isOutdated(node.uri) || navTreeResource.isOutdated(node.uri)),
+    );
     const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef, hotkeysRef);
 
     useImperativeHandle(ref, () => tree, [tree]);
