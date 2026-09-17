@@ -315,6 +315,14 @@ public class ServletAppUtils {
 
     @NotNull
     public static String getOriginFromRequest(@NotNull HttpServletRequest request) {
+        return getOriginFromRequest(request, getServletApplication());
+    }
+
+    @NotNull
+    public static String getOriginFromRequest(
+        @NotNull HttpServletRequest request,
+        @NotNull ServletApplication application
+    ) {
         String origin = request.getHeader(HEADER_ORIGIN);
         if (log.isTraceEnabled()) {
             log.trace("Origin header: " + origin);
@@ -347,8 +355,7 @@ public class ServletAppUtils {
             origin = getRootUrlFromUri(requestUrl) + "/";
         }
         origin = removeSideSlashes(origin);
-        var app = ServletAppUtils.getServletApplication();
-        String rootUri = removeSideSlashes(app.getRootURI());
+        String rootUri = removeSideSlashes(application.getRootURI());
         if (!origin.endsWith(rootUri)) {
             origin = origin + "/" + rootUri + "/";
         }

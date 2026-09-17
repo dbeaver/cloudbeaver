@@ -69,7 +69,7 @@ public class RequestHostFilter implements Filter {
             CBServerConfig serverConfig = application.getServerConfiguration();
             URI originUri;
             try {
-                String origin = ServletAppUtils.getOriginFromRequest(httpRequest);
+                String origin = ServletAppUtils.getOriginFromRequest(httpRequest, application);
                 originUri = URI.create(origin);
             } catch (Exception e) {
                 log.error("Failed to get origin from request", e);
@@ -109,7 +109,7 @@ public class RequestHostFilter implements Filter {
         }
     }
 
-    protected boolean validateSchema(
+    private boolean validateSchema(
         @NotNull CBServerConfig serverConfig,
         @NotNull HttpServletRequest httpRequest,
         @NotNull HttpServletResponse response,
@@ -194,7 +194,7 @@ public class RequestHostFilter implements Filter {
     }
 
     @NotNull
-    protected static URI createHttpRedirectUri(
+    private static URI createHttpRedirectUri(
         @NotNull String scheme,
         @NotNull String authority,
         @NotNull String requestUri,

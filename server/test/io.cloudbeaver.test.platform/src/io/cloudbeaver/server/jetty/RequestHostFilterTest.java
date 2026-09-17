@@ -18,137 +18,107 @@ package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.server.CBApplication;
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
 public class RequestHostFilterTest {
     private CBServerConfig serverConfig;
-    private TestRequestHostFilter filter;
+    private RequestHostFilter filter;
     private HttpServletRequest request;
     private HttpServletResponse response;
+    private FilterChain filterChain;
 
     @BeforeEach
     public void setUp() {
         serverConfig = new CBServerConfig();
         CBApplication<?> application = Mockito.mock(CBApplication.class);
         Mockito.doReturn(serverConfig).when(application).getServerConfiguration();
-        filter = new TestRequestHostFilter(application);
+        Mockito.when(application.getRootURI()).thenReturn("");
+        filter = new RequestHostFilter(application, Set.of(), Set.of());
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
+        filterChain = Mockito.mock(FilterChain.class);
         Mockito.when(request.getRequestURI()).thenReturn("/editor/script%20one");
         Mockito.when(request.getQueryString()).thenReturn("connection=main");
     }
 
     @Test
-    public void redirectsHttpRequestToTrustedHttpsHost() throws IOException {
+    public void redirectsHttpRequestToTrustedHttpsHost() throws Exception {
         serverConfig.setForceHttps(true);
         serverConfig.setSupportedHosts(List.of("cloudbeaver.example:8443"));
 
-        boolean requestAllowed = filter.validateSchemaForTest(
-            serverConfig,
-            request,
-            response,
-            URI.create("http://cloudbeaver.example:8443")
-        );
+        filterRequest("http://cloudbeaver.example:8443");
 
-        Assertions.assertFalse(requestAllowed);
         Mockito.verify(response).sendRedirect(
             "https://cloudbeaver.example:8443/editor/script%20one?connection=main"
         );
+        Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
     }
 
     @Test
-    public void rejectsHttpsRedirectWithoutTrustedHosts() throws IOException {
+    public void rejectsHttpsRedirectWithoutTrustedHosts() throws Exception {
         serverConfig.setForceHttps(true);
 
-        boolean requestAllowed = filter.validateSchemaForTest(
-            serverConfig,
-            request,
-            response,
-            URI.create("http://malicious.example")
-        );
+        filterRequest("http://malicious.example");
 
-        Assertions.assertFalse(requestAllowed);
         Mockito.verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
         Mockito.verify(response, Mockito.never()).sendRedirect(Mockito.anyString());
+        Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
     }
 
     @Test
-    public void rejectsHttpsRedirectToUntrustedHost() throws IOException {
+    public void redirectsUntrustedRequestToTrustedDefaultHost() throws Exception {
         serverConfig.setForceHttps(true);
         serverConfig.setSupportedHosts(List.of("cloudbeaver.example"));
 
-        boolean requestAllowed = filter.validateSchemaForTest(
-            serverConfig,
-            request,
-            response,
-            URI.create("http://malicious.example")
-        );
+        filterRequest("http://malicious.example");
 
-        Assertions.assertFalse(requestAllowed);
-        Mockito.verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
+        Mockito.verify(response).sendRedirect(
+            "https://cloudbeaver.example/editor/script%20one?connection=main"
+        );
+        Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
+    }
+
+    @Test
+    public void rejectsAuthorityInRequestPath() throws Exception {
+        serverConfig.setForceHttps(true);
+        serverConfig.setSupportedHosts(List.of("cloudbeaver.example"));
+        Mockito.when(request.getRequestURI()).thenReturn("//malicious.example");
+
+        filterRequest("http://cloudbeaver.example");
+
+        Mockito.verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
         Mockito.verify(response, Mockito.never()).sendRedirect(Mockito.anyString());
+        Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
     }
 
     @Test
-    public void rejectsAuthorityInRequestPath() {
-        Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> TestRequestHostFilter.createHttpRedirectUriForTest(
-                "https",
-                "cloudbeaver.example",
-                "//malicious.example",
-                null
-            )
-        );
+    public void rejectsUntrustedAuthority() throws Exception {
+        CBServerConfig unsafeServerConfig = Mockito.mock(CBServerConfig.class);
+        Mockito.when(unsafeServerConfig.isForceHttps()).thenReturn(true);
+        Mockito.when(unsafeServerConfig.getSupportedHosts())
+            .thenReturn(List.of("cloudbeaver.example@malicious.example"));
+        CBApplication<?> application = Mockito.mock(CBApplication.class);
+        Mockito.doReturn(unsafeServerConfig).when(application).getServerConfiguration();
+        Mockito.when(application.getRootURI()).thenReturn("");
+        filter = new RequestHostFilter(application, Set.of(), Set.of());
+
+        filterRequest("http://malicious.example");
+
+        Mockito.verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        Mockito.verify(response, Mockito.never()).sendRedirect(Mockito.anyString());
+        Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
     }
 
-    @Test
-    public void rejectsUntrustedAuthority() {
-        Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> TestRequestHostFilter.createHttpRedirectUriForTest(
-                "https",
-                "cloudbeaver.example@malicious.example",
-                "/",
-                null
-            )
-        );
-    }
-
-    private static final class TestRequestHostFilter extends RequestHostFilter {
-        private TestRequestHostFilter(@NotNull CBApplication<?> application) {
-            super(application, Set.of(), Set.of());
-        }
-
-        private boolean validateSchemaForTest(
-            @NotNull CBServerConfig serverConfig,
-            @NotNull HttpServletRequest request,
-            @NotNull HttpServletResponse response,
-            @NotNull URI originUri
-        ) throws IOException {
-            return validateSchema(serverConfig, request, response, originUri);
-        }
-
-        @NotNull
-        private static URI createHttpRedirectUriForTest(
-            @NotNull String scheme,
-            @NotNull String authority,
-            @NotNull String requestUri,
-            @Nullable String query
-        ) {
-            return createHttpRedirectUri(scheme, authority, requestUri, query);
-        }
+    private void filterRequest(String origin) throws Exception {
+        Mockito.when(request.getHeader("Origin")).thenReturn(origin);
+        filter.doFilter(request, response, filterChain);
     }
 }
