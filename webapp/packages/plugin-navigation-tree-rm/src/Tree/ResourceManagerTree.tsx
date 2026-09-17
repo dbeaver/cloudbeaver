@@ -22,6 +22,7 @@ import {
   getNavigationTreeUserSettingsId,
   type IElementsTreeSettings,
   NavigationTreeService,
+  useElementsTreeLimit,
   validateElementsTreeSettings,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
@@ -111,6 +112,8 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     return navTreeService.loadNestedNodes(nodeId, manual);
   }
 
+  const [limit] = useElementsTreeLimit(root);
+
   return (
     <CaptureView view={navTreeService} className={s(styles, { captureView: true })}>
       <ResourceManagerTreeCaptureViewContext resourceTypeId={resourceTypeId} />
@@ -131,6 +134,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
             <div className={s(styles, { message: true })}>{children}</div>
           </div>
         )}
+        limit={limit}
         onOpen={node => navTreeService.navToNode(node.uri, node.parentId)}
       />
     </CaptureView>
