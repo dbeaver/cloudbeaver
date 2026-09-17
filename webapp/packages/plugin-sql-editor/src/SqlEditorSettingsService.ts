@@ -14,11 +14,9 @@ import {
   SettingsTransformationService,
 } from '@cloudbeaver/core-root';
 import {
-  createSettingsAliasResolver,
   createSettingsOverrideResolver,
   ESettingsValueType,
   type ISettingDescription,
-  ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
   SettingsProviderService,
@@ -146,15 +144,6 @@ export class SqlEditorSettingsService {
     private readonly serverConfigResource: ServerConfigResource,
   ) {
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
-    this.settingsResolverService.addResolver(
-      ROOT_SETTINGS_LAYER,
-      /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<SqlEditorSettingsSchema>(this.settingsProviderService.settingsResolver, {
-        'plugin.sql-editor.autoSave': 'core.app.sqlEditor.autoSave',
-        'plugin.sql-editor.maxFileSize': 'core.app.sqlEditor.maxFileSize',
-        'plugin.sql-editor.disabled': 'core.app.sqlEditor.disabled',
-      }),
-    );
     this.settingsResolverService.addResolver(
       HIGHEST_SETTINGS_LAYER,
       createSettingsOverrideResolver<SqlEditorSettingsSchema>(this.settingsProviderService.settingsResolver, {
