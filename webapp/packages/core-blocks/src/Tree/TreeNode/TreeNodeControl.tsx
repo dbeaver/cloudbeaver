@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2026 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useContext } from 'react';
+import React, { forwardRef, useContext, useRef } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
@@ -19,7 +19,6 @@ import type { ITreeNodeState } from './ITreeNodeState.js';
 import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeControl.module.css';
 import { useMergeRefs } from '../../useMergeRefs.js';
-import { useTreeNodeKeyboardActions } from '../useTreeKeyboardActions.js';
 
 const KEY = {
   ENTER: 'Enter',
@@ -40,8 +39,8 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
   ) {
     const styles = useS(style);
     const context = useContext(TreeNodeContext);
-    const keyboardRef = useTreeNodeKeyboardActions();
-    const mergedRef = useMergeRefs(ref, keyboardRef);
+    const innerRef = useRef<HTMLDivElement>(null);
+    const mergedRef = useMergeRefs(innerRef, ref);
 
     if (!context) {
       throw new Error('Context not provided');
@@ -76,11 +75,7 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
     }
 
     async function handleEnter(event: React.KeyboardEvent<HTMLDivElement>) {
-      if (
-        event.defaultPrevented ||
-        event.target !== event.currentTarget ||
-        EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)
-      ) {
+      if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
         return;
       }
 

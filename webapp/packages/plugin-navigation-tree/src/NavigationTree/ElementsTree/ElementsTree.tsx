@@ -19,7 +19,7 @@ import {
   Translate,
   TreeNodeNested,
   TreeNodeNestedMessage,
-  useTreeKeyboardActions,
+  useListKeyboardNavigation,
   useMergeRefs,
   useS,
 } from '@cloudbeaver/core-blocks';
@@ -44,6 +44,7 @@ import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimi
 import { useDropOutside } from './useDropOutside.js';
 import { type IElementsTree, type IElementsTreeOptions, useElementsTree } from './useElementsTree.js';
 import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer.js';
+import { useElementsTreeHotkeys } from './useElementsTreeHotkeys.js';
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   /** Specifies the root path for the tree. ROOT_NODE_PATH will be used if not defined */
@@ -96,8 +97,7 @@ export const ElementsTree = observer(
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
     const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
-    const keyboardRef = useTreeKeyboardActions();
-    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, keyboardRef);
+    const listRef = useListKeyboardNavigation('[data-tree-node-control][tabindex]:not(:disabled)');
 
     const root = folderExplorer.state.folder;
 
@@ -134,6 +134,9 @@ export const ElementsTree = observer(
       onOpen,
       onClick,
     });
+
+    const hotkeysRef = useElementsTreeHotkeys(tree, navNodeInfoResource);
+    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef, hotkeysRef);
 
     useImperativeHandle(ref, () => tree, [tree]);
 
