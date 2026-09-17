@@ -15,6 +15,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,
  io.cloudbeaver.model.config,
  io.cloudbeaver.server,
+ io.cloudbeaver.server.jetty,
  io.cloudbeaver.service,
  io.cloudbeaver.service.core,
  io.cloudbeaver.service.session
