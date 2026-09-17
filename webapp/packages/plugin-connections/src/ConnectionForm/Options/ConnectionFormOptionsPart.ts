@@ -32,7 +32,7 @@ import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { action, computed, makeObservable, observable, reaction, runInAction, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import { getObjectPropertyDefaults } from '@cloudbeaver/core-blocks';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
@@ -355,7 +355,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    if (!this.state.driverId || !this.formState.state.projectId || !this.isChanged) {
+    if (!this.state.driverId || !this.formState.state.projectId) {
       return;
     }
 
@@ -435,41 +435,29 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
   }
 
-  protected override async format(): Promise<void> {
-    runInAction(() => {
-      this.state.name = this.state.name?.trim();
-      this.state.description = this.state.description?.trim();
-      this.state.url = this.state.url?.trim();
-      this.state.host = this.state.host?.trim();
-      this.state.port = this.state.port?.trim();
-      this.state.databaseName = this.state.databaseName?.trim();
-      this.state.serverName = this.state.serverName?.trim();
+  protected override format(): void {
+    this.state.name = this.state.name?.trim();
+    this.state.description = this.state.description?.trim();
+    this.state.url = this.state.url?.trim();
+    this.state.host = this.state.host?.trim();
+    this.state.port = this.state.port?.trim();
+    this.state.databaseName = this.state.databaseName?.trim();
+    this.state.serverName = this.state.serverName?.trim();
 
-      for (const properties of [
-        this.state.credentials,
-        this.state.providerProperties,
-        this.state.mainPropertyValues,
-        this.state.expertSettingsValues,
-      ]) {
-        if (!properties) {
-          continue;
-        }
-        for (const key of Object.keys(properties)) {
-          if (typeof properties[key] === 'string') {
-            properties[key] = properties[key].trim();
-          }
+    for (const properties of [
+      this.state.credentials,
+      this.state.providerProperties,
+      this.state.mainPropertyValues,
+      this.state.expertSettingsValues,
+    ]) {
+      if (!properties) {
+        continue;
+      }
+      for (const key of Object.keys(properties)) {
+        if (typeof properties[key] === 'string') {
+          properties[key] = properties[key].trim();
         }
       }
-    });
-
-    if (this.formState.mode === FormMode.Create && this.state.name && this.formState.state.projectId) {
-      const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
-      runInAction(() => {
-        this.state.name = getUniqueName(
-          this.state.name || '',
-          connections.map(connection => connection.name),
-        );
-      });
     }
   }
 
@@ -556,7 +544,13 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       if (this.formState.mode === 'edit') {
         await this.connectionInfoResource.update(this.connectionKey!, this.state);
       } else {
-        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, this.state);
+        const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
+        const connectionNames = connections.map(connection => connection.name);
+
+        const uniqueName = getUniqueName(this.state.name || '', connectionNames);
+        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, { ...this.state, name: uniqueName });
+
+        this.state.name = uniqueName;
         this.state.connectionId = connection.id;
         this.initialState.connectionId = connection.id;
         this.formState.setMode(FormMode.Edit);

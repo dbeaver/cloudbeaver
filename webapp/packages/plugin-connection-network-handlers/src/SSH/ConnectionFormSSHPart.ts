@@ -5,15 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { FormPart, formSubmitContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { DriverConfigurationType, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
+import { DriverConfigurationType, type NetworkHandlerConfigInput, type NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
 import {
   getNetworkHandlerDefaultProperties,
-  prepareSSHHandlerConfig,
+  getSSHHandlerConfig,
   NetworkHandlerResource,
+  prepareSSHHandlerConfig,
   SSH_DEFAULT_HANDLER_CONFIG,
   SSH_TUNNEL_ID,
   trimSSHConfig,
@@ -41,6 +42,10 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     // probably in the future when we will supposed different network handlers for profiles we
     // may want to move this logic in FormPart level for all readonly parts
     return super.isChanged && !this.isReadOnly;
+  }
+
+  getConfig(): NetworkHandlerConfigInput {
+    return getSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
   }
 
   override isOutdated(): boolean {
@@ -88,10 +93,8 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
     const urlType = this.optionsPart.state.configurationType === DriverConfigurationType.Url;
-    const requiresCredentials = this.state.enabled && !this.state.savePassword;
-    const testCredentials = contexts.getContext(formSubmitContext).type !== 'submit' && requiresCredentials;
 
-    if (urlType || this.isReadOnly || (!this.isChanged && !testCredentials)) {
+    if (urlType) {
       return;
     }
 

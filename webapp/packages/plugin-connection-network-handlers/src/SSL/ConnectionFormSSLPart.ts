@@ -99,8 +99,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    const testCredentials = contexts.getContext(formSubmitContext).type !== 'submit' && this.state.enabled && !this.state.savePassword;
-    if (!this.optionsPart.state.driverId || (!this.isChanged && !testCredentials)) {
+    if (!this.optionsPart.state.driverId) {
       return;
     }
 
