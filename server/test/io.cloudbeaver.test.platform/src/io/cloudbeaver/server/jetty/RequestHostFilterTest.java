@@ -21,6 +21,7 @@ import io.cloudbeaver.server.CBApplication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jkiss.code.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -117,7 +118,7 @@ public class RequestHostFilterTest {
         Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
     }
 
-    private void filterRequest(String origin) throws Exception {
+    private void filterRequest(@NotNull String origin) throws Exception {
         Mockito.when(request.getHeader("Origin")).thenReturn(origin);
         filter.doFilter(request, response, filterChain);
     }
