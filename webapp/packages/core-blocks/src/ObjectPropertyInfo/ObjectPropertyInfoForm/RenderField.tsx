@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import {
@@ -164,19 +163,12 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
   if (controlType === 'selector') {
     if (property.allowCustomValue && state !== undefined) {
-      const customState = state;
-
-      function setCustomValue(value: unknown) {
-        runInAction(() => {
-          customState[property.id!] = value;
-        });
-      }
-
       return (
         <Combobox
           required={required}
           name={property.id!}
-          value={customState[property.id!] ?? defaultValue}
+          state={state}
+          defaultValue={defaultValue}
           items={property.validValues!}
           keySelector={getObjectPropertyOptionValue}
           valueSelector={getObjectPropertyOptionName}
@@ -188,8 +180,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           description={property.hint}
           className={className}
           allowCustomValue
-          onChange={setCustomValue}
-          onSelect={setCustomValue}
         >
           {property.displayName ?? ''}
         </Combobox>

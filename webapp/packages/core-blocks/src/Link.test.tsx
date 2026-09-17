@@ -1,22 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2026 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
 
 import { Link } from './Link.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
-import * as iconOrImage from './IconOrImage.js';
 
-beforeEach(() => {
-  vi.spyOn(iconOrImage, 'IconOrImage').mockImplementation(({ icon }) => <svg data-icon={icon} />);
-});
-
-afterEach(() => vi.restoreAllMocks());
+vi.mock('./IconOrImage', () => ({
+  IconOrImage: (props: any) => <svg {...props}>{props.children}</svg>,
+}));
 
 describe('Link', () => {
   it('should render link and children correctly', async () => {
@@ -38,7 +35,7 @@ describe('Link', () => {
     const link = container.querySelector('a');
     const icon = link?.querySelector('svg');
 
-    expect(icon).toHaveAttribute('data-icon', 'external-link');
+    expect(icon).toHaveAttribute('icon', 'external-link');
   });
 
   it('should apply the className correctly', async () => {

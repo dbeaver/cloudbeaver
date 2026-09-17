@@ -111,7 +111,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
 
   const inputValue: string | null = allowCustomValue ? ((selectedKey ?? null) as string | null) : internalInputValue;
   const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
-  const displayValue = inputValue ?? selectedValue;
+  const displayValue = allowCustomValue && selectedItem !== undefined ? selectedValue : (inputValue ?? selectedValue);
 
   const filteredItems = items
     .map((item, index) => {
@@ -172,6 +172,10 @@ export const Combobox: IComboboxType = observer(function Combobox({
 
   function setInputValue(value: string | null) {
     setInternalInputValue(value);
+    if (allowCustomValue && state && name !== undefined) {
+      state[name] = value;
+      context?.change(value ?? '', name);
+    }
     onChange?.(value);
   }
 
