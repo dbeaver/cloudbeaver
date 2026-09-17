@@ -204,28 +204,46 @@ public class RequestHostFilter implements Filter {
             throw new IllegalArgumentException("Unsupported redirect scheme: " + scheme);
         }
 
+        URI baseUri = validateRedirectAuthority(scheme, authority);
+        validateRedirectPath(requestUri);
+
+        URI redirectUri = URI.create(baseUri + requestUri + (query == null ? "" : "?" + query));
+        validateRedirectUri(scheme, authority, baseUri, redirectUri);
+        return redirectUri;
+    }
+
+    @NotNull
+    private static URI validateRedirectAuthority(@NotNull String scheme, @NotNull String authority) {
         URI baseUri = URI.create(scheme + "://" + authority);
         if (baseUri.getHost() == null ||
             baseUri.getUserInfo() != null ||
             !authority.equals(baseUri.getRawAuthority())) {
             throw new IllegalArgumentException("Invalid redirect authority");
         }
+        return baseUri;
+    }
 
+    private static void validateRedirectPath(@NotNull String requestUri) {
         URI pathUri = URI.create(requestUri);
         if (!requestUri.startsWith("/") || pathUri.isAbsolute() || pathUri.getRawAuthority() != null ||
             pathUri.getRawQuery() != null || pathUri.getRawFragment() != null) {
             throw new IllegalArgumentException("Invalid redirect path");
         }
+    }
 
-        URI redirectUri = URI.create(baseUri + requestUri + (query == null ? "" : "?" + query));
-        if (scheme.equals(redirectUri.getScheme()) &&
-            authority.equals(redirectUri.getRawAuthority()) &&
-            baseUri.getHost().equals(redirectUri.getHost()) &&
-            baseUri.getPort() == redirectUri.getPort() &&
-            redirectUri.getRawFragment() == null) {
-            return redirectUri;
+    private static void validateRedirectUri(
+        @NotNull String scheme,
+        @NotNull String authority,
+        @NotNull URI baseUri,
+        @NotNull URI redirectUri
+    ) {
+        if (!scheme.equals(redirectUri.getScheme()) ||
+            !authority.equals(redirectUri.getRawAuthority()) ||
+            !baseUri.getHost().equals(redirectUri.getHost()) ||
+            baseUri.getPort() != redirectUri.getPort() ||
+            redirectUri.getRawFragment() != null) {
+            throw new IllegalArgumentException("Invalid redirect URI");
         }
-        throw new IllegalArgumentException("Invalid redirect URI");
     }
 
     @Nullable
