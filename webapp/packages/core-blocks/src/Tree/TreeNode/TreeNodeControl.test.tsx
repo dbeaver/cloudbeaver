@@ -10,14 +10,14 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
-import { useListKeyboardNavigation } from '../../useListKeyboardNavigation.js';
+import { useTreeKeyboardActions } from '../useTreeKeyboardActions.js';
 import { TreeNode } from './TreeNode.js';
 import { TreeNodeControl } from './TreeNodeControl.js';
 
 function KeyboardTree({ children }: React.PropsWithChildren) {
-  const listRef = useListKeyboardNavigation('[data-tree-node-control]');
+  const ref = useTreeKeyboardActions();
   return (
-    <div ref={listRef} data-testid="tree" data-tree-keyboard-actions>
+    <div ref={ref} data-testid="tree">
       {children}
     </div>
   );
@@ -164,6 +164,31 @@ describe('Tree keyboard actions', () => {
     fireEvent.keyDown(node, { key: 'Enter', code: 'Enter' });
     expect(select).toHaveBeenCalledOnce();
     expect(open).not.toHaveBeenCalled();
+  });
+
+  it('reattaches hotkeys when the root element is replaced', async () => {
+    const open = vi.fn();
+    function Tree({ rootKey }: { rootKey: string }) {
+      const ref = useTreeKeyboardActions();
+      return (
+        <div key={rootKey} ref={ref}>
+          <TreeNode leaf selected onOpen={open}>
+            <TreeNodeControl data-testid="node">Node</TreeNodeControl>
+          </TreeNode>
+        </div>
+      );
+    }
+
+    const view = renderInApp(<Tree rootKey="first" />);
+    const previousNode = view.getByTestId('node');
+    view.rerender(<Tree rootKey="second" />);
+    const node = view.getByTestId('node');
+    expect(node).not.toBe(previousNode);
+    act(() => node.focus());
+    await act(() => {
+      fireEvent.keyDown(node, { key: 'Enter', code: 'Enter' });
+    });
+    expect(open).toHaveBeenCalledOnce();
   });
 
   it.each([false, true])('composes a custom capture handler (prevented: %s)', prevented => {
