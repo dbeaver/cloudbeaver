@@ -460,6 +460,7 @@ public class ServletAppUtils {
         }
     }
 
+    @NotNull
     public static String getRootUrlFromUri(@NotNull URI uri) {
         var builder = new StringBuilder()
             .append(uri.getScheme())
