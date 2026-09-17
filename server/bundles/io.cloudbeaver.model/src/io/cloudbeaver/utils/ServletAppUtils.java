@@ -323,6 +323,16 @@ public class ServletAppUtils {
         @NotNull HttpServletRequest request,
         @NotNull ServletApplication application
     ) {
+        String origin = getOriginHeader(request);
+        String forwardedScheme = getForwardedScheme(request);
+        String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
+        origin = resolveOrigin(request, origin, forwardedScheme, forwardedHost);
+        origin = appendRootUri(origin, application.getRootURI());
+        return normalizeOrigin(request, origin, forwardedScheme, forwardedHost);
+    }
+
+    @Nullable
+    private static String getOriginHeader(@NotNull HttpServletRequest request) {
         String origin = request.getHeader(HEADER_ORIGIN);
         if (log.isTraceEnabled()) {
             log.trace("Origin header: " + origin);
@@ -337,11 +347,25 @@ public class ServletAppUtils {
                 log.trace("X-Origin header: " + origin);
             }
         }
+        return origin;
+    }
+
+    @Nullable
+    private static String getForwardedScheme(@NotNull HttpServletRequest request) {
         String forwardedScheme = request.getHeader(HEADER_FORWARDED_SCHEME);
         if (CommonUtils.isEmpty(forwardedScheme)) {
             forwardedScheme = request.getHeader(HEADER_FORWARDED_PROTO);
         }
-        String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
+        return forwardedScheme;
+    }
+
+    @NotNull
+    private static String resolveOrigin(
+        @NotNull HttpServletRequest request,
+        @Nullable String origin,
+        @Nullable String forwardedScheme,
+        @Nullable String forwardedHost
+    ) {
         if (CommonUtils.isNotEmpty(forwardedScheme) && CommonUtils.isNotEmpty(forwardedHost)) {
             origin = forwardedScheme + "://" + forwardedHost;
             if (log.isTraceEnabled()) {
@@ -354,23 +378,28 @@ public class ServletAppUtils {
             }
             origin = getRootUrlFromUri(requestUrl) + "/";
         }
+        return origin;
+    }
+
+    @NotNull
+    private static String appendRootUri(@NotNull String origin, @NotNull String applicationRootUri) {
         origin = removeSideSlashes(origin);
-        String rootUri = removeSideSlashes(application.getRootURI());
+        String rootUri = removeSideSlashes(applicationRootUri);
         if (!origin.endsWith(rootUri)) {
             origin = origin + "/" + rootUri + "/";
         }
+        return removeSideSlashes(origin);
+    }
 
-        origin = removeSideSlashes(origin);
+    @NotNull
+    private static String normalizeOrigin(
+        @NotNull HttpServletRequest request,
+        @NotNull String origin,
+        @Nullable String forwardedScheme,
+        @Nullable String forwardedHost
+    ) {
         URI uri = URI.create(origin);
-        int port = uri.getPort();
-        if (CommonUtils.isNotEmpty(request.getHeader(HEADER_FORWARDED_PORT))) {
-            try {
-                port = Integer.parseInt(request.getHeader(HEADER_FORWARDED_PORT));
-            } catch (NumberFormatException e) {
-                log.error("Failed to parse port from header: " + request.getHeader(HEADER_FORWARDED_PORT), e);
-            }
-        }
-
+        int port = getForwardedPort(request, uri.getPort());
         String finalScheme = uri.getScheme();
         String finalHost = uri.getHost();
         int finalPort = port;
@@ -390,24 +419,45 @@ public class ServletAppUtils {
         if (log.isTraceEnabled()) {
             log.trace("Origin URI: " + origin);
         }
-
         if (changed) {
+            return createOriginUri(origin, uri, finalScheme, finalHost, finalPort);
+        }
+        return origin;
+    }
+
+    private static int getForwardedPort(@NotNull HttpServletRequest request, int port) {
+        if (CommonUtils.isNotEmpty(request.getHeader(HEADER_FORWARDED_PORT))) {
             try {
-                origin = new URI(
-                    finalScheme,
-                    uri.getUserInfo(),
-                    finalHost,
-                    finalPort,
-                    uri.getPath(),
-                    uri.getQuery(),
-                    uri.getFragment()
-                ).toString();
-            } catch (URISyntaxException e) {
-                log.error("Failed to create URI without port", e);
+                port = Integer.parseInt(request.getHeader(HEADER_FORWARDED_PORT));
+            } catch (NumberFormatException e) {
+                log.error("Failed to parse port from header: " + request.getHeader(HEADER_FORWARDED_PORT), e);
             }
         }
+        return port;
+    }
 
-        return origin;
+    @NotNull
+    private static String createOriginUri(
+        @NotNull String origin,
+        @NotNull URI uri,
+        @Nullable String scheme,
+        @Nullable String host,
+        int port
+    ) {
+        try {
+            return new URI(
+                scheme,
+                uri.getUserInfo(),
+                host,
+                port,
+                uri.getPath(),
+                uri.getQuery(),
+                uri.getFragment()
+            ).toString();
+        } catch (URISyntaxException e) {
+            log.error("Failed to create URI without port", e);
+            return origin;
+        }
     }
 
     public static String getRootUrlFromUri(@NotNull URI uri) {
