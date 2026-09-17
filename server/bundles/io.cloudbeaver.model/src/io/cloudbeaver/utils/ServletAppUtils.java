@@ -425,15 +425,15 @@ public class ServletAppUtils {
         return origin;
     }
 
-    private static int getForwardedPort(@NotNull HttpServletRequest request, int port) {
+    private static int getForwardedPort(@NotNull HttpServletRequest request, int defaultPort) {
         if (CommonUtils.isNotEmpty(request.getHeader(HEADER_FORWARDED_PORT))) {
             try {
-                port = Integer.parseInt(request.getHeader(HEADER_FORWARDED_PORT));
+                return Integer.parseInt(request.getHeader(HEADER_FORWARDED_PORT));
             } catch (NumberFormatException e) {
                 log.error("Failed to parse port from header: " + request.getHeader(HEADER_FORWARDED_PORT), e);
             }
         }
-        return port;
+        return defaultPort;
     }
 
     @NotNull
