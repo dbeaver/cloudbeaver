@@ -11,23 +11,19 @@ import { describe, expect, it, vi } from 'vitest';
 import { renderInApp } from '@cloudbeaver/tests-runner';
 
 import { useListKeyboardNavigation } from '../../useListKeyboardNavigation.js';
-import { useMergeRefs } from '../../useMergeRefs.js';
-import { useTreeKeyboardActions } from '../useTreeKeyboardActions.js';
 import { TreeNode } from './TreeNode.js';
 import { TreeNodeControl } from './TreeNodeControl.js';
 
 function KeyboardTree({ children }: React.PropsWithChildren) {
   const listRef = useListKeyboardNavigation('[data-tree-node-control]');
-  const keyboardRef = useTreeKeyboardActions();
-  const ref = useMergeRefs(listRef, keyboardRef);
   return (
-    <div ref={ref} data-testid="tree">
+    <div ref={listRef} data-testid="tree" data-tree-keyboard-actions>
       {children}
     </div>
   );
 }
 
-function setup(props: { expanded?: boolean; leaf?: boolean; disabled?: boolean; loading?: boolean } = {}) {
+function setup(props: { expanded?: boolean; externalExpanded?: boolean; leaf?: boolean; disabled?: boolean; loading?: boolean } = {}) {
   const expand = vi.fn();
   const open = vi.fn();
   const select = vi.fn();
@@ -226,6 +222,13 @@ describe('Tree keyboard actions', () => {
     const { node, getByTestId, expand, open } = setup({ expanded: true });
     fireEvent.keyDown(node, { key });
     expect(getByTestId('next')).toHaveFocus();
+    expect(expand).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+  });
+
+  it.each(['Enter', 'ArrowRight'])('does not toggle an externally expanded branch with %s', key => {
+    const { node, expand, open } = setup({ externalExpanded: true });
+    fireEvent.keyDown(node, { key, code: key });
     expect(expand).not.toHaveBeenCalled();
     expect(open).not.toHaveBeenCalled();
   });

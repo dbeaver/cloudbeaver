@@ -20,7 +20,6 @@ import {
   TreeNodeNested,
   TreeNodeNestedMessage,
   useListKeyboardNavigation,
-  useTreeKeyboardActions,
   useMergeRefs,
   useS,
 } from '@cloudbeaver/core-blocks';
@@ -98,8 +97,7 @@ export const ElementsTree = observer(
     const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
     const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
     const listRef = useListKeyboardNavigation('[data-tree-node-control][tabindex]:not(:disabled)');
-    const keyboardRef = useTreeKeyboardActions();
-    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef, keyboardRef);
+    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef);
 
     const root = folderExplorer.state.folder;
 
@@ -177,7 +175,7 @@ export const ElementsTree = observer(
         <ElementsTreeTools tree={tree} settingsElements={settingsElements} />
         <DNDScrollContainer ref={treeMergedRef} className={s(styles, { treeBox: true })} isDragging={!!dndBox.state.context}>
           <ElementsTreeContext.Provider value={context}>
-            <div className={s(styles, { box: true }, className)}>
+            <div className={s(styles, { box: true }, className)} data-tree-keyboard-actions>
               <FolderExplorer state={folderExplorer}>
                 <div ref={dropOutside.mouse.reference} className={s(styles, { tree: true })} onClick={handleClick}>
                   {settings?.showFolderExplorerPath && (

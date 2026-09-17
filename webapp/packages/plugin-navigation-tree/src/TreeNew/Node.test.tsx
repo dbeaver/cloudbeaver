@@ -24,7 +24,7 @@ vi.mock('./useNodeDnD.js', () => ({
 afterEach(cleanup);
 
 describe('TreeNew keyboard actions', () => {
-  it.each(['Enter', 'ArrowRight'])('opens a leaf with %s instead of expanding or selecting it', async key => {
+  it.each(['Enter', 'ArrowRight'])('preserves existing %s behavior without legacy tree actions', async key => {
     const open = vi.fn();
     const data: ITreeData = {
       rootId: 'root',
@@ -64,8 +64,12 @@ describe('TreeNew keyboard actions', () => {
       fireEvent.keyDown(node, { key, code: key });
     });
 
-    expect(open).toHaveBeenCalledExactlyOnceWith('leaf');
-    expect(data.updateState).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+    if (key === 'Enter') {
+      expect(data.updateState).toHaveBeenCalledExactlyOnceWith('leaf', { selected: false });
+    } else {
+      expect(data.updateState).not.toHaveBeenCalled();
+    }
     expect(data.load).not.toHaveBeenCalled();
     expect(document.activeElement).toBe(node);
   });

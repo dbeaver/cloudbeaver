@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext, useEffect, useState, type KeyboardEvent, type RefCallback } from 'react';
+import { useContext, type KeyboardEvent } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
@@ -13,25 +13,7 @@ import { EventKeyboardNavigationFlag } from '../useListKeyboardNavigation.js';
 import { EventTreeNodeExpandFlag } from './TreeNode/EventTreeNodeExpandFlag.js';
 import { TreeNodeContext, type ITreeNodeContext } from './TreeNode/TreeNodeContext.js';
 
-const TREE_KEYBOARD_ACTIONS_ATTRIBUTE = 'data-tree-keyboard-actions';
-const TREE_KEYBOARD_ACTIONS_SELECTOR = `[${TREE_KEYBOARD_ACTIONS_ATTRIBUTE}]`;
-
-export function useTreeKeyboardActions(): RefCallback<HTMLDivElement> {
-  const [root, setRoot] = useState<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!root) {
-      return;
-    }
-
-    root.setAttribute(TREE_KEYBOARD_ACTIONS_ATTRIBUTE, '');
-    return () => {
-      root.removeAttribute(TREE_KEYBOARD_ACTIONS_ATTRIBUTE);
-    };
-  }, [root]);
-
-  return setRoot;
-}
+const TREE_KEYBOARD_ACTIONS_SELECTOR = '[data-tree-keyboard-actions]';
 
 export function useTreeNodeKeyboardActions(): (event: KeyboardEvent<HTMLDivElement>) => Promise<void> {
   const context = useContext(TreeNodeContext);
@@ -59,10 +41,11 @@ export function useTreeNodeKeyboardActions(): (event: KeyboardEvent<HTMLDivEleme
     }
 
     switch (event.key) {
+      case 'Enter':
       case 'ArrowRight':
         if (context.leaf) {
           await handleAction(context, event, context.open);
-        } else if (!context.expanded && !context.externalExpanded) {
+        } else if (!context.externalExpanded && (event.key === 'Enter' || !context.expanded)) {
           await handleAction(context, event, context.expand);
         }
         break;
@@ -86,13 +69,6 @@ export function useTreeNodeKeyboardActions(): (event: KeyboardEvent<HTMLDivEleme
             control.tabIndex = 0;
             control.focus();
           }
-        }
-        break;
-      case 'Enter':
-        if (context.leaf) {
-          await handleAction(context, event, context.open);
-        } else if (!context.externalExpanded) {
-          await handleAction(context, event, context.expand);
         }
         break;
     }

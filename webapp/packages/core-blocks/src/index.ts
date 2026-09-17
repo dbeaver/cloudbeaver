@@ -125,7 +125,6 @@ export * from './Tree/TreeNode/EventTreeNodeSelectFlag.js';
 export * from './Tree/TreeNode/TreeNode.js';
 export * from './Tree/TreeNode/TreeNodeContext.js';
 export * from './Tree/TreeNode/TreeNodeControl.js';
-export { useTreeKeyboardActions } from './Tree/useTreeKeyboardActions.js';
 export * from './Tree/TreeNode/TreeNodeExpand.js';
 export * from './Tree/TreeNode/TreeNodeIcon.js';
 export * from './Tree/TreeNode/TreeNodeName.js';
