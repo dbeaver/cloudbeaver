@@ -155,25 +155,42 @@ describe('Tree keyboard actions', () => {
     expect(first).toHaveFocus();
   });
 
-  it('attaches one action listener to the tree and removes it on unmount', () => {
-    const addListener = vi.spyOn(HTMLElement.prototype, 'addEventListener');
-    const removeListener = vi.spyOn(HTMLElement.prototype, 'removeEventListener');
-    try {
-      const { getByTestId, node, unmount } = setup();
-      const tree = getByTestId('tree');
-      const actionListeners = addListener.mock.calls.filter(
-        ([type, , capture], index) => type === 'keydown' && capture === true && addListener.mock.contexts[index] === tree,
-      );
-      expect(actionListeners).toHaveLength(1);
-      expect(addListener.mock.contexts).not.toContain(node);
-      expect(addListener.mock.contexts).not.toContain(getByTestId('next'));
+  it('preserves Enter selection outside a keyboard-enabled tree', () => {
+    const open = vi.fn();
+    const select = vi.fn();
+    const view = renderInApp(
+      <TreeNode leaf selected onOpen={open} onSelect={select}>
+        <TreeNodeControl data-testid="node">Node</TreeNodeControl>
+      </TreeNode>,
+    );
+    const node = view.getByTestId('node');
+    act(() => node.focus());
+    fireEvent.keyDown(node, { key: 'Enter', code: 'Enter' });
+    expect(select).toHaveBeenCalledOnce();
+    expect(open).not.toHaveBeenCalled();
+  });
 
-      unmount();
-      expect(removeListener).toHaveBeenCalledWith(...actionListeners[0]!);
-    } finally {
-      addListener.mockRestore();
-      removeListener.mockRestore();
-    }
+  it.each([false, true])('composes a custom capture handler (prevented: %s)', prevented => {
+    const open = vi.fn();
+    const capture = vi.fn((event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (prevented) {
+        event.preventDefault();
+      }
+    });
+    const view = renderInApp(
+      <KeyboardTree>
+        <TreeNode leaf selected onOpen={open}>
+          <TreeNodeControl data-testid="node" onKeyDownCapture={capture}>
+            Node
+          </TreeNodeControl>
+        </TreeNode>
+      </KeyboardTree>,
+    );
+    const node = view.getByTestId('node');
+    act(() => node.focus());
+    fireEvent.keyDown(node, { key: 'Enter', code: 'Enter' });
+    expect(capture).toHaveBeenCalledOnce();
+    expect(open).toHaveBeenCalledTimes(prevented ? 0 : 1);
   });
 
   it.each([

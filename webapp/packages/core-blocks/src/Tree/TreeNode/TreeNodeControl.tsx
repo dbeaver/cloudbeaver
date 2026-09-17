@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useCallback, useContext, useRef } from 'react';
+import React, { forwardRef, useContext } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
@@ -18,8 +18,7 @@ import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag.js';
 import type { ITreeNodeState } from './ITreeNodeState.js';
 import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeControl.module.css';
-import { useMergeRefs } from '../../useMergeRefs.js';
-import { registerTreeNode, unregisterTreeNode } from '../useTreeKeyboardActions.js';
+import { useTreeNodeKeyboardActions } from '../useTreeKeyboardActions.js';
 
 const KEY = {
   ENTER: 'Enter',
@@ -35,25 +34,27 @@ interface Props extends ITreeNodeState {
 
 export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>(
   forwardRef(function TreeNodeControl(
-    { title, group, disabled, loading, selected, expanded, externalExpanded, leaf, onClick, onMouseDown, className, children, ...rest },
+    {
+      title,
+      group,
+      disabled,
+      loading,
+      selected,
+      expanded,
+      externalExpanded,
+      leaf,
+      onClick,
+      onMouseDown,
+      onKeyDownCapture,
+      className,
+      children,
+      ...rest
+    },
     ref,
   ) {
     const styles = useS(style);
     const context = useContext(TreeNodeContext);
-    const innerRef = useRef<HTMLDivElement>(null);
-    const nodeRef = useCallback(
-      (element: HTMLDivElement | null) => {
-        if (innerRef.current) {
-          unregisterTreeNode(innerRef.current);
-        }
-        innerRef.current = element;
-        if (element) {
-          registerTreeNode(element, context);
-        }
-      },
-      [context],
-    );
-    const mergedRef = useMergeRefs(nodeRef, ref);
+    const handleKeyboardAction = useTreeNodeKeyboardActions();
 
     if (!context) {
       throw new Error('Context not provided');
@@ -131,7 +132,7 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
 
     return (
       <div
-        ref={mergedRef}
+        ref={ref}
         tabIndex={context.selected ? 0 : -1}
         title={title}
         aria-selected={context.selected}
@@ -140,6 +141,10 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onKeyDown={handleEnter}
+        onKeyDownCapture={event => {
+          onKeyDownCapture?.(event);
+          void handleKeyboardAction(event);
+        }}
         onDoubleClick={handleDbClick}
         {...rest}
       >
