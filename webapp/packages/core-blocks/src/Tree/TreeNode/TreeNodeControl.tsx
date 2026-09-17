@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useContext } from 'react';
+import React, { forwardRef, useContext, useRef } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
@@ -18,6 +18,7 @@ import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag.js';
 import type { ITreeNodeState } from './ITreeNodeState.js';
 import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeControl.module.css';
+import { useMergeRefs } from '../../useMergeRefs.js';
 import { useTreeNodeKeyboardActions } from '../useTreeKeyboardActions.js';
 
 const KEY = {
@@ -54,6 +55,8 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
   ) {
     const styles = useS(style);
     const context = useContext(TreeNodeContext);
+    const innerRef = useRef<HTMLDivElement>(null);
+    const mergedRef = useMergeRefs(innerRef, ref);
     const handleKeyboardAction = useTreeNodeKeyboardActions();
 
     if (!context) {
@@ -132,7 +135,7 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
 
     return (
       <div
-        ref={ref}
+        ref={mergedRef}
         tabIndex={context.selected ? 0 : -1}
         title={title}
         aria-selected={context.selected}
