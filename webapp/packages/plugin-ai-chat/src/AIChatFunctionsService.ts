@@ -25,10 +25,13 @@ const FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA = schema.object({
 
 const FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA = schema.object({
   sqlText: schema.string().optional(),
+  newEditor: schema.boolean().optional(),
 });
 
 const FUNCTION_SCHEMAS = {
+  db_uiOpenDBeaverEntityEditor: FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA,
   db_openTableDataEditor: FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA,
+  db_uiOpenDBeaverSQLEditor: FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA,
   db_openSQLEditor: FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA,
 };
 
@@ -56,7 +59,13 @@ export class AIChatFunctionsService {
   ) {}
 
   getFunction(id: string) {
-    return this.aiFunctionsResource.data.find(func => func.id === id);
+    let functionId = id;
+    if (id === 'db_openTableDataEditor') {
+      functionId = 'db_uiOpenDBeaverEntityEditor';
+    } else if (id === 'db_openSQLEditor') {
+      functionId = 'db_uiOpenDBeaverSQLEditor';
+    }
+    return this.aiFunctionsResource.data.find(func => func.id === functionId);
   }
 
   async executeFunction<T extends AIFunctionName>(functionName: T, params: AIParamsFor<T>): Promise<void> {
@@ -72,16 +81,22 @@ export class AIChatFunctionsService {
   }
 
   private handlers: { [K in AIFunctionName]: (params: AIParamsFor<K>) => void | Promise<void> } = {
+    db_uiOpenDBeaverEntityEditor: params => this.openEntity(params),
     db_openTableDataEditor: params => this.openEntity(params),
+    db_uiOpenDBeaverSQLEditor: params => this.openEditor(params),
     db_openSQLEditor: params => this.openEditor(params),
   };
 
-  private async openEntity(params: AIParamsFor<'db_openTableDataEditor'>) {
+  private async openEntity(params: AIParamsFor<'db_uiOpenDBeaverEntityEditor' | 'db_openTableDataEditor'>) {
     await this.navNodeManagerService.navToNode(params.objectName_nodePath);
   }
 
-  private async openEditor(params: AIParamsFor<'db_openSQLEditor'>) {
+  private async openEditor(params: AIParamsFor<'db_uiOpenDBeaverSQLEditor' | 'db_openSQLEditor'>) {
     const context = this.aiChatContextService.currentContext;
+    if (params.newEditor === false && this.sqlEditorNavigatorService.openRecentEditor(context?.connectionKey || undefined)) {
+      return;
+    }
+
     const conversationId = this.aiChatConversationsService.currentConversationId;
 
     let name = this.localizationService.translate('plugin_ai_chat_editor_name');
@@ -97,7 +112,7 @@ export class AIChatFunctionsService {
     await this.sqlEditorNavigatorService.openNewEditor({
       connectionKey: context?.connectionKey || undefined,
       dataSourceKey: LocalStorageSqlDataSource.key,
-      query: params.sqlText,
+      query: params.newEditor === false ? undefined : params.sqlText,
       name,
     });
   }
