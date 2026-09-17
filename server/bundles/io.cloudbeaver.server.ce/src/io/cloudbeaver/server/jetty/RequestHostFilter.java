@@ -24,6 +24,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
 
@@ -108,31 +109,23 @@ public class RequestHostFilter implements Filter {
         }
     }
 
-    private boolean validateSchema(
+    protected boolean validateSchema(
         @NotNull CBServerConfig serverConfig,
         @NotNull HttpServletRequest httpRequest,
         @NotNull HttpServletResponse response,
         @NotNull URI originUri
-    ) {
+    ) throws IOException {
         boolean httpsExpected = serverConfig.isForceHttps();
-        try {
-            if ("http".equals(originUri.getScheme()) && httpsExpected) {
-                log.warn("Request schema is 'http' but 'forceHttps' is enabled. Redirecting to 'https'.");
-                StringBuilder redirectUrlBuilder = new StringBuilder("https://")
-                    .append(originUri.getHost());
-                if (originUri.getPort() > -1) {
-                    redirectUrlBuilder.append(':').append(originUri.getPort());
-                }
-                redirectUrlBuilder.append(httpRequest.getRequestURI());
-                if (httpRequest.getQueryString() != null) {
-                    redirectUrlBuilder.append("?")
-                        .append(httpRequest.getQueryString());
-                }
-                response.sendRedirect(redirectUrlBuilder.toString());
+        if ("http".equals(originUri.getScheme()) && httpsExpected) {
+            String redirectHost = getAllowedHost(originUri, serverConfig.getSupportedHosts());
+            if (redirectHost == null) {
+                log.warn("Unable to redirect request to HTTPS because its host is not configured in 'supportedHosts'");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }
-        } catch (Exception e) {
-            log.error("Failed to redirect to HTTPS", e);
+            log.warn("Request schema is 'http' but 'forceHttps' is enabled. Redirecting to 'https'.");
+            redirectToHost(response, httpRequest, "https", redirectHost);
+            return false;
         }
         return true;
     }
@@ -148,12 +141,8 @@ public class RequestHostFilter implements Filter {
             return true;
         }
         try {
-            var requestHostBuilder = new StringBuilder(originUri.getHost());
-            if (originUri.getPort() > -1) {
-                requestHostBuilder.append(':').append(originUri.getPort());
-            }
-            String requestHost = requestHostBuilder.toString();
-            if (!availableHosts.contains(requestHost)) {
+            String requestHost = getRequestHost(originUri);
+            if (getAllowedHost(originUri, availableHosts) == null) {
                 for (String errorPath : errorPaths) {
                     if (httpRequest.getServletPath().contains(errorPath)) {
                         log.warn("Request host '" + requestHost + "' is not allowed. Available hosts: " + availableHosts);
@@ -167,9 +156,9 @@ public class RequestHostFilter implements Filter {
                 redirectToDefaultHost(response, httpRequest, availableHosts);
                 return false;
             }
-        } catch (Throwable e) {
+        } catch (RuntimeException e) {
             log.error(e.getMessage(), e);
-            redirectToDefaultHost(response, httpRequest, availableHosts);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return false;
         }
         return true;
@@ -181,11 +170,83 @@ public class RequestHostFilter implements Filter {
         @NotNull List<String> availableHosts
     ) throws IOException {
         boolean https = application.getServerConfiguration().isForceHttps();
-        String redirectUrl = (https ? "https://" : "http://") + getDefaultHost(availableHosts) + httpRequest.getRequestURI();
-        if (httpRequest.getQueryString() != null) {
-            redirectUrl += "?" + httpRequest.getQueryString();
+        redirectToHost(response, httpRequest, https ? "https" : "http", getDefaultHost(availableHosts));
+    }
+
+    private void redirectToHost(
+        @NotNull HttpServletResponse response,
+        @NotNull HttpServletRequest httpRequest,
+        @NotNull String scheme,
+        @NotNull String host
+    ) throws IOException {
+        try {
+            URI redirectUri = createHttpRedirectUri(
+                scheme,
+                host,
+                httpRequest.getRequestURI(),
+                httpRequest.getQueryString()
+            );
+            response.sendRedirect(redirectUri.toString());
+        } catch (IllegalArgumentException e) {
+            log.warn("Unable to construct a safe redirect URI", e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
-        response.sendRedirect(redirectUrl);
+    }
+
+    @NotNull
+    protected static URI createHttpRedirectUri(
+        @NotNull String scheme,
+        @NotNull String authority,
+        @NotNull String requestUri,
+        @Nullable String query
+    ) {
+        if (!"http".equals(scheme) && !"https".equals(scheme)) {
+            throw new IllegalArgumentException("Unsupported redirect scheme: " + scheme);
+        }
+
+        URI baseUri = URI.create(scheme + "://" + authority);
+        if (baseUri.getHost() == null ||
+            baseUri.getUserInfo() != null ||
+            !authority.equals(baseUri.getRawAuthority())) {
+            throw new IllegalArgumentException("Invalid redirect authority");
+        }
+
+        URI pathUri = URI.create(requestUri);
+        if (!requestUri.startsWith("/") || pathUri.isAbsolute() || pathUri.getRawAuthority() != null ||
+            pathUri.getRawQuery() != null || pathUri.getRawFragment() != null) {
+            throw new IllegalArgumentException("Invalid redirect path");
+        }
+
+        URI redirectUri = URI.create(baseUri + requestUri + (query == null ? "" : "?" + query));
+        if (scheme.equals(redirectUri.getScheme()) &&
+            authority.equals(redirectUri.getRawAuthority()) &&
+            baseUri.getHost().equals(redirectUri.getHost()) &&
+            baseUri.getPort() == redirectUri.getPort() &&
+            redirectUri.getRawFragment() == null) {
+            return redirectUri;
+        }
+        throw new IllegalArgumentException("Invalid redirect URI");
+    }
+
+    @Nullable
+    private String getAllowedHost(@NotNull URI originUri, @NotNull List<String> availableHosts) {
+        String requestHost = getRequestHost(originUri);
+        return availableHosts.stream()
+            .filter(host -> host.equals(requestHost))
+            .findFirst()
+            .orElse(null);
+    }
+
+    @Nullable
+    private String getRequestHost(@NotNull URI originUri) {
+        if (originUri.getHost() == null) {
+            return null;
+        }
+        var requestHostBuilder = new StringBuilder(originUri.getHost());
+        if (originUri.getPort() > -1) {
+            requestHostBuilder.append(':').append(originUri.getPort());
+        }
+        return requestHostBuilder.toString();
     }
 
     @NotNull
