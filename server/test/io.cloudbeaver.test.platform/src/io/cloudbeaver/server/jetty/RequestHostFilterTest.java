@@ -20,6 +20,8 @@ import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.server.CBApplication;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -126,24 +128,25 @@ public class RequestHostFilterTest {
     }
 
     private static final class TestRequestHostFilter extends RequestHostFilter {
-        private TestRequestHostFilter(CBApplication<?> application) {
+        private TestRequestHostFilter(@NotNull CBApplication<?> application) {
             super(application, Set.of(), Set.of());
         }
 
         private boolean validateSchemaForTest(
-            CBServerConfig serverConfig,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            URI originUri
+            @NotNull CBServerConfig serverConfig,
+            @NotNull HttpServletRequest request,
+            @NotNull HttpServletResponse response,
+            @NotNull URI originUri
         ) throws IOException {
             return validateSchema(serverConfig, request, response, originUri);
         }
 
+        @NotNull
         private static URI createHttpRedirectUriForTest(
-            String scheme,
-            String authority,
-            String requestUri,
-            String query
+            @NotNull String scheme,
+            @NotNull String authority,
+            @NotNull String requestUri,
+            @Nullable String query
         ) {
             return createHttpRedirectUri(scheme, authority, requestUri, query);
         }
