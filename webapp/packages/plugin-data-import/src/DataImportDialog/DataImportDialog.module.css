@@ -6,7 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tableColumnValue {
-  height: 36px;
-  padding: 0 24px;
+.container .propertiesTable {
+  flex: 1;
+  overflow: hidden;
+  padding: 12px 0;
+}
+
+.tabList {
+  margin: 0 10px;
 }
