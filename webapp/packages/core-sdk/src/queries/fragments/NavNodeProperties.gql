@@ -9,4 +9,5 @@ fragment NavNodeProperties on ObjectPropertyInfo {
   value
   order
   required
+  allowCustomValue
 }
