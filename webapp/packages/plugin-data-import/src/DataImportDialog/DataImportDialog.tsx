@@ -22,7 +22,7 @@ import {
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { DataTransferImportSettings } from '@cloudbeaver/core-sdk';
-import { Tab, TabList, TabPanel, TabsState, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabList, TabsState, TabTitle } from '@cloudbeaver/core-ui';
 
 import { DataImportDriverConfigurationResource } from '../DataImportDriverConfigurationResource.js';
 import classes from './DataImportDialog.module.css';
@@ -91,30 +91,31 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   return (
     <CommonDialogWrapper className={s(styles, { container: true })} size="large" fixedSize>
       <CommonDialogHeader title={title} subTitle={payload.tableName} icon={icon} onReject={rejectDialog} />
-      <CommonDialogBody noBodyPadding>
+      <CommonDialogBody noOverflow={dialog.state.step === EDataImportDialogStep.File} noBodyPadding>
         {dialog.state.step === EDataImportDialogStep.Processor && <ImportProcessorList onSelect={dialog.selectProcessor} />}
         {dialog.state.step === EDataImportDialogStep.File &&
           (hasFormatSettings ? (
-            <TabsState currentTabId={dialog.currentTabId} onChange={tab => dialog.selectTab(tab.tabId as EDataImportDialogTab)}>
-              <TabList className={s(styles, { tabList: true })} aria-label={translate('plugin_data_import_title')} underline>
-                <Tab tabId={EDataImportDialogTab.File}>
-                  <TabTitle>{translate('plugin_data_import_file')}</TabTitle>
-                </Tab>
-                <Tab tabId={EDataImportDialogTab.Format}>
-                  <TabTitle>{translate('plugin_data_import_format_settings')}</TabTitle>
-                </Tab>
-              </TabList>
-              <TabPanel tabId={EDataImportDialogTab.File}>
+            <>
+              <TabsState currentTabId={dialog.currentTabId} onChange={tab => dialog.selectTab(tab.tabId as EDataImportDialogTab)}>
+                <TabList className={s(styles, { tabList: true })} aria-label={translate('plugin_data_import_title')} underline>
+                  <Tab tabId={EDataImportDialogTab.File}>
+                    <TabTitle>{translate('plugin_data_import_file')}</TabTitle>
+                  </Tab>
+                  <Tab tabId={EDataImportDialogTab.Format}>
+                    <TabTitle>{translate('plugin_data_import_format_settings')}</TabTitle>
+                  </Tab>
+                </TabList>
+              </TabsState>
+              {dialog.currentTabId === EDataImportDialogTab.File ? (
                 <DataImportFileSelector state={dialog.state} onDelete={dialog.deleteFile} />
-              </TabPanel>
-              <TabPanel tabId={EDataImportDialogTab.Format}>
+              ) : (
                 <PropertiesTable
                   className={s(styles, { propertiesTable: true })}
                   properties={dialog.properties}
                   propertiesState={dialog.state.processorProperties}
                 />
-              </TabPanel>
-            </TabsState>
+              )}
+            </>
           ) : (
             <DataImportFileSelector state={dialog.state} onDelete={dialog.deleteFile} />
           ))}
