@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -446,6 +446,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       this.loadingMessage = 'plugin_sql_editor_navigation_tab_script_state_reading';
       const script = await this.actions.read(this, this.resourceKey);
       const executionContext = await this.actions.getProperties(this, this.resourceKey);
+      if (executionContext) {
+        await this.connectionInfoResource.load(createConnectionParam(executionContext.projectId, executionContext.connectionId));
+      }
 
       runInAction(() => {
         if (!this.loaded) {
