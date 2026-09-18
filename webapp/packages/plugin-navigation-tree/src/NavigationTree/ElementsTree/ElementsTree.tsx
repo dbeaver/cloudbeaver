@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,14 @@ import type { IElementsTreeSettingsProps } from './ElementsTreeTools/NavigationT
 import type { NavTreeControlComponent } from './NavigationNodeComponent.js';
 import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested.js';
 import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement.js';
+import { isLeaf } from './NavigationTreeNode/useNavigationNode.js';
 import type { NavNodeFilterCompareFn } from './NavNodeFilterCompareFn.js';
 import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter.js';
 import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer.js';
 import { useDropOutside } from './useDropOutside.js';
 import { type IElementsTree, type IElementsTreeOptions, useElementsTree } from './useElementsTree.js';
 import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer.js';
+import { useElementsTreeHotkeys } from './useElementsTreeHotkeys.js';
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   /** Specifies the root path for the tree. ROOT_NODE_PATH will be used if not defined */
@@ -97,7 +99,6 @@ export const ElementsTree = observer(
     const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
     const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
     const listRef = useListKeyboardNavigation('[data-tree-node-control][tabindex]:not(:disabled)');
-    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef);
 
     const root = folderExplorer.state.folder;
 
@@ -134,6 +135,11 @@ export const ElementsTree = observer(
       onOpen,
       onClick,
     });
+
+    const hotkeysRef = useElementsTreeHotkeys(tree, navNodeInfoResource, node =>
+      isLeaf(node, navTreeResource.get(node.uri), tree, navNodeInfoResource.isOutdated(node.uri) || navTreeResource.isOutdated(node.uri)),
+    );
+    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef, hotkeysRef);
 
     useImperativeHandle(ref, () => tree, [tree]);
 
