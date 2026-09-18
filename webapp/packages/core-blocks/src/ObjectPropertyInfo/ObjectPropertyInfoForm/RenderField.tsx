@@ -167,7 +167,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         <Combobox
           required={required}
           name={property.id!}
-          state={state}
+          value={state[property.id!]}
           defaultValue={defaultValue}
           items={property.validValues!}
           keySelector={getObjectPropertyOptionValue}
@@ -180,6 +180,9 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           description={property.hint}
           className={className}
           allowCustomValue
+          onChange={value => {
+            state[property.id!] = value ?? '';
+          }}
         >
           {property.displayName ?? ''}
         </Combobox>
