@@ -91,6 +91,7 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
               dataType
               defaultValue
               validValues
+              allowCustomValue
               length
               features
               order
@@ -247,6 +248,7 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
         Map<String, Object> header = findProperty(properties, "header");
         Assertions.assertEquals("top", header.get("defaultValue"));
         Assertions.assertTrue(((List<?>) header.get("validValues")).containsAll(List.of("none", "top")));
+        Assertions.assertEquals(true, header.get("allowCustomValue"));
 
         Map<String, Object> strictQuotes = findProperty(properties, "strictQuotes");
         Assertions.assertEquals("Boolean", strictQuotes.get("dataType"));
@@ -263,7 +265,7 @@ public class DataTransferImportTest extends CloudbeaverMockTest {
         for (Map<String, Object> property : properties) {
             for (String field : List.of(
                 "required", "id", "displayName", "description", "category", "dataType", "defaultValue",
-                "validValues", "length", "features", "order"
+                "validValues", "allowCustomValue", "length", "features", "order"
             )) {
                 Assertions.assertTrue(
                     property.containsKey(field),
