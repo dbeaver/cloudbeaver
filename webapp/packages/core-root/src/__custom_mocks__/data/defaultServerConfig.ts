@@ -18,7 +18,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     workspaceId: 'D14DGNGYNPI71M',
     rootURI: '/',
     containerId: '931cdabfc0b3',
-    defaultAuthRole: null,
+    defaultAuthRole: '',
     defaultUserTeam: 'user',
     productConfiguration: productConfiguration,
     supportsCustomConnections: true,
