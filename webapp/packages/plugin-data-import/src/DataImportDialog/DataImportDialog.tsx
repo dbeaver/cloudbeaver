@@ -13,16 +13,22 @@ import {
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
+  PropertiesTable,
+  s,
   useResource,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { DataTransferImportSettings } from '@cloudbeaver/core-sdk';
+import { Tab, TabList, TabPanel, TabsState, TabTitle } from '@cloudbeaver/core-ui';
 
 import { DataImportDriverConfigurationResource } from '../DataImportDriverConfigurationResource.js';
+import classes from './DataImportDialog.module.css';
 import { DataImportFileSelector } from './DataImportFileSelector.js';
 import { EDataImportDialogStep } from './EDataImportDialogStep.js';
+import { EDataImportDialogTab } from './EDataImportDialogTab.js';
 import type { IDataImportDialogState } from './IDataImportDialogState.js';
 import { ImportProcessorList } from './ImportProcessorList.js';
 import { ImportSettingsForm } from './ImportSettingsForm.js';
@@ -32,6 +38,7 @@ export interface IDataImportDialogResult {
   file: File;
   processorId: string;
   settings: DataTransferImportSettings;
+  processorProperties?: Record<string, string | null>;
 }
 
 export interface IDataImportDialogPayload {
@@ -46,11 +53,13 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   rejectDialog,
 }) {
   const translate = useTranslate();
+  const styles = useS(classes);
   const dialog = useDataImportDialog(payload.initialState);
   const driverConfigurationResource = useResource(DataImportDialog, DataImportDriverConfigurationResource, payload.connectionKey, { silent: true });
 
   const driverConfiguration = driverConfigurationResource.tryGetData ?? null;
   const isSettingsStep = dialog.state.step === EDataImportDialogStep.Settings;
+  const hasFormatSettings = dialog.properties.length > 0;
 
   let title = translate('plugin_data_import_title');
   let icon = '/icons/data-import.svg';
@@ -62,16 +71,53 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
 
   function importData() {
     if (dialog.state.file && dialog.state.selectedProcessor) {
-      resolveDialog({ file: dialog.state.file, processorId: dialog.state.selectedProcessor.id, settings: dialog.state.settings });
+      resolveDialog({
+        file: dialog.state.file,
+        processorId: dialog.state.selectedProcessor.id,
+        settings: dialog.state.settings,
+        processorProperties: dialog.state.processorProperties,
+      });
+    }
+  }
+
+  function handleNext() {
+    if (isSettingsStep) {
+      importData();
+    } else {
+      dialog.stepForward(driverConfiguration);
     }
   }
 
   return (
-    <CommonDialogWrapper size="large" fixedSize>
+    <CommonDialogWrapper className={s(styles, { container: true })} size="large" fixedSize>
       <CommonDialogHeader title={title} subTitle={payload.tableName} icon={icon} onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding>
         {dialog.state.step === EDataImportDialogStep.Processor && <ImportProcessorList onSelect={dialog.selectProcessor} />}
-        {dialog.state.step === EDataImportDialogStep.File && <DataImportFileSelector state={dialog.state} onDelete={dialog.deleteFile} />}
+        {dialog.state.step === EDataImportDialogStep.File &&
+          (hasFormatSettings ? (
+            <TabsState currentTabId={dialog.currentTabId} onChange={tab => dialog.selectTab(tab.tabId as EDataImportDialogTab)}>
+              <TabList className={s(styles, { tabList: true })} aria-label={translate('plugin_data_import_title')} underline>
+                <Tab tabId={EDataImportDialogTab.File}>
+                  <TabTitle>{translate('plugin_data_import_file')}</TabTitle>
+                </Tab>
+                <Tab tabId={EDataImportDialogTab.Format}>
+                  <TabTitle>{translate('plugin_data_import_format_settings')}</TabTitle>
+                </Tab>
+              </TabList>
+              <TabPanel tabId={EDataImportDialogTab.File}>
+                <DataImportFileSelector state={dialog.state} onDelete={dialog.deleteFile} />
+              </TabPanel>
+              <TabPanel tabId={EDataImportDialogTab.Format}>
+                <PropertiesTable
+                  className={s(styles, { propertiesTable: true })}
+                  properties={dialog.properties}
+                  propertiesState={dialog.state.processorProperties}
+                />
+              </TabPanel>
+            </TabsState>
+          ) : (
+            <DataImportFileSelector state={dialog.state} onDelete={dialog.deleteFile} />
+          ))}
         {dialog.state.step === EDataImportDialogStep.Settings && driverConfiguration && (
           <ImportSettingsForm settings={dialog.state.settings} driverConfiguration={driverConfiguration} />
         )}
@@ -90,7 +136,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
               type="button"
               loading={driverConfigurationResource.isLoading()}
               disabled={!dialog.state.file || !dialog.state.selectedProcessor}
-              onClick={isSettingsStep ? importData : () => dialog.goToSettings(driverConfiguration)}
+              onClick={handleNext}
             >
               {translate(isSettingsStep ? 'ui_import' : 'ui_stepper_next')}
             </Button>
