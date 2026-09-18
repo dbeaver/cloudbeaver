@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, s, useResource, useS } from '@cloudbeaver/core-blocks';
+import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
@@ -17,27 +17,32 @@ import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList.j
 import style from './ProcessorSelectDialog.module.css';
 
 interface Props {
-  context: IExportContext;
+  contexts: IExportContext[];
   onSelect: (processorId: string) => void;
   onClose: () => void;
 }
 
-export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({ context, onSelect, onClose }) {
+export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({ contexts, onSelect, onClose }) {
   const styles = useS(style);
+  const translate = useTranslate();
   const dataTransferProcessorsResource = useResource(ProcessorSelectDialog, DataTransferProcessorsResource, CachedMapAllKey, {
     forceSuspense: true,
   });
 
   const processors = dataTransferProcessorsResource.resource.values.slice().sort(sortProcessors);
+  const singleContext = contexts.length === 1 ? contexts[0] : undefined;
+  const subTitle = singleContext
+    ? singleContext.name
+    : translate('plugin_data_export_dialog_subtitle_objects', undefined, { count: contexts.length });
 
   return (
     <CommonDialogWrapper size="large" fixedSize>
-      <CommonDialogHeader title="data_transfer_dialog_title" subTitle={context.name} onReject={onClose} />
+      <CommonDialogHeader title="data_transfer_dialog_title" subTitle={subTitle} onReject={onClose} />
       <CommonDialogBody noBodyPadding noOverflow>
-        {context.query && (
+        {singleContext?.query && (
           <div className={s(styles, { exportObject: true })}>
-            <pre className={s(styles, { pre: true })} title={context.query}>
-              {context.query}
+            <pre className={s(styles, { pre: true })} title={singleContext.query}>
+              {singleContext.query}
             </pre>
           </div>
         )}

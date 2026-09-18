@@ -19,4 +19,6 @@ export default [
   ['data_transfer_output_settings', 'Output'],
   ['data_transfer_output_settings_compress', 'Compression'],
   ['plugin_data_export_download_process_info', 'The download process may take some time to start'],
+  ['plugin_data_export_export_selected_objects_tooltip', 'Export selected objects'],
+  ['plugin_data_export_dialog_subtitle_objects', '{arg:count} objects'],
 ];
