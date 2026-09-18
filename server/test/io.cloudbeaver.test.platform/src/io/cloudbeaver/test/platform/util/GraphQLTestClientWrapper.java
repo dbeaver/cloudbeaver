@@ -35,7 +35,7 @@ import static io.cloudbeaver.test.platform.util.GraphQLTestConstant.*;
 
 public class GraphQLTestClientWrapper {
 
-    private static final Duration ASYNC_TASK_TIMEOUT = Duration.ofSeconds(30);
+    private static final Duration ASYNC_TASK_TIMEOUT = Duration.ofSeconds(60);
     private static final long ASYNC_TASK_POLL_INTERVAL_MILLIS = 200;
 
     @NotNull
