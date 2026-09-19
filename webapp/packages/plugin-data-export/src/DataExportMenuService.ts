@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, getNodesFromContext, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { withTimestamp } from '@dbeaver/js-helpers';
 import { ACTION_EXPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
@@ -23,7 +23,11 @@ import {
   type IDataContainerOptions,
   isResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
+import { MENU_OBJECT_VIEWER_FOOTER } from '@cloudbeaver/plugin-object-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
+
+import { getNodeExportContexts, type INodeExportConnection, isExportableNode } from './getNodeExportContexts.js';
+import type { IExportContext } from './IExportContext.js';
 
 const DataExportDialog = importLazyComponent(() => import('./Dialog/DataExportDialog.js').then(module => module.DataExportDialog));
 
@@ -93,20 +97,22 @@ export class DataExportMenuService {
             throw new Error('Source options must be provided');
           }
 
-          this.commonDialogService.open(DataExportDialog, {
-            connectionKey: source.options.connectionKey,
-            contextId: source.executionContext?.context?.id,
-            containerNodePath: source.options.containerNodePath,
-            resultId: result.id,
-            name: model.name ?? undefined,
-            fileName: withTimestamp(model.name ?? this.localizationService.translate('data_transfer_dialog_title')),
-            query: source.options.query,
-            filter: {
-              constraints: source.options.constraints,
-              where: source.options.whereFilter,
-              anyConstraint: source.options.anyConstraint,
+          this.commonDialogService.open(DataExportDialog, [
+            {
+              connectionKey: source.options.connectionKey,
+              contextId: source.executionContext?.context?.id,
+              containerNodePath: source.options.containerNodePath,
+              resultId: result.id,
+              name: model.name ?? undefined,
+              fileName: withTimestamp(model.name ?? this.localizationService.translate('data_transfer_dialog_title')),
+              query: source.options.query,
+              filter: {
+                constraints: source.options.constraints,
+                where: source.options.whereFilter,
+                anyConstraint: source.options.anyConstraint,
+              },
             },
-          });
+          ]);
         }
       },
     });
@@ -117,7 +123,7 @@ export class DataExportMenuService {
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (!node.objectFeatures.includes(EObjectFeature.dataContainer)) {
+        if (!isExportableNode(node)) {
           return false;
         }
 
@@ -131,18 +137,77 @@ export class DataExportMenuService {
       actions: [ACTION_EXPORT],
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       handler: async context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        const connection = await this.connectionInfoResource.load(connectionKey);
-        const fileName = withTimestamp(`${connection.name}${node.name ? ` - ${node.name}` : ''}`);
-
-        this.commonDialogService.open(DataExportDialog, {
-          connectionKey,
-          name: node.name,
-          fileName,
-          containerNodePath: node.uri,
-        });
+        // exports every selected node when the tree has a multi-selection, the clicked node otherwise
+        await this.openExportDialog(getNodesFromContext(context));
       },
     });
+
+    this.menuService.addCreator({
+      menus: [MENU_OBJECT_VIEWER_FOOTER],
+      contexts: [DATA_CONTEXT_NAV_NODES],
+      isApplicable: () => this.dataViewerService.canExportData,
+      getItems: (context, items) => [...items, ACTION_EXPORT],
+      orderItems(context, items) {
+        // keep the destructive actions of this footer last
+        const extracted = menuExtractItems(items, [ACTION_EXPORT]);
+        return [...extracted, ...items];
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'data-export-object-viewer-footer',
+      menus: [MENU_OBJECT_VIEWER_FOOTER],
+      contexts: [DATA_CONTEXT_NAV_NODES],
+      actions: [ACTION_EXPORT],
+      isHidden: () => !this.dataViewerService.canExportData,
+      isDisabled: context => {
+        const selected = context.get(DATA_CONTEXT_NAV_NODES)!();
+
+        return !selected.some(isExportableNode);
+      },
+      getActionInfo: (context, action) => {
+        if (action === ACTION_EXPORT) {
+          return { ...action.info, tooltip: 'plugin_data_export_export_selected_objects_tooltip', icon: 'table-export' };
+        }
+
+        return action.info;
+      },
+      handler: async context => {
+        await this.openExportDialog(context.get(DATA_CONTEXT_NAV_NODES)!());
+      },
+    });
+  }
+
+  private async openExportDialog(nodes: NavNode[]): Promise<void> {
+    const contexts = await this.getExportContexts(nodes);
+
+    if (contexts.length === 0) {
+      return;
+    }
+
+    this.commonDialogService.open(DataExportDialog, contexts);
+  }
+
+  private async getExportContexts(nodes: NavNode[]): Promise<IExportContext[]> {
+    const connections = new Map<string, INodeExportConnection>();
+
+    for (const node of nodes) {
+      if (!isExportableNode(node) || connections.has(node.uri)) {
+        continue;
+      }
+
+      const nodeConnection = this.connectionInfoResource.getConnectionForNode(node.uri);
+
+      if (!nodeConnection) {
+        continue;
+      }
+
+      const key = createConnectionParam(nodeConnection);
+      const connection = await this.connectionInfoResource.load(key);
+
+      connections.set(node.uri, { key, name: connection.name });
+    }
+
+    return getNodeExportContexts(nodes, nodeId => connections.get(nodeId));
   }
 }

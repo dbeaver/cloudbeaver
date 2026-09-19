@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ interface State {
   export(): Promise<void>;
 }
 
-export function useDataExportDialog(context: IExportContext, onExport?: () => void) {
+export function useDataExportDialog(contexts: IExportContext[], onExport?: () => void): State {
   const notificationService = useService(NotificationService);
   const localizationService = useService(LocalizationService);
   const dataExportService = useService(DataExportService);
@@ -86,27 +86,47 @@ export function useDataExportDialog(context: IExportContext, onExport?: () => vo
         }
       },
       async export() {
-        if (!this.processor || this.processing) {
+        const processor = this.processor;
+
+        if (!processor || this.processing) {
           return;
         }
 
         this.processing = true;
         this.exception = null;
 
-        try {
-          await this.dataExportService.exportData(this.context, {
-            processorId: this.processor.id,
-            processorProperties: this.processorProperties,
-            filter: this.context.filter,
-            outputSettings: {
-              ...this.outputSettings,
-              fileName: this.context.fileName,
-            },
-          });
+        let started = 0;
+        let lastException: any = null;
 
-          this.onExport?.();
-        } catch (exception: any) {
-          this.exception = exception;
+        try {
+          // the server exports one container per task, so every selected object gets its own task and notification
+          for (const context of this.contexts) {
+            try {
+              await this.dataExportService.exportData(context, {
+                processorId: processor.id,
+                processorProperties: this.processorProperties,
+                filter: context.filter,
+                outputSettings: {
+                  ...this.outputSettings,
+                  fileName: context.fileName,
+                },
+              });
+
+              started++;
+            } catch (exception: any) {
+              lastException = exception;
+
+              if (this.contexts.length > 1) {
+                this.notificationService.logException(exception, 'data_transfer_notification_error');
+              }
+            }
+          }
+
+          if (started > 0) {
+            this.onExport?.();
+          } else {
+            this.exception = lastException;
+          }
         } finally {
           this.processing = false;
         }
@@ -125,7 +145,7 @@ export function useDataExportDialog(context: IExportContext, onExport?: () => vo
       selectProcessor: action.bound,
     },
     {
-      context,
+      contexts,
       onExport,
       notificationService,
       dataExportService,
