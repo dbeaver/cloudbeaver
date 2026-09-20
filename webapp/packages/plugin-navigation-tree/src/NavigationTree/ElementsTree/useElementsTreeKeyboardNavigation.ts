@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { useRef } from 'react';
+
 import { EventKeyboardNavigationFlag, useHotkeys } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
@@ -14,10 +16,40 @@ import type { IElementsTree } from './useElementsTree.js';
 
 export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.RefObject<HTMLDivElement | null> {
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const expandingNodes = useRef(new Set<string>()).current;
+
+  async function expandNode(nodeId: string, state: boolean): Promise<void> {
+    // Prevent multiple simultaneous expansions of the same node
+    if (expandingNodes.has(nodeId)) {
+      return;
+    }
+
+    const node = navNodeInfoResource.get(nodeId);
+
+    if (node) {
+      expandingNodes.add(nodeId);
+      try {
+        await tree.expand(node, state);
+      } finally {
+        expandingNodes.delete(nodeId);
+      }
+    }
+  }
+
+  async function selectAndFocus(nodeId: string): Promise<void> {
+    const node = navNodeInfoResource.get(nodeId);
+
+    if (node) {
+      await tree.select(node, false, false);
+      tree.focus(nodeId);
+    }
+  }
 
   return useHotkeys<HTMLDivElement>(
     ['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'enter'],
     async event => {
+      const target = event.target instanceof HTMLElement ? event.target : null;
+      const control = target?.closest<HTMLElement>('[data-tree-node-control]');
       const nodeId = tree.getSelected()[0];
       const node = nodeId ? navNodeInfoResource.get(nodeId) : undefined;
 
@@ -25,11 +57,22 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
         return;
       }
 
+      // Ignore enter if focused context menu or other control
+      if (event.key === 'Enter' && target !== control) {
+        return;
+      }
+
       EventContext.set(event, EventKeyboardNavigationFlag);
       EventContext.set(event, EventStopPropagationFlag);
       event.preventDefault();
+      event.stopPropagation();
 
-      const { expanded } = tree.getNodeState(nodeId);
+      // holding right arrow won't trigger multiple expansions
+      if (event.key === 'ArrowRight' && event.repeat) {
+        return;
+      }
+
+      const expanded = tree.isNodeExpanded(nodeId);
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || (event.key === 'ArrowRight' && expanded)) {
         const visibleNodes = getVisibleNodes(tree);
@@ -41,11 +84,9 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
 
         const offset = event.key === 'ArrowUp' ? -1 : 1;
         const nextNodeId = visibleNodes[(currentIndex + offset + visibleNodes.length) % visibleNodes.length];
-        const nextNode = nextNodeId ? navNodeInfoResource.get(nextNodeId) : undefined;
 
-        if (nextNode) {
-          await tree.select(nextNode, false, false);
-          tree.focus(nextNode.uri);
+        if (nextNodeId) {
+          await selectAndFocus(nextNodeId);
         }
         return;
       }
@@ -53,19 +94,20 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
       switch (event.key) {
         case 'ArrowLeft':
           if (expanded) {
-            await tree.expand(node, false);
+            await expandNode(nodeId, false);
           } else {
             const parentId = navNodeInfoResource.getParent(nodeId);
             const parent = parentId ? navNodeInfoResource.get(parentId) : undefined;
 
             if (parentId && parent && getVisibleNodes(tree).includes(parentId)) {
-              await tree.select(parent, false, false);
-              tree.focus(parentId);
+              await selectAndFocus(parentId);
             }
           }
           break;
         case 'ArrowRight':
-          await tree.expand(node, true);
+          if (node.hasChildren) {
+            await expandNode(nodeId, true);
+          }
           break;
         case 'Enter':
           await tree.open(node, navNodeInfoResource.getParents(nodeId), !node.hasChildren);
