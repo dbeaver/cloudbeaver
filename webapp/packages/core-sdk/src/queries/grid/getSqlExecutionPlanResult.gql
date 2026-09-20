@@ -24,6 +24,7 @@ mutation getSqlExecutionPlanResult($taskId: ID!) {
         features
         value
         order
+        allowCustomValue
       }
     }
     hasCost
