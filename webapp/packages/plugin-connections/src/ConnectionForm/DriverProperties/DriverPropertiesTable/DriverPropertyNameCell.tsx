@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useLayoutEffect, useRef } from 'react';
+import type { Ref } from 'react';
 
 import { clsx, Input } from '@dbeaver/ui-kit';
 
@@ -16,30 +16,19 @@ interface Props {
   property: IDriverProperty;
   error: boolean;
   readOnly?: boolean;
-  autoFocus?: boolean;
+  inputRef?: Ref<HTMLInputElement>;
   tabIndex: number;
   onChange: (id: string, key: string) => void;
-  onFocusHandled: () => void;
 }
 
 export const DriverPropertyNameCell = observer<Props>(function DriverPropertyNameCell({
   property,
   error,
   readOnly,
-  autoFocus,
+  inputRef,
   tabIndex,
   onChange,
-  onFocusHandled,
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useLayoutEffect(() => {
-    if (inputRef.current && autoFocus) {
-      inputRef.current.focus();
-      onFocusHandled();
-    }
-  }, [autoFocus, onFocusHandled]);
-
   if (!property.custom || readOnly) {
     const name = property.displayName ?? property.key;
     return (

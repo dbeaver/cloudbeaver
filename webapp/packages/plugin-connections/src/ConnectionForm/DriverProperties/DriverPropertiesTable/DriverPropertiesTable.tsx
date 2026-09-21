@@ -7,7 +7,7 @@
  */
 import { computed, reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useDeferredValue, useMemo, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useMemo, useRef, useState } from 'react';
 
 import { Button, Filter, s, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
@@ -44,6 +44,13 @@ export const DriverPropertiesTable = observer<Props>(function DriverPropertiesTa
   const [filterValue, setFilterValue] = useState('');
   const [propertyIdToFocus, setPropertyIdToFocus] = useState<string | null>(null);
   const deferredFilterValue = useDeferredValue(filterValue);
+
+  const focusPropertyInput = useCallback((input: HTMLInputElement | null) => {
+    if (input) {
+      input.focus();
+      setPropertyIdToFocus(null);
+    }
+  }, []);
 
   const visibleProperties = useMemo(
     () =>
@@ -161,10 +168,9 @@ export const DriverPropertiesTable = observer<Props>(function DriverPropertiesTa
           property={property}
           error={!isKeyUnique(property.key)}
           readOnly={readOnly}
-          autoFocus={property.id === propertyIdToFocus}
+          inputRef={property.id === propertyIdToFocus ? focusPropertyInput : undefined}
           tabIndex={tabIndex}
           onChange={changeName}
-          onFocusHandled={() => setPropertyIdToFocus(null)}
         />
       );
     }
