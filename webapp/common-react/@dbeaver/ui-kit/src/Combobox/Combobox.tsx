@@ -11,6 +11,7 @@ import {
   Combobox,
   ComboboxPopover as AriaComboboxPopover,
   ComboboxItem as AriaComboboxItem,
+  ComboboxGroup as AriaComboboxGroup,
   ComboboxDisclosure,
   ComboboxCancel,
   ComboboxValue,
@@ -19,6 +20,7 @@ import {
   type ComboboxProps as AriaComboboxProps,
   type ComboboxPopoverProps as AriaComboboxPopoverProps,
   type ComboboxItemProps,
+  type ComboboxGroupProps,
   useComboboxContext,
   useComboboxStore,
   useStoreState,
@@ -58,6 +60,10 @@ export function ComboboxPopover({ children, className, portal: portalProp, ...pr
 
 export function ComboboxItem(props: ComboboxItemProps): React.JSX.Element {
   return <AriaComboboxItem {...props} className={clsx('dbv-kit-combobox__item', props.className)} />;
+}
+
+export function ComboboxGroup(props: ComboboxGroupProps): React.JSX.Element {
+  return <AriaComboboxGroup {...props} className={clsx('dbv-kit-combobox__group', props.className)} />;
 }
 
 export {
