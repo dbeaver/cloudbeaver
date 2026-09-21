@@ -194,7 +194,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
   const comboboxStore = useComboboxStore({
     value: displayValue,
     setValue: setInputValue,
-    selectedValue: selectedValue,
+    selectedValue: String(selectedKey ?? ''),
     defaultValue: comboboxDefaultValue,
     defaultSelectedValue: comboboxDefaultSelectedValue as string,
     setSelectedValue: handleSelect,
