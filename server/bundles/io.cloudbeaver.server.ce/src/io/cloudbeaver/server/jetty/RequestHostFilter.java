@@ -152,8 +152,8 @@ public class RequestHostFilter implements Filter {
                         return false;
                     }
                 }
-                log.warn("Request host '" + requestHost + "' is not allowed. Redirect to default: " + availableHosts);
-                redirectToDefaultHost(response, httpRequest, availableHosts);
+                log.warn("Request host '" + requestHost + "' is not allowed. Available hosts: " + availableHosts);
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }
         } catch (RuntimeException e) {
@@ -162,15 +162,6 @@ public class RequestHostFilter implements Filter {
             return false;
         }
         return true;
-    }
-
-    private void redirectToDefaultHost(
-        @NotNull HttpServletResponse response,
-        @NotNull HttpServletRequest httpRequest,
-        @NotNull List<String> availableHosts
-    ) throws IOException {
-        boolean https = application.getServerConfiguration().isForceHttps();
-        redirectToHost(response, httpRequest, https ? "https" : "http", getDefaultHost(availableHosts));
     }
 
     private void redirectToHost(
@@ -267,8 +258,4 @@ public class RequestHostFilter implements Filter {
         return requestHostBuilder.toString();
     }
 
-    @NotNull
-    private String getDefaultHost(@NotNull List<String> availableHosts) {
-        return availableHosts.getFirst();
-    }
 }

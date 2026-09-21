@@ -75,15 +75,30 @@ public class RequestHostFilterTest {
     }
 
     @Test
-    public void redirectsUntrustedRequestToTrustedDefaultHost() throws Exception {
+    public void rejectsUntrustedRequestHost() throws Exception {
+        serverConfig.setForceHttps(true);
+        serverConfig.setSupportedHosts(List.of("cloudbeaver.example:8978"));
+        Mockito.when(request.getHeader("X-Forwarded-Proto")).thenReturn("http");
+        Mockito.when(request.getHeader("X-Forwarded-Host")).thenReturn("malicious.example:8978");
+
+        filter.doFilter(request, response, filterChain);
+
+        Mockito.verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
+        Mockito.verify(response, Mockito.never()).sendRedirect(Mockito.anyString());
+        Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
+    }
+
+    @Test
+    public void rejectsUntrustedForwardedHostWithPort() throws Exception {
         serverConfig.setForceHttps(true);
         serverConfig.setSupportedHosts(List.of("cloudbeaver.example"));
+        Mockito.when(request.getHeader("Origin")).thenReturn("http://cloudbeaver.example");
+        Mockito.when(request.getHeader("X-Forwarded-Host")).thenReturn("malicious.example:8978");
 
-        filterRequest("http://malicious.example");
+        filter.doFilter(request, response, filterChain);
 
-        Mockito.verify(response).sendRedirect(
-            "https://cloudbeaver.example/editor/script%20one?connection=main"
-        );
+        Mockito.verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
+        Mockito.verify(response, Mockito.never()).sendRedirect(Mockito.anyString());
         Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
     }
 
@@ -113,7 +128,7 @@ public class RequestHostFilterTest {
 
         filterRequest("http://malicious.example");
 
-        Mockito.verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        Mockito.verify(response).sendError(HttpServletResponse.SC_FORBIDDEN);
         Mockito.verify(response, Mockito.never()).sendRedirect(Mockito.anyString());
         Mockito.verify(filterChain, Mockito.never()).doFilter(request, response);
     }

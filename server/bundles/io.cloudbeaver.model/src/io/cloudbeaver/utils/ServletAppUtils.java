@@ -399,7 +399,9 @@ public class ServletAppUtils {
         @Nullable String forwardedHost
     ) {
         URI uri = URI.create(origin);
-        int port = getForwardedPort(request, uri.getPort());
+        URI forwardedHostUri = parseForwardedHost(forwardedHost);
+        int forwardedHostPort = forwardedHostUri == null ? -1 : forwardedHostUri.getPort();
+        int port = getForwardedPort(request, forwardedHostPort > -1 ? forwardedHostPort : uri.getPort());
         String finalScheme = uri.getScheme();
         String finalHost = uri.getHost();
         int finalPort = port;
@@ -408,8 +410,8 @@ public class ServletAppUtils {
             finalScheme = forwardedScheme;
             changed = true;
         }
-        if (CommonUtils.isNotEmpty(forwardedHost) && !forwardedHost.equals(finalHost)) {
-            finalHost = forwardedHost;
+        if (forwardedHostUri != null && !Objects.equals(forwardedHostUri.getHost(), finalHost)) {
+            finalHost = forwardedHostUri.getHost();
             changed = true;
         }
         if (DEFAULT_PORTS.contains(port)) {
@@ -423,6 +425,23 @@ public class ServletAppUtils {
             return createOriginUri(origin, uri, finalScheme, finalHost, finalPort);
         }
         return origin;
+    }
+
+    @Nullable
+    private static URI parseForwardedHost(@Nullable String forwardedHost) {
+        if (CommonUtils.isEmpty(forwardedHost)) {
+            return null;
+        }
+        URI forwardedHostUri = URI.create("http://" + forwardedHost);
+        if (forwardedHostUri.getHost() == null ||
+            forwardedHostUri.getUserInfo() != null ||
+            CommonUtils.isNotEmpty(forwardedHostUri.getRawPath()) ||
+            forwardedHostUri.getRawQuery() != null ||
+            forwardedHostUri.getRawFragment() != null ||
+            !forwardedHost.equals(forwardedHostUri.getRawAuthority())) {
+            throw new IllegalArgumentException("Invalid forwarded host");
+        }
+        return forwardedHostUri;
     }
 
     private static int getForwardedPort(@NotNull HttpServletRequest request, int defaultPort) {
