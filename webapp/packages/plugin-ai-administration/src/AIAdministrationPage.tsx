@@ -43,7 +43,7 @@ export const AIAdministrationPage = observer<{
   const notificationService = useService(NotificationService);
   const profilesLoader = useResource(AIAdministrationPage, AIProfilesResource, CachedMapAllKey);
   const aiEnginesResource = useResource(AIAdministrationPage, AiEnginesResource, undefined);
-  const profiles = profilesLoader.data.filter(isDefined);
+  const profiles = profilesLoader.data.filter(isDefined).sort((a, b) => a.name.localeCompare(b.name));
 
   const settingsInfoPart = getAdministrationAISettingsFormInfoPart(formState);
   useAutoLoad(AIAdministrationPage, settingsInfoPart);

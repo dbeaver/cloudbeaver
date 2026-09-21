@@ -66,7 +66,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
     <MenuGroup className="tw:flex tw:flex-col tw:gap-1">
       <MenuGroupLabel>{translate('plugin_ai_chat_profile_group')}</MenuGroupLabel>
 
-      {profiles.map(profile => {
+      {profiles.toSorted((a, b) => a.name.localeCompare(b.name)).map(profile => {
         const isCurrent = conversation.profile === profile.id;
         const engine = aiEnginesResource.data.find(e => e.id === profile.engineId);
 
