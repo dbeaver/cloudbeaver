@@ -1,0 +1,48 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  height: 100%;
+}
+
+.button {
+  --dbv-kit-btn-outline-color: var(--theme-on-primary);
+  --dbv-kit-btn-secondary-background-hover: color-mix(in srgb, var(--theme-on-primary), transparent 90%);
+  --dbv-kit-btn-secondary-background-active: color-mix(in srgb, var(--theme-on-primary), transparent 80%);
+  --dbv-kit-btn-secondary-border-color: color-mix(in srgb, var(--theme-on-primary), transparent 40%);
+
+  min-width: initial;
+  flex-shrink: 0;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+
+  & :global(.icon) {
+    fill: currentColor;
+    transform: rotate(90deg);
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 32px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--theme-on-primary), transparent 70%);
+}
+
+.title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
