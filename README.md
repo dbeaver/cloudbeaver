@@ -34,7 +34,7 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
   - Added the ability for users to configure their own API tokens for administrator-created AI profiles. Users can set, update, and reset API tokens from AI Chat and User Settings.
   - Fixed Gson parsing errors when using OpenAI-compatible streaming providers, such as LiteLLM.
 - Connectivity:
-  - Fixed long-polling fallback when WebSocket connections close cleanly, preventing queries from staying in the Loading state. (thanks to [@ThomasSwinicki](https://github.com/ThomasSwinicki ))
+  - Fixed long-polling fallback when WebSocket connections close cleanly, preventing queries from staying in the Loading state. (thanks to [@ThomasSwinicki](https://github.com/ThomasSwinicki))
 - General:
   - The connection page was redesigned to improve users' experience with this form. Connection, authentication, database-specific, and other settings moved to the vertical tabs on the left side of the page.
   - Fixed an issue where new icons were not shown after updating the application until the browser cache was cleared.
