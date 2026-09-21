@@ -29,6 +29,8 @@ Set up the smallest environment required by the test, implement the test, and le
 
 5. Implement colocated `*.test.ts` or `*.test.tsx` tests. Use `.js` suffixes for relative imports. Keep fixtures local unless they are reusable package-level mocks; put reusable mocks under `__custom_mocks__` and declare every imported package in the correct dependency section.
 
+   **Mocking with `isolate: false`:** Prefer injected doubles or typed `vi.spyOn` on module namespaces, installed in `beforeEach` and restored in `afterEach`. Hoisted `vi.mock` may miss cached consumers, and `restoreAllMocks` does not unregister module factories. Avoid blanket `vi.resetModules()`: re-importing DI modules can fail with “module already added”.
+
 6. For application tests, read the current implementations of `@cloudbeaver/tests-runner` and `core-di` before writing setup. Register current modules through `module.ts`, then create the application with the current `createApp()` API. Replace legacy manifest imports and `createApp(...manifests)` calls rather than recreating the removed manifest layer. Import every required module registration before application startup, and install focused GraphQL/MSW and known-console-message expectations for observable side effects.
 
    The shared Vitest configuration currently uses `isolate: false` in order to increase tests run speed. Test files in the same worker share the module cache and global environment, so module registration, mocks, globals, timers, environment variables, console handlers, DOM state, and open resources can affect later files. Make setup idempotent, restore mutable state in `afterEach` or `afterAll`, reset mocks and handlers to their declared baseline, unload applications, and close servers, sockets, and timers. Check that every test declares and initializes its own required dependencies and mocks instead of relying on another file having run first.
@@ -53,6 +55,8 @@ Set up the smallest environment required by the test, implement the test, and le
 9. Confirm the test would fail for the behavior it protects, then restore the implementation and rerun the focused checks. Run root `yarn test` and `yarn validate-dependencies` only for shared test-infrastructure or cross-package changes. Leave generated `lib`, coverage, install, and test-result artifacts uncommitted.
 
    Because isolation is disabled, also run the complete affected package suite rather than only the new file. When shared modules, registries, mocks, or test helpers changed, run the broader workspace suite to expose order-dependent state leakage. A test must pass both alone and with its neighboring suite.
+
+   For mock changes, also run the affected package with `--maxWorkers=1`; separate workers can hide cached-module failures.
 
 ## Boundaries
 

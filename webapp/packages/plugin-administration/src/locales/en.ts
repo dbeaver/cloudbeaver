@@ -76,6 +76,8 @@ export default [
   ],
   ['administration_configuration_wizard_configuration_security_public_credentials', 'Save users credentials'],
   ['administration_configuration_wizard_configuration_security_public_credentials_description', 'Allows to save credentials for non-admin users'],
+  ['administration_configuration_wizard_configuration_security_db_user_password_change', 'Enable database user password change'],
+  ['administration_configuration_wizard_configuration_security_db_user_password_change_description', 'The database user password can be changed for an existing connection'],
   ['administration_configuration_wizard_configuration_navigator', 'Navigator'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Hide Folders'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Hide Schemas'],
