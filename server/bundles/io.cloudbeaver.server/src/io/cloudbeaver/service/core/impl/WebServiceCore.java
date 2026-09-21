@@ -150,6 +150,7 @@ public class WebServiceCore implements DBWServiceCore {
         Set<String> applicableDrivers = WebServiceUtils.getApplicableDriversIds();
         return stream
             .flatMap(p -> p.getConnections().stream())
+            .filter(c -> !c.getDataSourceContainer().isHidden())
             .filter(c -> applicableDrivers.contains(c.getDataSourceContainer().getDriver().getId()))
             .toList();
     }
@@ -554,11 +555,14 @@ public class WebServiceCore implements DBWServiceCore {
 
         configInput.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
-        DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
-            webSession, projectId, configInput.getConnectionId());
+        WebConnectionInfo cachedConnection = project.findWebConnectionInfo(configInput.getConnectionId());
+        DataSourceDescriptor dataSource = cachedConnection == null ?
+            (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
+                webSession, projectId, configInput.getConnectionId()) :
+            (DataSourceDescriptor) cachedConnection.getDataSourceContainer();
         DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
         testDataSource.setTemporary(true);
-        WebConnectionInfo connectionInfo = project.addConnection(testDataSource);
+        WebConnectionInfo connectionInfo = project.createConnectionInfo(testDataSource);
         connectionInfo.setSavedCredentials(configInput.getCredentials(), configInput.getNetworkHandlersConfig());
         try {
             ConnectionTestJob ct = new ConnectionTestJob(
@@ -583,8 +587,6 @@ public class WebServiceCore implements DBWServiceCore {
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error connecting to database", e);
-        } finally {
-            project.removeConnection(testDataSource);
         }
     }
 

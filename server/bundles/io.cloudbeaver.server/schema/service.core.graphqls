@@ -740,6 +740,8 @@ input NetworkHandlerConfigInput {
 input ConnectionConfig {
     "used only for testing created connection"
     connectionId: String
+    "Whether a newly created connection is an unpersisted hidden draft. Set to false to publish a hidden draft."
+    hidden: Boolean @since(version: "26.2.2")
     name: String
     description: String
 

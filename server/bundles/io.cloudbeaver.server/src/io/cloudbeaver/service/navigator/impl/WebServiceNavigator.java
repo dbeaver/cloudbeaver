@@ -123,6 +123,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     // Skip connections which are not supported in CB
                     if (node instanceof DBNDataSource dataSourceNode) {
                         DBPDataSourceContainer container = dataSourceNode.getDataSourceContainer();
+                        if (container.isHidden()) {
+                            continue;
+                        }
                         // compare by id because driver object can be recreated if it was custom or disabled
                         if (!applicableDrivers.contains(container.getDriver().getId())) {
                             continue;
