@@ -28,6 +28,28 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.2.1 2026-09-21
+
+- AI Assistant:
+  - Added the ability for users to configure their own API tokens for administrator-created AI profiles. Users can set, update, and reset API tokens from AI Chat and User Settings.
+  - Fixed Gson parsing errors when using OpenAI-compatible streaming providers, such as LiteLLM.
+- Connectivity:
+  - Fixed long-polling fallback when WebSocket connections close cleanly, preventing queries from staying in the Loading state. (thanks to [@ThomasSwinicki](https://github.com/ThomasSwinicki ))
+- General:
+  - The connection page was redesigned to improve users' experience with this form. Connection, authentication, database-specific, and other settings moved to the vertical tabs on the left side of the page.
+  - Fixed an issue where new icons were not shown after updating the application until the browser cache was cleared.
+  - Fixed an issue where subfolders disappeared when another folder with the same name was created in CloudBeaver.
+  - Fixed notifications for opened connections when they are moved to a folder or deleted from another CloudBeaver session.
+- Security:
+  - Restricted web-service actions in CloudBeaver configuration mode to prevent unauthorized access before server setup is complete.
+  - Restricted CloudBeaver file system API access and added file name validation to prevent unauthorized file operations.
+- Databases and drivers:
+  - DuckDB: Added SQL LIMIT clauses to Data Editor queries to prevent excessive memory use with large tables.
+  - Firebird: Fixed function DDL generation to preserve parameter and return types, nullability, and SQL security mode.
+  - MariaDB:
+    - Fixed an issue where the Constraints tab could show a CHECK expression from another table
+    - Named CHECK constraints are now shown in the Constraints tab for users with SELECT-only access
+
 ### 26.2.0 2026-08-31
 
 ### Changes since 26.1.0
@@ -67,17 +89,17 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
   - Fixed synchronization between devices. Users see updated connections and folders in other devices without manual refreshes.
 - Databases:
   - ClickHouse
-        - The driver was updated to version 0.10.0
-        - Improved JSON display in the Value panel
-        - Added support for the Map data type visualization for the Data Editor
+    - The driver was updated to version 0.10.0
+    - Improved JSON display in the Value panel
+    - Added support for the Map data type visualization for the Data Editor
   - The Databend driver was updated to version 0.4.8.
   - LibSQL: Added support for database views.
   - MySQL: Fixed support for comments starting with '#' symbol in the SQL Editor.
   - PostgreSQL
-        - Updated the driver to version 42.7.13.
-        - Added a Show full DDL option for schemas and tables to generate complete DDL, including objects within a schema and object comments and privileges.
-        - Fixed an error that occurred when applying filters to database nodes
-        - Fixed generated calls for procedures with OUT parameters
+    - Updated the driver to version 42.7.13.
+    - Added a Show full DDL option for schemas and tables to generate complete DDL, including objects within a schema and object comments and privileges.
+    - Fixed an error that occurred when applying filters to database nodes
+    - Fixed generated calls for procedures with OUT parameters
 - Security:
   - Removed the ability to rename SQL scripts that start with dots to prevent them from being moved outside the Scripts directory into the root Tree.
   - Added a new "Auto-create users" setting for the reverse proxy provider, allowing new user creation on login. It is enabled by default.
