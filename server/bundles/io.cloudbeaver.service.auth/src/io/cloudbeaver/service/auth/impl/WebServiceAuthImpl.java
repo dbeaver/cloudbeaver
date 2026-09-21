@@ -246,7 +246,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Not logged in");
         }
         try {
-            List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId);
+            List<WebAuthInfo> removedInfos = providerId != null && configurationId != null ?
+                webSession.removeAuthInfo(providerId, configurationId) :
+                webSession.removeAuthInfo(providerId);
             var cbApp = CBApplication.getInstance();
 
             List<WebLogoutLink> redirectLinks = new ArrayList<>();

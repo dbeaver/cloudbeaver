@@ -356,7 +356,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
             const newFolderId = getConnectionFolderId(createConnectionFolderParam(result.projectId, createPath(result.folder, result.name)));
             await this.navNodeInfoResource.loadNodeParents(newFolderId);
-            await this.navigationTreeService.showNode(newFolderId, this.navNodeInfoResource.getParents(newFolderId));
+            await this.navigationTreeService.showNode(newFolderId);
           } catch (exception: any) {
             this.notificationService.logException(exception, "Can't create folder");
           }

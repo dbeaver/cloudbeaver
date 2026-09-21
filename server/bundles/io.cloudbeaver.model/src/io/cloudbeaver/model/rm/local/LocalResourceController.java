@@ -1065,7 +1065,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull String projectId,
         @NotNull String resourcePath,
         @NotNull String propertyName,
-        @Nullable Object propertyValue
+        @Nullable String propertyValue
     ) throws DBException {
         try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("resourcePropertyUpdate"))) {
             validateResourcePath(resourcePath);
@@ -1086,7 +1086,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     public String setResourceProperties(
         @NotNull String projectId,
         @NotNull String resourcePath,
-        @NotNull Map<String, Object> properties
+        @NotNull Map<String, String> properties
     ) throws DBException {
         try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("resourcePropertyUpdate"))) {
             validateResourcePath(resourcePath);
@@ -1326,7 +1326,7 @@ public class LocalResourceController extends BaseLocalResourceController {
             if (readProperties) {
                 final BaseProjectImpl project = getWebProject(projectId, true);
                 final String resourcePath = getProjectRelativePath(projectId, path);
-                final Map<String, Object> properties = project.getResourceProperties(resourcePath);
+                final Map<String, String> properties = project.getResourceProperties(resourcePath);
 
                 if (properties != null && !properties.isEmpty()) {
                     resource.setProperties(new LinkedHashMap<>(properties));

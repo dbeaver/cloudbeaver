@@ -14,8 +14,10 @@ import {
   getNetworkHandlerDefaultProperties,
   getSSHHandlerConfig,
   NetworkHandlerResource,
+  prepareSSHHandlerConfig,
   SSH_DEFAULT_HANDLER_CONFIG,
   SSH_TUNNEL_ID,
+  trimSSHConfig,
   validateSSHConfig,
   type INetworkHandlerConfig,
 } from '@cloudbeaver/plugin-network-handlers';
@@ -86,7 +88,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 
-  protected override format(
+  protected override prepare(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
@@ -96,7 +98,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const config = this.getConfig();
+    const config = prepareSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
 
     if (this.state.enabled && !this.state.savePassword) {
       this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
@@ -105,6 +107,13 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     }
 
     this.optionsPart.state.networkHandlersConfig!.push(config);
+  }
+
+  protected override format(): void {
+    const index = this.optionsPart.state.networkHandlersConfig?.findIndex(config => config.id === this.state.id) ?? -1;
+    if (index >= 0) {
+      this.optionsPart.state.networkHandlersConfig![index] = trimSSHConfig(this.optionsPart.state.networkHandlersConfig![index]!);
+    }
   }
 
   protected override validate(

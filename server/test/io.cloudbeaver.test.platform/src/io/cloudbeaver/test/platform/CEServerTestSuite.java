@@ -24,6 +24,7 @@ import io.cloudbeaver.model.rm.local.LocalResourceControllerTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
+import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
 import io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdateTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
@@ -31,6 +32,7 @@ import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
 import io.cloudbeaver.test.platform.fs.FileSystemSecurityTest;
 import io.cloudbeaver.test.platform.sql.*;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
@@ -46,19 +48,25 @@ import org.junit.platform.suite.api.Suite;
         RMNIOTest.class,
         LocalResourceControllerTest.class,
         NoSessionTest.class,
+        ConfigurationModeAccessTest.class,
         FileSystemSecurityTest.class,
+        CBSecretControllerEmbeddedTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
         WSEventHandlerWorkspaceConfigUpdateTest.class,
         WebNavigatorNodeInfoTest.class,
+        WebAIProfileUtilsTest.class,
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
         GenerateSQLResultSetTest.class,
+        WebSQLDataUpdateTest.class,
+        WebSQLResultsInfoTest.class,
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,
         ForeignKeyNavigationEndpointTest.class,
-        DataFilterConstraintsTest.class
+        DataFilterConstraintsTest.class,
+        DataTransferImportTest.class
     }
 )
 public class CEServerTestSuite {
@@ -66,6 +74,7 @@ public class CEServerTestSuite {
     @BeforeAll
     public static void startServer() throws Exception {
         CEAppStarter.startServerIfNotStarted();
+        Assertions.assertFalse(CEAppStarter.getTestApp().isConfigurationMode());
     }
 
     @AfterAll

@@ -414,6 +414,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 "adminCredentialsSaveEnabled",
                 appConfig.isAdminCredentialsSaveEnabled());
             copyConfigValue(
+                oldAppConfig,
+                appConfigProperties,
+                "dbUserPasswordChangeEnabled",
+                appConfig.isDbUserPasswordChangeEnabled());
+            copyConfigValue(
                 oldAppConfig, appConfigProperties, "enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
             copyConfigValue(
                 oldAppConfig, appConfigProperties, "forwardProxy", appConfig.isEnabledForwardProxy());
