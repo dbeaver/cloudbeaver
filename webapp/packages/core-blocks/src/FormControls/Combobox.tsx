@@ -142,15 +142,15 @@ export const Combobox: IComboboxType = observer(function Combobox({
         !inputValue.trim() ||
         itemValue.toLowerCase().includes(inputValue.trim().toLowerCase()),
     );
-  const itemGroups: (typeof filteredItems)[] = [[]];
+  const itemGroups: { key: string; items: typeof filteredItems }[] = [{ key: 'first', items: [] }];
   for (const item of filteredItems) {
     if (item.itemSeparator) {
-      itemGroups.push([]);
+      itemGroups.push({ key: `separator:${item.itemKey}`, items: [] });
     } else {
-      itemGroups[itemGroups.length - 1]!.push(item);
+      itemGroups[itemGroups.length - 1]!.items.push(item);
     }
   }
-  const visibleGroups = itemGroups.filter(group => group.length > 0);
+  const visibleGroups = itemGroups.filter(group => group.items.length > 0);
 
   const handleSelect = useCallback(
     (selectedValue: string | string[] | null) => {
@@ -242,6 +242,19 @@ export const Combobox: IComboboxType = observer(function Combobox({
     );
   }
 
+  function renderItems() {
+    if (visibleGroups.length === 0) {
+      return <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>;
+    }
+
+    if (!isSeparator) {
+      return filteredItems.map(renderItem);
+    }
+
+    return visibleGroups.map(group => <ComboboxGroup key={group.key}>{group.items.map(renderItem)}</ComboboxGroup>);
+  }
+
+  const hasFooterItems = !!footerItems?.length;
   const displayPopover = !allowCustomValue || allItems.length > 0;
   const hasCancelButton = !!displayValue && allowClear && !disabled && !readOnly;
 
@@ -292,17 +305,13 @@ export const Combobox: IComboboxType = observer(function Combobox({
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           {displayPopover && (
-            <ComboboxPopover className="theme-text-on-surface theme-background-surface dbv-kit-combobox__popover--grouped">
-              <div className="dbv-kit-combobox__popover-items">
-                {visibleGroups.length > 0 ? (
-                  visibleGroups.map(group => <ComboboxGroup key={group[0]!.itemKey}>{group.map(renderItem)}</ComboboxGroup>)
-                ) : (
-                  <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
-                )}
-              </div>
-              {!!footerItems?.length && (
+            <ComboboxPopover
+              className={clsx('theme-text-on-surface theme-background-surface', hasFooterItems && 'dbv-kit-combobox__popover--grouped')}
+            >
+              {hasFooterItems ? <div className="dbv-kit-combobox__popover-items">{renderItems()}</div> : renderItems()}
+              {hasFooterItems && (
                 <ComboboxGroup className="dbv-kit-combobox__popover-footer">
-                  {footerItems.map((item, index) => renderItem(mapItem(item, items.length + index)))}
+                  {footerItems!.map((item, index) => renderItem(mapItem(item, items.length + index)))}
                 </ComboboxGroup>
               )}
             </ComboboxPopover>
