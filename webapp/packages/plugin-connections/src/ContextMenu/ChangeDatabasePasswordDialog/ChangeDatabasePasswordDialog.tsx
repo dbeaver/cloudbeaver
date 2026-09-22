@@ -86,7 +86,7 @@ export const ChangeDatabasePasswordDialog: DialogComponent<ChangeDatabasePasswor
 
     const passwordValidation = usePasswordValidation(form);
     const repeatValidation = useFormCustomInputValidation<string>(
-      value => (isValuesEqual(value, state.newPassword, '') ? null : 'plugin_connections_change_db_password_mismatch'),
+      value => (isValuesEqual(value, state.newPassword, '') ? null : translate('plugin_connections_change_db_password_mismatch')),
       form,
     );
 
@@ -95,7 +95,7 @@ export const ChangeDatabasePasswordDialog: DialogComponent<ChangeDatabasePasswor
         <CommonDialogHeader title="plugin_connections_change_db_password_dialog_title" onReject={rejectDialog} />
         <CommonDialogBody>
           <Form context={form}>
-            <Container center>
+            <Container gap>
               <InputField type="password" name="currentPassword" state={state} required>
                 {translate('plugin_connections_change_db_password_current')}
               </InputField>
