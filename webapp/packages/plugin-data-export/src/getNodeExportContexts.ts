@@ -25,9 +25,12 @@ export function isExportableNode(node: NavNode): boolean {
  * so a multi-object export is a list of contexts sharing the same processor configuration.
  *
  * Nodes that can't be exported (columns, indexes) and nodes without a resolvable connection are skipped.
+ * A repeated connection name + object name pair (e.g. same table name in two schemas) gets a
+ * disambiguating suffix so the batch never produces two identical file names.
  */
 export function getNodeExportContexts(nodes: NavNode[], getConnection: (nodeId: string) => INodeExportConnection | undefined): IExportContext[] {
   const contexts: IExportContext[] = [];
+  const occurrences = new Map<string, number>();
 
   for (const node of nodes) {
     if (!isExportableNode(node)) {
@@ -40,10 +43,14 @@ export function getNodeExportContexts(nodes: NavNode[], getConnection: (nodeId: 
       continue;
     }
 
+    const baseName = `${connection.name}${node.name ? ` - ${node.name}` : ''}`;
+    const occurrence = (occurrences.get(baseName) ?? 0) + 1;
+    occurrences.set(baseName, occurrence);
+
     contexts.push({
       connectionKey: connection.key,
       name: node.name,
-      fileName: withTimestamp(`${connection.name}${node.name ? ` - ${node.name}` : ''}`),
+      fileName: withTimestamp(occurrence > 1 ? `${baseName} (${occurrence})` : baseName),
       containerNodePath: node.uri,
     });
   }

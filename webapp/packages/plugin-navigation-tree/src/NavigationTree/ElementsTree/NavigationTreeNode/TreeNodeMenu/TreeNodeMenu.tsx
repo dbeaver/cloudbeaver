@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 
 import { getComputed, Icon, type IContextMenuPosition, s, useS } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
@@ -44,9 +44,12 @@ export const TreeNodeMenu = observer<ITreeNodeMenuProps>(function TreeNodeMenu({
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const connectionKey = getComputed(() => connectionInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri));
 
-  function getSelected(): NavNode[] {
-    return navNodeInfoResource.get(resourceKeyList(elementsTreeContext?.tree.getSelected() ?? [])).filter(Boolean) as NavNode[];
-  }
+  // stable reference: useDataContextLink re-runs its update callback on every render, and DataContext.set
+  // treats a new function reference as a change, invalidating every menu computed that reads the selection
+  const getSelected = useCallback(
+    (): NavNode[] => navNodeInfoResource.get(resourceKeyList(elementsTreeContext?.tree.getSelected() ?? [])).filter(Boolean) as NavNode[],
+    [elementsTreeContext, navNodeInfoResource],
+  );
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);

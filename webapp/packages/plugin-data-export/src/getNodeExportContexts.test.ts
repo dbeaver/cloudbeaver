@@ -16,9 +16,9 @@ const CONNECTION: INodeExportConnection = {
   name: 'MySQL',
 };
 
-function createNode(name: string, objectFeatures: string[] = [EObjectFeature.dataContainer]): NavNode {
+function createNode(name: string, objectFeatures: string[] = [EObjectFeature.dataContainer], schema = 'test'): NavNode {
   return {
-    uri: `database://mysql-local/schema/test/table/${name}`,
+    uri: `database://mysql-local/schema/${schema}/table/${name}`,
     name,
     objectFeatures,
   } as NavNode;
@@ -70,5 +70,14 @@ describe('getNodeExportContexts', () => {
     const [context] = getNodeExportContexts([createNode('users')], getConnection);
 
     expect(context?.fileName).toMatch(/^MySQL - users/);
+  });
+
+  it('disambiguates file names when two selected objects share the same connection and name', () => {
+    const contexts = getNodeExportContexts([createNode('users', undefined, 'public'), createNode('users', undefined, 'archive')], getConnection);
+
+    expect(contexts[0]?.containerNodePath).toBe('database://mysql-local/schema/public/table/users');
+    expect(contexts[1]?.containerNodePath).toBe('database://mysql-local/schema/archive/table/users');
+    expect(contexts[0]?.fileName).toMatch(/^MySQL - users \d{4}-\d{2}-\d{2}/);
+    expect(contexts[1]?.fileName).toMatch(/^MySQL - users \(2\) \d{4}-\d{2}-\d{2}/);
   });
 });

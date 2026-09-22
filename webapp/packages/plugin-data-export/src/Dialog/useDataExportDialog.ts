@@ -95,38 +95,42 @@ export function useDataExportDialog(contexts: IExportContext[], onExport?: () =>
         this.processing = true;
         this.exception = null;
 
-        let started = 0;
-        let lastException: any = null;
+        // snapshot the configuration once: the forms behind this dialog stay editable while
+        // the batch runs, and every context must be exported with the same settings
+        const processorProperties = toJS(this.processorProperties);
+        const outputSettings = toJS(this.outputSettings);
+        const failures: Array<{ context: IExportContext; exception: any }> = [];
 
         try {
-          // the server exports one container per task, so every selected object gets its own task and notification
+          // the server exports one container per task, so every selected object gets its own task and notification;
+          // one failure skips only its own object instead of cancelling the rest of the selection
           for (const context of this.contexts) {
             try {
               await this.dataExportService.exportData(context, {
                 processorId: processor.id,
-                processorProperties: this.processorProperties,
+                processorProperties,
                 filter: context.filter,
                 outputSettings: {
-                  ...this.outputSettings,
+                  ...outputSettings,
                   fileName: context.fileName,
                 },
               });
-
-              started++;
             } catch (exception: any) {
-              lastException = exception;
-
-              if (this.contexts.length > 1) {
-                this.notificationService.logException(exception, 'data_transfer_notification_error');
-              }
+              failures.push({ context, exception });
             }
           }
 
-          if (started > 0) {
-            this.onExport?.();
-          } else {
-            this.exception = lastException;
+          if (failures.length === this.contexts.length) {
+            // nothing could be started: keep the dialog open and show the error there, same as a single-object export
+            this.exception = failures[0]?.exception ?? null;
+            return;
           }
+
+          for (const failure of failures) {
+            this.notificationService.logException(failure.exception, failure.context.name ?? 'data_transfer_notification_error');
+          }
+
+          this.onExport?.();
         } finally {
           this.processing = false;
         }

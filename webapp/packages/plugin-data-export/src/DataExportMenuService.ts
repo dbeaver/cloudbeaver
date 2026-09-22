@@ -6,12 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import {
-  ConnectionInfoResource,
-  DATA_CONTEXT_CONNECTION,
-  type IConnectionInfoParams,
-  isConnectionInfoParamEqual,
-} from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, type IConnectionInfoParams, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -136,12 +131,18 @@ export class DataExportMenuService {
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
-        // the menu may be opened on a non-exportable node of a selection that contains exportable ones
-        if (!getNodesFromContext(context).some(isExportableNode)) {
+        if (!this.dataViewerService.canExportData || !context.has(DATA_CONTEXT_CONNECTION)) {
           return false;
         }
 
-        return this.dataViewerService.canExportData && context.has(DATA_CONTEXT_CONNECTION);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        if (isExportableNode(node)) {
+          return true;
+        }
+
+        // the menu may be opened on a non-exportable node of a selection that contains exportable ones
+        return getNodesFromContext(context).some(isExportableNode);
       },
       getItems: (context, items) => [...items, ACTION_EXPORT],
     });
@@ -203,40 +204,55 @@ export class DataExportMenuService {
   }
 
   private async getExportContexts(nodes: NavNode[]): Promise<IExportContext[]> {
-    const nodeConnections = new Map<string, INodeExportConnection>();
-    const loadedConnections: INodeExportConnection[] = [];
-    const failedConnections: IConnectionInfoParams[] = [];
+    // node.uri -> connection id, and connection id -> key, so every distinct connection loads exactly once
+    const nodeConnectionIds = new Map<string, string>();
+    const connectionKeysById = new Map<string, IConnectionInfoParams>();
+    let unresolvedCount = 0;
 
     for (const node of nodes) {
-      if (!isExportableNode(node) || nodeConnections.has(node.uri) || !node.projectId) {
+      if (!isExportableNode(node) || nodeConnectionIds.has(node.uri)) {
         continue;
       }
 
       // the key is derived from the node, the connection of a selected node may not be cached yet
-      const key = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri);
+      const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
 
-      if (!key || failedConnections.some(failed => isConnectionInfoParamEqual(failed, key))) {
+      if (!key) {
+        unresolvedCount++;
         continue;
       }
 
-      let connection = loadedConnections.find(loaded => isConnectionInfoParamEqual(loaded.key, key));
-
-      if (!connection) {
-        try {
-          connection = { key, name: (await this.connectionInfoResource.load(key)).name };
-        } catch (exception: any) {
-          // an unavailable connection skips its own objects instead of cancelling the whole selection
-          failedConnections.push(key);
-          this.notificationService.logException(exception, 'plugin_data_export_connection_load_fail');
-          continue;
-        }
-
-        loadedConnections.push(connection);
-      }
-
-      nodeConnections.set(node.uri, connection);
+      const connectionId = serializeConnectionParam(key);
+      nodeConnectionIds.set(node.uri, connectionId);
+      connectionKeysById.set(connectionId, key);
     }
 
-    return getNodeExportContexts(nodes, nodeId => nodeConnections.get(nodeId));
+    if (unresolvedCount > 0) {
+      // an exportable node whose connection can't even be identified is skipped without a network call,
+      // so it needs its own notification instead of relying on the connection-load failure below
+      this.notificationService.logInfo({
+        title: 'plugin_data_export_skipped_objects_title',
+        message: this.localizationService.translate('plugin_data_export_skipped_objects_message', undefined, { count: unresolvedCount }),
+      });
+    }
+
+    // resolve every distinct connection once, in parallel, instead of one sequential round trip per node;
+    // an unavailable connection skips its own objects instead of cancelling the whole selection
+    const connectionsById = new Map<string, INodeExportConnection>();
+
+    await Promise.all(
+      Array.from(connectionKeysById, async ([connectionId, key]) => {
+        try {
+          connectionsById.set(connectionId, { key, name: (await this.connectionInfoResource.load(key)).name });
+        } catch (exception: any) {
+          this.notificationService.logException(exception, 'plugin_data_export_connection_load_fail');
+        }
+      }),
+    );
+
+    return getNodeExportContexts(nodes, nodeUri => {
+      const connectionId = nodeConnectionIds.get(nodeUri);
+      return connectionId ? connectionsById.get(connectionId) : undefined;
+    });
   }
 }

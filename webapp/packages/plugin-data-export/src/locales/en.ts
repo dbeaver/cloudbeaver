@@ -22,4 +22,9 @@ export default [
   ['plugin_data_export_export_selected_objects_tooltip', 'Export selected objects'],
   ['plugin_data_export_dialog_subtitle_objects', '{arg:count} objects'],
   ['plugin_data_export_connection_load_fail', 'Failed to load the connection of a selected object'],
+  ['plugin_data_export_skipped_objects_title', 'Some objects were skipped'],
+  [
+    'plugin_data_export_skipped_objects_message',
+    '{arg:count} selected object(s) could not be exported because their connection could not be identified',
+  ],
 ];
