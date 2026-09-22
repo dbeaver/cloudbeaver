@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { AIProfileCredentialsService, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfileCredentialsService, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { AIChatConversationInfo } from '../AIChatConversationsResource.js';
 import { AIChatConversationsService } from '../AIChatConversationsService.js';
@@ -66,7 +66,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
     <MenuGroup className="tw:flex tw:flex-col tw:gap-1">
       <MenuGroupLabel>{translate('plugin_ai_chat_profile_group')}</MenuGroupLabel>
 
-      {profiles.toSorted((a, b) => a.name.localeCompare(b.name)).map(profile => {
+      {profiles.toSorted(compareAIProfiles).map(profile => {
         const isCurrent = conversation.profile === profile.id;
         const engine = aiEnginesResource.data.find(e => e.id === profile.engineId);
 
