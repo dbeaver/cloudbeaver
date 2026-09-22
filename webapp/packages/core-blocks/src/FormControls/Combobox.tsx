@@ -121,8 +121,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
       const itemIcon = iconSelector?.(item);
       const itemDisabled = isDisabled?.(item);
 
-      const isVisible =
-        allowCustomValue || inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
+      const isVisible = inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
 
       return {
         item,
@@ -254,7 +253,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
             </>
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
-          {displayPopover && (
+          {displayPopover && (!allowCustomValue || filteredItems.length > 0) && (
             <ComboboxPopover className="theme-text-on-surface theme-background-surface">
               {filteredItems.length > 0 ? (
                 filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
