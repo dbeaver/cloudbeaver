@@ -93,3 +93,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     this.markOutdated(profileId);
   }
 }
+
+export function compareAIProfiles(a: AIProfile, b: AIProfile): number {
+  return a.name.localeCompare(b.name);
+}
