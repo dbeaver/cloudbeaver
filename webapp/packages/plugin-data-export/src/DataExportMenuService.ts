@@ -6,9 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, isConnectionInfoParamEqual } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoResource,
+  DATA_CONTEXT_CONNECTION,
+  type IConnectionInfoParams,
+  isConnectionInfoParamEqual,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, getNodesFromContext, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { withTimestamp } from '@dbeaver/js-helpers';
@@ -31,7 +37,15 @@ import type { IExportContext } from './IExportContext.js';
 
 const DataExportDialog = importLazyComponent(() => import('./Dialog/DataExportDialog.js').then(module => module.DataExportDialog));
 
-@injectable(() => [CommonDialogService, ActionService, MenuService, LocalizationService, DataViewerService, ConnectionInfoResource])
+@injectable(() => [
+  CommonDialogService,
+  ActionService,
+  MenuService,
+  LocalizationService,
+  DataViewerService,
+  ConnectionInfoResource,
+  NotificationService,
+])
 export class DataExportMenuService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
@@ -40,6 +54,7 @@ export class DataExportMenuService {
     private readonly localizationService: LocalizationService,
     private readonly dataViewerService: DataViewerService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly notificationService: NotificationService,
   ) {}
 
   register(): void {
@@ -190,6 +205,7 @@ export class DataExportMenuService {
   private async getExportContexts(nodes: NavNode[]): Promise<IExportContext[]> {
     const nodeConnections = new Map<string, INodeExportConnection>();
     const loadedConnections: INodeExportConnection[] = [];
+    const failedConnections: IConnectionInfoParams[] = [];
 
     for (const node of nodes) {
       if (!isExportableNode(node) || nodeConnections.has(node.uri) || !node.projectId) {
@@ -199,14 +215,22 @@ export class DataExportMenuService {
       // the key is derived from the node, the connection of a selected node may not be cached yet
       const key = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri);
 
-      if (!key) {
+      if (!key || failedConnections.some(failed => isConnectionInfoParamEqual(failed, key))) {
         continue;
       }
 
       let connection = loadedConnections.find(loaded => isConnectionInfoParamEqual(loaded.key, key));
 
       if (!connection) {
-        connection = { key, name: (await this.connectionInfoResource.load(key)).name };
+        try {
+          connection = { key, name: (await this.connectionInfoResource.load(key)).name };
+        } catch (exception: any) {
+          // an unavailable connection skips its own objects instead of cancelling the whole selection
+          failedConnections.push(key);
+          this.notificationService.logException(exception, 'plugin_data_export_connection_load_fail');
+          continue;
+        }
+
         loadedConnections.push(connection);
       }
 
