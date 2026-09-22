@@ -8,6 +8,7 @@ fragment ObjectPropertyInfo on ObjectPropertyInfo {
   dataType
   value
   validValues
+  allowCustomValue
   defaultValue
   constraints {
     min

@@ -73,6 +73,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.publicCredentialsSaveEnabled ?? false;
   }
 
+  get dbUserPasswordChangeEnabled(): boolean {
+    return this.data?.dbUserPasswordChangeEnabled ?? false;
+  }
+
   get anonymousAccessEnabled(): boolean {
     return this.data?.anonymousAccessEnabled ?? false;
   }
