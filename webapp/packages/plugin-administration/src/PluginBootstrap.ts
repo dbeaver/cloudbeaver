@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@ import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService.js';
 
 const AdministrationMenu = lazy(() => import('./AdministrationMenu/AdministrationMenu.js').then(m => ({ default: m.AdministrationMenu })));
+const AdministrationTopAppBarHeader = lazy(() =>
+  import('./AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarHeader.js').then(m => ({ default: m.AdministrationTopAppBarHeader })),
+);
 const AppStateMenu = lazy(() => import('@cloudbeaver/plugin-top-app-bar').then(m => ({ default: m.AppStateMenu })));
 
 @injectable(() => [PermissionsService, ScreenService, AdministrationScreenService, AdministrationTopAppBarService, MenuService])
@@ -33,6 +36,7 @@ export class PluginBootstrap extends Bootstrap {
 
   override register(): void {
     this.administrationTopAppBarService.placeholder.add(AdministrationMenu, 0);
+    this.administrationTopAppBarService.placeholder.add(AdministrationTopAppBarHeader, 0);
     this.administrationTopAppBarService.placeholder.add(AppStateMenu);
 
     const ADMINISTRATION_MENU_OPEN = new MenuBaseItem(
