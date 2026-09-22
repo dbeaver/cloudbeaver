@@ -27,7 +27,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfilesResource, compareAIProfiles } from '@cloudbeaver/plugin-ai-profiles';
 
 import { getAdministrationAISettingsFormInfoPart } from './AISettingsForm/getAdministrationAISettingsFormInfoPart.js';
 import { LANGUAGE_OPTIONS } from './AISettingsForm/getLanguageOptions.js';
@@ -43,7 +43,7 @@ export const AIAdministrationPage = observer<{
   const notificationService = useService(NotificationService);
   const profilesLoader = useResource(AIAdministrationPage, AIProfilesResource, CachedMapAllKey);
   const aiEnginesResource = useResource(AIAdministrationPage, AiEnginesResource, undefined);
-  const profiles = profilesLoader.data.filter(isDefined);
+  const profiles = profilesLoader.data.filter(isDefined).sort(compareAIProfiles);
 
   const settingsInfoPart = getAdministrationAISettingsFormInfoPart(formState);
   useAutoLoad(AIAdministrationPage, settingsInfoPart);
