@@ -1,8 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <schema targetNamespace="io.cloudbeaver.model" xmlns="http://www.w3.org/2001/XMLSchema">
-   <annotation><appInfo><meta.schema plugin="io.cloudbeaver.model" id="org.jkiss.dbeaver.auth.provider" name="Authentication provider"/></appInfo><documentation>CloudBeaver authentication providers</documentation></annotation>
+   <annotation><appinfo><meta.schema plugin="io.cloudbeaver.model" id="org.jkiss.dbeaver.auth.provider" name="Authentication provider"/></appinfo><documentation>CloudBeaver authentication providers</documentation></annotation>
 
    <element name="extension">
+      <annotation><appinfo><meta.element/></appinfo></annotation>
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="authProvider"/>
@@ -22,12 +23,12 @@
             <element ref="credentials"/>
             <element ref="metaParameters"/>
          </choice>
-         <attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute>
+         <attribute name="id" type="string"><annotation><appinfo><meta.attribute kind="identifier"/></appinfo></annotation></attribute>
          <attribute name="extended" type="string"/>
-         <attribute name="label" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
-         <attribute name="description" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
-         <attribute name="class" type="string" use="required"><annotation><appInfo><meta.attribute kind="java" basedOn=":org.jkiss.dbeaver.model.auth.SMAuthProvider"/></appInfo></annotation></attribute>
-         <attribute name="icon" type="string"><annotation><appInfo><meta.attribute kind="resource"/></appInfo></annotation></attribute>
+         <attribute name="label" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
+         <attribute name="description" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
+         <attribute name="class" type="string" use="required"><annotation><appinfo><meta.attribute kind="java" basedOn=":org.jkiss.dbeaver.model.auth.SMAuthProvider"/></appinfo></annotation></attribute>
+         <attribute name="icon" type="string"><annotation><appinfo><meta.attribute kind="resource"/></appinfo></annotation></attribute>
          <attribute name="configurable" type="boolean"/>
          <attribute name="trusted" type="boolean"/>
          <attribute name="private" type="boolean"/>
@@ -61,8 +62,8 @@
       <complexType>
          <sequence><element ref="propertyGroup" minOccurs="0" maxOccurs="unbounded"/></sequence>
          <attribute name="id" type="string"/>
-         <attribute name="label" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
-         <attribute name="description" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
+         <attribute name="label" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
+         <attribute name="description" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
       </complexType>
    </element>
 
@@ -83,16 +84,16 @@
    <element name="propertyGroup">
       <complexType>
          <sequence><element ref="property" minOccurs="0" maxOccurs="unbounded"/></sequence>
-         <attribute name="label" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
+         <attribute name="label" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
       </complexType>
    </element>
 
    <element name="property">
       <complexType>
          <attribute name="id" type="string" use="required"/>
-         <attribute name="label" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
-         <attribute name="description" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
-         <attribute name="hint" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
+         <attribute name="label" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
+         <attribute name="description" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
+         <attribute name="hint" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
           <attribute name="type">
              <simpleType>
                 <restriction base="string">

@@ -1,8 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <schema targetNamespace="io.cloudbeaver.server" xmlns="http://www.w3.org/2001/XMLSchema">
-   <annotation><appInfo><meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.driver" name="Web drivers"/></appInfo><documentation>Web data source drivers</documentation></annotation>
+   <annotation><appinfo><meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.driver" name="Web drivers"/></appinfo><documentation>Web data source drivers</documentation></annotation>
 
    <element name="extension">
+      <annotation><appinfo><meta.element/></appinfo></annotation>
       <complexType>
          <sequence><element ref="driver" minOccurs="0" maxOccurs="unbounded"/></sequence>
          <attribute name="point" type="string" use="required"/>
@@ -12,6 +13,6 @@
    </element>
 
    <element name="driver">
-      <complexType><attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute></complexType>
+      <complexType><attribute name="id" type="string" use="required"><annotation><appinfo><meta.attribute kind="identifier"/></appinfo></annotation></attribute></complexType>
    </element>
 </schema>
