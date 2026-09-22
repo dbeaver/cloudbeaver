@@ -162,7 +162,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
   ]);
 
   return (
-    <div className="tw:overflow-auto tw:h-full tw:max-w-full theme-text-on-surface">
+    <div className="tw:h-full tw:max-w-full theme-text-on-surface">
       <DataGrid
         columnCount={columnsCount}
         rowCount={rowsCount}
