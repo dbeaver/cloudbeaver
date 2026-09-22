@@ -108,6 +108,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
 
   const selectedItem = items.find((item, index) => keySelector(item, index) === selectedKey);
   const [internalInputValue, setInternalInputValue] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   const inputValue: string | null = allowCustomValue ? ((selectedKey ?? null) as string | null) : internalInputValue;
   const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
@@ -122,7 +123,10 @@ export const Combobox: IComboboxType = observer(function Combobox({
       const itemDisabled = isDisabled?.(item);
 
       const isVisible =
-        allowCustomValue || inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
+        (allowCustomValue && !isSearching) ||
+        inputValue === null ||
+        !inputValue.trim() ||
+        itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
 
       return {
         item,
@@ -199,6 +203,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
 
   function handleSetValueOnClick() {
     if (allowCustomValue) {
+      setIsSearching(false);
       return true;
     }
     setInputValue(null);
@@ -238,6 +243,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
             autoSelect={!allowCustomValue}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
+            onChange={allowCustomValue ? () => setIsSearching(true) : undefined}
             {...rest}
           />
           {loading ? (
@@ -278,7 +284,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
                   </ComboboxItem>
                 ))
               ) : (
-                <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
+                !allowCustomValue && <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
               )}
             </ComboboxPopover>
           )}
