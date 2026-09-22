@@ -121,9 +121,8 @@ export class DataExportMenuService {
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-
-        if (!isExportableNode(node)) {
+        // the menu may be opened on a non-exportable node of a selection that contains exportable ones
+        if (!getNodesFromContext(context).some(isExportableNode)) {
           return false;
         }
 
