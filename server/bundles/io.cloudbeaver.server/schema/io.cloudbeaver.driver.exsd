@@ -1,34 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
-<annotation>
-      <appInfo>
-         <meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.driver" name="Web drivers"/>
-      </appInfo>
-      <documentation>
-         DBeaver data source provider
-      </documentation>
-   </annotation>
+<schema targetNamespace="io.cloudbeaver.server" xmlns="http://www.w3.org/2001/XMLSchema">
+   <annotation><appInfo><meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.driver" name="Web drivers"/></appInfo><documentation>Web data source drivers</documentation></annotation>
 
    <element name="extension">
-      <annotation>
-         <appInfo>
-            <meta.element />
-         </appInfo>
-      </annotation>
       <complexType>
-         <sequence>
-            <element ref="driver"/>
-         </sequence>
+         <sequence><element ref="driver" minOccurs="0" maxOccurs="unbounded"/></sequence>
+         <attribute name="point" type="string" use="required"/>
+         <attribute name="id" type="string"/>
+         <attribute name="name" type="string"/>
       </complexType>
    </element>
 
    <element name="driver">
-      <annotation>
-         <documentation>
-            Web service description
-         </documentation>
-      </annotation>
+      <complexType><attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute></complexType>
    </element>
-
-
 </schema>

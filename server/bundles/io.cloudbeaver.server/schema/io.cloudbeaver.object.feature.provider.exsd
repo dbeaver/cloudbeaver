@@ -1,34 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
-<annotation>
-      <appInfo>
-         <meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.object.feature.provider" name="Web object feature providers"/>
-      </appInfo>
-      <documentation>
-         Web feature
-      </documentation>
-   </annotation>
+<schema targetNamespace="io.cloudbeaver.server" xmlns="http://www.w3.org/2001/XMLSchema">
+   <annotation><appInfo><meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.object.feature.provider" name="Web object feature providers"/></appInfo><documentation>Web object feature providers</documentation></annotation>
 
    <element name="extension">
-      <annotation>
-         <appInfo>
-            <meta.element />
-         </appInfo>
-      </annotation>
       <complexType>
-         <sequence>
-            <element ref="featureProvider"/>
-         </sequence>
+         <sequence><element ref="featureProvider" minOccurs="0" maxOccurs="unbounded"/></sequence>
+         <attribute name="point" type="string" use="required"/>
+         <attribute name="id" type="string"/>
+         <attribute name="name" type="string"/>
       </complexType>
    </element>
 
    <element name="featureProvider">
-      <annotation>
-         <documentation>
-            Web service description
-         </documentation>
-      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute>
+         <attribute name="class" type="string" use="required"><annotation><appInfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.service.navigator.DBWFeatureProvider"/></appInfo></annotation></attribute>
+      </complexType>
    </element>
-
-
 </schema>
