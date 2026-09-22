@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, createConnectionParam, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, isConnectionInfoParamEqual } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -188,25 +188,31 @@ export class DataExportMenuService {
   }
 
   private async getExportContexts(nodes: NavNode[]): Promise<IExportContext[]> {
-    const connections = new Map<string, INodeExportConnection>();
+    const nodeConnections = new Map<string, INodeExportConnection>();
+    const loadedConnections: INodeExportConnection[] = [];
 
     for (const node of nodes) {
-      if (!isExportableNode(node) || connections.has(node.uri)) {
+      if (!isExportableNode(node) || nodeConnections.has(node.uri) || !node.projectId) {
         continue;
       }
 
-      const nodeConnection = this.connectionInfoResource.getConnectionForNode(node.uri);
+      // the key is derived from the node, the connection of a selected node may not be cached yet
+      const key = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri);
 
-      if (!nodeConnection) {
+      if (!key) {
         continue;
       }
 
-      const key = createConnectionParam(nodeConnection);
-      const connection = await this.connectionInfoResource.load(key);
+      let connection = loadedConnections.find(loaded => isConnectionInfoParamEqual(loaded.key, key));
 
-      connections.set(node.uri, { key, name: connection.name });
+      if (!connection) {
+        connection = { key, name: (await this.connectionInfoResource.load(key)).name };
+        loadedConnections.push(connection);
+      }
+
+      nodeConnections.set(node.uri, connection);
     }
 
-    return getNodeExportContexts(nodes, nodeId => connections.get(nodeId));
+    return getNodeExportContexts(nodes, nodeId => nodeConnections.get(nodeId));
   }
 }
