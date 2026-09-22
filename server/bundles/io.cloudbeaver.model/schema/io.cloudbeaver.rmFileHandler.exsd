@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <schema targetNamespace="io.cloudbeaver.model" xmlns="http://www.w3.org/2001/XMLSchema">
-   <annotation><appinfo><meta.schema plugin="io.cloudbeaver.model" id="io.cloudbeaver.rm.file.handler" name="RM file operations handler"/></appinfo><documentation>RM file operations handler</documentation></annotation>
+   <annotation><appInfo><meta.schema plugin="io.cloudbeaver.model" id="io.cloudbeaver.rm.file.handler" name="RM file operations handler"/></appInfo><documentation>RM file operations handler</documentation></annotation>
 
    <element name="extension">
-      <annotation><appinfo><meta.element/></appinfo></annotation>
+      <annotation><appInfo><meta.element/></appInfo></annotation>
       <complexType>
          <sequence><element ref="rmFileHandler" minOccurs="0" maxOccurs="unbounded"/></sequence>
          <attribute name="point" type="string" use="required"/>
@@ -14,8 +14,8 @@
 
    <element name="rmFileHandler">
       <complexType>
-         <attribute name="id" type="string" use="required"><annotation><appinfo><meta.attribute kind="identifier"/></appinfo></annotation></attribute>
-         <attribute name="class" type="string" use="required"><annotation><appinfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.model.rm.local.RMFileOperationHandler"/></appinfo></annotation></attribute>
+         <attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute>
+         <attribute name="class" type="string" use="required"><annotation><appInfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.model.rm.local.RMFileOperationHandler"/></appInfo></annotation></attribute>
       </complexType>
    </element>
 </schema>

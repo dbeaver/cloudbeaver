@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <schema targetNamespace="io.cloudbeaver.model" xmlns="http://www.w3.org/2001/XMLSchema">
-   <annotation><appinfo><meta.schema plugin="io.cloudbeaver.model" id="io.cloudbeaver.metaParameters" name="Subject meta parameters"/></appinfo></annotation>
+   <annotation><appInfo><meta.schema plugin="io.cloudbeaver.model" id="io.cloudbeaver.metaParameters" name="Subject meta parameters"/></appInfo></annotation>
 
    <element name="extension">
-      <annotation><appinfo><meta.element/></appinfo></annotation>
+      <annotation><appInfo><meta.element/></appInfo></annotation>
       <complexType>
          <sequence><element ref="metaParameters" minOccurs="0" maxOccurs="unbounded"/></sequence>
          <attribute name="point" type="string" use="required"/>
@@ -29,16 +29,16 @@
    <element name="propertyGroup">
       <complexType>
          <sequence><element ref="property" minOccurs="0" maxOccurs="unbounded"/></sequence>
-         <attribute name="label" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
+         <attribute name="label" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
       </complexType>
    </element>
 
    <element name="property">
       <complexType>
          <attribute name="id" type="string" use="required"/>
-         <attribute name="label" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
-         <attribute name="description" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
-         <attribute name="hint" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
+         <attribute name="label" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
+         <attribute name="description" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
+         <attribute name="hint" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
           <attribute name="type">
              <simpleType>
                 <restriction base="string">

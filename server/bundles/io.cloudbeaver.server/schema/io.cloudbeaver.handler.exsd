@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <schema targetNamespace="io.cloudbeaver.server" xmlns="http://www.w3.org/2001/XMLSchema">
-   <annotation><appinfo><meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.handler" name="Web handlers"/></appinfo><documentation>Web servlet and session handlers</documentation></annotation>
+   <annotation><appInfo><meta.schema plugin="io.cloudbeaver.server" id="io.cloudbeaver.handler" name="Web handlers"/></appInfo><documentation>Web servlet and session handlers</documentation></annotation>
 
    <element name="extension">
-      <annotation><appinfo><meta.element/></appinfo></annotation>
+      <annotation><appInfo><meta.element/></appInfo></annotation>
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="servletHandler"/>
@@ -17,15 +17,15 @@
 
    <element name="servletHandler">
       <complexType>
-         <attribute name="id" type="string" use="required"><annotation><appinfo><meta.attribute kind="identifier"/></appinfo></annotation></attribute>
-         <attribute name="class" type="string" use="required"><annotation><appinfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.service.DBWServletHandler"/></appinfo></annotation></attribute>
+         <attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute>
+         <attribute name="class" type="string" use="required"><annotation><appInfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.service.DBWServletHandler"/></appInfo></annotation></attribute>
       </complexType>
    </element>
 
    <element name="sessionHandler">
       <complexType>
-         <attribute name="id" type="string" use="required"><annotation><appinfo><meta.attribute kind="identifier"/></appinfo></annotation></attribute>
-         <attribute name="class" type="string" use="required"><annotation><appinfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.service.DBWSessionHandler"/></appinfo></annotation></attribute>
+         <attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute>
+         <attribute name="class" type="string" use="required"><annotation><appInfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.service.DBWSessionHandler"/></appInfo></annotation></attribute>
       </complexType>
    </element>
 </schema>

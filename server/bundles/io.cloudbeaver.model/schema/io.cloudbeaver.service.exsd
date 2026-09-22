@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <schema targetNamespace="io.cloudbeaver.model" xmlns="http://www.w3.org/2001/XMLSchema">
-   <annotation><appinfo><meta.schema plugin="io.cloudbeaver.model" id="io.cloudbeaver.service" name="Web services"/></appinfo><documentation>Web services</documentation></annotation>
+   <annotation><appInfo><meta.schema plugin="io.cloudbeaver.model" id="io.cloudbeaver.service" name="Web services"/></appInfo><documentation>Web services</documentation></annotation>
 
    <element name="extension">
-      <annotation><appinfo><meta.element/></appinfo></annotation>
+      <annotation><appInfo><meta.element/></appInfo></annotation>
       <complexType>
          <sequence><element ref="service" minOccurs="0" maxOccurs="unbounded"/></sequence>
          <attribute name="point" type="string" use="required"/>
@@ -15,18 +15,18 @@
    <element name="service">
       <complexType>
          <sequence><element ref="permission" minOccurs="0" maxOccurs="unbounded"/></sequence>
-         <attribute name="id" type="string" use="required"><annotation><appinfo><meta.attribute kind="identifier"/></appinfo></annotation></attribute>
-         <attribute name="label" type="string" use="required"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
-         <attribute name="description" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
-         <attribute name="class" type="string" use="required"><annotation><appinfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.service.DBWServiceBinding"/></appinfo></annotation></attribute>
+         <attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute>
+         <attribute name="label" type="string" use="required"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
+         <attribute name="description" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
+         <attribute name="class" type="string" use="required"><annotation><appInfo><meta.attribute kind="java" basedOn=":io.cloudbeaver.service.DBWServiceBinding"/></appInfo></annotation></attribute>
       </complexType>
    </element>
 
    <element name="permission">
       <complexType>
-         <attribute name="id" type="string" use="required"><annotation><appinfo><meta.attribute kind="identifier"/></appinfo></annotation></attribute>
-         <attribute name="label" type="string" use="required"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
-         <attribute name="description" type="string"><annotation><appinfo><meta.attribute translatable="true"/></appinfo></annotation></attribute>
+         <attribute name="id" type="string" use="required"><annotation><appInfo><meta.attribute kind="identifier"/></appInfo></annotation></attribute>
+         <attribute name="label" type="string" use="required"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
+         <attribute name="description" type="string"><annotation><appInfo><meta.attribute translatable="true"/></appInfo></annotation></attribute>
          <attribute name="category" type="string"/>
          <attribute name="scope" type="string"/>
       </complexType>
