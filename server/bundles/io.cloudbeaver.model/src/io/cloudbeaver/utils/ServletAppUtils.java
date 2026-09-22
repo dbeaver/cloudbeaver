@@ -50,10 +50,6 @@ public class ServletAppUtils {
     private static final String HEADER_FORWARDED_PROTO = "X-Forwarded-Proto";
     private static final String HEADER_FORWARDED_PORT = "X-Forwarded-Port";
     private static final String HEADER_FORWARDED_HOST = "X-Forwarded-Host";
-    private static final Set<Integer> DEFAULT_PORTS = Set.of(
-        80,
-        443
-    );
 
 
     private static final Log log = Log.getLog(ServletAppUtils.class);
@@ -323,12 +319,37 @@ public class ServletAppUtils {
         @NotNull HttpServletRequest request,
         @NotNull ServletApplication application
     ) {
-        String origin = getOriginHeader(request);
-        String forwardedScheme = getForwardedScheme(request);
-        String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
-        origin = resolveOrigin(request, origin, forwardedScheme, forwardedHost);
+        return getOriginFromRequest(request, application, true, true);
+    }
+
+    @NotNull
+    public static String getRequestOriginFromRequest(
+        @NotNull HttpServletRequest request,
+        @NotNull ServletApplication application,
+        boolean useForwardedHeaders
+    ) {
+        return getOriginFromRequest(request, application, false, useForwardedHeaders);
+    }
+
+    @Nullable
+    public static String getClientOriginFromRequest(@NotNull HttpServletRequest request) {
+        return getOriginHeader(request);
+    }
+
+    @NotNull
+    private static String getOriginFromRequest(
+        @NotNull HttpServletRequest request,
+        @NotNull ServletApplication application,
+        boolean useOriginHeader,
+        boolean useForwardedHeaders
+    ) {
+        String origin = useOriginHeader ? getOriginHeader(request) : null;
+        String forwardedScheme = useForwardedHeaders ? getForwardedScheme(request) : null;
+        URI forwardedHostUri = useForwardedHeaders ?
+            parseForwardedHost(request.getHeader(HEADER_FORWARDED_HOST)) : null;
+        origin = resolveOrigin(request, origin, forwardedScheme, forwardedHostUri);
         origin = appendRootUri(origin, application.getRootURI());
-        return normalizeOrigin(request, origin, forwardedScheme, forwardedHost);
+        return normalizeOrigin(request, origin, forwardedScheme, forwardedHostUri, useForwardedHeaders);
     }
 
     @Nullable
@@ -364,10 +385,10 @@ public class ServletAppUtils {
         @NotNull HttpServletRequest request,
         @Nullable String origin,
         @Nullable String forwardedScheme,
-        @Nullable String forwardedHost
+        @Nullable URI forwardedHostUri
     ) {
-        if (CommonUtils.isNotEmpty(forwardedScheme) && CommonUtils.isNotEmpty(forwardedHost)) {
-            origin = forwardedScheme + "://" + forwardedHost;
+        if (CommonUtils.isNotEmpty(forwardedScheme) && forwardedHostUri != null) {
+            origin = forwardedScheme + "://" + forwardedHostUri.getRawAuthority();
             if (log.isTraceEnabled()) {
                 log.trace("forwarded origin: " + origin);
             }
@@ -396,16 +417,17 @@ public class ServletAppUtils {
         @NotNull HttpServletRequest request,
         @NotNull String origin,
         @Nullable String forwardedScheme,
-        @Nullable String forwardedHost
+        @Nullable URI forwardedHostUri,
+        boolean useForwardedHeaders
     ) {
         URI uri = URI.create(origin);
-        URI forwardedHostUri = parseForwardedHost(forwardedHost);
         int forwardedHostPort = forwardedHostUri == null ? -1 : forwardedHostUri.getPort();
-        int port = getForwardedPort(request, forwardedHostPort > -1 ? forwardedHostPort : uri.getPort());
+        int defaultPort = forwardedHostPort > -1 ? forwardedHostPort : uri.getPort();
+        int port = useForwardedHeaders ? getForwardedPort(request, defaultPort) : defaultPort;
         String finalScheme = uri.getScheme();
         String finalHost = uri.getHost();
         int finalPort = port;
-        boolean changed = false;
+        boolean changed = port != uri.getPort();
         if (CommonUtils.isNotEmpty(forwardedScheme) && !forwardedScheme.equals(finalScheme)) {
             finalScheme = forwardedScheme;
             changed = true;
@@ -414,7 +436,7 @@ public class ServletAppUtils {
             finalHost = forwardedHostUri.getHost();
             changed = true;
         }
-        if (DEFAULT_PORTS.contains(port)) {
+        if (isDefaultPort(finalScheme, port)) {
             finalPort = -1;
             changed = true;
         }
@@ -432,16 +454,28 @@ public class ServletAppUtils {
         if (CommonUtils.isEmpty(forwardedHost)) {
             return null;
         }
-        URI forwardedHostUri = URI.create("http://" + forwardedHost);
-        if (forwardedHostUri.getHost() == null ||
-            forwardedHostUri.getUserInfo() != null ||
-            CommonUtils.isNotEmpty(forwardedHostUri.getRawPath()) ||
-            forwardedHostUri.getRawQuery() != null ||
-            forwardedHostUri.getRawFragment() != null ||
-            !forwardedHost.equals(forwardedHostUri.getRawAuthority())) {
-            throw new IllegalArgumentException("Invalid forwarded host");
+        try {
+            URI forwardedHostUri = URI.create("http://" + forwardedHost);
+            if (!isValidForwardedHost(forwardedHostUri, forwardedHost)) {
+                log.warn("Ignoring invalid X-Forwarded-Host header");
+                return null;
+            }
+            return forwardedHostUri;
+        } catch (IllegalArgumentException e) {
+            log.warn("Ignoring invalid X-Forwarded-Host header");
+            return null;
         }
-        return forwardedHostUri;
+    }
+
+    private static boolean isValidForwardedHost(@NotNull URI forwardedHostUri, @NotNull String forwardedHost) {
+        return forwardedHostUri.getHost() != null &&
+            forwardedHostUri.getUserInfo() == null &&
+            forwardedHost.equals(forwardedHostUri.getRawAuthority());
+    }
+
+    private static boolean isDefaultPort(@Nullable String scheme, int port) {
+        return ("http".equalsIgnoreCase(scheme) && port == 80) ||
+            ("https".equalsIgnoreCase(scheme) && port == 443);
     }
 
     private static int getForwardedPort(@NotNull HttpServletRequest request, int defaultPort) {
@@ -488,7 +522,7 @@ public class ServletAppUtils {
         if (uri.getPort() > 0) {
             builder.append(":").append(uri.getPort());
         }
-        return removeSideSlashes(substringBeforeRootURI(builder.toString()));
+        return removeSideSlashes(builder.toString());
     }
 
     public static String substringBeforeRootURI(@NotNull String uri) {

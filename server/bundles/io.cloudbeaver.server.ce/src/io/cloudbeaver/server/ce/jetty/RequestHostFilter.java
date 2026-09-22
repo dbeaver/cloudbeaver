@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server.jetty;
+package io.cloudbeaver.server.ce.jetty;
 
 import com.google.common.net.InetAddresses;
 import io.cloudbeaver.model.config.CBServerConfig;
@@ -67,41 +67,38 @@ public class RequestHostFilter implements Filter {
 
         if (request instanceof HttpServletRequest httpRequest) {
             CBServerConfig serverConfig = application.getServerConfiguration();
-            URI originUri;
+            boolean excludedPath = isExcludedPath(httpRequest.getServletPath());
+            URI requestOriginUri;
+            URI clientOriginUri = null;
             try {
-                String origin = ServletAppUtils.getOriginFromRequest(httpRequest, application);
-                originUri = URI.create(origin);
+                requestOriginUri = URI.create(ServletAppUtils.getRequestOriginFromRequest(
+                    httpRequest,
+                    application,
+                    application.getAppConfiguration().isEnabledForwardProxy()
+                ));
+                if (!excludedPath) {
+                    String clientOrigin = ServletAppUtils.getClientOriginFromRequest(httpRequest);
+                    if (CommonUtils.isNotEmpty(clientOrigin)) {
+                        clientOriginUri = URI.create(clientOrigin);
+                    }
+                }
             } catch (Exception e) {
                 log.error("Failed to get origin from request", e);
-                chain.doFilter(request, response);
+                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
-            if (CommonUtils.isNotEmpty(originUri.getHost())) {
-                requestAllowed = InetAddresses.isInetAddress(originUri.getHost());
-            } else {
-                log.debug(
-                    "Request origin host is null, request URI - " + originUri +
-                        ", request path - " + httpRequest.getServletPath() +
-                        ", request url - " + httpRequest.getRequestURL()
-                );
-
+            if (!isValidOrigin(requestOriginUri) || (clientOriginUri != null && !isValidOrigin(clientOriginUri))) {
+                log.warn("Invalid request origin");
+                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
             }
-
-            String servletPath = httpRequest.getServletPath();
-            if (!requestAllowed) {
-                if (CommonUtils.isNotEmpty(servletPath)) {
-                    for (String excludedPath : excludedPaths) {
-                        if (servletPath.contains(excludedPath)) {
-                            chain.doFilter(request, response);
-                            return;
-                        }
-                    }
-                }
-                requestAllowed = validateHosts(serverConfig, httpRequest, (HttpServletResponse) response, originUri);
+            requestAllowed = validateSchema(serverConfig, httpRequest, (HttpServletResponse) response, requestOriginUri);
+            if (requestAllowed && !InetAddresses.isInetAddress(requestOriginUri.getHost())) {
+                requestAllowed = validateHosts(serverConfig, httpRequest, (HttpServletResponse) response, requestOriginUri);
             }
-            if (requestAllowed) {
-                requestAllowed = validateSchema(serverConfig, httpRequest, (HttpServletResponse) response, originUri);
+            if (requestAllowed && clientOriginUri != null && !InetAddresses.isInetAddress(clientOriginUri.getHost())) {
+                requestAllowed = validateHosts(serverConfig, httpRequest, (HttpServletResponse) response, clientOriginUri);
             }
         }
         if (requestAllowed) {
@@ -116,8 +113,8 @@ public class RequestHostFilter implements Filter {
         @NotNull URI originUri
     ) throws IOException {
         boolean httpsExpected = serverConfig.isForceHttps();
-        if ("http".equals(originUri.getScheme()) && httpsExpected) {
-            String redirectHost = getAllowedHost(originUri, serverConfig.getSupportedHosts());
+        if ("http".equalsIgnoreCase(originUri.getScheme()) && httpsExpected) {
+            String redirectHost = getHttpsRedirectHost(originUri, serverConfig.getSupportedHosts());
             if (redirectHost == null) {
                 log.warn("Unable to redirect request to HTTPS because its host is not configured in 'supportedHosts'");
                 response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -130,11 +127,18 @@ public class RequestHostFilter implements Filter {
         return true;
     }
 
+    private boolean isExcludedPath(@Nullable String servletPath) {
+        if (CommonUtils.isEmpty(servletPath)) {
+            return false;
+        }
+        return excludedPaths.stream().anyMatch(servletPath::contains);
+    }
+
     private boolean validateHosts(
         @NotNull CBServerConfig serverConfig,
         @NotNull HttpServletRequest httpRequest,
         @NotNull HttpServletResponse response,
-        URI originUri
+        @NotNull URI originUri
     ) throws IOException {
         List<String> availableHosts = serverConfig.getSupportedHosts();
         if (CommonUtils.isEmpty(availableHosts)) {
@@ -239,11 +243,79 @@ public class RequestHostFilter implements Filter {
 
     @Nullable
     private String getAllowedHost(@NotNull URI originUri, @NotNull List<String> availableHosts) {
-        String requestHost = getRequestHost(originUri);
         return availableHosts.stream()
-            .filter(host -> host.equals(requestHost))
+            .filter(host -> isSameAuthority(originUri, host))
             .findFirst()
             .orElse(null);
+    }
+
+    @Nullable
+    private String getHttpsRedirectHost(@NotNull URI originUri, @NotNull List<String> availableHosts) {
+        List<String> sameHostAuthorities = availableHosts.stream()
+            .filter(host -> isSameHost(originUri, host, "https"))
+            .toList();
+        if (getEffectivePort(originUri) == 80) {
+            String defaultHttpsAuthority = sameHostAuthorities.stream()
+                .filter(host -> getEffectivePort("https", host) == 443)
+                .findFirst()
+                .orElse(null);
+            if (defaultHttpsAuthority != null) {
+                return defaultHttpsAuthority;
+            }
+        }
+        int originPort = getEffectivePort(originUri);
+        return sameHostAuthorities.stream()
+            .filter(host -> getEffectivePort("https", host) == originPort)
+            .findFirst()
+            .orElse(null);
+    }
+
+    private static boolean isSameHost(@NotNull URI originUri, @NotNull String authority, @NotNull String scheme) {
+        try {
+            URI allowedUri = validateRedirectAuthority(scheme, authority);
+            return originUri.getHost().equalsIgnoreCase(allowedUri.getHost());
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private static int getEffectivePort(@NotNull String scheme, @NotNull String authority) {
+        try {
+            return getEffectivePort(validateRedirectAuthority(scheme, authority));
+        } catch (IllegalArgumentException e) {
+            return -1;
+        }
+    }
+
+    private static boolean isSameAuthority(@NotNull URI originUri, @NotNull String authority) {
+        try {
+            URI allowedUri = validateRedirectAuthority(originUri.getScheme(), authority);
+            return originUri.getHost() != null && originUri.getHost().equalsIgnoreCase(allowedUri.getHost()) &&
+                getEffectivePort(originUri) == getEffectivePort(allowedUri);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private static int getEffectivePort(@NotNull URI uri) {
+        if (uri.getPort() > -1) {
+            return uri.getPort();
+        }
+        if ("http".equalsIgnoreCase(uri.getScheme())) {
+            return 80;
+        }
+        if ("https".equalsIgnoreCase(uri.getScheme())) {
+            return 443;
+        }
+        return -1;
+    }
+
+    private static boolean isHttpScheme(@Nullable String scheme) {
+        return "http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme);
+    }
+
+    private static boolean isValidOrigin(@NotNull URI originUri) {
+        return isHttpScheme(originUri.getScheme()) && CommonUtils.isNotEmpty(originUri.getHost());
     }
 
     @Nullable
