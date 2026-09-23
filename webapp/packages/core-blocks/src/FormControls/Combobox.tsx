@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { runInAction } from 'mobx';
 import { useCallback, useContext, useId, useState } from 'react';
 import {
   ComboboxInput,
@@ -136,6 +137,29 @@ export const Combobox: IComboboxType = observer(function Combobox({
     };
   }
 
+  const commitValue = useCallback(
+    (value: unknown) => {
+      if (name !== undefined && state) {
+        runInAction(() => {
+          state[name] = value;
+        });
+      }
+      if (onSelect) {
+        onSelect(value, name as undefined, selectedKey);
+      }
+      if (context) {
+        context.change(typeof value === 'string' ? value : String(value ?? ''), name);
+      }
+    },
+    [name, state, onSelect, selectedKey, context],
+  );
+
+  const commitPendingCustomValue = useCallback(() => {
+    if (internalInputValue !== null && internalInputValue !== String(selectedKey ?? '')) {
+      commitValue(internalInputValue);
+    }
+  }, [internalInputValue, selectedKey, commitValue]);
+
   const filteredItems = items
     .map(mapItem)
     .filter(
@@ -159,22 +183,17 @@ export const Combobox: IComboboxType = observer(function Combobox({
   const handleSelect = useCallback(
     (selectedValue: string | string[] | null) => {
       const allItems = footerItems ? [...items, ...footerItems] : items;
-      const item = allItems.find((item, idx) => keySelector(item, idx) === selectedValue);
-      if ((!item || selectedValue === selectedKey) && !allowClear) {
+      const itemIndex =
+        typeof selectedValue === 'string' ? allItems.findIndex((item, idx) => String(keySelector(item, idx)) === selectedValue) : -1;
+      const normalizedSelectedValue = itemIndex === -1 ? selectedValue : keySelector(allItems[itemIndex]!, itemIndex);
+
+      if ((itemIndex === -1 || normalizedSelectedValue === selectedKey) && !allowClear) {
         return;
       }
 
-      if (name !== undefined && state) {
-        state[name] = selectedValue;
-      }
-      if (onSelect) {
-        onSelect(selectedValue, name as undefined, selectedKey);
-      }
-      if (context) {
-        context.change(typeof selectedValue === 'string' ? selectedValue : '', name);
-      }
+      commitValue(normalizedSelectedValue);
     },
-    [items, footerItems, selectedKey, allowClear, name, state, onSelect, context, keySelector],
+    [items, footerItems, selectedKey, allowClear, keySelector, commitValue],
   );
 
   const icon: string | React.ReactElement | undefined = selectedItem ? iconSelector?.(selectedItem) : undefined;
@@ -205,8 +224,9 @@ export const Combobox: IComboboxType = observer(function Combobox({
   });
 
   function handleBlur() {
-    setIsSearching(false);
     if (allowCustomValue) {
+      commitPendingCustomValue();
+      setIsSearching(false);
       comboboxStore.setOpen(false);
     } else {
       setInputValue(null);
@@ -216,6 +236,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (allowCustomValue && event.key === 'Enter') {
       event.preventDefault();
+      commitPendingCustomValue();
       comboboxStore.setOpen(false);
       setIsSearching(false);
     }

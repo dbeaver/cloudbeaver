@@ -201,6 +201,36 @@ describe('Combobox', () => {
       expect(screen.queryByRole('option', { name: 'Never' })).not.toBeInTheDocument();
     });
 
+    it('restores the original non-string key when selecting an option', async () => {
+      const user = userEvent.setup();
+      const onSelect = vi.fn();
+      const state = observable<{ database: string | boolean }>({ database: 'always' });
+      const items = [
+        { value: false, label: 'Never' },
+        { value: 'always', label: 'Always' },
+      ];
+
+      render(
+        <Combobox
+          aria-label="Database"
+          items={items}
+          state={state}
+          name="database"
+          keySelector={item => item.value}
+          valueSelector={item => item.label}
+          allowCustomValue
+          onSelect={onSelect}
+        />,
+      );
+      const input = await openOptions(user);
+
+      await user.click(screen.getByRole('option', { name: 'Never' }));
+
+      expect(input).toHaveValue('false');
+      expect(state.database).toBe(false);
+      expect(onSelect).toHaveBeenCalledExactlyOnceWith(false, 'database', 'always');
+    });
+
     it('filters by the typed query when the named state field has no onChange handler', async () => {
       const user = userEvent.setup();
       const state = observable({ database: 'PostgreSQL' });
@@ -217,6 +247,20 @@ describe('Combobox', () => {
       await user.click(screen.getByRole('option', { name: 'MySQL' }));
       expect(input).toHaveValue('MySQL');
       expect(state.database).toBe('MySQL');
+    });
+
+    it('keeps a state-backed custom value after blur without an onChange handler', async () => {
+      const user = userEvent.setup();
+      const state = observable({ database: 'PostgreSQL' });
+      render(<Combobox aria-label="Database" items={['PostgreSQL', 'MySQL']} state={state} name="database" allowCustomValue />);
+      const input = await openOptions(user);
+
+      await user.clear(input);
+      await user.type(input, 'SQLite');
+      await user.tab();
+
+      expect(input).toHaveValue('SQLite');
+      expect(state.database).toBe('SQLite');
     });
 
     it.each([
