@@ -100,9 +100,15 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   useExecutor({
     executor: contextRef.context?.tree.actions,
     handlers: [
-      function refreshRoot({ type, nodeId }) {
-        if (type === 'show' && nodeId === node.uri) {
+      function handleTreeAction({ type, nodeId }) {
+        if (nodeId !== node.uri) {
+          return;
+        }
+
+        if (type === 'show') {
           elementRef.current?.scrollIntoView();
+        } else if (type === 'focus') {
+          elementRef.current?.focus();
         }
       },
     ],
