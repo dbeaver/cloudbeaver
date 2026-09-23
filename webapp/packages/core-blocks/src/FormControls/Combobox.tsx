@@ -202,7 +202,10 @@ export const Combobox: IComboboxType = observer(function Combobox({
   });
 
   function handleBlur() {
-    if (!allowCustomValue) {
+    setIsSearching(false);
+    if (allowCustomValue) {
+      comboboxStore.setOpen(false);
+    } else {
       setInputValue(null);
     }
   }
@@ -211,6 +214,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
     if (allowCustomValue && event.key === 'Enter') {
       event.preventDefault();
       comboboxStore.setOpen(false);
+      setIsSearching(false);
     }
   }
 
