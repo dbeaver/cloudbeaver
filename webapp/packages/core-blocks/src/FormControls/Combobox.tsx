@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { runInAction } from 'mobx';
 import { useCallback, useContext, useId, useState } from 'react';
 import {
   ComboboxInput,
@@ -117,12 +116,8 @@ export const Combobox: IComboboxType = observer(function Combobox({
   const allItems = footerItems ? [...items, ...footerItems] : items;
   const selectedItem = allItems.find((item, index) => keySelector(item, index) === selectedKey);
   const [internalInputValue, setInternalInputValue] = useState<string | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
 
-  let inputValue = internalInputValue;
-  if (allowCustomValue && !isSearching) {
-    inputValue = selectedKey == null ? null : String(selectedKey);
-  }
+  const inputValue: string | null = allowCustomValue ? ((selectedKey ?? null) as string | null) : internalInputValue;
   const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
   const displayValue = inputValue ?? selectedValue;
 
@@ -137,38 +132,14 @@ export const Combobox: IComboboxType = observer(function Combobox({
     };
   }
 
-  const commitValue = useCallback(
-    (value: unknown) => {
-      if (name !== undefined && state) {
-        runInAction(() => {
-          state[name] = value;
-        });
-      }
-      if (onSelect) {
-        onSelect(value, name as undefined, selectedKey);
-      }
-      if (context) {
-        context.change(typeof value === 'string' ? value : String(value ?? ''), name);
-      }
-    },
-    [name, state, onSelect, selectedKey, context],
-  );
-
-  const commitPendingCustomValue = useCallback(() => {
-    if (internalInputValue !== null && internalInputValue !== String(selectedKey ?? '')) {
-      commitValue(internalInputValue);
-    }
-  }, [internalInputValue, selectedKey, commitValue]);
-
   const filteredItems = items
     .map(mapItem)
     .filter(
       ({ itemValue, itemSeparator }) =>
         itemSeparator ||
-        (allowCustomValue && !isSearching) ||
-        inputValue === null ||
-        !inputValue.trim() ||
-        itemValue.toLowerCase().includes(inputValue.trim().toLowerCase()),
+        internalInputValue === null ||
+        !internalInputValue.trim() ||
+        itemValue.toLowerCase().includes(internalInputValue.trim().toLowerCase()),
     );
   const itemGroups: { key: string; items: typeof filteredItems }[] = [{ key: 'first', items: [] }];
   for (const item of filteredItems) {
@@ -183,17 +154,22 @@ export const Combobox: IComboboxType = observer(function Combobox({
   const handleSelect = useCallback(
     (selectedValue: string | string[] | null) => {
       const allItems = footerItems ? [...items, ...footerItems] : items;
-      const itemIndex =
-        typeof selectedValue === 'string' ? allItems.findIndex((item, idx) => String(keySelector(item, idx)) === selectedValue) : -1;
-      const normalizedSelectedValue = itemIndex === -1 ? selectedValue : keySelector(allItems[itemIndex]!, itemIndex);
-
-      if ((itemIndex === -1 || normalizedSelectedValue === selectedKey) && !allowClear) {
+      const item = allItems.find((item, idx) => keySelector(item, idx) === selectedValue);
+      if ((!item || selectedValue === selectedKey) && !allowClear) {
         return;
       }
 
-      commitValue(normalizedSelectedValue);
+      if (name !== undefined && state) {
+        state[name] = selectedValue;
+      }
+      if (onSelect) {
+        onSelect(selectedValue, name as undefined, selectedKey);
+      }
+      if (context) {
+        context.change(typeof selectedValue === 'string' ? selectedValue : '', name);
+      }
     },
-    [items, footerItems, selectedKey, allowClear, keySelector, commitValue],
+    [items, footerItems, selectedKey, allowClear, name, state, onSelect, context, keySelector],
   );
 
   const icon: string | React.ReactElement | undefined = selectedItem ? iconSelector?.(selectedItem) : undefined;
@@ -221,12 +197,15 @@ export const Combobox: IComboboxType = observer(function Combobox({
     defaultValue: comboboxDefaultValue,
     defaultSelectedValue: comboboxDefaultSelectedValue as string,
     setSelectedValue: handleSelect,
+    setOpen: open => {
+      if (!open && allowCustomValue) {
+        setInternalInputValue(null);
+      }
+    },
   });
 
   function handleBlur() {
     if (allowCustomValue) {
-      commitPendingCustomValue();
-      setIsSearching(false);
       comboboxStore.setOpen(false);
     } else {
       setInputValue(null);
@@ -236,15 +215,12 @@ export const Combobox: IComboboxType = observer(function Combobox({
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (allowCustomValue && event.key === 'Enter') {
       event.preventDefault();
-      commitPendingCustomValue();
       comboboxStore.setOpen(false);
-      setIsSearching(false);
     }
   }
 
   function handleSetValueOnClick() {
     if (allowCustomValue) {
-      setIsSearching(false);
       return true;
     }
     setInputValue(null);
@@ -274,7 +250,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
 
   function renderItems() {
     if (visibleGroups.length === 0) {
-      return !allowCustomValue && <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>;
+      return <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>;
     }
 
     if (!isSeparator) {
@@ -318,7 +294,6 @@ export const Combobox: IComboboxType = observer(function Combobox({
             autoSelect={!allowCustomValue}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            onChange={allowCustomValue ? () => setIsSearching(true) : undefined}
             {...rest}
           />
           {loading ? (
