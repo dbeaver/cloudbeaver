@@ -100,9 +100,15 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   useExecutor({
     executor: contextRef.context?.tree.actions,
     handlers: [
-      function refreshRoot({ type, nodeId }) {
-        if (type === 'show' && nodeId === node.uri) {
+      function handleTreeAction({ type, nodeId }) {
+        if (nodeId !== node.uri) {
+          return;
+        }
+
+        if (type === 'show') {
           elementRef.current?.scrollIntoView();
+        } else if (type === 'focus') {
+          elementRef.current?.focus();
         }
       },
     ],
@@ -133,7 +139,9 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
 
 export function isLeaf(node: NavNode, children: string[] | undefined, tree: IElementsTree | undefined, outdated: boolean): boolean {
   return (
-    (!tree?.settings?.showTableContents && node.objectFeatures.includes(EObjectFeature.entity)) ||
+    (!tree?.settings?.showTableContents &&
+      node.objectFeatures.includes(EObjectFeature.entity) &&
+      !node.objectFeatures.includes(EObjectFeature.keyValue)) ||
     !node.hasChildren ||
     (children?.length === 0 && !outdated)
   );

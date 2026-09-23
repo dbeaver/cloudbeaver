@@ -36,10 +36,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.eclipse.core.runtime.IAdaptable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBAUserPasswordManager;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -641,6 +644,158 @@ public class WebServiceCore implements DBWServiceCore {
         testDataSource.setSavePassword(true); // We need for test to avoid password callback
         testDataSource.setAccessCheckRequired(!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN));
         return testDataSource;
+    }
+
+    @Override
+    public boolean changeConnectionUserPassword(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId,
+        @NotNull String oldPassword,
+        @NotNull String newPassword
+    ) throws DBWebException {
+        DBPDataSourceContainer container = null;
+        try {
+            requireServerFlagEnabled();
+            container = resolveContainer(webSession, projectId, connectionId);
+            ensureConnected(webSession, container);
+            DBAUserPasswordManager manager = resolveUserPasswordManager(container);
+            String userName = resolveUserName(container);
+            applyPasswordChange(webSession, projectId, connectionId, manager, userName, oldPassword, newPassword);
+            persistNewPassword(webSession, container, projectId, connectionId, newPassword);
+            WebDataSourceUtils.disconnectDataSource(webSession, container, true);
+            log.info("changeConnectionUserPassword: succeeded " + formatPasswordChangeLogContext(webSession, projectId, connectionId));
+            return true;
+        } catch (DBWebException e) {
+            throw e;
+        } catch (Throwable t) {
+            log.error("changeConnectionUserPassword: unexpected error " + formatPasswordChangeLogContext(webSession, projectId, connectionId), t);
+            throw new DBWebException("Password change failed", t);
+        }
+    }
+
+    private void requireServerFlagEnabled() throws DBWebException {
+        if (WebAppUtils.getWebApplication().getAppConfiguration().isDbUserPasswordChangeEnabled()) {
+            return;
+        }
+        throw new DBWebException("Password change is disabled by the administrator.");
+    }
+
+    @NotNull
+    private DBPDataSourceContainer resolveContainer(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId
+    ) throws DBWebException {
+        DBPDataSourceContainer container = null;
+        try {
+            container = WebDataSourceUtils.getLocalOrGlobalDataSource(webSession, projectId, connectionId);
+        } catch (DBWebException ignored) {
+        }
+        if (container != null) {
+            return container;
+        }
+        throw new DBWebException("Connection not found.");
+    }
+
+    private void ensureConnected(
+        @NotNull WebSession webSession,
+        @NotNull DBPDataSourceContainer container
+    ) throws DBWebException {
+        if (container.isConnected()) {
+            return;
+        }
+        try {
+            container.connect(webSession.getProgressMonitor(), true, false);
+        } catch (Exception e) {
+            throw new DBWebException("Cannot connect to database.", e);
+        }
+    }
+
+    @NotNull
+    private DBAUserPasswordManager resolveUserPasswordManager(
+        @NotNull DBPDataSourceContainer container
+    ) throws DBWebException {
+        DBAUserPasswordManager manager = null;
+        DBPDataSource dataSource = container.getDataSource();
+        if (dataSource instanceof IAdaptable adaptable) {
+            manager = adaptable.getAdapter(DBAUserPasswordManager.class);
+        }
+        if (manager != null) {
+            return manager;
+        }
+        throw new DBWebException("This driver does not support password change from CloudBeaver.");
+    }
+
+    @NotNull
+    private String resolveUserName(
+        @NotNull DBPDataSourceContainer container
+    ) throws DBWebException {
+        String userName = container.getActualConnectionConfiguration().getUserName();
+        if (CommonUtils.isEmpty(userName)) {
+            userName = container.getConnectionConfiguration().getUserName();
+        }
+        if (!CommonUtils.isEmpty(userName)) {
+            return userName;
+        }
+        throw new DBWebException("Connection has no user name configured.");
+    }
+
+    private void applyPasswordChange(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId,
+        @NotNull DBAUserPasswordManager manager,
+        @NotNull String userName,
+        @NotNull String oldPassword,
+        @NotNull String newPassword
+    ) throws DBWebException {
+        log.info("changeConnectionUserPassword: attempting " + formatPasswordChangeLogContext(webSession, projectId, connectionId));
+        try {
+            manager.changeUserPassword(webSession.getProgressMonitor(), userName, newPassword, oldPassword);
+        } catch (DBException e) {
+            log.info("changeConnectionUserPassword: handler error " + formatPasswordChangeLogContext(webSession, projectId, connectionId) + " error=" + e.getClass().getName());
+            throw new DBWebException("Password change failed", e);
+        }
+    }
+
+    private void persistNewPassword(
+        @NotNull WebSession webSession,
+        @NotNull DBPDataSourceContainer container,
+        @Nullable String projectId,
+        @NotNull String connectionId,
+        @NotNull String newPassword
+    ) throws DBWebException {
+        String failureClass = null;
+        boolean persisted;
+        try {
+            container.getConnectionConfiguration().setUserPassword(newPassword);
+            container.getActualConnectionConfiguration().setUserPassword(newPassword);
+            var project = container.getProject();
+            if (project.isUseSecretStorage()) {
+                container.persistSecrets(DBSSecretController.getProjectSecretController(project));
+            }
+            persisted = container.isTemporary() || container.persistConfiguration();
+        } catch (Exception e) {
+            failureClass = e.getClass().getName();
+            persisted = false;
+        }
+        if (persisted) {
+            return;
+        }
+        log.info("changeConnectionUserPassword: persist failed " + formatPasswordChangeLogContext(webSession, projectId, connectionId) + " error=" + failureClass);
+        throw new DBWebException(
+            "Database password was changed but CloudBeaver failed to persist the new credential. "
+                + "The connection will require re-entry of the new password.");
+    }
+
+    private static String formatPasswordChangeLogContext(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId
+    ) {
+        return String.format("sessionId=%s userId=%s projectId=%s connectionId=%s",
+            webSession.getSessionId(), webSession.getUserId(), projectId, connectionId);
     }
 
     @Override

@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createAction } from '@cloudbeaver/core-view';
 
-.tableColumnValue {
-  height: 36px;
-  padding: 0 24px;
-}
+export const ACTION_CONNECTION_CHANGE_DB_PASSWORD = createAction('connection-change-db-password', {
+  label: 'plugin_connections_change_db_password_menu_title',
+});
