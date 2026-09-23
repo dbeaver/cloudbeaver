@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ public class WebDatabaseObjectInfo {
     public static final String OBJECT_FEATURE_CATALOG = "catalog";
     public static final String OBJECT_FEATURE_DATA_CONTAINER = "dataContainer";
     public static final String OBJECT_FEATURE_DATA_CONTAINER_SUPPORTS_FILTERS = "supportsDataFilter";
+    public static final String OBJECT_FEATURE_KEY_VALUE = "keyValue";
     public static final String OBJECT_FEATURE_DATA_MANIPULATOR = "dataManipulator";
     public static final String OBJECT_FEATURE_DATA_SOURCE = "dataSource";
     public static final String OBJECT_FEATURE_DATA_SOURCE_CONNECTED = "dataSourceConnected";
@@ -183,12 +184,13 @@ public class WebDatabaseObjectInfo {
             features.add(OBJECT_FEATURE_SUPPORTS_FULL_DDL);
         }
         boolean isDiagramSupported = true;
-        if (object instanceof DBSDataContainer) {
+        if (object instanceof DBSDataContainer dataContainer) {
             features.add(OBJECT_FEATURE_DATA_CONTAINER);
-            if (((DBSDataContainer) object).isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER)) {
+            if (dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER)) {
                 features.add(OBJECT_FEATURE_DATA_CONTAINER_SUPPORTS_FILTERS);
             }
-            if (((DBSDataContainer) object).isFeatureSupported(DBSDataContainer.FEATURE_KEY_VALUE)) {
+            if (dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_KEY_VALUE)) {
+                features.add(OBJECT_FEATURE_KEY_VALUE);
                 isDiagramSupported = false;
             }
         }

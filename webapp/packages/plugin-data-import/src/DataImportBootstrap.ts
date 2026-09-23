@@ -90,6 +90,7 @@ export class DataImportBootstrap extends Bootstrap {
               dialogResult.processorId,
               dialogResult.file,
               dialogResult.settings,
+              dialogResult.processorProperties,
             );
 
             if (success) {

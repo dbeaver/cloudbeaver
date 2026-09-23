@@ -15,6 +15,7 @@ import {
   Form,
   Group,
   GroupTitle,
+  StatusMessage,
   Text,
   ToolsAction,
   ToolsPanel,
@@ -26,8 +27,8 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import { AIProfilesResource, compareAIProfiles } from '@cloudbeaver/plugin-ai-profiles';
 
 import { getAdministrationAISettingsFormInfoPart } from './AISettingsForm/getAdministrationAISettingsFormInfoPart.js';
 import { LANGUAGE_OPTIONS } from './AISettingsForm/getLanguageOptions.js';
@@ -43,9 +44,11 @@ export const AIAdministrationPage = observer<{
   const notificationService = useService(NotificationService);
   const profilesLoader = useResource(AIAdministrationPage, AIProfilesResource, CachedMapAllKey);
   const aiEnginesResource = useResource(AIAdministrationPage, AiEnginesResource, undefined);
-  const profiles = profilesLoader.data.filter(isDefined);
+  const profiles = profilesLoader.data.filter(isDefined).sort(compareAIProfiles);
 
   const settingsInfoPart = getAdministrationAISettingsFormInfoPart(formState);
+  const exception = getFirstException(formState.exception);
+
   useAutoLoad(AIAdministrationPage, settingsInfoPart);
 
   const changed = settingsInfoPart.isChanged;
@@ -119,6 +122,11 @@ export const AIAdministrationPage = observer<{
             >
               {translate('plugin_ai_administration_language_label')}
             </Combobox>
+            {exception && (
+              <div>
+                <StatusMessage exception={exception} type={ENotificationType.Error} />
+              </div>
+            )}
           </Container>
         </Group>
       </ColoredContainer>
