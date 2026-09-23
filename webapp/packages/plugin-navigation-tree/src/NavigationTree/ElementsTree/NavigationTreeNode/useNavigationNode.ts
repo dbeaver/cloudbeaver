@@ -139,7 +139,9 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
 
 export function isLeaf(node: NavNode, children: string[] | undefined, tree: IElementsTree | undefined, outdated: boolean): boolean {
   return (
-    (!tree?.settings?.showTableContents && node.objectFeatures.includes(EObjectFeature.entity)) ||
+    (!tree?.settings?.showTableContents &&
+      node.objectFeatures.includes(EObjectFeature.entity) &&
+      !node.objectFeatures.includes(EObjectFeature.keyValue)) ||
     !node.hasChildren ||
     (children?.length === 0 && !outdated)
   );

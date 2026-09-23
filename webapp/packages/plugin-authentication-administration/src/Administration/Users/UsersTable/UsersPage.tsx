@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, Container, Group, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, Loader, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Spinner } from '@dbeaver/ui-kit';
 
@@ -41,7 +41,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const isManageable = !administrationUsersManagementService.externalUserProviderEnabled;
 
   return (
-    <ColoredContainer vertical wrap gap parent maximum>
+    <ColoredContainer vertical noWrap gap parent maximum>
       {usersAdministrationService.informationPlaceholder.getDisplayed({}).length > 0 && (
         <Group keepSize box maximum>
           <Placeholder container={usersAdministrationService.informationPlaceholder} />
@@ -52,14 +52,22 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
         <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
 
+      {usersAdministrationService.statisticsPlaceholder.getDisplayed({}).length > 0 && (
+        <Group keepSize box maximum>
+          <Loader suspense>
+            <Placeholder container={usersAdministrationService.statisticsPlaceholder} />
+          </Loader>
+        </Group>
+      )}
+
       <Group keepSize box maximum>
         <UsersTableFilters filters={filters} />
       </Group>
 
-      <Container overflow gap maximum>
+      <Container keepSize gap maximum>
         <Placeholder container={createUserService.toolsContainer} param={param} />
 
-        <div className="tw:h-full tw:relative">
+        <div className="tw:relative">
           <UsersTable users={table.users} isManageable={isManageable} displayAuthRole={displayAuthRole} onLoadMore={table.loadMore} />
           <Spinner className="tw:absolute tw:bottom-4 tw:right-8" active={loading} />
         </div>
