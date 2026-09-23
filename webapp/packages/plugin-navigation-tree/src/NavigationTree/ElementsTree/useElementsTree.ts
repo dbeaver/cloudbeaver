@@ -132,6 +132,7 @@ export interface IElementsTree extends ILoadableState {
   open: (node: NavNode, path: string[], leaf: boolean) => Promise<void>;
   click: (node: NavNode, path: string[], leaf: boolean) => Promise<void>;
   expand: (node: NavNode, state: boolean) => Promise<void>;
+  focus: (nodeId: string) => void;
   show: (nodeId: string, parents: string[]) => Promise<void>;
   refresh: (nodeId: string) => Promise<void>;
   collapse: (nodeId?: string) => void;
@@ -543,6 +544,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
         } catch (exception: any) {
           notificationService.logException(exception, 'app_navigationTree_refresh_error');
         }
+      },
+      focus(nodeId: string): void {
+        this.actions.execute({ type: 'focus', nodeId });
       },
       async show(nodeId: string, path: string[]): Promise<void> {
         if (!path.includes(this.baseRoot)) {
