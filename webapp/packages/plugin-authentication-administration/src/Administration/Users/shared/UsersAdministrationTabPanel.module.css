@@ -7,8 +7,6 @@
  */
 
 /* TODO: same styles cloudbeaver/webapp/packages/plugin-product-information-administration/src/shared/ProductInfoPageTabPanel.module.css */
-/* Match the specificity of the base tab panel's :not(.contents) selector. */
-.tabPanel.tabPanel {
-  min-height: 0;
+.tabPanel {
   overflow: auto;
 }

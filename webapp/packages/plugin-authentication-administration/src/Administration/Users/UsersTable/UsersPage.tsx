@@ -41,7 +41,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const isManageable = !administrationUsersManagementService.externalUserProviderEnabled;
 
   return (
-    <ColoredContainer vertical noWrap gap parent maximum>
+    <ColoredContainer vertical wrap gap parent maximum>
       {usersAdministrationService.informationPlaceholder.getDisplayed({}).length > 0 && (
         <Group keepSize box maximum>
           <Placeholder container={usersAdministrationService.informationPlaceholder} />
@@ -64,10 +64,10 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
         <UsersTableFilters filters={filters} />
       </Group>
 
-      <Container keepSize gap maximum>
+      <Container overflow gap maximum>
         <Placeholder container={createUserService.toolsContainer} param={param} />
 
-        <div className="tw:relative">
+        <div className="tw:h-full tw:relative">
           <UsersTable users={table.users} isManageable={isManageable} displayAuthRole={displayAuthRole} onLoadMore={table.loadMore} />
           <Spinner className="tw:absolute tw:bottom-4 tw:right-8" active={loading} />
         </div>
