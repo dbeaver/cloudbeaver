@@ -44,6 +44,9 @@
       "path": "../core-settings"
     },
     {
+      "path": "../core-ui"
+    },
+    {
       "path": "../core-utils"
     },
     {

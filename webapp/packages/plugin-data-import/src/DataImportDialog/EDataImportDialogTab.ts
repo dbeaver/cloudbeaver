@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tableColumnValue {
-  height: 36px;
-  padding: 0 24px;
+export enum EDataImportDialogTab {
+  File = 'FILE',
+  Format = 'FORMAT',
 }
