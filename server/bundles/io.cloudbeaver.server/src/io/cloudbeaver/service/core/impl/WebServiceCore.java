@@ -59,6 +59,7 @@ import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHSession;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -671,10 +672,10 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             requireServerFlagEnabled();
             container = resolveContainer(webSession, projectId, connectionId);
-            ensureConnected(webSession, container);
-            DBAUserPasswordManager manager = resolveUserPasswordManager(container);
+            requireEditPermission(webSession, container);
             String userName = resolveUserName(container);
             // Verify the caller-supplied current password by opening a fresh JDBC connection.
+            // Works whether the container is currently connected or not: uses driver + config, not the session.
             // DBAUserPasswordManager.changeUserPassword does not verify oldPassword on every dialect
             // (e.g. PostgreSQL ALTER USER ... WITH PASSWORD requires no old password).
             Object rawDriver;
@@ -708,6 +709,17 @@ public class WebServiceCore implements DBWServiceCore {
                 }
                 throw new DBWebException("Cannot verify current password.", e);
             }
+            // Ensure a live container session for DBAUserPasswordManager. If not connected,
+            // authenticate with the just-verified oldPassword rather than the (possibly stale) persisted one.
+            if (!container.isConnected()) {
+                cfg.setUserPassword(oldPassword);
+                try {
+                    container.connect(webSession.getProgressMonitor(), true, false);
+                } catch (Exception e) {
+                    throw new DBWebException("Cannot open connection with the current password.", e);
+                }
+            }
+            DBAUserPasswordManager manager = resolveUserPasswordManager(container);
             applyPasswordChange(webSession, projectId, connectionId, manager, userName, oldPassword, newPassword);
             persistNewPassword(webSession, container, projectId, connectionId, newPassword);
             WebDataSourceUtils.disconnectDataSource(webSession, container, true);
@@ -728,6 +740,19 @@ public class WebServiceCore implements DBWServiceCore {
         throw new DBWebException("Password change is disabled by the administrator.");
     }
 
+    private void requireEditPermission(
+        @NotNull WebSession webSession,
+        @NotNull DBPDataSourceContainer container
+    ) throws DBWebException {
+        WebProjectImpl project = webSession.getProjectById(container.getProject().getId());
+        if (project == null) {
+            throw new DBWebException("Connection project not accessible.");
+        }
+        if (!SMUtils.hasProjectPermission(webSession, project.getRMProject(), RMProjectPermission.DATA_SOURCES_EDIT)) {
+            throw new DBWebException("Not authorized to change the database password for this connection.");
+        }
+    }
+
     @NotNull
     private DBPDataSourceContainer resolveContainer(
         @NotNull WebSession webSession,
@@ -743,20 +768,6 @@ public class WebServiceCore implements DBWServiceCore {
             return container;
         }
         throw new DBWebException("Connection not found.");
-    }
-
-    private void ensureConnected(
-        @NotNull WebSession webSession,
-        @NotNull DBPDataSourceContainer container
-    ) throws DBWebException {
-        if (container.isConnected()) {
-            return;
-        }
-        try {
-            container.connect(webSession.getProgressMonitor(), true, false);
-        } catch (Exception e) {
-            throw new DBWebException("Cannot connect to database.", e);
-        }
     }
 
     @NotNull
