@@ -118,7 +118,10 @@ export const Combobox: IComboboxType = observer(function Combobox({
   const [internalInputValue, setInternalInputValue] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
-  const inputValue: string | null = allowCustomValue ? ((selectedKey ?? null) as string | null) : internalInputValue;
+  let inputValue = internalInputValue;
+  if (allowCustomValue && !isSearching) {
+    inputValue = selectedKey == null ? null : String(selectedKey);
+  }
   const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
   const displayValue = inputValue ?? selectedValue;
 

@@ -175,6 +175,50 @@ describe('Combobox', () => {
   });
 
   describe('custom values', () => {
+    it.each([false, 0])('filters typed input with a non-string selected value of %s', async initialValue => {
+      const user = userEvent.setup();
+      const items = [
+        { value: initialValue, label: 'Never' },
+        { value: 'always', label: 'Always' },
+      ];
+      render(
+        <Combobox
+          aria-label="Database"
+          items={items}
+          value={initialValue}
+          keySelector={item => item.value}
+          valueSelector={item => item.label}
+          allowCustomValue
+        />,
+      );
+      const input = await openOptions(user);
+
+      await user.clear(input);
+      await user.type(input, 'Al');
+
+      expect(input).toHaveValue('Al');
+      expect(screen.getByRole('option', { name: 'Always' })).toBeVisible();
+      expect(screen.queryByRole('option', { name: 'Never' })).not.toBeInTheDocument();
+    });
+
+    it('filters by the typed query when the named state field has no onChange handler', async () => {
+      const user = userEvent.setup();
+      const state = observable({ database: 'PostgreSQL' });
+      render(<Combobox aria-label="Database" items={['PostgreSQL', 'MySQL']} state={state} name="database" allowCustomValue />);
+      const input = await openOptions(user);
+
+      await user.clear(input);
+      await user.type(input, 'My');
+
+      expect(input).toHaveValue('My');
+      expect(screen.getByRole('option', { name: 'MySQL' })).toBeVisible();
+      expect(screen.queryByRole('option', { name: 'PostgreSQL' })).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('option', { name: 'MySQL' }));
+      expect(input).toHaveValue('MySQL');
+      expect(state.database).toBe('MySQL');
+    });
+
     it.each([
       ['Enter', 'Post'],
       ['Enter', 'SQLite'],
