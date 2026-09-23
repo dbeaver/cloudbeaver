@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ export const DataImportFileSelector = observer<Props>(function DataImportFileSel
           </TableColumnHeader>
           <TableColumnHeader className={s(style, { columnHeader: true })} heightBig flex>
             <Container zeroBasis />
-            <InputFiles accept={extension} hideTags keepSize onChange={handleFileSelect} />
+            <InputFiles accept={extension} aria-label={translate('ui_upload_file')} hideTags keepSize onChange={handleFileSelect} />
           </TableColumnHeader>
         </TableHeader>
         <TableBody>

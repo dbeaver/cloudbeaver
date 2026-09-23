@@ -14,4 +14,5 @@ export interface IDataImportDialogState {
   file: File | null;
   selectedProcessor: DataTransferProcessorInfo | null;
   settings: DataTransferImportSettings;
+  processorProperties?: Record<string, string | null>;
 }
