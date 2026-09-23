@@ -87,7 +87,7 @@ export default [
   ['ui_manage', 'Manage'],
   ['ui_tools', 'Tools'],
   ['ui_folder', 'Folder'],
-  ['ui_folder_new', 'New folder'],
+  ['ui_folder_new', 'New Folder'],
   ['ui_folder_new_default_name', 'New folder'],
   ['ui_rename_processing', 'Renaming...'],
   ['ui_interval', 'Interval'],
