@@ -34,8 +34,9 @@
 .divider {
   width: 1px;
   height: 32px;
+  margin-inline: 13px;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--theme-on-primary), transparent 70%);
+  background: #236ea0;
 }
 
 .title {
