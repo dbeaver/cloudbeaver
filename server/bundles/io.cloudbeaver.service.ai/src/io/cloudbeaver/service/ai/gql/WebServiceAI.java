@@ -46,14 +46,12 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.ai.*;
+import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
 import org.jkiss.dbeaver.model.ai.engine.AIDatabaseContext;
 import org.jkiss.dbeaver.model.ai.engine.AIEngine;
 import org.jkiss.dbeaver.model.ai.engine.AIEngineProperties;
 import org.jkiss.dbeaver.model.ai.engine.AIModel;
 import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
-import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIAccountAuthenticator;
-import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIConstants;
-import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIProperties;
 import org.jkiss.dbeaver.model.ai.internal.AIChatMessages;
 import org.jkiss.dbeaver.model.ai.prompt.AIPromptGenerateSql;
 import org.jkiss.dbeaver.model.ai.registry.*;
@@ -649,14 +647,22 @@ public class WebServiceAI implements DBWServiceAI {
     ) throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
         try {
-            AIConfigurationProfile profile = getUserOpenAIAccountProfile(webSession, profileId);
+            AIConfigurationProfile profile = getUserAccountProfile(webSession, profileId);
             String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
             WebAIProfileUtils.cancelDeviceAuthorizationAttempt(webSession, profile, userId);
-            OpenAIProperties properties = (OpenAIProperties) profile.getConfiguration();
-            AIAccountAuthenticator authenticator = new OpenAIAccountAuthenticator(properties.getTimeout());
+            AIAccountProperties properties = WebAIProfileUtils.getAccountProperties(profile);
+            AIAccountAuthenticator authenticator = properties.createAccountAuthenticator();
             AIAccountAuthenticator.DeviceAuthorization authorization = authenticator.startDeviceAuthorization();
-            WebAsyncTaskInfo taskInfo = webSession.createAsyncTask("ChatGPT account authorization");
-            WebAIProfileUtils.registerDeviceAuthorizationAttempt(webSession, profile, userId, taskInfo.getId());
+            String providerName = properties.getAccountAuthenticationProviderName();
+            String taskName = providerName + " account authorization";
+            WebAsyncTaskInfo taskInfo = webSession.createAsyncTask(taskName);
+            WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+                webSession,
+                profile,
+                userId,
+                taskInfo.getId(),
+                taskName
+            );
             webSession.runAsyncTask(
                 taskInfo,
                 new WebAIDeviceAuthorizationProcessor(
@@ -664,12 +670,13 @@ public class WebServiceAI implements DBWServiceAI {
                     profile,
                     authenticator,
                     authorization,
-                    taskInfo.getId()
+                    taskInfo.getId(),
+                    providerName
                 )
             );
             return new WebAIDeviceAuthorizationInfo(authorization, taskInfo);
         } catch (DBException e) {
-            throw new DBWebException("Error starting ChatGPT account authorization", e);
+            throw new DBWebException("Error starting AI account authorization", e);
         }
     }
 
@@ -677,16 +684,16 @@ public class WebServiceAI implements DBWServiceAI {
     public boolean disconnectAccount(@NotNull WebSession webSession, @NotNull String profileId) throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
         try {
-            AIConfigurationProfile profile = getUserOpenAIAccountProfile(webSession, profileId);
+            AIConfigurationProfile profile = getUserAccountProfile(webSession, profileId);
             WebAIProfileUtils.deleteAccountCredentials(webSession, profile);
             return true;
         } catch (DBException e) {
-            throw new DBWebException("Error disconnecting ChatGPT account", e);
+            throw new DBWebException("Error disconnecting AI account", e);
         }
     }
 
     @NotNull
-    private static AIConfigurationProfile getUserOpenAIAccountProfile(
+    private static AIConfigurationProfile getUserAccountProfile(
         @NotNull WebSession webSession,
         @NotNull String profileId
     ) throws DBException {
@@ -694,17 +701,14 @@ public class WebServiceAI implements DBWServiceAI {
             throw new DBWebException("User authentication is required");
         }
         AIConfigurationProfile profile = AISettingsManager.getInstance().getSettings().getConfiguration(profileId);
-        if (!OpenAIConstants.OPENAI_ENGINE.equals(profile.getEngineId())) {
-            throw new DBWebException("AI profile does not support ChatGPT account authentication");
-        }
         if (profile.isGlobal()) {
             throw new DBWebException("AI profile does not use user credentials");
         }
-        if (!(profile.getConfiguration() instanceof OpenAIProperties properties)) {
-            throw new DBWebException("AI profile does not support ChatGPT account authentication");
+        if (!(profile.getConfiguration() instanceof AIAccountProperties properties)) {
+            throw new DBWebException("AI profile does not support account authentication");
         }
         if (!properties.isAccountAuthentication()) {
-            throw new DBWebException("AI profile does not use ChatGPT account authentication");
+            throw new DBWebException("AI profile does not use account authentication");
         }
         return profile;
     }

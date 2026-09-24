@@ -24,7 +24,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
-import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIProperties;
+import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
 
 public class WebAIConfigurationProfile {
 
@@ -64,14 +64,14 @@ public class WebAIConfigurationProfile {
     @Nullable
     public WebAIAccountInfo getAccount() throws DBException {
         if (profile.isGlobal()
-            || !(profile.getConfiguration() instanceof OpenAIProperties properties)
+            || !(profile.getConfiguration() instanceof AIAccountProperties properties)
             || !properties.isAccountAuthentication()
             || !WebAIProfileUtils.areCredentialsSaved(webSession, profile)
         ) {
             return null;
         }
         AIConfigurationProfile effectiveProfile = WebAIProfileUtils.getEffectiveProfile(webSession, profile);
-        OpenAIProperties effectiveProperties = (OpenAIProperties) effectiveProfile.getConfiguration();
+        AIAccountProperties effectiveProperties = (AIAccountProperties) effectiveProfile.getConfiguration();
         return new WebAIAccountInfo(effectiveProperties.getAccountEmail());
     }
 

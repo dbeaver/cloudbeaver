@@ -41,13 +41,16 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
     private final String taskId;
     @NotNull
     private final String userId;
+    @NotNull
+    private final String providerName;
 
     public WebAIDeviceAuthorizationProcessor(
         @NotNull WebSession webSession,
         @NotNull AIConfigurationProfile profile,
         @NotNull AIAccountAuthenticator authenticator,
         @NotNull AIAccountAuthenticator.DeviceAuthorization authorization,
-        @NotNull String taskId
+        @NotNull String taskId,
+        @NotNull String providerName
     ) {
         this.webSession = webSession;
         this.profile = profile;
@@ -55,11 +58,12 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
         this.authorization = authorization;
         this.taskId = taskId;
         this.userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
+        this.providerName = providerName;
     }
 
     @Override
     public void run(@NotNull DBRProgressMonitor monitor) throws InvocationTargetException {
-        monitor.beginTask("Authorize ChatGPT account", 1);
+        monitor.beginTask("Authorize " + providerName + " account", 1);
         try {
             validateAttempt(monitor);
             CompletableFuture<Void> cancellation = new CompletableFuture<>() {
@@ -85,10 +89,10 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
 
     private void validateAttempt(@NotNull DBRProgressMonitor monitor) throws DBException {
         if (monitor.isCanceled() || !isCurrentAttempt()) {
-            throw new DBException("OpenAI device authorization was cancelled");
+            throw new DBException(providerName + " device authorization was cancelled");
         }
         if (!isCurrentUser()) {
-            throw new DBException("OpenAI device authorization session has changed");
+            throw new DBException(providerName + " device authorization session has changed");
         }
     }
 

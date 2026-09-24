@@ -22,6 +22,7 @@ import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
 import org.jkiss.dbeaver.model.ai.AISettings;
+import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
 import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIConstants;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIProperties;
@@ -153,6 +154,14 @@ public class WebAIProfileUtilsTest {
             DBException.class,
             () -> WebAIProfileUtils.saveCredentials(webSession, profile, Map.of("model", "invalid"))
         );
+    }
+
+    @Test
+    public void resolvesProviderNeutralAccountCapability() throws DBException {
+        AIAccountProperties accountProperties = Mockito.mock(AIAccountProperties.class);
+        Mockito.when(profile.getConfiguration()).thenReturn(accountProperties);
+
+        Assertions.assertSame(accountProperties, WebAIProfileUtils.getAccountProperties(profile));
     }
 
     @Test
@@ -335,9 +344,16 @@ public class WebAIProfileUtilsTest {
             profile,
             authenticator,
             authorization,
-            "task-id"
+            "task-id",
+            "ChatGPT"
         );
-        WebAIProfileUtils.registerDeviceAuthorizationAttempt(webSession, profile, "test-user", "task-id");
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "task-id",
+            "ChatGPT account authorization"
+        );
 
         processor.run(webSession.getProgressMonitor());
 
@@ -362,9 +378,16 @@ public class WebAIProfileUtilsTest {
             profile,
             authenticator,
             authorization,
-            "old-task"
+            "old-task",
+            "ChatGPT"
         );
-        WebAIProfileUtils.registerDeviceAuthorizationAttempt(webSession, profile, "test-user", "new-task");
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "new-task",
+            "ChatGPT account authorization"
+        );
 
         Assertions.assertThrows(
             InvocationTargetException.class,
@@ -398,9 +421,16 @@ public class WebAIProfileUtilsTest {
             profile,
             authenticator,
             authorization,
-            "task-id"
+            "task-id",
+            "ChatGPT"
         );
-        WebAIProfileUtils.registerDeviceAuthorizationAttempt(webSession, profile, "test-user", "task-id");
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "task-id",
+            "ChatGPT account authorization"
+        );
 
         Assertions.assertThrows(
             InvocationTargetException.class,
@@ -430,9 +460,16 @@ public class WebAIProfileUtilsTest {
             profile,
             authenticator,
             authorization,
-            "task-id"
+            "task-id",
+            "ChatGPT"
         );
-        WebAIProfileUtils.registerDeviceAuthorizationAttempt(webSession, profile, "test-user", "task-id");
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "task-id",
+            "ChatGPT account authorization"
+        );
 
         Assertions.assertThrows(
             InvocationTargetException.class,
@@ -594,9 +631,16 @@ public class WebAIProfileUtilsTest {
             profile,
             authenticator,
             authorization,
-            "other-task"
+            "other-task",
+            "ChatGPT"
         );
-        WebAIProfileUtils.registerDeviceAuthorizationAttempt(otherSession, profile, "other-user", "other-task");
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            otherSession,
+            profile,
+            "other-user",
+            "other-task",
+            "ChatGPT account authorization"
+        );
 
         WebAIProfileUtils.invalidateAccountProfile(webSession, profile);
         try {
