@@ -150,7 +150,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         Map<String, String> serviceUserContext = creteAuthEnvironment(ldapSettings);
         serviceUserContext.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
         serviceUserContext.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
-        DirContext serviceContext;
+        DirContext serviceContext = null;
 
         try {
             serviceContext = initConnection(serviceUserContext);
@@ -161,6 +161,14 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             return authenticateLdap(userDN, password, ldapSettings, login, creteAuthEnvironment(ldapSettings), false);
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
+        } finally {
+            if (serviceContext != null) {
+                try {
+                    serviceContext.close();
+                } catch (NamingException e) {
+                    log.warn("Error closing LDAP service context", e);
+                }
+            }
         }
     }
 
@@ -300,6 +308,12 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
         } catch (NamingException e) {
             throw new DBException("Error finding user DN: " + e.getMessage(), e);
+        } finally {
+            try {
+                results.close();
+            } catch (NamingException e) {
+                log.warn("Error closing LDAP user search results", e);
+            }
         }
         return null;
     }

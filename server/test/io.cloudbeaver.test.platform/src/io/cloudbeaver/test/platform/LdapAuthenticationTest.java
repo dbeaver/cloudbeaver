@@ -37,6 +37,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 public class LdapAuthenticationTest {
+    private static final String USER_LOGIN = "test-user";
     private static final String USER_DN = "cn=test-user,dc=example,dc=com";
     private static final String USER_PASSWORD = UUID.randomUUID().toString();
     private static final String BIND_USER_DN = "cn=bind-user,dc=example,dc=com";
@@ -113,6 +114,48 @@ public class LdapAuthenticationTest {
     }
 
     @Test
+    public void usernameLoginClosesServiceResources() throws Exception {
+        DirContext serviceContext = Mockito.mock(DirContext.class);
+        NamingEnumeration<SearchResult> userLookupResults = mockFilterSearchResult(true);
+        SearchResult foundUser = Mockito.mock(SearchResult.class);
+        Mockito.when(foundUser.getNameInNamespace()).thenReturn(USER_DN);
+        Mockito.when(userLookupResults.next()).thenReturn(foundUser);
+        Mockito.when(serviceContext.search(
+            Mockito.eq("dc=example,dc=com"),
+            Mockito.anyString(),
+            Mockito.any(Object[].class),
+            Mockito.any(SearchControls.class)
+        )).thenReturn(userLookupResults);
+
+        DirContext userContext = Mockito.mock(DirContext.class);
+        NamingEnumeration<SearchResult> userSearchResult = mockUserSearchResult();
+        Mockito.when(userContext.search(
+            Mockito.eq(USER_DN),
+            Mockito.eq("objectClass=*"),
+            Mockito.any(SearchControls.class)
+        )).thenReturn(userSearchResult);
+
+        LdapAuthProvider provider = Mockito.spy(new LdapAuthProvider());
+        Mockito.doReturn(serviceContext, userContext).when(provider).initConnection(Mockito.anyMap());
+
+        Map<String, Object> userData = authenticate(
+            provider,
+            FILTER,
+            USER_LOGIN,
+            Map.of(
+                LdapConstants.PARAM_LOGIN, "uid",
+                LdapConstants.PARAM_BIND_USER, BIND_USER_DN,
+                LdapConstants.PARAM_BIND_USER_PASSWORD, BIND_USER_PASSWORD
+            )
+        );
+
+        Assertions.assertEquals(USER_LOGIN, userData.get(LdapConstants.CRED_USERNAME));
+        Mockito.verify(userLookupResults).close();
+        Mockito.verify(serviceContext).close();
+        Mockito.verify(userContext).close();
+    }
+
+    @Test
     public void fullDnLoginSucceedsWhenUserMatchesFilterWithoutBindUser() throws Exception {
         DirContext userContext = Mockito.mock(DirContext.class);
         NamingEnumeration<SearchResult> filterSearchResult = mockFilterSearchResult(true);
@@ -150,13 +193,23 @@ public class LdapAuthenticationTest {
         @NotNull LdapAuthProvider provider,
         @NotNull String filter
     ) throws DBException {
-        return authenticate(provider, filter, Map.of());
+        return authenticate(provider, filter, USER_DN, Map.of());
     }
 
     @NotNull
     private static Map<String, Object> authenticate(
         @NotNull LdapAuthProvider provider,
         @NotNull String filter,
+        @NotNull Map<String, Object> additionalParameters
+    ) throws DBException {
+        return authenticate(provider, filter, USER_DN, additionalParameters);
+    }
+
+    @NotNull
+    private static Map<String, Object> authenticate(
+        @NotNull LdapAuthProvider provider,
+        @NotNull String filter,
+        @NotNull String userName,
         @NotNull Map<String, Object> additionalParameters
     ) throws DBException {
         final SMAuthProviderCustomConfiguration configuration = new SMAuthProviderCustomConfiguration("test-ldap");
@@ -172,7 +225,7 @@ public class LdapAuthenticationTest {
             new VoidProgressMonitor(),
             configuration,
             Map.of(
-                LdapConstants.CRED_USER_DN, USER_DN,
+                LdapConstants.CRED_USER_DN, userName,
                 LdapConstants.CRED_PASSWORD, USER_PASSWORD
             )
         );
