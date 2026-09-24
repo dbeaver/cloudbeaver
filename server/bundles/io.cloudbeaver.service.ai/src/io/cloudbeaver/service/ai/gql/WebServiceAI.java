@@ -144,7 +144,7 @@ public class WebServiceAI implements DBWServiceAI {
         WebAIUtils.validateAiPluginEnabled();
         try {
             AIConfigurationProfile sourceProfile = getDefaultConfiguration(engineId, profileId);
-            AIConfigurationProfile profile = settingsInput == null && profileId != null && !sourceProfile.isGlobal()
+            AIConfigurationProfile profile = profileId != null && !sourceProfile.isGlobal()
                 ? WebAIProfileUtils.getEffectiveProfile(webSession, sourceProfile)
                 : copyConfigurationProfile(webSession.getProgressMonitor(), sourceProfile);
             AIEngineProperties configuration = settingsInput == null
@@ -649,32 +649,51 @@ public class WebServiceAI implements DBWServiceAI {
         try {
             AIConfigurationProfile profile = getUserAccountProfile(webSession, profileId);
             String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
-            WebAIProfileUtils.cancelDeviceAuthorizationAttempt(webSession, profile, userId);
             AIAccountProperties properties = WebAIProfileUtils.getAccountProperties(profile);
             AIAccountAuthenticator authenticator = properties.createAccountAuthenticator();
-            AIAccountAuthenticator.DeviceAuthorization authorization = authenticator.startDeviceAuthorization();
             String providerName = properties.getAccountAuthenticationProviderName();
             String taskName = providerName + " account authorization";
             WebAsyncTaskInfo taskInfo = webSession.createAsyncTask(taskName);
-            WebAIProfileUtils.registerDeviceAuthorizationAttempt(
-                webSession,
-                profile,
-                userId,
-                taskInfo.getId(),
-                taskName
-            );
-            webSession.runAsyncTask(
-                taskInfo,
-                new WebAIDeviceAuthorizationProcessor(
+            boolean taskStarted = false;
+            try {
+                WebAIProfileUtils.registerDeviceAuthorizationAttempt(
                     webSession,
                     profile,
-                    authenticator,
-                    authorization,
+                    userId,
                     taskInfo.getId(),
-                    providerName
-                )
-            );
-            return new WebAIDeviceAuthorizationInfo(authorization, taskInfo);
+                    taskName
+                );
+                AIAccountAuthenticator.DeviceAuthorization authorization = authenticator.startDeviceAuthorization();
+                WebAIProfileUtils.validateDeviceAuthorizationAttempt(
+                    webSession,
+                    profile,
+                    userId,
+                    taskInfo.getId()
+                );
+                webSession.runAsyncTask(
+                    taskInfo,
+                    new WebAIDeviceAuthorizationProcessor(
+                        webSession,
+                        profile,
+                        authenticator,
+                        authorization,
+                        taskInfo.getId(),
+                        providerName
+                    )
+                );
+                taskStarted = true;
+                return new WebAIDeviceAuthorizationInfo(authorization, taskInfo);
+            } finally {
+                if (!taskStarted) {
+                    WebAIProfileUtils.discardDeviceAuthorizationAttempt(
+                        webSession,
+                        profile,
+                        userId,
+                        taskInfo.getId(),
+                        taskName
+                    );
+                }
+            }
         } catch (DBException e) {
             throw new DBWebException("Error starting AI account authorization", e);
         }

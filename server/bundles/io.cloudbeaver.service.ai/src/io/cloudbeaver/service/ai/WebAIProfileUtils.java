@@ -490,7 +490,7 @@ public final class WebAIProfileUtils {
         }
         String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
         DBSSecretController secretController = webSession.getUserContext().getSecretController();
-        if (!profile.isGlobal() && isAccountProfile(profile)) {
+        if (isAccountProfile(profile)) {
             AIAccountProperties accountCredentials = getAccountCredentials(webSession, profile, userId);
             DeviceAuthorizationAttempt attempt;
             synchronized (accountCredentials) {
@@ -499,14 +499,6 @@ public final class WebAIProfileUtils {
                     webSession.removeAttribute(getSessionCredentialsAttribute(profile, userId));
                     webSession.removeAttribute(getAccountCredentialsAttribute(profile, userId));
                     accountCredentials.clearAccountTokens();
-                    if (isPersistentStorageSupported(secretController)) {
-                        clearPersistentCredentials(
-                            secretController,
-                            profile,
-                            getAllCredentialPropertyIds(profile.getConfiguration()),
-                            userId
-                        );
-                    }
                     validateExpectedUser(webSession, userId);
                 }
             }
@@ -514,15 +506,10 @@ public final class WebAIProfileUtils {
         } else {
             webSession.removeAttribute(getSessionCredentialsAttribute(profile, userId));
             webSession.removeAttribute(getAccountCredentialsAttribute(profile, userId));
-            if (isPersistentStorageSupported(secretController)) {
-                clearPersistentCredentials(
-                    secretController,
-                    profile,
-                    getAllCredentialPropertyIds(profile.getConfiguration()),
-                    userId
-                );
-            }
             validateExpectedUser(webSession, userId);
+        }
+        if (isPersistentStorageSupported(secretController)) {
+            secretController.deleteObjectSecrets(getSecretObject(profile));
         }
     }
 
@@ -581,6 +568,50 @@ public final class WebAIProfileUtils {
             attempt = removeDeviceAuthorizationAttempt(webSession, expectedUserId, profile.getProfileId());
         }
         cancelDeviceAuthorizationTask(attempt);
+    }
+
+    public static void discardDeviceAuthorizationAttempt(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile,
+        @NotNull String expectedUserId,
+        @NotNull String taskId,
+        @NotNull String taskName
+    ) throws DBException {
+        DeviceAuthorizationAttempt attempt = null;
+        synchronized (getAccountLock(webSession, expectedUserId, profile.getProfileId())) {
+            AccountKey key = getAccountKey(webSession, expectedUserId, profile.getProfileId());
+            DeviceAuthorizationAttempt currentAttempt = DEVICE_AUTHORIZATION_ATTEMPTS.get(key);
+            if (currentAttempt != null
+                && currentAttempt.webSession() == webSession
+                && taskId.equals(currentAttempt.taskId())
+            ) {
+                DEVICE_AUTHORIZATION_ATTEMPTS.remove(key, currentAttempt);
+                attempt = currentAttempt;
+            }
+        }
+        cancelDeviceAuthorizationTask(
+            attempt == null ? new DeviceAuthorizationAttempt(webSession, taskId, taskName) : attempt
+        );
+    }
+
+    public static void validateDeviceAuthorizationAttempt(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile,
+        @NotNull String expectedUserId,
+        @NotNull String taskId
+    ) throws DBException {
+        synchronized (getAccountLock(webSession, expectedUserId, profile.getProfileId())) {
+            validateExpectedUser(webSession, expectedUserId);
+            validateCurrentAccountProfile(profile);
+            if (!isCurrentDeviceAuthorizationAttempt(
+                webSession,
+                expectedUserId,
+                profile.getProfileId(),
+                taskId
+            )) {
+                throw new DBWebException("AI device authorization was cancelled");
+            }
+        }
     }
 
     public static void invalidateAccountProfile(
@@ -654,8 +685,13 @@ public final class WebAIProfileUtils {
             return;
         }
         var taskInfo = attempt.webSession().getAsyncTask(attempt.taskId(), attempt.taskName(), false);
-        if (taskInfo != null && taskInfo.isRunning()) {
+        if (taskInfo == null) {
+            return;
+        }
+        if (taskInfo.isRunning()) {
             attempt.webSession().asyncTaskCancel(attempt.taskId());
+        } else {
+            attempt.webSession().asyncTaskStatus(attempt.taskId(), true);
         }
     }
 

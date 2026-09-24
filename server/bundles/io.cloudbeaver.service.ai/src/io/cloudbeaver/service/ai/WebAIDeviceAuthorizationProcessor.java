@@ -87,6 +87,11 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
         }
     }
 
+    @Override
+    public void cancel() {
+        clearAttempt();
+    }
+
     private void validateAttempt(@NotNull DBRProgressMonitor monitor) throws DBException {
         if (monitor.isCanceled() || !isCurrentAttempt()) {
             throw new DBException(providerName + " device authorization was cancelled");
