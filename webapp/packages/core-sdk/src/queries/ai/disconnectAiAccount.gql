@@ -1,0 +1,3 @@
+mutation disconnectAiAccount($profileId: ID!) {
+  result: aiDisconnectAccount(profileId: $profileId)
+}
