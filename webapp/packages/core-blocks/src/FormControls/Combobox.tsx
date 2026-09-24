@@ -197,8 +197,8 @@ export const Combobox: IComboboxType = observer(function Combobox({
     defaultValue: comboboxDefaultValue,
     defaultSelectedValue: comboboxDefaultSelectedValue as string,
     setSelectedValue: handleSelect,
-    setOpen: open => {
-      if (!open && allowCustomValue) {
+    setMounted: mounted => {
+      if (!mounted && allowCustomValue) {
         setInternalInputValue(null);
       }
     },
@@ -310,7 +310,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
             </>
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
-          {displayPopover && (!allowCustomValue || visibleGroups.length > 0 || hasFooterItems) && (
+          {displayPopover && (
             <ComboboxPopover
               className={clsx('theme-text-on-surface theme-background-surface', hasFooterItems && 'dbv-kit-combobox__popover--grouped')}
             >
