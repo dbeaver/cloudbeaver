@@ -10,7 +10,7 @@ import React, { use, useLayoutEffect, useMemo } from 'react';
 
 import { MenuItemElement, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IContextMenuProps } from './IContextMenuProps.js';
-import { MenuButton, MenuProvider, Menu, type HovercardStoreState, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
+import { MenuButton, MenuProvider, Menu, type HovercardStoreState, type MenuProps, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
 import { RenderMenuItems } from './RenderMenuItems.js';
 import { type IMenuContext, MenuContext } from './MenuContext.js';
 
@@ -22,6 +22,8 @@ export interface IContextMenuNewProps extends IContextMenuProps {
   shift?: number;
   gutter?: number;
   autoFocusOnShow?: boolean;
+  autoFocusOnHide?: MenuProps['autoFocusOnHide'];
+  preserveTabOrderAnchor?: MenuProps['preserveTabOrderAnchor'];
 }
 
 export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuInner({
@@ -35,6 +37,8 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   shift,
   gutter,
   autoFocusOnShow,
+  autoFocusOnHide,
+  preserveTabOrderAnchor,
   ...rest
 }) {
   const translate = useTranslate();
@@ -99,6 +103,8 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
           {children}
         </MenuButton>
         <Menu
+          autoFocusOnHide={autoFocusOnHide}
+          preserveTabOrderAnchor={preserveTabOrderAnchor}
           aria-label={translate(menuData.menu.info.label)}
           getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
           shift={shift}
