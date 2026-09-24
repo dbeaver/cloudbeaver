@@ -18,6 +18,7 @@ package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.service.auth.ldap.LdapAuthProvider;
 import io.cloudbeaver.service.auth.ldap.LdapConstants;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
@@ -27,6 +28,7 @@ import org.mockito.Mockito;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.directory.BasicAttributes;
@@ -36,9 +38,9 @@ import javax.naming.directory.SearchResult;
 
 public class LdapAuthenticationTest {
     private static final String USER_DN = "cn=test-user,dc=example,dc=com";
-    private static final String USER_PASSWORD = "user-password";
+    private static final String USER_PASSWORD = UUID.randomUUID().toString();
     private static final String BIND_USER_DN = "cn=bind-user,dc=example,dc=com";
-    private static final String BIND_USER_PASSWORD = "bind-password";
+    private static final String BIND_USER_PASSWORD = UUID.randomUUID().toString();
     private static final String FILTER = "(memberOf=cn=cloudbeaver-users,dc=example,dc=com)";
 
     @Test
@@ -143,16 +145,21 @@ public class LdapAuthenticationTest {
         Assertions.assertEquals("LDAP authentication failed: User bind failed", exception.getMessage());
     }
 
-    private static Map<String, Object> authenticate(LdapAuthProvider provider, String filter) throws DBException {
+    @NotNull
+    private static Map<String, Object> authenticate(
+        @NotNull LdapAuthProvider provider,
+        @NotNull String filter
+    ) throws DBException {
         return authenticate(provider, filter, Map.of());
     }
 
+    @NotNull
     private static Map<String, Object> authenticate(
-        LdapAuthProvider provider,
-        String filter,
-        Map<String, Object> additionalParameters
+        @NotNull LdapAuthProvider provider,
+        @NotNull String filter,
+        @NotNull Map<String, Object> additionalParameters
     ) throws DBException {
-        SMAuthProviderCustomConfiguration configuration = new SMAuthProviderCustomConfiguration("test-ldap");
+        final SMAuthProviderCustomConfiguration configuration = new SMAuthProviderCustomConfiguration("test-ldap");
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(LdapConstants.PARAM_HOST, "localhost");
         parameters.put(LdapConstants.PARAM_DN, "dc=example,dc=com");
@@ -171,6 +178,7 @@ public class LdapAuthenticationTest {
         );
     }
 
+    @NotNull
     @SuppressWarnings("unchecked")
     private static NamingEnumeration<SearchResult> mockFilterSearchResult(boolean hasMore) throws Exception {
         NamingEnumeration<SearchResult> searchResult = Mockito.mock(NamingEnumeration.class);
@@ -178,6 +186,7 @@ public class LdapAuthenticationTest {
         return searchResult;
     }
 
+    @NotNull
     @SuppressWarnings("unchecked")
     private static NamingEnumeration<SearchResult> mockUserSearchResult() throws Exception {
         BasicAttributes attributes = new BasicAttributes();
@@ -194,12 +203,13 @@ public class LdapAuthenticationTest {
         private final DirContext bindUserContext;
         private int connectionCount;
 
-        private BindUserLdapAuthProvider(DirContext bindUserContext) {
+        private BindUserLdapAuthProvider(@NotNull DirContext bindUserContext) {
             this.bindUserContext = bindUserContext;
         }
 
+        @NotNull
         @Override
-        public DirContext initConnection(Map<String, String> environment) {
+        public DirContext initConnection(@NotNull Map<String, String> environment) {
             connectionCount++;
             Assertions.assertEquals(BIND_USER_DN, environment.get(Context.SECURITY_PRINCIPAL));
             Assertions.assertEquals(BIND_USER_PASSWORD, environment.get(Context.SECURITY_CREDENTIALS));
@@ -212,8 +222,9 @@ public class LdapAuthenticationTest {
     }
 
     private static class FailingLdapAuthProvider extends LdapAuthProvider {
+        @NotNull
         @Override
-        public DirContext initConnection(Map<String, String> environment) throws DBException {
+        public DirContext initConnection(@NotNull Map<String, String> environment) throws DBException {
             throw new DBException("User bind failed");
         }
     }
@@ -221,12 +232,13 @@ public class LdapAuthenticationTest {
     private static class TestLdapAuthProvider extends LdapAuthProvider {
         private final DirContext userContext;
 
-        private TestLdapAuthProvider(DirContext userContext) {
+        private TestLdapAuthProvider(@NotNull DirContext userContext) {
             this.userContext = userContext;
         }
 
+        @NotNull
         @Override
-        public DirContext initConnection(Map<String, String> environment) {
+        public DirContext initConnection(@NotNull Map<String, String> environment) {
             Assertions.assertEquals(USER_DN, environment.get(Context.SECURITY_PRINCIPAL));
             Assertions.assertEquals(USER_PASSWORD, environment.get(Context.SECURITY_CREDENTIALS));
             return userContext;
