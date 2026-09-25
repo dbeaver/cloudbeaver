@@ -108,6 +108,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
         if (type === 'show') {
           elementRef.current?.scrollIntoView();
         } else if (type === 'focus') {
+          elementRef.current?.scrollIntoView({ block: 'nearest' });
           elementRef.current?.focus();
         }
       },
