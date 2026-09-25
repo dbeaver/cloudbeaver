@@ -10,12 +10,14 @@ import { useRef } from 'react';
 import { EventKeyboardNavigationFlag, useHotkeys } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
+import { isLeaf } from './NavigationTreeNode/useNavigationNode.js';
 import type { IElementsTree } from './useElementsTree.js';
 
 export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.RefObject<HTMLDivElement | null> {
   const navNodeInfoResource = useService(NavNodeInfoResource);
+  const navTreeResource = useService(NavTreeResource);
   const expandingNodes = useRef(new Set<string>()).current;
 
   async function expandNode(nodeId: string, state: boolean): Promise<void> {
@@ -72,7 +74,8 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
         return;
       }
 
-      const expanded = tree.isNodeExpanded(nodeId);
+      const leaf = isLeaf(node, navTreeResource.get(nodeId), tree, navNodeInfoResource.isOutdated(nodeId) || navTreeResource.isOutdated(nodeId));
+      const expanded = !leaf && tree.isNodeExpanded(nodeId);
 
       if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || (event.key === 'ArrowRight' && expanded)) {
         const visibleNodes = getVisibleNodes(tree);
@@ -105,12 +108,12 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
           }
           break;
         case 'ArrowRight':
-          if (node.hasChildren) {
+          if (!leaf) {
             await expandNode(nodeId, true);
           }
           break;
         case 'Enter':
-          await tree.open(node, navNodeInfoResource.getParents(nodeId), !node.hasChildren);
+          await tree.open(node, navNodeInfoResource.getParents(nodeId), leaf);
           break;
       }
     },

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
   forwardRef(function NavigationNodeControlRenderer({ node, navNode, dragging, control: externalControl }, ref) {
     const styles = useS(style);
     const elementRef = useRef<HTMLDivElement | null>(null);
+    const restoreFocus = useRef(false);
     const [size, setSize] = useState(24);
     const contextRef = useObjectRef({
       context: useContext(ElementsTreeContext),
@@ -39,6 +40,7 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
 
     const setElementRef = useCallback((ref: HTMLDivElement | null) => {
       if (elementRef.current) {
+        restoreFocus.current = elementRef.current === document.activeElement;
         observer.current?.unobserve(elementRef.current);
       }
 
@@ -46,6 +48,11 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
 
       if (elementRef.current) {
         observer.current?.observe(elementRef.current);
+        // Transfer focus from the offscreen placeholder to the rendered control.
+        if (restoreFocus.current) {
+          restoreFocus.current = false;
+          elementRef.current.focus({ preventScroll: true });
+        }
       }
     }, []);
     const mergedRef = useMergeRefs(setElementRef, ref);
@@ -61,7 +68,7 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
         entries => {
           for (const entry of entries) {
             if (entry.target === elementRef.current) {
-              if (entry.isIntersecting) {
+              if (entry.isIntersecting || elementRef.current.contains(document.activeElement)) {
                 setSize(-1);
               } else {
                 setSize(Math.ceil(elementRef.current.offsetHeight));
@@ -85,7 +92,7 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     const displayed = useDeferredValue(size !== -1);
 
     if (displayed) {
-      return <div ref={mergedRef} style={{ height: `${size}px` }} />;
+      return <div ref={mergedRef} tabIndex={-1} style={{ height: `${size}px` }} onFocus={() => setSize(-1)} />;
     }
 
     const Control = navNode.control || externalControl || NavigationNodeControlLoader;
