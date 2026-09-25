@@ -41,6 +41,7 @@ import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navig
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm.js';
 import { useNavigationTree } from './useNavigationTree.js';
 import { TableContentsSettingsPlaceholderElement } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/TableContentsSettingsForm.js';
+import { useElementsTreeLimit } from './ElementsTree/useElementsTreeLimit.js';
 
 const registry: StyleRegistry = [
   [
@@ -66,6 +67,7 @@ export const NavigationTree = observer(function NavigationTree() {
 
   const root = ROOT_NODE_PATH;
   const { handleOpen, handleSelect, handleSelectReset } = useNavigationTree();
+  const [limit] = useElementsTreeLimit(root);
 
   const connectionGroupFilter = useMemo(() => navigationTreeConnectionGroupFilter(navNodeInfoResource), [navNodeInfoResource]);
 
@@ -132,6 +134,7 @@ export const NavigationTree = observer(function NavigationTree() {
           settings={settings}
           getChildren={navTreeService.getChildren}
           loadChildren={navTreeService.loadNestedNodes}
+          limit={limit}
           onOpen={handleOpen}
         />
       </CaptureView>
