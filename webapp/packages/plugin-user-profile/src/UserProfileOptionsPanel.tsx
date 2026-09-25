@@ -8,34 +8,30 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Container, Group, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, s, SContext, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabList, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabsState, VerticalTabsStyleRegistry } from '@cloudbeaver/core-ui';
 
 import style from './UserProfileOptionsPanel.module.css';
-import UserProfileTabStyles from './UserProfileTab.module.css';
 import { UserProfileTabsService } from './UserProfileTabsService.js';
-
-export const tabsStyleRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [UserProfileTabStyles] }]];
 
 export const UserProfileOptionsPanel = observer(function UserProfileOptionsPanel() {
   const styles = useS(style);
   const userProfileTabsService = useService(UserProfileTabsService);
 
   return (
-    <ColoredContainer className={s(styles, { userProfileOptionsPanel: true })} overflow parent compact vertical noWrap maximum>
+    <ColoredContainer className={s(styles, { userProfileOptionsPanel: true })} noWrap maximum>
       <TabsState
         container={userProfileTabsService.tabContainer}
         currentTabId={userProfileTabsService.selectedTabId}
+        orientation="vertical"
         autoSelect={false}
         lazy
         onChange={tab => userProfileTabsService.open(tab.tabId)}
       >
-        <Group overflow box keepSize noWrap>
-          <SContext registry={tabsStyleRegistry}>
-            <TabList underline />
-          </SContext>
-        </Group>
+        <SContext registry={VerticalTabsStyleRegistry}>
+          <TabList vertical />
+        </SContext>
         <Container overflow vertical noWrap>
           <TabPanelList />
         </Container>
