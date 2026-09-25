@@ -59,6 +59,7 @@ import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHSession;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -77,8 +78,12 @@ import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Web service implementation
@@ -86,6 +91,10 @@ import java.util.stream.Collectors;
 public class WebServiceCore implements DBWServiceCore {
 
     private static final Log log = Log.getLog(WebServiceCore.class);
+
+    private static final int ORACLE_ERR_PASSWORD_EXPIRED = 28001;
+    private static final int MSSQL_ERR_LOGIN_PASSWORD_EXPIRED = 18487;
+    private static final int MSSQL_ERR_LOGIN_MUST_CHANGE_PASSWORD = 18488;
 
     @Override
     public WebServerConfig getServerConfig(@Nullable WebSession webSession) {
@@ -390,6 +399,13 @@ public class WebServiceCore implements DBWServiceCore {
                     throwDriverNotFoundException(dataSourceContainer);
                 }
             }
+            if (isPasswordExpiredException(e)) {
+                log.info("initConnection: password expired for " + dataSourceContainer.getId());
+                throw new DBWebException(
+                    "Database password has expired.",
+                    DBWebException.ERROR_CODE_PASSWORD_EXPIRED,
+                    e);
+            }
             throw new DBWebException("Error connecting to database", e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
@@ -656,9 +672,54 @@ public class WebServiceCore implements DBWServiceCore {
         try {
             requireServerFlagEnabled();
             container = resolveContainer(webSession, projectId, connectionId);
-            ensureConnected(webSession, container);
-            DBAUserPasswordManager manager = resolveUserPasswordManager(container);
+            requireEditPermission(webSession, container);
             String userName = resolveUserName(container);
+            // Verify the caller-supplied current password by opening a fresh JDBC connection.
+            // Works whether the container is currently connected or not: uses driver + config, not the session.
+            // DBAUserPasswordManager.changeUserPassword does not verify oldPassword on every dialect
+            // (e.g. PostgreSQL ALTER USER ... WITH PASSWORD requires no old password).
+            Object rawDriver;
+            try {
+                rawDriver = container.getDriver().getDriverLoader(container).getDriverInstance(webSession.getProgressMonitor());
+            } catch (Exception e) {
+                throw new DBWebException("Cannot verify current password.", e);
+            }
+            if (!(rawDriver instanceof Driver jdbcDriver)) {
+                throw new DBWebException("Cannot verify current password: driver is not a JDBC driver.");
+            }
+            DBPConnectionConfiguration cfg = container.getActualConnectionConfiguration();
+            Properties props = new Properties();
+            Stream.of(cfg.getProperties(), cfg.getProviderProperties())
+                .filter(Objects::nonNull)
+                .flatMap(m -> m.entrySet().stream())
+                .filter(e -> e.getKey() != null && e.getValue() != null)
+                .forEach(e -> props.setProperty(e.getKey(), e.getValue()));
+            props.setProperty("user", userName);
+            props.setProperty("password", oldPassword);
+            try (Connection c = jdbcDriver.connect(cfg.getUrl(), props)) {
+                if (c == null) {
+                    throw new DBWebException("Cannot verify current password: driver returned null.");
+                }
+            } catch (SQLException e) {
+                // SQLSTATE class 28 (SQL/2016 auth violation) means bad credentials, except for
+                // expiry codes handled by initConnection.
+                String sqlState = e.getSQLState();
+                if (!isPasswordExpiryErrorCode(e.getErrorCode()) && sqlState != null && sqlState.startsWith("28")) {
+                    throw new DBWebException("Current password is incorrect.", e);
+                }
+                throw new DBWebException("Cannot verify current password.", e);
+            }
+            // Ensure a live container session for DBAUserPasswordManager. If not connected,
+            // authenticate with the just-verified oldPassword rather than the (possibly stale) persisted one.
+            if (!container.isConnected()) {
+                cfg.setUserPassword(oldPassword);
+                try {
+                    container.connect(webSession.getProgressMonitor(), true, false);
+                } catch (Exception e) {
+                    throw new DBWebException("Cannot open connection with the current password.", e);
+                }
+            }
+            DBAUserPasswordManager manager = resolveUserPasswordManager(container);
             applyPasswordChange(webSession, projectId, connectionId, manager, userName, oldPassword, newPassword);
             persistNewPassword(webSession, container, projectId, connectionId, newPassword);
             WebDataSourceUtils.disconnectDataSource(webSession, container, true);
@@ -679,6 +740,19 @@ public class WebServiceCore implements DBWServiceCore {
         throw new DBWebException("Password change is disabled by the administrator.");
     }
 
+    private void requireEditPermission(
+        @NotNull WebSession webSession,
+        @NotNull DBPDataSourceContainer container
+    ) throws DBWebException {
+        WebProjectImpl project = webSession.getProjectById(container.getProject().getId());
+        if (project == null) {
+            throw new DBWebException("Connection project not accessible.");
+        }
+        if (!SMUtils.hasProjectPermission(webSession, project.getRMProject(), RMProjectPermission.DATA_SOURCES_EDIT)) {
+            throw new DBWebException("Not authorized to change the database password for this connection.");
+        }
+    }
+
     @NotNull
     private DBPDataSourceContainer resolveContainer(
         @NotNull WebSession webSession,
@@ -694,20 +768,6 @@ public class WebServiceCore implements DBWServiceCore {
             return container;
         }
         throw new DBWebException("Connection not found.");
-    }
-
-    private void ensureConnected(
-        @NotNull WebSession webSession,
-        @NotNull DBPDataSourceContainer container
-    ) throws DBWebException {
-        if (container.isConnected()) {
-            return;
-        }
-        try {
-            container.connect(webSession.getProgressMonitor(), true, false);
-        } catch (Exception e) {
-            throw new DBWebException("Cannot connect to database.", e);
-        }
     }
 
     @NotNull
@@ -794,6 +854,22 @@ public class WebServiceCore implements DBWServiceCore {
     ) {
         return String.format("sessionId=%s userId=%s projectId=%s connectionId=%s",
             webSession.getSessionId(), webSession.getUserId(), projectId, connectionId);
+    }
+
+    // PostgreSQL 28P01 is indistinguishable from wrong-password client-side. Excluded.
+    private static boolean isPasswordExpiryErrorCode(int errorCode) {
+        return errorCode == ORACLE_ERR_PASSWORD_EXPIRED
+            || errorCode == MSSQL_ERR_LOGIN_PASSWORD_EXPIRED
+            || errorCode == MSSQL_ERR_LOGIN_MUST_CHANGE_PASSWORD;
+    }
+
+    private static boolean isPasswordExpiredException(@NotNull Throwable t) {
+        for (Throwable cause = t; cause != null; cause = cause.getCause()) {
+            if (cause instanceof SQLException sql && isPasswordExpiryErrorCode(sql.getErrorCode())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
