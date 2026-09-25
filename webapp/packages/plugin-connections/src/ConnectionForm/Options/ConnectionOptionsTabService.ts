@@ -12,8 +12,8 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ConnectionFormService } from '../ConnectionFormService.js';
 
 export const Options = React.lazy(async () => {
-  const { Options } = await import('./Options.js');
-  return { default: Options };
+  const { OptionsPanel } = await import('./OptionsPanel.js');
+  return { default: OptionsPanel };
 });
 
 @injectable(() => [ConnectionFormService])

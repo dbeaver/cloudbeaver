@@ -34,6 +34,7 @@ public class WebConnectionConfig {
 
     private String connectionId;
     private String driverId;
+    private Boolean hidden;
 
     private boolean readOnly;
 
@@ -75,6 +76,8 @@ public class WebConnectionConfig {
     public WebConnectionConfig(@NotNull Map<String, Object> params) {
         connectionId = JSONUtils.getString(params, "connectionId");
         driverId = JSONUtils.getString(params, "driverId");
+        hidden = params.containsKey("hidden") && params.get("hidden") != null ?
+            JSONUtils.getBoolean(params, "hidden") : null;
 
         host = JSONUtils.getString(params, "host");
         port = JSONUtils.getString(params, "port");
@@ -137,6 +140,15 @@ public class WebConnectionConfig {
 
     public void setConnectionId(String connectionId) {
         this.connectionId = connectionId;
+    }
+
+    @Nullable
+    public Boolean getHidden() {
+        return hidden;
+    }
+
+    public void setHidden(@Nullable Boolean hidden) {
+        this.hidden = hidden;
     }
 
     @Property
