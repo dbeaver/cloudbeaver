@@ -34,6 +34,8 @@ import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.jobs.Job;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.eclipse.core.runtime.IAdaptable;
@@ -45,12 +47,14 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAUserPasswordManager;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPConnectionType;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.exec.DBCConnectException;
+import org.jkiss.dbeaver.model.meta.ForTest;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -61,6 +65,7 @@ import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHSession;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -78,6 +83,7 @@ import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
+import java.util.concurrent.CancellationException;
 import java.util.stream.Collectors;
 
 /**
@@ -547,47 +553,104 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
+    @NotNull
     public WebConnectionInfo testConnection(
         @NotNull WebSession webSession,
         @Nullable String projectId,
-        @NotNull Map<String, Object> connectionConfig
+        @NotNull Map<String, Object> connectionConfig,
+        @Nullable List<Map<String, Object>> extensions
     ) throws DBWebException {
-        WebSessionProjectImpl project = getProjectById(webSession, projectId);
+        WebSessionProjectImpl project = getConnectionTestProject(webSession, projectId);
         WebConnectionConfig configInput = project.getConnectionConfigInput(connectionConfig);
-
         configInput.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
-        DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
-            webSession, projectId, configInput.getConnectionId());
-        DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
-        testDataSource.setTemporary(true);
-        WebConnectionInfo connectionInfo = project.addConnection(testDataSource);
-        connectionInfo.setSavedCredentials(configInput.getCredentials(), configInput.getNetworkHandlersConfig());
-        try {
-            ConnectionTestJob ct = new ConnectionTestJob(
-                testDataSource, param -> {
+        Map<String, Map<String, Object>> extensionConfigurations = new LinkedHashMap<>();
+        if (!CommonUtils.isEmpty(extensions)) {
+            for (Map<String, Object> extension : extensions) {
+                if (extension == null) {
+                    throw new DBWebException("Connection test extension must be an object");
+                }
+                Object idValue = extension.get("id");
+                if (!(idValue instanceof String id) || CommonUtils.isEmpty(id)) {
+                    throw new DBWebException("Connection test extension ID must be specified");
+                }
+                Object configurationValue = extension.get("configuration");
+                if (!(configurationValue instanceof Map<?, ?> configuration)) {
+                    throw new DBWebException(
+                        "Configuration for connection test extension '" + id + "' must be an object"
+                    );
+                }
+                @SuppressWarnings("unchecked")
+                Map<String, Object> typedConfiguration = (Map<String, Object>) configuration;
+                if (extensionConfigurations.putIfAbsent(id, typedConfiguration) != null) {
+                    throw new DBWebException("Duplicate connection test extension '" + id + "'");
+                }
             }
-            );
-            ct.run(webSession.getProgressMonitor());
-            if (ct.getConnectError() != null) {
-                if (ct.getConnectError() instanceof DBCConnectException error) {
+        }
+        DataSourceDescriptor originalDataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
+            webSession, projectId, configInput.getConnectionId());
+
+        DataSourceDescriptor testDataSource = null;
+        Throwable testError = null;
+        try {
+            testDataSource = createTestDataSourceDescriptor(originalDataSource, configInput, project);
+            testDataSource.setTemporary(true);
+            configureTestDataSourceDescriptor(webSession, originalDataSource, testDataSource, configInput, project);
+            for (Map.Entry<String, Map<String, Object>> extension : extensionConfigurations.entrySet()) {
+                testDataSource.setExtension(extension.getKey(), extension.getValue());
+            }
+
+            WebConnectionInfo connectionInfo = project.addTemporaryConnection(testDataSource);
+            connectionInfo.setSavedCredentials(configInput.getCredentials(), configInput.getNetworkHandlersConfig());
+            return runConnectionTest(webSession, testDataSource, connectionInfo);
+        } catch (DBWebException e) {
+            testError = e;
+            throw e;
+        } catch (RuntimeException | Error e) {
+            testError = e;
+            throw e;
+        } finally {
+            if (testDataSource != null) {
+                DBWebException cleanupError = cleanupTemporaryDataSource(project, testDataSource);
+                if (cleanupError != null) {
+                    if (testError == null) {
+                        throw cleanupError;
+                    }
+                    testError.addSuppressed(cleanupError);
+                }
+            }
+        }
+    }
+
+    @NotNull
+    private static WebConnectionInfo runConnectionTest(
+        @NotNull WebSession webSession,
+        @NotNull DataSourceDescriptor testDataSource,
+        @NotNull WebConnectionInfo connectionInfo
+    ) throws DBWebException {
+        try {
+            ConnectionTestJob connectionTestJob = new ConnectionTestJob(testDataSource, param -> {
+            });
+            DBRProgressMonitor monitor = webSession.getProgressMonitor();
+            IStatus status = connectionTestJob.run(monitor);
+            checkConnectionTestCancellation(monitor, status);
+            if (connectionTestJob.getConnectError() != null) {
+                if (connectionTestJob.getConnectError() instanceof DBCConnectException error) {
                     Throwable rootCause = CommonUtils.getRootCause(error);
                     if (rootCause instanceof ClassNotFoundException) {
                         log.error(error);
                         throwDriverNotFoundException(testDataSource);
                     }
                 }
-                throw new DBWebException("Connection failed", ct.getConnectError());
+                throw new DBWebException("Connection failed", connectionTestJob.getConnectError());
             }
-            connectionInfo.setConnectError(ct.getConnectError());
-            connectionInfo.setServerVersion(ct.getServerVersion());
-            connectionInfo.setClientVersion(ct.getClientVersion());
-            connectionInfo.setConnectTime(RuntimeUtils.formatExecutionTime(ct.getConnectTime()));
+            connectionInfo.setConnectError(connectionTestJob.getConnectError());
+            connectionInfo.setServerVersion(connectionTestJob.getServerVersion());
+            connectionInfo.setClientVersion(connectionTestJob.getClientVersion());
+            connectionInfo.setConnectTime(RuntimeUtils.formatExecutionTime(connectionTestJob.getConnectTime()));
             return connectionInfo;
         } catch (DBException e) {
             throw new DBWebException("Error connecting to database", e);
-        } finally {
-            project.removeConnection(testDataSource);
         }
     }
 
@@ -598,7 +661,17 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebConnectionConfig configInput,
         @NotNull WebSessionProjectImpl project
     ) throws DBWebException {
-        DataSourceDescriptor testDataSource;
+        DataSourceDescriptor testDataSource = createTestDataSourceDescriptor(dataSource, configInput, project);
+        configureTestDataSourceDescriptor(webSession, dataSource, testDataSource, configInput, project);
+        return testDataSource;
+    }
+
+    @NotNull
+    private DataSourceDescriptor createTestDataSourceDescriptor(
+        @Nullable DataSourceDescriptor dataSource,
+        @NotNull WebConnectionConfig configInput,
+        @NotNull WebSessionProjectImpl project
+    ) throws DBWebException {
         if (dataSource != null) {
             try {
                 // Check that creds are saved to trigger secrets resolve
@@ -607,7 +680,19 @@ public class WebServiceCore implements DBWServiceCore {
                 throw new DBWebException("Can't determine whether datasource credentials are saved", e);
             }
 
-            testDataSource = (DataSourceDescriptor) dataSource.createCopy(dataSource.getRegistry());
+            return (DataSourceDescriptor) dataSource.createCopy(dataSource.getRegistry());
+        }
+        return project.getDataSourceContainerFromInput(configInput);
+    }
+
+    private void configureTestDataSourceDescriptor(
+        @NotNull WebSession webSession,
+        @Nullable DataSourceDescriptor dataSource,
+        @NotNull DataSourceDescriptor testDataSource,
+        @NotNull WebConnectionConfig configInput,
+        @NotNull WebSessionProjectImpl project
+    ) throws DBWebException {
+        if (dataSource != null) {
             project.updateDataSourceContainerFromInput(configInput, testDataSource);
             if (configInput.getSelectedSecretId() != null) {
                 try {
@@ -630,8 +715,6 @@ public class WebServiceCore implements DBWServiceCore {
                 false,
                 true
             );
-        } else {
-            testDataSource = project.getDataSourceContainerFromInput(configInput);
         }
         validateDriverLibrariesPresence(testDataSource);
         webSession.provideAuthParameters(
@@ -641,7 +724,192 @@ public class WebServiceCore implements DBWServiceCore {
         );
         testDataSource.setSavePassword(true); // We need for test to avoid password callback
         testDataSource.setAccessCheckRequired(!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN));
-        return testDataSource;
+    }
+
+    @ForTest
+    public static void checkConnectionTestCancellation(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull IStatus status
+    ) {
+        if (monitor.isCanceled() || status.matches(IStatus.CANCEL)) {
+            throw new CancellationException("Connection test was canceled");
+        }
+    }
+
+    @Nullable
+    @ForTest
+    public static DBWebException cleanupTemporaryDataSource(
+        @NotNull WebSessionProjectImpl project,
+        @NotNull DataSourceDescriptor dataSource
+    ) {
+        boolean interrupted = Thread.interrupted();
+        Job[] jobs;
+        Throwable lookupFailure = null;
+        try {
+            jobs = Job.getJobManager().find(dataSource);
+        } catch (Throwable e) {
+            jobs = new Job[0];
+            lookupFailure = e;
+        }
+        return cleanupTemporaryDataSource(project, dataSource, jobs, lookupFailure, interrupted);
+    }
+
+    @Nullable
+    @ForTest
+    public static DBWebException cleanupTemporaryDataSource(
+        @NotNull WebSessionProjectImpl project,
+        @NotNull DataSourceDescriptor dataSource,
+        @NotNull Job[] jobs
+    ) {
+        return cleanupTemporaryDataSource(project, dataSource, jobs, null, Thread.interrupted());
+    }
+
+    @Nullable
+    private static DBWebException cleanupTemporaryDataSource(
+        @NotNull WebSessionProjectImpl project,
+        @NotNull DataSourceDescriptor dataSource,
+        @NotNull Job[] jobs,
+        @Nullable Throwable initialFailure,
+        boolean interrupted
+    ) {
+        Throwable cleanupFailure = cancelCleanupJobs(jobs, initialFailure);
+        CleanupResult joinResult = joinCleanupJobs(jobs, cleanupFailure);
+        cleanupFailure = joinResult.failure();
+        boolean shouldRestoreInterrupt = consumeInterrupt(interrupted || joinResult.interrupted());
+        cleanupFailure = disconnectTemporaryDataSource(dataSource, cleanupFailure);
+        shouldRestoreInterrupt = consumeInterrupt(shouldRestoreInterrupt);
+        cleanupFailure = removeTemporaryConnection(project, dataSource, cleanupFailure);
+        shouldRestoreInterrupt = consumeInterrupt(shouldRestoreInterrupt);
+        cleanupFailure = removeTemporaryDataSource(dataSource, cleanupFailure);
+        shouldRestoreInterrupt = consumeInterrupt(shouldRestoreInterrupt);
+        if (shouldRestoreInterrupt) {
+            Thread.currentThread().interrupt();
+        }
+        return cleanupFailure == null ? null : new DBWebException(
+            "Failed to clean up temporary connection",
+            cleanupFailure
+        );
+    }
+
+    @Nullable
+    private static Throwable cancelCleanupJobs(@NotNull Job[] jobs, @Nullable Throwable initialFailure) {
+        Throwable cleanupFailure = initialFailure;
+        for (Job job : jobs) {
+            try {
+                if (job.getState() != Job.NONE) {
+                    job.cancel();
+                }
+            } catch (Throwable e) {
+                cleanupFailure = appendCleanupFailure(cleanupFailure, e);
+            }
+        }
+        return cleanupFailure;
+    }
+
+    @NotNull
+    private static CleanupResult joinCleanupJobs(@NotNull Job[] jobs, @Nullable Throwable initialFailure) {
+        Throwable cleanupFailure = initialFailure;
+        boolean interrupted = false;
+        for (Job job : jobs) {
+            boolean joined = false;
+            while (!joined) {
+                try {
+                    job.join();
+                    joined = true;
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                    Thread.interrupted();
+                    cleanupFailure = appendCleanupFailure(cleanupFailure, e);
+                } catch (Throwable e) {
+                    cleanupFailure = appendCleanupFailure(cleanupFailure, e);
+                    joined = true;
+                }
+            }
+        }
+        return new CleanupResult(cleanupFailure, interrupted);
+    }
+
+    @Nullable
+    private static Throwable disconnectTemporaryDataSource(
+        @NotNull DataSourceDescriptor dataSource,
+        @Nullable Throwable initialFailure
+    ) {
+        Throwable cleanupFailure = initialFailure;
+        try {
+            if (!dataSource.disconnect(new VoidProgressMonitor())) {
+                throw new DBWebException("Failed to disconnect temporary connection");
+            }
+        } catch (Throwable e) {
+            cleanupFailure = appendCleanupFailure(cleanupFailure, e);
+        }
+        return cleanupFailure;
+    }
+
+    @Nullable
+    private static Throwable removeTemporaryConnection(
+        @NotNull WebSessionProjectImpl project,
+        @NotNull DataSourceDescriptor dataSource,
+        @Nullable Throwable initialFailure
+    ) {
+        Throwable cleanupFailure = initialFailure;
+        try {
+            WebConnectionInfo cachedConnection = project.findWebConnectionInfo(dataSource.getId());
+            if (cachedConnection != null && cachedConnection.getDataSourceContainer() == dataSource) {
+                project.removeConnection(dataSource);
+            }
+            cachedConnection = project.findWebConnectionInfo(dataSource.getId());
+            if (cachedConnection != null && cachedConnection.getDataSourceContainer() == dataSource) {
+                throw new DBWebException("Failed to remove temporary connection from the web session cache");
+            }
+        } catch (Throwable e) {
+            cleanupFailure = appendCleanupFailure(cleanupFailure, e);
+        }
+        return cleanupFailure;
+    }
+
+    @Nullable
+    private static Throwable removeTemporaryDataSource(
+        @NotNull DataSourceDescriptor dataSource,
+        @Nullable Throwable initialFailure
+    ) {
+        Throwable cleanupFailure = initialFailure;
+        try {
+            DBPDataSourceRegistry registry = dataSource.getRegistry();
+            if (registry.getDataSource(dataSource.getId()) == dataSource) {
+                if (registry instanceof DBPDataSourceRegistryCache registryCache) {
+                    registryCache.removeDataSourceFromList(dataSource);
+                } else {
+                    throw new DBWebException("Project registry does not support temporary connection cleanup");
+                }
+            } else {
+                dataSource.dispose();
+            }
+            if (registry.getDataSource(dataSource.getId()) == dataSource) {
+                throw new DBWebException("Failed to remove temporary connection from the project registry");
+            }
+        } catch (Throwable e) {
+            cleanupFailure = appendCleanupFailure(cleanupFailure, e);
+        }
+        return cleanupFailure;
+    }
+
+    private static boolean consumeInterrupt(boolean interrupted) {
+        boolean currentInterrupt = Thread.interrupted();
+        return interrupted || currentInterrupt;
+    }
+
+    @NotNull
+    private static Throwable appendCleanupFailure(@Nullable Throwable current, @NotNull Throwable next) {
+        if (current == null) {
+            return next;
+        }
+        if (!Objects.equals(current, next)) {
+            current.addSuppressed(next);
+        }
+        return current;
+    }
+
+    private record CleanupResult(@Nullable Throwable failure, boolean interrupted) {
     }
 
     @Override
@@ -1045,6 +1313,26 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Project '" + projectId + "' not found");
         }
         return project;
+    }
+
+    @NotNull
+    private static WebSessionProjectImpl getConnectionTestProject(
+        @NotNull WebSession webSession,
+        @Nullable String projectId
+    ) throws DBWebException {
+        if (projectId == null) {
+            WebSessionProjectImpl project = webSession.getProjectById(null);
+            if (project != null) {
+                return project;
+            }
+        } else {
+            for (WebSessionProjectImpl project : webSession.getAccessibleProjects()) {
+                if (projectId.equals(project.getId())) {
+                    return project;
+                }
+            }
+        }
+        throw new DBWebException("Project '" + projectId + "' not found");
     }
 
     private void validateDriverLibrariesPresence(@NotNull DBPDataSourceContainer container) throws DBWebException {

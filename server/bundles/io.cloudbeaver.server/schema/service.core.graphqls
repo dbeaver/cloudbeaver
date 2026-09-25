@@ -905,7 +905,11 @@ extend type Mutation {
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: ID ): ConnectionInfo!
 
     "Test connection configuration. Returns remote server version"
-    testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
+    testConnection(
+        config: ConnectionConfig!
+        projectId: ID
+        extensions: [ConnectionTestExtensionInput!] @since(version: "26.2.1")
+    ): ConnectionInfo!
 
     """
     Change the DB user password for this connection.
@@ -949,4 +953,9 @@ extend type Mutation {
 
     "Get async task info by ID"
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
+}
+
+input ConnectionTestExtensionInput @since(version: "26.2.1") {
+    id: ID!
+    configuration: Object!
 }

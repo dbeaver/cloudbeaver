@@ -79,6 +79,7 @@ public class GraphQLEndpoint extends HttpServlet {
     public static final Gson gson = new GsonBuilder()
         .serializeNulls()
         .setPrettyPrinting()
+        .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
         .create();
     private GraphQLBindingContext bindingContext;
 

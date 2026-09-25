@@ -204,15 +204,35 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     }
 
     /**
+     * Adds a temporary connection without replacing an existing cached connection with the same ID.
+     */
+    @NotNull
+    public WebConnectionInfo addTemporaryConnection(
+        @NotNull DBPDataSourceContainer dataSourceContainer
+    ) throws DBWebException {
+        synchronized (connections) {
+            if (connections.containsKey(dataSourceContainer.getId())) {
+                throw new DBWebException("Temporary connection ID conflicts with an existing connection");
+            }
+            WebConnectionInfo connection = createConnectionInfo(dataSourceContainer);
+            connections.put(dataSourceContainer.getId(), connection);
+            return connection;
+        }
+    }
+
+    /**
      * Removes connection from project cache.
      */
     public void removeConnection(@NotNull DBPDataSourceContainer dataSourceContainer) {
-        WebConnectionInfo webConnectionInfo = connections.get(dataSourceContainer.getId());
-        if (webConnectionInfo != null) {
-            webConnectionInfo.clearCache();
-            synchronized (connections) {
-                connections.remove(dataSourceContainer.getId());
+        WebConnectionInfo removedConnection = null;
+        synchronized (connections) {
+            WebConnectionInfo webConnectionInfo = connections.get(dataSourceContainer.getId());
+            if (webConnectionInfo != null && webConnectionInfo.getDataSourceContainer() == dataSourceContainer) {
+                removedConnection = connections.remove(dataSourceContainer.getId());
             }
+        }
+        if (removedConnection != null) {
+            removedConnection.clearCache();
         }
     }
 

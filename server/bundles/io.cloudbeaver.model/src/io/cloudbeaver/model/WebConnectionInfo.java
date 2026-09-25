@@ -223,9 +223,10 @@ public class WebConnectionInfo {
         return dsNode == null ? null : dsNode.getNodeUri();
     }
 
+    @Nullable
     @Property
     public String getConnectTime() {
-        return dataSourceContainer.getConnectTime() == null ? null :
+        return connectTime != null ? connectTime : dataSourceContainer.getConnectTime() == null ? null :
             CBModelConstants.ISO_DATE_FORMAT.format(dataSourceContainer.getConnectTime().toInstant());
     }
 
