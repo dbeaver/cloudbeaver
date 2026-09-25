@@ -136,7 +136,10 @@ export const Combobox: IComboboxType = observer(function Combobox({
     .map(mapItem)
     .filter(
       ({ itemValue, itemSeparator }) =>
-        itemSeparator || inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase()),
+        itemSeparator ||
+        internalInputValue === null ||
+        !internalInputValue.trim() ||
+        itemValue.toLowerCase().includes(internalInputValue.trim().toLowerCase()),
     );
   const itemGroups: { key: string; items: typeof filteredItems }[] = [{ key: 'first', items: [] }];
   for (const item of filteredItems) {
@@ -194,10 +197,17 @@ export const Combobox: IComboboxType = observer(function Combobox({
     defaultValue: comboboxDefaultValue,
     defaultSelectedValue: comboboxDefaultSelectedValue as string,
     setSelectedValue: handleSelect,
+    setMounted: mounted => {
+      if (!mounted && allowCustomValue) {
+        setInternalInputValue(null);
+      }
+    },
   });
 
   function handleBlur() {
-    if (!allowCustomValue) {
+    if (allowCustomValue) {
+      comboboxStore.setOpen(false);
+    } else {
       setInputValue(null);
     }
   }
@@ -300,7 +310,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
             </>
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
-          {displayPopover && (!allowCustomValue || visibleGroups.length > 0 || hasFooterItems) && (
+          {displayPopover && (
             <ComboboxPopover
               className={clsx('theme-text-on-surface theme-background-surface', hasFooterItems && 'dbv-kit-combobox__popover--grouped')}
             >
