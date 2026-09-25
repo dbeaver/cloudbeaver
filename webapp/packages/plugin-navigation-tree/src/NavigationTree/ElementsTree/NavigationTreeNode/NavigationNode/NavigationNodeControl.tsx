@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,12 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
       contextMenuPosition.open(event);
-      treeNodeContext.select();
+
+      // opening the context menu on a node that is already part of a multi-selection must not
+      // collapse that selection down to the clicked node
+      if (!selected) {
+        treeNodeContext.select();
+      }
     }
 
     const { editing, saving } = editingState;

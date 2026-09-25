@@ -3221,10 +3221,12 @@ __metadata:
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -3234,6 +3236,7 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 
