@@ -196,4 +196,14 @@ public interface DBWServiceAI extends DBWService {
         @NotNull String profileId,
         @WebParameterSecure @NotNull WebAIProfileCredentialsInput credentials
     ) throws DBWebException;
+
+    @NotNull
+    @WebAction
+    WebAIDeviceAuthorizationInfo startDeviceAuthorization(
+        @NotNull WebSession webSession,
+        @NotNull String profileId
+    ) throws DBWebException;
+
+    @WebAction
+    boolean disconnectAccount(@NotNull WebSession webSession, @NotNull String profileId) throws DBWebException;
 }

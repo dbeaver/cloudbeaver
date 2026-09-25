@@ -21,8 +21,10 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
+import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
 
 public class WebAIConfigurationProfile {
 
@@ -57,6 +59,20 @@ public class WebAIConfigurationProfile {
 
     public boolean isCredentialsSaved() throws DBException {
         return WebAIProfileUtils.areCredentialsSaved(webSession, profile);
+    }
+
+    @Nullable
+    public WebAIAccountInfo getAccount() throws DBException {
+        if (profile.isGlobal()
+            || !(profile.getConfiguration() instanceof AIAccountProperties properties)
+            || !properties.isAccountAuthentication()
+            || !WebAIProfileUtils.areCredentialsSaved(webSession, profile)
+        ) {
+            return null;
+        }
+        AIConfigurationProfile effectiveProfile = WebAIProfileUtils.getEffectiveProfile(webSession, profile);
+        AIAccountProperties effectiveProperties = (AIAccountProperties) effectiveProfile.getConfiguration();
+        return new WebAIAccountInfo(effectiveProperties.getAccountEmail());
     }
 
     @NotNull

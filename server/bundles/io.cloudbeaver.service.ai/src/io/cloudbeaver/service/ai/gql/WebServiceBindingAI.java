@@ -199,6 +199,16 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                     getArgumentVal(env, "profileId"),
                     JSONUtils.deserializeObject(getArgumentVal(env, "credentials"), WebAIProfileCredentialsInput.class)
                 )
+            ).dataFetcher(
+                "aiStartDeviceAuthorization", env -> getService(env).startDeviceAuthorization(
+                    getWebSession(env),
+                    getArgumentVal(env, "profileId")
+                )
+            ).dataFetcher(
+                "aiDisconnectAccount", env -> getService(env).disconnectAccount(
+                    getWebSession(env),
+                    getArgumentVal(env, "profileId")
+                )
             );
     }
 
