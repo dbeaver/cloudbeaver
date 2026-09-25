@@ -117,13 +117,24 @@ public class RequestHostFilter implements Filter {
         boolean httpsExpected = serverConfig.isForceHttps();
         try {
             if ("http".equals(originUri.getScheme()) && httpsExpected) {
-                log.warn("Request schema is 'http' but 'forceHttps' is enabled. Redirecting to 'https'.");
-                StringBuilder redirectUrlBuilder = new StringBuilder("https://")
-                    .append(originUri.getHost());
-                if (originUri.getPort() > -1) {
-                    redirectUrlBuilder.append(':').append(originUri.getPort());
+                List<String> supportedHosts = serverConfig.getSupportedHosts();
+                if (CommonUtils.isEmpty(supportedHosts) || InetAddresses.isInetAddress(originUri.getHost())) {
+                    return true;
                 }
-                redirectUrlBuilder.append(httpRequest.getRequestURI());
+                log.warn("Request schema is 'http' but 'forceHttps' is enabled. Redirecting to 'https'.");
+                StringBuilder requestHostBuilder = new StringBuilder(originUri.getHost());
+                if (originUri.getPort() > -1) {
+                    requestHostBuilder.append(':').append(originUri.getPort());
+                }
+                String requestHost = requestHostBuilder.toString();
+                if (!supportedHosts.contains(requestHost)) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    return false;
+                }
+                String requestPath = "/" + httpRequest.getRequestURI().replaceFirst("^/+", "");
+                StringBuilder redirectUrlBuilder = new StringBuilder("https://")
+                    .append(requestHost)
+                    .append(requestPath);
                 if (httpRequest.getQueryString() != null) {
                     redirectUrlBuilder.append("?")
                         .append(httpRequest.getQueryString());
@@ -181,7 +192,8 @@ public class RequestHostFilter implements Filter {
         @NotNull List<String> availableHosts
     ) throws IOException {
         boolean https = application.getServerConfiguration().isForceHttps();
-        String redirectUrl = (https ? "https://" : "http://") + getDefaultHost(availableHosts) + httpRequest.getRequestURI();
+        String requestPath = "/" + httpRequest.getRequestURI().replaceFirst("^/+", "");
+        String redirectUrl = (https ? "https://" : "http://") + getDefaultHost(availableHosts) + requestPath;
         if (httpRequest.getQueryString() != null) {
             redirectUrl += "?" + httpRequest.getQueryString();
         }
