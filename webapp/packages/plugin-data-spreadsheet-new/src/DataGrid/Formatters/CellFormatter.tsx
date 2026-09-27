@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
-import { getComputed, IconButton, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, IconButton, preventFocusHandler, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
@@ -63,6 +63,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
             tabIndex={-1}
             className={s(styles, { menuTrigger: true })}
             onDoubleClick={stopPropagation}
+            onMouseDown={preventFocusHandler}
             onMouseUp={handleMouseUp}
             onClick={openMenu}
           />

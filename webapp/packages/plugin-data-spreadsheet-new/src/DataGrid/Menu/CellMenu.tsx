@@ -35,22 +35,16 @@ export const CellMenu = observer<Props>(function CellMenu({ menu }) {
 
   const gridContext = useContext(DataGridContext);
 
-  function handleAutoFocusOnHide() {
-    gridContext.focus();
-    return false;
+  function handleVisibleSwitch(visible: boolean) {
+    if (!visible) {
+      gridContext.focus();
+    }
   }
 
   return (
     <SContext registry={registry}>
       <div className={s(style, { contextMenu: true })}>
-        {/* Keep portal focus guards outside cells so they do not interfere with the grid's roving tab index. */}
-        <ContextMenu
-          menu={menu.menu}
-          contextMenuPosition={menu.position}
-          preserveTabOrderAnchor={menu.position.position ? gridContext.getContainer() : null}
-          autoFocusOnHide={handleAutoFocusOnHide}
-          autoFocusOnShow
-        />
+        <ContextMenu menu={menu.menu} contextMenuPosition={menu.position} autoFocusOnShow onVisibleSwitch={handleVisibleSwitch} />
       </div>
     </SContext>
   );
