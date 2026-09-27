@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.test.platform.fs;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.fs.WebFSUtils;
 import io.cloudbeaver.test.WebGQLClient;
@@ -27,7 +28,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-public class FileSystemSecurityTest {
+public class FileSystemSecurityTest extends CloudbeaverMockTest {
     @Test
     public void unauthorizedSessionCannotUseFileSystemApi() {
         WebGQLClient client = CEAppStarter.createClient();
