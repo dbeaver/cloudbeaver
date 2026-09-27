@@ -45,6 +45,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 public abstract class BaseLocalResourceController implements RMController {
@@ -103,6 +104,18 @@ public abstract class BaseLocalResourceController implements RMController {
             () -> {
                 log.debug("Updating value for property '" + propName + "' in project '" + projectId + "'");
                 webProject.setProjectProperty(propName, propValue);
+                return null;
+            }
+        );
+    }
+
+    @Override
+    public void setProjectProperties(@NotNull String projectId, @NotNull Map<String, Object> properties) throws DBException {
+        RMLocalProject webProject = getWebProject(projectId, false);
+        doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
+            () -> {
+                log.debug("Updating project properties in project '" + projectId + "'");
+                webProject.setProjectProperties(properties);
                 return null;
             }
         );
