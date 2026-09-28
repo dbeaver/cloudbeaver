@@ -29,6 +29,7 @@ import { type ILoadableState, MetadataMap, debounce } from '@cloudbeaver/core-ut
 import { ElementsTreeService } from './ElementsTreeService.js';
 import type { IElementsTreeAction } from './IElementsTreeAction.js';
 import type { INavTreeNodeInfo } from './INavTreeNodeInfo.js';
+import { isLeaf } from './isLeaf.js';
 import type { NavigationNodeRendererComponent } from './NavigationNodeComponent.js';
 import { transformNodeInfo } from './transformNodeInfo.js';
 
@@ -589,10 +590,21 @@ export function useElementsTree(options: IOptions): IElementsTree {
           return;
         }
 
+        const leaf = isLeaf(
+          node,
+          navTreeResource.get(node.uri),
+          this,
+          navNodeInfoResource.isOutdated(node.uri) || navTreeResource.isOutdated(node.uri),
+        );
+
+        if (state && leaf) {
+          return;
+        }
+
         const treeNodeState = this.state.get(node.uri);
 
         try {
-          if (state || (this.filtering && !treeNodeState.showInFilter)) {
+          if (!leaf && (state || (this.filtering && !treeNodeState.showInFilter))) {
             state = await handleLoadChildren(node.uri, true);
           }
 
