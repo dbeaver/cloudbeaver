@@ -38,9 +38,6 @@
       "path": "../core-resource"
     },
     {
-      "path": "../core-root"
-    },
-    {
       "path": "../core-ui"
     },
     {
@@ -48,6 +45,9 @@
     },
     {
       "path": "../plugin-ai"
+    },
+    {
+      "path": "../plugin-ai-chat"
     },
     {
       "path": "../plugin-ai-profiles"

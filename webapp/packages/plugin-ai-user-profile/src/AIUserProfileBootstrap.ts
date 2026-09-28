@@ -9,7 +9,7 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
+import { AIChatService } from '@cloudbeaver/plugin-ai-chat';
 import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 import { UserProfileTabsService } from '@cloudbeaver/plugin-user-profile';
 
@@ -17,12 +17,12 @@ import { AI_PROFILES_TAB_ID } from './AI_PROFILES_TAB_ID.js';
 
 const AIProfilesPanel = importLazyComponent(() => import('./components/AIProfilesPanel.js').then(module => module.AIProfilesPanel));
 
-@injectable(() => [UserProfileTabsService, AppAuthService, ServerConfigResource, AIProfilesResource])
+@injectable(() => [UserProfileTabsService, AppAuthService, AIChatService, AIProfilesResource])
 export class AIUserProfileBootstrap extends Bootstrap {
   constructor(
     private readonly userProfileTabsService: UserProfileTabsService,
     private readonly appAuthService: AppAuthService,
-    private readonly serverConfigResource: ServerConfigResource,
+    private readonly aiChatService: AIChatService,
     private readonly aiProfilesResource: AIProfilesResource,
   ) {
     super();
@@ -40,10 +40,6 @@ export class AIUserProfileBootstrap extends Bootstrap {
   }
 
   private isAvailable(): boolean {
-    return (
-      this.appAuthService.authenticated &&
-      this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true) &&
-      this.aiProfilesResource.values.length > 0
-    );
+    return this.appAuthService.authenticated && this.aiChatService.isEnabled && this.aiProfilesResource.values.length > 0;
   }
 }
