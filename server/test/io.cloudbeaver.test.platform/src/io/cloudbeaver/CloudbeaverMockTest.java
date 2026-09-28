@@ -36,7 +36,8 @@ import java.net.http.HttpClient;
     bundleName = "io.cloudbeaver.server.ce",
     registryName = "io.cloudbeaver.product.ce.application",
     args = {"-web-config", "workspace/conf/cloudbeaver.conf"},
-    vmArgs = {"logback.configurationFile", "workspace/conf/logback.xml"}
+    vmArgs = {"logback.configurationFile", "workspace/conf/logback.xml"},
+    waitForWorkbench = false
 )
 public abstract class CloudbeaverMockTest implements IAsyncApplication {
     @BeforeAll

@@ -7,33 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import {
-  Container,
-  Form,
-  Loader,
-  Placeholder,
-  s,
-  SContext,
-  StatusMessage,
-  type StyleRegistry,
-  useForm,
-  useObjectRef,
-  useS,
-} from '@cloudbeaver/core-blocks';
+import { Container, Form, Loader, Placeholder, s, SContext, StatusMessage, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import {
-  FormMode,
-  formSubmitContext,
-  TabList,
-  TabListStyles,
-  TabPanelList,
-  TabsState,
-  TabStyles,
-  TabTitleStyles,
-  type IFormState,
-} from '@cloudbeaver/core-ui';
+import { FormMode, formSubmitContext, TabList, TabPanelList, TabsState, type IFormState, VerticalTabsStyleRegistry } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, type IConnectionFormActionsContext } from './ConnectFormActionsContext.js';
 import style from './ConnectionForm.module.css';
@@ -51,12 +29,6 @@ export interface IConnectionFormComponentProps {
   onSave?: (config: ConnectionConfig, isCreate?: boolean) => void;
   className?: string;
 }
-
-const tabsRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [style] }],
-  [TabListStyles, { mode: 'append', styles: [style] }],
-  [TabTitleStyles, { mode: 'append', styles: [style] }],
-];
 
 export const ConnectionForm = observer<IConnectionFormComponentProps>(function ConnectionForm({ formState, onCancel, onSave = () => {}, className }) {
   const service = useService(ConnectionFormService);
@@ -132,8 +104,8 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
             </div>
           </div>
           <div className={s(styles, { connectionBody: true })}>
-            <SContext registry={tabsRegistry}>
-              <TabList className={s(styles, { tabList: true })} disabled={formState.isDisabled} vertical />
+            <SContext registry={VerticalTabsStyleRegistry}>
+              <TabList disabled={formState.isDisabled} vertical />
             </SContext>
             <div className={s(styles, { contentBox: true })}>
               <TabPanelList />

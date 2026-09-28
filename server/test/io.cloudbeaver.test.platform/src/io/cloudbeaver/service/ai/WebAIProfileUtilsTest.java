@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.ai;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebUserContext;
 import io.cloudbeaver.model.user.WebUser;
@@ -36,7 +37,7 @@ import org.mockito.Mockito;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WebAIProfileUtilsTest {
+public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
     private final Map<String, String> secrets = new HashMap<>();
     private final Map<String, Object> sessionAttributes = new HashMap<>();
     private DBSSecretController secretController;

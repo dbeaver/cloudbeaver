@@ -110,10 +110,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override format(): void {
-    const index = this.optionsPart.state.networkHandlersConfig?.findIndex(config => config.id === this.state.id) ?? -1;
-    if (index >= 0) {
-      this.optionsPart.state.networkHandlersConfig![index] = trimSSHConfig(this.optionsPart.state.networkHandlersConfig![index]!);
-    }
+    Object.assign(this.state, trimSSHConfig(this.state));
   }
 
   protected override validate(
