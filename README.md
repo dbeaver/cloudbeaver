@@ -19,6 +19,7 @@ It is free to use and open-source (licensed under [Apache 2](https://github.com/
 
 - [Official Docker repository](https://hub.docker.com/r/dbeaver/cloudbeaver)
 - [Deployment instructions](https://github.com/dbeaver/cloudbeaver/wiki/CloudBeaver-Deployment)
+- One-click deploy on [Easypanel](https://easypanel.io/templates/cloudbeaver)
 
 ## Demo server
 
