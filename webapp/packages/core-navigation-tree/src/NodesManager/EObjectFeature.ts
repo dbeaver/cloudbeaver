@@ -10,6 +10,7 @@ export enum EObjectFeature {
   'script' = 'script', // for DDL viewer
   'scriptExtended' = 'scriptExtended',
   'dataContainer' = 'dataContainer',
+  'keyValue' = 'keyValue',
   'dataManipulator' = 'dataManipulator',
   // in navigation tree we hide children for entities
   'entity' = 'entity',

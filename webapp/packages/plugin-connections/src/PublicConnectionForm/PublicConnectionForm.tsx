@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import { ColoredContainer, Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { ConnectionFormLoader } from '../ConnectionForm/ConnectionFormLoader.js';
+import { ConnectionForm } from '../ConnectionForm/ConnectionForm.js';
 import styles from './PublicConnectionForm.module.css';
 import { PublicConnectionFormService } from './PublicConnectionFormService.js';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -19,6 +19,7 @@ import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 export const PublicConnectionForm: React.FC = observer(function PublicConnectionForm() {
   const service = useService(PublicConnectionFormService);
   const style = useS(styles);
+  const formState = service.formState;
 
   const close = useCallback(() => service.close(true), []);
   const save = useCallback(async (state: ConnectionConfig, isCreate?: boolean) => {
@@ -30,8 +31,8 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
 
   return (
     <ColoredContainer className={s(style, { loader: true })}>
-      <Loader className={s(style, { loader: true })} suspense>
-        {service.formState && <ConnectionFormLoader formState={service.formState} onSave={save} onCancel={close} />}
+      <Loader className={s(style, { loader: true })} loading={!formState}>
+        {formState && <ConnectionForm formState={formState} onSave={save} onCancel={close} />}
       </Loader>
     </ColoredContainer>
   );

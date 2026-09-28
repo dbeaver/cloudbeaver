@@ -15,9 +15,10 @@ import {
   DATA_CONTEXT_CONNECTION,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getUniqueName } from '@cloudbeaver/core-utils';
@@ -26,10 +27,12 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService.js';
 import { ACTION_CONNECTION_CHANGE_CREDENTIALS } from './Actions/ACTION_CONNECTION_CHANGE_CREDENTIALS.js';
+import { ACTION_CONNECTION_CHANGE_DB_PASSWORD } from './Actions/ACTION_CONNECTION_CHANGE_DB_PASSWORD.js';
 import { ACTION_CONNECTION_CLONE } from './Actions/ACTION_CONNECTION_CLONE.js';
 import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCONNECT.js';
 import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DISCONNECT_ALL.js';
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
+import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
 import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -44,7 +47,7 @@ import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree
   ConnectionsSettingsService,
   ServerConfigResource,
   LocalizationService,
-  NavTreeSettingsService,
+  CommonDialogService,
 ])
 export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
@@ -58,6 +61,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly connectionsSettingsService: ConnectionsSettingsService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly localizationService: LocalizationService,
+    private readonly commonDialogService: CommonDialogService,
   ) {
     super();
   }
@@ -73,7 +77,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_DB_PASSWORD, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       orderItems(context, items) {
         const disconnect = menuExtractItems(items, [ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL]);
 
@@ -161,7 +165,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'connection-management',
-      actions: [ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
+      actions: [ACTION_CONNECTION_CHANGE_DB_PASSWORD, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -187,6 +191,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           const auth = this.connectionInfoAuthPropertiesResource.get(connectionKey);
           return !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
+        }
+
+        if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
+          return !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit;
         }
 
         return true;
@@ -217,9 +225,18 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             await this.connectionsManagerService.requireConnection({ connectionId: connection.id, projectId: connection.projectId }, true);
             break;
           }
+
+          case ACTION_CONNECTION_CHANGE_DB_PASSWORD: {
+            await this.commonDialogService.open(ChangeDatabasePasswordDialog, {
+              projectId: connection.projectId,
+              connectionId: connection.id,
+            });
+            break;
+          }
         }
       },
     });
+
   }
 
   private addConnectionsMenuToTopAppBar() {

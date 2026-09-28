@@ -51,6 +51,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
     private boolean forwardProxy;
     private boolean publicCredentialsSaveEnabled;
     private boolean adminCredentialsSaveEnabled;
+    private boolean dbUserPasswordChangeEnabled;
     private boolean linkExternalCredentialsWithUser;
 
     private boolean redirectOnFederatedAuth;
@@ -80,6 +81,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.supportsCustomConnections = true;
         this.publicCredentialsSaveEnabled = true;
         this.adminCredentialsSaveEnabled = true;
+        this.dbUserPasswordChangeEnabled = false;
         this.redirectOnFederatedAuth = false;
         this.enabledDrivers = new String[0];
         this.disabledDrivers = new String[0];
@@ -104,6 +106,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.supportsCustomConnections = src.supportsCustomConnections;
         this.publicCredentialsSaveEnabled = src.publicCredentialsSaveEnabled;
         this.adminCredentialsSaveEnabled = src.adminCredentialsSaveEnabled;
+        this.dbUserPasswordChangeEnabled = src.dbUserPasswordChangeEnabled;
         this.redirectOnFederatedAuth = src.redirectOnFederatedAuth;
         this.enabledDrivers = src.enabledDrivers;
         this.disabledDrivers = src.disabledDrivers;
@@ -152,6 +155,14 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
 
     public void setPublicCredentialsSaveEnabled(boolean publicCredentialsSaveEnabled) {
         this.publicCredentialsSaveEnabled = publicCredentialsSaveEnabled;
+    }
+
+    public boolean isDbUserPasswordChangeEnabled() {
+        return dbUserPasswordChangeEnabled;
+    }
+
+    public void setDbUserPasswordChangeEnabled(boolean dbUserPasswordChangeEnabled) {
+        this.dbUserPasswordChangeEnabled = dbUserPasswordChangeEnabled;
     }
 
     public boolean isAdminCredentialsSaveEnabled() {

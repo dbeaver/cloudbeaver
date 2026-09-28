@@ -63,6 +63,7 @@ public class CBServerConfigurationMapper<C extends CBServerConfig, I extends Adm
         appConfig.setSupportsCustomConnections(input.isCustomConnectionsEnabled());
         appConfig.setPublicCredentialsSaveEnabled(input.isPublicCredentialsSaveEnabled());
         appConfig.setAdminCredentialsSaveEnabled(input.isAdminCredentialsSaveEnabled());
+        appConfig.setDbUserPasswordChangeEnabled(input.isDbUserPasswordChangeEnabled());
         updateDisabledFeaturesConfig(appConfig, input.getEnabledFeatures());
         // custom logic for enabling embedded drivers
         updateDisabledDriversConfig(appConfig, input.getDisabledDrivers());

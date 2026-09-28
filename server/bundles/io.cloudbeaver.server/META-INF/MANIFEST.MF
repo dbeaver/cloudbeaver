@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Server
 Bundle-SymbolicName: io.cloudbeaver.server;singleton:=true
-Bundle-Version: 26.2.1.qualifier
-Bundle-Release-Date: 20260921
+Bundle-Version: 26.2.2.qualifier
+Bundle-Release-Date: 20261005
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.jkiss.bundle.jetty.server;visibility:=reexport,
@@ -25,6 +25,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.server.servlets,
  io.cloudbeaver.server.websockets,
  io.cloudbeaver.service,
+ io.cloudbeaver.service.core,
  io.cloudbeaver.service.navigator,
  io.cloudbeaver.service.sql,
  io.cloudbeaver.service.sql.resultset

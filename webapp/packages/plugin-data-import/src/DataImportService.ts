@@ -46,6 +46,7 @@ export class DataImportService {
     processorId: string,
     file: File,
     settings?: DataTransferImportSettings,
+    processorProperties?: Record<string, string | null>,
   ): Promise<boolean> {
     const abortController = new AbortController();
     let cancelImplementation: (() => void | Promise<void>) | null;
@@ -77,7 +78,7 @@ export class DataImportService {
           connectionId: connectionKey.connectionId,
           projectId: connectionKey.projectId,
           resultsId,
-          parameters: { processorId, settings },
+          parameters: { processorId, settings, processorProperties },
         },
         undefined,
         abortController.signal,

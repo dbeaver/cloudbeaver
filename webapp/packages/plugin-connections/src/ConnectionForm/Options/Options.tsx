@@ -19,6 +19,7 @@ import {
   InputField,
   Link,
   ObjectPropertyInfoForm,
+  Placeholder,
   Radio,
   RadioGroup,
   useAdministrationSettings,
@@ -48,6 +49,7 @@ import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 
 import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
 import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
 import { isConnectionFormReadOnly } from '../isConnectionFormReadOnly.js';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
@@ -78,6 +80,7 @@ const driverConfiguration: IDriverConfiguration[] = [
 
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState }) {
   const isAdmin = usePermission(EAdminPermission.admin);
+  const connectionFormService = useService(ConnectionFormService);
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
   const projectInfoResource = useService(ProjectInfoResource);
   const formRef = useRef<HTMLFormElement>(null);
@@ -144,7 +147,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   const sharedCredentials = optionsPart.state.sharedCredentials && serverConfigResource.data?.distributed;
-  const authenticationVisible = !driver?.anonymousAccess && (authentication.authorized || !edit);
+  const showAuth = !driver?.anonymousAccess;
+  const showAuthDetails = authentication.authorized || !edit;
 
   function openCredentialsTab(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
@@ -221,10 +225,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
             ))}
         </section>
 
-        {authenticationVisible && (
+        <Placeholder container={connectionFormService.mainPropertiesContainer} formState={formState} />
+
+        {showAuth && (
           <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-t tw:py-6">
             <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-            {serverConfigResource.resource.distributed && isSharedProject && (
+            {showAuthDetails && serverConfigResource.resource.distributed && isSharedProject && (
               <FieldCheckbox
                 id={optionsPart.state.connectionId + 'isShared'}
                 name="sharedCredentials"
@@ -246,26 +252,27 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 onAuthModelChange={handleAuthModelSelect}
               />
             </div>
-            {!sharedCredentials ? (
-              <>
-                {properties && (
-                  <ConnectionAuthModelCredentialsForm
-                    credentials={optionsPart.state.credentials}
-                    properties={properties}
-                    readonly={readonly}
-                    disabled={formState.isDisabled}
-                  />
-                )}
-              </>
-            ) : (
-              <FormFieldDescription>
-                {translate('plugin_connections_connection_form_shared_credentials_manage_info')}
-                <Link inline onClick={openCredentialsTab}>
-                  {translate('plugin_connections_connection_form_shared_credentials_manage_info_tab_link')}
-                </Link>
-              </FormFieldDescription>
-            )}
-            {!sharedCredentials && authModel && credentialsSavingEnabled && (
+            {showAuthDetails &&
+              (!sharedCredentials ? (
+                <>
+                  {properties && (
+                    <ConnectionAuthModelCredentialsForm
+                      credentials={optionsPart.state.credentials}
+                      properties={properties}
+                      readonly={readonly}
+                      disabled={formState.isDisabled}
+                    />
+                  )}
+                </>
+              ) : (
+                <FormFieldDescription>
+                  {translate('plugin_connections_connection_form_shared_credentials_manage_info')}
+                  <Link inline onClick={openCredentialsTab}>
+                    {translate('plugin_connections_connection_form_shared_credentials_manage_info_tab_link')}
+                  </Link>
+                </FormFieldDescription>
+              ))}
+            {showAuthDetails && !sharedCredentials && authModel && credentialsSavingEnabled && (
               <FieldCheckbox
                 id={optionsPart.state.connectionId + 'authNeeded'}
                 name="saveCredentials"

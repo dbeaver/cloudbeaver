@@ -3,5 +3,7 @@ query getAiProfiles {
     id
     name
     engineId
+    global
+    credentialsSaved
   }
 }

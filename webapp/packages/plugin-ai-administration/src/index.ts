@@ -11,3 +11,4 @@ import './module.js';
 export { AIAdministrationTabsService } from './AIAdministrationTabsService.js';
 export { AIAdministrationNavigationService, EAIAdministrationSub } from './AIAdministrationNavigationService.js';
 export { AIAdministrationBootstrap } from './AIAdministrationBootstrap.js';
+export { AISettingsService } from './AISettingsService.js';

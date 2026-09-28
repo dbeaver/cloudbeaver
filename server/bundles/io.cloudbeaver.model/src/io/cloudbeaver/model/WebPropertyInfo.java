@@ -180,6 +180,12 @@ public class WebPropertyInfo {
         return null;
     }
 
+    @Property
+    public boolean isAllowCustomValue() {
+        return property instanceof IPropertyValueListProvider<?> valueListProvider &&
+            valueListProvider.allowCustomValue();
+    }
+
     @NotNull
     @Property
     public String[] getFeatures() {

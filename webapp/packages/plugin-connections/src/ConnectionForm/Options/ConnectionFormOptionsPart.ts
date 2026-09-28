@@ -378,15 +378,15 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     // databaseName, host, port, serverName only saves on backend like this
     if (this.state.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
-      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName?.trim();
+      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName;
 
       if (!driver.embedded) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host?.trim();
-        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host;
+        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port;
       }
 
       if (driver.requiresServerName) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName;
       }
     }
 
@@ -439,6 +439,26 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.name = this.state.name?.trim();
     this.state.description = this.state.description?.trim();
     this.state.url = this.state.url?.trim();
+    this.state.host = this.state.host?.trim();
+    this.state.port = this.state.port?.trim();
+    this.state.databaseName = this.state.databaseName?.trim();
+    this.state.serverName = this.state.serverName?.trim();
+
+    for (const properties of [
+      this.state.credentials,
+      this.state.providerProperties,
+      this.state.mainPropertyValues,
+      this.state.expertSettingsValues,
+    ]) {
+      if (!properties) {
+        continue;
+      }
+      for (const key of Object.keys(properties)) {
+        if (typeof properties[key] === 'string') {
+          properties[key] = properties[key].trim();
+        }
+      }
+    }
   }
 
   private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<IObjectPropertyInfo[]> {
@@ -585,12 +605,6 @@ function prepareDynamicProperties(
       if (!(propertyInfo.id in result) && isDefault) {
         result[propertyInfo.id] = getObjectPropertyDefaultValue(propertyInfo);
       }
-    }
-  }
-
-  for (const key of Object.keys(result)) {
-    if (typeof result[key] === 'string') {
-      result[key] = result[key]?.trim();
     }
   }
 

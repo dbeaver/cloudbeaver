@@ -50,6 +50,8 @@ export default [
   ['plugin_ai_chat_scope_change_fail', 'Failed to change context'],
   ['plugin_ai_chat_profile_group', 'Active configuration'],
   ['plugin_ai_chat_profile_change_fail', 'Failed to change AI profile'],
+  ['plugin_ai_chat_profile_edit_credentials', 'Edit credentials'],
+  ['plugin_ai_chat_profile_credentials_edit_fail', 'Failed to edit AI profile credentials'],
   ['plugin_ai_chat_scope_connection', 'Connection'],
   ['plugin_ai_chat_scope_schema', 'Current Schema'],
   ['plugin_ai_chat_scope_database', 'Current Database'],

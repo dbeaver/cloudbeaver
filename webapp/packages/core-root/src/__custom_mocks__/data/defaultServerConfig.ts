@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import type { ServerConfigQuery } from '@cloudbeaver/core-sdk';
 
 import { defaultProductConfiguration } from './defaultProductConfiguration.js';
@@ -19,26 +18,26 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     workspaceId: 'D14DGNGYNPI71M',
     rootURI: '/',
     containerId: '931cdabfc0b3',
+    defaultAuthRole: '',
+    defaultUserTeam: 'user',
     productConfiguration: productConfiguration,
     supportsCustomConnections: true,
-    supportsConnectionBrowser: false,
     forceHttps: true,
     supportedHosts: ['https://test.ce.cloudbeaver.io'],
-    supportsWorkspaces: false,
     sessionExpireTime: 6000000,
     anonymousAccessEnabled: true,
     bindSessionToIp: 'disable',
     adminCredentialsSaveEnabled: true,
     publicCredentialsSaveEnabled: true,
+    dbUserPasswordChangeEnabled: false,
     secretManagerEnabled: true,
     resourceManagerEnabled: true,
-    licenseRequired: false,
-    licenseValid: false,
     distributed: false,
     configurationMode: false,
     developmentMode: false,
     redirectOnFederatedAuth: false,
     enabledFeatures: [],
+    disabledBetaFeatures: [],
     enabledAuthProviders: ['local'],
     supportedLanguages: [
       {
@@ -97,35 +96,6 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
         nativeName: '繁体中文',
       },
     ],
-    defaultNavigatorSettings: {
-      showSystemObjects: true,
-      showUtilityObjects: false,
-      showOnlyEntities: false,
-      mergeEntities: false,
-      hideFolders: false,
-      hideSchemas: false,
-      hideVirtualModel: false,
-    },
-    resourceQuotas: {
-      sqlMaxRunningQueries: 3.0,
-      sqlResultSetRowsLimit: 100000.0,
-      sqlResultSetMemoryLimit: 2000000.0,
-    },
     disabledDrivers: [],
-    productInfo: {
-      id: 'io.cloudbeaver.product.ce.product',
-      version: '22.1.2.202207140640',
-      latestVersionInfo: WEBSITE_LINKS.LATEST_COMMUNITY_VERSION_PAGE,
-      name: 'CloudBeaver Community',
-      buildTime: 'July 14, 2022',
-      releaseTime: 'July 11, 2022',
-      licenseInfo: '',
-    },
-    passwordPolicyConfiguration: {
-      minLength: 8,
-      minNumberCount: 0,
-      minSymbolCount: 0,
-      requireMixedCase: false,
-    },
   },
 });

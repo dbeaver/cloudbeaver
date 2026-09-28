@@ -21,6 +21,7 @@ import { EMPTY_ARRAY, getTextFileReadingProcess, removeMetadataFromDataURL } fro
 import { clsx } from '@dbeaver/ui-kit';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox.js';
+import { Combobox } from '../../FormControls/Combobox.js';
 import { Select } from '../../FormControls/Select.js';
 import { FormFieldDescription } from '../../FormControls/FormFieldDescription.js';
 import { InputField } from '../../FormControls/InputField/InputField.js';
@@ -161,6 +162,33 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   const placeholder = getPlaceholder();
 
   if (controlType === 'selector') {
+    if (property.allowCustomValue && state !== undefined) {
+      return (
+        <Combobox
+          required={required}
+          name={property.id!}
+          value={state[property.id!]}
+          defaultValue={defaultValue}
+          items={property.validValues!}
+          keySelector={getObjectPropertyOptionValue}
+          valueSelector={getObjectPropertyOptionName}
+          titleSelector={getObjectPropertyOptionName}
+          placeholder={placeholder}
+          title={property.description}
+          disabled={disabled}
+          readOnly={readonly}
+          description={property.hint}
+          className={className}
+          allowCustomValue
+          onChange={value => {
+            state[property.id!] = value ?? '';
+          }}
+        >
+          {property.displayName ?? ''}
+        </Combobox>
+      );
+    }
+
     if (state !== undefined) {
       return (
         <Select

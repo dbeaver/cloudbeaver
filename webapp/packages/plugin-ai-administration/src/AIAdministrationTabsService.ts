@@ -15,10 +15,6 @@ const AIAdministrationMainTabPanel = importLazyComponent(() =>
   import('./AIAdministrationMainTabPanel.js').then(module => module.AIAdministrationMainTabPanel),
 );
 
-const AIAdministrationProfilesTabPanel = importLazyComponent(() =>
-  import('./AIAdministrationProfilesTabPanel.js').then(module => module.AIAdministrationProfilesTabPanel),
-);
-
 @injectable(() => [AIAdministrationBootstrap])
 export class AIAdministrationTabsService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
@@ -36,13 +32,6 @@ export class AIAdministrationTabsService extends Bootstrap {
       panel: () => AIAdministrationMainTabPanel,
     });
 
-    this.tabsContainer.add({
-      key: EAIAdministrationSub.Profiles,
-      name: 'plugin_ai_administration_profiles_title',
-      order: 2,
-      panel: () => AIAdministrationProfilesTabPanel,
-    });
-
-    this.aiAdministrationBootstrap.administrationItem.sub.push({ name: EAIAdministrationSub.Settings }, { name: EAIAdministrationSub.Profiles });
+    this.aiAdministrationBootstrap.administrationItem.sub.push({ name: EAIAdministrationSub.Settings });
   }
 }

@@ -25,6 +25,7 @@ import io.cloudbeaver.service.ai.model.*;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAIProfileCredentialsInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAiChatCompletionSettingsInput;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -188,4 +189,11 @@ public interface DBWServiceAI extends DBWService {
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteProfile(@NotNull WebSession webSession, @NotNull String profileId) throws DBWebException;
+
+    @WebAction
+    boolean saveProfileCredentials(
+        @NotNull WebSession webSession,
+        @NotNull String profileId,
+        @WebParameterSecure @NotNull WebAIProfileCredentialsInput credentials
+    ) throws DBWebException;
 }

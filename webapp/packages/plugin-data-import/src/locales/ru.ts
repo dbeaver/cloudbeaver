@@ -1,5 +1,7 @@
 export default [
   ['plugin_data_import_title', 'Импорт данных'],
+  ['plugin_data_import_file', 'Файл'],
+  ['plugin_data_import_format_settings', 'Настройки формата'],
   ['plugin_data_import_process_title', 'Импорт данных...'],
   ['plugin_data_import_process_success', 'Данные успешно импортированы'],
   ['plugin_data_import_process_fail', 'Ошибка импорта данных'],

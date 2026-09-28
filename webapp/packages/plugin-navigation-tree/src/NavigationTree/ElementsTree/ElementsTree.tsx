@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import {
   Translate,
   TreeNodeNested,
   TreeNodeNestedMessage,
-  useListKeyboardNavigation,
   useMergeRefs,
   useS,
 } from '@cloudbeaver/core-blocks';
@@ -44,6 +43,7 @@ import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimi
 import { useDropOutside } from './useDropOutside.js';
 import { type IElementsTree, type IElementsTreeOptions, useElementsTree } from './useElementsTree.js';
 import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer.js';
+import { useElementsTreeKeyboardNavigation } from './useElementsTreeKeyboardNavigation.js';
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   /** Specifies the root path for the tree. ROOT_NODE_PATH will be used if not defined */
@@ -96,9 +96,6 @@ export const ElementsTree = observer(
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
     const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
-    const listRef = useListKeyboardNavigation('[data-tree-node-control][tabindex]:not(:disabled)');
-    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef);
-
     const root = folderExplorer.state.folder;
 
     const limitFilter = useMemo(() => elementsTreeLimitFilter(navTreeResource), [navTreeResource]);
@@ -134,6 +131,8 @@ export const ElementsTree = observer(
       onOpen,
       onClick,
     });
+    const keyboardNavigationRef = useElementsTreeKeyboardNavigation(tree);
+    const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, keyboardNavigationRef);
 
     useImperativeHandle(ref, () => tree, [tree]);
 

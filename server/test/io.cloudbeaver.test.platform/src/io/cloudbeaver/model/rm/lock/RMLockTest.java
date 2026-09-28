@@ -180,6 +180,7 @@ public class RMLockTest extends CloudbeaverMockTest {
         var lockController1 = new TestLockController(CEAppStarter.getTestApp(), 1);
 
         CountDownLatch thread1CDL = new CountDownLatch(1);
+        CountDownLatch thread1LockedCDL = new CountDownLatch(1);
         CountDownLatch globalCountDown = new CountDownLatch(2);
 
         AtomicBoolean isLockedByThread1 = new AtomicBoolean(false);
@@ -187,12 +188,14 @@ public class RMLockTest extends CloudbeaverMockTest {
         Runnable runnable1 = () -> {
             try (var lock = lockController1.lock(project1, "testForceUnlock1")) {
                 isLockedByThread1.set(true);
-                thread1CDL.await(1, TimeUnit.MINUTES);
+                thread1LockedCDL.countDown();
+                thread1CDL.await();
             } catch (Throwable e) {
                 log.error(e);
                 exceptionReference.set(e);
             } finally {
                 isLockedByThread1.set(false);
+                thread1LockedCDL.countDown();
                 globalCountDown.countDown();
             }
         };
@@ -200,22 +203,27 @@ public class RMLockTest extends CloudbeaverMockTest {
         var lockController2 = Mockito.spy(new TestLockController(CEAppStarter.getTestApp(), 100));
         Runnable runnable2 = () -> {
             try {
+                Assertions.assertTrue(thread1LockedCDL.await(1, TimeUnit.MINUTES), "Thread1 did not acquire the lock");
                 try (var lock = lockController2.lock(project1, "testForceUnlock2")) {
                     Assertions.assertTrue(isLockedByThread1.get(), "Project1 not locket by thread1");
                     Mockito.verify(lockController2, Mockito.atLeast(5)).isLocked(Mockito.any());
-                    thread1CDL.countDown();
                 }
             } catch (Throwable e) {
                 log.error(e);
                 exceptionReference.set(e);
             } finally {
+                thread1CDL.countDown();
                 globalCountDown.countDown();
             }
         };
 
         executor.submit(runnable1);
         executor.submit(runnable2);
-        globalCountDown.await(1, TimeUnit.MINUTES);
+        try {
+            Assertions.assertTrue(globalCountDown.await(1, TimeUnit.MINUTES), "Lock workers did not finish");
+        } finally {
+            thread1CDL.countDown();
+        }
         if (exceptionReference.get() != null) {
             throw exceptionReference.get();
         }

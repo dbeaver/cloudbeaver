@@ -66,6 +66,27 @@
     }
   }
 
+  .dbv-kit-combobox__popover--grouped {
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dbv-kit-combobox__popover-items {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .dbv-kit-combobox__popover-footer {
+    border-top: 1px solid var(--dbv-kit-combobox-border-color);
+    flex-shrink: 0;
+  }
+
+  .dbv-kit-combobox__group + .dbv-kit-combobox__group {
+    border-top: 1px solid var(--dbv-kit-combobox-border-color);
+  }
+
   .dbv-kit-combobox__item {
     display: block;
     width: 100%;

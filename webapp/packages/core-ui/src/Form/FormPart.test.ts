@@ -33,9 +33,9 @@ class TestFormState {
     this.loadedTask = new Executor(state, () => true);
     this.prepareTask = new Executor(state, () => true);
     this.formatTask = new Executor(state, () => true);
-    this.formatTask.before(this.prepareTask);
+    this.prepareTask.before(this.formatTask);
     this.validationTask = new Executor(state, () => true);
-    this.validationTask.before(this.formatTask);
+    this.validationTask.before(this.prepareTask);
     this.validationTask.addPostHandler((data, contexts) => {
       if (!contexts.getContext(formValidationContext).valid) {
         ExecutorInterrupter.interrupt(contexts);
@@ -136,7 +136,7 @@ describe('FormPart', () => {
     expect(calls).toEqual(['validate']);
   });
 
-  it('prepares changed parts before formatting and validating them', async () => {
+  it('formats changed parts before preparing and validating them', async () => {
     const calls: string[] = [];
     const formState = new TestFormState();
     const part = new TestFormPart(formState, calls);
@@ -146,7 +146,7 @@ describe('FormPart', () => {
 
     await formState.validationTask.execute(formState.asFormState());
 
-    expect(calls).toEqual(['prepare', 'format', 'validate']);
+    expect(calls).toEqual(['format', 'prepare', 'validate']);
   });
 
   it('runs the complete changed-part submission flow in order', async () => {
@@ -159,7 +159,7 @@ describe('FormPart', () => {
 
     await expect(formState.save()).resolves.toBe(true);
 
-    expect(calls).toEqual(['prepare', 'format', 'validate', 'load', 'save']);
+    expect(calls).toEqual(['format', 'prepare', 'validate', 'load', 'save']);
     expect(part.isLoaded()).toBe(false);
     expect(part.isSaving).toBe(false);
     expect(part.isLoading()).toBe(false);

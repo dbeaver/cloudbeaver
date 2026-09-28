@@ -72,10 +72,12 @@ public interface DBWServiceAuth extends DBWService {
         @Nullable String configurationId
     ) throws DBWebException;
 
-    @WebAction(authRequired = false)
+    @Nullable
+    @WebAction(authRequired = false, configurationModeAllowed = true)
     WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException;
 
-    @WebAction(authRequired = false)
+    @NotNull
+    @WebAction(authRequired = false, configurationModeAllowed = true)
     WebAuthProviderInfo[] getAuthProviders(@NotNull HttpServletRequest request) throws DBWebException;
 
     @WebAction()

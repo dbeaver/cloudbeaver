@@ -155,6 +155,43 @@ public class WebSQLDataUpdateTest extends CloudbeaverDBTest {
         }
     }
 
+    @Test
+    public void insertIsPersistedWithoutUniqueKey() throws Exception {
+        executeStatements(
+            "CREATE TABLE SQL_INSERT_NO_KEY (ID INT, DATA_VALUE VARCHAR)",
+            "INSERT INTO SQL_INSERT_NO_KEY VALUES (1, 'existing')"
+        );
+        QueryRow queryRow = queryFirstRow("SELECT ID, DATA_VALUE FROM SQL_INSERT_NO_KEY");
+        Map<String, Object> addedRow = new HashMap<>();
+        addedRow.put("data", List.of(2, "inserted"));
+        addedRow.put("updateValues", Map.of());
+
+        queryRow.processor().updateResultsDataBatch(
+            queryRow.processor().getWebSession().getProgressMonitor(),
+            queryRow.context(),
+            queryRow.resultId(),
+            List.of(),
+            List.of(),
+            List.of(new WebSQLResultsRow(addedRow)),
+            null
+        );
+
+        try (
+            JDBCStatement statement = databaseSession.createStatement();
+            JDBCResultSet resultSet = statement.executeQuery(
+                "SELECT ID, DATA_VALUE FROM SQL_INSERT_NO_KEY ORDER BY ID"
+            )
+        ) {
+            Assertions.assertTrue(resultSet.next());
+            Assertions.assertEquals(1, resultSet.getInt(1));
+            Assertions.assertEquals("existing", resultSet.getString(2));
+            Assertions.assertTrue(resultSet.next());
+            Assertions.assertEquals(2, resultSet.getInt(1));
+            Assertions.assertEquals("inserted", resultSet.getString(2));
+            Assertions.assertFalse(resultSet.next());
+        }
+    }
+
     private void executeStatements(@NotNull String... queries) throws Exception {
         try (JDBCStatement statement = databaseSession.createStatement()) {
             for (String query : queries) {

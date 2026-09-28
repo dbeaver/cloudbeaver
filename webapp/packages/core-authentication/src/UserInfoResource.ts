@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return this.data?.userId || UNAUTHORIZED_ID;
   }
 
-  hasToken(providerId: string): boolean {
+  hasToken(providerId: string, configurationId?: string): boolean {
     if (providerId === AUTH_PROVIDER_LOCAL_ID) {
       return true;
     }
@@ -100,7 +100,9 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     }
 
     // TODO: will be changed due wrong origin in authTokens
-    return this.data.authTokens.some(token => token.authProvider === providerId);
+    return this.data.authTokens.some(
+      token => token.authProvider === providerId && (configurationId === undefined || token.authConfiguration === configurationId),
+    );
   }
 
   async login(provider: string, { credentials, configurationId, linkUser, forceSessionsLogout }: ILoginOptions): Promise<AuthInfo> {

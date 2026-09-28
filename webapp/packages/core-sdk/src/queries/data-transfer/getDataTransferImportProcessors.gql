@@ -8,6 +8,20 @@ query getDataTransferImportProcessors {
     appName
     order
     icon
+    properties {
+      required
+      id
+      displayName
+      description
+      category
+      dataType
+      defaultValue
+      validValues
+      allowCustomValue
+      length
+      features
+      order
+    }
     isBinary
     isHTML
   }

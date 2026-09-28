@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,8 @@ public class CBServerConfig implements WebServerConfiguration {
     private long maxSessionIdleTime = CBAuthConstants.MAX_SESSION_IDLE_TIME;
     private boolean develMode = false;
     private boolean enableSecurityManager = false;
+    @NotNull
+    protected String secretController = "cb-embedded";
     private final Map<String, Object> productSettings = new HashMap<>();
 
     @SerializedName("sm")
@@ -145,6 +147,15 @@ public class CBServerConfig implements WebServerConfiguration {
 
     public void setEnableSecurityManager(boolean enableSecurityManager) {
         this.enableSecurityManager = enableSecurityManager;
+    }
+
+    @NotNull
+    public String getSecretControllerId() {
+        return secretController;
+    }
+
+    public void setSecretControllerId(@NotNull String secretControllerId) {
+        this.secretController = secretControllerId;
     }
 
     public void setDatabaseConfiguration(WebDatabaseConfig databaseConfiguration) {

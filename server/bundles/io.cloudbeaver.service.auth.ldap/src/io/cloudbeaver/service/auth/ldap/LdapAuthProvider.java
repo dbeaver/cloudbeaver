@@ -91,8 +91,22 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
         if (CommonUtils.isEmpty(userData)) {
             String fullUserDN = buildFullUserDN(userName, ldapSettings);
-            validateUserAccess(fullUserDN, ldapSettings);
-            userData = authenticateLdap(fullUserDN, password, ldapSettings, null, environment);
+            boolean validateAccessWithUserContext = false;
+            if (CommonUtils.isNotEmpty(ldapSettings.getFilter())) {
+                if (hasBindUserCredentials(ldapSettings)) {
+                    validateUserAccessWithBindUser(fullUserDN, ldapSettings);
+                } else {
+                    validateAccessWithUserContext = true;
+                }
+            }
+            userData = authenticateLdap(
+                fullUserDN,
+                password,
+                ldapSettings,
+                null,
+                environment,
+                validateAccessWithUserContext
+            );
         }
         return userData;
     }
@@ -130,16 +144,13 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull String password,
         @NotNull LdapSettings ldapSettings
     ) throws DBException {
-        if (
-            CommonUtils.isEmpty(ldapSettings.getBindUserDN())
-            || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())
-        ) {
+        if (!hasBindUserCredentials(ldapSettings)) {
             return null;
         }
         Map<String, String> serviceUserContext = creteAuthEnvironment(ldapSettings);
         serviceUserContext.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
         serviceUserContext.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
-        DirContext serviceContext;
+        DirContext serviceContext = null;
 
         try {
             serviceContext = initConnection(serviceUserContext);
@@ -147,35 +158,60 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             if (userDN == null) {
                 return null;
             }
-            return authenticateLdap(userDN, password, ldapSettings, login, creteAuthEnvironment(ldapSettings));
+            return authenticateLdap(userDN, password, ldapSettings, login, creteAuthEnvironment(ldapSettings), false);
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
+        } finally {
+            if (serviceContext != null) {
+                try {
+                    serviceContext.close();
+                } catch (NamingException e) {
+                    log.warn("Error closing LDAP service context", e);
+                }
+            }
         }
     }
 
+    private static boolean hasBindUserCredentials(@NotNull LdapSettings ldapSettings) {
+        return CommonUtils.isNotEmpty(ldapSettings.getBindUserDN())
+            && CommonUtils.isNotEmpty(ldapSettings.getBindUserPassword());
+    }
+
     /**
-     * Find user and validate in ldap by fullUserDN
+     * Validate LDAP user access by full user DN using the configured bind user.
      */
-    private void validateUserAccess(
+    private void validateUserAccessWithBindUser(
         @NotNull String fullUserDN,
         @NotNull LdapSettings ldapSettings
     ) throws DBException {
-        if (
-            CommonUtils.isEmpty(ldapSettings.getFilter())
-            || CommonUtils.isEmpty(ldapSettings.getBindUserDN())
-            || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())
-        ) {
-            return;
-        }
-
         var environment = creteAuthEnvironment(ldapSettings);
         environment.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
         environment.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
-        DirContext bindUserContext;
+
+        DirContext bindUserContext = null;
         try {
             bindUserContext = initConnection(environment);
+            validateUserAccess(fullUserDN, ldapSettings, bindUserContext);
+        } finally {
+            if (bindUserContext != null) {
+                try {
+                    bindUserContext.close();
+                } catch (NamingException e) {
+                    log.warn("Error closing LDAP bind user context", e);
+                }
+            }
+        }
+    }
+
+    private void validateUserAccess(
+        @NotNull String fullUserDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull DirContext validationContext
+    ) throws DBException {
+        NamingEnumeration<SearchResult> searchResult = null;
+        try {
             SearchControls searchControls = createSearchControls();
-            var searchResult = bindUserContext.search(fullUserDN, ldapSettings.getFilter(), searchControls);
+            searchResult = validationContext.search(fullUserDN, ldapSettings.getFilter(), searchControls);
             if (!searchResult.hasMore()) {
                 throw new DBException("Access denied");
             }
@@ -183,6 +219,14 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             throw e;
         } catch (Exception e) {
             throw new DBException("LDAP user access validation by filter failed: " + e.getMessage(), e);
+        } finally {
+            if (searchResult != null) {
+                try {
+                    searchResult.close();
+                } catch (NamingException e) {
+                    log.warn("Error closing LDAP user access validation results", e);
+                }
+            }
         }
     }
 
@@ -264,6 +308,12 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
         } catch (NamingException e) {
             throw new DBException("Error finding user DN: " + e.getMessage(), e);
+        } finally {
+            try {
+                results.close();
+            } catch (NamingException e) {
+                log.warn("Error closing LDAP user search results", e);
+            }
         }
         return null;
     }
@@ -452,7 +502,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull String password,
         @NotNull LdapSettings ldapSettings,
         @Nullable String login,
-        @NotNull Map<String, String> environment
+        @NotNull Map<String, String> environment,
+        boolean validateAccess
     ) throws DBException {
         Map<String, Object> userData = new HashMap<>();
         environment.put(Context.SECURITY_PRINCIPAL, userDN);
@@ -460,6 +511,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         DirContext userContext = null;
         try {
             userContext = initConnection(environment);
+            if (validateAccess) {
+                validateUserAccess(userDN, ldapSettings, userContext);
+            }
             SearchControls searchControls = createSearchControls();
             String userId = "";
             var searchResult = userContext.search(userDN, "objectClass=*", searchControls);

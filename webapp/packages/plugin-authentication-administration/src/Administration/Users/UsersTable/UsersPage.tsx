@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, Container, Group, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, Loader, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { Spinner } from '@dbeaver/ui-kit';
 
@@ -51,6 +51,14 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
       <Group keepSize box>
         <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
+
+      {usersAdministrationService.statisticsPlaceholder.getDisplayed({}).length > 0 && (
+        <Group keepSize box maximum>
+          <Loader suspense>
+            <Placeholder container={usersAdministrationService.statisticsPlaceholder} />
+          </Loader>
+        </Group>
+      )}
 
       <Group keepSize box maximum>
         <UsersTableFilters filters={filters} />

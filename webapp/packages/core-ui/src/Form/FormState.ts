@@ -73,14 +73,14 @@ export class FormState<TState> implements IFormState<TState> {
     this.loadedTask = new Executor(this as IFormState<TState>, () => true);
     this.loadedTask.addCollection(service.onLoaded).next(this.formStateTask);
 
-    this.prepareTask = new Executor(this as IFormState<TState>, () => true);
-    this.prepareTask.addCollection(service.onPrepare);
-
     this.formatTask = new Executor(this as IFormState<TState>, () => true);
-    this.formatTask.addCollection(service.onFormat).before(this.prepareTask);
+    this.formatTask.addCollection(service.onFormat);
+
+    this.prepareTask = new Executor(this as IFormState<TState>, () => true);
+    this.prepareTask.addCollection(service.onPrepare).before(this.formatTask);
 
     this.validationTask = new Executor(this as IFormState<TState>, () => true);
-    this.validationTask.addCollection(service.onValidate).before(this.formatTask);
+    this.validationTask.addCollection(service.onValidate).before(this.prepareTask);
 
     this.submitTask = new Executor(this as IFormState<TState>, () => true);
     this.submitTask.addCollection(service.onSubmit).before(this.validationTask);
