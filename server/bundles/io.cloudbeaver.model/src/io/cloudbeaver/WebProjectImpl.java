@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.registry.rm.DataSourceRegistryRM;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 public abstract class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
@@ -67,6 +68,15 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
             getResourceController().setProjectProperty(getId(), propName, propValue);
         } catch (DBException e) {
             log.error("Cannot set project property", e);
+        }
+    }
+
+    @Override
+    public void setProjectProperties(@NotNull Map<String, Object> properties) {
+        try {
+            getResourceController().setProjectProperties(getId(), properties);
+        } catch (DBException e) {
+            log.error("Cannot set project properties", e);
         }
     }
 
