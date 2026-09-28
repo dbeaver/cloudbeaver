@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Alert, Text, useTranslate } from '@cloudbeaver/core-blocks';
 import { AiMessageType, type AiMessage } from '@cloudbeaver/core-sdk';
+import { AI_ACCOUNT_AUTHENTICATION_REQUIRED } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatUserMessage } from './AIChatUserMessage.js';
 import { AIChatAssistentFormatter } from '../AIChatAssistentFormatter/AIChatAssistentFormatter.js';
@@ -18,6 +19,7 @@ import { MarkdownFormatter } from '../MarkdownFormatter.js';
 import { AIChatFunctionFormatter } from '../AIChatFunctionFormatter/AIChatFunctionFormatter.js';
 import { AIChatFunctionConfirmationFormatter } from '../AIChatFunctionFormatter/AIChatFunctionConfirmationFormatter.js';
 import { isFunctionConfirmationMessage, isFunctionMessage } from '../AIChatMessagesResource.js';
+import { AIChatAccountAuthenticationError } from '../AIChatAccountAuthenticationError.js';
 
 interface Props {
   message: AiMessage;
@@ -49,6 +51,9 @@ export const AIChatMessageFormatter = observer<Props>(function AIChatMessageForm
   }
 
   if (message.role === AiMessageType.Error) {
+    if (message.errorCode === AI_ACCOUNT_AUTHENTICATION_REQUIRED) {
+      return <AIChatAccountAuthenticationError conversationId={message.conversationId} />;
+    }
     return (
       <Alert variant="error" className="tw:break-all tw:my-2">
         <Text>{message.content}</Text>

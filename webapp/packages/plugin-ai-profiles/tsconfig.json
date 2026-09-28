@@ -32,6 +32,9 @@
       "path": "../core-events"
     },
     {
+      "path": "../core-executor"
+    },
+    {
       "path": "../core-localization"
     },
     {
@@ -42,6 +45,9 @@
     },
     {
       "path": "../core-sdk"
+    },
+    {
+      "path": "../core-utils"
     },
     {
       "path": "../plugin-ai"

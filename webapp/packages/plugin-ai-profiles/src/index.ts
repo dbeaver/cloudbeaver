@@ -11,6 +11,7 @@ import './module.js';
 export * from './AIProfileCredentials/AIProfileCredentialsDialogLazy.js';
 export type { IAIProfileCredentialsDialogPayload } from './AIProfileCredentials/AIProfileCredentialsDialog.js';
 export * from './AIProfileCredentials/AIProfileCredentialsService.js';
+export { AIProfileCredentialsFields } from './AIProfileCredentials/AIProfileCredentialsFieldsLazy.js';
 export * from './AIProfilesResource.js';
 export { AIProfilesTable } from './AIProfilesTableLazy.js';
 export type { IAIProfilesTableColumn, IAIProfilesTableProps } from './AIProfilesTable.js';
