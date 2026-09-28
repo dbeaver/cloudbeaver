@@ -802,6 +802,7 @@ public class WebServiceCore implements DBWServiceCore {
         passwordChangeContainer.setSavePassword(true);
         try {
             webSession.provideAuthParameters(webSession.getProgressMonitor(), container, configuration);
+            configuration.setUserName(userName);
             configuration.setUserPassword(oldPassword);
             DBAuthUtils.setPendingPasswordChange(configuration, passwordChangeInfo);
             passwordChangeContainer.setConnectionInfo(configuration);
