@@ -445,12 +445,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
           return false;
         }
 
-        const node = navNodeInfoResource.get(nodeId);
-
-        if (node && isLeaf(node, navTreeResource.get(nodeId), this, navNodeInfoResource.isOutdated(nodeId) || navTreeResource.isOutdated(nodeId))) {
-          return false;
-        }
-
         if (options.expandStateGetters?.length) {
           const nodeState = this.getNodeState(nodeId);
 
@@ -596,10 +590,21 @@ export function useElementsTree(options: IOptions): IElementsTree {
           return;
         }
 
+        const leaf = isLeaf(
+          node,
+          navTreeResource.get(node.uri),
+          this,
+          navNodeInfoResource.isOutdated(node.uri) || navTreeResource.isOutdated(node.uri),
+        );
+
+        if (state && leaf) {
+          return;
+        }
+
         const treeNodeState = this.state.get(node.uri);
 
         try {
-          if (state || (this.filtering && !treeNodeState.showInFilter)) {
+          if (!leaf && (state || (this.filtering && !treeNodeState.showInFilter))) {
             state = await handleLoadChildren(node.uri, true);
           }
 
