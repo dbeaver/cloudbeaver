@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -30,7 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-public class CBSecretControllerEmbeddedTest {
+public class CBSecretControllerEmbeddedTest extends CloudbeaverMockTest {
     private static final String TEST_USER_ID = "test";
     private static final DBSSecretObject TEST_OBJECT = new DBSSecretObject() {
         @NotNull
