@@ -194,7 +194,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
-          return !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit;
+          return !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
         }
 
         return true;

@@ -37,6 +37,8 @@ export interface IFormState<TState> {
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
 
+  readonly disposeTask: IExecutor<IFormState<TState>>;
+
   setMode(mode: FormMode): this;
   setPartsState(state: MetadataMap<string, any>): this;
   setState(state: TState): this;
