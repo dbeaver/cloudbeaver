@@ -315,7 +315,7 @@ public class WebServiceCore implements DBWServiceCore {
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
         try {
-            DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
+            DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project, false);
             DBPConnectionConfiguration connectionConfiguration
                 = new DBPConnectionConfiguration(testDataSource.getConnectionConfiguration());
             return WebServiceUtils.getDriverProperties(
@@ -559,7 +559,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             webSession, projectId, configInput.getConnectionId());
-        DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project);
+        DataSourceDescriptor testDataSource = getDataSourceDescriptor(webSession, dataSource, configInput, project, true);
         testDataSource.setTemporary(true);
         WebConnectionInfo connectionInfo = project.addConnection(testDataSource);
         connectionInfo.setSavedCredentials(configInput.getCredentials(), configInput.getNetworkHandlersConfig());
@@ -596,10 +596,13 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebSession webSession,
         @Nullable DataSourceDescriptor dataSource,
         @NotNull WebConnectionConfig configInput,
-        @NotNull WebSessionProjectImpl project
+        @NotNull WebSessionProjectImpl project,
+        boolean resetCredentialsOnTargetChange
     ) throws DBWebException {
         DataSourceDescriptor testDataSource;
-        if (dataSource != null) {
+        boolean connectionTargetChanged = resetCredentialsOnTargetChange && dataSource != null &&
+            project.isConnectionTargetChanged(configInput, dataSource);
+        if (dataSource != null && !connectionTargetChanged) {
             try {
                 // Check that creds are saved to trigger secrets resolve
                 dataSource.isCredentialsSaved();
@@ -631,14 +634,26 @@ public class WebServiceCore implements DBWServiceCore {
                 true
             );
         } else {
+            if (connectionTargetChanged) {
+                project.clearSecretReferences(configInput);
+            }
             testDataSource = project.getDataSourceContainerFromInput(configInput);
         }
         validateDriverLibrariesPresence(testDataSource);
-        webSession.provideAuthParameters(
-            webSession.getProgressMonitor(),
-            testDataSource,
-            testDataSource.getConnectionConfiguration()
-        );
+        if (connectionTargetChanged) {
+            // Server-side credential providers must not supply secrets to a client-controlled target.
+            webSession.provideInputAuthParameters(
+                webSession.getProgressMonitor(),
+                testDataSource,
+                testDataSource.getConnectionConfiguration()
+            );
+        } else {
+            webSession.provideAuthParameters(
+                webSession.getProgressMonitor(),
+                testDataSource,
+                testDataSource.getConnectionConfiguration()
+            );
+        }
         testDataSource.setSavePassword(true); // We need for test to avoid password callback
         testDataSource.setAccessCheckRequired(!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN));
         return testDataSource;

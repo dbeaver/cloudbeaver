@@ -97,6 +97,18 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         preferenceStore.setProperties(input.getDefaultUserPreferences());
     }
 
+    /**
+     * Removes references to credentials resolved on the server.
+     */
+    public void clearSecretReferences() {
+        input.setSharedCredentials(false);
+        input.setSelectedSecretId(null);
+    }
+
+    public boolean isConnectionTargetChanged(@NotNull C dataSource) {
+        return WebDataSourceUtils.isConnectionTargetChanged(dataSource.getConnectionConfiguration(), input);
+    }
+
     @NotNull
     protected C createDataSourceContainerFromInput(@NotNull DBPDriver driver) {
         DBPConnectionConfiguration dsConfig = new DBPConnectionConfiguration();
