@@ -383,6 +383,17 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         getInputConfigHandler(configInput).updateDataSource(dataSource);
     }
 
+    public void clearSecretReferences(@NotNull WebConnectionConfig configInput) {
+        getInputConfigHandler(configInput).clearSecretReferences();
+    }
+
+    public boolean isConnectionTargetChanged(
+        @NotNull WebConnectionConfig configInput,
+        @NotNull DataSourceDescriptor dataSource
+    ) {
+        return getInputConfigHandler(configInput).isConnectionTargetChanged(dataSource);
+    }
+
     @NotNull
     public WebConnectionConfig getConnectionConfigInput(@Nullable Map<String, Object> configMap) {
         return new WebConnectionConfig(configMap == null ? Map.of() : configMap);

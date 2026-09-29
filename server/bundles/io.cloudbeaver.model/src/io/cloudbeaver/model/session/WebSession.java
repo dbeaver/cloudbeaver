@@ -83,6 +83,7 @@ public class WebSession extends BaseWebSession
 
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
     public static String RUNTIME_PARAM_CLIENT_ORIGIN = "client-origin";
+    public static String RUNTIME_PARAM_INPUT_AUTH_ONLY = "input-auth-only";
     private final AtomicInteger taskCount = new AtomicInteger();
 
     private final String lastRemoteAddr;
@@ -918,21 +919,50 @@ public class WebSession extends BaseWebSession
         @NotNull DBPDataSourceContainer dataSourceContainer,
         @NotNull DBPConnectionConfiguration configuration
     ) {
+        return provideAuthParameters(
+            monitor,
+            dataSourceContainer,
+            configuration,
+            !Boolean.TRUE.equals(configuration.getRuntimeAttribute(RUNTIME_PARAM_INPUT_AUTH_ONLY))
+        );
+    }
+
+    /**
+     * Provides credentials from the connection configuration without credentials from the current session context.
+     */
+    public boolean provideInputAuthParameters(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
+        configuration.setRuntimeAttribute(RUNTIME_PARAM_INPUT_AUTH_ONLY, true);
+        configuration.removeRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS);
+        return provideAuthParameters(monitor, dataSourceContainer, configuration, false);
+    }
+
+    private boolean provideAuthParameters(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration,
+        boolean provideContextCredentials
+    ) {
         try {
             // Properties from nested auth sessions
-            for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
-                contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
-            }
-            configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
-            configuration.setRuntimeAttribute(RUNTIME_PARAM_CLIENT_ORIGIN, this.clientOrigin);
+            if (provideContextCredentials) {
+                for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
+                    contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
+                }
+                configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
 
-            WebSessionProjectImpl project = getProjectById(dataSourceContainer.getProject().getId());
-            if (project != null) {
-                WebConnectionInfo webConnectionInfo = project.findWebConnectionInfo(dataSourceContainer.getId());
-                if (webConnectionInfo != null) {
-                    WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
+                WebSessionProjectImpl project = getProjectById(dataSourceContainer.getProject().getId());
+                if (project != null) {
+                    WebConnectionInfo webConnectionInfo = project.findWebConnectionInfo(dataSourceContainer.getId());
+                    if (webConnectionInfo != null) {
+                        WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
+                    }
                 }
             }
+            configuration.setRuntimeAttribute(RUNTIME_PARAM_CLIENT_ORIGIN, this.clientOrigin);
 
             // uncommented because we had the problem with non-native auth models
             // (for example, can't connect to DynamoDB if credentials are not saved)
