@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 
 import {
   FieldCheckbox,
@@ -86,19 +85,21 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
           />
         )}
         {categories.map(category => (
-          <React.Fragment key={category}>
+          <section key={category} className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2">
             <GroupTitle keepSize>{category}</GroupTitle>
-            <ObjectPropertyInfoForm
-              state={handlerState.properties}
-              properties={handler.properties}
-              category={category}
-              disabled={disabled || !enabled}
-              isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
-              autocompleteSectionName="section-ssl"
-              hideEmptyPlaceholder
-              showRememberTip
-            />
-          </React.Fragment>
+            <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
+              <ObjectPropertyInfoForm
+                state={handlerState.properties}
+                properties={handler.properties}
+                category={category}
+                disabled={disabled || !enabled}
+                isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
+                autocompleteSectionName="section-ssl"
+                hideEmptyPlaceholder
+                showRememberTip
+              />
+            </div>
+          </section>
         ))}
         {canSave && !optionsPart.state.sharedCredentials && (
           <FieldCheckbox
