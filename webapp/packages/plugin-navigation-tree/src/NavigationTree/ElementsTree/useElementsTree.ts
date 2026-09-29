@@ -20,7 +20,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
@@ -29,7 +29,6 @@ import { type ILoadableState, MetadataMap, debounce } from '@cloudbeaver/core-ut
 import { ElementsTreeService } from './ElementsTreeService.js';
 import type { IElementsTreeAction } from './IElementsTreeAction.js';
 import type { INavTreeNodeInfo } from './INavTreeNodeInfo.js';
-import { isLeaf } from './isLeaf.js';
 import type { NavigationNodeRendererComponent } from './NavigationNodeComponent.js';
 import { transformNodeInfo } from './transformNodeInfo.js';
 
@@ -120,6 +119,7 @@ export interface IElementsTree extends ILoadableState {
   getNodeState: (nodeId: string) => ITreeNodeState;
   isNodeExpanded: (nodeId: string, ignoreFilter?: boolean) => boolean;
   isNodeExpandable: (nodeId: string) => boolean;
+  isNodeLeaf: (node: NavNode) => boolean;
   getExpanded: () => string[];
   getSelected: () => string[];
   isNodeSelected: (nodeId: string) => boolean;
@@ -456,6 +456,18 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
         return true;
       },
+      isNodeLeaf(node: NavNode): boolean {
+        const children = navTreeResource.get(node.uri);
+        const outdated = navNodeInfoResource.isOutdated(node.uri) || navTreeResource.isOutdated(node.uri);
+
+        return (
+          (!this.settings?.showTableContents &&
+            node.objectFeatures.includes(EObjectFeature.entity) &&
+            !node.objectFeatures.includes(EObjectFeature.keyValue)) ||
+          !node.hasChildren ||
+          (children?.length === 0 && !outdated)
+        );
+      },
       getExpanded(): string[] {
         return Array.from(this.state)
           .filter(([key, state]) => state.expanded)
@@ -586,25 +598,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await options.onOpen?.(node, false);
       },
       async expand(node: NavNode, state: boolean) {
-        if (!this.isNodeExpandable(node.uri)) {
-          return;
-        }
-
-        const leaf = isLeaf(
-          node,
-          navTreeResource.get(node.uri),
-          this,
-          navNodeInfoResource.isOutdated(node.uri) || navTreeResource.isOutdated(node.uri),
-        );
-
-        if (state && leaf) {
+        if (!this.isNodeExpandable(node.uri) || (state && this.isNodeLeaf(node))) {
           return;
         }
 
         const treeNodeState = this.state.get(node.uri);
 
         try {
-          if (!leaf && (state || (this.filtering && !treeNodeState.showInFilter))) {
+          if (!this.isNodeLeaf(node) && (state || (this.filtering && !treeNodeState.showInFilter))) {
             state = await handleLoadChildren(node.uri, true);
           }
 

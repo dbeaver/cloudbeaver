@@ -16,7 +16,6 @@ import type { IDNDData } from '@cloudbeaver/core-ui';
 import { useChildren } from '../../../NodesManager/useChildren.js';
 import { useNode } from '../../../NodesManager/useNode.js';
 import { ElementsTreeContext } from '../ElementsTreeContext.js';
-import { isLeaf } from '../isLeaf.js';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent.js';
 
 export interface INavigationNode {
@@ -55,7 +54,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const loaded = getComputed(() => children.children !== undefined && children.isLoaded() && isLoaded());
   const showInFilter = getComputed(() => contextRef.context?.tree.getNodeState(node.uri).showInFilter || false);
   const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.uri) || false);
-  const leaf = getComputed(() => isLeaf(node, children.children, contextRef.context?.tree, outdated));
+  const leaf = getComputed(() => contextRef.context?.tree.isNodeLeaf(node) ?? !node.hasChildren);
   const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
   const empty = getComputed(() => children.children?.length === 0);
   const expanded = getComputed(() => isExpanded);
