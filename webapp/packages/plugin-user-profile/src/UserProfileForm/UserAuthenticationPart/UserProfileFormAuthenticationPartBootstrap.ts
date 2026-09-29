@@ -43,6 +43,7 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
     this.userProfileTabsService.tabContainer.add({
       key: 'authentication',
       name: 'ui_authentication',
+      icon: '/icons/core_blocks_key.svg',
       order: 4,
       isHidden: () => this.userInfoResource.isAnonymous(),
       panel: () => ChangePassword,

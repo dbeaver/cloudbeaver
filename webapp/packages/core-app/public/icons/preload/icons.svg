@@ -235,8 +235,12 @@
   </symbol>
 
   <symbol id="table-export" viewBox="0 0 24 24">
-    <path fill="#338ECC" fill-rule="evenodd" clip-rule="evenodd"
-      d="M21 5L21 3L3 3L3 5L21 5ZM15.7955 12.7955C15.3562 13.2348 14.6438 13.2348 14.2045 12.7955L13 11.716L13 21L11 21L11 11.716L9.79549 12.7955C9.35616 13.2348 8.6439 13.2348 8.20455 12.7955C7.7652 12.3561 7.7652 11.6438 8.20455 11.2045L12 7.40895L15.7955 11.2045C16.2348 11.6438 16.2348 12.3561 15.7955 12.7955Z" />
+    <path d="M13.5714 10.4286L22.4382 1.56987" stroke="#3387C5" stroke-width="1.5" stroke-miterlimit="10" />
+    <rect x="1" y="1" width="13.3571" height="1.57143" fill="#3387C5" />
+    <rect x="23" y="9.64285" width="13.3571" height="1.57143" transform="rotate(90 23 9.64285)" fill="#3387C5" />
+    <rect x="1" y="21.4286" width="22" height="1.57143" fill="#3387C5" />
+    <rect x="2.57143" y="1" width="22" height="1.57143" transform="rotate(90 2.57143 1)" fill="#3387C5" />
+    <path d="M21.4286 6.5L21.4286 2.57143L17.5 2.57143L17.5 1L23 1L23 6.5L21.4286 6.5Z" fill="#3387C5" />
   </symbol>
 
   <symbol id="edit" viewBox="0 0 13 13">
