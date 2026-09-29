@@ -11,9 +11,9 @@ import { computed, makeObservable, runInAction } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
-import { AISettingsService } from '@cloudbeaver/plugin-ai';
 
 import { AIChatContextService } from './AIChatContext/AIChatContextService.js';
+import { AIChatSettingsService } from '../AIChatSettingsService.js';
 
 const queryAiChatSettingsKey = 'ai-chat';
 
@@ -22,14 +22,14 @@ interface ISettings {
   metrics: boolean;
 }
 
-@injectable(() => [ServerConfigResource, UserDataService, AIChatContextService, AISettingsService])
+@injectable(() => [ServerConfigResource, UserDataService, AIChatContextService, AIChatSettingsService])
 export class AIChatService {
   get settings(): ISettings {
     return this.userDataService.getUserData(queryAiChatSettingsKey, getAiChatDefaultSettings);
   }
 
   get isEnabled(): boolean {
-    return !this.aiSettingsService.aiChatDisabled && this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true);
+    return !this.aiChatSettingsService.disabled && this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true);
   }
 
   get metrics(): boolean {
@@ -44,7 +44,7 @@ export class AIChatService {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly userDataService: UserDataService,
     private readonly aiChatContextService: AIChatContextService,
-    private readonly aiSettingsService: AISettingsService,
+    private readonly aiChatSettingsService: AIChatSettingsService,
   ) {
     this.togglePanel = this.togglePanel.bind(this);
 

@@ -25,8 +25,6 @@
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
-    "@cloudbeaver/core-settings": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
     "tslib": "^2"
   },
   "devDependencies": {

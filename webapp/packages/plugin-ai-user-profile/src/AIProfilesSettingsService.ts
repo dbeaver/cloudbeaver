@@ -11,16 +11,13 @@ import { SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-set
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  'plugin.ai-chat.disabled': schemaExtra.stringedBoolean().default(false),
+  'ai-profiles.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
-export type AIChatSettingsSchema = typeof defaultSettings;
-export type AIChatSettings = schema.infer<typeof defaultSettings>;
-
 @injectable(() => [SettingsProviderService])
-export class AISettingsService {
-  get aiChatDisabled(): boolean {
-    return this.settings.getValue('plugin.ai-chat.disabled');
+export class AIProfilesSettingsService {
+  get disabled(): boolean {
+    return this.settings.getValue('ai-profiles.disabled');
   }
 
   readonly settings: SettingsProvider<typeof defaultSettings>;

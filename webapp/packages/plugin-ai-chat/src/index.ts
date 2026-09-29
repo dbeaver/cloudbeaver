@@ -8,7 +8,7 @@
 
 import './module.js';
 
-export { AISettingsService as AIChatSettingsService } from '@cloudbeaver/plugin-ai';
+export { AIChatSettingsService } from './AIChatSettingsService.js';
 
 export * from './AIChat/AIChatService.js';
 export * from './AIChat/AIChatConversation/AIChatConversationsService.js';
