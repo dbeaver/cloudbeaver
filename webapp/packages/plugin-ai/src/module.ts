@@ -10,15 +10,18 @@ import { Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 
 import { AiEnginesResource } from './AiEnginesResource.js';
 import { AISettingsResource } from './AISettingsResource.js';
+import { AIChatSettingsService } from './AIChatSettingsService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai',
 
   configure: serviceCollection => {
     serviceCollection
+      .addSingleton(Dependency, proxy(AIChatSettingsService))
       .addSingleton(Dependency, proxy(AiEnginesResource))
       .addSingleton(Dependency, proxy(AISettingsResource))
       .addSingleton(AiEnginesResource)
+      .addSingleton(AIChatSettingsService)
       .addSingleton(AISettingsResource);
   },
 });

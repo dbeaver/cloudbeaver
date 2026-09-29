@@ -11,9 +11,9 @@ import { computed, makeObservable, runInAction } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
+import { AIChatSettingsService } from '@cloudbeaver/plugin-ai';
 
 import { AIChatContextService } from './AIChatContext/AIChatContextService.js';
-import { AIChatSettingsService } from '../AIChatSettingsService.js';
 
 const queryAiChatSettingsKey = 'ai-chat';
 

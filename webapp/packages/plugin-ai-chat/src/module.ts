@@ -9,7 +9,6 @@
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
 import { AIChatTabService } from './AIChatTabService.js';
-import { AIChatSettingsService } from './AIChatSettingsService.js';
 import { AIChatService } from './AIChat/AIChatService.js';
 import { AIChatServiceBootstrap } from './AIChatServiceBootstrap.js';
 import { AIChatMessageActionsService } from './AIChat/AIChatMessage/AIChatMessageActionsService.js';
@@ -32,12 +31,10 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, AIChatServiceBootstrap)
       .addSingleton(Bootstrap, proxy(AIChatContextService))
-      .addSingleton(Dependency, proxy(AIChatSettingsService))
       .addSingleton(Dependency, proxy(AIChatMessagesResource))
       .addSingleton(Dependency, proxy(AIChatConversationsResource))
       .addSingleton(AIChatContextService)
       .addSingleton(AIChatTabService)
-      .addSingleton(AIChatSettingsService)
       .addSingleton(AIChatService)
       .addSingleton(AIChatMessageActionsService)
       .addSingleton(AIChatMessageEventHandler)
