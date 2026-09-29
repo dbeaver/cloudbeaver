@@ -5,14 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ConnectionInfoResource, createConnectionParam, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
-import { NavigationService } from '@cloudbeaver/core-ui';
-import { uuid } from '@cloudbeaver/core-utils';
-import { type ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
+import {ConnectionInfoResource, createConnectionParam, type IConnectionInfoParams} from '@cloudbeaver/core-connections';
+import {injectable} from '@cloudbeaver/core-di';
+import {NotificationService} from '@cloudbeaver/core-events';
+import {Executor, type IExecutionContextProvider, type IExecutor} from '@cloudbeaver/core-executor';
+import {NavigationService} from '@cloudbeaver/core-ui';
+import {uuid} from '@cloudbeaver/core-utils';
+import {type ITab, NavigationTabsService} from '@cloudbeaver/plugin-navigation-tabs';
 import {
+  ESqlDataSourceFeatures,
   type ISqlEditorTabState,
   MemorySqlDataSource,
   SqlDataSourceService,
@@ -20,9 +21,9 @@ import {
   SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 
-import { isSQLEditorTab } from './isSQLEditorTab.js';
-import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION.js';
-import { SqlEditorTabService } from './SqlEditorTabService.js';
+import {isSQLEditorTab} from './isSQLEditorTab.js';
+import {SQL_EDITOR_SOURCE_ACTION} from './SQL_EDITOR_SOURCE_ACTION.js';
+import {SqlEditorTabService} from './SqlEditorTabService.js';
 
 enum SQLEditorNavigationAction {
   create,
@@ -96,7 +97,11 @@ export class SqlEditorNavigatorService {
     for (const tabId of this.navigationTabsService.history.history) {
       const tab = this.navigationTabsService.getTab(tabId);
       if (tab && isSQLEditorTab(tab)) {
-        const executionContext = this.sqlDataSourceService.get(tab.handlerState.editorId)?.executionContext;
+        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+        if (!dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
+          continue;
+        }
+        const executionContext = dataSource.executionContext;
         if (
           connectionKey &&
           (!executionContext ||

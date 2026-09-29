@@ -6,30 +6,31 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { runInAction } from 'mobx';
+import {runInAction} from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, isResourceAlias, resourceKeyList, ResourceKeyUtils, type ResourceKey } from '@cloudbeaver/core-resource';
-import { LocalizationService } from '@cloudbeaver/core-localization';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { SyncExecutor } from '@cloudbeaver/core-executor';
+import {injectable} from '@cloudbeaver/core-di';
+import {CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils} from '@cloudbeaver/core-resource';
+import {LocalizationService} from '@cloudbeaver/core-localization';
+import {UserInfoResource} from '@cloudbeaver/core-authentication';
+import {SyncExecutor} from '@cloudbeaver/core-executor';
 import {
+  type AiFunctionCall,
+  type AiFunctionConfirmation,
+  type AiFunctionResult,
   AiFunctionType,
+  type AiMessage,
   AiMessageType,
   CbClientEventId,
   CbServerEventId,
   GraphQLService,
-  type AiFunctionCall,
-  type AiFunctionConfirmation,
-  type AiFunctionResult,
-  type AiMessage,
   type WsaiChatMessageErrorEvent,
   type WsaiFunctionCallConfirmationEvent,
 } from '@cloudbeaver/core-sdk';
 
-import { AIChatMessageEventHandler, type IAiChatMessageChunkEvent, type IAiChatMessageEvent } from './AIChatMessageEventHandler.js';
-import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
-import { AIFunctionsResource } from '../../AIFunctionsResource.js';
+import {AIChatMessageEventHandler, type IAiChatMessageChunkEvent, type IAiChatMessageEvent} from './AIChatMessageEventHandler.js';
+import {AIChatConversationsResource} from '../AIChatConversation/AIChatConversationsResource.js';
+import {AIFunctionsResource} from '../../AIFunctionsResource.js';
+import {getCanonicalAIFunctionId} from '../../AIChatFunctionsService.js';
 
 export interface IAIFunctionMessage extends AiMessage {
   role: AiMessageType.Function;
@@ -227,7 +228,8 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     }
 
     return message.functionConfirmation.functionCalls.some(call => {
-      const func = this.aiFunctionsResource.data.find(f => f.id === call.functionName);
+      const functionId = getCanonicalAIFunctionId(call.functionName);
+      const func = this.aiFunctionsResource.data.find(f => f.id === functionId);
       return func?.system === false;
     });
   }

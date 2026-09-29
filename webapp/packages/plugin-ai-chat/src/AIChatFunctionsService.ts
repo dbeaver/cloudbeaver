@@ -6,17 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
-import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { schema } from '@cloudbeaver/core-utils';
-import { LocalizationService } from '@cloudbeaver/core-localization';
-import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
-import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import {injectable} from '@cloudbeaver/core-di';
+import {NavNodeManagerService} from '@cloudbeaver/core-navigation-tree';
+import {schema} from '@cloudbeaver/core-utils';
+import {LocalizationService} from '@cloudbeaver/core-localization';
+import {LocalStorageSqlDataSource} from '@cloudbeaver/plugin-sql-editor';
+import {SqlEditorNavigatorService} from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
-import { AIFunctionsResource } from './AIFunctionsResource.js';
-import { AIChatContextService } from './AIChat/AIChatContext/AIChatContextService.js';
-import { AIChatConversationsService } from './AIChat/AIChatConversation/AIChatConversationsService.js';
-import { AIChatConversationsResource } from './AIChat/AIChatConversation/AIChatConversationsResource.js';
+import {AIFunctionsResource} from './AIFunctionsResource.js';
+import {AIChatContextService} from './AIChat/AIChatContext/AIChatContextService.js';
+import {AIChatConversationsService} from './AIChat/AIChatConversation/AIChatConversationsService.js';
+import {AIChatConversationsResource} from './AIChat/AIChatConversation/AIChatConversationsResource.js';
 
 const FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA = schema.object({
   objectName: schema.string(),
@@ -37,6 +37,16 @@ const FUNCTION_SCHEMAS = {
 
 export type AIFunctionName = keyof typeof FUNCTION_SCHEMAS;
 export type AIParamsFor<T extends AIFunctionName> = schema.infer<(typeof FUNCTION_SCHEMAS)[T]>;
+
+export function getCanonicalAIFunctionId(id: string): string {
+  if (id === 'db_openTableDataEditor') {
+    return 'db_uiOpenDBeaverEntityEditor';
+  }
+  if (id === 'db_openSQLEditor') {
+    return 'db_uiOpenDBeaverSQLEditor';
+  }
+  return id;
+}
 
 @injectable(() => [
   NavNodeManagerService,
@@ -59,13 +69,7 @@ export class AIChatFunctionsService {
   ) {}
 
   getFunction(id: string) {
-    let functionId = id;
-    if (id === 'db_openTableDataEditor') {
-      functionId = 'db_uiOpenDBeaverEntityEditor';
-    } else if (id === 'db_openSQLEditor') {
-      functionId = 'db_uiOpenDBeaverSQLEditor';
-    }
-    return this.aiFunctionsResource.data.find(func => func.id === functionId);
+    return this.aiFunctionsResource.data.find(func => func.id === getCanonicalAIFunctionId(id));
   }
 
   async executeFunction<T extends AIFunctionName>(functionName: T, params: AIParamsFor<T>): Promise<void> {
