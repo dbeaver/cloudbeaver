@@ -7,3 +7,5 @@
  */
 
 import './module.js';
+
+export * from './AIProfilesSettingsService.js';
