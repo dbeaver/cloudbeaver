@@ -10,7 +10,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
-import { AIChatSettingsService } from '@cloudbeaver/plugin-ai';
+import { AISettingsService } from '@cloudbeaver/plugin-ai';
 import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 import { UserProfileTabsService } from '@cloudbeaver/plugin-user-profile';
 
@@ -18,14 +18,14 @@ import { AI_PROFILES_TAB_ID } from './AI_PROFILES_TAB_ID.js';
 
 const AIProfilesPanel = importLazyComponent(() => import('./components/AIProfilesPanel.js').then(module => module.AIProfilesPanel));
 
-@injectable(() => [UserProfileTabsService, AppAuthService, ServerConfigResource, AIProfilesResource, AIChatSettingsService])
+@injectable(() => [UserProfileTabsService, AppAuthService, ServerConfigResource, AIProfilesResource, AISettingsService])
 export class AIUserProfileBootstrap extends Bootstrap {
   constructor(
     private readonly userProfileTabsService: UserProfileTabsService,
     private readonly appAuthService: AppAuthService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly aiProfilesResource: AIProfilesResource,
-    private readonly aiChatSettingsService: AIChatSettingsService,
+    private readonly aiSettingsService: AISettingsService,
   ) {
     super();
   }
@@ -44,7 +44,7 @@ export class AIUserProfileBootstrap extends Bootstrap {
   private isAvailable(): boolean {
     return (
       this.appAuthService.authenticated &&
-      !this.aiChatSettingsService.disabled &&
+      !this.aiSettingsService.aiChatDisabled &&
       this.serverConfigResource.isFeatureEnabled(FEATURE_AI_ID, true) &&
       this.aiProfilesResource.values.length > 0
     );

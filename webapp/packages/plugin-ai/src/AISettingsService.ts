@@ -18,8 +18,8 @@ export type AIChatSettingsSchema = typeof defaultSettings;
 export type AIChatSettings = schema.infer<typeof defaultSettings>;
 
 @injectable(() => [SettingsProviderService])
-export class AIChatSettingsService {
-  get disabled(): boolean {
+export class AISettingsService {
+  get aiChatDisabled(): boolean {
     return this.settings.getValue('plugin.ai-chat.disabled');
   }
 

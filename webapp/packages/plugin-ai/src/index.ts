@@ -10,4 +10,4 @@ import './module.js';
 
 export * from './AiEnginesResource.js';
 export * from './AISettingsResource.js';
-export * from './AIChatSettingsService.js';
+export * from './AISettingsService.js';
