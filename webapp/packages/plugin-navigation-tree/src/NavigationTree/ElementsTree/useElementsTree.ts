@@ -605,7 +605,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         const treeNodeState = this.state.get(node.uri);
 
         try {
-          if (!this.isNodeLeaf(node) && (state || (this.filtering && !treeNodeState.showInFilter))) {
+          if (state || (this.filtering && !treeNodeState.showInFilter)) {
             state = await handleLoadChildren(node.uri, true);
           }
 
