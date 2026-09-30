@@ -42,12 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
@@ -309,11 +304,63 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
     }
 
     @Test
-    public void accountProfileIgnoresSavedApiToken() throws DBException {
+    public void selectedAccountAuthenticationIgnoresSavedApiToken() throws DBException {
         WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "api-token"));
-        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(), true);
 
         Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.isTokenSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+    }
+
+    @Test
+    public void storesAuthenticationMethodPerUserWithoutChangingProfile() throws DBException {
+        Assertions.assertFalse(properties.isAccountAuthentication());
+        Assertions.assertFalse(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(), true);
+
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+        Assertions.assertFalse(properties.isAccountAuthentication());
+    }
+
+    @Test
+    public void usesSharedAuthenticationAsMigrationFallback() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(), false);
+
+        Assertions.assertFalse(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+        Assertions.assertTrue(properties.isAccountAuthentication());
+    }
+
+    @Test
+    public void createsAccountAuthenticationPropertiesWithoutChangingProfile() throws DBException {
+        AIAccountProperties accountProperties = WebAIProfileUtils.createAccountAuthenticationProperties(profile);
+
+        Assertions.assertTrue(accountProperties.isAccountAuthentication());
+        Assertions.assertDoesNotThrow(accountProperties::createAccountAuthenticator);
+        Assertions.assertFalse(properties.isAccountAuthentication());
+    }
+
+    @Test
+    public void deviceAuthorizationSelectsAccountAndKeepsApiToken() throws DBException {
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "api-token"));
+
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens("access", "refresh", 3600, "account", "user@example.com")
+        );
+
+        Assertions.assertTrue(WebAIProfileUtils.isTokenSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.isAccountSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+        Assertions.assertEquals("user@example.com", WebAIProfileUtils.getAccountEmail(webSession, profile));
+        Assertions.assertEquals("api-token", secrets.get("ai.profile.test-profile.token"));
+        Assertions.assertEquals("refresh", secrets.get("ai.profile.test-profile.refreshToken"));
     }
 
     @Test
@@ -347,7 +394,7 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
         WebAIProfileUtils.saveCredentials(
             webSession,
             profile,
-            Map.of(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY, "new-refresh-token")
+            Map.of(credentialPropertyId, "new-api-token")
         );
 
         Assertions.assertThrows(
@@ -362,8 +409,20 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
     }
 
     @Test
+    public void rejectsAccountTokensInCredentialsMutation() {
+        Assertions.assertThrows(
+            DBException.class,
+            () -> WebAIProfileUtils.saveCredentials(
+                webSession,
+                profile,
+                Map.of(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY, "refresh")
+            )
+        );
+        Assertions.assertFalse(secrets.containsValue("refresh"));
+    }
+
+    @Test
     public void deviceAuthorizationProcessorStoresReturnedTokens() throws Exception {
-        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
         AIAccountAuthenticator.DeviceAuthorization authorization = new AIAccountAuthenticator.DeviceAuthorization(
             "device-code",
             "user-code",
@@ -396,6 +455,7 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
         Assertions.assertTrue(processor.getResult());
         Assertions.assertEquals("access", secrets.get("ai.profile.test-profile.accessToken"));
         Assertions.assertEquals("refresh", secrets.get("ai.profile.test-profile.refreshToken"));
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
     }
 
     @Test
@@ -578,6 +638,32 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
     }
 
     @Test
+    public void effectiveAccountProfileCannotBeUsedAfterSwitchingToApiToken() throws DBException {
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens(
+                tokenWithClaims("{\"exp\":4102444800,\"chatgpt_account_id\":\"account-1\"}"),
+                "refresh-1",
+                3600,
+                "account-1",
+                null
+            )
+        );
+        AISettings settings = Mockito.mock(AISettings.class);
+        Mockito.when(settings.getConfigurationOrNull(profile.getProfileId())).thenReturn(profile);
+        OpenAIProperties effectiveProperties = (OpenAIProperties) WebAIProfileUtils
+            .getEffectiveProfile(webSession, profile, settings)
+            .getConfiguration();
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(), false);
+
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Assertions.assertThrows(DBException.class, () -> effectiveProperties.getValidAccessToken(authenticator));
+        Mockito.verifyNoInteractions(authenticator);
+    }
+
+    @Test
     public void effectiveProfileCannotUseCredentialsAfterProfileDeletion() throws DBException {
         properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
         String accessToken = tokenWithClaims("{\"exp\":4102444800,\"chatgpt_account_id\":\"account-1\"}");
@@ -628,7 +714,6 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
 
     @Test
     public void serializesRefreshAcrossSessions() throws Exception {
-        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
         WebAIProfileUtils.saveAccountCredentials(
             webSession,
             profile,

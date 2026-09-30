@@ -36,21 +36,13 @@ import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceEditable;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class WebAIProfileUtils {
     private static final String SECRET_ID_PREFIX = "ai.profile.";
     private static final String SECRET_OBJECT_TYPE = "aiProfile";
+    private static final String ACCOUNT_AUTHENTICATION_PROPERTY = "accountAuthentication";
     private static final String SESSION_CREDENTIALS_ATTRIBUTE_PREFIX = "ai.profile.credentials.";
     private static final String ACCOUNT_CREDENTIALS_ATTRIBUTE_PREFIX = "ai.profile.accountCredentials.";
     private static final int ACCOUNT_LOCK_COUNT = 64;
@@ -78,11 +70,19 @@ public final class WebAIProfileUtils {
             return false;
         }
         DBSSecretController secretController = webSession.getUserContext().getSecretController();
-        Set<String> credentialProperties = getCredentialPropertyIds(profile.getConfiguration());
         if (isAccountProfile(profile)) {
             AIAccountProperties accountCredentials = getAccountCredentials(webSession, profile, userId);
             synchronized (accountCredentials) {
                 synchronized (getAccountLock(webSession, userId, profile.getProfileId())) {
+                    boolean accountAuthentication = isAccountAuthentication(
+                        webSession,
+                        profile,
+                        secretController,
+                        userId
+                    );
+                    Set<String> credentialProperties = accountAuthentication
+                        ? AIAccountProperties.ACCOUNT_CREDENTIAL_PROPERTY_IDS
+                        : getTokenCredentialPropertyIds(profile.getConfiguration());
                     Map<String, String> storedCredentials = getCredentials(
                         webSession,
                         secretController,
@@ -90,10 +90,11 @@ public final class WebAIProfileUtils {
                         credentialProperties,
                         userId
                     );
-                    return hasRequiredCredentials(profile.getConfiguration(), storedCredentials);
+                    return hasRequiredCredentials(accountAuthentication, storedCredentials);
                 }
             }
         }
+        Set<String> credentialProperties = getCredentialPropertyIds(profile.getConfiguration());
         Map<String, String> storedCredentials = getCredentials(
             webSession,
             secretController,
@@ -101,7 +102,100 @@ public final class WebAIProfileUtils {
             credentialProperties,
             userId
         );
-        return hasRequiredCredentials(profile.getConfiguration(), storedCredentials);
+        return hasRequiredCredentials(false, storedCredentials);
+    }
+
+    public static boolean isAccountAuthentication(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile
+    ) throws DBException {
+        String userId = webSession.getUserId();
+        if (profile.isGlobal()
+            || userId == null
+            || !webSession.isAuthorizedInSecurityManager()
+            || !isAccountProfile(profile)
+            || !getAccountProperties(profile).supportsDeviceAuthorization()
+        ) {
+            return false;
+        }
+        synchronized (getAccountLock(webSession, userId, profile.getProfileId())) {
+            return isAccountAuthentication(
+                webSession,
+                profile,
+                webSession.getUserContext().getSecretController(),
+                userId
+            );
+        }
+    }
+
+    public static boolean isTokenSaved(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile
+    ) throws DBException {
+        String userId = webSession.getUserId();
+        if (profile.isGlobal() || userId == null || !webSession.isAuthorizedInSecurityManager()) {
+            return false;
+        }
+        Set<String> tokenProperties = getTokenCredentialPropertyIds(profile.getConfiguration());
+        if (tokenProperties.isEmpty()) {
+            return false;
+        }
+        synchronized (getAccountLock(webSession, userId, profile.getProfileId())) {
+            return !getCredentials(
+                webSession,
+                webSession.getUserContext().getSecretController(),
+                profile,
+                tokenProperties,
+                userId
+            ).isEmpty();
+        }
+    }
+
+    public static boolean isAccountSaved(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile
+    ) throws DBException {
+        String userId = webSession.getUserId();
+        if (profile.isGlobal()
+            || userId == null
+            || !webSession.isAuthorizedInSecurityManager()
+            || !isAccountProfile(profile)
+            || !getAccountProperties(profile).supportsDeviceAuthorization()
+        ) {
+            return false;
+        }
+        synchronized (getAccountLock(webSession, userId, profile.getProfileId())) {
+            return CommonUtils.isNotEmpty(getCredentials(
+                webSession,
+                webSession.getUserContext().getSecretController(),
+                profile,
+                Set.of(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY),
+                userId
+            ).get(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY));
+        }
+    }
+
+    @Nullable
+    public static String getAccountEmail(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile
+    ) throws DBException {
+        String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
+        synchronized (getAccountLock(webSession, userId, profile.getProfileId())) {
+            Map<String, String> credentials = getCredentials(
+                webSession,
+                webSession.getUserContext().getSecretController(),
+                profile,
+                Set.of(
+                    AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY,
+                    AIAccountProperties.ACCOUNT_EMAIL_PROPERTY
+                ),
+                userId
+            );
+            return CommonUtils.isEmpty(credentials.get(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY))
+                ? null
+                : credentials.get(AIAccountProperties.ACCOUNT_EMAIL_PROPERTY);
+        }
     }
 
     public static void saveCredentials(
@@ -109,20 +203,45 @@ public final class WebAIProfileUtils {
         @NotNull AIConfigurationProfile profile,
         @NotNull Map<String, Object> credentials
     ) throws DBException {
+        saveCredentials(webSession, profile, credentials, null);
+    }
+
+    public static void saveCredentials(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile,
+        @NotNull Map<String, Object> credentials,
+        @Nullable Boolean accountAuthentication
+    ) throws DBException {
         validateUserProfile(webSession, profile);
         String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
+        Map<String, Object> updates = new LinkedHashMap<>(credentials);
+        if (isAccountProfile(profile)
+            && !Collections.disjoint(credentials.keySet(), AIAccountProperties.ACCOUNT_CREDENTIAL_PROPERTY_IDS)
+        ) {
+            throw new DBWebException("AI account credentials can only be set by account authorization");
+        }
+        if (accountAuthentication != null) {
+            if (accountAuthentication
+                && (!isAccountProfile(profile) || !getAccountProperties(profile).supportsDeviceAuthorization())
+            ) {
+                throw new DBWebException("AI profile does not support account authentication");
+            }
+            if (isAccountProfile(profile)) {
+                updates.put(ACCOUNT_AUTHENTICATION_PROPERTY, accountAuthentication.toString());
+            }
+        }
         if (isAccountProfile(profile)) {
             AIAccountProperties accountCredentials = getAccountCredentials(webSession, profile, userId);
             DeviceAuthorizationAttempt attempt;
             synchronized (accountCredentials) {
                 synchronized (getAccountLock(webSession, userId, profile.getProfileId())) {
                     attempt = removeDeviceAuthorizationAttempt(webSession, userId, profile.getProfileId());
-                    saveCredentials(webSession, profile, credentials, userId, accountCredentials);
+                    saveCredentials(webSession, profile, updates, userId, accountCredentials);
                 }
             }
             cancelDeviceAuthorizationTask(attempt);
         } else {
-            saveCredentials(webSession, profile, credentials, userId, null);
+            saveCredentials(webSession, profile, updates, userId, null);
         }
     }
 
@@ -136,7 +255,7 @@ public final class WebAIProfileUtils {
         validateUserProfile(webSession, profile);
         validateExpectedUser(webSession, expectedUserId);
         DBSSecretController secretController = webSession.getUserContext().getSecretController();
-        Set<String> credentialProperties = getCredentialPropertyIds(profile.getConfiguration());
+        Set<String> credentialProperties = getUserPropertyIds(profile.getConfiguration());
         validateCredentialProperties(credentialProperties, credentials.keySet());
         if (!isPersistentStorageAvailable(webSession, secretController)) {
             if (isPersistentStorageSupported(secretController)) {
@@ -249,10 +368,7 @@ public final class WebAIProfileUtils {
         @NotNull String expectedUserId,
         @NotNull AIAccountProperties accountCredentials
     ) throws DBException {
-        AIAccountProperties properties = getAccountProperties(profile);
-        if (!properties.isAccountAuthentication()) {
-            throw new DBWebException("AI profile does not use account authentication");
-        }
+        getAccountProperties(profile);
         Map<String, Object> credentials = new LinkedHashMap<>();
         // Save the rotating refresh token first. If the second write fails, the stored pair can still be recovered.
         credentials.put(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY, tokens.refreshToken());
@@ -263,6 +379,7 @@ public final class WebAIProfileUtils {
             AIAccountProperties.ACCOUNT_EXPIRES_AT_PROPERTY,
             System.currentTimeMillis() + tokens.expiresInSeconds() * 1000
         );
+        credentials.put(ACCOUNT_AUTHENTICATION_PROPERTY, Boolean.TRUE.toString());
         saveCredentials(webSession, profile, credentials, expectedUserId, accountCredentials);
     }
 
@@ -270,10 +387,7 @@ public final class WebAIProfileUtils {
         @NotNull WebSession webSession,
         @NotNull AIConfigurationProfile profile
     ) throws DBException {
-        AIAccountProperties properties = getAccountProperties(profile);
-        if (!properties.isAccountAuthentication()) {
-            throw new DBWebException("AI profile does not use account authentication");
-        }
+        getAccountProperties(profile);
         Map<String, Object> credentials = new LinkedHashMap<>();
         credentials.put(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY, "");
         credentials.put(AIAccountProperties.ACCOUNT_ACCESS_TOKEN_PROPERTY, "");
@@ -322,8 +436,13 @@ public final class WebAIProfileUtils {
             sourceProperties.getClass()
         );
         DBSSecretController secretController = webSession.getUserContext().getSecretController();
-        if (sourceProperties instanceof AIAccountProperties accountProperties && accountProperties.isAccountAuthentication()) {
-            String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
+        String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
+        boolean accountAuthentication = sourceProperties instanceof AIAccountProperties
+            && isAccountAuthentication(webSession, source, secretController, userId);
+        if (effectiveProperties instanceof AIAccountProperties accountProperties) {
+            accountProperties.setAccountAuthentication(accountAuthentication);
+        }
+        if (accountAuthentication) {
             AIAccountProperties accountCredentials = getAccountCredentials(webSession, source, userId);
             synchronized (accountCredentials) {
                 synchronized (getAccountLock(webSession, userId, source.getProfileId())) {
@@ -331,10 +450,10 @@ public final class WebAIProfileUtils {
                         webSession,
                         secretController,
                         source,
-                        getCredentialPropertyIds(sourceProperties),
+                        AIAccountProperties.ACCOUNT_CREDENTIAL_PROPERTY_IDS,
                         userId
                     );
-                    if (!hasRequiredCredentials(sourceProperties, credentials)) {
+                    if (!hasRequiredCredentials(true, credentials)) {
                         throw new DBWebException("AI profile credentials are not configured");
                     }
                     accountCredentials.clearAccountTokens();
@@ -370,15 +489,14 @@ public final class WebAIProfileUtils {
                 ((AIAccountProperties) effectiveProperties).useAccountCredentialsFrom(accountCredentials);
             }
         } else {
-            String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
             Map<String, String> credentials = getCredentials(
                 webSession,
                 secretController,
                 source,
-                getCredentialPropertyIds(sourceProperties),
+                getTokenCredentialPropertyIds(sourceProperties),
                 userId
             );
-            if (!hasRequiredCredentials(sourceProperties, credentials)) {
+            if (!hasRequiredCredentials(false, credentials)) {
                 throw new DBWebException("AI profile credentials are not configured");
             }
             applyCredentials(webSession, effectiveProperties, credentials);
@@ -454,7 +572,9 @@ public final class WebAIProfileUtils {
             Set.of(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY),
             expectedUserId
         );
-        if (!Objects.equals(refreshToken, storedCredentials.get(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY))) {
+        if (!isAccountAuthentication(webSession, profile, secretController, expectedUserId)
+            || !Objects.equals(refreshToken, storedCredentials.get(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY))
+        ) {
             throw new DBWebException("AI account credentials have changed");
         }
     }
@@ -875,6 +995,24 @@ public final class WebAIProfileUtils {
     }
 
     @NotNull
+    private static Set<String> getTokenCredentialPropertyIds(@NotNull AIEngineProperties properties) {
+        Set<String> credentialProperties = getAllCredentialPropertyIds(properties);
+        if (properties instanceof AIAccountProperties) {
+            credentialProperties.removeAll(AIAccountProperties.ACCOUNT_CREDENTIAL_PROPERTY_IDS);
+        }
+        return credentialProperties;
+    }
+
+    @NotNull
+    private static Set<String> getUserPropertyIds(@NotNull AIEngineProperties properties) {
+        Set<String> credentialProperties = getAllCredentialPropertyIds(properties);
+        if (properties instanceof AIAccountProperties) {
+            credentialProperties.add(ACCOUNT_AUTHENTICATION_PROPERTY);
+        }
+        return credentialProperties;
+    }
+
+    @NotNull
     private static Set<String> getAllCredentialPropertyIds(@NotNull AIEngineProperties properties) {
         Set<String> credentialProperties = new LinkedHashSet<>();
         for (ObjectPropertyDescriptor property : ObjectAttributeDescriptor.extractAnnotations(
@@ -892,17 +1030,17 @@ public final class WebAIProfileUtils {
     }
 
     private static boolean hasRequiredCredentials(
-        @NotNull AIEngineProperties properties,
+        boolean accountAuthentication,
         @NotNull Map<String, String> credentials
     ) {
-        if (properties instanceof AIAccountProperties accountProperties && accountProperties.isAccountAuthentication()) {
+        if (accountAuthentication) {
             return CommonUtils.isNotEmpty(credentials.get(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY));
         }
         return !credentials.isEmpty();
     }
 
     private static boolean isAccountProfile(@NotNull AIConfigurationProfile profile) throws DBException {
-        return profile.getConfiguration() instanceof AIAccountProperties properties && properties.isAccountAuthentication();
+        return profile.getConfiguration() instanceof AIAccountProperties;
     }
 
     @NotNull
@@ -911,6 +1049,26 @@ public final class WebAIProfileUtils {
             throw new DBWebException("AI profile does not support account authentication");
         }
         return properties;
+    }
+
+    @NotNull
+    public static AIAccountProperties createAccountAuthenticationProperties(
+        @NotNull AIConfigurationProfile profile
+    ) throws DBException {
+        AIEngineProperties source = profile.getConfiguration();
+        AIEngineProperties copy = AISettingsManager.READ_PROPS_GSON.fromJson(
+            AISettingsManager.READ_PROPS_GSON.toJson(source),
+            source.getClass()
+        );
+        if (!(copy instanceof AIAccountProperties accountProperties)) {
+            throw new DBWebException("AI profile does not support account authentication");
+        }
+        if (!accountProperties.supportsDeviceAuthorization()) {
+            throw new DBWebException("AI profile does not support server-side device authorization");
+        }
+        accountProperties.clearAccountTokens();
+        accountProperties.setAccountAuthentication(true);
+        return accountProperties;
     }
 
     @NotNull
@@ -1047,6 +1205,26 @@ public final class WebAIProfileUtils {
         }
         validateExpectedUser(webSession, expectedUserId);
         return credentials;
+    }
+
+    private static boolean isAccountAuthentication(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile,
+        @NotNull DBSSecretController secretController,
+        @NotNull String expectedUserId
+    ) throws DBException {
+        AIAccountProperties accountProperties = getAccountProperties(profile);
+        if (!accountProperties.supportsDeviceAuthorization()) {
+            return false;
+        }
+        String value = getCredentials(
+            webSession,
+            secretController,
+            profile,
+            Set.of(ACCOUNT_AUTHENTICATION_PROPERTY),
+            expectedUserId
+        ).get(ACCOUNT_AUTHENTICATION_PROPERTY);
+        return value == null ? accountProperties.isAccountAuthentication() : Boolean.parseBoolean(value);
     }
 
     @NotNull

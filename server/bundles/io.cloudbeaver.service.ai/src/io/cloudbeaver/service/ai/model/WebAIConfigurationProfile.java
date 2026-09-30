@@ -61,18 +61,34 @@ public class WebAIConfigurationProfile {
         return WebAIProfileUtils.areCredentialsSaved(webSession, profile);
     }
 
+    public boolean isAccountAuthentication() throws DBException {
+        return WebAIProfileUtils.isAccountAuthentication(webSession, profile);
+    }
+
     @Nullable
-    public WebAIAccountInfo getAccount() throws DBException {
+    public String getAccountProvider() throws DBException {
         if (profile.isGlobal()
             || !(profile.getConfiguration() instanceof AIAccountProperties properties)
-            || !properties.isAccountAuthentication()
-            || !WebAIProfileUtils.areCredentialsSaved(webSession, profile)
+            || !properties.supportsDeviceAuthorization()
         ) {
             return null;
         }
-        AIConfigurationProfile effectiveProfile = WebAIProfileUtils.getEffectiveProfile(webSession, profile);
-        AIAccountProperties effectiveProperties = (AIAccountProperties) effectiveProfile.getConfiguration();
-        return new WebAIAccountInfo(effectiveProperties.getAccountEmail());
+        return properties.getAccountAuthenticationProviderName();
+    }
+
+    public boolean isTokenSaved() throws DBException {
+        return WebAIProfileUtils.isTokenSaved(webSession, profile);
+    }
+
+    @Nullable
+    public WebAIAccountInfo getAccount() throws DBException {
+        if (profile.isGlobal()
+            || !(profile.getConfiguration() instanceof AIAccountProperties)
+            || !WebAIProfileUtils.isAccountSaved(webSession, profile)
+        ) {
+            return null;
+        }
+        return new WebAIAccountInfo(WebAIProfileUtils.getAccountEmail(webSession, profile));
     }
 
     @NotNull

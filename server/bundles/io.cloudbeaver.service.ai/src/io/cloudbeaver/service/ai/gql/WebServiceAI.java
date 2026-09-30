@@ -28,11 +28,7 @@ import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.*;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
-import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
-import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
-import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
-import io.cloudbeaver.service.ai.model.inputs.WebAIProfileCredentialsInput;
-import io.cloudbeaver.service.ai.model.inputs.WebAiChatCompletionSettingsInput;
+import io.cloudbeaver.service.ai.model.inputs.*;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.utils.ServletAppUtils;
@@ -46,11 +42,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.ai.*;
-import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
-import org.jkiss.dbeaver.model.ai.engine.AIDatabaseContext;
-import org.jkiss.dbeaver.model.ai.engine.AIEngine;
-import org.jkiss.dbeaver.model.ai.engine.AIEngineProperties;
-import org.jkiss.dbeaver.model.ai.engine.AIModel;
+import org.jkiss.dbeaver.model.ai.engine.*;
 import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
 import org.jkiss.dbeaver.model.ai.internal.AIChatMessages;
 import org.jkiss.dbeaver.model.ai.prompt.AIPromptGenerateSql;
@@ -632,7 +624,12 @@ public class WebServiceAI implements DBWServiceAI {
         WebAIUtils.validateAiPluginEnabled();
         try {
             AIConfigurationProfile profile = AISettingsManager.getInstance().getSettings().getConfiguration(profileId);
-            WebAIProfileUtils.saveCredentials(webSession, profile, credentials.properties());
+            WebAIProfileUtils.saveCredentials(
+                webSession,
+                profile,
+                credentials.properties(),
+                credentials.accountAuthentication()
+            );
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error saving credentials for AI profile " + profileId, e);
@@ -649,7 +646,7 @@ public class WebServiceAI implements DBWServiceAI {
         try {
             AIConfigurationProfile profile = getUserAccountProfile(webSession, profileId);
             String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
-            AIAccountProperties properties = WebAIProfileUtils.getAccountProperties(profile);
+            AIAccountProperties properties = WebAIProfileUtils.createAccountAuthenticationProperties(profile);
             AIAccountAuthenticator authenticator = properties.createAccountAuthenticator();
             String providerName = properties.getAccountAuthenticationProviderName();
             String taskName = providerName + " account authorization";
@@ -726,8 +723,8 @@ public class WebServiceAI implements DBWServiceAI {
         if (!(profile.getConfiguration() instanceof AIAccountProperties properties)) {
             throw new DBWebException("AI profile does not support account authentication");
         }
-        if (!properties.isAccountAuthentication()) {
-            throw new DBWebException("AI profile does not use account authentication");
+        if (!properties.supportsDeviceAuthorization()) {
+            throw new DBWebException("AI profile does not support server-side device authorization");
         }
         return profile;
     }
