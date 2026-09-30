@@ -34,6 +34,7 @@ export class AIUserProfileBootstrap extends Bootstrap {
     this.userProfileTabsService.tabContainer.add({
       key: AI_PROFILES_TAB_ID,
       name: 'plugin_ai_user_profile_tab_label',
+      icon: '/icons/core_blocks_sparkles.svg',
       order: 4,
       getLoader: () => getCachedMapResourceLoaderState(this.aiProfilesResource, () => CachedMapAllKey),
       isHidden: () => !this.isAvailable(),

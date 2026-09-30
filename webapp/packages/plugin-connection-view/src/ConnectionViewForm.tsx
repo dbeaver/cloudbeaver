@@ -30,27 +30,25 @@ export const ConnectionViewForm = observer<ConnectionFormContainerProps>(functio
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
+    <div className="tw:flex tw:flex-col tw:gap-2">
       <GroupTitle>{translate('plugin_connection_view_default')}</GroupTitle>
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        <RadioGroup
-          name="conection_view"
-          aria-label={translate('plugin_connection_view_default')}
-          value={isSimple ? 'simple' : 'advanced'}
-          onChange={changeView}
-        >
-          <Radio value="simple" disabled={disabled} title={translate('plugin_connection_view_option_simple_description')} small keepSize>
-            {translate('plugin_connection_view_option_simple')}
-          </Radio>
-          <Radio value="advanced" disabled={disabled} title={translate('plugin_connection_view_option_advanced_description')} small keepSize>
-            {translate('plugin_connection_view_option_advanced')}
-          </Radio>
-        </RadioGroup>
+      <RadioGroup
+        name="conection_view"
+        aria-label={translate('plugin_connection_view_default')}
+        value={isSimple ? 'simple' : 'advanced'}
+        onChange={changeView}
+      >
+        <Radio value="simple" disabled={disabled} title={translate('plugin_connection_view_option_simple_description')} small keepSize>
+          {translate('plugin_connection_view_option_simple')}
+        </Radio>
+        <Radio value="advanced" disabled={disabled} title={translate('plugin_connection_view_option_advanced_description')} small keepSize>
+          {translate('plugin_connection_view_option_advanced')}
+        </Radio>
+      </RadioGroup>
 
-        <FieldCheckbox disabled={disabled} name="showSystemObjects" state={viewFormPart.state}>
-          {translate('plugin_connection_view_option_show_system_objects')}
-        </FieldCheckbox>
-      </div>
+      <FieldCheckbox disabled={disabled} name="showSystemObjects" state={viewFormPart.state}>
+        {translate('plugin_connection_view_option_show_system_objects')}
+      </FieldCheckbox>
     </div>
   );
 });

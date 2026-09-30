@@ -3,7 +3,7 @@ import type { IInnerRow } from './IInnerRow.js';
 import { CellContentRenderer } from './renderers/CellContentRenderer.js';
 
 export function mapCellContentRenderer(colIdx: number) {
-  return function RenderCell({ rowIdx }: RenderCellProps<IInnerRow, unknown>) {
-    return <CellContentRenderer rowIdx={rowIdx} colIdx={colIdx} />;
+  return function RenderCell({ rowIdx, tabIndex }: RenderCellProps<IInnerRow, unknown>) {
+    return <CellContentRenderer rowIdx={rowIdx} colIdx={colIdx} tabIndex={tabIndex} />;
   };
 }
