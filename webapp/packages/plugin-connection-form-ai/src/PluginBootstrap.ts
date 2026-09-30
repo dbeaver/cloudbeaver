@@ -85,7 +85,7 @@ export class PluginBootstrap extends Bootstrap {
       key: this.key,
       name: 'plugin_connection_form_ai_name',
       title: 'plugin_connection_form_ai_name',
-      icon: '/icons/plugin_connection_sparkles.svg',
+      icon: '/icons/core_blocks_sparkles.svg',
       order: 7,
       stateGetter: context => () => getConnectionAiPart(context.formState),
       getLoader: () => [getCachedDataResourceLoaderState(this.serverConfigResource, () => undefined)],

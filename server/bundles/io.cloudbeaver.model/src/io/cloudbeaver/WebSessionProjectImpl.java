@@ -302,7 +302,13 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         if (CommonUtils.isEmpty(configMap)) {
             throw new DBWebException("Connection configuration parameters are missing");
         }
-        DBPDataSourceContainer newDataSource = getDataSourceContainerFromInput(getConnectionConfigInput(configMap));
+        WebConnectionConfig config = getConnectionConfigInput(configMap);
+        DataSourceDescriptor newDataSource = getDataSourceContainerFromInput(config);
+        boolean hidden = Boolean.TRUE.equals(config.getHidden());
+        newDataSource.setHidden(hidden);
+        if (hidden) {
+            return addConnection(newDataSource);
+        }
         return addDataSourceToProject(newDataSource);
     }
 
@@ -333,15 +339,34 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         WebConnectionConfig config = getConnectionConfigInput(configMap);
         WebConnectionInfo connectionInfo = getWebConnectionInfo(config.getConnectionId());
         DataSourceDescriptor dataSource = (DataSourceDescriptor) connectionInfo.getDataSourceContainer();
+        if (Boolean.TRUE.equals(config.getHidden()) && !dataSource.isHidden()) {
+            throw new DBWebException("Visible connection '%s' cannot be hidden".formatted(dataSource.getId()));
+        }
         webSession.addInfoMessage("Update connection - " + WebDataSourceUtils.getConnectionContainerInfo(dataSource));
 
         DBPDataSourceRegistry registry = getDataSourceRegistry();
-        getInputConfigHandler(config).updateDataSource(dataSource);
-        connectionInfo.setCredentialsSavedInSession(null);
+        boolean wasHidden = dataSource.isHidden();
+        boolean publishDraft = false;
         try {
-            registry.updateDataSource(dataSource);
-            registry.checkForErrors();
+            getInputConfigHandler(config).updateDataSource(dataSource);
+            if (config.getHidden() != null) {
+                dataSource.setHidden(config.getHidden());
+            }
+            connectionInfo.setCredentialsSavedInSession(null);
+            publishDraft = wasHidden && !dataSource.isHidden();
+            if (publishDraft) {
+                registry.addDataSource(dataSource);
+            } else if (!wasHidden) {
+                registry.updateDataSource(dataSource);
+            }
+            if (publishDraft || !wasHidden) {
+                registry.checkForErrors();
+            }
         } catch (DBException e) {
+            if (publishDraft) {
+                registry.removeDataSource(dataSource);
+            }
+            dataSource.setHidden(wasHidden);
             throw new DBWebException("Failed to update connection", e);
         }
         return connectionInfo;
