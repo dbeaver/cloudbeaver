@@ -16,6 +16,8 @@ export default [
   ['sql_editor_tools_more_menu_tooltip', 'Больше инструментов'],
   ['sql_editor_output_logs_button_tooltip', 'Показать вывод сервера'],
   ['sql_editor_output_logs_tab_title', 'Вывод логов'],
+  ['sql_editor_output_logs_filter_tooltip', 'Фильтр логов вывода'],
+  ['sql_editor_output_logs_settings_tooltip', 'Настройки логов вывода'],
   ['sql_editor_output_logs_input_placeholder', 'Введите часть сообщения для поиска'],
   ['sql_editor_output_logs_wrap_mode', 'Перенос строк'],
   ['sql_editor_sql_execution_button_tooltip', 'Выполнить SQL Выражение'],

@@ -1,4 +1,6 @@
 export default [
+  ['plugin_navigation_tree_context_menu_title', 'Действия навигатора'],
+  ['plugin_navigation_tree_node_menu_title', 'Действия для {arg:name}'],
   ['plugin_navigation_tree_explorer_tab_title', 'Проводник'],
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_search', 'Искать элементы...'],
