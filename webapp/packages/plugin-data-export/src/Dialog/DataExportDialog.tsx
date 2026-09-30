@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import { ProcessorConfigureDialog } from './ProcessorConfigureDialog.js';
 import { ProcessorSelectDialog } from './ProcessorSelectDialog.js';
 import { useDataExportDialog } from './useDataExportDialog.js';
 
-export const DataExportDialog: DialogComponent<IExportContext> = observer(function DataExportDialog({ payload, rejectDialog }) {
+export const DataExportDialog: DialogComponent<IExportContext[]> = observer(function DataExportDialog({ payload, rejectDialog }) {
   useResource(DataExportDialog, DefaultExportOutputSettingsResource, undefined, { forceSuspense: true });
 
   const dialog = useDataExportDialog(payload, rejectDialog);
@@ -38,5 +38,5 @@ export const DataExportDialog: DialogComponent<IExportContext> = observer(functi
     );
   }
 
-  return <ProcessorSelectDialog context={payload} onSelect={dialog.selectProcessor} onClose={rejectDialog} />;
+  return <ProcessorSelectDialog contexts={payload} onSelect={dialog.selectProcessor} onClose={rejectDialog} />;
 });

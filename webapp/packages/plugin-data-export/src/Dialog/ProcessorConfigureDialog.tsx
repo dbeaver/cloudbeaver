@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,9 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
 
   return (
     <CommonDialogWrapper className={s(styles, { container: true })} size="large" fixedSize>
-      <CommonDialogHeader title={title} onReject={onClose} />
+      {/* while a batch export is running, closing would still leave the loop starting the remaining tasks, so keep the header
+      close action in sync with the footer buttons below, which are already disabled during export */}
+      <CommonDialogHeader title={title} onReject={isExporting ? undefined : onClose} />
       <CommonDialogBody noOverflow noBodyPadding>
         {!processor.isBinary ? (
           <TabsState currentTabId={currentTabId} onChange={handleTabChange}>

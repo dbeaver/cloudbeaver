@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ interface State {
   export(): Promise<void>;
 }
 
-export function useDataExportDialog(context: IExportContext, onExport?: () => void) {
+export function useDataExportDialog(contexts: IExportContext[], onExport?: () => void): State {
   const notificationService = useService(NotificationService);
   const localizationService = useService(LocalizationService);
   const dataExportService = useService(DataExportService);
@@ -86,27 +86,51 @@ export function useDataExportDialog(context: IExportContext, onExport?: () => vo
         }
       },
       async export() {
-        if (!this.processor || this.processing) {
+        const processor = this.processor;
+
+        if (!processor || this.processing) {
           return;
         }
 
         this.processing = true;
         this.exception = null;
 
+        // snapshot the configuration once: the forms behind this dialog stay editable while
+        // the batch runs, and every context must be exported with the same settings
+        const processorProperties = toJS(this.processorProperties);
+        const outputSettings = toJS(this.outputSettings);
+        const failures: Array<{ context: IExportContext; exception: any }> = [];
+
         try {
-          await this.dataExportService.exportData(this.context, {
-            processorId: this.processor.id,
-            processorProperties: this.processorProperties,
-            filter: this.context.filter,
-            outputSettings: {
-              ...this.outputSettings,
-              fileName: this.context.fileName,
-            },
-          });
+          // the server exports one container per task, so every selected object gets its own task and notification;
+          // one failure skips only its own object instead of cancelling the rest of the selection
+          for (const context of this.contexts) {
+            try {
+              await this.dataExportService.exportData(context, {
+                processorId: processor.id,
+                processorProperties,
+                filter: context.filter,
+                outputSettings: {
+                  ...outputSettings,
+                  fileName: context.fileName,
+                },
+              });
+            } catch (exception: any) {
+              failures.push({ context, exception });
+            }
+          }
+
+          if (failures.length === this.contexts.length) {
+            // nothing could be started: keep the dialog open and show the error there, same as a single-object export
+            this.exception = failures[0]?.exception ?? null;
+            return;
+          }
+
+          for (const failure of failures) {
+            this.notificationService.logException(failure.exception, failure.context.name ?? 'data_transfer_notification_error');
+          }
 
           this.onExport?.();
-        } catch (exception: any) {
-          this.exception = exception;
         } finally {
           this.processing = false;
         }
@@ -125,7 +149,7 @@ export function useDataExportDialog(context: IExportContext, onExport?: () => vo
       selectProcessor: action.bound,
     },
     {
-      context,
+      contexts,
       onExport,
       notificationService,
       dataExportService,
