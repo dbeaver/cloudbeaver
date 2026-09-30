@@ -6,17 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import {injectable} from '@cloudbeaver/core-di';
-import {NavNodeManagerService} from '@cloudbeaver/core-navigation-tree';
-import {schema} from '@cloudbeaver/core-utils';
-import {LocalizationService} from '@cloudbeaver/core-localization';
-import {LocalStorageSqlDataSource} from '@cloudbeaver/plugin-sql-editor';
-import {SqlEditorNavigatorService} from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { injectable } from '@cloudbeaver/core-di';
+import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import type { AiFunction } from '@cloudbeaver/core-sdk';
+import { schema } from '@cloudbeaver/core-utils';
+import { LocalizationService } from '@cloudbeaver/core-localization';
+import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
+import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
-import {AIFunctionsResource} from './AIFunctionsResource.js';
-import {AIChatContextService} from './AIChat/AIChatContext/AIChatContextService.js';
-import {AIChatConversationsService} from './AIChat/AIChatConversation/AIChatConversationsService.js';
-import {AIChatConversationsResource} from './AIChat/AIChatConversation/AIChatConversationsResource.js';
+import { AIFunctionsResource } from './AIFunctionsResource.js';
+import { AIChatContextService } from './AIChat/AIChatContext/AIChatContextService.js';
+import { AIChatConversationsService } from './AIChat/AIChatConversation/AIChatConversationsService.js';
+import { AIChatConversationsResource } from './AIChat/AIChatConversation/AIChatConversationsResource.js';
 
 const FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA = schema.object({
   objectName: schema.string(),
@@ -68,7 +69,7 @@ export class AIChatFunctionsService {
     private readonly aiChatConversationsResource: AIChatConversationsResource,
   ) {}
 
-  getFunction(id: string) {
+  getFunction(id: string): AiFunction | undefined {
     return this.aiFunctionsResource.data.find(func => func.id === getCanonicalAIFunctionId(id));
   }
 

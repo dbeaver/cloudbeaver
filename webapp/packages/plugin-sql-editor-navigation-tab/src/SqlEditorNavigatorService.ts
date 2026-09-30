@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import {ConnectionInfoResource, createConnectionParam, type IConnectionInfoParams} from '@cloudbeaver/core-connections';
-import {injectable} from '@cloudbeaver/core-di';
-import {NotificationService} from '@cloudbeaver/core-events';
-import {Executor, type IExecutionContextProvider, type IExecutor} from '@cloudbeaver/core-executor';
-import {NavigationService} from '@cloudbeaver/core-ui';
-import {uuid} from '@cloudbeaver/core-utils';
-import {type ITab, NavigationTabsService} from '@cloudbeaver/plugin-navigation-tabs';
+import { ConnectionInfoResource, createConnectionParam, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { injectable } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { Executor, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
+import { NavigationService } from '@cloudbeaver/core-ui';
+import { uuid } from '@cloudbeaver/core-utils';
+import { type ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
   ESqlDataSourceFeatures,
   type ISqlEditorTabState,
@@ -21,9 +21,9 @@ import {
   SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 
-import {isSQLEditorTab} from './isSQLEditorTab.js';
-import {SQL_EDITOR_SOURCE_ACTION} from './SQL_EDITOR_SOURCE_ACTION.js';
-import {SqlEditorTabService} from './SqlEditorTabService.js';
+import { isSQLEditorTab } from './isSQLEditorTab.js';
+import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION.js';
+import { SqlEditorTabService } from './SqlEditorTabService.js';
 
 enum SQLEditorNavigationAction {
   create,
@@ -31,7 +31,7 @@ enum SQLEditorNavigationAction {
   close,
 }
 
-export interface SQLEditorActionContext {
+export interface ISQLEditorActionContext {
   type: SQLEditorNavigationAction;
 }
 
@@ -47,11 +47,11 @@ export interface ISQLEditorOptions {
   metadata?: Record<string, any>;
 }
 
-export interface SQLCreateAction extends SQLEditorActionContext, ISQLEditorOptions {
+export interface ISQLCreateAction extends ISQLEditorActionContext, ISQLEditorOptions {
   type: SQLEditorNavigationAction.create;
 }
 
-export interface SQLEditorAction extends SQLEditorActionContext {
+export interface ISQLEditorAction extends ISQLEditorActionContext {
   type: SQLEditorNavigationAction.close | SQLEditorNavigationAction.select;
 
   editorId: string;
@@ -69,7 +69,7 @@ export interface SQLEditorAction extends SQLEditorActionContext {
   SqlQueryService,
 ])
 export class SqlEditorNavigatorService {
-  private readonly navigator: IExecutor<SQLCreateAction | SQLEditorAction>;
+  private readonly navigator: IExecutor<ISQLCreateAction | ISQLEditorAction>;
 
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
@@ -81,12 +81,12 @@ export class SqlEditorNavigatorService {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlQueryService: SqlQueryService,
   ) {
-    this.navigator = new Executor<SQLCreateAction | SQLEditorAction>(null, (active, current) => active.type === current.type)
+    this.navigator = new Executor<ISQLCreateAction | ISQLEditorAction>(null, (active, current) => active.type === current.type)
       .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
   }
 
-  async openNewEditor(options: ISQLEditorOptions) {
+  async openNewEditor(options: ISQLEditorOptions): Promise<IExecutionContextProvider<ISQLCreateAction | ISQLEditorAction>> {
     return await this.navigator.execute({
       type: SQLEditorNavigationAction.create,
       ...options,
@@ -105,10 +105,7 @@ export class SqlEditorNavigatorService {
         if (
           connectionKey &&
           (!executionContext ||
-            !this.connectionInfoResource.isKeyEqual(
-              createConnectionParam(executionContext.projectId, executionContext.connectionId),
-              connectionKey,
-            ))
+            !this.connectionInfoResource.isKeyEqual(createConnectionParam(executionContext.projectId, executionContext.connectionId), connectionKey))
         ) {
           continue;
         }
@@ -155,7 +152,7 @@ export class SqlEditorNavigatorService {
     await this.sqlQueryService.executeQueries(currentTab.handlerState, queries);
   }
 
-  private async navigateHandler(data: SQLCreateAction | SQLEditorAction, contexts: IExecutionContextProvider<SQLCreateAction | SQLEditorAction>) {
+  private async navigateHandler(data: ISQLCreateAction | ISQLEditorAction, contexts: IExecutionContextProvider<ISQLCreateAction | ISQLEditorAction>) {
     try {
       const tabInfo = contexts.getContext(this.navigationTabsService.navigationTabContext);
 
