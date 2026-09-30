@@ -20,7 +20,17 @@
     <properties>
         <!--        <debugArgs>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:15001,suspend=y</debugArgs>-->
         <debugArgs></debugArgs>
+        <cloudbeaver.test.suite>io.cloudbeaver.test.platform.CEServerTestSuite</cloudbeaver.test.suite>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>ce-postgres-datasource-tests</id>
+            <properties>
+                <cloudbeaver.test.suite>io.cloudbeaver.test.platform.postgresql.PostgreSQLDataSourceTestSuite</cloudbeaver.test.suite>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -59,7 +69,7 @@
                     <product>io.cloudbeaver.product.ce.product</product>
                     <testRuntime>default</testRuntime>
                     <providerHint>junit6</providerHint>
-                    <testClass>io.cloudbeaver.test.platform.CEServerTestSuite</testClass>
+                    <testClass>${cloudbeaver.test.suite}</testClass>
                     <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
                     <environmentVariables>
                         <CLOUDBEAVER_WORKSPACE_LOCATION>target/workspace</CLOUDBEAVER_WORKSPACE_LOCATION>
