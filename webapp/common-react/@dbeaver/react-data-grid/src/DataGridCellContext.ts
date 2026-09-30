@@ -13,7 +13,7 @@ export interface IDataGridCellProps extends React.DetailedHTMLProps<React.HTMLAt
   isFocused: boolean;
 }
 
-export interface IDataGridCellRenderer { 
+export interface IDataGridCellRenderer {
   (propsOverride: Partial<IDataGridCellProps> & { [key: string]: any }): React.ReactNode;
 }
 
@@ -28,7 +28,7 @@ export interface IDataGridCellContext {
     React.ReactNode,
     [rowIdx: number, colIdx: number, props: IDataGridCellProps, renderDefaultCell: IDataGridCellRenderer]
   >;
-  cell?: IGridReactiveValue<React.ReactNode, [rowIdx: number, colIdx: number]>;
+  cell?: IGridReactiveValue<React.ReactNode, [rowIdx: number, colIdx: number, tabIndex: number]>;
   cellText?: IGridReactiveValue<string, [rowIdx: number, colIdx: number]>;
   cellTooltip?: IGridReactiveValue<string, [rowIdx: number, colIdx: number]>;
   getCellClassName?: IGridReactiveValue<string | undefined, [rowIdx: number, colIdx: number]>;

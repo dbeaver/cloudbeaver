@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebConnectionConfigInputHandler;
 import io.cloudbeaver.WebSessionProjectImpl;
+import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -37,6 +39,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Map;
 
 public class WebSessionProjectTest extends CloudbeaverMockTest {
     @Mock
@@ -310,6 +313,103 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         Assertions.assertNotNull(connections);
         Assertions.assertEquals(1, connections.size());
         Assertions.assertEquals("ds1", project.getConnections().getFirst().getDataSourceContainer().getId());
+    }
+
+    @Test
+    public void testCreateHiddenConnectionDoesNotAddItToRegistry() throws Exception {
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        Mockito.when(dataSource.getId()).thenReturn("draft");
+
+        WebSessionProjectImpl project = createProject(registry, dataSource, null);
+        project.createConnection(Map.of("driverId", "test-driver", "hidden", true));
+
+        Mockito.verify(dataSource).setHidden(true);
+        Mockito.verify(registry, Mockito.never()).addDataSource(Mockito.any());
+        Assertions.assertSame(dataSource, project.findWebConnectionInfo("draft").getDataSourceContainer());
+    }
+
+    @Test
+    public void testUpdateHiddenConnectionUnhidesBeforeRegistryAdd() throws Exception {
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        WebConnectionConfigInputHandler inputHandler = Mockito.mock(WebConnectionConfigInputHandler.class);
+        Mockito.when(dataSource.getId()).thenReturn("draft");
+        Mockito.when(dataSource.isHidden()).thenReturn(true, false);
+
+        WebSessionProjectImpl project = createProject(registry, dataSource, inputHandler);
+        project.addConnection(dataSource);
+        project.updateConnection(Map.of("connectionId", "draft", "hidden", false));
+
+        var order = Mockito.inOrder(inputHandler, dataSource, registry);
+        order.verify(inputHandler).updateDataSource(dataSource);
+        order.verify(dataSource).setHidden(false);
+        order.verify(registry).addDataSource(dataSource);
+    }
+
+    @Test
+    public void testUpdateHiddenConnectionDoesNotTouchRegistry() throws Exception {
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        WebConnectionConfigInputHandler inputHandler = Mockito.mock(WebConnectionConfigInputHandler.class);
+        Mockito.when(dataSource.getId()).thenReturn("draft");
+        Mockito.when(dataSource.isHidden()).thenReturn(true);
+
+        WebSessionProjectImpl project = createProject(registry, dataSource, inputHandler);
+        project.addConnection(dataSource);
+        project.updateConnection(Map.of("connectionId", "draft", "hidden", true));
+
+        Mockito.verify(inputHandler).updateDataSource(dataSource);
+        Mockito.verify(registry, Mockito.never()).addDataSource(Mockito.any());
+        Mockito.verify(registry, Mockito.never()).updateDataSource(Mockito.any());
+        Mockito.verify(registry, Mockito.never()).checkForErrors();
+    }
+
+    @Test
+    public void testVisibleConnectionCannotBeHidden() throws Exception {
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        WebConnectionConfigInputHandler inputHandler = Mockito.mock(WebConnectionConfigInputHandler.class);
+        Mockito.when(dataSource.getId()).thenReturn("visible");
+
+        WebSessionProjectImpl project = createProject(registry, dataSource, inputHandler);
+        project.addConnection(dataSource);
+
+        DBWebException exception = Assertions.assertThrows(
+            DBWebException.class,
+            () -> project.updateConnection(Map.of("connectionId", "visible", "hidden", true))
+        );
+        Assertions.assertTrue(exception.getMessage().contains("visible"));
+        Mockito.verify(inputHandler, Mockito.never()).updateDataSource(Mockito.any());
+        Mockito.verify(registry, Mockito.never()).updateDataSource(Mockito.any());
+        Mockito.verify(dataSource, Mockito.never()).setHidden(true);
+    }
+
+    @NotNull
+    private WebSessionProjectImpl createProject(
+        @NotNull DBPDataSourceRegistry registry,
+        @NotNull DataSourceDescriptor dataSource,
+        WebConnectionConfigInputHandler inputHandler
+    ) {
+        return new WebSessionProjectImpl(webSession, rmProject) {
+            @NotNull
+            @Override
+            public DBPDataSourceRegistry getDataSourceRegistry() {
+                return registry;
+            }
+
+            @NotNull
+            @Override
+            public DataSourceDescriptor getDataSourceContainerFromInput(@NotNull WebConnectionConfig configInput) {
+                return dataSource;
+            }
+
+            @NotNull
+            @Override
+            protected WebConnectionConfigInputHandler getInputConfigHandler(@NotNull WebConnectionConfig configInput) {
+                return inputHandler == null ? super.getInputConfigHandler(configInput) : inputHandler;
+            }
+        };
     }
 
 }
