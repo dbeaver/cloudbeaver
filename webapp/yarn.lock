@@ -13065,7 +13065,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-uri@npm:^4.1.5":
+"fast-uri@npm:>=4.1.5":
   version: 4.2.1
   resolution: "fast-uri@npm:4.2.1"
   checksum: 10c0/a6ecc2d8a2ed340e3e8895e8d201a54454bf29141539c784cbc2a9aa6be274e74eb032ab2f09c7136f096cacd5b7af601ef0c5fd86f2492faebb9b64502d9410
@@ -14782,7 +14782,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:~5.4.2":
+"js-yaml@npm:>=5.4.2":
   version: 5.4.2
   resolution: "js-yaml@npm:5.4.2"
   dependencies:
@@ -17224,7 +17224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-selector-parser@npm:~7.1.3":
+"postcss-selector-parser@npm:>=7.1.3":
   version: 7.1.6
   resolution: "postcss-selector-parser@npm:7.1.6"
   dependencies:
@@ -20230,7 +20230,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:~4.1.11":
+"vitest@npm:>=4.1.11":
   version: 4.1.11
   resolution: "vitest@npm:4.1.11"
   dependencies:
