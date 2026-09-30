@@ -46,37 +46,39 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   return (
     <section className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
       {isUncategorizedExists && (
-        <>
+        <section className="tw:flex tw:min-w-0 tw:flex-col tw:gap-2">
           <GroupTitle>{translate('ui_settings')}</GroupTitle>
-          {booleanProperties.length > 0 && (
-            <Container gap wrap dense>
-              <ObjectPropertyInfoForm
-                properties={booleanProperties}
-                state={config.providerProperties}
-                disabled={disabled}
-                readOnly={readonly}
-                maximum
-                hideEmptyPlaceholder
-              />
-            </Container>
-          )}
-          {nonBooleanProperties.length > 0 && (
-            <Container wrap gap>
-              <ObjectPropertyInfoForm
-                properties={nonBooleanProperties}
-                state={config.providerProperties}
-                disabled={disabled}
-                readOnly={readonly}
-                tiny
-                hideEmptyPlaceholder
-              />
-            </Container>
-          )}
-        </>
+          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
+            {booleanProperties.length > 0 && (
+              <Container gap wrap dense>
+                <ObjectPropertyInfoForm
+                  properties={booleanProperties}
+                  state={config.providerProperties}
+                  disabled={disabled}
+                  readOnly={readonly}
+                  maximum
+                  hideEmptyPlaceholder
+                />
+              </Container>
+            )}
+            {nonBooleanProperties.length > 0 && (
+              <Container wrap gap>
+                <ObjectPropertyInfoForm
+                  properties={nonBooleanProperties}
+                  state={config.providerProperties}
+                  disabled={disabled}
+                  readOnly={readonly}
+                  tiny
+                  hideEmptyPlaceholder
+                />
+              </Container>
+            )}
+          </div>
+        </section>
       )}
 
       {categories.map(category => (
-        <Container key={`${category}_${config.driverId}`} gap>
+        <Container key={`${category}_${config.driverId}`} gap dense>
           <GroupTitle>{category}</GroupTitle>
           <Container dense={isOnlyBooleans(supportedProperties, category)} wrap gap>
             <ObjectPropertyInfoForm

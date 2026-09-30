@@ -25,7 +25,7 @@ export class ConnectionDetailsTabService extends Bootstrap {
       key: 'connection_details',
       name: 'plugin_connections_connection_form_connection_details',
       title: 'plugin_connections_connection_form_connection_details',
-      icon: '/icons/plugin_connection_key.svg',
+      icon: '/icons/core_blocks_key.svg',
       order: 8,
       tab: () => ConnectionDetailsTab,
       panel: () => ConnectionDetails,
