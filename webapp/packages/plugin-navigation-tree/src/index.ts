@@ -88,6 +88,7 @@ export * from './TreeNew/useTreeMenu.js';
 export type { ITreeDnD } from './TreeNew/useTreeDnD.js';
 export type { INodeDnD } from './TreeNew/useNodeDnD.js';
 export { useTreeDnD } from './TreeNew/useTreeDnD.js';
+export { useElementsTreeLimit } from './NavigationTree/ElementsTree/useElementsTreeLimit.js';
 
 export * from './NodesManager/NodeLinkLoader.js';
 
