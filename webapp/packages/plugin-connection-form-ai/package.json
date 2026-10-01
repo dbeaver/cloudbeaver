@@ -36,7 +36,7 @@
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",
-    "@cloudbeaver/core-utils": "workspace:*",
+    "@cloudbeaver/plugin-ai": "workspace:*",
     "@cloudbeaver/plugin-ai-chat": "workspace:*",
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "@cloudbeaver/plugin-connections": "workspace:*",

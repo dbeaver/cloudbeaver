@@ -9,6 +9,7 @@
 import { Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 
 import { AiEnginesResource } from './AiEnginesResource.js';
+import { AIDataSourceSettingsResource } from './AIDataSourceSettingsResource.js';
 import { AISettingsResource } from './AISettingsResource.js';
 
 export default ModuleRegistry.add({
@@ -17,8 +18,10 @@ export default ModuleRegistry.add({
   configure: serviceCollection => {
     serviceCollection
       .addSingleton(Dependency, proxy(AiEnginesResource))
+      .addSingleton(Dependency, proxy(AIDataSourceSettingsResource))
       .addSingleton(Dependency, proxy(AISettingsResource))
       .addSingleton(AiEnginesResource)
+      .addSingleton(AIDataSourceSettingsResource)
       .addSingleton(AISettingsResource);
   },
 });

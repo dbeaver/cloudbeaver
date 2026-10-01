@@ -21,10 +21,13 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
+    "@cloudbeaver/core-connections": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
+    "@cloudbeaver/core-utils": "workspace:*",
+    "mobx": "^6",
     "tslib": "^2"
   },
   "devDependencies": {

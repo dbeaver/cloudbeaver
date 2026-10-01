@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export {
-  type AIDataSourceSettings as ConnectionInfoAiSettings,
-  AIDataSourceSettingsResource as ConnectionInfoAiResource,
-} from '@cloudbeaver/plugin-ai';
+export function isAINodeExcluded(nodeId: string, excludedNodeIds: readonly string[]): boolean {
+  return excludedNodeIds.some(excludedNodeId => nodeId === excludedNodeId || nodeId.startsWith(`${excludedNodeId}/`));
+}

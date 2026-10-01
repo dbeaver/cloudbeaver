@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { PluginBootstrap } from './PluginBootstrap.js';
-import { ConnectionInfoAiResource } from './ConnectionInfoAiResource.js';
 import { LocaleService } from './LocaleService.js';
 import { ConnectionFormAiService } from './ConnectionFormAiService.js';
 
@@ -19,8 +18,6 @@ export default ModuleRegistry.add({
     serviceCollection
       .addSingleton(Bootstrap, PluginBootstrap)
       .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Dependency, proxy(ConnectionInfoAiResource))
-      .addSingleton(ConnectionInfoAiResource)
       .addSingleton(ConnectionFormAiService);
   },
 });
