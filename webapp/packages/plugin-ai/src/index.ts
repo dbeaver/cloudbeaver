@@ -9,5 +9,4 @@
 import './module.js';
 
 export * from './AiEnginesResource.js';
-export * from './AIDataSourceSettingsResource.js';
 export * from './AISettingsResource.js';

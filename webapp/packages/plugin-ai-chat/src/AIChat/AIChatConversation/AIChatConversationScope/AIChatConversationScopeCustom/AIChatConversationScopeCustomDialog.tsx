@@ -34,10 +34,8 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AIDataSourceSettingsResource } from '@cloudbeaver/plugin-ai';
 
 import { AIChatConversationScopeCustomNodeControl } from './AIChatConversationScopeCustomNodeControl.js';
-import { isAINodeExcluded } from './isAINodeExcluded.js';
 
 interface IDialogPayload {
   connectionKey: IConnectionInfoParams;
@@ -56,14 +54,11 @@ export const AIChatConversationScopeCustomDialog: DialogComponent<IDialogPayload
 
   const key = payload.connectionKey;
   const connectionInfoResource = useResource(AIChatConversationScopeCustomDialog, ConnectionInfoResource, key);
-  const aiDataSourceSettingsResource = useResource(AIChatConversationScopeCustomDialog, AIDataSourceSettingsResource, key);
   const root = connectionInfoResource.data?.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.projectId, key.connectionId);
-  const excludedNodeIds = aiDataSourceSettingsResource.data?.excludedObjectIds ?? [];
-  const availableNodes = payload.nodes.filter(nodeId => !isAINodeExcluded(nodeId, excludedNodeIds));
 
   const parents = new Set<string>();
 
-  for (const nodeId of availableNodes) {
+  for (const nodeId of payload.nodes) {
     const parent = navNodeInfoResource.getParent(nodeId);
 
     if (parent && parents.has(parent)) {
@@ -78,7 +73,7 @@ export const AIChatConversationScopeCustomDialog: DialogComponent<IDialogPayload
   }
 
   const treeState = new MetadataMap<string, ITreeNodeState>(nodeId => {
-    const selected = availableNodes.includes(nodeId);
+    const selected = payload.nodes.includes(nodeId);
     const expanded = parents.has(nodeId) || nodeId === root;
 
     return {
@@ -115,8 +110,7 @@ export const AIChatConversationScopeCustomDialog: DialogComponent<IDialogPayload
         leaf: isLeaf(navNode),
       };
     },
-    getChildren: (nodeId: string) =>
-      (navigationTreeService.getChildren(nodeId) || []).filter(nodeId => !isAINodeExcluded(nodeId, excludedNodeIds)),
+    getChildren: (nodeId: string) => navigationTreeService.getChildren(nodeId) || [],
     getParent: (nodeId: string) => navNodeInfoResource.getParent(nodeId) || null,
     load: async (id: string): Promise<void> => {
       try {
@@ -132,7 +126,7 @@ export const AIChatConversationScopeCustomDialog: DialogComponent<IDialogPayload
     const result = [];
 
     for (const [node, selection] of treeState.entries()) {
-      if (selection.selected && !isAINodeExcluded(node, excludedNodeIds)) {
+      if (selection.selected) {
         result.push(node);
       }
     }

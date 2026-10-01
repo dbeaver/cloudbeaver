@@ -15,9 +15,6 @@
       "path": "../core-cli"
     },
     {
-      "path": "../core-connections"
-    },
-    {
       "path": "../core-di"
     },
     {
@@ -28,9 +25,6 @@
     },
     {
       "path": "../core-sdk"
-    },
-    {
-      "path": "../core-utils"
     }
   ],
   "include": [

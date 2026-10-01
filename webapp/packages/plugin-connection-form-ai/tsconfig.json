@@ -56,7 +56,7 @@
       "path": "../core-ui"
     },
     {
-      "path": "../plugin-ai"
+      "path": "../core-utils"
     },
     {
       "path": "../plugin-ai-chat"
