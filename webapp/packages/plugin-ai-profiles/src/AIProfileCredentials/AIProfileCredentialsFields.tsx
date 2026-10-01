@@ -17,6 +17,9 @@ import {
   ConfirmationDialog,
   Container,
   InputField,
+  Loader,
+  Radio,
+  RadioGroup,
   SAVED_VALUE_INDICATOR,
   useClipboard,
   useExecutor,
@@ -32,7 +35,6 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import type { AiDeviceAuthorizationInfo } from '@cloudbeaver/core-sdk';
 import { getFirstException } from '@cloudbeaver/core-utils';
-import { Radio, RadioGroup } from '@dbeaver/ui-kit';
 
 import { AIProfilesResource, type IAIProfileCredentialsState } from '../AIProfilesResource.js';
 import { AIProfileCredentialsService } from './AIProfileCredentialsService.js';
@@ -84,7 +86,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
   const profile = profiles.data;
   const taskState = usePromiseState(data.task);
   const exception = taskState.isCancelled?.() ? null : getFirstException(taskState.exception);
-  const [accountStatusRef, accountStatusFocus] = useFocus<HTMLParagraphElement>({});
+  const [accountStatusRef, accountStatusFocus] = useFocus<HTMLDivElement>({});
   const blocked = disabled || taskState.isLoading() || profiles.isOutdated();
   const [connectRef] = useFocus<HTMLDivElement>({ focusFirstChild: !!exception && !blocked });
 
@@ -106,6 +108,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
       if ((await task) && !task.cancelled) {
         accountStatusFocus.reference?.focus();
         onCredentialsChanged(true);
+        notifications.logSuccess({ title: 'plugin_ai_account_connected', message: profile?.name });
         onAuthorized?.();
       }
     } catch (error: any) {
@@ -147,21 +150,20 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
     return null;
   }
 
-  const connectionStatus = taskState.isLoading() ? 'plugin_ai_device_waiting' : 'plugin_ai_account_not_connected';
-
   return (
     <Container vertical gap>
       {!!profile.accountProvider && (
         <RadioGroup
+          name={name}
           label={translate('plugin_ai_credentials_method')}
           value={state.accountAuthentication ? 'subscription' : 'token'}
-          setValue={value => onChange({ ...state, accountAuthentication: value === 'subscription' })}
+          onChange={value => onChange({ ...state, accountAuthentication: value === 'subscription' })}
         >
-          <Radio name={name} value="token" disabled={blocked}>
+          <Radio name={name} value="token" disabled={blocked} keepSize>
             {translate('plugin_ai_credentials_token')}
           </Radio>
-          <Radio name={name} value="subscription" disabled={blocked}>
-            {translate('plugin_ai_credentials_subscription')}
+          <Radio name={name} value="subscription" disabled={blocked} keepSize>
+            {translate('plugin_ai_credentials_account', undefined, { provider: profile.accountProvider })}
           </Radio>
         </RadioGroup>
       )}
@@ -190,11 +192,18 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
         </>
       ) : (
         <>
-          <p>{translate('plugin_ai_account_description', undefined, { provider: profile.accountProvider ?? '' })}</p>
-          <p ref={accountStatusRef} role="status" tabIndex={-1}>
-            {translate(profile.account ? 'plugin_ai_account_connected' : connectionStatus)}
-            {profile.account?.email ? `: ${profile.account.email}` : ''}
-          </p>
+          {(profile.account || taskState.isLoading()) && (
+            <div ref={accountStatusRef} role="status" tabIndex={-1}>
+              {profile.account ? (
+                <>
+                  {translate('plugin_ai_account_connected')}
+                  {profile.account.email ? `: ${profile.account.email}` : ''}
+                </>
+              ) : (
+                <Loader message="plugin_ai_device_waiting" hideMessage={false} inline small />
+              )}
+            </div>
+          )}
           {profile.account ? (
             <div>
               <Button type="button" variant="secondary" disabled={blocked} onClick={() => removeCredentials(true)}>
@@ -205,14 +214,9 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
             <>
               {data.authorization && (
                 <>
-                  <InputField value={data.authorization.userCode} readOnly autoFocus>
+                  <InputField value={data.authorization.userCode} readOnly autoFocus onCustomCopy={() => copy(data.authorization!.userCode, true)}>
                     {translate('plugin_ai_device_code')}
                   </InputField>
-                  <div>
-                    <Button type="button" variant="secondary" onClick={() => copy(data.authorization!.userCode, true)}>
-                      {translate('plugin_ai_device_copy_code')}
-                    </Button>
-                  </div>
                   <a href={data.authorization.verificationUri} target="_blank" rel="noopener noreferrer">
                     {translate('plugin_ai_device_open_provider', undefined, { provider: profile.accountProvider ?? '' })}
                   </a>
