@@ -23,7 +23,7 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.service.ai.WebAIDeviceAuthorizationProcessor;
+import io.cloudbeaver.service.ai.WebAIDeviceAuthorizationService;
 import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.*;
@@ -43,7 +43,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.ai.*;
 import org.jkiss.dbeaver.model.ai.engine.*;
-import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
 import org.jkiss.dbeaver.model.ai.internal.AIChatMessages;
 import org.jkiss.dbeaver.model.ai.prompt.AIPromptGenerateSql;
 import org.jkiss.dbeaver.model.ai.registry.*;
@@ -645,52 +644,7 @@ public class WebServiceAI implements DBWServiceAI {
         WebAIUtils.validateAiPluginEnabled();
         try {
             AIConfigurationProfile profile = getUserAccountProfile(webSession, profileId);
-            String userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
-            AIAccountProperties properties = WebAIProfileUtils.createAccountAuthenticationProperties(profile);
-            AIAccountAuthenticator authenticator = properties.createAccountAuthenticator();
-            String providerName = properties.getAccountAuthenticationProviderName();
-            String taskName = providerName + " account authorization";
-            WebAsyncTaskInfo taskInfo = webSession.createAsyncTask(taskName);
-            boolean taskStarted = false;
-            try {
-                WebAIProfileUtils.registerDeviceAuthorizationAttempt(
-                    webSession,
-                    profile,
-                    userId,
-                    taskInfo.getId(),
-                    taskName
-                );
-                AIAccountAuthenticator.DeviceAuthorization authorization = authenticator.startDeviceAuthorization();
-                WebAIProfileUtils.validateDeviceAuthorizationAttempt(
-                    webSession,
-                    profile,
-                    userId,
-                    taskInfo.getId()
-                );
-                webSession.runAsyncTask(
-                    taskInfo,
-                    new WebAIDeviceAuthorizationProcessor(
-                        webSession,
-                        profile,
-                        authenticator,
-                        authorization,
-                        taskInfo.getId(),
-                        providerName
-                    )
-                );
-                taskStarted = true;
-                return new WebAIDeviceAuthorizationInfo(authorization, taskInfo);
-            } finally {
-                if (!taskStarted) {
-                    WebAIProfileUtils.discardDeviceAuthorizationAttempt(
-                        webSession,
-                        profile,
-                        userId,
-                        taskInfo.getId(),
-                        taskName
-                    );
-                }
-            }
+            return WebAIDeviceAuthorizationService.startAuthorization(webSession, profile);
         } catch (DBException e) {
             throw new DBWebException("Error starting AI account authorization", e);
         }

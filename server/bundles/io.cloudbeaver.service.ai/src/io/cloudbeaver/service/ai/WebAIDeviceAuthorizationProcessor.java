@@ -102,7 +102,7 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
     }
 
     private boolean isCurrentAttempt() {
-        return WebAIProfileUtils.isCurrentDeviceAuthorizationAttempt(
+        return WebAIDeviceAuthorizationManager.isCurrentAttempt(
             webSession,
             userId,
             profile.getProfileId(),
@@ -115,6 +115,6 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
     }
 
     private void clearAttempt() {
-        WebAIProfileUtils.clearDeviceAuthorizationAttempt(webSession, userId, profile.getProfileId(), taskId);
+        WebAIDeviceAuthorizationManager.clearAttempt(webSession, userId, profile.getProfileId(), taskId);
     }
 }

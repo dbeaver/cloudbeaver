@@ -346,6 +346,28 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
     }
 
     @Test
+    public void deviceAuthorizationServiceRejectsUnauthorizedSession() {
+        Mockito.when(webSession.isAuthorizedInSecurityManager()).thenReturn(false);
+
+        Assertions.assertThrows(
+            DBException.class,
+            () -> WebAIDeviceAuthorizationService.startAuthorization(webSession, profile)
+        );
+        Mockito.verify(webSession, Mockito.never()).createAsyncTask(Mockito.anyString());
+    }
+
+    @Test
+    public void deviceAuthorizationServiceRejectsGlobalProfile() {
+        Mockito.when(profile.isGlobal()).thenReturn(true);
+
+        Assertions.assertThrows(
+            DBException.class,
+            () -> WebAIDeviceAuthorizationService.startAuthorization(webSession, profile)
+        );
+        Mockito.verify(webSession, Mockito.never()).createAsyncTask(Mockito.anyString());
+    }
+
+    @Test
     public void deviceAuthorizationSelectsAccountAndKeepsApiToken() throws DBException {
         WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "api-token"));
 
