@@ -42,8 +42,10 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:*",
     "rimraf": "^6",
     "typescript": "^5",
-    "vite": "^7"
+    "vite": "^7",
+    "vitest": "^4"
   }
 }
