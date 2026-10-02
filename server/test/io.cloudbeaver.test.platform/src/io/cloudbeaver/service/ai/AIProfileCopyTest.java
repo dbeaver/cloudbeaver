@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class AIProfileCopyTest extends CloudbeaverMockTest {
     private static final String GQL_CREATE_PROFILE = """
@@ -89,7 +90,6 @@ public class AIProfileCopyTest extends CloudbeaverMockTest {
             createProfile(adminClient, sourceId, profileName, true, token);
             AISettings settings = AISettingsManager.getInstance().getSettings();
             AIConfigurationProfile source = settings.getConfiguration(sourceId);
-            String expectedId = settings.generateProfileId(source.getEngineDescriptor());
             String expectedName = settings.generateProfileName(profileName);
             AIConfigurationProfile defaultProfile = settings.getDefaultConfigurationOrNull();
             String defaultProfileId = defaultProfile == null ? null : defaultProfile.getProfileId();
@@ -97,7 +97,8 @@ public class AIProfileCopyTest extends CloudbeaverMockTest {
             Map<String, Object> copied = copyProfile(adminClient, sourceId);
             targetId = (String) copied.get("id");
 
-            Assertions.assertEquals(expectedId, targetId);
+            Assertions.assertNotEquals(sourceId, targetId);
+            Assertions.assertEquals(targetId, UUID.fromString(targetId).toString());
             Assertions.assertEquals(expectedName, copied.get("name"));
             Assertions.assertEquals(OpenAIConstants.OPENAI_ENGINE, copied.get("engineId"));
             Assertions.assertEquals(Boolean.TRUE, copied.get("global"));

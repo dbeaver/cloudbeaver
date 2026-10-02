@@ -580,7 +580,11 @@ public class WebServiceAI implements DBWServiceAI {
         try {
             AISettings settings = AISettingsManager.getInstance().getSettings();
             AIConfigurationProfile sourceProfile = settings.getConfiguration(profileId);
-            AIConfigurationProfile newProfile = settings.copyConfiguration(sourceProfile);
+            AIConfigurationProfile newProfile = settings.copyConfiguration(
+                sourceProfile,
+                UUID.randomUUID().toString(),
+                settings.generateProfileName(sourceProfile.getProfileName())
+            );
             WebAIProfileUtils.prepareGlobalProfile(webSession, newProfile);
             AISettingsManager.getInstance().saveSettings();
             addAISettingsChangedEvent(webSession);
