@@ -59,7 +59,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
       if (id === 'global') {
         return false;
       }
-      if (id === 'token') {
+      if (id === 'token' || id === 'authentication') {
         return !usesUserCredentials;
       }
       return true;
@@ -168,6 +168,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     part.state.properties['global'] = global;
     if (!global) {
       part.state.properties['token'] = null;
+      delete part.state.properties['authentication'];
     }
   }
 

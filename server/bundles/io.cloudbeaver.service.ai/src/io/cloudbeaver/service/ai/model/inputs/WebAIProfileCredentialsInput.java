@@ -17,8 +17,12 @@
 package io.cloudbeaver.service.ai.model.inputs;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.util.Map;
 
-public record WebAIProfileCredentialsInput(@NotNull Map<String, Object> properties) {
+public record WebAIProfileCredentialsInput(
+    @NotNull Map<String, Object> properties,
+    @Nullable Boolean accountAuthentication
+) {
 }

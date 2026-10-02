@@ -31,6 +31,8 @@ type WSAIChatMessageErrorEvent implements CBServerEvent @since(version: "25.1.1"
     conversationId: ID!
     messageId: ID!
     errorMessage: String
+    "Machine-readable error code, matching AIMessage.errorCode and ServerError.errorCode."
+    errorCode: String @since(version: "26.2.0")
 }
 
 type WSAIChatMessageEvent implements CBServerEvent @since(version: "25.3.5") {
@@ -40,6 +42,8 @@ type WSAIChatMessageEvent implements CBServerEvent @since(version: "25.3.5") {
     messageId: ID!
     role: String!
     content: String!
+    "Machine-readable error code for ERROR messages, matching AIMessage.errorCode."
+    errorCode: String @since(version: "26.2.0")
     displayMessage: String!
     time: String!
     "Present only with CONFIRMATION role"

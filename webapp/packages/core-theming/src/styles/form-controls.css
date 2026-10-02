@@ -13,7 +13,8 @@ textarea {
   min-height: 40px;
 }
 
-input {
+/* UI-kit radio inputs are visually hidden; text-field sizing must not override their 1px box. */
+input:not([type='radio']) {
   overflow: hidden;
   text-overflow: ellipsis;
   min-height: 24px;
@@ -36,7 +37,7 @@ input {
   }
 }
 
-input,
+input:not([type='radio']),
 textarea {
   --dbv-kit-input-placeholder-foreground: var(--theme-input-color-placeholder);
   box-sizing: border-box;

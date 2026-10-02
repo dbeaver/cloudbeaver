@@ -14,25 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.session;
+package io.cloudbeaver.service.ai.model;
 
-import org.jkiss.dbeaver.model.runtime.DBRRunnableWithResult;
+import org.jkiss.code.Nullable;
 
-/**
- * Async task processor
- */
-public abstract class WebAsyncTaskProcessor<TYPE> extends DBRRunnableWithResult<TYPE> {
-
-    protected Object extendedResults;
-
-    public Object getExtendedResults() {
-        return extendedResults;
-    }
-
-    public void setExtendedResults(Object extendedResults) {
-        this.extendedResults = extendedResults;
-    }
-
-    public void cancel() {
-    }
+public record WebAIAccountInfo(@Nullable String email) {
 }

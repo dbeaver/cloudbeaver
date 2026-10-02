@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 
 import {
   Button,
@@ -15,28 +14,29 @@ import {
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
-  ConfirmationDialog,
   Container,
   Fill,
   Form,
-  InputField,
-  SAVED_VALUE_INDICATOR,
-  useFocus,
+  StatusMessage,
   useForm,
-  useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult, type DialogComponent } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import type { IFormState } from '@cloudbeaver/core-ui';
+import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { AIProfilesResource } from '../AIProfilesResource.js';
+import { AIProfileCredentialsFields } from './AIProfileCredentialsFields.js';
+import { getAIProfileCredentialsFormParts } from './getAIProfileCredentialsFormParts.js';
+import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
 export interface IAIProfileCredentialsDialogPayload {
   profileId: string;
   profileName: string;
   engineName: string;
   engineIcon?: string;
+  formState: IFormState<IAIProfileCredentialsFormState>;
 }
 
 export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDialogPayload> = observer(function AIProfileCredentialsDialog({
@@ -45,107 +45,59 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   rejectDialog,
 }) {
   const translate = useTranslate();
-  const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
-  const aiProfilesResource = useResource(AIProfileCredentialsDialog, AIProfilesResource, payload.profileId);
-  const [tokenRef] = useFocus<HTMLInputElement>({ autofocus: true });
-  const [token, setToken] = useState('');
-  const [processing, setProcessing] = useState(false);
-  const credentialsSaved = aiProfilesResource.data?.credentialsSaved ?? false;
-  const form = useForm({ onSubmit: save });
+  const { formState } = payload;
+  const { token, subscription } = getAIProfileCredentialsFormParts(formState);
+  const selectedPart = token.accountAuthentication ? subscription : token;
+  const canComplete = !formState.isChanged && !!token.profile?.credentialsSaved && !selectedPart.credentialsMissing;
+  const saveDisabled = formState.isDisabled || !token.isLoaded() || token.isOutdated() || !token.profile || token.profile.global;
+  const form = useForm({
+    onSubmit: async function onSubmit() {
+      if (saveDisabled) {
+        return;
+      }
+      if (canComplete) {
+        resolveDialog();
+        return;
+      }
 
-  async function save(): Promise<void> {
-    if (processing || !token) {
-      return;
-    }
+      const saved = await formState.save();
+      const exception = getFirstException(formState.exception);
 
-    try {
-      setProcessing(true);
-      await aiProfilesResource.resource.saveCredentials(payload.profileId, token);
-
-      setToken('');
-      notificationService.logSuccess({
-        title: 'plugin_ai_credentials_saved',
-        message: payload.profileName,
-      });
-      resolveDialog();
-    } catch (exception: any) {
-      notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
-    } finally {
-      setProcessing(false);
-    }
-  }
-
-  async function resetCredentials(): Promise<void> {
-    const { status } = await commonDialogService.open(ConfirmationDialog, {
-      title: translate('plugin_ai_credentials_reset_title'),
-      message: 'plugin_ai_credentials_reset_confirmation',
-      confirmActionText: 'plugin_ai_credentials_reset',
-    });
-
-    if (status === DialogueStateResult.Resolved) {
-      try {
-        setProcessing(true);
-        await aiProfilesResource.resource.resetCredentials(payload.profileId);
-
-        setToken('');
+      if (saved) {
         notificationService.logSuccess({
-          title: 'plugin_ai_credentials_reset_success',
+          title: 'plugin_ai_credentials_saved',
           message: payload.profileName,
         });
-      } catch (exception: any) {
-        notificationService.logException(exception, 'plugin_ai_credentials_reset_failed');
-      } finally {
-        setProcessing(false);
+        resolveDialog();
+      } else if (exception) {
+        notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
       }
-    }
-  }
+    },
+  });
 
   return (
     <Form context={form} contents>
-      <CommonDialogWrapper size="medium" autoFocusOnShow={false} fixedWidth>
+      <CommonDialogWrapper size="medium" aria-label={translate('plugin_ai_credentials_dialog_title')} fixedWidth>
         <CommonDialogHeader
           title="plugin_ai_credentials_dialog_title"
           subTitle="plugin_ai_credentials_dialog_description"
           icon={payload.engineIcon}
-          onReject={processing ? undefined : rejectDialog}
+          onReject={formState.savingPromise ? undefined : rejectDialog}
         />
         <CommonDialogBody>
           <Container gap>
-            <InputField value={payload.profileName} disabled={processing} readOnly>
-              {translate('plugin_ai_credentials_profile')}
-            </InputField>
-            <InputField value={payload.engineName} disabled={processing} readOnly>
-              {translate('plugin_ai_credentials_engine')}
-            </InputField>
-            <InputField
-              ref={tokenRef}
-              value={token}
-              type="password"
-              name="token"
-              autoComplete="new-password"
-              required={!credentialsSaved}
-              disabled={processing}
-              placeholder={credentialsSaved ? SAVED_VALUE_INDICATOR : undefined}
-              description={credentialsSaved ? translate('ui_processing_saved') : undefined}
-              onChange={setToken}
-            >
-              {translate('plugin_ai_credentials_token')}
-            </InputField>
+            <StatusMessage exception={getFirstException(formState.exception)} message={formState.statusMessage} type={ENotificationType.Info} />
+            <AIProfileCredentialsFields formState={formState} />
           </Container>
         </CommonDialogBody>
         <CommonDialogFooter>
-          {credentialsSaved && (
-            <Button type="button" variant="secondary" disabled={processing} onClick={resetCredentials}>
-              {translate('plugin_ai_credentials_reset')}
-            </Button>
-          )}
           <Fill />
-          <Button type="button" variant="secondary" disabled={processing} onClick={() => rejectDialog()}>
+          <Button type="button" variant="secondary" disabled={!!formState.savingPromise} onClick={() => rejectDialog()}>
             {translate('ui_processing_cancel')}
           </Button>
-          <Button type="submit" disabled={processing || !token} onClick={() => form.submit()}>
-            {translate('ui_processing_save')}
+          <Button type="submit" disabled={saveDisabled || (!formState.isChanged && !canComplete)}>
+            {translate(canComplete ? 'plugin_ai_credentials_done' : 'ui_processing_save')}
           </Button>
         </CommonDialogFooter>
       </CommonDialogWrapper>

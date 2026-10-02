@@ -14,11 +14,22 @@ import {
   type AiAdminConfigurationProfileInfo,
   type AiConfigurationProfileInfo,
   type AiConfigurationProfileInput,
+  type AiDeviceAuthorizationInfo,
+  type AiProfileCredentialsInput,
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
 import { AISettingsResource } from '@cloudbeaver/plugin-ai';
 
 export type AIProfile = AiConfigurationProfileInfo;
+
+function getDefaultState(): Pick<AIProfile, 'credentialsSaved' | 'accountAuthentication' | 'deviceAuthorizationAvailable' | 'tokenSaved'> {
+  return {
+    credentialsSaved: false,
+    accountAuthentication: false,
+    deviceAuthorizationAvailable: false,
+    tokenSaved: false,
+  };
+}
 
 @injectable(() => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler, UserInfoResource, AISettingsResource])
 export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
@@ -44,7 +55,9 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   async createProfile(config: AiConfigurationProfileInput): Promise<AiAdminConfigurationProfileInfo> {
     const firstProfile = this.values.length === 0;
     const { profile } = await this.graphQLService.sdk.createAiProfile({ config });
-    this.set(profile.id, { ...profile, credentialsSaved: false });
+    this.set(profile.id, { ...profile, ...getDefaultState() });
+    // Load user-specific metadata, including Device Auth support, on the next read.
+    this.markOutdated(profile.id);
     if (firstProfile) {
       this.aiSettingsResource.markOutdated();
     }
@@ -53,7 +66,11 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
 
   async updateProfile(config: AiConfigurationProfileInput): Promise<AiAdminConfigurationProfileInfo> {
     const { profile } = await this.graphQLService.sdk.updateAiProfile({ config });
-    this.set(profile.id, { ...profile, credentialsSaved: this.get(profile.id)?.credentialsSaved ?? false });
+    this.set(profile.id, {
+      ...getDefaultState(),
+      ...this.get(profile.id),
+      ...profile,
+    });
     return profile;
   }
 
@@ -62,12 +79,25 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     this.delete(profileId);
   }
 
-  saveCredentials(profileId: string, token: string): Promise<void> {
-    return this.updateCredentials(profileId, token, true);
+  saveCredentials(profileId: string, token: string, accountAuthentication = false): Promise<void> {
+    return this.updateCredentials(profileId, {
+      properties: !accountAuthentication && token ? { token } : {},
+      accountAuthentication,
+    });
   }
 
   resetCredentials(profileId: string): Promise<void> {
-    return this.updateCredentials(profileId, '', false);
+    return this.updateCredentials(profileId, { properties: { token: '' } });
+  }
+
+  async disconnectAccount(profileId: string): Promise<void> {
+    await this.graphQLService.sdk.disconnectAiAccount({ profileId });
+    this.markOutdated(profileId);
+  }
+
+  async startDeviceAuthorization(profileId: string): Promise<AiDeviceAuthorizationInfo> {
+    const { authorization } = await this.graphQLService.sdk.startAiDeviceAuthorization({ profileId });
+    return authorization;
   }
 
   protected async loader(): Promise<Map<string, AIProfile>> {
@@ -80,16 +110,12 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     return typeof key === 'string';
   }
 
-  private async updateCredentials(profileId: string, token: string, credentialsSaved: boolean): Promise<void> {
+  private async updateCredentials(profileId: string, credentials: AiProfileCredentialsInput): Promise<void> {
     await this.graphQLService.sdk.saveAiProfileCredentials({
       profileId,
-      credentials: { properties: { token } },
+      credentials,
     });
 
-    const profile = this.get(profileId);
-    if (profile) {
-      this.set(profileId, { ...profile, credentialsSaved });
-    }
     this.markOutdated(profileId);
   }
 }
