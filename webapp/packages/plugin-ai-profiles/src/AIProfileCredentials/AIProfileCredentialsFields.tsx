@@ -46,7 +46,6 @@ export interface IAIProfileCredentialsFieldsProps {
   onChange: (state: IAIProfileCredentialsState) => void;
   onProcessing: (processing: boolean) => void;
   onCredentialsChanged: (accountAuthentication: boolean) => void;
-  onAuthorized?: () => void;
 }
 
 export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsProps>(function AIProfileCredentialsFields({
@@ -56,7 +55,6 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
   onChange,
   onProcessing,
   onCredentialsChanged,
-  onAuthorized,
 }) {
   const translate = useTranslate();
   const copy = useClipboard();
@@ -110,7 +108,6 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
         accountStatusFocus.reference?.focus();
         onCredentialsChanged(true);
         notifications.logSuccess({ title: 'plugin_ai_account_connected', message: profile?.name });
-        onAuthorized?.();
       }
     } catch (error: any) {
       // Task failures are exposed by usePromiseState; report errors creating the task separately.

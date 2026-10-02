@@ -109,7 +109,6 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
               onChange={setState}
               onProcessing={setCredentialsProcessing}
               onCredentialsChanged={credentialsChanged}
-              onAuthorized={resolveDialog}
             />
           </Container>
         </CommonDialogBody>
