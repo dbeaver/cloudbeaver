@@ -45,15 +45,16 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const aiProfilesResource = useResource(AIProfileCredentialsDialog, AIProfilesResource, payload.profileId);
+  const profile = aiProfilesResource.data;
   const [state, setState] = useState<IAIProfileCredentialsState>(() => ({
     token: '',
-    accountAuthentication: aiProfilesResource.data?.accountAuthentication ?? false,
+    accountAuthentication: !!profile?.accountProvider && profile.accountAuthentication,
   }));
   const [processing, setProcessing] = useState(false);
   const [credentialsProcessing, setCredentialsProcessing] = useState(false);
-  const profile = aiProfilesResource.data;
-  const changed = !!state.token || state.accountAuthentication !== profile?.accountAuthentication;
-  const credentialsMissing = state.accountAuthentication ? !profile?.account : !state.token && !profile?.tokenSaved;
+  const accountAuthentication = !!profile?.accountProvider && state.accountAuthentication;
+  const changed = !!state.token || (!!profile?.accountProvider && state.accountAuthentication !== profile.accountAuthentication);
+  const credentialsMissing = accountAuthentication ? !profile?.account : !state.token && !profile?.tokenSaved;
   const saveDisabled = processing || credentialsProcessing || !profile || profile.global || !changed || credentialsMissing;
   const form = useForm({ onSubmit: save });
 
@@ -64,9 +65,9 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
 
     try {
       setProcessing(true);
-      await aiProfilesResource.resource.saveCredentials(payload.profileId, state.token, state.accountAuthentication);
+      await aiProfilesResource.resource.saveCredentials(payload.profileId, state.token, accountAuthentication);
 
-      credentialsChanged(state.accountAuthentication);
+      credentialsChanged(accountAuthentication);
       notificationService.logSuccess({
         title: 'plugin_ai_credentials_saved',
         message: payload.profileName,

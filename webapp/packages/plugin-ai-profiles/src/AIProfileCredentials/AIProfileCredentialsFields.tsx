@@ -84,6 +84,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
     ['cancel'],
   );
   const profile = profiles.data;
+  const accountAuthentication = !!profile?.accountProvider && state.accountAuthentication;
   const taskState = usePromiseState(data.task);
   const exception = taskState.isCancelled?.() ? null : getFirstException(taskState.exception);
   const [accountStatusRef, accountStatusFocus] = useFocus<HTMLDivElement>({});
@@ -95,7 +96,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
   useEffect(() => data.cancel, [data]);
 
   async function connect(): Promise<void> {
-    if (disabled || data.task?.executing) {
+    if (disabled || !profile?.accountProvider || data.task?.executing) {
       return;
     }
     data.task = null;
@@ -138,7 +139,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
       } else {
         await profiles.resource.resetCredentials(profileId);
       }
-      onCredentialsChanged(profile?.accountAuthentication ?? false);
+      onCredentialsChanged(!!profile?.accountProvider && profile.accountAuthentication);
     } catch (exception: any) {
       notifications.logException(exception, account ? 'plugin_ai_account_disconnect_failed' : 'plugin_ai_credentials_reset_failed');
     } finally {
@@ -156,7 +157,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
         <RadioGroup
           name={name}
           label={translate('plugin_ai_credentials_method')}
-          value={state.accountAuthentication ? 'subscription' : 'token'}
+          value={accountAuthentication ? 'subscription' : 'token'}
           onChange={value => onChange({ ...state, accountAuthentication: value === 'subscription' })}
         >
           <Radio name={name} value="token" disabled={blocked} keepSize>
@@ -167,7 +168,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
           </Radio>
         </RadioGroup>
       )}
-      {!state.accountAuthentication ? (
+      {!accountAuthentication ? (
         <>
           <InputField
             value={state.token}
@@ -178,7 +179,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
             disabled={blocked}
             placeholder={profile.tokenSaved ? SAVED_VALUE_INDICATOR : undefined}
             description={profile.tokenSaved ? translate('ui_processing_saved') : undefined}
-            onChange={token => onChange({ ...state, token })}
+            onChange={token => onChange({ ...state, token, accountAuthentication: false })}
           >
             {translate('plugin_ai_credentials_token')}
           </InputField>

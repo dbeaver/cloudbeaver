@@ -48,7 +48,8 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
   const part = getAIProfileCredentialsFormPart(formState);
   const title = `${translate('ui_edit')} "${part.state.profileName}"`;
   const profile = profiles.get(formState.state.profileId);
-  const credentialsMissing = part.state.accountAuthentication ? !profile?.account : !part.state.token && !profile?.tokenSaved;
+  const accountAuthentication = !!profile?.accountProvider && part.state.accountAuthentication;
+  const credentialsMissing = accountAuthentication ? !profile?.account : !part.state.token && !profile?.tokenSaved;
   const saveDisabled = formState.isDisabled || credentialsProcessing || !formState.isChanged || credentialsMissing;
 
   async function save(): Promise<void> {

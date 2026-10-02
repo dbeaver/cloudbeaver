@@ -65,13 +65,15 @@ export class AIProfileCredentialsFormPart extends FormPart<IAIProfileCredentials
       profileName: profile.name,
       engineName: engine?.name ?? profile.engineId,
       token: '',
-      accountAuthentication: profile.accountAuthentication,
+      accountAuthentication: !!profile.accountProvider && profile.accountAuthentication,
     });
   }
 
   protected override async saveChanges(): Promise<void> {
-    await this.aiProfilesResource.saveCredentials(this.formState.state.profileId, this.state.token, this.state.accountAuthentication);
-    this.credentialsChanged(this.state.accountAuthentication);
+    const profile = this.aiProfilesResource.get(this.formState.state.profileId);
+    const accountAuthentication = !!profile?.accountProvider && this.state.accountAuthentication;
+    await this.aiProfilesResource.saveCredentials(this.formState.state.profileId, this.state.token, accountAuthentication);
+    this.credentialsChanged(accountAuthentication);
   }
 
   protected override validate(
@@ -80,8 +82,8 @@ export class AIProfileCredentialsFormPart extends FormPart<IAIProfileCredentials
   ): void {
     const profile = this.aiProfilesResource.get(this.formState.state.profileId);
     const validation = contexts.getContext(formValidationContext);
-    if (this.state.accountAuthentication) {
-      if (!profile?.accountProvider || !profile.account) {
+    if (profile?.accountProvider && this.state.accountAuthentication) {
+      if (!profile.account) {
         validation.error('plugin_ai_account_not_connected');
       }
     } else if (!this.state.token && !profile?.tokenSaved) {
