@@ -7,7 +7,6 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 
 import {
   Button,
@@ -18,24 +17,26 @@ import {
   Container,
   Fill,
   Form,
-  InputField,
+  StatusMessage,
   useForm,
-  useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import type { IFormState } from '@cloudbeaver/core-ui';
+import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { AIProfilesResource, type IAIProfileCredentialsState } from '../AIProfilesResource.js';
 import { AIProfileCredentialsFields } from './AIProfileCredentialsFields.js';
-import { getAIProfileCredentialsStatus } from './getAIProfileCredentialsStatus.js';
+import { getAIProfileCredentialsFormParts } from './getAIProfileCredentialsFormParts.js';
+import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
 export interface IAIProfileCredentialsDialogPayload {
   profileId: string;
   profileName: string;
   engineName: string;
   engineIcon?: string;
+  formState: IFormState<IAIProfileCredentialsFormState>;
 }
 
 export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDialogPayload> = observer(function AIProfileCredentialsDialog({
@@ -45,56 +46,35 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
 }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const aiProfilesResource = useResource(AIProfileCredentialsDialog, AIProfilesResource, payload.profileId);
-  const profile = aiProfilesResource.data;
-  const [state, setState] = useState<IAIProfileCredentialsState>(() => ({
-    token: '',
-    accountAuthentication: !!profile?.deviceAuthorizationAvailable && profile.accountAuthentication,
-  }));
-  const [processing, setProcessing] = useState(false);
-  const [credentialsProcessing, setCredentialsProcessing] = useState(false);
-  const { accountAuthentication, changed, validationError } = getAIProfileCredentialsStatus(profile, state);
-  const canComplete = !changed && !!profile?.credentialsSaved && !validationError;
-  const saveDisabled =
-    processing ||
-    credentialsProcessing ||
-    aiProfilesResource.isOutdated() ||
-    !profile ||
-    profile.global ||
-    (!changed && !canComplete) ||
-    !!validationError;
-  const form = useForm({ onSubmit: save });
+  const { formState } = payload;
+  const { token, subscription } = getAIProfileCredentialsFormParts(formState);
+  const selectedPart = token.accountAuthentication ? subscription : token;
+  const canComplete = !formState.isChanged && !!token.profile?.credentialsSaved && !selectedPart.credentialsMissing;
+  const saveDisabled = formState.isDisabled || !token.isLoaded() || token.isOutdated() || !token.profile || token.profile.global;
+  const form = useForm({
+    onSubmit: async function onSubmit() {
+      if (saveDisabled) {
+        return;
+      }
+      if (canComplete) {
+        resolveDialog();
+        return;
+      }
 
-  async function save(): Promise<void> {
-    if (saveDisabled) {
-      return;
-    }
+      const saved = await formState.save();
+      const exception = getFirstException(formState.exception);
 
-    if (canComplete) {
-      resolveDialog();
-      return;
-    }
-
-    try {
-      setProcessing(true);
-      await aiProfilesResource.resource.saveCredentials(payload.profileId, state.token, accountAuthentication);
-
-      credentialsChanged(accountAuthentication);
-      notificationService.logSuccess({
-        title: 'plugin_ai_credentials_saved',
-        message: payload.profileName,
-      });
-      resolveDialog();
-    } catch (exception: any) {
-      notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
-    } finally {
-      setProcessing(false);
-    }
-  }
-
-  function credentialsChanged(accountAuthentication: boolean): void {
-    setState({ token: '', accountAuthentication });
-  }
+      if (saved) {
+        notificationService.logSuccess({
+          title: 'plugin_ai_credentials_saved',
+          message: payload.profileName,
+        });
+        resolveDialog();
+      } else if (exception) {
+        notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
+      }
+    },
+  });
 
   return (
     <Form context={form} contents>
@@ -103,33 +83,20 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           title="plugin_ai_credentials_dialog_title"
           subTitle="plugin_ai_credentials_dialog_description"
           icon={payload.engineIcon}
-          onReject={processing ? undefined : rejectDialog}
+          onReject={formState.savingPromise ? undefined : rejectDialog}
         />
         <CommonDialogBody>
           <Container gap>
-            <InputField value={payload.profileName} disabled={processing} readOnly>
-              {translate('plugin_ai_credentials_profile')}
-            </InputField>
-            <InputField value={payload.engineName} disabled={processing} readOnly>
-              {translate('plugin_ai_credentials_engine')}
-            </InputField>
-            <AIProfileCredentialsFields
-              key={payload.profileId}
-              profileId={payload.profileId}
-              state={state}
-              disabled={processing || credentialsProcessing}
-              onChange={setState}
-              onProcessing={setCredentialsProcessing}
-              onCredentialsChanged={credentialsChanged}
-            />
+            <StatusMessage exception={getFirstException(formState.exception)} message={formState.statusMessage} type={ENotificationType.Info} />
+            <AIProfileCredentialsFields formState={formState} />
           </Container>
         </CommonDialogBody>
         <CommonDialogFooter>
           <Fill />
-          <Button type="button" variant="secondary" disabled={processing} onClick={() => rejectDialog()}>
+          <Button type="button" variant="secondary" disabled={!!formState.savingPromise} onClick={() => rejectDialog()}>
             {translate('ui_processing_cancel')}
           </Button>
-          <Button type="submit" disabled={saveDisabled} onClick={() => form.submit()}>
+          <Button type="submit" disabled={saveDisabled || (!formState.isChanged && !canComplete)}>
             {translate(canComplete ? 'plugin_ai_credentials_done' : 'ui_processing_save')}
           </Button>
         </CommonDialogFooter>

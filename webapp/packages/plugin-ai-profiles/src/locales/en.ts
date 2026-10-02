@@ -29,11 +29,6 @@ export default [
     'Disconnect your account from this AI profile? Your saved API token will be kept, but the authentication method will not change.',
   ],
   ['plugin_ai_account_disconnect_failed', 'Failed to disconnect account'],
-  [
-    'plugin_ai_account_authentication_required',
-    'Subscription access could not be refreshed. Open the profile credentials, disconnect the account, and connect it again.',
-  ],
-  ['plugin_ai_account_manage', 'Open profile credentials'],
   ['plugin_ai_device_code', 'Device code'],
   ['plugin_ai_device_open_provider', 'Open {arg:provider} authorization page'],
   [

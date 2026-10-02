@@ -38,7 +38,7 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
       label: 'plugin_ai_credentials_method',
       width: 180,
       render: profile =>
-        profile.global ? '' : translate(profile.accountAuthentication ? 'plugin_ai_credentials_subscription' : 'plugin_ai_credentials_token'),
+        translate(!profile.global && profile.accountAuthentication ? 'plugin_ai_credentials_subscription' : 'plugin_ai_credentials_token'),
     },
     {
       key: 'status',

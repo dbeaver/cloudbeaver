@@ -23,6 +23,9 @@
       "path": "../core-cli"
     },
     {
+      "path": "../core-data-context"
+    },
+    {
       "path": "../core-di"
     },
     {
@@ -45,6 +48,9 @@
     },
     {
       "path": "../core-sdk"
+    },
+    {
+      "path": "../core-ui"
     },
     {
       "path": "../core-utils"

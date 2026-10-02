@@ -10,7 +10,4 @@ import type { IFormProps } from '@cloudbeaver/core-ui';
 
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
-export interface IAIProfileCredentialsFormProps extends IFormProps<IAIProfileCredentialsFormState> {
-  credentialsProcessing: boolean;
-  onProcessing: (processing: boolean) => void;
-}
+export interface IAIProfileCredentialsFormProps extends IFormProps<IAIProfileCredentialsFormState> {}

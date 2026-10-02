@@ -15,9 +15,17 @@ import type { AiDeviceAuthorizationInfo } from '@cloudbeaver/core-sdk';
 
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { AIProfileCredentialsDialog } from './AIProfileCredentialsDialogLazy.js';
+import { AIProfileCredentialsFormService } from './AIProfileCredentialsFormService.js';
 import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
 
-@injectable(() => [CommonDialogService, NotificationService, AIProfilesResource, AiEnginesResource, AsyncTaskInfoService])
+@injectable(() => [
+  CommonDialogService,
+  NotificationService,
+  AIProfilesResource,
+  AiEnginesResource,
+  AsyncTaskInfoService,
+  AIProfileCredentialsFormService,
+])
 export class AIProfileCredentialsService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
@@ -25,6 +33,7 @@ export class AIProfileCredentialsService {
     private readonly aiProfilesResource: AIProfilesResource,
     private readonly aiEnginesResource: AiEnginesResource,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly aiProfileCredentialsFormService: AIProfileCredentialsFormService,
   ) {}
 
   async open(profileId: string): Promise<DialogResult<void>> {
@@ -38,28 +47,33 @@ export class AIProfileCredentialsService {
     const engines = await this.aiEnginesResource.load();
     const engine = engines.find(engine => engine.id === profile.engineId);
 
-    return this.commonDialogService.open(AIProfileCredentialsDialog, {
-      profileId: profile.id,
-      profileName: profile.name,
-      engineName: engine?.name ?? profile.engineId,
-      engineIcon: engine?.icon,
-    });
+    const formState = this.aiProfileCredentialsFormService.create(profile.id);
+
+    try {
+      return await this.commonDialogService.open(AIProfileCredentialsDialog, {
+        profileId: profile.id,
+        profileName: profile.name,
+        engineName: engine?.name ?? profile.engineId,
+        engineIcon: engine?.icon,
+        formState,
+      });
+    } finally {
+      await formState.dispose();
+    }
   }
 
-  authorize(profileId: string, onAuthorization: (info: AiDeviceAuthorizationInfo) => void): ITask<boolean> {
+  authorize(profileId: string): { authorization: Promise<AiDeviceAuthorizationInfo>; task: ITask<boolean> } {
+    const authorization = this.aiProfilesResource.startDeviceAuthorization(profileId);
     const task = this.asyncTaskInfoService.create(async () => {
-      const info = await this.aiProfilesResource.startDeviceAuthorization(profileId);
-      if (!authorization.cancelled) {
-        onAuthorization(info);
-      }
+      const info = await authorization;
       return info.taskInfo;
     });
 
-    const authorization: ITask<boolean> = new AutoRunningTask(
+    const completion: ITask<boolean> = new AutoRunningTask(
       async () => {
         try {
           const result = await this.asyncTaskInfoService.run(task);
-          if (authorization.cancelled || result.taskResult !== true) {
+          if (completion.cancelled || result.taskResult !== true) {
             return false;
           }
           this.aiProfilesResource.markOutdated(profileId);
@@ -68,11 +82,11 @@ export class AIProfileCredentialsService {
             await this.asyncTaskInfoService.remove(task.id);
           }
         }
-        return !authorization.cancelled;
+        return !completion.cancelled;
       },
       () => (task.pending ? this.asyncTaskInfoService.cancel(task.id) : undefined),
     );
-    return authorization;
+    return { authorization, task: completion };
   }
 
   isSupported(properties: ReadonlyArray<{ id?: string; features: readonly string[] }>): boolean {
@@ -83,5 +97,3 @@ export class AIProfileCredentialsService {
     return !profile.global && !profile.credentialsSaved;
   }
 }
-
-export const AI_ACCOUNT_AUTHENTICATION_REQUIRED = 'AI_ACCOUNT_AUTHENTICATION_REQUIRED';

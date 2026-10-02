@@ -29,11 +29,6 @@ export default [
     'Отключить аккаунт от этого профиля ИИ? Сохранённый API-токен останется, но способ авторизации не изменится.',
   ],
   ['plugin_ai_account_disconnect_failed', 'Не удалось отключить аккаунт'],
-  [
-    'plugin_ai_account_authentication_required',
-    'Не удалось обновить доступ к подписке. Откройте учётные данные профиля, отключите аккаунт и подключите его заново.',
-  ],
-  ['plugin_ai_account_manage', 'Открыть учётные данные профиля'],
   ['plugin_ai_device_code', 'Код устройства'],
   ['plugin_ai_device_open_provider', 'Открыть страницу авторизации {arg:provider}'],
   [
