@@ -29,6 +29,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 
 import { AIProfilesResource, type IAIProfileCredentialsState } from '../AIProfilesResource.js';
 import { AIProfileCredentialsFields } from './AIProfileCredentialsFields.js';
+import { getAIProfileCredentialsStatus } from './getAIProfileCredentialsStatus.js';
 
 export interface IAIProfileCredentialsDialogPayload {
   profileId: string;
@@ -52,14 +53,25 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   }));
   const [processing, setProcessing] = useState(false);
   const [credentialsProcessing, setCredentialsProcessing] = useState(false);
-  const accountAuthentication = !!profile?.accountProvider && state.accountAuthentication;
-  const changed = !!state.token || (!!profile?.accountProvider && state.accountAuthentication !== profile.accountAuthentication);
-  const credentialsMissing = accountAuthentication ? !profile?.account : !state.token && !profile?.tokenSaved;
-  const saveDisabled = processing || credentialsProcessing || !profile || profile.global || !changed || credentialsMissing;
+  const { accountAuthentication, changed, validationError } = getAIProfileCredentialsStatus(profile, state);
+  const canComplete = !changed && !!profile?.credentialsSaved && !validationError;
+  const saveDisabled =
+    processing ||
+    credentialsProcessing ||
+    aiProfilesResource.isOutdated() ||
+    !profile ||
+    profile.global ||
+    (!changed && !canComplete) ||
+    !!validationError;
   const form = useForm({ onSubmit: save });
 
   async function save(): Promise<void> {
     if (saveDisabled) {
+      return;
+    }
+
+    if (canComplete) {
+      resolveDialog();
       return;
     }
 
@@ -118,7 +130,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
             {translate('ui_processing_cancel')}
           </Button>
           <Button type="submit" disabled={saveDisabled} onClick={() => form.submit()}>
-            {translate('ui_processing_save')}
+            {translate(canComplete ? 'plugin_ai_credentials_done' : 'ui_processing_save')}
           </Button>
         </CommonDialogFooter>
       </CommonDialogWrapper>

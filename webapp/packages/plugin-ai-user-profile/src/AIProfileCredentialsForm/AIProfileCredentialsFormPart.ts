@@ -9,7 +9,7 @@
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { AIProfilesResource, type IAIProfileCredentialsState } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfilesResource, getAIProfileCredentialsStatus, type IAIProfileCredentialsState } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
@@ -71,7 +71,7 @@ export class AIProfileCredentialsFormPart extends FormPart<IAIProfileCredentials
 
   protected override async saveChanges(): Promise<void> {
     const profile = this.aiProfilesResource.get(this.formState.state.profileId);
-    const accountAuthentication = !!profile?.accountProvider && this.state.accountAuthentication;
+    const { accountAuthentication } = getAIProfileCredentialsStatus(profile, this.state);
     await this.aiProfilesResource.saveCredentials(this.formState.state.profileId, this.state.token, accountAuthentication);
     this.credentialsChanged(accountAuthentication);
   }
@@ -82,12 +82,9 @@ export class AIProfileCredentialsFormPart extends FormPart<IAIProfileCredentials
   ): void {
     const profile = this.aiProfilesResource.get(this.formState.state.profileId);
     const validation = contexts.getContext(formValidationContext);
-    if (profile?.accountProvider && this.state.accountAuthentication) {
-      if (!profile.account) {
-        validation.error('plugin_ai_account_not_connected');
-      }
-    } else if (!this.state.token && !profile?.tokenSaved) {
-      validation.error('plugin_ai_credentials_token_required');
+    const { validationError } = getAIProfileCredentialsStatus(profile, this.state);
+    if (validationError) {
+      validation.error(validationError);
     }
   }
 }

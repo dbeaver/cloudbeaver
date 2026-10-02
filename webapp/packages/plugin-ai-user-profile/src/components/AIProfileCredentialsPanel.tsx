@@ -25,7 +25,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
-import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfilesResource, getAIProfileCredentialsStatus } from '@cloudbeaver/plugin-ai-profiles';
 
 import { getAIProfileCredentialsFormPart } from '../AIProfileCredentialsForm/getAIProfileCredentialsFormPart.js';
 import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
@@ -48,9 +48,8 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
   const part = getAIProfileCredentialsFormPart(formState);
   const title = `${translate('ui_edit')} "${part.state.profileName}"`;
   const profile = profiles.get(formState.state.profileId);
-  const accountAuthentication = !!profile?.accountProvider && part.state.accountAuthentication;
-  const credentialsMissing = accountAuthentication ? !profile?.account : !part.state.token && !profile?.tokenSaved;
-  const saveDisabled = formState.isDisabled || credentialsProcessing || !formState.isChanged || credentialsMissing;
+  const { validationError } = getAIProfileCredentialsStatus(profile, part.state);
+  const saveDisabled = formState.isDisabled || credentialsProcessing || !formState.isChanged || !!validationError;
 
   async function save(): Promise<void> {
     if (!formState || saveDisabled) {

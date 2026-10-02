@@ -15,6 +15,7 @@ export default [
   ['plugin_ai_credentials_profile', 'Профиль'],
   ['plugin_ai_credentials_engine', 'Движок'],
   ['plugin_ai_credentials_token', 'API-токен'],
+  ['plugin_ai_credentials_done', 'Готово'],
   ['plugin_ai_credentials_token_required', 'Введите API-токен.'],
   ['plugin_ai_credentials_method', 'Способ авторизации'],
   ['plugin_ai_credentials_subscription', 'Подписка'],
