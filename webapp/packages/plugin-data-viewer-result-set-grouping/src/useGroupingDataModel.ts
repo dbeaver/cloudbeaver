@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,8 @@ export function useGroupingDataModel(
         return {
           source: model.source,
           model,
-          dispose() {
-            this.model.dispose();
+          async dispose() {
+            await this.model.dispose();
             tableViewerStorageService.remove(state.modelId);
           },
         };
@@ -76,8 +76,8 @@ export function useGroupingDataModel(
       return {
         source,
         model,
-        dispose() {
-          this.model.dispose();
+        async dispose() {
+          await this.model.dispose();
           tableViewerStorageService.remove(this.model.id);
         },
       };
