@@ -51,7 +51,13 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   async createProfile(config: AiConfigurationProfileInput): Promise<AiAdminConfigurationProfileInfo> {
     const firstProfile = this.values.length === 0;
     const { profile } = await this.graphQLService.sdk.createAiProfile({ config });
-    this.set(profile.id, { ...profile, credentialsSaved: false, accountAuthentication: false, tokenSaved: false });
+    this.set(profile.id, {
+      ...profile,
+      credentialsSaved: false,
+      accountAuthentication: false,
+      deviceAuthorizationAvailable: false,
+      tokenSaved: false,
+    });
     // Load user-specific metadata, including Device Auth support, on the next read.
     this.markOutdated(profile.id);
     if (firstProfile) {
@@ -65,6 +71,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     this.set(profile.id, {
       credentialsSaved: false,
       accountAuthentication: false,
+      deviceAuthorizationAvailable: false,
       tokenSaved: false,
       ...this.get(profile.id),
       ...profile,

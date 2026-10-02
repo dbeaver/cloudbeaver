@@ -49,7 +49,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const profile = aiProfilesResource.data;
   const [state, setState] = useState<IAIProfileCredentialsState>(() => ({
     token: '',
-    accountAuthentication: !!profile?.accountProvider && profile.accountAuthentication,
+    accountAuthentication: !!profile?.deviceAuthorizationAvailable && profile.accountAuthentication,
   }));
   const [processing, setProcessing] = useState(false);
   const [credentialsProcessing, setCredentialsProcessing] = useState(false);

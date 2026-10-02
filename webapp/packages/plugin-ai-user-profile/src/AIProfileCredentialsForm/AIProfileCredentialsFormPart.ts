@@ -65,7 +65,7 @@ export class AIProfileCredentialsFormPart extends FormPart<IAIProfileCredentials
       profileName: profile.name,
       engineName: engine?.name ?? profile.engineId,
       token: '',
-      accountAuthentication: !!profile.accountProvider && profile.accountAuthentication,
+      accountAuthentication: profile.deviceAuthorizationAvailable && profile.accountAuthentication,
     });
   }
 

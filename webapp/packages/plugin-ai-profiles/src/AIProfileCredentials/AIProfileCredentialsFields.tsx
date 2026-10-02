@@ -38,6 +38,7 @@ import { getFirstException } from '@cloudbeaver/core-utils';
 
 import { AIProfilesResource, type IAIProfileCredentialsState } from '../AIProfilesResource.js';
 import { AIProfileCredentialsService } from './AIProfileCredentialsService.js';
+import { getAIProfileCredentialsStatus } from './getAIProfileCredentialsStatus.js';
 
 export interface IAIProfileCredentialsFieldsProps {
   profileId: string;
@@ -82,7 +83,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
     ['cancel'],
   );
   const profile = profiles.data;
-  const accountAuthentication = !!profile?.accountProvider && state.accountAuthentication;
+  const { accountAuthentication } = getAIProfileCredentialsStatus(profile, state);
   const taskState = usePromiseState(data.task);
   const exception = taskState.isCancelled?.() ? null : getFirstException(taskState.exception);
   const [accountStatusRef, accountStatusFocus] = useFocus<HTMLDivElement>({});
@@ -94,7 +95,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
   useEffect(() => data.cancel, [data]);
 
   async function connect(): Promise<void> {
-    if (disabled || !profile?.accountProvider || data.task?.executing) {
+    if (disabled || !profile?.deviceAuthorizationAvailable || data.task?.executing) {
       return;
     }
     data.task = null;
@@ -136,7 +137,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
       } else {
         await profiles.resource.resetCredentials(profileId);
       }
-      onCredentialsChanged(!!profile?.accountProvider && profile.accountAuthentication);
+      onCredentialsChanged(!!profile?.deviceAuthorizationAvailable && profile.accountAuthentication);
     } catch (exception: any) {
       notifications.logException(exception, account ? 'plugin_ai_account_disconnect_failed' : 'plugin_ai_credentials_reset_failed');
     } finally {
@@ -150,7 +151,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
 
   return (
     <Container vertical gap>
-      {!!profile.accountProvider && (
+      {profile.deviceAuthorizationAvailable && (
         <RadioGroup
           name={name}
           label={translate('plugin_ai_credentials_method')}
@@ -161,7 +162,9 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
             {translate('plugin_ai_credentials_token')}
           </Radio>
           <Radio name={name} value="subscription" disabled={blocked} keepSize>
-            {translate('plugin_ai_credentials_account', undefined, { provider: profile.accountProvider })}
+            {profile.accountProvider
+              ? translate('plugin_ai_credentials_account', undefined, { provider: profile.accountProvider })
+              : translate('plugin_ai_credentials_subscription')}
           </Radio>
         </RadioGroup>
       )}
@@ -229,7 +232,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
               )}
               {!taskState.isLoading() && (
                 <div key={exception && !blocked ? 'retry' : 'connect'} ref={connectRef}>
-                  <Button type="button" disabled={blocked || !profile.accountProvider} onClick={connect}>
+                  <Button type="button" disabled={blocked || !profile.deviceAuthorizationAvailable} onClick={connect}>
                     {translate(exception ? 'plugin_ai_device_retry' : 'plugin_ai_account_connect')}
                   </Button>
                 </div>

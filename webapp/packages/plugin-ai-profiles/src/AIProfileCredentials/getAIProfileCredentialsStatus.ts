@@ -15,8 +15,8 @@ interface IAIProfileCredentialsStatus {
 }
 
 export function getAIProfileCredentialsStatus(profile: AIProfile | undefined, state: IAIProfileCredentialsState): IAIProfileCredentialsStatus {
-  const accountAuthentication = !!profile?.accountProvider && state.accountAuthentication;
-  const changed = !!state.token || (!!profile?.accountProvider && state.accountAuthentication !== profile.accountAuthentication);
+  const accountAuthentication = !!profile?.deviceAuthorizationAvailable && state.accountAuthentication;
+  const changed = !!state.token || (!!profile?.deviceAuthorizationAvailable && state.accountAuthentication !== profile.accountAuthentication);
   let validationError: string | undefined;
 
   if (accountAuthentication) {
