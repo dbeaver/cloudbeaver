@@ -65,15 +65,14 @@ public class WebAIConfigurationProfile {
         return WebAIProfileUtils.isAccountAuthentication(webSession, profile);
     }
 
+    public boolean isDeviceAuthorizationAvailable() throws DBException {
+        return getDeviceAuthorizationProperties() != null;
+    }
+
     @Nullable
     public String getAccountProvider() throws DBException {
-        if (profile.isGlobal()
-            || !(profile.getConfiguration() instanceof AIAccountProperties properties)
-            || !properties.supportsDeviceAuthorization()
-        ) {
-            return null;
-        }
-        return properties.getAccountAuthenticationProviderName();
+        AIAccountProperties properties = getDeviceAuthorizationProperties();
+        return properties == null ? null : properties.getAccountAuthenticationProviderName();
     }
 
     public boolean isTokenSaved() throws DBException {
@@ -94,5 +93,16 @@ public class WebAIConfigurationProfile {
     @NotNull
     public WebPropertyInfo[] getConfiguration() throws DBException {
         return WebServiceUtils.getObjectFilteredProperties(webSession, profile.getConfiguration(), null);
+    }
+
+    @Nullable
+    private AIAccountProperties getDeviceAuthorizationProperties() throws DBException {
+        if (profile.isGlobal()
+            || !(profile.getConfiguration() instanceof AIAccountProperties properties)
+            || !properties.supportsDeviceAuthorization()
+        ) {
+            return null;
+        }
+        return properties;
     }
 }

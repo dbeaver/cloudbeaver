@@ -128,6 +128,8 @@ type AIConfigurationProfileInfo @since(version: "26.1.3") {
     credentialsSaved: Boolean! @since(version: "26.2.0")
     "Whether the current user selected subscription authentication for this non-global profile. Defaults to false."
     accountAuthentication: Boolean! @since(version: "26.2.0")
+    "Whether device authorization is available for this profile."
+    deviceAuthorizationAvailable: Boolean! @since(version: "26.2.0")
     "Device authorization provider display name, such as ChatGPT. Null for global profiles and engines without server-side device authorization support."
     accountProvider: String @since(version: "26.2.0")
     "Whether the current user has a saved API token, independently of the selected authentication method."
