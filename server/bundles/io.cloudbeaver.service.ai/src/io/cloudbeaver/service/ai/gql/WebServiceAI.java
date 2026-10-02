@@ -569,6 +569,33 @@ public class WebServiceAI implements DBWServiceAI {
 
     @NotNull
     @Override
+    public WebAIConfigurationProfile copyProfile(
+        @NotNull WebSession webSession,
+        @NotNull String profileId
+    ) throws DBWebException {
+        WebAIUtils.validateAiPluginEnabled();
+        if (CommonUtils.isEmpty(profileId)) {
+            throw new DBWebException("Profile ID is not specified");
+        }
+        try {
+            AISettings settings = AISettingsManager.getInstance().getSettings();
+            AIConfigurationProfile sourceProfile = settings.getConfiguration(profileId);
+            AIConfigurationProfile newProfile = settings.copyConfiguration(
+                sourceProfile,
+                UUID.randomUUID().toString(),
+                settings.generateProfileName(sourceProfile.getProfileName())
+            );
+            WebAIProfileUtils.prepareGlobalProfile(webSession, newProfile);
+            AISettingsManager.getInstance().saveSettings();
+            addAISettingsChangedEvent(webSession);
+            return new WebAIConfigurationProfile(webSession, newProfile);
+        } catch (DBException e) {
+            throw new DBWebException("Error copying AI configuration " + profileId, e);
+        }
+    }
+
+    @NotNull
+    @Override
     public WebAIConfigurationProfile updateProfile(
         @NotNull WebSession webSession,
         @NotNull WebAIConfigurationProfileInput input
