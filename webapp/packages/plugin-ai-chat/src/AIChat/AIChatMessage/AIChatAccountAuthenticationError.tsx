@@ -17,19 +17,19 @@ import { AIChatConversationsResource } from '../AIChatConversation/AIChatConvers
 
 export const AIChatAccountAuthenticationError = observer<{ conversationId: string }>(function AIChatAccountAuthenticationError({ conversationId }) {
   const translate = useTranslate();
-  const credentials = useService(AIProfileCredentialsService);
-  const notifications = useService(NotificationService);
-  const conversations = useService(AIChatConversationsResource);
-  const profileId = conversations.get(conversationId)?.profile;
+  const aiProfileCredentialsService = useService(AIProfileCredentialsService);
+  const notificationService = useService(NotificationService);
+  const aiChatConversationsResource = useService(AIChatConversationsResource);
+  const profileId = aiChatConversationsResource.get(conversationId)?.profile;
 
   async function openCredentials(): Promise<void> {
     if (!profileId) {
       return;
     }
     try {
-      await credentials.open(profileId);
+      await aiProfileCredentialsService.open(profileId);
     } catch (exception: any) {
-      notifications.logException(exception, 'plugin_ai_credentials_save_failed');
+      notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
     }
   }
 
