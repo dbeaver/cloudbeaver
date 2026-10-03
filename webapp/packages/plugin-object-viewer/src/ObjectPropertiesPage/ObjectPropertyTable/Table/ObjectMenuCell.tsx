@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Icon, Loader, s, StaticImage, useContextMenuPosition, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
+import { Icon, Loader, s, StaticImage, useContextMenuPosition, useMouse, useS, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -32,6 +32,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   }
 
   const styles = useS(classes);
+  const translate = useTranslate();
   const navNodeManagerService = useService(NavNodeManagerService);
   const connectionsInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
@@ -87,6 +88,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
                 className={s(styles, { contextMenu: true })}
                 contextMenuPosition={contextMenuPosition}
                 menu={menu}
+                title={translate('plugin_navigation_tree_node_menu_title', undefined, { name: node.name })}
                 autoFocusOnShow
                 onVisibleSwitch={switchState}
               >

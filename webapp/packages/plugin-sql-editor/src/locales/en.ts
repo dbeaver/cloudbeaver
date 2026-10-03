@@ -16,6 +16,8 @@ export default [
   ['sql_editor_tools_more_menu_tooltip', 'More tools'],
   ['sql_editor_output_logs_button_tooltip', 'Show server output'],
   ['sql_editor_output_logs_tab_title', 'Output'],
+  ['sql_editor_output_logs_filter_tooltip', 'Filter output logs'],
+  ['sql_editor_output_logs_settings_tooltip', 'Output log settings'],
   ['sql_editor_output_logs_input_placeholder', 'Enter a part of a message to search for here'],
   ['sql_editor_output_logs_wrap_mode', 'Wrap mode'],
   ['sql_editor_sql_execution_button_tooltip', 'Execute SQL Statement'],
