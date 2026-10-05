@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,8 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const dataViewerView = useService(DataViewerViewService);
     const dataPresentationService = useService(DataPresentationService);
     const tableViewerStorageService = useService(TableViewerStorageService);
-    const dataModel = tableViewerStorageService.get(tableId);
+    const storedModel = tableViewerStorageService.get(tableId);
+    const dataModel = storedModel?.isDisposed ? undefined : storedModel;
     const result = dataModel?.source.getResult(resultIndex);
     const loading = useStateDelay(dataModel?.isLoading() ?? true, 100);
     const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;

@@ -24,6 +24,8 @@ export interface IDatabaseDataModel<TSource extends IDatabaseDataSource<any, any
   readonly supportedDataFormats: ResultDataFormat[];
   /** Represents the value by which the number of loaded rows will be increased when loading the next data portion */
   readonly countGain: number;
+  /** The model is no longer available to presentations; asynchronous source cleanup may still be pending. */
+  readonly isDisposed: boolean;
 
   readonly onOptionsChange: IExecutor;
   readonly onRequest: IExecutor<IRequestEventData<TSource>>;

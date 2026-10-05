@@ -130,7 +130,7 @@ export class DataViewerTabService {
   private async handleTabCanClose(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
     const model = this.tableViewerStorageService.get(tab.handlerState.tableId || '');
 
-    if (model) {
+    if (model && !model.isDisposed) {
       return await model.source.canSafelyDispose();
     }
 
@@ -148,14 +148,8 @@ export class DataViewerTabService {
       const model = this.tableViewerStorageService.get(tableId);
 
       if (model) {
-        // Keep child disposal handlers mounted, then hide the table before its source destroys the result actions.
-        const removeModel = () => this.tableViewerStorageService.remove(tableId);
-        model.onDispose.addPostHandler(removeModel);
-        try {
-          await model.dispose();
-        } finally {
-          model.onDispose.removePostHandler(removeModel);
-        }
+        await model.dispose();
+        this.tableViewerStorageService.remove(tableId);
       }
     }
   }

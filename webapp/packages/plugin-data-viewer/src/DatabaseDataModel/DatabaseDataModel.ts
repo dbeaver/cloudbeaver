@@ -19,6 +19,9 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
   name: string | null;
   source: TSource;
   countGain: number;
+  isDisposed: boolean;
+
+  private disposeTask: Promise<void> | null;
 
   get requestInfo(): IRequestInfo {
     return this.source.requestInfo;
@@ -37,6 +40,8 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
     this.name = null;
     this.source = source;
     this.countGain = 0;
+    this.isDisposed = false;
+    this.disposeTask = null;
     this.onDispose = new Executor();
     this.onOptionsChange = new Executor();
     this.onRequest = new Executor();
@@ -44,6 +49,7 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
 
     makeObservable(this, {
       countGain: observable,
+      isDisposed: observable,
     });
   }
 
@@ -133,8 +139,20 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
     this.source.resetData();
   }
 
-  async dispose(): Promise<void> {
-    await this.onDispose.execute();
+  dispose(): Promise<void> {
+    this.disposeTask ??= this.disposeModel().catch(exception => {
+      this.disposeTask = null;
+      throw exception;
+    });
+    return this.disposeTask;
+  }
+
+  private async disposeModel(): Promise<void> {
+    if (!this.isDisposed) {
+      await this.onDispose.execute();
+      // Presentations must stop using this model before its source releases the result actions.
+      this.isDisposed = true;
+    }
     await this.source.dispose();
   }
 }

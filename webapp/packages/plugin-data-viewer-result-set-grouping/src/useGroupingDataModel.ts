@@ -52,39 +52,35 @@ export function useGroupingDataModel(
   const connectionInfoLoader = useResource(useGroupingDataModel, ConnectionInfoResource, connectionKey);
   const connectionInfo = connectionInfoLoader.data;
 
-  const model = useObjectRef(
-    () => {
-      if (tableViewerStorageService.has(state.modelId)) {
-        const model = tableViewerStorageService.get(state.modelId) as IDatabaseDataModel<GroupingDataSource>;
-        return {
-          source: model.source,
-          model,
-          async dispose() {
-            tableViewerStorageService.remove(state.modelId);
-            await this.model.dispose();
-          },
-        };
-      }
-      const source = new GroupingDataSource(serviceProvider, commonDialogService, asyncTaskInfoEventHandler, graphQLService, asyncTaskInfoService);
-
-      source.setKeepExecutionContextOnDispose(true);
-      const model = tableViewerStorageService.add(new DatabaseDataModel(source));
-      state.modelId = model.id;
-
-      model.setAccess(DatabaseDataAccessMode.Readonly).setCountGain(dataViewerSettingsService.getDefaultRowsCount()).setSlice(0);
-
+  const model = useObjectRef(() => {
+    if (tableViewerStorageService.has(state.modelId)) {
+      const model = tableViewerStorageService.get(state.modelId) as IDatabaseDataModel<GroupingDataSource>;
       return {
-        source,
+        source: model.source,
         model,
-        async dispose() {
-          tableViewerStorageService.remove(this.model.id);
-          await this.model.dispose();
-        },
       };
-    },
-    false,
-    ['dispose'],
-  );
+    }
+    const source = new GroupingDataSource(serviceProvider, commonDialogService, asyncTaskInfoEventHandler, graphQLService, asyncTaskInfoService);
+
+    source.setKeepExecutionContextOnDispose(true);
+    const model = tableViewerStorageService.add(new DatabaseDataModel(source));
+    state.modelId = model.id;
+
+    model.setAccess(DatabaseDataAccessMode.Readonly).setCountGain(dataViewerSettingsService.getDefaultRowsCount()).setSlice(0);
+
+    // The parent owns this model even while the grouping panel is unmounted.
+    const dispose = async () => {
+      await model.dispose();
+      tableViewerStorageService.remove(model.id);
+      sourceModel.onDispose.removeHandler(dispose);
+    };
+    sourceModel.onDispose.addHandler(dispose);
+
+    return {
+      source,
+      model,
+    };
+  }, false);
 
   const prevStateRef = useRef({
     columns: state.columns,
@@ -92,13 +88,6 @@ export function useGroupingDataModel(
     showDuplicatesOnly: state.showDuplicatesOnly,
     sourceResultId: sourceModel.source.getResult(sourceResultIndex)?.id,
   });
-
-  useEffect(() => {
-    sourceModel.onDispose.addHandler(model.dispose);
-    return () => {
-      sourceModel.onDispose.removeHandler(model.dispose);
-    };
-  }, [sourceModel]);
 
   useEffect(() => {
     const sub = reaction(
