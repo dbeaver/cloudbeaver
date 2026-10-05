@@ -60,8 +60,8 @@ export function useGroupingDataModel(
           source: model.source,
           model,
           async dispose() {
-            await this.model.dispose();
             tableViewerStorageService.remove(state.modelId);
+            await this.model.dispose();
           },
         };
       }
@@ -77,8 +77,8 @@ export function useGroupingDataModel(
         source,
         model,
         async dispose() {
-          await this.model.dispose();
           tableViewerStorageService.remove(this.model.id);
+          await this.model.dispose();
         },
       };
     },

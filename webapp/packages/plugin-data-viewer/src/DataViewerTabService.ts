@@ -148,8 +148,14 @@ export class DataViewerTabService {
       const model = this.tableViewerStorageService.get(tableId);
 
       if (model) {
-        await model.dispose();
-        this.tableViewerStorageService.remove(tableId);
+        // Keep child disposal handlers mounted, then hide the table before its source destroys the result actions.
+        const removeModel = () => this.tableViewerStorageService.remove(tableId);
+        model.onDispose.addPostHandler(removeModel);
+        try {
+          await model.dispose();
+        } finally {
+          model.onDispose.removePostHandler(removeModel);
+        }
       }
     }
   }
