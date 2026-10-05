@@ -32,6 +32,8 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
   readonly onOptionsChange: IExecutor;
   readonly onRequest: IExecutor<IRequestEventData<TSource>>;
 
+  private disposePromise: Promise<void> | undefined;
+
   constructor(source: TSource) {
     this.id = uuid();
     this.name = null;
@@ -133,8 +135,11 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
     this.source.resetData();
   }
 
-  async dispose(): Promise<void> {
-    await this.onDispose.execute();
-    await this.source.dispose();
+  dispose(): Promise<void> {
+    if (!this.disposePromise) {
+      // Retain failures too: cleanup may already be partially completed.
+      this.disposePromise = this.onDispose.execute().then(() => this.source.dispose());
+    }
+    return this.disposePromise;
   }
 }
