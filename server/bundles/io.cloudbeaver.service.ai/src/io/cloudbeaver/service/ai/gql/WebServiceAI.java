@@ -27,11 +27,7 @@ import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.*;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
-import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
-import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
-import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
-import io.cloudbeaver.service.ai.model.inputs.WebAIProfileCredentialsInput;
-import io.cloudbeaver.service.ai.model.inputs.WebAiChatCompletionSettingsInput;
+import io.cloudbeaver.service.ai.model.inputs.*;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.utils.ServletAppUtils;
@@ -582,8 +578,7 @@ public class WebServiceAI implements DBWServiceAI {
             AIConfigurationProfile sourceProfile = settings.getConfiguration(profileId);
             AIConfigurationProfile newProfile = settings.copyConfiguration(
                 sourceProfile,
-                UUID.randomUUID().toString(),
-                settings.generateProfileName(sourceProfile.getProfileName())
+                UUID.randomUUID().toString()
             );
             WebAIProfileUtils.prepareGlobalProfile(webSession, newProfile);
             AISettingsManager.getInstance().saveSettings();
