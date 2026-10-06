@@ -1,25 +1,34 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useCallback, useContext } from 'react';
 
 import { getComputed, Icon, type IContextMenuPosition, s, useS } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
-import { DATA_CONTEXT_NAV_NODE, type INodeActions, type NavNode } from '@cloudbeaver/core-navigation-tree';
+import {
+  DATA_CONTEXT_NAV_NODE,
+  DATA_CONTEXT_NAV_NODES,
+  type INodeActions,
+  type NavNode,
+  NavNodeInfoResource,
+} from '@cloudbeaver/core-navigation-tree';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
+import { ElementsTreeContext } from '../../ElementsTreeContext.js';
 import { MENU_NAV_TREE } from '../../MENU_NAV_TREE.js';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from './DATA_CONTEXT_NAV_NODE_ACTIONS.js';
 import style from './TreeNodeMenu.module.css';
 
-export interface TreeNodeMenuProps {
+export interface ITreeNodeMenuProps {
   node: NavNode;
   actions?: INodeActions;
   selected?: boolean;
@@ -27,14 +36,24 @@ export interface TreeNodeMenuProps {
   onClose?: () => void;
 }
 
-export const TreeNodeMenu = observer<TreeNodeMenuProps>(function TreeNodeMenu({ node, actions, selected, contextMenuPosition, onClose }) {
+export const TreeNodeMenu = observer<ITreeNodeMenuProps>(function TreeNodeMenu({ node, actions, selected, contextMenuPosition, onClose }) {
   const styles = useS(style);
   const connectionInfoResource = useService(ConnectionInfoResource);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const elementsTreeContext = useContext(ElementsTreeContext);
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const connectionKey = getComputed(() => connectionInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri));
 
+  // stable reference: useDataContextLink re-runs its update callback on every render, and DataContext.set
+  // treats a new function reference as a change, invalidating every menu computed that reads the selection
+  const getSelected = useCallback(
+    (): NavNode[] => navNodeInfoResource.get(resourceKeyList(elementsTreeContext?.tree.getSelected() ?? [])).filter(Boolean) as NavNode[],
+    [elementsTreeContext, navNodeInfoResource],
+  );
+
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
+    context.set(DATA_CONTEXT_NAV_NODES, getSelected, id);
     context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions, id);
 
     if (connectionKey) {
