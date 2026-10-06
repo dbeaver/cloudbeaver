@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Button, ConfirmationDialog, InputField, Loader, useClipboard, useExecutor, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, ConfirmationDialog, Container, InputField, Loader, useClipboard, useExecutor, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -112,9 +112,11 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
         </div>
       )}
       {profile.account ? (
-        <Button type="button" variant="secondary" disabled={blocked} onClick={disconnect}>
-          {translate('plugin_ai_account_disconnect')}
-        </Button>
+        <Container className="tw:self-start" keepSize>
+          <Button type="button" variant="secondary" disabled={blocked} onClick={disconnect}>
+            {translate('plugin_ai_account_disconnect')}
+          </Button>
+        </Container>
       ) : (
         <>
           {authorization && (
@@ -130,9 +132,11 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
             </>
           )}
           {!processing && (
-            <Button type="button" disabled={blocked || !profile.deviceAuthorizationAvailable} onClick={connect}>
-              {translate('plugin_ai_account_connect')}
-            </Button>
+            <Container className="tw:self-start" keepSize>
+              <Button type="button" disabled={blocked || !profile.deviceAuthorizationAvailable} onClick={connect}>
+                {translate('plugin_ai_account_connect')}
+              </Button>
+            </Container>
           )}
         </>
       )}

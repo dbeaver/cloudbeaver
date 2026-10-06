@@ -8,7 +8,7 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Button, ConfirmationDialog, InputField, SAVED_VALUE_INDICATOR, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, ConfirmationDialog, Container, InputField, SAVED_VALUE_INDICATOR, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -59,9 +59,11 @@ export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFor
         {translate('plugin_ai_credentials_token')}
       </InputField>
       {profile.tokenSaved && (
-        <Button type="button" variant="secondary" disabled={formState.isDisabled} onClick={resetCredentials}>
-          {translate('plugin_ai_credentials_reset')}
-        </Button>
+        <Container className="tw:self-start" keepSize>
+          <Button type="button" variant="secondary" disabled={formState.isDisabled} onClick={resetCredentials}>
+            {translate('plugin_ai_credentials_reset')}
+          </Button>
+        </Container>
       )}
     </>
   );
