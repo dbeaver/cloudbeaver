@@ -12,22 +12,13 @@ interface PreparePropertiesParams {
   engineProperties: Record<string, any>;
   initialEngineProperties: Record<string, any>;
   infoProperties: IObjectPropertyInfo[];
-  userCredentials?: boolean;
 }
 
-export function prepareProperties({
-  engineProperties,
-  initialEngineProperties,
-  infoProperties,
-  userCredentials,
-}: PreparePropertiesParams): Record<string, any> {
+export function prepareProperties({ engineProperties, initialEngineProperties, infoProperties }: PreparePropertiesParams): Record<string, any> {
   const result: Record<string, any> = {};
   const passwordsProperties = infoProperties.filter(property => property.features.includes('password'));
 
   for (const key of Object.keys(engineProperties)) {
-    if (userCredentials && (key === 'token' || key === 'authentication')) {
-      continue;
-    }
     let value = engineProperties[key];
     const initial = initialEngineProperties[key];
 

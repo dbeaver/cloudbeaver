@@ -40,7 +40,7 @@ export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFor
     }
   }
 
-  if (!profile || profile.global) {
+  if (!profile) {
     return null;
   }
 
@@ -59,11 +59,9 @@ export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFor
         {translate('plugin_ai_credentials_token')}
       </InputField>
       {profile.tokenSaved && (
-        <div>
-          <Button type="button" variant="secondary" disabled={formState.isDisabled} onClick={resetCredentials}>
-            {translate('plugin_ai_credentials_reset')}
-          </Button>
-        </div>
+        <Button type="button" variant="secondary" disabled={formState.isDisabled} onClick={resetCredentials}>
+          {translate('plugin_ai_credentials_reset')}
+        </Button>
       )}
     </>
   );

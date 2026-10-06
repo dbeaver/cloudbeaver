@@ -56,6 +56,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     const firstProfile = this.values.length === 0;
     const { profile } = await this.graphQLService.sdk.createAiProfile({ config });
     this.set(profile.id, { ...profile, ...getDefaultState() });
+
     // Load user-specific metadata, including Device Auth support, on the next read.
     this.markOutdated(profile.id);
     if (firstProfile) {

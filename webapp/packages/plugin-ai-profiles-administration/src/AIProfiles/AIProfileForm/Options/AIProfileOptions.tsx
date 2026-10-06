@@ -168,7 +168,6 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     part.state.properties['global'] = global;
     if (!global) {
       part.state.properties['token'] = null;
-      delete part.state.properties['authentication'];
     }
   }
 

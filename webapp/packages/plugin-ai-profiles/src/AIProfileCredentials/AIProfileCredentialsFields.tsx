@@ -21,12 +21,13 @@ export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredenti
   const translate = useTranslate();
   const name = useId();
   const part = getAIProfileCredentialsFormPart(formState);
-  useAutoLoad(AIProfileCredentialsFields, part);
   const profile = part.currentProfile;
+
+  useAutoLoad(AIProfileCredentialsFields, part);
 
   return (
     <Container vertical gap>
-      <InputField value={profile?.name ?? ''} disabled={formState.isDisabled} readOnly>
+      <InputField value={profile?.name ?? ''} readOnly>
         {translate('plugin_ai_credentials_profile')}
       </InputField>
       <InputField value={part.currentEngine?.name ?? profile?.engineId ?? ''} readOnly>

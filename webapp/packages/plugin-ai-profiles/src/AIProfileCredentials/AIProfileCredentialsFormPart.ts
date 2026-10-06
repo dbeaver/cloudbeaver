@@ -37,7 +37,13 @@ export class AIProfileCredentialsFormPart extends FormPart<ReturnType<typeof get
   }
 
   override isOutdated(): boolean {
-    return this.aiProfilesResource.isOutdated(this.formState.state.profileId) || this.aiEnginesResource.isOutdated();
+    if (this.aiProfilesResource.isOutdated(this.formState.state.profileId)) {
+      return true;
+    }
+    if (!this.currentProfile) {
+      return false;
+    }
+    return this.aiEnginesResource.isOutdated();
   }
 
   async resetCredentials(): Promise<void> {
@@ -51,10 +57,12 @@ export class AIProfileCredentialsFormPart extends FormPart<ReturnType<typeof get
   }
 
   protected override async loader(): Promise<void> {
-    const [profile] = await Promise.all([this.aiProfilesResource.load(this.formState.state.profileId), this.aiEnginesResource.load()]);
+    const profile = await this.aiProfilesResource.load(this.formState.state.profileId);
     if (!profile) {
-      throw new Error('plugin_ai_credentials_profile_not_found');
+      this.setInitialState(getDefaultState());
+      return;
     }
+    await this.aiEnginesResource.load();
     this.setInitialState({ token: '', accountAuthentication: profile.deviceAuthorizationAvailable && profile.accountAuthentication });
   }
 

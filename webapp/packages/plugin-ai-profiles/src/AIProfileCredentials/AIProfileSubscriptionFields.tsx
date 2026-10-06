@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Alert, Button, ConfirmationDialog, InputField, Loader, useClipboard, useExecutor, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, ConfirmationDialog, InputField, Loader, useClipboard, useExecutor, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -35,7 +35,6 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
   const profile = part.currentProfile;
   const [processing, setProcessing] = useState(false);
   const [authorization, setAuthorization] = useState<AiDeviceAuthorizationInfo | null>(null);
-  const [exception, setException] = useState<Error | null>(null);
   const taskRef = useRef<AsyncTask | null>(null);
   const blocked = formState.isDisabled || processing;
 
@@ -58,7 +57,6 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
 
   async function connect(): Promise<void> {
     setProcessing(true);
-    setException(null);
     const task = credentialsService.authorize(formState.state.profileId, setAuthorization);
     taskRef.current = task;
     try {
@@ -67,7 +65,7 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
       }
     } catch (exception: any) {
       if (!task.cancelled) {
-        setException(exception);
+        notificationService.logException(exception, 'plugin_ai_device_failed');
       }
     } finally {
       taskRef.current = null;
@@ -95,7 +93,7 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
     }
   }
 
-  if (!profile || profile.global) {
+  if (!profile) {
     return null;
   }
 
@@ -114,11 +112,9 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
         </div>
       )}
       {profile.account ? (
-        <div>
-          <Button type="button" variant="secondary" disabled={blocked} onClick={disconnect}>
-            {translate('plugin_ai_account_disconnect')}
-          </Button>
-        </div>
+        <Button type="button" variant="secondary" disabled={blocked} onClick={disconnect}>
+          {translate('plugin_ai_account_disconnect')}
+        </Button>
       ) : (
         <>
           {authorization && (
@@ -133,17 +129,10 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
               <p>{translate('plugin_ai_device_expiration', undefined, { minutes: Math.ceil(authorization.expiresInSeconds / 60) })}</p>
             </>
           )}
-          {exception && (
-            <Alert variant="error">
-              {translate('plugin_ai_device_failed')}: {exception.message}
-            </Alert>
-          )}
           {!processing && (
-            <div>
-              <Button type="button" disabled={blocked || !profile.deviceAuthorizationAvailable} onClick={connect}>
-                {translate(exception ? 'plugin_ai_device_retry' : 'plugin_ai_account_connect')}
-              </Button>
-            </div>
+            <Button type="button" disabled={blocked || !profile.deviceAuthorizationAvailable} onClick={connect}>
+              {translate('plugin_ai_account_connect')}
+            </Button>
           )}
         </>
       )}

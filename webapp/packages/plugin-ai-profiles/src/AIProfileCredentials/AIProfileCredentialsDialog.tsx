@@ -45,6 +45,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const { formState } = payload;
   const part = getAIProfileCredentialsFormPart(formState);
   const error = getFirstException(formState.exception);
+  const isSaving = !!formState.savingPromise;
   const form = useForm({
     onSubmit: async function onSubmit() {
       const saved = await formState.save();
@@ -69,7 +70,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           title="plugin_ai_credentials_dialog_title"
           subTitle="plugin_ai_credentials_dialog_description"
           icon={part.currentEngine?.icon}
-          onReject={formState.savingPromise ? undefined : rejectDialog}
+          onReject={isSaving ? undefined : rejectDialog}
         />
         <CommonDialogBody>
           <Container gap>
@@ -79,10 +80,10 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
         </CommonDialogBody>
         <CommonDialogFooter>
           <Fill />
-          <Button type="button" variant="secondary" disabled={!!formState.savingPromise} onClick={() => rejectDialog()}>
+          <Button type="button" variant="secondary" disabled={isSaving} onClick={() => rejectDialog()}>
             {translate('ui_processing_cancel')}
           </Button>
-          <Button type="submit" disabled={formState.isDisabled}>
+          <Button type="submit" disabled={formState.isDisabled || isSaving}>
             {translate('ui_processing_save')}
           </Button>
         </CommonDialogFooter>

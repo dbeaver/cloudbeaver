@@ -172,7 +172,6 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
     this.state.properties[GLOBAL_PROPERTY_ID] = this.state.global;
     return {
       properties: prepareProperties({
-        userCredentials: !this.state.global,
         engineProperties: this.state.properties,
         initialEngineProperties: this.initialState.properties,
         infoProperties: this.aiEnginePropertiesResource.get(this.state.engineId) ?? [],

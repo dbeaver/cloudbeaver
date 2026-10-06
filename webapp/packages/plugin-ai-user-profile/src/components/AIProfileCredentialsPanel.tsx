@@ -62,6 +62,8 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
 
   const part = getAIProfileCredentialsFormPart(formState);
   const title = `${translate('ui_edit')} "${part.currentProfile?.name ?? ''}"`;
+  const error = getFirstException(formState.exception);
+  const isSaving = !!formState.savingPromise;
 
   return (
     <ColoredContainer aria-label={title} parent vertical noWrap surface gap compact>
@@ -80,14 +82,14 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
               noWrap
             >
               <Container fill>
-                {formState.exception && <StatusMessage exception={getFirstException(formState.exception)} />}
+                {error && <StatusMessage exception={error} />}
                 <TabList disabled={formState.isDisabled} underline big />
               </Container>
               <Container keepSize noWrap center gap compact>
-                <Button type="button" disabled={!!formState.savingPromise} variant="secondary" onClick={() => credentialsPanelService.close()}>
+                <Button type="button" variant="secondary" onClick={() => credentialsPanelService.close()}>
                   {translate('ui_processing_cancel')}
                 </Button>
-                <Button type="submit" disabled={formState.isDisabled || !formState.isChanged}>
+                <Button type="submit" disabled={formState.isDisabled || isSaving || !formState.isChanged}>
                   {translate('ui_processing_save')}
                 </Button>
               </Container>
