@@ -21,10 +21,10 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
-import { getAIProfileCredentialsFormParts } from '@cloudbeaver/plugin-ai-profiles';
+import { getAIProfileCredentialsFormPart } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
 
@@ -37,7 +37,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
   const formState = credentialsPanelService.formState;
   const form = useForm({
     onSubmit: async function onSubmit() {
-      if (!formState || formState.isDisabled || !formState.isChanged) {
+      if (!formState) {
         return;
       }
 
@@ -47,7 +47,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
       if (saved) {
         notificationService.logSuccess({
           title: 'plugin_ai_user_profile_credentials_saved',
-          message: token.profile?.name,
+          message: part.currentProfile?.name,
         });
         await credentialsPanelService.back();
       } else if (exception) {
@@ -60,8 +60,8 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
     return null;
   }
 
-  const { token } = getAIProfileCredentialsFormParts(formState);
-  const title = `${translate('ui_edit')} "${token.profile?.name ?? ''}"`;
+  const part = getAIProfileCredentialsFormPart(formState);
+  const title = `${translate('ui_edit')} "${part.currentProfile?.name ?? ''}"`;
 
   return (
     <ColoredContainer aria-label={title} parent vertical noWrap surface gap compact>
@@ -80,7 +80,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
               noWrap
             >
               <Container fill>
-                <StatusMessage exception={getFirstException(formState.exception)} message={formState.statusMessage} type={ENotificationType.Info} />
+                {formState.exception && <StatusMessage exception={getFirstException(formState.exception)} />}
                 <TabList disabled={formState.isDisabled} underline big />
               </Container>
               <Container keepSize noWrap center gap compact>

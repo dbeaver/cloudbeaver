@@ -10,16 +10,16 @@ import { observer } from 'mobx-react-lite';
 
 import { Group } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { AIProfileCredentialsFields as CredentialsFields } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfileCredentialsFields } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { IAIProfileCredentialsFormProps } from '../AIProfileCredentialsForm/IAIProfileCredentialsFormProps.js';
 
-export const AIProfileCredentialsFields: TabContainerPanelComponent<IAIProfileCredentialsFormProps> = observer(function AIProfileCredentialsFields({
+export const AIProfileCredentialsTab: TabContainerPanelComponent<IAIProfileCredentialsFormProps> = observer(function AIProfileCredentialsTab({
   formState,
 }) {
   return (
     <Group className="tw:w-full" small keepSize gap>
-      <CredentialsFields formState={formState} />
+      <AIProfileCredentialsFields formState={formState} />
     </Group>
   );
 });

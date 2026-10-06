@@ -15,7 +15,6 @@ export default [
   ['plugin_ai_credentials_profile', 'Profile'],
   ['plugin_ai_credentials_engine', 'Engine'],
   ['plugin_ai_credentials_token', 'API Token'],
-  ['plugin_ai_credentials_done', 'Done'],
   ['plugin_ai_credentials_token_required', 'Enter an API token.'],
   ['plugin_ai_credentials_method', 'Authentication method'],
   ['plugin_ai_credentials_subscription', 'Subscription'],

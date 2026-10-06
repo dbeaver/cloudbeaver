@@ -3,7 +3,6 @@ fragment AiChatMessage on AIMessage {
   id
   role
   content
-  errorCode
   displayMessage
   time
   functionCall {

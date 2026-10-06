@@ -7,16 +7,20 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useEffect, useRef, useState } from 'react';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Alert, Button, ConfirmationDialog, InputField, Loader, useClipboard, useExecutor, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
+import { Alert, Button, ConfirmationDialog, InputField, Loader, useClipboard, useExecutor, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { AsyncTask } from '@cloudbeaver/core-root';
+import type { AiDeviceAuthorizationInfo } from '@cloudbeaver/core-sdk';
 import type { IFormProps } from '@cloudbeaver/core-ui';
-import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { getAIProfileCredentialsFormParts } from './getAIProfileCredentialsFormParts.js';
+import { AIProfilesResource } from '../AIProfilesResource.js';
+import { AIProfileCredentialsService } from './AIProfileCredentialsService.js';
+import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
 export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredentialsFormState>>(function AIProfileSubscriptionFields({ formState }) {
@@ -25,20 +29,50 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
   const userInfoResource = useService(UserInfoResource);
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
-  const { subscription: part } = getAIProfileCredentialsFormParts(formState);
-  const profile = part.profile;
-  const blocked = formState.isDisabled || part.isOutdated();
-  const authorization = part.authorization;
-  const exception = getFirstException(part.exception);
-  const [accountStatusRef, accountStatusFocus] = useFocus<HTMLDivElement>({});
-  const [connectRef] = useFocus<HTMLDivElement>({ focusFirstChild: !!exception && !blocked });
+  const credentialsService = useService(AIProfileCredentialsService);
+  const aiProfilesResource = useService(AIProfilesResource);
+  const part = getAIProfileCredentialsFormPart(formState);
+  const profile = part.currentProfile;
+  const [processing, setProcessing] = useState(false);
+  const [authorization, setAuthorization] = useState<AiDeviceAuthorizationInfo | null>(null);
+  const [exception, setException] = useState<Error | null>(null);
+  const taskRef = useRef<AsyncTask | null>(null);
+  const blocked = formState.isDisabled || processing;
 
-  useExecutor({ executor: userInfoResource.onUserChange, handlers: [() => part.cancelAuthorization()] });
+  function cancelAuthorization(): Promise<void> | undefined {
+    if (taskRef.current) {
+      return credentialsService.cancelAuthorization(taskRef.current);
+    }
+    return undefined;
+  }
+
+  useExecutor({ executor: userInfoResource.onUserChange, handlers: [cancelAuthorization] });
+  useEffect(
+    () => () => {
+      if (taskRef.current) {
+        void credentialsService.cancelAuthorization(taskRef.current);
+      }
+    },
+    [credentialsService],
+  );
 
   async function connect(): Promise<void> {
-    if (await part.connect()) {
-      accountStatusFocus.reference?.focus();
-      notificationService.logSuccess({ title: 'plugin_ai_account_connected', message: profile?.name });
+    setProcessing(true);
+    setException(null);
+    const task = credentialsService.authorize(formState.state.profileId, setAuthorization);
+    taskRef.current = task;
+    try {
+      if (await credentialsService.connect(formState.state.profileId, task)) {
+        notificationService.logSuccess({ title: 'plugin_ai_account_connected', message: profile?.name });
+      }
+    } catch (exception: any) {
+      if (!task.cancelled) {
+        setException(exception);
+      }
+    } finally {
+      taskRef.current = null;
+      setAuthorization(null);
+      setProcessing(false);
     }
   }
 
@@ -51,10 +85,13 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
     if (status !== DialogueStateResult.Resolved) {
       return;
     }
+    setProcessing(true);
     try {
-      await part.disconnect();
+      await aiProfilesResource.disconnectAccount(formState.state.profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_account_disconnect_failed');
+    } finally {
+      setProcessing(false);
     }
   }
 
@@ -64,8 +101,8 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
 
   return (
     <>
-      {(profile.account || part.isLoading()) && (
-        <div ref={accountStatusRef} role="status" tabIndex={-1}>
+      {(profile.account || processing) && (
+        <div role="status">
           {profile.account ? (
             <>
               {translate('plugin_ai_account_connected')}
@@ -86,7 +123,7 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
         <>
           {authorization && (
             <>
-              <InputField value={authorization.userCode} readOnly autoFocus onCustomCopy={() => copy(authorization.userCode, true)}>
+              <InputField value={authorization.userCode} readOnly onCustomCopy={() => copy(authorization.userCode, true)}>
                 {translate('plugin_ai_device_code')}
               </InputField>
               <a href={authorization.verificationUri} target="_blank" rel="noopener noreferrer">
@@ -101,8 +138,8 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
               {translate('plugin_ai_device_failed')}: {exception.message}
             </Alert>
           )}
-          {!part.isLoading() && (
-            <div key={exception && !blocked ? 'retry' : 'connect'} ref={connectRef}>
+          {!processing && (
+            <div>
               <Button type="button" disabled={blocked || !profile.deviceAuthorizationAvailable} onClick={connect}>
                 {translate(exception ? 'plugin_ai_device_retry' : 'plugin_ai_account_connect')}
               </Button>

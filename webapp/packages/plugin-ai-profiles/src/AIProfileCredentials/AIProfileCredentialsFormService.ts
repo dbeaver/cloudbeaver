@@ -15,6 +15,8 @@ import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsForm
 
 @injectable(() => [LocalizationService, NotificationService, IServiceProvider])
 export class AIProfileCredentialsFormService extends FormBaseService<IAIProfileCredentialsFormState> {
+  private formState: FormState<IAIProfileCredentialsFormState> | null = null;
+
   constructor(
     localizationService: LocalizationService,
     notificationService: NotificationService,
@@ -23,7 +25,14 @@ export class AIProfileCredentialsFormService extends FormBaseService<IAIProfileC
     super(localizationService, notificationService, 'AIProfileCredentialsForm');
   }
 
-  create(profileId: string): FormState<IAIProfileCredentialsFormState> {
-    return new FormState(this.serviceProvider, this, { profileId }).setMode(FormMode.Edit);
+  create(profileId: string): FormState<IAIProfileCredentialsFormState> | null {
+    if (this.formState) {
+      return null;
+    }
+    this.formState = new FormState(this.serviceProvider, this, { profileId }).setMode(FormMode.Edit);
+    this.formState.disposeTask.addHandler(() => {
+      this.formState = null;
+    });
+    return this.formState;
   }
 }

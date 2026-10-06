@@ -82,8 +82,6 @@ type AIMessage {
     id: ID!
     role: AIMessageType!
     content: String!
-    "Machine-readable error code for ERROR messages. AI_ACCOUNT_AUTHENTICATION_REQUIRED means subscription access must be restored by disconnecting and connecting the account. Model and quota errors must not use this code."
-    errorCode: String @since(version: "26.2.0")
     displayMessage: String!
     time: DateTime!
     "Present only with CONFIRMATION role"

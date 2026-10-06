@@ -11,7 +11,7 @@ import './module.js';
 export * from './AIProfileCredentials/AIProfileCredentialsDialogLazy.js';
 export type { IAIProfileCredentialsDialogPayload } from './AIProfileCredentials/AIProfileCredentialsDialog.js';
 export * from './AIProfileCredentials/AIProfileCredentialsService.js';
-export * from './AIProfileCredentials/getAIProfileCredentialsFormParts.js';
+export * from './AIProfileCredentials/getAIProfileCredentialsFormPart.js';
 export type { IAIProfileCredentialsFormState } from './AIProfileCredentials/IAIProfileCredentialsFormState.js';
 export { AIProfileCredentialsFields } from './AIProfileCredentials/AIProfileCredentialsFieldsLazy.js';
 export * from './AIProfilesResource.js';

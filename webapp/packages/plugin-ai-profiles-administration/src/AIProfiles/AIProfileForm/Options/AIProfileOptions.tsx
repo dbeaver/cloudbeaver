@@ -56,10 +56,10 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const usesUserCredentials = !part.state.global;
   const configurableProperties = propertiesInfo
     .filter(({ id }) => {
-      if (id === 'global') {
+      if (id === 'global' || id === 'authentication') {
         return false;
       }
-      if (id === 'token' || id === 'authentication') {
+      if (id === 'token') {
         return !usesUserCredentials;
       }
       return true;

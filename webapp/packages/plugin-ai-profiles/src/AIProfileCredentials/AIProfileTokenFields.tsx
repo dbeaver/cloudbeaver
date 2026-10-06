@@ -14,16 +14,15 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IFormProps } from '@cloudbeaver/core-ui';
 
-import { getAIProfileCredentialsFormParts } from './getAIProfileCredentialsFormParts.js';
+import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
 export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFormState>>(function AIProfileTokenFields({ formState }) {
   const translate = useTranslate();
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
-  const { token: part } = getAIProfileCredentialsFormParts(formState);
-  const profile = part.profile;
-  const blocked = formState.isDisabled || part.isOutdated();
+  const part = getAIProfileCredentialsFormPart(formState);
+  const profile = part.currentProfile;
 
   async function resetCredentials(): Promise<void> {
     const { status } = await commonDialogService.open(ConfirmationDialog, {
@@ -53,7 +52,7 @@ export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFor
         name="token"
         autoComplete="new-password"
         required={!profile.tokenSaved}
-        disabled={blocked}
+        disabled={formState.isDisabled}
         placeholder={profile.tokenSaved ? SAVED_VALUE_INDICATOR : undefined}
         description={profile.tokenSaved ? translate('ui_processing_saved') : undefined}
       >
@@ -61,7 +60,7 @@ export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFor
       </InputField>
       {profile.tokenSaved && (
         <div>
-          <Button type="button" variant="secondary" disabled={blocked} onClick={resetCredentials}>
+          <Button type="button" variant="secondary" disabled={formState.isDisabled} onClick={resetCredentials}>
             {translate('plugin_ai_credentials_reset')}
           </Button>
         </div>

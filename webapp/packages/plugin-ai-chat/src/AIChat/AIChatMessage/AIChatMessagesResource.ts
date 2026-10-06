@@ -102,7 +102,6 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
             displayMessage: data.displayMessage,
             role: data.role as AiMessageType,
             content: data.content,
-            errorCode: data.errorCode,
             time: data.time,
             functionCall: data.functionCall,
             functionResult: data.functionResult,
@@ -163,7 +162,6 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
           if (prevMessage) {
             prevMessage.role = AiMessageType.Error;
             prevMessage.content = data.errorMessage ?? this.localizationService.translate('plugin_ai_chat_generate_response_error');
-            prevMessage.errorCode = data.errorCode;
           }
 
           this.onMessageStream.execute({ state: 'end', param });
