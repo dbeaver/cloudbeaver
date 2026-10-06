@@ -15,6 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { FormBaseService, FormMode, FormState, OptionsPanelService, type OptionsPanelCloseEventData } from '@cloudbeaver/core-ui';
+import { getAIProfileCredentialsFormPart } from '@cloudbeaver/plugin-ai-profiles';
 import { UserProfileTabsService } from '@cloudbeaver/plugin-user-profile';
 
 import type { IAIProfileCredentialsFormState } from './AIProfileCredentialsForm/IAIProfileCredentialsFormState.js';
@@ -90,6 +91,12 @@ export class AIProfileCredentialsPanelService extends FormBaseService<IAIProfile
       if (status === DialogueStateResult.Rejected) {
         ExecutorInterrupter.interrupt(contexts);
         return;
+      }
+    } else if (this.formState) {
+      const part = getAIProfileCredentialsFormPart(this.formState);
+      const leaveContexts = await part.onBeforeLeave.execute();
+      if (ExecutorInterrupter.isInterrupted(leaveContexts)) {
+        ExecutorInterrupter.interrupt(contexts);
       }
     }
   };

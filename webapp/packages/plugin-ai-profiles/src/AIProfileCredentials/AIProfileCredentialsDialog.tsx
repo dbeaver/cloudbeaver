@@ -24,6 +24,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
@@ -63,13 +64,23 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     },
   });
 
+  async function close(): Promise<void> {
+    if (isSaving) {
+      return;
+    }
+    const contexts = await part.onBeforeLeave.execute();
+    if (!ExecutorInterrupter.isInterrupted(contexts)) {
+      rejectDialog();
+    }
+  }
+
   return (
     <CommonDialogWrapper size="medium" aria-label={translate('plugin_ai_credentials_dialog_title')} fixedWidth>
       <CommonDialogHeader
         title="plugin_ai_credentials_dialog_title"
         subTitle="plugin_ai_credentials_dialog_description"
         icon={part.currentEngine?.icon}
-        onReject={isSaving ? undefined : rejectDialog}
+        onReject={isSaving ? undefined : close}
       />
       <CommonDialogBody>
         <Form context={form} contents>
@@ -81,7 +92,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
       </CommonDialogBody>
       <CommonDialogFooter>
         <Fill />
-        <Button type="button" variant="secondary" disabled={isSaving} onClick={() => rejectDialog()}>
+        <Button type="button" variant="secondary" disabled={isSaving} onClick={close}>
           {translate('ui_processing_cancel')}
         </Button>
         <Button type="button" disabled={formState.isDisabled || isSaving} onClick={() => form.submit()}>

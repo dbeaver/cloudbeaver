@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { AiEnginesResource, type EngineInfo } from '@cloudbeaver/plugin-ai';
 
@@ -16,6 +16,8 @@ import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsForm
 const getDefaultState = () => ({ token: '', accountAuthentication: false });
 
 export class AIProfileCredentialsFormPart extends FormPart<ReturnType<typeof getDefaultState>, IAIProfileCredentialsFormState> {
+  readonly onBeforeLeave = new Executor();
+
   constructor(
     formState: IFormState<IAIProfileCredentialsFormState>,
     private readonly aiProfilesResource: AIProfilesResource,

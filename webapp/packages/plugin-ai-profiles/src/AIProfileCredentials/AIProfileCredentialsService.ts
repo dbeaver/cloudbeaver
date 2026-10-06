@@ -46,9 +46,7 @@ export class AIProfileCredentialsService {
     }
 
     try {
-      return await this.commonDialogService.open(AIProfileCredentialsDialog, {
-        formState,
-      });
+      return await this.commonDialogService.open(AIProfileCredentialsDialog, { formState }, { persistent: true });
     } finally {
       await formState.dispose();
     }
@@ -77,13 +75,15 @@ export class AIProfileCredentialsService {
     }
   }
 
-  async cancelAuthorization(task: AsyncTask): Promise<void> {
+  async cancelAuthorization(task: AsyncTask): Promise<boolean> {
     try {
       if (task.pending) {
         await this.asyncTaskInfoService.cancel(task.id);
       }
+      return true;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'plugin_ai_device_cancel_failed');
+      return false;
     }
   }
 

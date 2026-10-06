@@ -6,14 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-/* Keep the hidden radio input independent of the global text-field sizing. */
-.dbv-kit-radio__input {
-  min-height: 0;
-  width: 1px;
-  padding: 0;
-  border: 0;
-}
-
 @layer components {
   :root {
     --dbv-kit-radio-small-height: 24px;

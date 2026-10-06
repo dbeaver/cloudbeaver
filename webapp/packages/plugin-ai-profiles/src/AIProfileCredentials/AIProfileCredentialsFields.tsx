@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useId } from 'react';
 
 import { Container, InputField, Radio, RadioGroup, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import type { IFormProps } from '@cloudbeaver/core-ui';
 
 import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
@@ -38,7 +39,13 @@ export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredenti
           name={name}
           label={translate('plugin_ai_credentials_method')}
           value={part.accountAuthentication ? 'subscription' : 'token'}
-          onChange={value => {
+          onChange={async value => {
+            if (part.accountAuthentication && value !== 'subscription') {
+              const contexts = await part.onBeforeLeave.execute();
+              if (ExecutorInterrupter.isInterrupted(contexts)) {
+                return;
+              }
+            }
             part.state.accountAuthentication = value === 'subscription';
           }}
         >

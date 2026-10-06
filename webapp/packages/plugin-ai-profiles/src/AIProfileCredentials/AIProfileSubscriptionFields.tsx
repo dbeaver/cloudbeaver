@@ -14,6 +14,7 @@ import { Button, ConfirmationDialog, Container, InputField, Loader, useClipboard
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import type { AsyncTask } from '@cloudbeaver/core-root';
 import type { AiDeviceAuthorizationInfo } from '@cloudbeaver/core-sdk';
 import type { IFormProps } from '@cloudbeaver/core-ui';
@@ -38,12 +39,36 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
   const taskRef = useRef<AsyncTask | null>(null);
   const blocked = formState.isDisabled || processing;
 
-  function cancelAuthorization(): Promise<void> | undefined {
+  async function cancelAuthorization(): Promise<void> {
     if (taskRef.current) {
-      return credentialsService.cancelAuthorization(taskRef.current);
+      await credentialsService.cancelAuthorization(taskRef.current);
     }
-    return undefined;
   }
+
+  async function confirmCancelAuthorization(): Promise<boolean> {
+    const task = taskRef.current;
+    if (!task?.pending || task.cancelled) {
+      return true;
+    }
+    const { status } = await commonDialogService.open(ConfirmationDialog, {
+      title: 'plugin_ai_device_cancel_title',
+      message: 'plugin_ai_device_cancel_confirmation',
+      confirmActionText: 'plugin_ai_device_cancel',
+      cancelActionText: 'plugin_ai_device_continue',
+    });
+    return status === DialogueStateResult.Resolved && credentialsService.cancelAuthorization(task);
+  }
+
+  useExecutor({
+    executor: part.onBeforeLeave,
+    handlers: [
+      async (_, contexts) => {
+        if (!(await confirmCancelAuthorization())) {
+          ExecutorInterrupter.interrupt(contexts);
+        }
+      },
+    ],
+  });
 
   useExecutor({ executor: userInfoResource.onUserChange, handlers: [cancelAuthorization] });
   useEffect(
