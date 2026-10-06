@@ -4,6 +4,7 @@ export default [
   ['ai_administration_models_refresh', 'Modelle aktualisieren'],
   ['ai_administration_models_refresh_description', 'Pflichtfelder ausfüllen und dann aktualisieren, um Modelle zu laden'],
   ['ai_administration_models_manual_description', 'Geben Sie den Modellnamen manuell ein'],
+  ['ai_administration_models_select_or_manual_description', 'Wählen Sie ein Modell aus der Liste oder geben Sie seinen Namen manuell ein'],
   ['ai_administration_models_refresh_fail', 'Modelle konnten nicht aktualisiert werden'],
   ['plugin_ai_administration_profiles_title', 'Profile'],
   ['plugin_ai_administration_profiles_table_empty_placeholder', 'Keine Profile gefunden. Erstellen Sie ein neues Profil'],

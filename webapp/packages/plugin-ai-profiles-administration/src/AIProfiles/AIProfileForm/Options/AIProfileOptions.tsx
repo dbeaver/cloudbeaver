@@ -86,6 +86,8 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const modelPropertyIndex = configurableProperties.findIndex(property => property.id === MODEL_PROPERTY_ID);
   const modelProperty = configurableProperties[modelPropertyIndex];
   const chatModels = (models ?? []).filter(model => model.features.map(feature => feature.toLowerCase()).includes('chat'));
+  const userModelDescription =
+    chatModels.length > 0 ? 'ai_administration_models_select_or_manual_description' : 'ai_administration_models_manual_description';
   const hasModels = !!modelProperty;
   const userCredentialsSupported = aiProfileCredentialsService.isSupported(propertiesInfo);
   const propertiesBeforeModel = hasModels ? configurableProperties.slice(0, modelPropertyIndex) : configurableProperties;
@@ -233,9 +235,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                     valueSelector={model => model.id}
                     disabled={formState.isDisabled}
                     loading={isLoading}
-                    description={translate(
-                      usesUserCredentials ? 'ai_administration_models_manual_description' : 'ai_administration_models_refresh_description',
-                    )}
+                    description={translate(usesUserCredentials ? userModelDescription : 'ai_administration_models_refresh_description')}
                     allowCustomValue
                     required
                     small
