@@ -3,6 +3,7 @@ export default [
   ['ai_administration_select_language_model_selector_title', 'Model'],
   ['ai_administration_models_refresh', 'Refresh models'],
   ['ai_administration_models_refresh_description', 'Fill in required fields, then refresh to load models'],
+  ['ai_administration_models_manual_description', 'Enter the model name manually'],
   ['ai_administration_models_refresh_fail', 'Failed to refresh models'],
   ['plugin_ai_administration_profiles_title', 'Profiles'],
   ['plugin_ai_administration_profiles_table_empty_placeholder', 'No profiles found. Create a new profile'],

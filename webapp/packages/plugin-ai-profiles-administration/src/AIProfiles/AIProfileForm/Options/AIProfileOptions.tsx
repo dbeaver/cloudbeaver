@@ -233,7 +233,9 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
                     valueSelector={model => model.id}
                     disabled={formState.isDisabled}
                     loading={isLoading}
-                    description={translate('ai_administration_models_refresh_description')}
+                    description={translate(
+                      usesUserCredentials ? 'ai_administration_models_manual_description' : 'ai_administration_models_refresh_description',
+                    )}
                     allowCustomValue
                     required
                     small

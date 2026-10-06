@@ -3,6 +3,7 @@ export default [
   ['ai_administration_select_language_model_selector_title', 'Модель'],
   ['ai_administration_models_refresh', 'Обновить модели'],
   ['ai_administration_models_refresh_description', 'Заполните обязательные поля и обновите список моделей'],
+  ['ai_administration_models_manual_description', 'Введите название модели вручную'],
   ['ai_administration_models_refresh_fail', 'Не удалось обновить модели'],
   ['plugin_ai_administration_profiles_title', 'Профили'],
   ['plugin_ai_administration_profiles_table_empty_placeholder', 'Профили не найдены. Создайте новый профиль'],
