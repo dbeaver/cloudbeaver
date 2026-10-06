@@ -9,20 +9,21 @@
 import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, isResourceAlias, resourceKeyList, ResourceKeyUtils, type ResourceKey } from '@cloudbeaver/core-resource';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import {
+  type AiFunctionCall,
+  type AiFunctionConfirmation,
+  type AiFunctionResult,
   AiFunctionType,
+  type AiMessage,
+  type AiSendChatMessageInfoFragment,
   AiMessageType,
   CbClientEventId,
   CbServerEventId,
   GraphQLService,
-  type AiFunctionCall,
-  type AiFunctionConfirmation,
-  type AiFunctionResult,
-  type AiMessage,
   type WsaiChatMessageErrorEvent,
   type WsaiFunctionCallConfirmationEvent,
 } from '@cloudbeaver/core-sdk';
@@ -30,6 +31,7 @@ import {
 import { AIChatMessageEventHandler, type IAiChatMessageChunkEvent, type IAiChatMessageEvent } from './AIChatMessageEventHandler.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 import { AIFunctionsResource } from '../../AIFunctionsResource.js';
+import { getCanonicalAIFunctionId } from '../../AIChatFunctionsService.js';
 
 export interface IAIFunctionMessage extends AiMessage {
   role: AiMessageType.Function;
@@ -187,7 +189,7 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     });
   }
 
-  processFunctionCall(param: IMessageParam, confirmed: boolean) {
+  processFunctionCall(param: IMessageParam, confirmed: boolean): void {
     const message = this.getMessage(param);
 
     if (!message || !isFunctionConfirmationMessage(message) || !message.functionConfirmation) {
@@ -221,7 +223,7 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     });
   }
 
-  isExternalFunction(param: IMessageParam) {
+  isExternalFunction(param: IMessageParam): boolean {
     const message = this.getMessage(param);
 
     if (!message || !isFunctionConfirmationMessage(message) || !message.functionConfirmation) {
@@ -229,19 +231,20 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     }
 
     return message.functionConfirmation.functionCalls.some(call => {
-      const func = this.aiFunctionsResource.data.find(f => f.id === call.functionName);
+      const functionId = getCanonicalAIFunctionId(call.functionName);
+      const func = this.aiFunctionsResource.data.find(f => f.id === functionId);
       return func?.system === false;
     });
   }
 
-  async sendMessage(conversationId: string, prompt: string) {
+  async sendMessage(conversationId: string, prompt: string): Promise<AiSendChatMessageInfoFragment> {
     return await this.processSendMessage(conversationId, async () => {
       const { message } = await this.graphQLService.sdk.sendConversationMessage({ conversationId, prompt });
       return message;
     });
   }
 
-  async processSendMessage<T>(conversationId: string, action: () => Promise<T>) {
+  async processSendMessage<T>(conversationId: string, action: () => Promise<T>): Promise<T> {
     const useId = this.trackUse(conversationId);
     const message = await this.performUpdate(conversationId, undefined, action);
 
@@ -260,14 +263,14 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     this.markOutdated(conversationId);
   }
 
-  getMessage(param: IMessageParam) {
+  getMessage(param: IMessageParam): AiMessage | undefined {
     const messages = this.data.get(param.conversationId) ?? [];
     const message = messages?.find(m => m.id === param.id);
 
     return message;
   }
 
-  getMessageIndex(param: IMessageParam) {
+  getMessageIndex(param: IMessageParam): number {
     const messages = this.data.get(param.conversationId) ?? [];
     const messageIndex = messages?.findIndex(m => m.id === param.id);
 
