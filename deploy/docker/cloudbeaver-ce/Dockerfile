@@ -1,5 +1,5 @@
 ARG BASE_JAVA_REPO="dbeaver/base-java"
-ARG BASE_JAVA_TAG="stable"
+ARG BASE_JAVA_TAG
 FROM $BASE_JAVA_REPO:$BASE_JAVA_TAG
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
