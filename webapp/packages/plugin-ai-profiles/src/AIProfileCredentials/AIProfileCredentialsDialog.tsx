@@ -95,7 +95,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
         <Button type="button" variant="secondary" disabled={isSaving} onClick={close}>
           {translate('ui_processing_cancel')}
         </Button>
-        <Button type="button" disabled={formState.isDisabled || isSaving} onClick={() => form.submit()}>
+        <Button type="button" disabled={formState.isDisabled || isSaving || !formState.isChanged} onClick={() => form.submit()}>
           {translate('ui_processing_save')}
         </Button>
       </CommonDialogFooter>
