@@ -72,6 +72,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
       ...this.get(profile.id),
       ...profile,
     });
+    this.markOutdated(profile.id);
     return profile;
   }
 
