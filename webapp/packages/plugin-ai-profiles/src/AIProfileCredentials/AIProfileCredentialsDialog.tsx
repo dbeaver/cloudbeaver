@@ -64,30 +64,30 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   });
 
   return (
-    <Form context={form} contents>
-      <CommonDialogWrapper size="medium" aria-label={translate('plugin_ai_credentials_dialog_title')} fixedWidth>
-        <CommonDialogHeader
-          title="plugin_ai_credentials_dialog_title"
-          subTitle="plugin_ai_credentials_dialog_description"
-          icon={part.currentEngine?.icon}
-          onReject={isSaving ? undefined : rejectDialog}
-        />
-        <CommonDialogBody>
+    <CommonDialogWrapper size="medium" aria-label={translate('plugin_ai_credentials_dialog_title')} fixedWidth>
+      <CommonDialogHeader
+        title="plugin_ai_credentials_dialog_title"
+        subTitle="plugin_ai_credentials_dialog_description"
+        icon={part.currentEngine?.icon}
+        onReject={isSaving ? undefined : rejectDialog}
+      />
+      <CommonDialogBody>
+        <Form context={form} contents>
           <Container gap>
             {error && <StatusMessage exception={error} />}
             <AIProfileCredentialsFields formState={formState} />
           </Container>
-        </CommonDialogBody>
-        <CommonDialogFooter>
-          <Fill />
-          <Button type="button" variant="secondary" disabled={isSaving} onClick={() => rejectDialog()}>
-            {translate('ui_processing_cancel')}
-          </Button>
-          <Button type="submit" disabled={formState.isDisabled || isSaving}>
-            {translate('ui_processing_save')}
-          </Button>
-        </CommonDialogFooter>
-      </CommonDialogWrapper>
-    </Form>
+        </Form>
+      </CommonDialogBody>
+      <CommonDialogFooter>
+        <Fill />
+        <Button type="button" variant="secondary" disabled={isSaving} onClick={() => rejectDialog()}>
+          {translate('ui_processing_cancel')}
+        </Button>
+        <Button type="button" disabled={formState.isDisabled || isSaving} onClick={() => form.submit()}>
+          {translate('ui_processing_save')}
+        </Button>
+      </CommonDialogFooter>
+    </CommonDialogWrapper>
   );
 });

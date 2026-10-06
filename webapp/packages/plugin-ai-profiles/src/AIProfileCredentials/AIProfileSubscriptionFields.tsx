@@ -86,6 +86,7 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
     setProcessing(true);
     try {
       await aiProfilesResource.disconnectAccount(formState.state.profileId);
+      notificationService.logSuccess({ title: 'plugin_ai_account_disconnected', message: profile?.name });
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_account_disconnect_failed');
     } finally {

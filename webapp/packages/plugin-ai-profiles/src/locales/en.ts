@@ -21,6 +21,7 @@ export default [
   ['plugin_ai_credentials_account', '{arg:provider} account'],
   ['plugin_ai_account_connect', 'Connect account'],
   ['plugin_ai_account_connected', 'Account connected'],
+  ['plugin_ai_account_disconnected', 'Account disconnected'],
   ['plugin_ai_account_not_connected', 'Account not connected'],
   ['plugin_ai_account_disconnect', 'Disconnect account'],
   [
