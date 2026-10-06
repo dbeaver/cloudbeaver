@@ -39,7 +39,7 @@ export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredenti
         <RadioGroup
           name={name}
           label={translate('plugin_ai_credentials_method')}
-          value={token.accountAuthentication ? 'subscription' : 'token'}
+          value={subscription.accountAuthentication ? 'subscription' : 'token'}
           onChange={value => {
             subscription.state.accountAuthentication = value === 'subscription';
           }}
@@ -54,7 +54,7 @@ export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredenti
           </Radio>
         </RadioGroup>
       )}
-      {token.accountAuthentication ? <AIProfileSubscriptionFields formState={formState} /> : <AIProfileTokenFields formState={formState} />}
+      {subscription.accountAuthentication ? <AIProfileSubscriptionFields formState={formState} /> : <AIProfileTokenFields formState={formState} />}
     </Container>
   );
 });

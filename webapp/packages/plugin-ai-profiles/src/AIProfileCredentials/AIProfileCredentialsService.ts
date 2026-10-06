@@ -73,7 +73,7 @@ export class AIProfileCredentialsService {
       async () => {
         try {
           const result = await this.asyncTaskInfoService.run(task);
-          if (completion.cancelled || result.taskResult !== true) {
+          if (result.taskResult !== true) {
             return false;
           }
           this.aiProfilesResource.markOutdated(profileId);
@@ -84,7 +84,17 @@ export class AIProfileCredentialsService {
         }
         return !completion.cancelled;
       },
-      () => (task.pending ? this.asyncTaskInfoService.cancel(task.id) : undefined),
+      async () => {
+        try {
+          await task.run();
+          if (task.pending) {
+            await this.asyncTaskInfoService.cancel(task.id);
+          }
+        } catch (exception: any) {
+          completion.cancelled = false;
+          this.notificationService.logException(exception, 'plugin_ai_device_cancel_failed');
+        }
+      },
     );
     return { authorization, task: completion };
   }

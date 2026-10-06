@@ -48,7 +48,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const notificationService = useService(NotificationService);
   const { formState } = payload;
   const { token, subscription } = getAIProfileCredentialsFormParts(formState);
-  const selectedPart = token.accountAuthentication ? subscription : token;
+  const selectedPart = subscription.accountAuthentication ? subscription : token;
   const canComplete = !formState.isChanged && !!token.profile?.credentialsSaved && !selectedPart.credentialsMissing;
   const saveDisabled = formState.isDisabled || !token.isLoaded() || token.isOutdated() || !token.profile || token.profile.global;
   const form = useForm({
