@@ -79,7 +79,7 @@ export const Main = observer(function Main() {
                 <RightArea />
               </Pane>
               <ResizerControls />
-              <Pane className={s(styles, { pane: true })} basis="400px" main>
+              <Pane className={s(styles, { pane: true })} basis="400px" main data-dialog-persistent-element>
                 <Loader className={s(styles, { loader: true })} suspense>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} panelId={PANEL_ID_RIGHT_SIDEBAR} />
                 </Loader>
