@@ -5,9 +5,5 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.container {
-  composes: theme-typography--caption from global;
-  box-sizing: border-box;
-  height: 100%;
-  border: 1px solid var(--theme-background);
-}
+
+export const CONNECTION_FORM_CONNECTION_DETAILS_TAB_ID = 'connection_details';
