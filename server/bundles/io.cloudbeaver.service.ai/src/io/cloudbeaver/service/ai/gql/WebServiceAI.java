@@ -28,7 +28,12 @@ import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.*;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
-import io.cloudbeaver.service.ai.model.inputs.*;
+import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
+import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAIDataSourceSettingsInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAIProfileCredentialsInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAiChatCompletionSettingsInput;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.utils.ServletAppUtils;
@@ -483,7 +488,7 @@ public class WebServiceAI implements DBWServiceAI {
         DBPDataSourceContainer dataSourceContainer = getDataSource(webSession, dataSourceId);
         AIContextSettingsDataSource settings = new AIContextSettingsDataSource(dataSourceContainer);
         String userOrigin = ServletAppUtils.getOriginFromRequest(request);
-        return new WebAIDataSourceSettings(settings, userOrigin);
+        return new WebAIDataSourceSettings(webSession, settings, userOrigin);
     }
 
     @NotNull
@@ -493,10 +498,16 @@ public class WebServiceAI implements DBWServiceAI {
         @NotNull WebSession webSession,
         @NotNull String projectId,
         @NotNull DataSourceId dataSourceId,
-        @NotNull WebAiChatCompletionSettingsInput settingsInput
+        @NotNull WebAIDataSourceSettingsInput settingsInput
     ) throws DBWebException {
         DBPDataSourceContainer dataSourceContainer = getDataSource(webSession, dataSourceId);
         AIContextSettingsDataSource aiSettings = new AIContextSettingsDataSource(dataSourceContainer);
+        String[] excludedObjectIds = settingsInput.excludedObjectIds() == null ? null :
+            WebAIUtils.convertNodePathsToObjectIds(
+                webSession,
+                dataSourceContainer.getProject(),
+                settingsInput.excludedObjectIds()
+            );
         if (settingsInput.mcpEnabled() != null) {
             aiSettings.setMcpEnabled(settingsInput.mcpEnabled());
         }
@@ -515,9 +526,12 @@ public class WebServiceAI implements DBWServiceAI {
                 )
             );
         }
+        if (excludedObjectIds != null) {
+            aiSettings.setExcludedObjectIds(excludedObjectIds);
+        }
         aiSettings.saveSettings();
         String userOrigin = ServletAppUtils.getOriginFromRequest(request);
-        return new WebAIDataSourceSettings(aiSettings, userOrigin);
+        return new WebAIDataSourceSettings(webSession, aiSettings, userOrigin);
     }
 
     @NotNull

@@ -148,10 +148,13 @@ export function useReferencesDataModel(
 
               const constraints: SqlDataFilterConstraint[] = [];
               const isCompositeKey = currentAssociation.columnMapping.length > 1;
-              const shouldFallback = isCompositeKey && activeRows.length > 1;
-              const whereFilter = shouldFallback ? getCompositeKeyFilter(activeRows, currentAssociation.columnMapping, data) : '';
+              const shouldUseDisjunctive = isCompositeKey && activeRows.length > 1;
+              const whereFilter = '';
 
-              if (!whereFilter) {
+              if (shouldUseDisjunctive) {
+                const disjunctiveConstraints = getDisjunctiveConstraints(currentAssociation.columnMapping, activeRows, data);
+                constraints.push(...disjunctiveConstraints);
+              } else {
                 for (const mapping of currentAssociation.columnMapping) {
                   for (const row of activeRows) {
                     const rowValue = data.getRowValue(row);
@@ -189,6 +192,7 @@ export function useReferencesDataModel(
                   constraints,
                   whereFilter,
                   anyConstraint: !isCompositeKey,
+                  shouldUseDisjunctive,
                 })
                 .clearError()
                 .setOutdated();
@@ -213,32 +217,41 @@ export function useReferencesDataModel(
   return model;
 }
 
-function getCompositeKeyFilter(rows: IGridRowKey[], columnMapping: SqlReferenceColumnMapping[], data: ResultSetDataAction): string {
-  const orGroups: string[] = [];
+function getDisjunctiveConstraints(
+  columnMapping: SqlReferenceColumnMapping[],
+  rows: IGridRowKey[],
+  data: ResultSetDataAction,
+): SqlDataFilterConstraint[] {
+  const keys: unknown[][] = [];
 
   for (const row of rows) {
     const rowValue = data.getRowValue(row);
 
     if (rowValue) {
-      const andParts: string[] = [];
+      const values: unknown[] = [];
 
-      for (const mapping of columnMapping) {
-        const targetValue = rowValue[mapping.sourceColumnIndex];
+      for (const column of columnMapping) {
+        const value = rowValue[column.sourceColumnIndex];
 
-        if (isNotNullDefined(targetValue)) {
-          andParts.push(`${mapping.targetColumnName} = ${targetValue}`);
+        if (isNotNullDefined(value)) {
+          values.push(value);
         }
       }
 
-      if (andParts.length === columnMapping.length) {
-        orGroups.push(`(${andParts.join(' AND ')})`);
+      if (values.length === columnMapping.length) {
+        keys.push(values);
       }
     }
   }
 
-  if (!orGroups.length) {
-    return '';
+  if (!keys.length) {
+    return [];
   }
 
-  return orGroups.join(' OR ');
+  return columnMapping.map((column, index) => ({
+    attributeName: column.targetColumnName,
+    attributePosition: column.targetColumnIndex,
+    operator: 'IN',
+    value: keys.map(key => key[index]),
+  }));
 }

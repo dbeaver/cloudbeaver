@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ export const TransactionLogDialog: DialogComponent<IPayload> = observer(function
   return (
     <CommonDialogWrapper size="large" fixedWidth>
       <CommonDialogHeader title={title} onReject={props.rejectDialog} />
-      <CommonDialogBody noOverflow noBodyPadding>
+      <CommonDialogBody noOverflow>
         <TransactionLogTable log={state.log ?? []} />
       </CommonDialogBody>
       <CommonDialogFooter>
@@ -67,7 +67,7 @@ export const TransactionLogDialog: DialogComponent<IPayload> = observer(function
           <Button variant="secondary" onClick={() => props.rejectDialog()}>
             {translate('ui_cancel')}
           </Button>
-          <Container gap dense noWrap keepSize>
+          <Container gap compact noWrap keepSize>
             <Button variant="secondary" onClick={handleRollback}>
               {translate('plugin_datasource_transaction_manager_rollback')}
             </Button>
