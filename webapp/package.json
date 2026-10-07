@@ -8,6 +8,8 @@
     "packages/*"
   ],
   "resolutions": {
+    "@fastify/busboy": ">=3.2.1",
+    "probe-image-size": ">=7.4.0",
     "lodash": ">4.17.23",
     "immutable": ">=5.1.8",
     "fast-uri": ">=4.1.5",
