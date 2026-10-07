@@ -29,6 +29,11 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
     super(localizationService, notificationService, 'ProjectInfoForm');
 
     this.formState = null;
+    this.projectInfoOptionsPanelService.onClose.addHandler(event => {
+      if (event === 'after') {
+        this.clearFormState();
+      }
+    });
 
     makeObservable(this, {
       formState: observable.shallow,
@@ -52,15 +57,20 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
 
     const opened = await this.projectInfoOptionsPanelService.open(tabId);
 
-    this.formState?.dispose();
-    this.formState = new FormState<IProjectInfoFormState>(this.serviceProvider, this, { projectId }).setMode(FormMode.Edit);
+    if (opened) {
+      this.clearFormState();
+      this.formState = new FormState<IProjectInfoFormState>(this.serviceProvider, this, { projectId }).setMode(FormMode.Edit);
+    }
 
     return opened;
   }
 
   async close(): Promise<void> {
+    await this.projectInfoOptionsPanelService.close();
+  }
+
+  private clearFormState(): void {
     this.formState?.dispose();
     this.formState = null;
-    await this.projectInfoOptionsPanelService.close();
   }
 }

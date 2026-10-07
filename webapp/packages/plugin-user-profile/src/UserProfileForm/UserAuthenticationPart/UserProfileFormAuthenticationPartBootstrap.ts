@@ -50,22 +50,26 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
     });
   }
 
-  private async closeHandler(_: unknown, contexts: IExecutionContextProvider<any>): Promise<void> {
-    const context = contexts.getContext(userProfileContext);
-
-    if (context.force) {
+  private async closeHandler(event: unknown, contexts: IExecutionContextProvider<any>): Promise<void> {
+    if (event === 'after') {
       this.userProfileFormAuthenticationPartStateService.reset();
       return;
     }
 
-    await this.confirmDiscardChanges(contexts);
+    const context = contexts.getContext(userProfileContext);
+
+    if (context.force) {
+      return;
+    }
+
+    await this.confirmDiscardChanges(contexts, false);
   }
 
   private async tabChangeHandler(_: string, contexts: IExecutionContextProvider<string>): Promise<void> {
     await this.confirmDiscardChanges(contexts);
   }
 
-  private async confirmDiscardChanges(contexts: IExecutionContextProvider<any>): Promise<void> {
+  private async confirmDiscardChanges(contexts: IExecutionContextProvider<any>, reset = true): Promise<void> {
     if (!this.userProfileFormAuthenticationPartStateService.isEdited()) {
       return;
     }
@@ -82,6 +86,8 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
       return;
     }
 
-    this.userProfileFormAuthenticationPartStateService.reset();
+    if (reset) {
+      this.userProfileFormAuthenticationPartStateService.reset();
+    }
   }
 }

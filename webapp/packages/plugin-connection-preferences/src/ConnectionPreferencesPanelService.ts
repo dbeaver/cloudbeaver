@@ -8,10 +8,11 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
-import { FormMode, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import type { IExecutorHandler } from '@cloudbeaver/core-executor';
+import { FormMode, OptionsPanelService, type OptionsPanelCloseEventData } from '@cloudbeaver/core-ui';
 
 import { ConnectionPreferencesFormState } from './ConnectionPreferencesForm/ConnectionPreferencesFormState.js';
 import { ConnectionPreferencesFormService } from './ConnectionPreferencesForm/ConnectionPreferencesFormService.js';
@@ -30,6 +31,7 @@ export class ConnectionPreferencesPanelService {
     private readonly connectionPreferencesFormService: ConnectionPreferencesFormService,
   ) {
     this.formState = null;
+    this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
     makeObservable(this, {
       formState: observable.shallow,
@@ -54,8 +56,14 @@ export class ConnectionPreferencesPanelService {
 
   async close(): Promise<void> {
     await this.optionsPanelService.close();
+  }
+
+  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = event => {
+    if (event !== 'after' || !this.optionsPanelService.isOpen(formGetter)) {
+      return;
+    }
 
     this.formState?.dispose();
     this.formState = null;
-  }
+  };
 }
