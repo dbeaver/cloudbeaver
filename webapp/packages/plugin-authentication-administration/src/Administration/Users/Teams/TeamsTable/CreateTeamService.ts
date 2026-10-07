@@ -64,12 +64,12 @@ export class CreateTeamService {
     this.formState = null;
   }
 
-  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (event, contexts) => {
-    if (!this.optionsPanelService.isOpen(panelGetter)) {
+  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
+    if (data !== 'before' || !this.optionsPanelService.isOpen(panelGetter)) {
       return;
     }
 
-    if (event === 'before' && this.formState?.isChanged) {
+    if (this.formState?.isChanged) {
       const { status } = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'ui_discard_changes',
         message: 'ui_discard_changes_message',
@@ -79,11 +79,10 @@ export class CreateTeamService {
 
       if (status === DialogueStateResult.Rejected) {
         ExecutorInterrupter.interrupt(contexts);
+        return;
       }
     }
 
-    if (event === 'after') {
-      await this.dispose();
-    }
+    await this.dispose();
   };
 }
