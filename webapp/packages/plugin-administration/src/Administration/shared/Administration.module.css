@@ -40,6 +40,10 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  & > * {
+    padding-bottom: 0 !important;
+  }
 }
 
 .loader {
