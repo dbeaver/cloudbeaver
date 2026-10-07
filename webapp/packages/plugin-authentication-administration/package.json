@@ -52,6 +52,9 @@
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/core-dialogs": "workspace:*",
+    "@cloudbeaver/core-executor": "workspace:*",
+    "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "@dbeaver/react-tests": "workspace:*",
