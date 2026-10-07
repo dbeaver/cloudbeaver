@@ -25,6 +25,7 @@ import io.cloudbeaver.service.ai.WebAIFeatureProvider;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAIDataSourceSettingsInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIProfileCredentialsInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAiChatCompletionSettingsInput;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
@@ -115,7 +116,7 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                         getWebSession(env),
                         dataSourceId.projectId(),
                         dataSourceId,
-                        JSONUtils.deserializeObject(getArgumentVal(env, "settings"), WebAiChatCompletionSettingsInput.class)
+                        JSONUtils.deserializeObject(getArgumentVal(env, "settings"), WebAIDataSourceSettingsInput.class)
                     );
                 }
             )

@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.ai.model;
 
+import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.ai.WebAIUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -24,14 +26,23 @@ import org.jkiss.dbeaver.model.ai.AIContextSettingsDataSource;
 import org.jkiss.dbeaver.model.ai.AIDatabaseScope;
 import org.jkiss.dbeaver.model.meta.Property;
 
+import java.util.List;
+
 public class WebAIDataSourceSettings {
+    @NotNull
+    private final WebSession webSession;
     @NotNull
     private final AIContextSettingsDataSource settings;
 
     @NotNull
     private final String userOrigin;
 
-    public WebAIDataSourceSettings(@NotNull AIContextSettingsDataSource settings, @NotNull String userOrigin) {
+    public WebAIDataSourceSettings(
+        @NotNull WebSession webSession,
+        @NotNull AIContextSettingsDataSource settings,
+        @NotNull String userOrigin
+    ) {
+        this.webSession = webSession;
         this.settings = settings;
         this.userOrigin = userOrigin;
     }
@@ -45,6 +56,20 @@ public class WebAIDataSourceSettings {
     @Property
     public AIDatabaseScope getScope() {
         return settings.getScope();
+    }
+
+    @NotNull
+    @Property
+    public List<String> getExcludedObjectIds() {
+        String[] excludedObjectIds = settings.getExcludedObjectIds();
+        if (excludedObjectIds == null || excludedObjectIds.length == 0) {
+            return List.of();
+        }
+        return WebAIUtils.convertObjectIdsToNodePaths(
+            webSession.getProgressMonitor(),
+            settings.getDataSourceContainer().getProject(),
+            excludedObjectIds
+        );
     }
 
     @NotNull
