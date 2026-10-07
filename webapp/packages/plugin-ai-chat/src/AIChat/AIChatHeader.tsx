@@ -7,9 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { Suspense, useContext } from 'react';
 
-import { ActionIconButton, Fill, RenameDialog, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Fill, Loader, RenameDialog, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { Command } from '@dbeaver/ui-kit';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -42,8 +42,8 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
 
   const connectionInfoResource = useResource(AIChatHeader, ConnectionInfoResource, currentConversation?.dataSourceId ?? null);
 
-  async function createConversation() {
-    await aiChatConversationsService.createConversation(context.connectionKey ?? null);
+  async function newConversation() {
+    await aiChatConversationsService.newConversation(context.connectionKey ?? null);
   }
 
   async function updateCaption(conversation: AIChatConversationInfo) {
@@ -67,7 +67,9 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
 
         <div className="tw:flex tw:items-center">
           {isScope && (
-            <AIChatConversationScope conversation={currentConversation} catalog={context.catalog} schema={context.schema} disabled={disabled} />
+            <Suspense fallback={<Loader className="tw:h-7 tw:w-7" small />}>
+              <AIChatConversationScope conversation={currentConversation} catalog={context.catalog} schema={context.schema} disabled={disabled} />
+            </Suspense>
           )}
           <AISettings />
         </div>
@@ -91,7 +93,7 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
             title={translate('plugin_ai_chat_conversation_new')}
             disabled={disabled}
             img
-            onClick={createConversation}
+            onClick={newConversation}
           />
           <AIChatConversationsHistory currentConnectionKey={context.connectionKey} disabled={disabled} />
         </div>

@@ -1,3 +1,4 @@
 fragment ConnectionInfoAiSettings on AIDataSourceSettingsInfo {
   metaTransferConfirmed
+  excludedObjectIds
 }
