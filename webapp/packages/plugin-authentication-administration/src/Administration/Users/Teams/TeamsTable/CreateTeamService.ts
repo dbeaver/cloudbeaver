@@ -42,7 +42,6 @@ export class CreateTeamService {
 
   async cancelCreate(): Promise<void> {
     await this.optionsPanelService.close();
-    await this.dispose();
   }
 
   async create(): Promise<void> {
@@ -65,12 +64,12 @@ export class CreateTeamService {
     this.formState = null;
   }
 
-  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
-    if (data !== 'before' || !this.optionsPanelService.isOpen(panelGetter)) {
+  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (event, contexts) => {
+    if (!this.optionsPanelService.isOpen(panelGetter)) {
       return;
     }
 
-    if (this.formState?.isChanged) {
+    if (event === 'before' && this.formState?.isChanged) {
       const { status } = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'ui_discard_changes',
         message: 'ui_discard_changes_message',
@@ -80,10 +79,11 @@ export class CreateTeamService {
 
       if (status === DialogueStateResult.Rejected) {
         ExecutorInterrupter.interrupt(contexts);
-        return;
       }
     }
 
-    await this.dispose();
+    if (event === 'after') {
+      await this.dispose();
+    }
   };
 }
