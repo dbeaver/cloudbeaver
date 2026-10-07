@@ -32,7 +32,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    this.userProfileOptionsPanelService.onClose.addHandler(this.closeHandler.bind(this));
+    this.userProfileOptionsPanelService.onClose.addHandler(this.confirmDiscardChanges.bind(this));
     this.userProfileTabsService.onBeforeTabChange.addHandler(this.confirmDiscardChanges.bind(this));
 
     this.userProfileTabsService.tabContainer.add({
@@ -68,16 +68,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
     });
   }
 
-  private async closeHandler(event: unknown, contexts: IExecutionContextProvider<any>): Promise<void> {
-    if (event === 'after') {
-      this.userSettingsService.resetChanges();
-      return;
-    }
-
-    await this.confirmDiscardChanges(event, contexts, false);
-  }
-
-  private async confirmDiscardChanges(_: unknown, contexts: IExecutionContextProvider<any>, reset = true): Promise<void> {
+  private async confirmDiscardChanges(_: unknown, contexts: IExecutionContextProvider<any>): Promise<void> {
     if (!this.userSettingsService.isEdited()) {
       return;
     }
@@ -94,8 +85,6 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
       return;
     }
 
-    if (reset) {
-      this.userSettingsService.resetChanges();
-    }
+    this.userSettingsService.resetChanges();
   }
 }

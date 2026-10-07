@@ -100,20 +100,15 @@ export class ConnectionSearchService {
     }
   }
 
-  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (event, contexts) => {
-    if (!this.optionsPanelService.isOpen(formGetter)) {
-      return;
-    }
-
-    if (event === 'before') {
+  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
+    if (data === 'before') {
       const isDialogClosed = await this.showUnsavedChangesDialog();
 
       if (!isDialogClosed) {
         ExecutorInterrupter.interrupt(contexts);
+        return;
       }
-    }
 
-    if (event === 'after') {
       this.clearFormState();
       this.close();
     }

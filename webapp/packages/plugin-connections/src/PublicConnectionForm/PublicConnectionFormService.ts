@@ -41,7 +41,6 @@ const formGetter = () => PublicConnectionForm;
 ])
 export class PublicConnectionFormService {
   formState: ConnectionFormState | null;
-  private forceClose: boolean;
 
   constructor(
     private readonly commonDialogService: CommonDialogService,
@@ -55,7 +54,6 @@ export class PublicConnectionFormService {
     private readonly authenticationService: AuthenticationService,
   ) {
     this.formState = null;
-    this.forceClose = false;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
     this.connectionInfoResource.onDataUpdate.addPostHandler(this.closeRemoved);
     this.connectionInfoResource.onItemDelete.addPostHandler(this.closeDeleted);
@@ -118,18 +116,16 @@ export class PublicConnectionFormService {
     return state;
   }
 
-  async close(force?: boolean): Promise<void> {
+  async close(saved?: boolean): Promise<void> {
     if (!this.formState) {
       return;
     }
 
-    this.forceClose = force ?? false;
-
-    try {
-      await this.optionsPanelService.close();
-    } finally {
-      this.forceClose = false;
+    if (saved) {
+      this.clearFormState();
     }
+
+    await this.optionsPanelService.close();
   }
 
   async save(): Promise<void> {
@@ -164,27 +160,21 @@ export class PublicConnectionFormService {
     }
   };
 
-  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (event, contexts) => {
-    if (!this.optionsPanelService.isOpen(formGetter)) {
-      return;
-    }
-
-    if (event === 'before') {
+  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
+    if (data === 'before') {
       const confirmed = await this.showUnsavedChangesDialog();
 
       if (!confirmed) {
         ExecutorInterrupter.interrupt(contexts);
+        return;
       }
-    }
 
-    if (event === 'after') {
       this.clearFormState();
     }
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
     if (
-      this.forceClose ||
       !this.formState ||
       !this.optionsPanelService.isOpen(formGetter) ||
       (this.optionsPart?.connectionKey && !this.connectionInfoResource.has(this.optionsPart.connectionKey))

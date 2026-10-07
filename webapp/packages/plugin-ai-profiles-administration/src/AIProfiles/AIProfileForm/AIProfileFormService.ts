@@ -68,20 +68,15 @@ export class AIProfileFormService extends FormBaseService<IAIProfileFormState> {
     await this.optionsPanelService.close();
   }
 
-  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (event, contexts) => {
-    if (!this.optionsPanelService.isOpen(formGetter)) {
-      return;
-    }
-
-    if (event === 'before') {
+  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
+    if (data === 'before') {
       const confirmed = await this.showUnsavedChangesDialog();
 
       if (!confirmed) {
         ExecutorInterrupter.interrupt(contexts);
+        return;
       }
-    }
 
-    if (event === 'after') {
       this.clearFormState();
     }
   };
