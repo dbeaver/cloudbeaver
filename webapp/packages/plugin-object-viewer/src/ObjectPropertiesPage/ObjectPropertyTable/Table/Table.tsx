@@ -13,7 +13,7 @@ import { type IScrollState, Link, s, useControlledScroll, useExecutor, useS, use
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
-import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 import { getObjectPropertyDisplayValue, getObjectPropertyType, getObjectPropertyValue } from '@cloudbeaver/core-sdk';
 import { CheckboxIndicator } from '@dbeaver/ui-kit';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
@@ -33,6 +33,7 @@ export interface ITableProps {
 
 export const Table = observer<ITableProps>(function Table({ objects, hasNextPage, objectId, loadMore }) {
   const styles = useS(classes);
+  const cellCopy = useCellCopy();
   const navTreeResource = useService(NavTreeResource);
 
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
@@ -159,6 +160,7 @@ export const Table = observer<ITableProps>(function Table({ objects, hasNextPage
         getRowHeight={() => 40}
         rowCount={rowCount}
         onScrollToBottom={loadMore}
+        onCellKeyDown={cellCopy.handleKeyDown}
       />
       {hasNextPage && (
         <div className={s(styles, { info: true })}>
