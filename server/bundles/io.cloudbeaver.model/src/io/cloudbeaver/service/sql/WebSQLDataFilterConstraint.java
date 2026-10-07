@@ -21,6 +21,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -61,6 +62,8 @@ public class WebSQLDataFilterConstraint {
                     (Map<String, Object>) mappedValue.get(WebSQLConstants.ATTR_PROPERTIES));
             }
 
+        } else if (value instanceof Collection<?> values) {
+            this.value = values.toArray();
         } else {
             this.value = CommonUtils.toString(value, null);
         }
