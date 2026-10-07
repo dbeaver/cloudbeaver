@@ -185,6 +185,11 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                     JSONUtils.deserializeObject(getArgumentVal(env, "config"), WebAIConfigurationProfileInput.class)
                 )
             ).dataFetcher(
+                "aiCopyProfile", env -> getService(env).copyProfile(
+                    getWebSession(env),
+                    getArgumentVal(env, "profileId")
+                )
+            ).dataFetcher(
                 "aiUpdateProfile", env -> getService(env).updateProfile(
                     getWebSession(env),
                     JSONUtils.deserializeObject(getArgumentVal(env, "config"), WebAIConfigurationProfileInput.class)
