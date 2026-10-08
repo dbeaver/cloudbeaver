@@ -18,13 +18,15 @@ import {
   StatusMessage,
   Text,
   useForm,
+  useExecutor,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { OptionsPanelService, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
-import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfilesResource, useAIProfileAuthorization } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
 
@@ -36,6 +38,21 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
   const notificationService = useService(NotificationService);
   const profiles = useService(AIProfilesResource);
   const formState = credentialsPanelService.formState;
+  const authorization = useAIProfileAuthorization(formState);
+  const optionsPanelService = useService(OptionsPanelService);
+  useExecutor({
+    executor: optionsPanelService.closeTask,
+    handlers: [
+      async (stage, contexts) => {
+        if (stage !== 'before' || !formState || credentialsPanelService.formState !== formState || ExecutorInterrupter.isInterrupted(contexts)) {
+          return;
+        }
+        if (!(await authorization.confirmLeave())) {
+          ExecutorInterrupter.interrupt(contexts);
+        }
+      },
+    ],
+  });
   const form = useForm({
     onSubmit: async function onSubmit() {
       if (!formState) {
@@ -73,7 +90,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
         </GroupBack>
       </GroupTitle>
       <Form context={form} contents>
-        <TabsState container={credentialsPanelService.parts} selectedId={CREDENTIALS_TAB_ID} formState={formState}>
+        <TabsState container={credentialsPanelService.parts} selectedId={CREDENTIALS_TAB_ID} formState={formState} authorization={authorization}>
           <Container noWrap vertical>
             <Container
               className="theme-border-color-background tw:relative tw:before:content-[''] tw:before:absolute tw:before:bottom-0 tw:before:w-full tw:before:border-b-2 tw:before:border-inherit"

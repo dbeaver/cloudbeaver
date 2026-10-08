@@ -10,18 +10,16 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, Container, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { AIProfileAuthorizationController } from './AIProfileAuthorizationController.js';
-
 interface Props {
   disabled: boolean;
-  controller: AIProfileAuthorizationController;
+  onConnect: () => Promise<void>;
 }
 
-export const ConnectSubscription = observer<Props>(function ConnectSubscription({ disabled, controller }) {
+export const ConnectSubscription = observer<Props>(function ConnectSubscription({ disabled, onConnect }) {
   const translate = useTranslate();
   return (
     <Container className="tw:self-start" keepSize>
-      <Button type="button" disabled={disabled} onClick={() => controller.connect()}>
+      <Button type="button" disabled={disabled} onClick={onConnect}>
         {translate('plugin_ai_account_connect')}
       </Button>
     </Container>

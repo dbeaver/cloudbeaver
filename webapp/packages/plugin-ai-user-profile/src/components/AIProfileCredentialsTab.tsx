@@ -16,10 +16,11 @@ import type { IAIProfileCredentialsFormProps } from '../AIProfileCredentialsForm
 
 export const AIProfileCredentialsTab: TabContainerPanelComponent<IAIProfileCredentialsFormProps> = observer(function AIProfileCredentialsTab({
   formState,
+  authorization,
 }) {
   return (
     <Group className="tw:w-full" small keepSize gap>
-      <AIProfileCredentialsFields formState={formState} />
+      <AIProfileCredentialsFields formState={formState} authorization={authorization} />
     </Group>
   );
 });

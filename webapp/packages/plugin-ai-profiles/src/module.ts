@@ -9,6 +9,7 @@
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 
 import { AIProfileCredentialsService } from './AIProfileCredentials/AIProfileCredentialsService.js';
+import { AIProfileAuthorizationService } from './AIProfileCredentials/AIProfileAuthorizationService.js';
 import { AIProfileCredentialsFormService } from './AIProfileCredentials/AIProfileCredentialsFormService.js';
 import { AIProfilesResource } from './AIProfilesResource.js';
 import { LocaleService } from './LocaleService.js';
@@ -22,6 +23,7 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(AIProfilesResource))
       .addSingleton(AIProfilesResource)
       .addSingleton(AIProfileCredentialsFormService)
+      .addSingleton(AIProfileAuthorizationService)
       .addSingleton(AIProfileCredentialsService);
   },
 });

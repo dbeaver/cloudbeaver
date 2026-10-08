@@ -13,24 +13,23 @@ import type { IFormProps } from '@cloudbeaver/core-ui';
 import type { AIProfile } from '../AIProfilesResource.js';
 import { ConnectedSubscription } from './ConnectedSubscription.js';
 import { ConnectSubscription } from './ConnectSubscription.js';
-import { getAIProfileAuthorizationController } from './getAIProfileAuthorizationController.js';
+import type { IAIProfileAuthorizationState } from './useAIProfileAuthorization.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 import { PendingSubscription } from './PendingSubscription.js';
 
 interface Props extends IFormProps<IAIProfileCredentialsFormState> {
   profile: AIProfile;
+  authorization: IAIProfileAuthorizationState;
 }
 
-export const AIProfileSubscriptionFields = observer<Props>(function AIProfileSubscriptionFields({ formState, profile }) {
-  const controller = getAIProfileAuthorizationController(formState);
-
-  if (controller.processing) {
-    return <PendingSubscription profile={profile} controller={controller} />;
+export const AIProfileSubscriptionFields = observer<Props>(function AIProfileSubscriptionFields({ formState, profile, authorization }) {
+  if (authorization.processing) {
+    return <PendingSubscription profile={profile} authorization={authorization.authorization} />;
   }
 
   if (profile.account) {
     return <ConnectedSubscription profile={profile} disabled={formState.isDisabled} />;
   }
 
-  return <ConnectSubscription disabled={formState.isDisabled || !profile.deviceAuthorizationAvailable} controller={controller} />;
+  return <ConnectSubscription disabled={formState.isDisabled || !profile.deviceAuthorizationAvailable} onConnect={authorization.connect} />;
 });

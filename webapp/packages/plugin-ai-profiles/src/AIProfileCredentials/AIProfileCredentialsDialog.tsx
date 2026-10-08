@@ -30,7 +30,7 @@ import type { IFormState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import { AIProfileCredentialsFields } from './AIProfileCredentialsFields.js';
-import { getAIProfileAuthorizationController } from './getAIProfileAuthorizationController.js';
+import { useAIProfileAuthorization } from './useAIProfileAuthorization.js';
 import { AIProfilesResource } from '../AIProfilesResource.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
@@ -51,7 +51,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const engines = useService(AiEnginesResource);
   const profile = profiles.get(formState.state.profileId);
   const engine = engines.data.find(engine => engine.id === profile?.engineId);
-  const profileAuthController = getAIProfileAuthorizationController(formState);
+  const authorization = useAIProfileAuthorization(formState);
   const error = getFirstException(formState.exception);
   const isSaving = !!formState.savingPromise;
   const form = useForm({
@@ -86,7 +86,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
         return;
       }
     }
-    if (await profileAuthController.confirmLeave()) {
+    if (await authorization.confirmLeave()) {
       rejectDialog();
     }
   }
@@ -103,7 +103,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
         <Form context={form} contents>
           <Container gap>
             {error && <StatusMessage exception={error} />}
-            <AIProfileCredentialsFields formState={formState} />
+            <AIProfileCredentialsFields formState={formState} authorization={authorization} />
           </Container>
         </Form>
       </CommonDialogBody>

@@ -15,19 +15,25 @@ import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import type { IFormProps } from '@cloudbeaver/core-ui';
 
 import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
-import { getAIProfileAuthorizationController } from './getAIProfileAuthorizationController.js';
+import type { IAIProfileAuthorizationState } from './useAIProfileAuthorization.js';
 import { AIProfilesResource } from '../AIProfilesResource.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 import { AIProfileTokenFields } from './AIProfileTokenFields.js';
 import { AIProfileSubscriptionFields } from './AIProfileSubscriptionFields.js';
 
-export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredentialsFormState>>(function AIProfileCredentialsFields({ formState }) {
+export interface IAIProfileCredentialsFieldsProps extends IFormProps<IAIProfileCredentialsFormState> {
+  authorization: IAIProfileAuthorizationState;
+}
+
+export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsProps>(function AIProfileCredentialsFields({
+  formState,
+  authorization,
+}) {
   const translate = useTranslate();
   const name = useId();
   const part = getAIProfileCredentialsFormPart(formState);
   const profiles = useService(AIProfilesResource);
   const engines = useService(AiEnginesResource);
-  const controller = getAIProfileAuthorizationController(formState);
   const profile = profiles.get(formState.state.profileId);
 
   useAutoLoad(AIProfileCredentialsFields, part);
@@ -53,7 +59,7 @@ export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredenti
           label={translate('plugin_ai_credentials_method')}
           value={accountAuthentication ? 'subscription' : 'token'}
           onChange={async value => {
-            if (!(await controller.confirmLeave())) {
+            if (!(await authorization.confirmLeave())) {
               return;
             }
             part.state.accountAuthentication = value === 'subscription';
@@ -70,7 +76,7 @@ export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredenti
         </RadioGroup>
       )}
       {accountAuthentication ? (
-        <AIProfileSubscriptionFields formState={formState} profile={profile} />
+        <AIProfileSubscriptionFields formState={formState} profile={profile} authorization={authorization} />
       ) : (
         <AIProfileTokenFields formState={formState} profile={profile} />
       )}

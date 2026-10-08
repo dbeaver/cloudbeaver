@@ -9,19 +9,18 @@
 import { observer } from 'mobx-react-lite';
 
 import { InputField, Loader, useClipboard, useTranslate } from '@cloudbeaver/core-blocks';
+import type { AiDeviceAuthorizationInfo } from '@cloudbeaver/core-sdk';
 
 import type { AIProfile } from '../AIProfilesResource.js';
-import type { AIProfileAuthorizationController } from './AIProfileAuthorizationController.js';
 
 interface Props {
   profile: AIProfile;
-  controller: AIProfileAuthorizationController;
+  authorization: AiDeviceAuthorizationInfo | null;
 }
 
-export const PendingSubscription = observer<Props>(function PendingSubscription({ profile, controller }) {
+export const PendingSubscription = observer<Props>(function PendingSubscription({ profile, authorization }) {
   const translate = useTranslate();
   const copy = useClipboard();
-  const authorization = controller.authorization;
   return (
     <>
       <div role="status">
