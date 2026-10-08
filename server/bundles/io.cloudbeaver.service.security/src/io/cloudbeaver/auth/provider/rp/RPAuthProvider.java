@@ -37,6 +37,8 @@ import org.jkiss.utils.CommonUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSignOutLinkProvider {
 
@@ -53,6 +55,11 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
     public static final String AUTH_PROVIDER = "reverseProxy";
     public static final String LOGOUT_URL = "logout-url";
     public static final String PARAM_AUTO_USER_PROVISIONING = "auto-user-provisioning";
+    /**
+     * Team meta parameter: a value of the trusted teams header that stands for this team
+     * when the value is not usable as a team id.
+     */
+    public static final String META_TEAM_GROUP_NAME = "reverseProxy.group-name";
 
     @NotNull
     @Override
@@ -91,28 +98,26 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
         String userName = String.valueOf(authParameters.get("user"));
-        StringBuilder nameBuilder = new StringBuilder();
         Map<String, String> userMeta = new HashMap<>();
         String firstName = JSONUtils.getString(authParameters, SMStandardMeta.META_FIRST_NAME);
         String lastName = JSONUtils.getString(authParameters, SMStandardMeta.META_LAST_NAME);
         String fullName = JSONUtils.getString(authParameters, "fullName");
         if (CommonUtils.isNotEmpty(firstName)) {
-            nameBuilder.append(firstName);
             userMeta.put(SMStandardMeta.META_FIRST_NAME, firstName);
         }
-
         if (CommonUtils.isNotEmpty(lastName)) {
-            nameBuilder.append(lastName);
             userMeta.put(SMStandardMeta.META_LAST_NAME, lastName);
         }
 
-        if (CommonUtils.isNotEmpty(fullName)) {
-            nameBuilder = new StringBuilder(fullName);
+        // The full name wins, otherwise "first last"
+        String displayName = fullName;
+        if (CommonUtils.isEmpty(displayName)) {
+            displayName = Stream.of(firstName, lastName).filter(CommonUtils::isNotEmpty).collect(Collectors.joining(" "));
         }
 
         return new DBWUserIdentity(
             userName,
-            nameBuilder.length() > 0 ? nameBuilder.toString() : userName,
+            CommonUtils.isNotEmpty(displayName) ? displayName : userName,
             userMeta
         );
     }

@@ -46,6 +46,13 @@
                     <property id="auto-user-provisioning" label="%auto-user-provisioning" type="boolean" description="%auto-user-provisioning.description" defaultValue="true"/>
                 </propertyGroup>
             </configuration>
+
+            <metaParameters type="team">
+                <propertyGroup label="Reverse proxy group name">
+                    <property id="reverseProxy.group-name" label="Reverse proxy group name" type="string"
+                              description="Value of the team header sent by the reverse proxy that stands for this team, when it can't be used as the team id"/>
+                </propertyGroup>
+            </metaParameters>
         </authProvider>
     </extension>
 </plugin>
