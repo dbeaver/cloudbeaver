@@ -7,101 +7,47 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Button, ConfirmationDialog, Container, InputField, Loader, useClipboard, useExecutor, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, ConfirmationDialog, Container, InputField, Loader, useClipboard, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import type { AsyncTask } from '@cloudbeaver/core-root';
-import type { AiDeviceAuthorizationInfo } from '@cloudbeaver/core-sdk';
 import type { IFormProps } from '@cloudbeaver/core-ui';
 
-import { AIProfilesResource } from '../AIProfilesResource.js';
-import { AIProfileCredentialsService } from './AIProfileCredentialsService.js';
-import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
+import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
+import type { AIProfileAuthorizationController } from './AIProfileAuthorizationController.js';
+import { getAIProfileAuthorizationController } from './getAIProfileAuthorizationController.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
-export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredentialsFormState>>(function AIProfileSubscriptionFields({ formState }) {
+interface Props extends IFormProps<IAIProfileCredentialsFormState> {
+  profile: AIProfile;
+}
+
+export const AIProfileSubscriptionFields = observer<Props>(function AIProfileSubscriptionFields({ formState, profile }) {
+  const controller = getAIProfileAuthorizationController(formState);
+
+  if (controller.processing) {
+    return <PendingSubscription profile={profile} controller={controller} />;
+  }
+
+  if (profile.account) {
+    return <ConnectedSubscription profile={profile} disabled={formState.isDisabled} />;
+  }
+
+  return <ConnectSubscription disabled={formState.isDisabled || !profile.deviceAuthorizationAvailable} controller={controller} />;
+});
+
+const ConnectedSubscription = observer<{ profile: AIProfile; disabled: boolean }>(function ConnectedSubscription({ profile, disabled }) {
   const translate = useTranslate();
-  const copy = useClipboard();
-  const userInfoResource = useService(UserInfoResource);
-  const commonDialogService = useService(CommonDialogService);
-  const notificationService = useService(NotificationService);
-  const credentialsService = useService(AIProfileCredentialsService);
-  const aiProfilesResource = useService(AIProfilesResource);
-  const part = getAIProfileCredentialsFormPart(formState);
-  const profile = part.currentProfile;
+  const dialogs = useService(CommonDialogService);
+  const notifications = useService(NotificationService);
+  const profiles = useService(AIProfilesResource);
   const [processing, setProcessing] = useState(false);
-  const [authorization, setAuthorization] = useState<AiDeviceAuthorizationInfo | null>(null);
-  const taskRef = useRef<AsyncTask | null>(null);
-  const blocked = formState.isDisabled || processing;
-
-  async function cancelAuthorization(): Promise<void> {
-    if (taskRef.current) {
-      await credentialsService.cancelAuthorization(taskRef.current);
-    }
-  }
-
-  async function confirmCancelAuthorization(): Promise<boolean> {
-    const task = taskRef.current;
-    if (!task?.pending || task.cancelled) {
-      return true;
-    }
-    const { status } = await commonDialogService.open(ConfirmationDialog, {
-      title: 'plugin_ai_device_cancel_title',
-      message: 'plugin_ai_device_cancel_confirmation',
-      confirmActionText: 'plugin_ai_device_cancel',
-      cancelActionText: 'plugin_ai_device_continue',
-    });
-    return status === DialogueStateResult.Resolved && credentialsService.cancelAuthorization(task);
-  }
-
-  useExecutor({
-    executor: part.onBeforeLeave,
-    handlers: [
-      async (_, contexts) => {
-        if (!(await confirmCancelAuthorization())) {
-          ExecutorInterrupter.interrupt(contexts);
-        }
-      },
-    ],
-  });
-
-  useExecutor({ executor: userInfoResource.onUserChange, handlers: [cancelAuthorization] });
-  useEffect(
-    () => () => {
-      if (taskRef.current) {
-        void credentialsService.cancelAuthorization(taskRef.current);
-      }
-    },
-    [credentialsService],
-  );
-
-  async function connect(): Promise<void> {
-    setProcessing(true);
-    const task = credentialsService.authorize(formState.state.profileId, setAuthorization);
-    taskRef.current = task;
-    try {
-      if (await credentialsService.connect(formState.state.profileId, task)) {
-        notificationService.logSuccess({ title: 'plugin_ai_account_connected', message: profile?.name });
-      }
-    } catch (exception: any) {
-      if (!task.cancelled) {
-        notificationService.logException(exception, 'plugin_ai_device_failed');
-      }
-    } finally {
-      taskRef.current = null;
-      setAuthorization(null);
-      setProcessing(false);
-    }
-  }
 
   async function disconnect(): Promise<void> {
-    const { status } = await commonDialogService.open(ConfirmationDialog, {
-      title: translate('plugin_ai_account_disconnect'),
+    const { status } = await dialogs.open(ConfirmationDialog, {
+      title: 'plugin_ai_account_disconnect',
       message: 'plugin_ai_account_disconnect_confirmation',
       confirmActionText: 'plugin_ai_account_disconnect',
     });
@@ -110,60 +56,66 @@ export const AIProfileSubscriptionFields = observer<IFormProps<IAIProfileCredent
     }
     setProcessing(true);
     try {
-      await aiProfilesResource.disconnectAccount(formState.state.profileId);
-      notificationService.logSuccess({ title: 'plugin_ai_account_disconnected', message: profile?.name });
+      await profiles.disconnectAccount(profile.id);
+      notifications.logSuccess({ title: 'plugin_ai_account_disconnected', message: profile.name });
     } catch (exception: any) {
-      notificationService.logException(exception, 'plugin_ai_account_disconnect_failed');
+      notifications.logException(exception, 'plugin_ai_account_disconnect_failed');
     } finally {
       setProcessing(false);
     }
   }
 
-  if (!profile) {
-    return null;
-  }
-
   return (
     <>
-      {(profile.account || processing) && (
-        <div role="status">
-          {profile.account ? (
-            <>
-              {translate('plugin_ai_account_connected')}
-              {profile.account.email ? `: ${profile.account.email}` : ''}
-            </>
-          ) : (
-            <Loader message="plugin_ai_device_waiting" hideMessage={false} inline small />
-          )}
-        </div>
-      )}
-      {profile.account ? (
-        <Container className="tw:self-start" keepSize>
-          <Button type="button" variant="secondary" disabled={blocked} onClick={disconnect}>
-            {translate('plugin_ai_account_disconnect')}
-          </Button>
-        </Container>
-      ) : (
+      <div role="status">
+        {translate('plugin_ai_account_connected')}
+        {profile.account?.email ? `: ${profile.account.email}` : ''}
+      </div>
+      <Container className="tw:self-start" keepSize>
+        <Button type="button" variant="secondary" disabled={disabled || processing} onClick={disconnect}>
+          {translate('plugin_ai_account_disconnect')}
+        </Button>
+      </Container>
+    </>
+  );
+});
+
+const ConnectSubscription = observer<{ disabled: boolean; controller: AIProfileAuthorizationController }>(function ConnectSubscription({
+  disabled,
+  controller,
+}) {
+  const translate = useTranslate();
+  return (
+    <Container className="tw:self-start" keepSize>
+      <Button type="button" disabled={disabled} onClick={() => controller.connect()}>
+        {translate('plugin_ai_account_connect')}
+      </Button>
+    </Container>
+  );
+});
+
+const PendingSubscription = observer<{ profile: AIProfile; controller: AIProfileAuthorizationController }>(function PendingSubscription({
+  profile,
+  controller,
+}) {
+  const translate = useTranslate();
+  const copy = useClipboard();
+  const authorization = controller.authorization;
+  return (
+    <>
+      <div role="status">
+        <Loader message="plugin_ai_device_waiting" hideMessage={false} inline small />
+      </div>
+      {authorization && (
         <>
-          {authorization && (
-            <>
-              <InputField value={authorization.userCode} readOnly onCustomCopy={() => copy(authorization.userCode, true)}>
-                {translate('plugin_ai_device_code')}
-              </InputField>
-              <a href={authorization.verificationUri} target="_blank" rel="noopener noreferrer">
-                {translate('plugin_ai_device_open_provider', undefined, { provider: profile.accountProvider ?? '' })}
-              </a>
-              <p>{translate('plugin_ai_device_instructions')}</p>
-              <p>{translate('plugin_ai_device_expiration', undefined, { minutes: Math.ceil(authorization.expiresInSeconds / 60) })}</p>
-            </>
-          )}
-          {!processing && (
-            <Container className="tw:self-start" keepSize>
-              <Button type="button" disabled={blocked || !profile.deviceAuthorizationAvailable} onClick={connect}>
-                {translate('plugin_ai_account_connect')}
-              </Button>
-            </Container>
-          )}
+          <InputField value={authorization.userCode} readOnly onCustomCopy={() => copy(authorization.userCode, true)}>
+            {translate('plugin_ai_device_code')}
+          </InputField>
+          <a href={authorization.verificationUri} target="_blank" rel="noopener noreferrer">
+            {translate('plugin_ai_device_open_provider', undefined, { provider: profile.accountProvider ?? '' })}
+          </a>
+          <p>{translate('plugin_ai_device_instructions')}</p>
+          <p>{translate('plugin_ai_device_expiration', undefined, { minutes: Math.ceil(authorization.expiresInSeconds / 60) })}</p>
         </>
       )}
     </>

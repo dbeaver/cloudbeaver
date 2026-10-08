@@ -24,12 +24,13 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import { AIProfileCredentialsFields } from './AIProfileCredentialsFields.js';
-import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
+import { getAIProfileAuthorizationController } from './getAIProfileAuthorizationController.js';
+import { AIProfilesResource } from '../AIProfilesResource.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
 export interface IAIProfileCredentialsDialogPayload {
@@ -44,7 +45,11 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const { formState } = payload;
-  const part = getAIProfileCredentialsFormPart(formState);
+  const profiles = useService(AIProfilesResource);
+  const engines = useService(AiEnginesResource);
+  const profile = profiles.get(formState.state.profileId);
+  const engine = engines.data.find(engine => engine.id === profile?.engineId);
+  const profileAuthController = getAIProfileAuthorizationController(formState);
   const error = getFirstException(formState.exception);
   const isSaving = !!formState.savingPromise;
   const form = useForm({
@@ -55,7 +60,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
       if (saved) {
         notificationService.logSuccess({
           title: 'plugin_ai_credentials_saved',
-          message: part.currentProfile?.name,
+          message: profile?.name,
         });
         resolveDialog();
       } else if (exception) {
@@ -68,8 +73,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     if (isSaving) {
       return;
     }
-    const contexts = await part.onBeforeLeave.execute();
-    if (!ExecutorInterrupter.isInterrupted(contexts)) {
+    if (await profileAuthController.confirmLeave()) {
       rejectDialog();
     }
   }
@@ -79,7 +83,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
       <CommonDialogHeader
         title="plugin_ai_credentials_dialog_title"
         subTitle="plugin_ai_credentials_dialog_description"
-        icon={part.currentEngine?.icon}
+        icon={engine?.icon}
         onReject={isSaving ? undefined : close}
       />
       <CommonDialogBody>

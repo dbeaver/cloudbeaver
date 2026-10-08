@@ -6,18 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Executor, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { AiEnginesResource, type EngineInfo } from '@cloudbeaver/plugin-ai';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 
-import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
+import { AIProfilesResource } from '../AIProfilesResource.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
 const getDefaultState = () => ({ token: '', accountAuthentication: false });
 
 export class AIProfileCredentialsFormPart extends FormPart<ReturnType<typeof getDefaultState>, IAIProfileCredentialsFormState> {
-  readonly onBeforeLeave = new Executor();
-
   constructor(
     formState: IFormState<IAIProfileCredentialsFormState>,
     private readonly aiProfilesResource: AIProfilesResource,
@@ -26,36 +24,14 @@ export class AIProfileCredentialsFormPart extends FormPart<ReturnType<typeof get
     super(formState, getDefaultState());
   }
 
-  get currentProfile(): AIProfile | undefined {
-    return this.aiProfilesResource.get(this.formState.state.profileId);
-  }
-
-  get currentEngine(): EngineInfo | undefined {
-    return this.aiEnginesResource.data.find(engine => engine.id === this.currentProfile?.engineId);
-  }
-
-  get accountAuthentication(): boolean {
-    return !!this.currentProfile?.deviceAuthorizationAvailable && this.state.accountAuthentication;
-  }
-
   override isOutdated(): boolean {
     if (this.aiProfilesResource.isOutdated(this.formState.state.profileId)) {
       return true;
     }
-    if (!this.currentProfile) {
+    if (!this.aiProfilesResource.get(this.formState.state.profileId)) {
       return false;
     }
     return this.aiEnginesResource.isOutdated();
-  }
-
-  async resetCredentials(): Promise<void> {
-    this.loading = true;
-    try {
-      await this.aiProfilesResource.resetCredentials(this.formState.state.profileId);
-      this.loaded = false;
-    } finally {
-      this.loading = false;
-    }
   }
 
   protected override async loader(): Promise<void> {
@@ -69,18 +45,24 @@ export class AIProfileCredentialsFormPart extends FormPart<ReturnType<typeof get
   }
 
   protected override async saveChanges(): Promise<void> {
-    await this.aiProfilesResource.saveCredentials(this.formState.state.profileId, this.state.token, this.accountAuthentication);
+    const profile = this.aiProfilesResource.get(this.formState.state.profileId);
+    await this.aiProfilesResource.saveCredentials(
+      this.formState.state.profileId,
+      this.state.token,
+      !!profile?.deviceAuthorizationAvailable && this.state.accountAuthentication,
+    );
   }
 
   protected override validate(
     _: IFormState<IAIProfileCredentialsFormState>,
     contexts: IExecutionContextProvider<IFormState<IAIProfileCredentialsFormState>>,
   ): void {
-    if (this.accountAuthentication) {
-      if (!this.currentProfile?.account) {
+    const profile = this.aiProfilesResource.get(this.formState.state.profileId);
+    if (profile?.deviceAuthorizationAvailable && this.state.accountAuthentication) {
+      if (!profile.account) {
         contexts.getContext(formValidationContext).error('plugin_ai_account_not_connected');
       }
-    } else if (!this.state.token && !this.currentProfile?.tokenSaved) {
+    } else if (!this.state.token && !profile?.tokenSaved) {
       contexts.getContext(formValidationContext).error('plugin_ai_credentials_token_required');
     }
   }

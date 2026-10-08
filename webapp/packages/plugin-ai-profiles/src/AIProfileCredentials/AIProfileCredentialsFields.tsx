@@ -10,10 +10,13 @@ import { observer } from 'mobx-react-lite';
 import { useId } from 'react';
 
 import { Container, InputField, Radio, RadioGroup, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { useService } from '@cloudbeaver/core-di';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import type { IFormProps } from '@cloudbeaver/core-ui';
 
 import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
+import { getAIProfileAuthorizationController } from './getAIProfileAuthorizationController.js';
+import { AIProfilesResource } from '../AIProfilesResource.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 import { AIProfileTokenFields } from './AIProfileTokenFields.js';
 import { AIProfileSubscriptionFields } from './AIProfileSubscriptionFields.js';
@@ -22,29 +25,36 @@ export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredenti
   const translate = useTranslate();
   const name = useId();
   const part = getAIProfileCredentialsFormPart(formState);
-  const profile = part.currentProfile;
+  const profiles = useService(AIProfilesResource);
+  const engines = useService(AiEnginesResource);
+  const controller = getAIProfileAuthorizationController(formState);
+  const profile = profiles.get(formState.state.profileId);
 
   useAutoLoad(AIProfileCredentialsFields, part);
 
+  if (!profile) {
+    return null;
+  }
+
+  const engine = engines.data.find(engine => engine.id === profile.engineId);
+  const accountAuthentication = profile.deviceAuthorizationAvailable && part.state.accountAuthentication;
+
   return (
     <Container vertical gap>
-      <InputField value={profile?.name ?? ''} readOnly>
+      <InputField value={profile.name} readOnly>
         {translate('plugin_ai_credentials_profile')}
       </InputField>
-      <InputField value={part.currentEngine?.name ?? profile?.engineId ?? ''} readOnly>
+      <InputField value={engine?.name ?? profile.engineId} readOnly>
         {translate('plugin_ai_credentials_engine')}
       </InputField>
-      {profile?.deviceAuthorizationAvailable && !profile.global && (
+      {profile.deviceAuthorizationAvailable && !profile.global && (
         <RadioGroup
           name={name}
           label={translate('plugin_ai_credentials_method')}
-          value={part.accountAuthentication ? 'subscription' : 'token'}
+          value={accountAuthentication ? 'subscription' : 'token'}
           onChange={async value => {
-            if (part.accountAuthentication && value !== 'subscription') {
-              const contexts = await part.onBeforeLeave.execute();
-              if (ExecutorInterrupter.isInterrupted(contexts)) {
-                return;
-              }
+            if (!(await controller.confirmLeave())) {
+              return;
             }
             part.state.accountAuthentication = value === 'subscription';
           }}
@@ -59,7 +69,11 @@ export const AIProfileCredentialsFields = observer<IFormProps<IAIProfileCredenti
           </Radio>
         </RadioGroup>
       )}
-      {part.accountAuthentication ? <AIProfileSubscriptionFields formState={formState} /> : <AIProfileTokenFields formState={formState} />}
+      {accountAuthentication ? (
+        <AIProfileSubscriptionFields formState={formState} profile={profile} />
+      ) : (
+        <AIProfileTokenFields formState={formState} profile={profile} />
+      )}
     </Container>
   );
 });

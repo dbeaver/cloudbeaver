@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
 import { Button, ConfirmationDialog, Container, InputField, SAVED_VALUE_INDICATOR, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -16,13 +17,19 @@ import type { IFormProps } from '@cloudbeaver/core-ui';
 
 import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
+import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
 
-export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFormState>>(function AIProfileTokenFields({ formState }) {
+interface Props extends IFormProps<IAIProfileCredentialsFormState> {
+  profile: AIProfile;
+}
+
+export const AIProfileTokenFields = observer<Props>(function AIProfileTokenFields({ formState, profile }) {
   const translate = useTranslate();
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const part = getAIProfileCredentialsFormPart(formState);
-  const profile = part.currentProfile;
+  const profiles = useService(AIProfilesResource);
+  const [resetting, setResetting] = useState(false);
 
   async function resetCredentials(): Promise<void> {
     const { status } = await commonDialogService.open(ConfirmationDialog, {
@@ -33,15 +40,14 @@ export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFor
     if (status !== DialogueStateResult.Resolved) {
       return;
     }
+    setResetting(true);
     try {
-      await part.resetCredentials();
+      await profiles.resetCredentials(profile.id);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_credentials_reset_failed');
+    } finally {
+      setResetting(false);
     }
-  }
-
-  if (!profile) {
-    return null;
   }
 
   return (
@@ -52,7 +58,7 @@ export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFor
         name="token"
         autoComplete="new-password"
         required={!profile.tokenSaved}
-        disabled={formState.isDisabled}
+        disabled={formState.isDisabled || resetting}
         placeholder={profile.tokenSaved ? SAVED_VALUE_INDICATOR : undefined}
         description={profile.tokenSaved ? translate('ui_processing_saved') : undefined}
       >
@@ -60,7 +66,7 @@ export const AIProfileTokenFields = observer<IFormProps<IAIProfileCredentialsFor
       </InputField>
       {profile.tokenSaved && (
         <Container className="tw:self-start" keepSize>
-          <Button type="button" variant="secondary" disabled={formState.isDisabled} onClick={resetCredentials}>
+          <Button type="button" variant="secondary" disabled={formState.isDisabled || resetting} onClick={resetCredentials}>
             {translate('plugin_ai_credentials_reset')}
           </Button>
         </Container>

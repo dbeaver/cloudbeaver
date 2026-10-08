@@ -24,7 +24,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
-import { getAIProfileCredentialsFormPart } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
 
@@ -34,6 +34,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
   const translate = useTranslate();
   const credentialsPanelService = useService(AIProfileCredentialsPanelService);
   const notificationService = useService(NotificationService);
+  const profiles = useService(AIProfilesResource);
   const formState = credentialsPanelService.formState;
   const form = useForm({
     onSubmit: async function onSubmit() {
@@ -47,7 +48,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
       if (saved) {
         notificationService.logSuccess({
           title: 'plugin_ai_user_profile_credentials_saved',
-          message: part.currentProfile?.name,
+          message: profiles.get(formState.state.profileId)?.name,
         });
         await credentialsPanelService.back();
       } else if (exception) {
@@ -60,8 +61,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
     return null;
   }
 
-  const part = getAIProfileCredentialsFormPart(formState);
-  const title = `${translate('ui_edit')} "${part.currentProfile?.name ?? ''}"`;
+  const title = `${translate('ui_edit')} "${profiles.get(formState.state.profileId)?.name ?? ''}"`;
   const error = getFirstException(formState.exception);
   const isSaving = !!formState.savingPromise;
 

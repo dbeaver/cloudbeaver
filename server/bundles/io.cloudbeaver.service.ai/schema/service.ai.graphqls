@@ -163,6 +163,18 @@ type AIAdminConfigurationProfileInfo @since(version: "26.1.3") {
     engineId: ID!
     "Whether this profile uses global administrator-managed credentials."
     global: Boolean! @since(version: "26.2.0")
+    "Whether the current user has saved credentials for the selected authentication method. Does not validate provider access."
+    credentialsSaved: Boolean! @since(version: "26.2.0")
+    "Whether the current user selected subscription authentication for this non-global profile. Defaults to false."
+    accountAuthentication: Boolean! @since(version: "26.2.0")
+    "Whether device authorization is available for this profile."
+    deviceAuthorizationAvailable: Boolean! @since(version: "26.2.0")
+    "Device authorization provider display name, such as ChatGPT. Null for global profiles and engines without server-side device authorization support."
+    accountProvider: String @since(version: "26.2.0")
+    "Whether the current user has a saved API token, independently of the selected authentication method."
+    tokenSaved: Boolean! @since(version: "26.2.0")
+    "Current user's connected subscription account, independently of the selected authentication method. Null when disconnected; email may be unavailable."
+    account: AIAccountInfo @since(version: "26.2.0")
     "Configuration of the AI engine profile."
     configuration: [ObjectPropertyInfo!]!
 }

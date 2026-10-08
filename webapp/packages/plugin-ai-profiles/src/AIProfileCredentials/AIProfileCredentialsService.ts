@@ -7,83 +7,39 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult, type DialogResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, type DialogResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AsyncTaskInfoService, type AsyncTask } from '@cloudbeaver/core-root';
-import type { AiDeviceAuthorizationInfo } from '@cloudbeaver/core-sdk';
 
 import { AIProfileCredentialsDialog } from './AIProfileCredentialsDialogLazy.js';
 import { AIProfileCredentialsFormService } from './AIProfileCredentialsFormService.js';
 import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
 
-@injectable(() => [
-  CommonDialogService,
-  NotificationService,
-  AIProfilesResource,
-  AsyncTaskInfoService,
-  AIProfileCredentialsFormService,
-])
+@injectable(() => [CommonDialogService, NotificationService, AIProfilesResource, AIProfileCredentialsFormService])
 export class AIProfileCredentialsService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly aiProfilesResource: AIProfilesResource,
-    private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly aiProfileCredentialsFormService: AIProfileCredentialsFormService,
   ) {}
 
-  async open(profileId: string): Promise<DialogResult<void>> {
+  async open(profileId: string): Promise<DialogResult<void> | undefined> {
     const profile = await this.aiProfilesResource.load(profileId);
 
     if (!profile) {
       this.notificationService.logError({ title: 'plugin_ai_credentials_profile_not_found' });
-      return { status: DialogueStateResult.Rejected };
+      return;
     }
 
     const formState = this.aiProfileCredentialsFormService.create(profile.id);
     if (!formState) {
-      return { status: DialogueStateResult.Rejected };
+      return;
     }
 
     try {
       return await this.commonDialogService.open(AIProfileCredentialsDialog, { formState }, { persistent: true });
     } finally {
       await formState.dispose();
-    }
-  }
-
-  authorize(profileId: string, onAuthorization: (info: AiDeviceAuthorizationInfo) => void): AsyncTask {
-    return this.asyncTaskInfoService.create(async () => {
-      const info = await this.aiProfilesResource.startDeviceAuthorization(profileId);
-      onAuthorization(info);
-      return info.taskInfo;
-    });
-  }
-
-  async connect(profileId: string, task: AsyncTask): Promise<boolean> {
-    try {
-      const result = await this.asyncTaskInfoService.run(task);
-      if (task.cancelled || result.taskResult !== true) {
-        return false;
-      }
-      this.aiProfilesResource.markOutdated(profileId);
-      return true;
-    } finally {
-      if (!task.pending) {
-        await this.asyncTaskInfoService.remove(task.id);
-      }
-    }
-  }
-
-  async cancelAuthorization(task: AsyncTask): Promise<boolean> {
-    try {
-      if (task.pending) {
-        await this.asyncTaskInfoService.cancel(task.id);
-      }
-      return true;
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'plugin_ai_device_cancel_failed');
-      return false;
     }
   }
 

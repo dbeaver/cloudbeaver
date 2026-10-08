@@ -37,8 +37,8 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
     try {
       if (aiProfileCredentialsService.isRequired(profile)) {
         menu?.hide();
-        const { status } = await aiProfileCredentialsService.open(profile.id);
-        if (status !== DialogueStateResult.Resolved) {
+        const result = await aiProfileCredentialsService.open(profile.id);
+        if (result?.status !== DialogueStateResult.Resolved) {
           return;
         }
       }

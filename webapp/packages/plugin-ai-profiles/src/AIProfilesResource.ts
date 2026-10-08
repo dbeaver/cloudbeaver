@@ -22,15 +22,6 @@ import { AISettingsResource } from '@cloudbeaver/plugin-ai';
 
 export type AIProfile = AiConfigurationProfileInfo;
 
-function getDefaultState(): Pick<AIProfile, 'credentialsSaved' | 'accountAuthentication' | 'deviceAuthorizationAvailable' | 'tokenSaved'> {
-  return {
-    credentialsSaved: false,
-    accountAuthentication: false,
-    deviceAuthorizationAvailable: false,
-    tokenSaved: false,
-  };
-}
-
 @injectable(() => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler, UserInfoResource, AISettingsResource])
 export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   constructor(
@@ -55,10 +46,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   async createProfile(config: AiConfigurationProfileInput): Promise<AiAdminConfigurationProfileInfo> {
     const firstProfile = this.values.length === 0;
     const { profile } = await this.graphQLService.sdk.createAiProfile({ config });
-    this.set(profile.id, { ...profile, ...getDefaultState() });
-
-    // Load user-specific metadata, including Device Auth support, on the next read.
-    this.markOutdated(profile.id);
+    this.set(profile.id, profile);
     if (firstProfile) {
       this.aiSettingsResource.markOutdated();
     }
@@ -67,12 +55,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
 
   async updateProfile(config: AiConfigurationProfileInput): Promise<AiAdminConfigurationProfileInfo> {
     const { profile } = await this.graphQLService.sdk.updateAiProfile({ config });
-    this.set(profile.id, {
-      ...getDefaultState(),
-      ...this.get(profile.id),
-      ...profile,
-    });
-    this.markOutdated(profile.id);
+    this.set(profile.id, profile);
     return profile;
   }
 
