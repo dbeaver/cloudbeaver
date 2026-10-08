@@ -22,10 +22,10 @@ export class ConnectionFormAccessTabBootstrap extends Bootstrap {
   private readonly key: string;
 
   constructor(
-    private readonly ConnectionFormService: ConnectionFormService,
+    private readonly connectionFormService: ConnectionFormService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly sessionPermissionsResource: SessionPermissionsResource,
-    private readonly permissionsResource: PermissionsService,
+    private readonly permissionsService: PermissionsService,
     private readonly projectInfoResource: ProjectInfoResource,
   ) {
     super();
@@ -33,7 +33,7 @@ export class ConnectionFormAccessTabBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    this.ConnectionFormService.parts.add({
+    this.connectionFormService.parts.add({
       key: this.key,
       name: 'connections_connection_edit_access',
       title: 'connections_connection_edit_access',
@@ -55,6 +55,6 @@ export class ConnectionFormAccessTabBootstrap extends Bootstrap {
   }
 
   private isAccessTabActive(projectId: string | null): boolean {
-    return projectId !== null && isGlobalProject(this.projectInfoResource.get(projectId)) && this.permissionsResource.has(EAdminPermission.admin);
+    return projectId !== null && isGlobalProject(this.projectInfoResource.get(projectId)) && this.permissionsService.has(EAdminPermission.admin);
   }
 }

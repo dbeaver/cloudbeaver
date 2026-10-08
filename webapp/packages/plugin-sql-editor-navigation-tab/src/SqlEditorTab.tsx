@@ -40,16 +40,16 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   });
 
   const sqlDataSourceService = useService(SqlDataSourceService);
-  const connectionInfo = useService(ConnectionInfoResource);
-  const projectInfo = useService(ProjectInfoResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
+  const projectInfoResource = useService(ProjectInfoResource);
 
   const translate = useTranslate();
 
   const dataSource = sqlDataSourceService.get(handlerState.editorId);
   const executionContext = dataSource?.executionContext;
-  const project = executionContext ? projectInfo.get(executionContext.projectId) : undefined;
+  const project = executionContext ? projectInfoResource.get(executionContext.projectId) : undefined;
   const connection = executionContext
-    ? connectionInfo.get(createConnectionParam(executionContext.projectId, executionContext.connectionId))
+    ? connectionInfoResource.get(createConnectionParam(executionContext.projectId, executionContext.connectionId))
     : undefined;
 
   const name = getSqlEditorName(handlerState, dataSource, connection);

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ interface Props {
 
 export const Database = observer<Props>(function Database({ database, onSelect }) {
   const styles = useS(style);
-  const drivers = useService(DBDriverResource);
+  const dbDriverResource = useService(DBDriverResource);
   const select = useCallback(() => onSelect(database), [database]);
   const orderedDrivers = useMemo(
     () =>
@@ -45,7 +45,7 @@ export const Database = observer<Props>(function Database({ database, onSelect }
     <ListItem onClick={select}>
       <ListItemIcon className={s(styles, { listItemIcon: true })}>
         {orderedDrivers.map(driverId => (
-          <StaticImage key={driverId} className={s(styles, { staticImage: true })} icon={drivers.get(driverId)?.icon} />
+          <StaticImage key={driverId} className={s(styles, { staticImage: true })} icon={dbDriverResource.get(driverId)?.icon} />
         ))}
       </ListItemIcon>
       <ListItemName>{name}</ListItemName>

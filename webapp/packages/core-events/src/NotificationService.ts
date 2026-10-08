@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ export class NotificationService {
     return this.notificationList.values.filter(notification => !notification.isSilent);
   }
 
-  constructor(private readonly settings: EventsSettingsService) {
+  constructor(private readonly eventsSettingsService: EventsSettingsService) {
     this.notificationList = new OrderedMap<number, INotification<any>>(({ id }) => id);
     this.closeTask = new Executor();
     this.notificationNextId = 0;
@@ -52,7 +52,7 @@ export class NotificationService {
     if (options.persistent) {
       const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
 
-      const maxPersistentAllow = this.settings.maxPersistentAllow;
+      const maxPersistentAllow = this.eventsSettingsService.maxPersistentAllow;
 
       if (persistentNotifications.length >= maxPersistentAllow) {
         throw new Error(`You cannot create more than ${maxPersistentAllow} persistent notification`);
@@ -120,7 +120,7 @@ export class NotificationService {
 
     const filteredNotificationList = this.notificationList.values.filter(notification => !notification.persistent);
 
-    const notificationsPool = this.settings.notificationsPool;
+    const notificationsPool = this.eventsSettingsService.notificationsPool;
 
     if (filteredNotificationList.length > notificationsPool) {
       let i = 0;
