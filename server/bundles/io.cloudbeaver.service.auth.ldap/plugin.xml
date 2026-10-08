@@ -32,6 +32,14 @@
                     <property id="ldap-enable-ssl" label="%ldap-enable-ssl" description="%ldap-enable-ssl.description" type="boolean" defaultValue="false"/>
                     <property id="ldap-ssl-cert" label="%ldap-ssl-cert" description="%ldap-ssl-cert.description" type="file" features="file"/>
                     <property id="ldap-referral" label="%ldap-referral" description="%ldap-referral.description" type="string" defaultValue="ignore"/>
+                    <property id="ldap-first-name-attr" label="%ldap-first-name-attr" type="string" defaultValue="givenName"
+                              description="%ldap-first-name-attr.description"/>
+                    <property id="ldap-last-name-attr" label="%ldap-last-name-attr" type="string" defaultValue="sn"
+                              description="%ldap-last-name-attr.description"/>
+                    <property id="ldap-display-name-attr" label="%ldap-display-name-attr" type="string" defaultValue="displayName"
+                              description="%ldap-display-name-attr.description"/>
+                    <property id="ldap-user-meta-attrs" label="%ldap-user-meta-attrs" type="string"
+                              description="%ldap-user-meta-attrs.description"/>
 
                 </propertyGroup>
             </configuration>

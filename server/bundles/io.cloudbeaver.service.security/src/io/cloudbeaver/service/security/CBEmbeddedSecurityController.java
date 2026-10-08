@@ -76,6 +76,9 @@ import java.util.stream.Collectors;
  */
 public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     implements SMAdminController, SMAuthenticationManager {
+    // Sizes of the columns of the subject meta table
+    private static final int MAX_META_PARAMETER_NAME_LENGTH = 32;
+    private static final int MAX_META_PARAMETER_VALUE_LENGTH = 1024;
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
@@ -3052,9 +3055,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     return null;
                 }
                 log.debug("Create user: " + userId);
+                Map<String, String> profile = readProvidedMetaParameters(userCredentials.get(SMStandardMeta.KEY_META_PARAMS));
+                profile.values().removeIf(String::isEmpty);
                 validateAndCreateUser(
                     userId,
-                    (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
+                    profile,
                     true,
                     resolveUserAuthRole(null, authRole)
                 );
@@ -3062,6 +3067,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
             userId = userIdFromCredentials;
+        }
+        if (userId != null && smAuthProviderInstance instanceof SMAuthProviderExternal<?>) {
+            refreshExternalUserMetaParameters(userId, userCredentials);
         }
         if (authProvider.isTrusted()) {
             Object reverseProxyUserRole = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLE);
@@ -3074,6 +3082,63 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
         }
         return userId;
+    }
+
+    /**
+     * Reads the profile reported by an external provider. An empty value means the provider has no such value (any
+     * more). Parameters that don't fit the database columns are skipped.
+     */
+    @NotNull
+    private static Map<String, String> readProvidedMetaParameters(@Nullable Object providedMeta) {
+        Map<String, String> result = new LinkedHashMap<>();
+        if (!(providedMeta instanceof Map<?, ?> provided)) {
+            return result;
+        }
+        for (Map.Entry<?, ?> entry : provided.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null) {
+                continue;
+            }
+            String name = entry.getKey().toString();
+            String value = entry.getValue().toString();
+            if (name.isEmpty() || name.length() > MAX_META_PARAMETER_NAME_LENGTH || value.length() > MAX_META_PARAMETER_VALUE_LENGTH) {
+                log.debug("Skipped the meta parameter '" + name + "' reported by an external provider, it doesn't fit the database");
+                continue;
+            }
+            result.put(name, value);
+        }
+        return result;
+    }
+
+    /**
+     * Keeps the profile of a user (first name, last name, ...) in sync with what the external provider reports,
+     * the way a directory is expected to be the source of truth. A value the provider reports as empty is removed,
+     * meta parameters the provider doesn't report stay.
+     */
+    private void refreshExternalUserMetaParameters(@NotNull String userId, @NotNull Map<String, Object> userCredentials) {
+        Map<String, String> providedMeta = readProvidedMetaParameters(userCredentials.get(SMStandardMeta.KEY_META_PARAMS));
+        if (providedMeta.isEmpty()) {
+            return;
+        }
+        try {
+            SMUser user = getUserById(userId);
+            if (user == null) {
+                return;
+            }
+            Map<String, String> metaParameters = new LinkedHashMap<>(user.getMetaParameters());
+            boolean changed = false;
+            for (Map.Entry<String, String> entry : providedMeta.entrySet()) {
+                if (entry.getValue().isEmpty()) {
+                    changed |= metaParameters.remove(entry.getKey()) != null;
+                } else {
+                    changed |= !entry.getValue().equals(metaParameters.put(entry.getKey(), entry.getValue()));
+                }
+            }
+            if (changed) {
+                setSubjectMetas(userId, metaParameters);
+            }
+        } catch (DBException e) {
+            log.warn("Can't update meta parameters of user '" + userId + "'", e);
+        }
     }
 
     @Nullable

@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMStandardMeta;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayInputStream;
@@ -45,6 +46,8 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -59,6 +62,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     private static final Log log = Log.getLog(LdapAuthProvider.class);
     public static final String LDAP_AUTH_PROVIDER_ID = "ldap";
     private static final int DEFAULT_TIME_LIMIT = 30_000;
+    // Size of the user meta parameter value column
+    private static final int MAX_PROFILE_VALUE_LENGTH = 1024;
 
     public LdapAuthProvider() {
     }
@@ -403,11 +408,35 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         if (CommonUtils.isEmpty(userName)) {
             throw new DBException("LDAP user name is empty");
         }
-        String displayName = JSONUtils.getString(authParameters, LocalAuthProviderConstants.CRED_DISPLAY_NAME);
+        Map<String, String> userMeta = new LinkedHashMap<>();
+        if (authParameters.get(SMStandardMeta.KEY_META_PARAMS) instanceof Map<?, ?> storedMeta) {
+            storedMeta.forEach((key, value) -> {
+                if (key != null && value != null && !value.toString().isEmpty()) {
+                    userMeta.put(key.toString(), value.toString());
+                }
+            });
+        }
+        String firstName = JSONUtils.getString(authParameters, SMStandardMeta.META_FIRST_NAME);
+        String lastName = JSONUtils.getString(authParameters, SMStandardMeta.META_LAST_NAME);
+        if (CommonUtils.isNotEmpty(firstName)) {
+            userMeta.putIfAbsent(SMStandardMeta.META_FIRST_NAME, firstName);
+        }
+        if (CommonUtils.isNotEmpty(lastName)) {
+            userMeta.putIfAbsent(SMStandardMeta.META_LAST_NAME, lastName);
+        }
+
+        // Name from the directory first, then "first last", the login is the last resort
+        String displayName = JSONUtils.getString(authParameters, LdapConstants.CRED_FULL_NAME);
+        if (CommonUtils.isEmpty(displayName)) {
+            displayName = Stream.of(firstName, lastName).filter(CommonUtils::isNotEmpty).collect(Collectors.joining(" "));
+        }
+        if (CommonUtils.isEmpty(displayName)) {
+            displayName = JSONUtils.getString(authParameters, LocalAuthProviderConstants.CRED_DISPLAY_NAME);
+        }
         if (CommonUtils.isEmpty(displayName)) {
             displayName = userName;
         }
-        return new DBWUserIdentity(userName, displayName);
+        return new DBWUserIdentity(userName, displayName, userMeta);
     }
 
     @Nullable
@@ -531,6 +560,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                         ldapSettings.getProviderConfiguration().getParameter(LdapConstants.LDAP_META_GROUP_NAME)
                     )
                 );
+                collectUserProfile(ldapSettings, attributes, userData);
                 doCustomModifyUserDataAfterAuthentication(ldapSettings, attributes, userData);
             }
             userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(login) ? login : userId);
@@ -551,6 +581,54 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 }
             }
         }
+    }
+
+    /**
+     * Copies the user name and the other configured attributes of the directory entry into the authentication data.
+     * They are shown in the UI and stored in the profile of a new user.
+     */
+    private void collectUserProfile(
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Attributes attributes,
+        @NotNull Map<String, Object> userData
+    ) {
+        // Every configured parameter is reported. An empty value means the attribute is empty or missing in the
+        // directory, so the value stored in the profile is removed instead of staying forever.
+        Map<String, String> profile = new LinkedHashMap<>();
+
+        String firstName = readProfileAttribute(attributes, ldapSettings.getFirstNameAttr());
+        if (CommonUtils.isNotEmpty(ldapSettings.getFirstNameAttr())) {
+            profile.put(SMStandardMeta.META_FIRST_NAME, firstName);
+        }
+        if (CommonUtils.isNotEmpty(firstName)) {
+            userData.put(SMStandardMeta.META_FIRST_NAME, firstName);
+        }
+        String lastName = readProfileAttribute(attributes, ldapSettings.getLastNameAttr());
+        if (CommonUtils.isNotEmpty(ldapSettings.getLastNameAttr())) {
+            profile.put(SMStandardMeta.META_LAST_NAME, lastName);
+        }
+        if (CommonUtils.isNotEmpty(lastName)) {
+            userData.put(SMStandardMeta.META_LAST_NAME, lastName);
+        }
+        String displayName = readProfileAttribute(attributes, ldapSettings.getDisplayNameAttr());
+        if (CommonUtils.isNotEmpty(displayName)) {
+            userData.put(LdapConstants.CRED_FULL_NAME, displayName);
+        }
+        for (Map.Entry<String, String> metaAttr : ldapSettings.getUserMetaAttrs().entrySet()) {
+            profile.put(metaAttr.getKey(), readProfileAttribute(attributes, metaAttr.getValue()));
+        }
+        if (!profile.isEmpty()) {
+            userData.put(SMStandardMeta.KEY_META_PARAMS, profile);
+        }
+    }
+
+    @NotNull
+    private String readProfileAttribute(@NotNull Attributes attributes, @NotNull String attributeName) {
+        if (CommonUtils.isEmpty(attributeName)) {
+            return "";
+        }
+        String value = getAttributeValueSafe(attributes, attributeName).trim();
+        return value.length() > MAX_PROFILE_VALUE_LENGTH ? value.substring(0, MAX_PROFILE_VALUE_LENGTH) : value;
     }
 
     protected void doCustomModifyUserDataAfterAuthentication(LdapSettings ldapSettings, Attributes attributes, Map<String, Object> userData) {
