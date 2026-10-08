@@ -278,6 +278,8 @@ extend type Mutation @since(version: "23.2.2") {
 
     "Creates a new AI engine configuration profile."
     aiCreateProfile(config: AIConfigurationProfileInput!): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
+    "Creates a copy of an existing AI engine configuration profile with a generated unique ID and name."
+    aiCopyProfile(profileId: ID!): AIAdminConfigurationProfileInfo! @since(version: "26.2.3")
     "Updates the configuration of the specified AI engine configuration profile."
     aiUpdateProfile(config: AIConfigurationProfileInput!): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
     "Deletes the specified AI engine configuration profile."
