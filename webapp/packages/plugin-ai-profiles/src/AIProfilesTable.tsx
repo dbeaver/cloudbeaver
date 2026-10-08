@@ -13,7 +13,7 @@ import type { ReactNode } from 'react';
 import { IconOrImage, Link, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { DataGrid, TableRowSelect, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, TableRowSelect, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 import { Command } from '@dbeaver/ui-kit';
 
 import { AI_PROFILES_TABLE_ROW_HEIGHT } from './AI_PROFILES_TABLE_ROW_HEIGHT.js';
@@ -63,6 +63,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
 }) {
   const translate = useTranslate();
   const styles = useS(AdministrationTableStyles);
+  const cellCopy = useCellCopy();
   const enginesLoader = useResource(AIProfilesTable, AiEnginesResource, undefined);
   const selectable = !!isProfileSelectable;
   const columns: TableColumn[] = [
@@ -204,6 +205,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
         getHeaderMinWidth={getHeaderMinWidth}
         cell={cell}
         className={s(styles, { table: true })}
+        onCellKeyDown={cellCopy.handleKeyDown}
       />
     </div>
   );

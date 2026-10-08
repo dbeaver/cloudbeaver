@@ -24,6 +24,7 @@ export * from './bytesToSize.js';
 export * from './cacheValue.js';
 export * from './combineITerableIterators.js';
 export * from './copyToClipboard.js';
+export * from './isCopyShortcut.js';
 export * from './declensionOfNumber.js';
 export * from './flat.js';
 export * from './getMIME.js';
