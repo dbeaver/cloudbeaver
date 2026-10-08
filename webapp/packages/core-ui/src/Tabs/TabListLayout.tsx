@@ -18,10 +18,22 @@ export function TabListLayout({
   const items = useTabsState('renderedItems');
 
   return (
-    <div className={className} data-dialog-persistent-element={persistent}>
-      {/* Tab actions share the visual layout, but only tabs belong to the accessible tablist. */}
-      <BaseTabList {...props} className="tw:sr-only" aria-owns={items.map(item => item.id).join(' ') || undefined} />
+    <BaseTabList
+      {...props}
+      className="tw:sr-only"
+      aria-owns={items.map(item => item.id).join(' ') || undefined}
+      data-dialog-persistent-element={persistent}
+      render={({ children, ...tabListProps }) => (
+        <>
+          {/* Keep Ariakit's tab context while separating action buttons from accessible tab ownership. */}
+          <div {...tabListProps} />
+          <div className={className} data-dialog-persistent-element={persistent}>
+            {children}
+          </div>
+        </>
+      )}
+    >
       {children}
-    </div>
+    </BaseTabList>
   );
 }

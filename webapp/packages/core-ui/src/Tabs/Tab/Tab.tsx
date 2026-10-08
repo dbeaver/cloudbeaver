@@ -62,14 +62,6 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
         {...dropProps}
       >
         <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
-          <TabActions
-            className={s(styles, { actions: true })}
-            state={tab.state}
-            menuContext={props.menuContext}
-            canClose={canClose}
-            tabId={tabId}
-            handleClose={tab.handleClose}
-          />
           <BaseTab
             ref={ref}
             type="button"
@@ -83,6 +75,14 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
           >
             <div className={s(styles, { tabContainer: true })}>{children}</div>
           </BaseTab>
+          <TabActions
+            className={s(styles, { actions: true })}
+            state={tab.state}
+            menuContext={props.menuContext}
+            canClose={canClose}
+            tabId={tabId}
+            handleClose={tab.handleClose}
+          />
           {after}
         </div>
       </div>

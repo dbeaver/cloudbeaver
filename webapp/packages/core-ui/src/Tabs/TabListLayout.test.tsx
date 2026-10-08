@@ -34,6 +34,31 @@ function Tabs({ ids = ['first', 'second'], onAction = () => {} }: { ids?: string
 }
 
 describe('TabListLayout', () => {
+  it('keeps nested tablists in their own tab store', async () => {
+    render(
+      <TabProvider defaultSelectedId="outer">
+        <TabListLayout aria-label="Outer tabs">
+          <Tab id="outer">Outer</Tab>
+        </TabListLayout>
+        <TabPanel tabId="outer">
+          <TabProvider defaultSelectedId="inner">
+            <TabListLayout aria-label="Inner tabs">
+              <Tab id="inner">Inner</Tab>
+            </TabListLayout>
+            <TabPanel tabId="inner">Inner content</TabPanel>
+          </TabProvider>
+        </TabPanel>
+      </TabProvider>,
+    );
+    await waitFor(() => expect(screen.getByRole('tablist', { name: 'Inner tabs' }).getAttribute('aria-owns')).toBe('inner'));
+    expect(screen.getByRole('tablist', { name: 'Outer tabs' }).getAttribute('aria-owns')).toBe('outer');
+  });
+
+  it('preserves only-child selectors for a single visible tab wrapper', () => {
+    render(<Tabs ids={['first']} />);
+    expect(screen.getByRole('tab', { name: 'first' }).parentElement?.matches(':only-child')).toBe(true);
+  });
+
   it('owns only tabs and updates ownership when tabs are added, reordered, or closed', async () => {
     const { rerender } = render(<Tabs />);
     const tablist = screen.getByRole('tablist', { name: 'Editors' });
@@ -41,8 +66,10 @@ describe('TabListLayout', () => {
     await waitFor(() => expect(tablist.getAttribute('aria-owns')).toBe('first second'));
     expect(tablist.querySelector('button')).toBeNull();
     expect(screen.getByRole('button', { name: 'Menu for first' })).toBeTruthy();
-    expect(screen.getByRole('tab', { name: 'first' }).closest('[data-dialog-persistent-element]')).toBe(tablist.parentElement);
-    expect(screen.getByRole('button', { name: 'Menu for first' }).closest('[data-dialog-persistent-element]')).toBe(tablist.parentElement);
+    const persistent = screen.getByRole('tab', { name: 'first' }).closest('[data-dialog-persistent-element]');
+    expect(persistent).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Menu for first' }).closest('[data-dialog-persistent-element]')).toBe(persistent);
+    expect(tablist.matches('[data-dialog-persistent-element]')).toBe(true);
 
     rerender(<Tabs ids={['second', 'third', 'first']} />);
     await waitFor(() => expect(tablist.getAttribute('aria-owns')).toBe('second third first'));
