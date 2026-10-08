@@ -666,6 +666,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     dbStat.execute();
                 }
             }
+            markUserTeamsAsManual(dbCon, userId, teamIds);
         }
     }
 
@@ -712,6 +713,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 dbStat.execute();
             }
         }
+        markUserTeamsAsManual(dbCon, userId, teamIds);
         log.info(String.format(
             "User added to team: [userId=%s,team=%s, grantorUserId=%s]",
             userId,
@@ -2857,7 +2859,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
         String externalTeamIdMetadataFieldName = authProviderAssigner.getExternalTeamIdMetadataFieldName();
         if (!CommonUtils.isEmpty(externalTeamIdMetadataFieldName)) {
-            String[] newTeamIds = autoAssign.getExternalTeamIds()
+            List<String> desiredTeamIds = autoAssign.getExternalTeamIds()
                 .stream()
                 .flatMap(externalTeamId -> findTeamByExternalTeamId(
                     allTeams,
@@ -2866,22 +2868,138 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     authProvider.isCaseInsensitive()
                 ).stream())
                 .map(SMTeam::getTeamId)
-                .toArray(String[]::new);
-            SMUserTeam[] oldUserTeams = getUserTeams(userId);
-            Set<String> oldUserTeamIdSet = Arrays.stream(oldUserTeams).map(SMTeam::getTeamId).collect(Collectors.toSet());
-            oldUserTeamIdSet.remove(getDefaultUserTeam());
-            Set<String> newUserTeamIdSet = Arrays.stream(newTeamIds).collect(Collectors.toSet());
-            if (oldUserTeamIdSet.equals(newUserTeamIdSet)) {
-                //do not need to update teams and send events
-                return;
-            }
-            if (!ArrayUtils.isEmpty(newTeamIds)) {
-                setUserTeams(
-                    userId,
-                    newTeamIds,
-                    userId
+                .distinct()
+                .toList();
+            syncAutoAssignedTeams(userId, desiredTeamIds, autoAssign.isExternalTeamIdsComplete());
+        }
+    }
+
+    /**
+     * Adds the teams the external provider says the user belongs to, and removes the teams that were added this way
+     * before and are not reported any more. Teams assigned by hand are never removed.
+     */
+    private void syncAutoAssignedTeams(
+        @NotNull String userId,
+        @NotNull Collection<String> desiredTeamIds,
+        boolean desiredIsComplete
+    ) throws DBException {
+        AutoAssignedTeams.Plan plan;
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                plan = AutoAssignedTeams.plan(
+                    readUserTeamOrigins(dbCon, userId),
+                    desiredTeamIds,
+                    desiredIsComplete,
+                    getDefaultUserTeam()
                 );
+                if (plan.isEmpty()) {
+                    // nothing to update and no events to send
+                    return;
+                }
+                deleteAutoAssignedUserTeams(dbCon, userId, plan.toRemove());
+                insertAutoAssignedUserTeams(dbCon, userId, plan.toAdd());
+                txn.commit();
             }
+        } catch (SQLException e) {
+            throw new DBCException("Error saving user teams in database", e);
+        }
+        log.info(String.format(
+            "User teams assigned automatically updated: [userId=%s,added=%s,removed=%s]",
+            userId,
+            String.join(",", plan.toAdd()),
+            String.join(",", plan.toRemove())
+        ));
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+    }
+
+    /**
+     * @return teams of the user, the value tells if the membership was assigned automatically
+     */
+    @NotNull
+    private Map<String, Boolean> readUserTeamOrigins(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        Map<String, Boolean> result = new LinkedHashMap<>();
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT TEAM_ID,IS_AUTO_ASSIGNED FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?")
+        ) {
+            dbStat.setString(1, userId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    result.put(dbResult.getString(1), CHAR_BOOL_TRUE.equals(dbResult.getString(2)));
+                }
+            }
+        }
+        return result;
+    }
+
+    private void insertAutoAssignedUserTeams(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull List<String> teamIds
+    ) throws SQLException {
+        if (teamIds.isEmpty()) {
+            return;
+        }
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "INSERT INTO {table_prefix}CB_USER_TEAM(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY,IS_AUTO_ASSIGNED) VALUES(?,?,?,?,?)")
+        ) {
+            for (String teamId : teamIds) {
+                dbStat.setString(1, userId);
+                dbStat.setString(2, teamId);
+                dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                dbStat.setString(4, userId);
+                dbStat.setString(5, CHAR_BOOL_TRUE);
+                dbStat.execute();
+            }
+        }
+    }
+
+    private void deleteAutoAssignedUserTeams(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull List<String> teamIds
+    ) throws SQLException {
+        if (teamIds.isEmpty()) {
+            return;
+        }
+        // the flag is checked again, a team assigned by hand in the meantime stays
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? AND IS_AUTO_ASSIGNED=? " +
+                "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.size()) + ")")
+        ) {
+            int index = 1;
+            dbStat.setString(index++, userId);
+            dbStat.setString(index++, CHAR_BOOL_TRUE);
+            for (String teamId : teamIds) {
+                dbStat.setString(index++, teamId);
+            }
+            dbStat.execute();
+        }
+    }
+
+    /**
+     * A team assigned by hand (or by a trusted header) that the user already has automatically becomes a manual one,
+     * so the synchronization with the external provider doesn't take it away.
+     */
+    private void markUserTeamsAsManual(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String[] teamIds
+    ) throws SQLException {
+        if (teamIds.length == 0) {
+            return;
+        }
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "UPDATE {table_prefix}CB_USER_TEAM SET IS_AUTO_ASSIGNED=? WHERE USER_ID=? AND IS_AUTO_ASSIGNED=? " +
+                "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")")
+        ) {
+            int index = 1;
+            dbStat.setString(index++, CHAR_BOOL_FALSE);
+            dbStat.setString(index++, userId);
+            dbStat.setString(index++, CHAR_BOOL_TRUE);
+            for (String teamId : teamIds) {
+                dbStat.setString(index++, teamId);
+            }
+            dbStat.execute();
         }
     }
 
