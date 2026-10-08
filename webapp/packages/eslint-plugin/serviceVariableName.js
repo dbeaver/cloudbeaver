@@ -56,7 +56,7 @@ export default {
       if (!serviceName || !/^[A-Z].*(?:Service|Resource)$/.test(serviceName) || identifier.type !== 'Identifier') {
         return;
       }
-      if (serviceName === 'EESDKService' && identifier.name === 'sdk') {
+      if (['EESDKService', 'AWSSDKService'].includes(serviceName) && identifier.name === 'sdk') {
         return;
       }
 
