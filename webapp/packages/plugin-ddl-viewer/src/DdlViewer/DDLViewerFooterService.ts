@@ -34,7 +34,7 @@ export class DDLViewerFooterService {
 
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly actionsService: ActionService,
+    private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -55,7 +55,7 @@ export class DDLViewerFooterService {
   }
 
   register(): void {
-    this.actionsService.addHandler({
+    this.actionService.addHandler({
       id: 'ddl-viewer-footer-base-handler',
       menus: [MENU_DDL_VIEWER_FOOTER],
       contexts: [DATA_CONTEXT_DDL_VIEWER_NODE, DATA_CONTEXT_DDL_VIEWER_QUERY],
@@ -127,7 +127,7 @@ export class DDLViewerFooterService {
       getItems: (context, items) => [...items, ACTION_DDL_VIEWER_FULL_DDL],
     });
 
-    this.actionsService.addHandler({
+    this.actionService.addHandler({
       id: 'ddl-viewer-footer-full-ddl-handler',
       menus: [MENU_DDL_VIEWER_FOOTER],
       actions: [ACTION_DDL_VIEWER_FULL_DDL],
