@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,6 +10,7 @@ import { forwardRef, useCallback, useContext, useDeferredValue, useEffect, useRe
 
 import { getComputed, s, TreeNodeContext, useMergeRefs, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
 import { ElementsTreeContext } from '../ElementsTreeContext.js';
@@ -93,6 +94,9 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     const nodeInfo = contextRef.context?.tree.getTransformedNodeInfo(node);
 
     function onClickHandler(event: React.MouseEvent<HTMLDivElement>) {
+      if (EventContext.has(event, EventStopPropagationFlag)) {
+        return;
+      }
       treeNodeContext.select(event.ctrlKey || event.metaKey);
     }
 

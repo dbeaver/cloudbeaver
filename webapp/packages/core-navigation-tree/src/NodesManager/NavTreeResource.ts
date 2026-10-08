@@ -10,7 +10,7 @@ import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutor } from '@cloudbeaver/core-executor';
+import { ExecutionContext, Executor, ExecutorInterrupter, type IExecutionContext, type IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
@@ -38,6 +38,7 @@ import { isDefined } from '@dbeaver/js-helpers';
 import { NavTreeSettingsService } from '../NavTreeSettingsService.js';
 import type { NavNode } from './EntityTypes.js';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource.js';
+import { nodeDeleteContext } from './nodeDeleteContext.js';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -208,8 +209,12 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     });
   }
 
-  async deleteNode(key: ResourceKeySimple<string>): Promise<void> {
-    const contexts = await this.beforeNodeDelete.execute(key);
+  async deleteNode(key: ResourceKeySimple<string>, confirmed = false): Promise<void> {
+    const context = new ExecutionContext(key);
+    if (confirmed) {
+      context.getContext(nodeDeleteContext).confirm();
+    }
+    const contexts = await this.beforeNodeDelete.execute(key, context);
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;

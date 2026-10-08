@@ -51,9 +51,11 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:*",
     "@types/react": "^19",
     "rimraf": "^6",
     "typescript": "^5",
-    "typescript-plugin-css-modules": "^5"
+    "typescript-plugin-css-modules": "^5",
+    "vitest": "^4"
   }
 }
