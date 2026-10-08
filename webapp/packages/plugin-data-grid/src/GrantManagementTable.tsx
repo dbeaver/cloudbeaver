@@ -19,6 +19,7 @@ import { DataGrid } from './DataGridLazy.js';
 import { useTableSelection } from './useTableSelection.js';
 import { TableSelectionContext } from './TableSelectionContext.js';
 import { TableRowSelect } from './TableRowSelect.js';
+import { useCellCopy } from './useCellCopy.js';
 import classes from './GrantManagementTable.module.css';
 
 export interface IGrantManagementTableColumn<T = unknown> {
@@ -59,6 +60,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
 }: IGrantManagementTableProps<T>) {
   const translate = useTranslate();
   const styles = useS(classes);
+  const cellCopy = useCellCopy();
 
   const [sort, setSort] = useState<{ colIdx: number; order: 'asc' | 'desc' } | null>({ colIdx: 1, order: 'desc' });
   const [filter, setFilter] = useState('');
@@ -265,6 +267,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
             columnSortable={columnSortable}
             columnSortingState={columnSortingState}
             onColumnSort={handleSort}
+            onCellKeyDown={cellCopy.handleKeyDown}
           />
         </div>
       </TableSelectionContext>

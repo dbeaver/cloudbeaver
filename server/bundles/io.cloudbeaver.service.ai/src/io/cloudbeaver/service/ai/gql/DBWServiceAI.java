@@ -183,6 +183,13 @@ public interface DBWServiceAI extends DBWService {
 
     @NotNull
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    WebAIConfigurationProfile copyProfile(
+        @NotNull WebSession webSession,
+        @NotNull String profileId
+    ) throws DBWebException;
+
+    @NotNull
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     WebAIConfigurationProfile updateProfile(
         @NotNull WebSession webSession,
         @WebParameterSecure @NotNull WebAIConfigurationProfileInput config
