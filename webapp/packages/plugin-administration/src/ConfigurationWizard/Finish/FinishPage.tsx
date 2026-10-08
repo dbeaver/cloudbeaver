@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ import styles from './FinishPage.module.css';
 
 export const FinishPage = observer(function FinishPage() {
   const translate = useTranslate();
-  const service = useService(ConfigurationWizardService);
+  const configurationWizardService = useService(ConfigurationWizardService);
   const [focus] = useFocus<HTMLDivElement>({
     focusFirstChild: true,
   });
@@ -28,7 +28,7 @@ export const FinishPage = observer(function FinishPage() {
           <h3 className="tw:text-xl tw:font-semibold">{translate('administration_configuration_wizard_finish_title')}</h3>
           <p className={s(style, { message: true })}>{translate('administration_configuration_wizard_finish_message')}</p>
 
-          <Button type="button" onClick={() => service.next()}>
+          <Button type="button" onClick={() => configurationWizardService.next()}>
             {translate('ui_stepper_finish')}
           </Button>
         </div>

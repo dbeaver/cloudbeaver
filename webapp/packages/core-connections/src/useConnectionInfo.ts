@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,9 @@ interface IPublic {
 }
 
 export function useConnectionInfo(key: IConnectionInfoParams): IPublic {
-  const manager = useService(ConnectionsManagerService);
-  const resource = useService(ConnectionInfoResource);
-  key = resource.getKeyRef(key);
+  const connectionsManagerService = useService(ConnectionsManagerService);
+  const connectionInfoResource = useService(ConnectionInfoResource);
+  key = connectionInfoResource.getKeyRef(key);
 
   return useObservableRef<IPrivate>(
     () => ({
@@ -63,7 +63,7 @@ export function useConnectionInfo(key: IConnectionInfoParams): IPublic {
       connectionInfo: computed,
       key: observable.ref,
     },
-    { manager, resource, key },
+    { manager: connectionsManagerService, resource: connectionInfoResource, key },
     ['isLoading', 'isLoaded', 'isOutdated', 'load', 'refresh', 'connect'],
   );
 }

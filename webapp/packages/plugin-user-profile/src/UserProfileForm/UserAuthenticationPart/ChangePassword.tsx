@@ -31,9 +31,9 @@ import { UserProfileFormAuthenticationService } from './UserProfileFormAuthentic
 export const ChangePassword = observer(function ChangePassword() {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const userProfileFormAuthenticationPartStateService = useService(UserProfileFormAuthenticationService);
+  const userProfileFormAuthenticationService = useService(UserProfileFormAuthenticationService);
   const userInfoResource = useService(UserInfoResource);
-  const state = userProfileFormAuthenticationPartStateService.state;
+  const state = userProfileFormAuthenticationService.state;
   const disabled = userInfoResource.isLoading();
 
   const form = useForm({
@@ -58,7 +58,7 @@ export const ChangePassword = observer(function ChangePassword() {
   }, form);
 
   function resetForm() {
-    userProfileFormAuthenticationPartStateService.reset();
+    userProfileFormAuthenticationService.reset();
     form.ref?.reset();
   }
 

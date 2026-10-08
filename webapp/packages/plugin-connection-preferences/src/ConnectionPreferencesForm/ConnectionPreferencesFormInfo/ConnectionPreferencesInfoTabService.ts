@@ -17,12 +17,12 @@ const ConnectionPreferencesFormInfo = importLazyComponent(() =>
 
 @injectable(() => [ConnectionPreferencesFormService])
 export class ConnectionPreferencesInfoTabService extends Bootstrap {
-  constructor(private readonly connectionFormService: ConnectionPreferencesFormService) {
+  constructor(private readonly connectionPreferencesFormService: ConnectionPreferencesFormService) {
     super();
   }
 
   override register(): void {
-    this.connectionFormService.parts.add({
+    this.connectionPreferencesFormService.parts.add({
       key: 'preferences-info',
       name: 'Info',
       order: 1,
