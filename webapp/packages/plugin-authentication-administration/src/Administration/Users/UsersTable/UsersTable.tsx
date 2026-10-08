@@ -16,7 +16,7 @@ import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
-import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
 import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.js';
 import { UsersAdministrationService } from '../UsersAdministrationService.js';
@@ -41,6 +41,7 @@ const COLUMNS = [ID_COLUMN, TEAM_COLUMN, ENABLED_COLUMN, AUTH_COLUMN, LAST_LOGIN
 export const UsersTable = observer<Props>(function UsersTable({ users, isManageable, displayAuthRole, onLoadMore }) {
   const translate = useTranslate();
   const styles = useS(AdministrationTableStyles);
+  const cellCopy = useCellCopy();
   const notificationService = useService(NotificationService);
   const usersTableOptionsPanelService = useService(UsersTableOptionsPanelService);
   const usersAdministrationService = useService(UsersAdministrationService);
@@ -173,6 +174,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
         cell={cell}
         className={s(styles, { table: true })}
         onScrollToBottom={onLoadMore}
+        onCellKeyDown={cellCopy.handleKeyDown}
       />
     </div>
   );
