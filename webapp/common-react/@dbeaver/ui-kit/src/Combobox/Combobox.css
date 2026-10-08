@@ -38,7 +38,7 @@
   .dbv-kit-combobox__popover {
     z-index: 1000;
     min-width: 100%;
-    max-height: var(--dbv-kit-combobox-popover-height);
+    max-height: min(var(--dbv-kit-combobox-popover-height), var(--popover-available-height));
     overflow-y: auto;
     background-color: var(--dbv-kit-combobox-popover-background);
     color: var(--dbv-kit-combobox-popover-foreground);
