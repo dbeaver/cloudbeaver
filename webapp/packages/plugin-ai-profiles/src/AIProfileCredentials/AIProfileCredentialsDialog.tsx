@@ -14,6 +14,7 @@ import {
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
+  ConfirmationDialog,
   Container,
   Fill,
   Form,
@@ -22,7 +23,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import type { DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult, type DialogComponent } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import type { IFormState } from '@cloudbeaver/core-ui';
@@ -44,6 +45,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
 }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
+  const commonDialogService = useService(CommonDialogService);
   const { formState } = payload;
   const profiles = useService(AIProfilesResource);
   const engines = useService(AiEnginesResource);
@@ -72,6 +74,17 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   async function close(): Promise<void> {
     if (isSaving) {
       return;
+    }
+    if (formState.isChanged) {
+      const { status } = await commonDialogService.open(ConfirmationDialog, {
+        title: 'ui_discard_changes',
+        message: 'ui_discard_changes_message',
+        confirmActionText: 'ui_discard',
+        cancelActionText: 'ui_keep_editing',
+      });
+      if (status !== DialogueStateResult.Resolved) {
+        return;
+      }
     }
     if (await profileAuthController.confirmLeave()) {
       rejectDialog();
