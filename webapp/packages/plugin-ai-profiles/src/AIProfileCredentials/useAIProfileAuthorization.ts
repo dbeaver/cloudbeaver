@@ -32,11 +32,11 @@ export interface IAIProfileAuthorizationState {
 }
 
 export function useAIProfileAuthorization(formState: IFormState<IAIProfileCredentialsFormState> | null): IAIProfileAuthorizationState {
-  const service = useService(AIProfileAuthorizationService);
-  const profiles = useService(AIProfilesResource);
-  const notifications = useService(NotificationService);
-  const dialogs = useService(CommonDialogService);
-  const user = useService(UserInfoResource);
+  const aiProfileAuthorizationService = useService(AIProfileAuthorizationService);
+  const aiProfilesResource = useService(AIProfilesResource);
+  const notificationService = useService(NotificationService);
+  const commonDialogService = useService(CommonDialogService);
+  const userInfoResource = useService(UserInfoResource);
   const state = useObservableRef(
     () => ({
       authorization: null as AiDeviceAuthorizationInfo | null,
@@ -49,17 +49,17 @@ export function useAIProfileAuthorization(formState: IFormState<IAIProfileCreden
           return;
         }
         const profileId = this.formState.state.profileId;
-        const task = service.authorize(profileId, info => {
+        const task = aiProfileAuthorizationService.authorize(profileId, info => {
           this.authorization = info;
         });
         this.task = task;
         try {
           if (await task) {
-            notifications.logSuccess({ title: 'plugin_ai_account_connected', message: profiles.get(profileId)?.name });
+            notificationService.logSuccess({ title: 'plugin_ai_account_connected', message: aiProfilesResource.get(profileId)?.name });
           }
         } catch (exception: any) {
           if (!task.cancelled) {
-            notifications.logException(exception, 'plugin_ai_device_failed');
+            notificationService.logException(exception, 'plugin_ai_device_failed');
           }
         } finally {
           if (this.task === task) {
@@ -77,7 +77,7 @@ export function useAIProfileAuthorization(formState: IFormState<IAIProfileCreden
         if (!this.task?.executing || this.task.cancelled) {
           return true;
         }
-        const { status } = await dialogs.open(ConfirmationDialog, {
+        const { status } = await commonDialogService.open(ConfirmationDialog, {
           title: 'plugin_ai_device_cancel_title',
           message: 'plugin_ai_device_cancel_confirmation',
           confirmActionText: 'plugin_ai_device_cancel',
@@ -90,7 +90,7 @@ export function useAIProfileAuthorization(formState: IFormState<IAIProfileCreden
           await this.cancel();
           return true;
         } catch (exception: any) {
-          notifications.logException(exception, 'plugin_ai_device_cancel_failed');
+          notificationService.logException(exception, 'plugin_ai_device_cancel_failed');
           return false;
         }
       },
@@ -104,11 +104,11 @@ export function useAIProfileAuthorization(formState: IFormState<IAIProfileCreden
     try {
       await state.cancel();
     } catch (exception: any) {
-      notifications.logException(exception, 'plugin_ai_device_cancel_failed');
+      notificationService.logException(exception, 'plugin_ai_device_cancel_failed');
     }
-  }, [state, notifications]);
+  }, [state, notificationService]);
 
-  useExecutor({ executor: user.onUserChange, handlers: [cancel] });
+  useExecutor({ executor: userInfoResource.onUserChange, handlers: [cancel] });
   useEffect(() => {
     formState?.disposeTask.addHandler(cancel);
     return () => {

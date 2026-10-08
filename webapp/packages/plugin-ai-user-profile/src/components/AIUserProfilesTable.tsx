@@ -21,12 +21,12 @@ interface Props {
 
 export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable({ profiles }) {
   const translate = useTranslate();
-  const credentialsPanelService = useService(AIProfileCredentialsPanelService);
+  const aiProfileCredentialsPanelService = useService(AIProfileCredentialsPanelService);
   const notificationService = useService(NotificationService);
 
   async function editCredentials(profileId: string): Promise<void> {
     try {
-      await credentialsPanelService.open(profileId);
+      await aiProfileCredentialsPanelService.open(profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_user_profile_credentials_edit_failed');
     }

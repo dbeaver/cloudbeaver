@@ -16,13 +16,13 @@ import { AIProfilesResource } from '../AIProfilesResource.js';
 @injectable(() => [AIProfilesResource, AsyncTaskInfoService])
 export class AIProfileAuthorizationService {
   constructor(
-    private readonly profiles: AIProfilesResource,
-    private readonly asyncTasks: AsyncTaskInfoService,
+    private readonly aiProfilesResource: AIProfilesResource,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
   ) {}
 
   authorize(profileId: string, onAuthorization: (info: AiDeviceAuthorizationInfo) => void): ITask<boolean> {
-    const task = this.asyncTasks.create(async () => {
-      const info = await this.profiles.startDeviceAuthorization(profileId);
+    const task = this.asyncTaskInfoService.create(async () => {
+      const info = await this.aiProfilesResource.startDeviceAuthorization(profileId);
       if (!task.cancelled) {
         onAuthorization(info);
       }
@@ -32,22 +32,22 @@ export class AIProfileAuthorizationService {
     const operation = new AutoRunningTask(
       async () => {
         try {
-          const result = await this.asyncTasks.run(task);
+          const result = await this.asyncTaskInfoService.run(task);
           if (task.cancelled || result.taskResult !== true) {
             return false;
           }
-          this.profiles.markOutdated(profileId);
+          this.aiProfilesResource.markOutdated(profileId);
           return true;
         } finally {
           if (!task.pending) {
-            await this.asyncTasks.remove(task.id);
+            await this.asyncTaskInfoService.remove(task.id);
           }
         }
       },
       async () => {
         try {
           if (task.pending && !task.cancelled) {
-            await this.asyncTasks.cancel(task.id);
+            await this.asyncTaskInfoService.cancel(task.id);
           }
         } catch (exception) {
           // Task.cancel marks itself cancelled before calling the server; allow a retry on failure.

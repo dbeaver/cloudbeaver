@@ -32,9 +32,9 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
   const translate = useTranslate();
   const name = useId();
   const part = getAIProfileCredentialsFormPart(formState);
-  const profiles = useService(AIProfilesResource);
-  const engines = useService(AiEnginesResource);
-  const profile = profiles.get(formState.state.profileId);
+  const aiProfilesResource = useService(AIProfilesResource);
+  const aiEnginesResource = useService(AiEnginesResource);
+  const profile = aiProfilesResource.get(formState.state.profileId);
 
   useAutoLoad(AIProfileCredentialsFields, part);
 
@@ -42,7 +42,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
     return null;
   }
 
-  const engine = engines.data.find(engine => engine.id === profile.engineId);
+  const engine = aiEnginesResource.data.find(engine => engine.id === profile.engineId);
   const accountAuthentication = profile.deviceAuthorizationAvailable && part.state.accountAuthentication;
 
   return (

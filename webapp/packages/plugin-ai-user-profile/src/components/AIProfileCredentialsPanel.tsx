@@ -34,17 +34,22 @@ const CREDENTIALS_TAB_ID = 'credentials';
 
 export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsPanel() {
   const translate = useTranslate();
-  const credentialsPanelService = useService(AIProfileCredentialsPanelService);
+  const aiProfileCredentialsPanelService = useService(AIProfileCredentialsPanelService);
   const notificationService = useService(NotificationService);
-  const profiles = useService(AIProfilesResource);
-  const formState = credentialsPanelService.formState;
+  const aiProfilesResource = useService(AIProfilesResource);
+  const formState = aiProfileCredentialsPanelService.formState;
   const authorization = useAIProfileAuthorization(formState);
   const optionsPanelService = useService(OptionsPanelService);
   useExecutor({
     executor: optionsPanelService.closeTask,
     handlers: [
       async (stage, contexts) => {
-        if (stage !== 'before' || !formState || credentialsPanelService.formState !== formState || ExecutorInterrupter.isInterrupted(contexts)) {
+        if (
+          stage !== 'before' ||
+          !formState ||
+          aiProfileCredentialsPanelService.formState !== formState ||
+          ExecutorInterrupter.isInterrupted(contexts)
+        ) {
           return;
         }
         if (!(await authorization.confirmLeave())) {
@@ -65,9 +70,9 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
       if (saved) {
         notificationService.logSuccess({
           title: 'plugin_ai_user_profile_credentials_saved',
-          message: profiles.get(formState.state.profileId)?.name,
+          message: aiProfilesResource.get(formState.state.profileId)?.name,
         });
-        await credentialsPanelService.back();
+        await aiProfileCredentialsPanelService.back();
       } else if (exception) {
         notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
       }
@@ -78,19 +83,24 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
     return null;
   }
 
-  const title = `${translate('ui_edit')} "${profiles.get(formState.state.profileId)?.name ?? ''}"`;
+  const title = `${translate('ui_edit')} "${aiProfilesResource.get(formState.state.profileId)?.name ?? ''}"`;
   const error = getFirstException(formState.exception);
   const isSaving = !!formState.savingPromise;
 
   return (
     <ColoredContainer aria-label={title} parent vertical noWrap surface gap compact>
       <GroupTitle header>
-        <GroupBack onClick={() => credentialsPanelService.back()}>
+        <GroupBack onClick={() => aiProfileCredentialsPanelService.back()}>
           <Text truncate>{title}</Text>
         </GroupBack>
       </GroupTitle>
       <Form context={form} contents>
-        <TabsState container={credentialsPanelService.parts} selectedId={CREDENTIALS_TAB_ID} formState={formState} authorization={authorization}>
+        <TabsState
+          container={aiProfileCredentialsPanelService.parts}
+          selectedId={CREDENTIALS_TAB_ID}
+          formState={formState}
+          authorization={authorization}
+        >
           <Container noWrap vertical>
             <Container
               className="theme-border-color-background tw:relative tw:before:content-[''] tw:before:absolute tw:before:bottom-0 tw:before:w-full tw:before:border-b-2 tw:before:border-inherit"
@@ -99,11 +109,11 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
               noWrap
             >
               <Container fill>
-                {error && <StatusMessage exception={error} />}
+                <StatusMessage exception={error} />
                 <TabList disabled={formState.isDisabled} underline big />
               </Container>
               <Container keepSize noWrap center gap compact>
-                <Button type="button" variant="secondary" onClick={() => credentialsPanelService.close()}>
+                <Button type="button" variant="secondary" onClick={() => aiProfileCredentialsPanelService.close()}>
                   {translate('ui_processing_cancel')}
                 </Button>
                 <Button type="submit" disabled={formState.isDisabled || isSaving || !formState.isChanged}>

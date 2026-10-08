@@ -23,13 +23,13 @@ interface Props {
 
 export const ConnectedSubscription = observer<Props>(function ConnectedSubscription({ profile, disabled }) {
   const translate = useTranslate();
-  const dialogs = useService(CommonDialogService);
-  const notifications = useService(NotificationService);
-  const profiles = useService(AIProfilesResource);
+  const commonDialogService = useService(CommonDialogService);
+  const notificationService = useService(NotificationService);
+  const aiProfilesResource = useService(AIProfilesResource);
   const [processing, setProcessing] = useState(false);
 
   async function disconnect(): Promise<void> {
-    const { status } = await dialogs.open(ConfirmationDialog, {
+    const { status } = await commonDialogService.open(ConfirmationDialog, {
       title: 'plugin_ai_account_disconnect',
       message: 'plugin_ai_account_disconnect_confirmation',
       confirmActionText: 'plugin_ai_account_disconnect',
@@ -39,10 +39,10 @@ export const ConnectedSubscription = observer<Props>(function ConnectedSubscript
     }
     setProcessing(true);
     try {
-      await profiles.disconnectAccount(profile.id);
-      notifications.logSuccess({ title: 'plugin_ai_account_disconnected', message: profile.name });
+      await aiProfilesResource.disconnectAccount(profile.id);
+      notificationService.logSuccess({ title: 'plugin_ai_account_disconnected', message: profile.name });
     } catch (exception: any) {
-      notifications.logException(exception, 'plugin_ai_account_disconnect_failed');
+      notificationService.logException(exception, 'plugin_ai_account_disconnect_failed');
     } finally {
       setProcessing(false);
     }

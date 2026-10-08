@@ -28,7 +28,7 @@ export const AIProfileTokenFields = observer<Props>(function AIProfileTokenField
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const part = getAIProfileCredentialsFormPart(formState);
-  const profiles = useService(AIProfilesResource);
+  const aiProfilesResource = useService(AIProfilesResource);
   const [resetting, setResetting] = useState(false);
 
   async function resetCredentials(): Promise<void> {
@@ -42,7 +42,7 @@ export const AIProfileTokenFields = observer<Props>(function AIProfileTokenField
     }
     setResetting(true);
     try {
-      await profiles.resetCredentials(profile.id);
+      await aiProfilesResource.resetCredentials(profile.id);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_credentials_reset_failed');
     } finally {

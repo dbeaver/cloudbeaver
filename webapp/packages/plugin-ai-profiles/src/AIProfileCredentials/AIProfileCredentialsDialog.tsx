@@ -47,10 +47,10 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const notificationService = useService(NotificationService);
   const commonDialogService = useService(CommonDialogService);
   const { formState } = payload;
-  const profiles = useService(AIProfilesResource);
-  const engines = useService(AiEnginesResource);
-  const profile = profiles.get(formState.state.profileId);
-  const engine = engines.data.find(engine => engine.id === profile?.engineId);
+  const aiProfilesResource = useService(AIProfilesResource);
+  const aiEnginesResource = useService(AiEnginesResource);
+  const profile = aiProfilesResource.get(formState.state.profileId);
+  const engine = aiEnginesResource.data.find(engine => engine.id === profile?.engineId);
   const authorization = useAIProfileAuthorization(formState);
   const error = getFirstException(formState.exception);
   const isSaving = !!formState.savingPromise;
