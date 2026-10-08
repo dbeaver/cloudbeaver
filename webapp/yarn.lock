@@ -3247,6 +3247,7 @@ __metadata:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/react-data-grid": "workspace:*"
@@ -5978,10 +5979,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/busboy@npm:^3.1.1":
-  version: 3.2.0
-  resolution: "@fastify/busboy@npm:3.2.0"
-  checksum: 10c0/3e4fb00a27e3149d1c68de8ff14007d2bbcbbc171a9d050d0a8772e836727329d4d3f130995ebaa19cf537d5d2f5ce2a88000366e6192e751457bfcc2125f351
+"@fastify/busboy@npm:>=3.2.1":
+  version: 3.2.2
+  resolution: "@fastify/busboy@npm:3.2.2"
+  checksum: 10c0/d19f67952b7e2b3305606444d3e9da8dc20e18537e52ec2f367429d4b4846fcbbd1b5b6b4e79c00dbf59c1734af2b2135a2dedb5b28eaa7f21b72eef40ca8f2f
   languageName: node
   linkType: hard
 
@@ -17314,14 +17315,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"probe-image-size@npm:^7.2.3":
-  version: 7.3.0
-  resolution: "probe-image-size@npm:7.3.0"
+"probe-image-size@npm:>=7.4.0":
+  version: 7.4.0
+  resolution: "probe-image-size@npm:7.4.0"
   dependencies:
     lodash.merge: "npm:^4.6.2"
     needle: "npm:^2.5.2"
     stream-parser: "npm:~0.3.1"
-  checksum: 10c0/92a1c11fbb6149c0122852a179a54d9edda9f7a5084e837aa529d30b7a213120771356e72547bb18a4e183c8896b83b53380b232ed0a97594d2d80c97cf9a127
+  checksum: 10c0/2746be804dc265eec58a0f48c1e78b13e7504700e9c4e924dedc95bdc45d801fd8279ba3bea29dcf1bb743b536fd5c80b0103cb1d1a4d34e2f4d035093b68166
   languageName: node
   linkType: hard
 
