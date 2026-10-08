@@ -174,11 +174,11 @@ export class NavNodeContextMenuService extends Bootstrap {
 
           const nodeIds = nodes.filter(node => !isConnectionNode(node)).map(node => node.uri);
           if (nodeIds.length) {
-            await this.navTreeResource.deleteNode(resourceKeyList(nodeIds), true);
+            await this.navTreeResource.deleteNodes(resourceKeyList(nodeIds), true);
           }
 
           if (connectionKeys.length) {
-            await this.connectionsManagerService.deleteConnection(resourceKeyList(connectionKeys), true);
+            await this.connectionsManagerService.deleteConnections(resourceKeyList(connectionKeys), true);
           }
         } catch (exception: any) {
           this.notificationService.logException(

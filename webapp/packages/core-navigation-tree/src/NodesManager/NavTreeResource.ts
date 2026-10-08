@@ -209,7 +209,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     });
   }
 
-  async deleteNode(key: ResourceKeySimple<string>, confirmed = false): Promise<void> {
+  async deleteNodes(key: ResourceKeySimple<string>, confirmed = false): Promise<void> {
     const context = new ExecutionContext(key);
     if (confirmed) {
       context.getContext(nodeDeleteContext).confirm();

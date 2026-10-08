@@ -28,7 +28,7 @@ export class NavResourceNodeService {
     return getResourceNodeId(newKey);
   }
 
-  async delete(key: string | string[]) {
+  async deleteResources(key: string | string[]) {
     const keys = typeof key === 'string' ? [key] : key;
     const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',

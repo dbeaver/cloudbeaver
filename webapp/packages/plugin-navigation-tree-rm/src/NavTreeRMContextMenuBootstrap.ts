@@ -135,7 +135,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
             const nodes = this.navNodeContextMenuService.getNodesToDelete(context);
             try {
               const keys = nodes.map(node => getResourceKeyFromNodeId(node.uri)!);
-              await this.navResourceNodeService.delete(keys);
+              await this.navResourceNodeService.deleteResources(keys);
             } catch (exception: any) {
               this.notificationService.logException(
                 exception,

@@ -105,7 +105,7 @@ export class ConnectionsManagerService {
     return undefined;
   }
 
-  async deleteConnection(key: ResourceKeySimple<IConnectionInfoParams>, confirmed = false): Promise<void> {
+  async deleteConnections(key: ResourceKeySimple<IConnectionInfoParams>, confirmed = false): Promise<void> {
     const keys = ResourceKeyUtils.toArray(key);
     const connections = await this.connectionInfoResource.load(resourceKeyList(keys));
 
@@ -135,7 +135,7 @@ export class ConnectionsManagerService {
       }
     }
 
-    await this.connectionInfoResource.deleteConnection(key);
+    await this.connectionInfoResource.deleteConnections(key);
 
     this.onDelete.execute({
       connections: keys,

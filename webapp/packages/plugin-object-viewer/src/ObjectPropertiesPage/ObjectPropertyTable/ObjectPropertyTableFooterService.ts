@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ export class ObjectPropertyTableFooterService {
           const nodes = selected.filter(node => node.features?.includes(ENodeFeature.canDelete));
 
           try {
-            await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.uri)));
+            await this.navTreeResource.deleteNodes(resourceKeyList(nodes.map(node => node.uri)));
           } catch (exception: any) {
             this.notificationService.logException(exception, 'plugin_object_viewer_delete_object_fail');
           }
