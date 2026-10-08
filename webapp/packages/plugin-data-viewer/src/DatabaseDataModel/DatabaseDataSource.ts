@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, toJS } from 'mobx';
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { withExternal, type IServiceProvider, type IServiceScope, type SingleServiceType } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, type ITask, SyncExecutor, Task } from '@cloudbeaver/core-executor';
@@ -355,7 +355,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   async dispose(): Promise<void> {
     await this.cancel();
-    this.dataSourceScope[Symbol.dispose]?.();
+    runInAction(() => {
+      // Mounted viewers must stop seeing results when their actions are disposed.
+      this.results = [];
+      this.dataSourceScope[Symbol.dispose]?.();
+    });
   }
 
   abstract request(prevResults: TResult[]): Promise<TResult[]>;

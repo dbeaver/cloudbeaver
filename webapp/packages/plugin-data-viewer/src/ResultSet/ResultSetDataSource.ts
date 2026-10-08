@@ -165,9 +165,10 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
 
   override async dispose(): Promise<void> {
     this.persistConstraintsDisposer();
+    const results = this.results;
     await super.dispose();
     if (this.keepExecutionContextOnDispose) {
-      await this.closeResults(this.results);
+      await this.closeResults(results);
     } else {
       await this.executionContext?.destroy();
     }
