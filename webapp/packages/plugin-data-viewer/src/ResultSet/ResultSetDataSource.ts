@@ -52,6 +52,7 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
   executionContext: IConnectionExecutionContext | null;
   totalCountRequestTask: ITask<number> | null;
   private keepExecutionContextOnDispose: boolean;
+  private readonly closingResults = new Set<string>();
   private readonly persistConstraintsDisposer: IReactionDisposer;
 
   constructor(
@@ -227,9 +228,11 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
 
     for (const result of results) {
       // TODO: it's better to track that context is closed with subscription
-      if (result.id === null || result.contextId !== this.executionContext.context.id) {
+      if (result.id === null || this.closingResults.has(result.id) || result.contextId !== this.executionContext.context.id) {
         continue;
       }
+      const resultId = result.id;
+      this.closingResults.add(resultId);
       try {
         await this.graphQLService.sdk.closeResult({
           projectId: result.projectId,
@@ -239,6 +242,8 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
         });
       } catch (exception: any) {
         console.log(`Error closing result (${result.id}):`, exception);
+      } finally {
+        this.closingResults.delete(resultId);
       }
     }
   }
