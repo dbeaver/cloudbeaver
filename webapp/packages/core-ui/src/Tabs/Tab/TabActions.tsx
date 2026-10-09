@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ interface TabActionsProps {
   state: ITabsContext<any>;
   className?: string;
   menuContext?: IDataContext;
-  handleClose: React.MouseEventHandler<HTMLDivElement> | undefined;
+  handleClose: React.MouseEventHandler<HTMLButtonElement> | undefined;
 }
 
 export const TabActions = observer(function TabActions({ tabId, canClose, state, className, menuContext, handleClose }: TabActionsProps) {
@@ -43,7 +43,7 @@ export const TabActions = observer(function TabActions({ tabId, canClose, state,
 interface TabActionProps {
   iconName: string;
   title?: string;
-  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const TabAction = observer(function TabAction({ iconName, title, onClick }: TabActionProps) {
@@ -51,8 +51,8 @@ const TabAction = observer(function TabAction({ iconName, title, onClick }: TabA
   const translate = useTranslate();
 
   return (
-    <div className={s(styles, { tabAction: true })} title={translate(title)} onClick={onClick}>
+    <button type="button" className={s(styles, { tabAction: true })} title={translate(title)} onClick={onClick}>
       <Icon className={s(styles, { icon: true })} name={iconName} viewBox="0 0 7 8" />
-    </div>
+    </button>
   );
 });

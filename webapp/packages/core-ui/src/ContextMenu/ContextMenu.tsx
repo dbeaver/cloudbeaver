@@ -95,11 +95,11 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   return (
     <MenuContext value={menuContext}>
       <MenuProvider store={menu} setOpen={handlers.handleVisibleSwitch}>
-        <MenuButton {...rest} title={translate(menuData.menu.info.tooltip)}>
+        <MenuButton {...rest} title={rest.title ?? translate(menuData.menu.info.tooltip || menuData.menu.info.label)}>
           {children}
         </MenuButton>
         <Menu
-          aria-label={translate(menuData.menu.info.label)}
+          aria-label={rest['aria-label'] || rest.title || translate(menuData.menu.info.label || menuData.menu.info.tooltip)}
           getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
           shift={shift}
           gutter={gutter}

@@ -78,7 +78,7 @@ export function useTab(
         }
         refObject.onClick?.(this.tabId);
       },
-      handleClose(e: React.MouseEvent<HTMLDivElement>) {
+      handleClose(e: React.MouseEvent<HTMLElement>) {
         EventContext.set(e, EventStopPropagationFlag); // TODO: probably should use special flag
         this.state.close(this.tabId);
       },
