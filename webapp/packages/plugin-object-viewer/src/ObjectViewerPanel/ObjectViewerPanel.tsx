@@ -36,7 +36,7 @@ const tabsRegistry: StyleRegistry = [
 
 export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({ tab }) {
   const translate = useTranslate();
-  const dbObjectPagesService = useService(DBObjectPageService);
+  const dbObjectPageService = useService(DBObjectPageService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
 
@@ -58,7 +58,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     });
   }, [node.tryGetData, tab.handlerState]);
 
-  const pages = dbObjectPagesService.orderedPages;
+  const pages = dbObjectPageService.orderedPages;
 
   if (tab.handlerState.error) {
     return <TextPlaceholder>{translate('plugin_object_viewer_error')}</TextPlaceholder>;
@@ -72,7 +72,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
             <TabList className="theme-background-background theme-text-text-primary-on-light">
               <SContext registry={tabsRegistry}>
                 {pages.map(page => (
-                  <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
+                  <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPageService.selectPage} />
                 ))}
               </SContext>
             </TabList>

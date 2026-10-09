@@ -17,16 +17,16 @@ import { PublicConnectionFormService } from './PublicConnectionFormService.js';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 export const PublicConnectionForm: React.FC = observer(function PublicConnectionForm() {
-  const service = useService(PublicConnectionFormService);
+  const publicConnectionFormService = useService(PublicConnectionFormService);
   const style = useS(styles);
-  const formState = service.formState;
+  const formState = publicConnectionFormService.formState;
 
-  const close = useCallback(() => service.close(true), []);
+  const close = useCallback(() => publicConnectionFormService.close(true), []);
   const save = useCallback(async (state: ConnectionConfig, isCreate?: boolean) => {
     if (isCreate) {
-      await service.close(true);
+      await publicConnectionFormService.close(true);
     }
-    await service.save();
+    await publicConnectionFormService.save();
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ export class ChristmasService extends Bootstrap implements IHoliday {
   public startDate = new Date(new Date().getFullYear(), 11, 12); // Since December, 12, 00:00:00
   public endDate = new Date(new Date().getFullYear(), 0, 8); // Before January, 7 23:59:59
 
-  constructor(private readonly holidayService: HolidaysService) {
+  constructor(private readonly holidaysService: HolidaysService) {
     super();
     this.christmas = new Christmas();
   }
 
   override register(): void {
-    this.holidayService.addHoliday(this);
+    this.holidaysService.addHoliday(this);
   }
 
   get isEffectsActive() {
