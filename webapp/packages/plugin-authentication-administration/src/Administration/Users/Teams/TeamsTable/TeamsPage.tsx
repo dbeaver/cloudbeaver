@@ -25,7 +25,7 @@ interface Props {
 
 export const TeamsPage = observer<Props>(function TeamsPage() {
   const translate = useTranslate();
-  const service = useService(CreateTeamService);
+  const createTeamService = useService(CreateTeamService);
 
   const teamsLoader = useResource(TeamsPage, TeamsResource, CachedMapAllKey);
   const teams = teamsLoader.data.filter(isDefined).sort(compareTeams);
@@ -41,8 +41,8 @@ export const TeamsPage = observer<Props>(function TeamsPage() {
             title={translate('administration_teams_add_tooltip')}
             icon="add"
             viewBox="0 0 24 24"
-            disabled={!!service.formState || table.processing}
-            onClick={service.create}
+            disabled={!!createTeamService.formState || table.processing}
+            onClick={createTeamService.create}
           >
             {translate('ui_create')}
           </ToolsAction>

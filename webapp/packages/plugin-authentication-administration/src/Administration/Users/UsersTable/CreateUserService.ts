@@ -48,7 +48,6 @@ export class CreateUserService {
 
   async cancelCreate(): Promise<void> {
     await this.optionsPanelService.close();
-    await this.dispose();
   }
 
   async create(): Promise<void> {

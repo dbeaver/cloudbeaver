@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ export class AdministrationScreenService {
   private itemsStateSync: Array<[string, any]>;
 
   constructor(
-    private readonly permissionsResource: SessionPermissionsResource,
+    private readonly sessionPermissionsResource: SessionPermissionsResource,
     private readonly permissionsService: PermissionsService,
     private readonly screenService: ScreenService,
     private readonly administrationItemService: AdministrationItemService,
@@ -117,7 +117,7 @@ export class AdministrationScreenService {
         this.itemState.sync(this.itemsStateSync);
       },
     );
-    this.permissionsResource.onDataUpdate.addPostHandler(() => {
+    this.sessionPermissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });
 
@@ -324,7 +324,7 @@ export class AdministrationScreenService {
 
   private async isAccessProvided(state: RouterState): Promise<boolean> {
     await this.serverConfigResource.load();
-    await this.permissionsResource.load();
+    await this.sessionPermissionsResource.load();
 
     if (this.isConfigurationMode) {
       return true;

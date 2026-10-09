@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ const tabPanelListRegistry: StyleRegistry = [
 ];
 
 export const ValuePanel: DataPresentationComponent = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
-  const service = useService(DataValuePanelService);
+  const dataValuePanelService = useService(DataValuePanelService);
   const selectAction = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);
   const dataResultAction = model.source.tryGetAction(resultIndex, IDatabaseDataResultAction);
   const metadataAction = model.source.getAction(resultIndex, IDatabaseDataMetadataAction);
@@ -60,7 +60,7 @@ export const ValuePanel: DataPresentationComponent = observer(function ValuePane
     ),
   );
 
-  const displayed = service.getDisplayed({ dataFormat, model, resultIndex });
+  const displayed = dataValuePanelService.getDisplayed({ dataFormat, model, resultIndex });
 
   const currentTabId = useContentType({
     model: model as any,
@@ -73,7 +73,7 @@ export const ValuePanel: DataPresentationComponent = observer(function ValuePane
   return (
     <TabsState
       currentTabId={currentTabId}
-      container={service.tabs}
+      container={dataValuePanelService.tabs}
       dataFormat={dataFormat}
       model={model}
       resultIndex={resultIndex}

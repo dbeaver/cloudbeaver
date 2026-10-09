@@ -11,7 +11,7 @@ import { FormState } from '@cloudbeaver/core-ui';
 import type { AdministrationAISettingsFormService } from './AdministrationAISettingsFormService.js';
 
 export class AdministrationAISettingsFormState extends FormState<null> {
-  constructor(serviceProvider: IServiceProvider, service: AdministrationAISettingsFormService) {
-    super(serviceProvider, service, null);
+  constructor(serviceProvider: IServiceProvider, administrationAISettingsFormService: AdministrationAISettingsFormService) {
+    super(serviceProvider, administrationAISettingsFormService, null);
   }
 }

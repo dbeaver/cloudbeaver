@@ -25,6 +25,7 @@ import io.cloudbeaver.service.ai.model.*;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAIDataSourceSettingsInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIProfileCredentialsInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAiChatCompletionSettingsInput;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
@@ -170,7 +171,7 @@ public interface DBWServiceAI extends DBWService {
         @NotNull WebSession webSession,
         @NotNull @WebObjectId String projectId,
         @NotNull DataSourceId dataSourceId,
-        @NotNull WebAiChatCompletionSettingsInput settings
+        @NotNull WebAIDataSourceSettingsInput settings
     ) throws DBWebException;
 
     @NotNull
@@ -178,6 +179,13 @@ public interface DBWServiceAI extends DBWService {
     WebAIConfigurationProfile createProfile(
         @NotNull WebSession webSession,
         @WebParameterSecure @NotNull WebAIConfigurationProfileInput config
+    ) throws DBWebException;
+
+    @NotNull
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    WebAIConfigurationProfile copyProfile(
+        @NotNull WebSession webSession,
+        @NotNull String profileId
     ) throws DBWebException;
 
     @NotNull

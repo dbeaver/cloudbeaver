@@ -25,7 +25,7 @@ export class CreateTeamService {
 
   constructor(
     private readonly serviceProvider: IServiceProvider,
-    private readonly service: TeamsAdministrationFormService,
+    private readonly teamsAdministrationFormService: TeamsAdministrationFormService,
     private readonly optionsPanelService: OptionsPanelService,
     private readonly commonDialogService: CommonDialogService,
   ) {
@@ -42,7 +42,6 @@ export class CreateTeamService {
 
   async cancelCreate(): Promise<void> {
     await this.optionsPanelService.close();
-    await this.dispose();
   }
 
   async create(): Promise<void> {
@@ -54,7 +53,7 @@ export class CreateTeamService {
 
     if (opened) {
       await this.dispose();
-      this.formState = new TeamsAdministrationFormState(this.serviceProvider, this.service, {
+      this.formState = new TeamsAdministrationFormState(this.serviceProvider, this.teamsAdministrationFormService, {
         teamId: null,
       });
     }

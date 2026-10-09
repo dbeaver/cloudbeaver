@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,12 @@ import {
 } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  DATA_CONTEXT_ELEMENTS_TREE,
+  MENU_ELEMENTS_TREE_TOOLS,
+  MENU_NAVIGATION_TREE_CREATE,
+  TreeSelectionService,
+} from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
@@ -122,7 +127,8 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      menus: [MENU_ELEMENTS_TREE_TOOLS],
+      menus: [MENU_ELEMENTS_TREE_TOOLS, MENU_NAVIGATION_TREE_CREATE],
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID],
       getItems: (context, items) => {
         if (!items.includes(ACTION_NEW_FOLDER)) {
           return [...items, ACTION_NEW_FOLDER];

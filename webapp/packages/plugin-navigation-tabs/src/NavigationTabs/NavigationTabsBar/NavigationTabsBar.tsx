@@ -40,25 +40,25 @@ const tabsRegistry: StyleRegistry = [
 
 export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ className }) {
   const userInfoResource = useService(UserInfoResource);
-  const navigation = useService(NavigationTabsService);
-  const navigationSettings = useService(NavigationTabsSettingsService);
+  const navigationTabsService = useService(NavigationTabsService);
+  const navigationTabsSettingsService = useService(NavigationTabsSettingsService);
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
   const [restoring, setRestoring] = useState(false);
 
-  const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
-  const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
+  const handleSelect = useCallback((tabId: string) => navigationTabsService.selectTab(tabId), [navigationTabsService]);
+  const handleClose = useCallback((tabId: string) => navigationTabsService.closeTab(tabId), [navigationTabsService]);
 
   useConnectionTypeLoader();
 
   function unloadTabs() {
-    navigation.unloadTabs();
+    navigationTabsService.unloadTabs();
   }
 
   async function restoreTabs() {
     setRestoring(true);
     try {
-      await navigation.restoreTabs();
+      await navigationTabsService.restoreTabs();
     } finally {
       setRestoring(false);
     }
@@ -70,12 +70,12 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
 
   const handleReorder = useCallback(
     (draggedTabId: string, targetTabId: string, position: 'before' | 'after') => {
-      navigation.reorderTab(draggedTabId, {
+      navigationTabsService.reorderTab(draggedTabId, {
         tabId: targetTabId,
         position,
       });
     },
-    [navigation],
+    [navigationTabsService],
   );
 
   useExecutor({
@@ -84,7 +84,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   });
 
   useExecutor({
-    executor: navigation.onStateUpdate,
+    executor: navigationTabsService.onStateUpdate,
     postHandlers: [unloadTabs, restoreTabs],
   });
 
@@ -93,17 +93,17 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
     restoreTabs();
   }, []);
 
-  if (navigation.tabIdList.length === 0) {
+  if (navigationTabsService.tabIdList.length === 0) {
     return <NavigationWelcomeScreen />;
   }
 
   return (
-    <CaptureView view={navigation} className={clsx('tw:flex-1 tw:flex tw:overflow-auto', className)}>
+    <CaptureView view={navigationTabsService} className={clsx('tw:flex-1 tw:flex tw:overflow-auto', className)}>
       <Loader loading={restoring}>
         <TabsState
-          currentTabId={navigation.currentTabId}
+          currentTabId={navigationTabsService.currentTabId}
           reorderStateKey="navigation-tabs-bar"
-          tabList={navigation.tabIdList}
+          tabList={navigationTabsService.tabIdList}
           enabledBaseActions
           autoSelect
           onChange={handleTabChange}
@@ -113,16 +113,16 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
             <TabList
               className={clsx(
                 'tw:overflow-auto tw:max-w-full theme-background-secondary theme-text-on-secondary',
-                navigationSettings.hasMultipleRows && 'tw:flex-wrap',
+                navigationTabsSettingsService.hasMultipleRows && 'tw:flex-wrap',
               )}
             >
               <SContext registry={tabsRegistry}>
-                {navigation.tabIdList.map(tabId => (
+                {navigationTabsService.tabIdList.map(tabId => (
                   <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
                 ))}
               </SContext>
             </TabList>
-            {navigation.tabIdList.map(tabId => (
+            {navigationTabsService.tabIdList.map(tabId => (
               <TabPanel key={tabId} className="tw:flex-1 tw:flex tw:overflow-hidden tw:relative" tabId={tabId} lazy>
                 {() => <TabHandlerPanel tabId={tabId} />}
               </TabPanel>

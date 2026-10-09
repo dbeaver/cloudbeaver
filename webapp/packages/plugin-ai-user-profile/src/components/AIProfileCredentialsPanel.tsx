@@ -32,9 +32,9 @@ const CREDENTIALS_TAB_ID = 'credentials';
 
 export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsPanel() {
   const translate = useTranslate();
-  const credentialsPanelService = useService(AIProfileCredentialsPanelService);
+  const aiProfileCredentialsPanelService = useService(AIProfileCredentialsPanelService);
   const notificationService = useService(NotificationService);
-  const formState = credentialsPanelService.formState;
+  const formState = aiProfileCredentialsPanelService.formState;
   const form = useForm({ onSubmit: save });
 
   if (!formState) {
@@ -56,7 +56,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
         title: 'plugin_ai_user_profile_credentials_saved',
         message: part.state.profileName,
       });
-      await credentialsPanelService.back();
+      await aiProfileCredentialsPanelService.back();
       return;
     }
 
@@ -69,12 +69,12 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
   return (
     <ColoredContainer aria-label={title} parent vertical noWrap surface gap compact>
       <GroupTitle header>
-        <GroupBack onClick={() => credentialsPanelService.back()}>
+        <GroupBack onClick={() => aiProfileCredentialsPanelService.back()}>
           <Text truncate>{title}</Text>
         </GroupBack>
       </GroupTitle>
       <Form context={form} contents>
-        <TabsState container={credentialsPanelService.parts} selectedId={CREDENTIALS_TAB_ID} formState={formState}>
+        <TabsState container={aiProfileCredentialsPanelService.parts} selectedId={CREDENTIALS_TAB_ID} formState={formState}>
           <Container noWrap vertical>
             <Container
               className="theme-border-color-background tw:relative tw:before:content-[''] tw:before:absolute tw:before:bottom-0 tw:before:w-full tw:before:border-b-2 tw:before:border-inherit"
@@ -87,7 +87,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
                 <TabList disabled={formState.isDisabled} underline big />
               </Container>
               <Container keepSize noWrap center gap compact>
-                <Button type="button" disabled={formState.isDisabled} variant="secondary" onClick={() => credentialsPanelService.close()}>
+                <Button type="button" disabled={formState.isDisabled} variant="secondary" onClick={() => aiProfileCredentialsPanelService.close()}>
                   {translate('ui_processing_cancel')}
                 </Button>
                 <Button type="button" disabled={formState.isDisabled || !formState.isChanged} loader onClick={() => form.submit()}>

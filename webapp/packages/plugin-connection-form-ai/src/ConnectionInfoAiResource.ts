@@ -24,7 +24,7 @@ import {
   ConnectionInfoResource,
   type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
-import { GraphQLService, type ConnectionInfoAiSettingsFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type AiDataSourceSettingsInput, type ConnectionInfoAiSettingsFragment } from '@cloudbeaver/core-sdk';
 
 export type ConnectionInfoAiSettings = ConnectionInfoAiSettingsFragment;
 
@@ -40,7 +40,7 @@ export class ConnectionInfoAiResource extends CachedMapResource<IConnectionInfoP
     this.connectionInfoResource.onItemDelete.addHandler(this.delete.bind(this));
   }
 
-  async save(key: ResourceKeySimple<IConnectionInfoParams>, settings: ConnectionInfoAiSettings): Promise<void> {
+  async save(key: ResourceKeySimple<IConnectionInfoParams>, settings: AiDataSourceSettingsInput): Promise<void> {
     await this.performUpdate(key, undefined, async () => {
       await ResourceKeyUtils.forEachAsync(key, async dataSourceId => {
         const result = await this.graphQLService.sdk.saveUserConnectionAiSettings({
