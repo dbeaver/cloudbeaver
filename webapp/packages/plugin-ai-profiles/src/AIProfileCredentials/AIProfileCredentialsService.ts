@@ -7,39 +7,40 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult, type DialogResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, type DialogResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { AIProfileCredentialsDialog } from './AIProfileCredentialsDialogLazy.js';
+import { AIProfileCredentialsFormService } from './AIProfileCredentialsFormService.js';
 import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
 
-@injectable(() => [CommonDialogService, NotificationService, AIProfilesResource, AiEnginesResource])
+@injectable(() => [CommonDialogService, NotificationService, AIProfilesResource, AIProfileCredentialsFormService])
 export class AIProfileCredentialsService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly aiProfilesResource: AIProfilesResource,
-    private readonly aiEnginesResource: AiEnginesResource,
+    private readonly aiProfileCredentialsFormService: AIProfileCredentialsFormService,
   ) {}
 
-  async open(profileId: string): Promise<DialogResult<void>> {
+  async open(profileId: string): Promise<DialogResult<void> | undefined> {
     const profile = await this.aiProfilesResource.load(profileId);
 
     if (!profile) {
       this.notificationService.logError({ title: 'plugin_ai_credentials_profile_not_found' });
-      return { status: DialogueStateResult.Rejected };
+      return;
     }
 
-    const engines = await this.aiEnginesResource.load();
-    const engine = engines.find(engine => engine.id === profile.engineId);
+    const formState = this.aiProfileCredentialsFormService.create(profile.id);
+    if (!formState) {
+      return;
+    }
 
-    return this.commonDialogService.open(AIProfileCredentialsDialog, {
-      profileId: profile.id,
-      profileName: profile.name,
-      engineName: engine?.name ?? profile.engineId,
-      engineIcon: engine?.icon,
-    });
+    try {
+      return await this.commonDialogService.open(AIProfileCredentialsDialog, { formState }, { persistent: true });
+    } finally {
+      await formState.dispose();
+    }
   }
 
   isSupported(properties: ReadonlyArray<{ id?: string; features: readonly string[] }>): boolean {

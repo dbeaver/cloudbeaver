@@ -117,20 +117,11 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
   }
 
   private getConfig(): AiConfigurationProfileInput {
-    this.state.properties[GLOBAL_PROPERTY_ID] = this.state.global;
     return {
       profileId: this.formState.state.profileId,
       profileName: this.state.name,
       engineId: this.state.engineId,
-      configuration: {
-        properties: prepareProperties({
-          engineProperties: this.state.properties,
-          initialEngineProperties: this.initialState.properties,
-          infoProperties: (this.aiEnginePropertiesResource.get(this.state.engineId) ?? []).filter(
-            property => this.state.global || property.id !== 'token',
-          ),
-        }),
-      },
+      configuration: this.getCurrentEngineSettings(),
     };
   }
 

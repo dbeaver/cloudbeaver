@@ -1,0 +1,10 @@
+mutation startAiDeviceAuthorization($profileId: ID!) {
+  authorization: aiStartDeviceAuthorization(profileId: $profileId) {
+    userCode
+    verificationUri
+    expiresInSeconds
+    taskInfo {
+      ...AsyncTaskInfo
+    }
+  }
+}

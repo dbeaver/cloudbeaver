@@ -18,6 +18,7 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
@@ -80,6 +81,17 @@ public class WebSessionTest extends CloudbeaverMockTest {
             DBWebException.class, () -> session.asyncTaskStatus("nonexistent-task", false),
             "DBWebException must be thrown for unknown async task"
         );
+    }
+
+    @Test
+    public void asyncTaskCancellationNotifiesProcessor() throws Exception {
+        WebAsyncTaskProcessor<?> processor = Mockito.mock(WebAsyncTaskProcessor.class);
+        WebAsyncTaskInfo taskInfo = session.createAsyncTask("Test task");
+        session.runAsyncTask(taskInfo, processor);
+
+        session.asyncTaskCancel(taskInfo.getId());
+
+        Mockito.verify(processor).cancel();
     }
 
     @Test

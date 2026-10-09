@@ -23,6 +23,8 @@ import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
 import org.jkiss.dbeaver.model.ai.AISettings;
+import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
+import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIConstants;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIProperties;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -34,8 +36,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
     private final Map<String, String> secrets = new HashMap<>();
@@ -73,6 +81,25 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
             Mockito.any(DBSSecretObject.class),
             Mockito.any(DBSSecretValue.class)
         );
+        Mockito.doAnswer(invocation -> {
+            String subjectId = invocation.getArgument(0, String.class);
+            DBSSecretValue secret = invocation.getArgument(2, DBSSecretValue.class);
+            Assertions.assertEquals("test-user", subjectId);
+            if (secret.getValue() == null) {
+                secrets.remove(secret.getId());
+            } else {
+                secrets.put(secret.getId(), secret.getValue());
+            }
+            return null;
+        }).when(secretController).setSubjectSecretValue(
+            Mockito.anyString(),
+            Mockito.any(DBSSecretObject.class),
+            Mockito.any(DBSSecretValue.class)
+        );
+        Mockito.doAnswer(invocation -> {
+            secrets.clear();
+            return null;
+        }).when(secretController).deleteObjectSecrets(Mockito.any(DBSSecretObject.class));
 
         WebUserContext userContext = Mockito.mock(WebUserContext.class);
         Mockito.when(userContext.getSecretController()).thenReturn(secretController);
@@ -127,6 +154,14 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
             DBException.class,
             () -> WebAIProfileUtils.saveCredentials(webSession, profile, Map.of("model", "invalid"))
         );
+    }
+
+    @Test
+    public void resolvesProviderNeutralAccountCapability() throws DBException {
+        AIAccountProperties accountProperties = Mockito.mock(AIAccountProperties.class);
+        Mockito.when(profile.getConfiguration()).thenReturn(accountProperties);
+
+        Assertions.assertSame(accountProperties, WebAIProfileUtils.getAccountProperties(profile));
     }
 
     @Test
@@ -220,5 +255,590 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
         Mockito.when(secretController.getSupportedFeatures()).thenReturn(0L);
 
         Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+    }
+
+    @Test
+    public void deletesCredentialsAfterProfileBecomesGlobal() throws DBException {
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "api-token"));
+        secrets.put("other-user-secret", "other-user-token");
+        Mockito.when(profile.isGlobal()).thenReturn(true);
+
+        WebAIProfileUtils.deleteCredentials(webSession, profile);
+
+        Assertions.assertTrue(secrets.isEmpty());
+        Mockito.verify(secretController).deleteObjectSecrets(Mockito.any(DBSSecretObject.class));
+    }
+
+    @Test
+    public void savesAppliesAndRefreshesAccountCredentials() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        String accessToken = tokenWithClaims("{\"exp\":1,\"chatgpt_account_id\":\"account-1\",\"email\":\"user@example.com\"}");
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens(accessToken, "refresh-1", -1, "account-1", "user@example.com")
+        );
+
+        Assertions.assertTrue(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+        Assertions.assertEquals(accessToken, secrets.get("ai.profile.test-profile.accessToken"));
+        Assertions.assertEquals("refresh-1", secrets.get("ai.profile.test-profile.refreshToken"));
+
+        AISettings settings = Mockito.mock(AISettings.class);
+        Mockito.when(settings.getConfigurationOrNull(profile.getProfileId())).thenReturn(profile);
+        AIConfigurationProfile effectiveProfile = WebAIProfileUtils.getEffectiveProfile(webSession, profile, settings);
+        OpenAIProperties effectiveProperties = (OpenAIProperties) effectiveProfile.getConfiguration();
+        Assertions.assertTrue(effectiveProperties.isAccountConnected());
+        Assertions.assertEquals("account-1", effectiveProperties.getAccountId());
+        Assertions.assertEquals("user@example.com", effectiveProperties.getAccountEmail());
+
+        String refreshedAccessToken = tokenWithClaims("{\"exp\":4102444800,\"chatgpt_account_id\":\"account-1\"}");
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Mockito.when(authenticator.refresh("refresh-1")).thenReturn(
+            new AIAccountAuthenticator.Tokens(refreshedAccessToken, "refresh-2", 3600, "account-1", null)
+        );
+
+        Assertions.assertEquals(refreshedAccessToken, effectiveProperties.getValidAccessToken(authenticator));
+        Assertions.assertEquals(refreshedAccessToken, secrets.get("ai.profile.test-profile.accessToken"));
+        Assertions.assertEquals("refresh-2", secrets.get("ai.profile.test-profile.refreshToken"));
+        Assertions.assertEquals("user@example.com", secrets.get("ai.profile.test-profile.accountEmail"));
+    }
+
+    @Test
+    public void selectedAccountAuthenticationIgnoresSavedApiToken() throws DBException {
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "api-token"));
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(), true);
+
+        Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.isTokenSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+    }
+
+    @Test
+    public void storesAuthenticationMethodPerUserWithoutChangingProfile() throws DBException {
+        Assertions.assertFalse(properties.isAccountAuthentication());
+        Assertions.assertFalse(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(), true);
+
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+        Assertions.assertFalse(properties.isAccountAuthentication());
+    }
+
+    @Test
+    public void usesSharedAuthenticationAsMigrationFallback() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(), false);
+
+        Assertions.assertFalse(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+        Assertions.assertTrue(properties.isAccountAuthentication());
+    }
+
+    @Test
+    public void createsAccountAuthenticationPropertiesWithoutChangingProfile() throws DBException {
+        AIAccountProperties accountProperties = WebAIProfileUtils.createAccountAuthenticationProperties(profile);
+
+        Assertions.assertTrue(accountProperties.isAccountAuthentication());
+        Assertions.assertDoesNotThrow(accountProperties::createAccountAuthenticator);
+        Assertions.assertFalse(properties.isAccountAuthentication());
+    }
+
+    @Test
+    public void deviceAuthorizationServiceRejectsUnauthorizedSession() {
+        Mockito.when(webSession.isAuthorizedInSecurityManager()).thenReturn(false);
+
+        Assertions.assertThrows(
+            DBException.class,
+            () -> WebAIDeviceAuthorizationService.startAuthorization(webSession, profile)
+        );
+        Mockito.verify(webSession, Mockito.never()).createAsyncTask(Mockito.anyString());
+    }
+
+    @Test
+    public void deviceAuthorizationServiceRejectsGlobalProfile() {
+        Mockito.when(profile.isGlobal()).thenReturn(true);
+
+        Assertions.assertThrows(
+            DBException.class,
+            () -> WebAIDeviceAuthorizationService.startAuthorization(webSession, profile)
+        );
+        Mockito.verify(webSession, Mockito.never()).createAsyncTask(Mockito.anyString());
+    }
+
+    @Test
+    public void deviceAuthorizationSelectsAccountAndKeepsApiToken() throws DBException {
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "api-token"));
+
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens("access", "refresh", 3600, "account", "user@example.com")
+        );
+
+        Assertions.assertTrue(WebAIProfileUtils.isTokenSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.isAccountSaved(webSession, profile));
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+        Assertions.assertEquals("user@example.com", WebAIProfileUtils.getAccountEmail(webSession, profile));
+        Assertions.assertEquals("api-token", secrets.get("ai.profile.test-profile.token"));
+        Assertions.assertEquals("refresh", secrets.get("ai.profile.test-profile.refreshToken"));
+    }
+
+    @Test
+    public void disconnectRemovesOnlyAccountCredentials() throws DBException {
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(credentialPropertyId, "api-token"));
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens("access", "refresh", 3600, null, null)
+        );
+
+        WebAIProfileUtils.deleteAccountCredentials(webSession, profile);
+
+        Assertions.assertEquals("api-token", secrets.get("ai.profile.test-profile.token"));
+        Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+        Mockito.verify(secretController, Mockito.never()).deleteObjectSecrets(Mockito.any(DBSSecretObject.class));
+    }
+
+    @Test
+    public void credentialUpdateInvalidatesReservedDeviceAuthorization() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "task-id",
+            "ChatGPT account authorization"
+        );
+
+        WebAIProfileUtils.saveCredentials(
+            webSession,
+            profile,
+            Map.of(credentialPropertyId, "new-api-token")
+        );
+
+        Assertions.assertThrows(
+            DBException.class,
+            () -> WebAIProfileUtils.validateDeviceAuthorizationAttempt(
+                webSession,
+                profile,
+                "test-user",
+                "task-id"
+            )
+        );
+    }
+
+    @Test
+    public void rejectsAccountTokensInCredentialsMutation() {
+        Assertions.assertThrows(
+            DBException.class,
+            () -> WebAIProfileUtils.saveCredentials(
+                webSession,
+                profile,
+                Map.of(AIAccountProperties.ACCOUNT_REFRESH_TOKEN_PROPERTY, "refresh")
+            )
+        );
+        Assertions.assertFalse(secrets.containsValue("refresh"));
+    }
+
+    @Test
+    public void deviceAuthorizationProcessorStoresReturnedTokens() throws Exception {
+        AIAccountAuthenticator.DeviceAuthorization authorization = new AIAccountAuthenticator.DeviceAuthorization(
+            "device-code",
+            "user-code",
+            URI.create("https://auth.openai.com/codex/device"),
+            5,
+            900
+        );
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Mockito.when(authenticator.completeDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenReturn(
+            new AIAccountAuthenticator.Tokens("access", "refresh", 3600, null, null)
+        );
+        WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
+            webSession,
+            profile,
+            authenticator,
+            authorization,
+            "task-id",
+            "ChatGPT"
+        );
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "task-id",
+            "ChatGPT account authorization"
+        );
+
+        processor.run(webSession.getProgressMonitor());
+
+        Assertions.assertTrue(processor.getResult());
+        Assertions.assertEquals("access", secrets.get("ai.profile.test-profile.accessToken"));
+        Assertions.assertEquals("refresh", secrets.get("ai.profile.test-profile.refreshToken"));
+        Assertions.assertTrue(WebAIProfileUtils.isAccountAuthentication(webSession, profile));
+    }
+
+    @Test
+    public void deviceAuthorizationProcessorRejectsStaleAttempt() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        AIAccountAuthenticator.DeviceAuthorization authorization = new AIAccountAuthenticator.DeviceAuthorization(
+            "device-code",
+            "user-code",
+            URI.create("https://auth.openai.com/codex/device"),
+            5,
+            900
+        );
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
+            webSession,
+            profile,
+            authenticator,
+            authorization,
+            "old-task",
+            "ChatGPT"
+        );
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "new-task",
+            "ChatGPT account authorization"
+        );
+
+        Assertions.assertThrows(
+            InvocationTargetException.class,
+            () -> processor.run(webSession.getProgressMonitor())
+        );
+        Mockito.verifyNoInteractions(authenticator);
+        Assertions.assertTrue(secrets.isEmpty());
+        WebAIProfileUtils.cancelDeviceAuthorizationAttempt(webSession, profile, "test-user");
+    }
+
+    @Test
+    public void cancellingQueuedProcessorClearsAuthorizationAttempt() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        AIAccountAuthenticator.DeviceAuthorization authorization = new AIAccountAuthenticator.DeviceAuthorization(
+            "device-code",
+            "user-code",
+            URI.create("https://auth.openai.com/codex/device"),
+            5,
+            900
+        );
+        WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
+            webSession,
+            profile,
+            Mockito.mock(AIAccountAuthenticator.class),
+            authorization,
+            "task-id",
+            "ChatGPT"
+        );
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "task-id",
+            "ChatGPT account authorization"
+        );
+
+        processor.cancel();
+
+        Assertions.assertThrows(
+            DBException.class,
+            () -> WebAIProfileUtils.validateDeviceAuthorizationAttempt(
+                webSession,
+                profile,
+                "test-user",
+                "task-id"
+            )
+        );
+    }
+
+    @Test
+    public void deviceAuthorizationProcessorDoesNotWriteAfterUserChanges() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        Mockito.when(secretController.getSupportedFeatures()).thenReturn(0L);
+        AtomicReference<String> activeUserId = new AtomicReference<>("test-user");
+        Mockito.when(webSession.getUserId()).thenAnswer(invocation -> activeUserId.get());
+        AIAccountAuthenticator.DeviceAuthorization authorization = new AIAccountAuthenticator.DeviceAuthorization(
+            "device-code",
+            "user-code",
+            URI.create("https://auth.openai.com/codex/device"),
+            5,
+            900
+        );
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Mockito.when(authenticator.completeDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenAnswer(invocation -> {
+            activeUserId.set("other-user");
+            return new AIAccountAuthenticator.Tokens("access", "refresh", 3600, null, null);
+        });
+        WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
+            webSession,
+            profile,
+            authenticator,
+            authorization,
+            "task-id",
+            "ChatGPT"
+        );
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "task-id",
+            "ChatGPT account authorization"
+        );
+
+        Assertions.assertThrows(
+            InvocationTargetException.class,
+            () -> processor.run(webSession.getProgressMonitor())
+        );
+        Assertions.assertTrue(secrets.isEmpty());
+        Assertions.assertTrue(sessionAttributes.keySet().stream().noneMatch(key -> key.contains("other-user")));
+    }
+
+    @Test
+    public void deviceAuthorizationProcessorDoesNotRestoreCredentialsAfterDisconnect() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        AIAccountAuthenticator.DeviceAuthorization authorization = new AIAccountAuthenticator.DeviceAuthorization(
+            "device-code",
+            "user-code",
+            URI.create("https://auth.openai.com/codex/device"),
+            5,
+            900
+        );
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Mockito.when(authenticator.completeDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenAnswer(invocation -> {
+            WebAIProfileUtils.deleteAccountCredentials(webSession, profile);
+            return new AIAccountAuthenticator.Tokens("stale-access", "stale-refresh", 3600, null, null);
+        });
+        WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
+            webSession,
+            profile,
+            authenticator,
+            authorization,
+            "task-id",
+            "ChatGPT"
+        );
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            webSession,
+            profile,
+            "test-user",
+            "task-id",
+            "ChatGPT account authorization"
+        );
+
+        Assertions.assertThrows(
+            InvocationTargetException.class,
+            () -> processor.run(webSession.getProgressMonitor())
+        );
+        Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+        Assertions.assertFalse(secrets.containsValue("stale-refresh"));
+    }
+
+    @Test
+    public void staleEffectiveProfileCannotUseReplacedAccountCredentials() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        String firstAccessToken = tokenWithClaims("{\"exp\":4102444800,\"chatgpt_account_id\":\"account-1\"}");
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens(firstAccessToken, "refresh-1", 3600, "account-1", null)
+        );
+        AISettings settings = Mockito.mock(AISettings.class);
+        Mockito.when(settings.getConfigurationOrNull(profile.getProfileId())).thenReturn(profile);
+        OpenAIProperties staleProperties = (OpenAIProperties) WebAIProfileUtils
+            .getEffectiveProfile(webSession, profile, settings)
+            .getConfiguration();
+
+        secrets.put("ai.profile.test-profile.refreshToken", "refresh-2");
+        secrets.put("ai.profile.test-profile.accessToken", "access-2");
+
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Assertions.assertThrows(DBException.class, () -> staleProperties.getValidAccessToken(authenticator));
+        Mockito.verifyNoInteractions(authenticator);
+    }
+
+    @Test
+    public void effectiveAccountProfileCannotBeUsedAfterSwitchingToApiToken() throws DBException {
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens(
+                tokenWithClaims("{\"exp\":4102444800,\"chatgpt_account_id\":\"account-1\"}"),
+                "refresh-1",
+                3600,
+                "account-1",
+                null
+            )
+        );
+        AISettings settings = Mockito.mock(AISettings.class);
+        Mockito.when(settings.getConfigurationOrNull(profile.getProfileId())).thenReturn(profile);
+        OpenAIProperties effectiveProperties = (OpenAIProperties) WebAIProfileUtils
+            .getEffectiveProfile(webSession, profile, settings)
+            .getConfiguration();
+
+        WebAIProfileUtils.saveCredentials(webSession, profile, Map.of(), false);
+
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Assertions.assertThrows(DBException.class, () -> effectiveProperties.getValidAccessToken(authenticator));
+        Mockito.verifyNoInteractions(authenticator);
+    }
+
+    @Test
+    public void effectiveProfileCannotUseCredentialsAfterProfileDeletion() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        String accessToken = tokenWithClaims("{\"exp\":4102444800,\"chatgpt_account_id\":\"account-1\"}");
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens(accessToken, "refresh-1", 3600, "account-1", null)
+        );
+        AISettings settings = Mockito.mock(AISettings.class);
+        Mockito.when(settings.getConfigurationOrNull(profile.getProfileId())).thenReturn(profile);
+        OpenAIProperties effectiveProperties = (OpenAIProperties) WebAIProfileUtils
+            .getEffectiveProfile(webSession, profile, settings)
+            .getConfiguration();
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+
+        WebAIProfileUtils.invalidateAccountProfile(webSession, profile);
+        try {
+            Assertions.assertThrows(DBException.class, () -> effectiveProperties.getValidAccessToken(authenticator));
+            Mockito.verifyNoInteractions(authenticator);
+        } finally {
+            WebAIProfileUtils.restoreAccountProfile(profile);
+        }
+    }
+
+    @Test
+    public void refreshDoesNotRestoreCredentialsAfterDisconnect() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens("expired-access", "refresh-1", -1, null, null)
+        );
+        AISettings settings = Mockito.mock(AISettings.class);
+        Mockito.when(settings.getConfigurationOrNull(profile.getProfileId())).thenReturn(profile);
+        OpenAIProperties effectiveProperties = (OpenAIProperties) WebAIProfileUtils
+            .getEffectiveProfile(webSession, profile, settings)
+            .getConfiguration();
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Mockito.when(authenticator.refresh("refresh-1")).thenAnswer(invocation -> {
+            WebAIProfileUtils.deleteAccountCredentials(webSession, profile);
+            return new AIAccountAuthenticator.Tokens("stale-access", "stale-refresh", 3600, null, null);
+        });
+
+        Assertions.assertThrows(DBException.class, () -> effectiveProperties.getValidAccessToken(authenticator));
+        Assertions.assertFalse(WebAIProfileUtils.areCredentialsSaved(webSession, profile));
+        Assertions.assertFalse(secrets.containsValue("stale-refresh"));
+    }
+
+    @Test
+    public void serializesRefreshAcrossSessions() throws Exception {
+        WebAIProfileUtils.saveAccountCredentials(
+            webSession,
+            profile,
+            new AIAccountAuthenticator.Tokens("expired-access", "refresh-1", -1, null, null)
+        );
+        AISettings settings = Mockito.mock(AISettings.class);
+        Mockito.when(settings.getConfigurationOrNull(profile.getProfileId())).thenReturn(profile);
+        OpenAIProperties firstProperties = (OpenAIProperties) WebAIProfileUtils
+            .getEffectiveProfile(webSession, profile, settings)
+            .getConfiguration();
+
+        Map<String, Object> secondSessionAttributes = new HashMap<>();
+        WebSession secondSession = Mockito.mock(WebSession.class);
+        WebUserContext sharedUserContext = webSession.getUserContext();
+        Mockito.when(secondSession.getUserId()).thenReturn("test-user");
+        Mockito.when(secondSession.isAuthorizedInSecurityManager()).thenReturn(true);
+        Mockito.when(secondSession.getUserContext()).thenReturn(sharedUserContext);
+        Mockito.when(secondSession.getProgressMonitor()).thenReturn(Mockito.mock(DBRProgressMonitor.class));
+        Mockito.when(secondSession.getAttribute(Mockito.anyString()))
+            .thenAnswer(invocation -> secondSessionAttributes.get(invocation.getArgument(0, String.class)));
+        Mockito.doAnswer(invocation -> {
+            secondSessionAttributes.put(invocation.getArgument(0, String.class), invocation.getArgument(1));
+            return null;
+        }).when(secondSession).setAttribute(Mockito.anyString(), Mockito.any());
+        OpenAIProperties secondProperties = (OpenAIProperties) WebAIProfileUtils
+            .getEffectiveProfile(secondSession, profile, settings)
+            .getConfiguration();
+
+        CountDownLatch refreshStarted = new CountDownLatch(1);
+        CountDownLatch releaseRefresh = new CountDownLatch(1);
+        CountDownLatch secondCallStarted = new CountDownLatch(1);
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Mockito.when(authenticator.refresh("refresh-1")).thenAnswer(invocation -> {
+            refreshStarted.countDown();
+            Assertions.assertTrue(releaseRefresh.await(5, TimeUnit.SECONDS));
+            return new AIAccountAuthenticator.Tokens("access-2", "refresh-2", 3600, null, null);
+        });
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<String> firstResult = executor.submit(() -> firstProperties.getValidAccessToken(authenticator));
+            Assertions.assertTrue(refreshStarted.await(5, TimeUnit.SECONDS));
+            Future<String> secondResult = executor.submit(() -> {
+                secondCallStarted.countDown();
+                return secondProperties.getValidAccessToken(authenticator);
+            });
+            Assertions.assertTrue(secondCallStarted.await(5, TimeUnit.SECONDS));
+            releaseRefresh.countDown();
+
+            Assertions.assertEquals("access-2", firstResult.get(5, TimeUnit.SECONDS));
+            Assertions.assertThrows(ExecutionException.class, () -> secondResult.get(5, TimeUnit.SECONDS));
+            Mockito.verify(authenticator).refresh("refresh-1");
+        } finally {
+            releaseRefresh.countDown();
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    public void profileInvalidationCancelsAttemptsForAllUsers() throws DBException {
+        properties.setAuthentication(OpenAIProperties.AUTHENTICATION_CHATGPT_ACCOUNT);
+        WebSession otherSession = Mockito.mock(WebSession.class);
+        Mockito.when(otherSession.getUserId()).thenReturn("other-user");
+        Mockito.when(otherSession.isAuthorizedInSecurityManager()).thenReturn(true);
+        Mockito.when(otherSession.getProgressMonitor()).thenReturn(Mockito.mock(DBRProgressMonitor.class));
+        AIAccountAuthenticator.DeviceAuthorization authorization = new AIAccountAuthenticator.DeviceAuthorization(
+            "device-code",
+            "user-code",
+            URI.create("https://auth.openai.com/codex/device"),
+            5,
+            900
+        );
+        AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
+            otherSession,
+            profile,
+            authenticator,
+            authorization,
+            "other-task",
+            "ChatGPT"
+        );
+        WebAIProfileUtils.registerDeviceAuthorizationAttempt(
+            otherSession,
+            profile,
+            "other-user",
+            "other-task",
+            "ChatGPT account authorization"
+        );
+
+        WebAIProfileUtils.invalidateAccountProfile(webSession, profile);
+        try {
+            Assertions.assertThrows(
+                InvocationTargetException.class,
+                () -> processor.run(otherSession.getProgressMonitor())
+            );
+            Mockito.verifyNoInteractions(authenticator);
+        } finally {
+            WebAIProfileUtils.restoreAccountProfile(profile);
+        }
+    }
+
+    private static String tokenWithClaims(String claims) {
+        return "header."
+            + Base64.getUrlEncoder().withoutPadding().encodeToString(claims.getBytes(StandardCharsets.UTF_8))
+            + ".signature";
     }
 }
