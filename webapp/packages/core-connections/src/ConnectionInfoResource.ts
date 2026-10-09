@@ -560,10 +560,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return properties;
   }
 
-  deleteConnection(key: IConnectionInfoParams): Promise<void>;
-  deleteConnection(key: ResourceKeyList<IConnectionInfoParams>): Promise<void>;
-  deleteConnection(key: ResourceKey<IConnectionInfoParams>): Promise<void>;
-  async deleteConnection(key: ResourceKey<IConnectionInfoParams>): Promise<void> {
+  deleteConnections(key: IConnectionInfoParams): Promise<void>;
+  deleteConnections(key: ResourceKeyList<IConnectionInfoParams>): Promise<void>;
+  deleteConnections(key: ResourceKey<IConnectionInfoParams>): Promise<void>;
+  async deleteConnections(key: ResourceKey<IConnectionInfoParams>): Promise<void> {
     key = this.aliases.transformToKey(key);
     await ResourceKeyUtils.forEachAsync(key, async key => {
       await this.performUpdate(key, [], async () => {

@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { ConfirmationDialogDelete, RenameDialog } from '@cloudbeaver/core-blocks';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -16,6 +17,7 @@ import {
   ENodeFeature,
   EObjectFeature,
   getNodePlainName,
+  getNodesFromContext,
   type INodeActions,
   isConnectionFolder,
   type NavNode,
@@ -26,8 +28,14 @@ import {
   nodeDeleteContext,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
-import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, EConnectionFeature, isConnectionNode } from '@cloudbeaver/core-connections';
-import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import {
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  DATA_CONTEXT_CONNECTION,
+  EConnectionFeature,
+  isConnectionNode,
+} from '@cloudbeaver/core-connections';
+import { resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   ACTION_DELETE,
   ACTION_OPEN,
@@ -60,6 +68,7 @@ export interface INodeMenuData {
   NavNodeInfoResource,
   NavTreeSettingsService,
   ConnectionInfoResource,
+  ConnectionsManagerService,
 ])
 export class NavNodeContextMenuService extends Bootstrap {
   constructor(
@@ -73,8 +82,22 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
     super();
+  }
+
+  getNodesToDelete(context: IDataContextProvider): NavNode[] {
+    const nodes = getNodesFromContext(context);
+    const selected = new Map(nodes.map(node => [node.uri, node]));
+
+    return nodes.filter(
+      node =>
+        !this.navNodeInfoResource.getParents(node.uri).some(parent => {
+          const ancestor = selected.get(parent);
+          return ancestor && !isConnectionNode(ancestor) && (!isConnectionFolder(ancestor) || isConnectionFolder(node));
+        }),
+    );
   }
 
   override register(): void {
@@ -92,7 +115,7 @@ export class NavNodeContextMenuService extends Bootstrap {
       const nodes = ResourceKeyUtils.mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId)).filter<NavNode>(Boolean as any);
 
       const name = nodes.map(node => node.name).join(', ');
-      const folder = nodes.some(node => node.folder);
+      const folder = nodes.some(node => node.folder && !isConnectionFolder(node));
 
       let message: string = this.localizationService.translate('app_navigationTree_node_delete_confirmation', undefined, { name });
 
@@ -106,15 +129,72 @@ export class NavNodeContextMenuService extends Bootstrap {
         confirmActionText: 'ui_delete',
       });
 
-      if (status === DialogueStateResult.Rejected) {
+      if (status !== DialogueStateResult.Resolved) {
         ExecutorInterrupter.interrupt(contexts);
       }
     });
 
     this.actionService.addHandler({
+      id: 'nav-node-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => {
+        const nodes = this.getNodesToDelete(context);
+        return (
+          nodes.length > 0 &&
+          nodes.every(node => {
+            const key = node.projectId && this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri);
+            const connection = key ? this.connectionInfoResource.get(key) : undefined;
+
+            if (isConnectionNode(node)) {
+              return connection?.canDelete ?? false;
+            }
+
+            return (
+              (NodeManagerUtils.isDatabaseObject(node.uri) || isConnectionFolder(node)) &&
+              !connection?.features.includes(EConnectionFeature.restrictMetadataEdit) &&
+              !!node.features?.includes(ENodeFeature.canDelete)
+            );
+          })
+        );
+      },
+      handler: async context => {
+        const nodes = this.getNodesToDelete(context);
+        const key = resourceKeyList(nodes.map(node => node.uri));
+        const connectionKeys = nodes
+          .filter(isConnectionNode)
+          .map(node => this.connectionInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri)!);
+
+        try {
+          const contexts = await this.navTreeResource.beforeNodeDelete.execute(key);
+          if (ExecutorInterrupter.isInterrupted(contexts)) {
+            return;
+          }
+
+          const nodeIds = nodes.filter(node => !isConnectionNode(node)).map(node => node.uri);
+          if (nodeIds.length) {
+            await this.navTreeResource.deleteNodes(resourceKeyList(nodeIds), true);
+          }
+
+          if (connectionKeys.length) {
+            await this.connectionsManagerService.deleteConnections(resourceKeyList(connectionKeys), true);
+          }
+        } catch (exception: any) {
+          this.notificationService.logException(
+            exception,
+            this.localizationService.translate('app_navigationTree_node_delete_error', undefined, {
+              name: nodes.map(getNodePlainName).join(', '),
+            }),
+          );
+        }
+      },
+    });
+
+    this.actionService.addHandler({
       id: 'nav-node-base-manage-menu',
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      actions: [ACTION_RENAME, ACTION_DELETE],
+      actions: [ACTION_RENAME],
       contexts: [DATA_CONTEXT_NAV_NODE],
       isActionApplicable: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -129,10 +209,6 @@ export class NavNodeContextMenuService extends Bootstrap {
         if (NodeManagerUtils.isDatabaseObject(node.uri) || isConnectionFolder(node)) {
           if (action === ACTION_RENAME) {
             return node.features?.includes(ENodeFeature.canRename) ?? false;
-          }
-
-          if (action === ACTION_DELETE) {
-            return node.features?.includes(ENodeFeature.canDelete) ?? false;
           }
         }
 
@@ -172,17 +248,6 @@ export class NavNodeContextMenuService extends Bootstrap {
               if (status === DialogueStateResult.Resolved && result !== undefined) {
                 save(result);
               }
-            }
-            break;
-          }
-          case ACTION_DELETE: {
-            try {
-              await this.navTreeResource.deleteNode(node.uri);
-            } catch (exception: any) {
-              this.notificationService.logException(
-                exception,
-                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name }),
-              );
             }
             break;
           }

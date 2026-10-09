@@ -118,8 +118,11 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       }
       await this.connectionFolderResource.load(CachedMapAllKey);
 
-      const nodes = ResourceKeyUtils.filter(data, nodeId => this.connectionFolderResource.fromNodeId(nodeId) !== undefined)
-        .map(nodeId => this.navNodeInfoResource.get(nodeId))
+      if (!ResourceKeyUtils.toArray(data).every(nodeId => this.connectionFolderResource.fromNodeId(nodeId) !== undefined)) {
+        return;
+      }
+
+      const nodes = ResourceKeyUtils.mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId))
         .filter<NavNode>(Boolean as any)
         .map(node => node.name)
         .join();
@@ -134,7 +137,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         confirmActionText: 'ui_delete',
       });
 
-      if (status === DialogueStateResult.Rejected) {
+      if (status !== DialogueStateResult.Resolved) {
         ExecutorInterrupter.interrupt(contexts);
       } else {
         deleteContext.confirm();

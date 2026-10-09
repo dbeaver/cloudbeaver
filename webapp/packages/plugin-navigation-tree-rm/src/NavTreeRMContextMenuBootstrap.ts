@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,20 @@ import { isResourceOfType, ProjectInfoResource, type ProjectInfoResourceType } f
 import { getRmResourceKey, isRMResourceNode, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '@cloudbeaver/plugin-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE_ACTIONS, NavNodeContextMenuService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId.js';
 import { NavResourceNodeService } from './NavResourceNodeService.js';
 
-@injectable(() => [ActionService, ProjectInfoResource, CommonDialogService, NotificationService, NavResourceNodeService, LocalizationService])
+@injectable(() => [
+  ActionService,
+  ProjectInfoResource,
+  CommonDialogService,
+  NotificationService,
+  NavResourceNodeService,
+  LocalizationService,
+  NavNodeContextMenuService,
+])
 export class NavTreeRMContextMenuBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
@@ -29,6 +37,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly navResourceNodeService: NavResourceNodeService,
     private readonly localizationService: LocalizationService,
+    private readonly navNodeContextMenuService: NavNodeContextMenuService,
   ) {
     super();
   }
@@ -49,7 +58,16 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DELETE) {
-          return node.features?.includes(ENodeFeature.canDelete) ?? false;
+          const nodes = this.navNodeContextMenuService.getNodesToDelete(context);
+          return (
+            nodes.length > 0 &&
+            nodes.every(
+              node =>
+                [NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType as string) &&
+                node.features?.includes(ENodeFeature.canDelete) &&
+                getResourceKeyFromNodeId(node.uri) !== undefined,
+            )
+          );
         }
 
         return false;
@@ -114,12 +132,16 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
             break;
           }
           case ACTION_DELETE: {
+            const nodes = this.navNodeContextMenuService.getNodesToDelete(context);
             try {
-              await this.navResourceNodeService.delete(resourceKey);
+              const keys = nodes.map(node => getResourceKeyFromNodeId(node.uri)!);
+              await this.navResourceNodeService.deleteResources(keys);
             } catch (exception: any) {
               this.notificationService.logException(
                 exception,
-                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name: key.name }),
+                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, {
+                  name: nodes.map(node => node.name).join(', '),
+                }),
               );
             }
             break;
