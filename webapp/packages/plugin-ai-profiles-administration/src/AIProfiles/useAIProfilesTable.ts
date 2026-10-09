@@ -28,7 +28,7 @@ interface State {
 
 export function useAIProfilesTable(selection: ITableSelection): Readonly<State> {
   const notificationService = useService(NotificationService);
-  const dialogService = useService(CommonDialogService);
+  const commonDialogService = useService(CommonDialogService);
   const aiProfilesResource = useService(AIProfilesResource);
   const translate = useTranslate();
 
@@ -104,6 +104,6 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
       refresh: action.bound,
       delete: action.bound,
     },
-    { aiProfilesResource, selection, notificationService, dialogService },
+    { aiProfilesResource, selection, notificationService, dialogService: commonDialogService },
   );
 }

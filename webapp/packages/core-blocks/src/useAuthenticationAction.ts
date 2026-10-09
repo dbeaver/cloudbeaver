@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ export type Options = {
 
 export function useAuthenticationAction(options: Options): IAuthenticationAction {
   const authProviderService = useService(AuthProviderService);
-  const userInfoService = useService(UserInfoResource);
+  const userInfoResource = useService(UserInfoResource);
 
   return useObservableRef(
     () => ({
       authenticating: false,
       get authorized() {
-        return !this.authenticating && userInfoService.hasToken(this.providerId);
+        return !this.authenticating && userInfoResource.hasToken(this.providerId);
       },
       async auth() {
         this.authenticating = true;

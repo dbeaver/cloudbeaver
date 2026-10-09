@@ -196,7 +196,7 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    return this.connectionsManagerService.containerContainers.get({
+    return this.connectionsManagerService.containerResource.get({
       ...this.currentConnectionKey,
       catalogId: this.currentObjectCatalogId,
     });

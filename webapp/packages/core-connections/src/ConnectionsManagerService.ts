@@ -48,7 +48,7 @@ export class ConnectionsManagerService {
 
   constructor(
     readonly connectionInfoResource: ConnectionInfoResource,
-    readonly containerContainers: ContainerResource,
+    readonly containerResource: ContainerResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
@@ -85,7 +85,7 @@ export class ConnectionsManagerService {
 
   getObjectContainerById(connectionKey: IConnectionInfoParams, objectCatalogId?: string, objectSchemaId?: string): ObjectContainer | undefined {
     if (objectCatalogId) {
-      const objectContainers = this.containerContainers.getCatalogData(connectionKey, objectCatalogId);
+      const objectContainers = this.containerResource.getCatalogData(connectionKey, objectCatalogId);
 
       if (!objectContainers) {
         return;
@@ -99,7 +99,7 @@ export class ConnectionsManagerService {
     }
 
     if (objectSchemaId) {
-      return this.containerContainers.getSchema(connectionKey, objectSchemaId);
+      return this.containerResource.getSchema(connectionKey, objectSchemaId);
     }
 
     return undefined;
@@ -221,7 +221,7 @@ export class ConnectionsManagerService {
   }
 
   async loadObjectContainer(key: IConnectionInfoParams, catalogId?: string): Promise<IStructContainers> {
-    await this.containerContainers.load({ projectId: key.projectId, connectionId: key.connectionId, catalogId });
-    return this.containerContainers.get({ projectId: key.projectId, connectionId: key.connectionId, catalogId })!;
+    await this.containerResource.load({ projectId: key.projectId, connectionId: key.connectionId, catalogId });
+    return this.containerResource.get({ projectId: key.projectId, connectionId: key.connectionId, catalogId })!;
   }
 }

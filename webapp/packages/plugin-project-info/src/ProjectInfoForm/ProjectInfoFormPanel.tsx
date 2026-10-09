@@ -15,12 +15,12 @@ import { ProjectInfoFormService } from './ProjectInfoFormService.js';
 import { ProjectInfoOptionsPanelService } from './ProjectInfoOptionsPanelService.js';
 
 export const ProjectInfoFormPanel = observer<IProjectInfoFormProps>(function ProjectInfoFormPanel({ formState }) {
-  const service = useService(ProjectInfoFormService);
+  const projectInfoFormService = useService(ProjectInfoFormService);
   const projectInfoOptionsPanelService = useService(ProjectInfoOptionsPanelService);
 
   return (
     <TabsState
-      container={service.parts}
+      container={projectInfoFormService.parts}
       localState={formState.parts}
       selectedId={projectInfoOptionsPanelService.itemId ?? undefined}
       formState={formState}

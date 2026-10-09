@@ -17,9 +17,9 @@ import { CreateTeamService } from './CreateTeamService.js';
 export const CreateTeam: React.FC = observer(function CreateTeam() {
   const translate = useTranslate();
   const styles = useS(style);
-  const service = useService(CreateTeamService);
+  const createTeamService = useService(CreateTeamService);
 
-  if (!service.formState) {
+  if (!createTeamService.formState) {
     return null;
   }
 
@@ -30,7 +30,7 @@ export const CreateTeam: React.FC = observer(function CreateTeam() {
       </GroupTitle>
       <Container overflow vertical>
         <Loader suspense>
-          <TeamForm state={service.formState} onCancel={service.cancelCreate} />
+          <TeamForm state={createTeamService.formState} onCancel={createTeamService.cancelCreate} />
         </Loader>
       </Container>
     </Group>

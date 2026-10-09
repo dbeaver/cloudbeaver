@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ interface State {
 
 export function useTeamsTable(selection: ITableSelection): Readonly<State> {
   const notificationService = useService(NotificationService);
-  const dialogService = useService(CommonDialogService);
+  const commonDialogService = useService(CommonDialogService);
   const teamsResource = useService(TeamsResource);
 
   const translate = useTranslate();
@@ -64,7 +64,7 @@ export function useTeamsTable(selection: ITableSelection): Readonly<State> {
         const message = `${translate('administration_teams_delete_confirmation')}${teamNames}.\n\n${translate(
           'administration_teams_delete_confirmation_users_note',
         )}.\n\n${translate('ui_are_you_sure')}`;
-        const { status } = await dialogService.open(ConfirmationDialogDelete, {
+        const { status } = await commonDialogService.open(ConfirmationDialogDelete, {
           title: 'ui_data_delete_confirmation',
           message,
           confirmActionText: 'ui_delete',
