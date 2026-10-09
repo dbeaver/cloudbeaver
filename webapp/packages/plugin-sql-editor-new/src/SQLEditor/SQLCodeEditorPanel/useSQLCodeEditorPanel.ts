@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { action } from 'mobx';
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { throttle } from '@cloudbeaver/core-utils';
@@ -51,7 +51,10 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
     { editor, data },
   );
 
-  const updateHighlight = useMemo(() => throttle(() => state.highlightActiveQuery(), 1000), [state]);
+  const updateHighlight = useCallback(
+    throttle(() => state.highlightActiveQuery(), 1000),
+    [state],
+  );
 
   useExecutor({
     executor: data.model.onUpdate,
