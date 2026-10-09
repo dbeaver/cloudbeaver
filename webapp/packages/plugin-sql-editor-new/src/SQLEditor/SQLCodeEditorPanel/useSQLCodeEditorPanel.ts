@@ -27,6 +27,11 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
   const state: State = useObservableRef(
     () => ({
       highlightActiveQuery() {
+        // Rebuilding query decorations during IME composition can disrupt the composing DOM.
+        if (this.editor.view?.compositionStarted) {
+          return;
+        }
+
         this.editor.clearActiveQueryHighlight();
 
         const segment = this.data.model.cursorSegment;
