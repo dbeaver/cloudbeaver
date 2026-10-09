@@ -10,7 +10,7 @@ import React, { use, useLayoutEffect, useMemo } from 'react';
 
 import { MenuItemElement, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IContextMenuProps } from './IContextMenuProps.js';
-import { MenuButton, MenuProvider, Menu, type HovercardStoreState, type MenuProps, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
+import { MenuButton, MenuProvider, Menu, type HovercardStoreState, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
 import { RenderMenuItems } from './RenderMenuItems.js';
 import { type IMenuContext, MenuContext } from './MenuContext.js';
 
@@ -22,7 +22,6 @@ export interface IContextMenuNewProps extends IContextMenuProps {
   shift?: number;
   gutter?: number;
   autoFocusOnShow?: boolean;
-  autoFocusOnHide?: MenuProps['autoFocusOnHide'];
   modal?: boolean;
   /** For menus opened programmatically, without a rendered trigger button. */
   hideTrigger?: boolean;
@@ -39,7 +38,6 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   shift,
   gutter,
   autoFocusOnShow,
-  autoFocusOnHide,
   modal,
   hideTrigger = false,
   ...rest
@@ -109,7 +107,6 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
         )}
         <Menu
           modal={modal}
-          autoFocusOnHide={autoFocusOnHide}
           aria-label={translate(menuData.menu.info.label)}
           getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
           shift={shift}

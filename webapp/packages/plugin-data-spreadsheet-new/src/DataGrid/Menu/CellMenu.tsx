@@ -35,10 +35,10 @@ export const CellMenu = observer<Props>(function CellMenu({ menu }) {
 
   const gridContext = useContext(DataGridContext);
 
-  function handleAutoFocusOnHide() {
-    // Restore the cell after the modal releases focus, instead of its menu button.
-    gridContext.focus();
-    return false;
+  function handleVisibleSwitch(visible: boolean) {
+    if (!visible) {
+      gridContext.focus();
+    }
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -59,10 +59,10 @@ export const CellMenu = observer<Props>(function CellMenu({ menu }) {
           menu={menu.menu}
           contextMenuPosition={menu.position}
           visible={!!menu.position.position}
-          autoFocusOnHide={handleAutoFocusOnHide}
           modal
           hideTrigger
           autoFocusOnShow
+          onVisibleSwitch={handleVisibleSwitch}
         />
       </div>
     </SContext>
