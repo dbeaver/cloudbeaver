@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { action } from 'mobx';
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { throttle } from '@cloudbeaver/core-utils';
@@ -27,6 +27,11 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
   const state: State = useObservableRef(
     () => ({
       highlightActiveQuery() {
+        // Rebuilding query decorations during IME composition can disrupt the composing DOM.
+        if (this.editor.view?.compositionStarted) {
+          return;
+        }
+
         this.editor.clearActiveQueryHighlight();
 
         const segment = this.data.model.cursorSegment;
@@ -46,10 +51,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
     { editor, data },
   );
 
-  const updateHighlight = useCallback(
-    throttle(() => state.highlightActiveQuery(), 1000),
-    [state],
-  );
+  const updateHighlight = useMemo(() => throttle(() => state.highlightActiveQuery(), 1000), [state]);
 
   useExecutor({
     executor: data.model.onUpdate,
