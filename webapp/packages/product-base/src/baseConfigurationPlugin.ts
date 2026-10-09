@@ -123,7 +123,8 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
             manifest: false,
             injectManifest: {
               maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
-              globPatterns: ['**/icons/preload/**/*.{svg,png,jpg,gif,jpeg}'],
+              // Custom patterns replace the defaults, so keep the application shell alongside preload icons.
+              globPatterns: ['**/*.{js,css,html}', '**/icons/preload/**/*.{svg,png,jpg,gif,jpeg}'],
               globIgnores: [
                 '**/license.txt',
                 '**/*.map',
