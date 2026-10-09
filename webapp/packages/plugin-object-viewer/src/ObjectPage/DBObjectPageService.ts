@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState.js';
-import { ObjectPage, type ObjectPageCallback, type ObjectPageOptions } from './ObjectPage.js';
+import { ObjectPage, type ObjectPageOptions } from './ObjectPage.js';
 
 @injectable()
 export class DBObjectPageService {
@@ -72,7 +72,9 @@ export class DBObjectPageService {
       tab.handlerState.pagesState[page.key] = state;
     }
 
-    this.callHandlerCallback(tab, page => page.onSelect);
+    for (const page of this.pages.values()) {
+      page.onSelect?.(tab, this.getPageState(tab, page));
+    }
   }
 
   async restorePages(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
@@ -97,15 +99,8 @@ export class DBObjectPageService {
   }
 
   async closePages(tab: ITab<IObjectViewerTabState>) {
-    await this.callHandlerCallback(tab, page => page.onClose);
-  }
-
-  private async callHandlerCallback<T>(tab: ITab<IObjectViewerTabState>, selector: (page: ObjectPage<T>) => ObjectPageCallback<T> | undefined) {
     for (const page of this.pages.values()) {
-      const callback = selector(page);
-      if (callback) {
-        await callback.call(page, tab, this.getPageState(tab, page));
-      }
+      await page.onClose?.(tab, this.getPageState(tab, page));
     }
   }
 

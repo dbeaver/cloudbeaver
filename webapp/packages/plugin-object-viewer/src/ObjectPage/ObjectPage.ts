@@ -25,7 +25,8 @@ export interface ObjectPagePanelProps<T = unknown> {
 export type ObjectPagePanelComponent<T = unknown> = React.FunctionComponent<ObjectPagePanelProps<T>>;
 
 export type ObjectPageCloseCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<boolean> | boolean;
-export type ObjectPageCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<void> | void;
+export type ObjectPageCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => void;
+export type ObjectPageAsyncCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<void> | void;
 export type ObjectPageRestoreCallback<T> = (tab: ITab<IObjectViewerTabState>, pageState: T) => Promise<boolean> | boolean;
 
 export interface ObjectPageOptions<T = unknown> {
@@ -36,8 +37,8 @@ export interface ObjectPageOptions<T = unknown> {
   getPanelComponent: () => ObjectPagePanelComponent<T>;
   canClose?: ObjectPageCloseCallback<T>;
   onSelect?: ObjectPageCallback<T>;
-  onClose?: ObjectPageCallback<T>;
-  onUnload?: ObjectPageCallback<T>;
+  onClose?: ObjectPageAsyncCallback<T>;
+  onUnload?: ObjectPageAsyncCallback<T>;
   onRestore?: ObjectPageRestoreCallback<T>;
 }
 
@@ -49,8 +50,8 @@ export class ObjectPage<T = unknown> {
   getPanelComponent: () => ObjectPagePanelComponent<T>;
   onSelect?: ObjectPageCallback<T>;
   canClose?: ObjectPageCloseCallback<T>;
-  onClose?: ObjectPageCallback<T>;
-  onUnload?: ObjectPageCallback<T>;
+  onClose?: ObjectPageAsyncCallback<T>;
+  onUnload?: ObjectPageAsyncCallback<T>;
   onRestore?: ObjectPageRestoreCallback<T>;
 
   constructor(options: ObjectPageOptions<T>) {
