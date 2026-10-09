@@ -22,6 +22,9 @@ export interface IContextMenuNewProps extends IContextMenuProps {
   shift?: number;
   gutter?: number;
   autoFocusOnShow?: boolean;
+  modal?: boolean;
+  /** For menus opened programmatically, without a rendered trigger button. */
+  hideTrigger?: boolean;
 }
 
 export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuInner({
@@ -35,6 +38,8 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   shift,
   gutter,
   autoFocusOnShow,
+  modal,
+  hideTrigger = false,
   ...rest
 }) {
   const translate = useTranslate();
@@ -95,10 +100,13 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   return (
     <MenuContext value={menuContext}>
       <MenuProvider store={menu} setOpen={handlers.handleVisibleSwitch}>
-        <MenuButton {...rest} title={translate(menuData.menu.info.tooltip)}>
-          {children}
-        </MenuButton>
+        {!hideTrigger && (
+          <MenuButton {...rest} title={translate(menuData.menu.info.tooltip)}>
+            {children}
+          </MenuButton>
+        )}
         <Menu
+          modal={modal}
           aria-label={translate(menuData.menu.info.label)}
           getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
           shift={shift}

@@ -41,10 +41,29 @@ export const CellMenu = observer<Props>(function CellMenu({ menu }) {
     }
   }
 
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    // Return to the cell; the next Tab continues grid navigation.
+    event.preventDefault();
+    event.stopPropagation();
+    menu.closeMenu();
+  }
+
   return (
     <SContext registry={registry}>
-      <div className={s(style, { contextMenu: true })}>
-        <ContextMenu menu={menu.menu} contextMenuPosition={menu.position} autoFocusOnShow onVisibleSwitch={handleVisibleSwitch} />
+      <div className={s(style, { contextMenu: true })} onKeyDownCapture={handleKeyDown}>
+        <ContextMenu
+          menu={menu.menu}
+          contextMenuPosition={menu.position}
+          visible={!!menu.position.position}
+          modal
+          hideTrigger
+          autoFocusOnShow
+          onVisibleSwitch={handleVisibleSwitch}
+        />
       </div>
     </SContext>
   );
