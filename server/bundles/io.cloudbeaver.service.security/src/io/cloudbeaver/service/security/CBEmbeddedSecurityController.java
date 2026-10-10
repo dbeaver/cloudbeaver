@@ -21,6 +21,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.*;
+import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
@@ -3070,7 +3071,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
-                setUserTeams(userId, ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new), userId);
+                // Unknown values are skipped instead of failing the whole login on a foreign key error
+                var trustedTeams = TeamMappingUtils.resolveTrustedTeams(
+                    ((List<?>) reverseProxyUserTeams).stream().map(String::valueOf).toList(),
+                    readAllTeams(),
+                    RPAuthProvider.META_TEAM_GROUP_NAME
+                );
+                if (!trustedTeams.unknownValues().isEmpty()) {
+                    log.debug("Ignored values of the trusted teams header that match no team: " + trustedTeams.unknownValues());
+                }
+                setUserTeams(userId, trustedTeams.teamIds().toArray(String[]::new), userId);
             }
         }
         return userId;

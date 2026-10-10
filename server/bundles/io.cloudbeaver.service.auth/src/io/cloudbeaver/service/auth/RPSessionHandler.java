@@ -43,9 +43,11 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class RPSessionHandler implements DBWSessionHandler {
 
@@ -105,16 +107,23 @@ public class RPSessionHandler implements DBWSessionHandler {
             teamDelimiter = resolveParam(JSONUtils.getString(configuration.getParameters(),
                 RPConstants.PARAM_TEAM_DELIMITER), DEFAULT_TEAM_DELIMITER);
         }
-        List<String> userTeams = teams == null ? null : (teams.isEmpty() ? List.of() : List.of(teams.split(teamDelimiter)));
+        List<String> userTeams = teams == null ? null : splitTeams(teams, teamDelimiter);
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
                 credentials.put("user", userName);
+                Map<String, String> profile = new HashMap<>();
                 if (!CommonUtils.isEmpty(firstName)) {
                     credentials.put(SMStandardMeta.META_FIRST_NAME, firstName);
+                    profile.put(SMStandardMeta.META_FIRST_NAME, firstName);
                 }
                 if (!CommonUtils.isEmpty(lastName)) {
                     credentials.put(SMStandardMeta.META_LAST_NAME, lastName);
+                    profile.put(SMStandardMeta.META_LAST_NAME, lastName);
+                }
+                if (!profile.isEmpty()) {
+                    // stored in the profile of a new user and refreshed on the next logins
+                    credentials.put(SMStandardMeta.KEY_META_PARAMS, profile);
                 }
                 if (!CommonUtils.isEmpty(fullName)) {
                     credentials.put("fullName", fullName);
@@ -152,6 +161,19 @@ public class RPSessionHandler implements DBWSessionHandler {
     @Override
     public boolean handleSessionClose(WebSession webSession) throws DBException, IOException {
         return false;
+    }
+
+    /**
+     * Splits the value of the teams header. A one character delimiter is taken literally, so "|" or "." work as they
+     * are written. A longer one is a regular expression, like the default "\\|".
+     * Blank values are dropped.
+     */
+    public static List<String> splitTeams(String teams, String delimiter) {
+        String regex = delimiter.length() == 1 ? Pattern.quote(delimiter) : delimiter;
+        return Arrays.stream(teams.split(regex))
+            .map(String::trim)
+            .filter(team -> !team.isEmpty())
+            .toList();
     }
 
     private String resolveParam(Object value, String defaultValue) {

@@ -44,6 +44,8 @@ import org.junit.platform.suite.api.Suite;
 //        ConnectionsTest.class,
         SQLQueryTranslatorTest.class,
         AuthenticationTest.class,
+        RPSessionHandlerTest.class,
+        TeamMappingUtilsTest.class,
         LdapAuthenticationTest.class,
         ResourceManagerTest.class,
         RMLockTest.class,
