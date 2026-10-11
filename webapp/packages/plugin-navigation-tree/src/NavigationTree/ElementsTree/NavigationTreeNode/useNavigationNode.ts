@@ -87,7 +87,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
         }
       }
     },
-    [node],
+    [node.uri],
   );
 
   useEffect(() => {

@@ -71,7 +71,6 @@ export interface INavNodeRenameData {
   AppAuthService,
 ])
 export class NavTreeResource extends CachedMapResource<string, string[], Record<string, unknown>, INodeMetadata> {
-  readonly beforeNodeDelete: IExecutor<ResourceKeySimple<string>>;
   readonly onNodeRefresh: IExecutor<string>;
   readonly onNodeRename: IExecutor<INavNodeRenameData>;
   readonly onNodeMove: IExecutor<INavNodeMoveData>;
@@ -91,7 +90,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   ) {
     super();
 
-    this.beforeNodeDelete = new Executor();
     this.onNodeRename = new Executor();
     this.onNodeMove = new Executor();
 
@@ -208,25 +206,24 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     });
   }
 
+  /** Execute deletion after the caller has confirmed the selected nodes. */
   async deleteNode(key: ResourceKeySimple<string>): Promise<void> {
-    const contexts = await this.beforeNodeDelete.execute(key);
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
+    const nodePaths = ResourceKeyUtils.toArray(key);
+    if (!nodePaths.length) {
       return;
     }
-
-    const nodePaths = ResourceKeyUtils.toArray(key);
 
     await this.performUpdate(key, [], async () => {
       const deletedPaths: string[] = [];
 
       try {
-        for (const path of nodePaths) {
-          await this.graphQLService.sdk.navDeleteNodes({ nodePaths: [path] });
-          deletedPaths.push(path);
-        }
-        this.onDataOutdated.execute(key);
+        await this.graphQLService.sdk.navDeleteNodes({ nodePaths });
+        deletedPaths.push(...nodePaths);
       } finally {
+        // The backend may have partially applied a failed batch. Reload all affected parents.
+        const parents = nodePaths.map(path => this.navNodeInfoResource.get(path)?.parentId).filter(isDefined);
+        this.markOutdated(resourceKeyList(parents));
+        this.onDataOutdated.execute(key);
         runInAction(() => {
           const deletedNodes: string[] = [];
           const deletionMap = new Map<string, string[]>();

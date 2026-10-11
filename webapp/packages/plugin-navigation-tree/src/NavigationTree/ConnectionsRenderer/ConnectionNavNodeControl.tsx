@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { EObjectFeature, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
+import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext.js';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent.js';
 import style from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.module.css';
 import { NavigationNodeExpand } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeExpand.js';
@@ -39,6 +40,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     const translate = useTranslate();
     const contextMenuPosition = useContextMenuPosition();
     const treeNodeContext = useContext(TreeNodeContext);
+    const elementsTreeContext = useContext(ElementsTreeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const navTreeResource = useService(NavTreeResource);
     const selected = treeNodeContext.selected;
@@ -60,12 +62,16 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
 
     function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
       EventContext.set(event, EventStopPropagationFlag);
-      treeNodeContext.select();
+      if (!treeNodeContext.selected) {
+        treeNodeContext.select();
+      }
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
       contextMenuPosition.open(event);
-      treeNodeContext.select();
+      if (!treeNodeContext.selected) {
+        treeNodeContext.select();
+      }
     }
 
     const temporary = node.objectFeatures.includes(EObjectFeature.dataSourceTemporary);
@@ -97,7 +103,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
         </TreeNodeName>
         {mountMenu && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
-            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} selected={selected} />
+            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} elementsTree={elementsTreeContext} selected={selected} />
           </div>
         )}
       </TreeNodeControl>

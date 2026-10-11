@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ConfirmationDialogDelete } from '@cloudbeaver/core-blocks';
 import {
   CONNECTION_FOLDER_NAME_VALIDATION,
   ConnectionFolderProjectKey,
@@ -14,6 +13,7 @@ import {
   ConnectionInfoResource,
   createConnectionFolderParam,
   createConnectionParam,
+  EConnectionFeature,
   getConnectionFolderId,
   getConnectionFolderIdFromNodeId,
   type IConnectionFolderParam,
@@ -24,10 +24,11 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
+  ENodeFeature,
   ENodeMoveType,
   getNodesFromContext,
   type INodeMoveData,
@@ -38,7 +39,6 @@ import {
   NavNodeManagerService,
   navNodeMoveContext,
   NavTreeResource,
-  nodeDeleteContext,
   ProjectsNavNodeService,
   ROOT_NODE_PATH,
 } from '@cloudbeaver/core-navigation-tree';
@@ -57,6 +57,7 @@ import {
   MENU_ELEMENTS_TREE_TOOLS,
   MENU_NAVIGATION_TREE_CREATE,
   NavigationTreeService,
+  NodeDeletionService,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -79,6 +80,7 @@ import { ACTION_TREE_CREATE_FOLDER } from '../Actions/ACTION_TREE_CREATE_FOLDER.
   ProjectsNavNodeService,
   NavigationTreeService,
   TreeSelectionService,
+  NodeDeletionService,
 ])
 export class ConnectionFoldersBootstrap extends Bootstrap {
   constructor(
@@ -97,49 +99,42 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly projectsNavNodeService: ProjectsNavNodeService,
     private readonly navigationTreeService: NavigationTreeService,
     private readonly treeSelectionService: TreeSelectionService,
+    private readonly nodeDeletionService: NodeDeletionService,
   ) {
     super();
   }
 
   override register(): void {
+    const canDelete = (node: NavNode) => {
+      const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
+      const connection = key ? this.connectionInfoResource.get(key) : undefined;
+      return !!node.features?.includes(ENodeFeature.canDelete) && !connection?.features.includes(EConnectionFeature.restrictMetadataEdit);
+    };
+    this.nodeDeletionService.registerProvider({
+      isApplicable: node => isConnectionFolder(node) && !isConnectionNode(node),
+      isDisabled: node => !canDelete(node),
+      getInfo: async node => {
+        const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
+        if (key) {
+          await this.connectionInfoResource.load(key);
+        }
+        return {
+          type: 'ui_folder',
+          warning: 'plugin_connections_delete_folder_warning',
+          batchKey: JSON.stringify([node.projectId, key?.connectionId]),
+        };
+      },
+      handler: async nodes => {
+        if (!nodes.every(canDelete)) {
+          return false;
+        }
+        return await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.uri)));
+      },
+    });
+
     this.navNodeInfoResource.onItemUpdate.addHandler(this.syncWithNavTree.bind(this));
     this.navNodeInfoResource.onItemDelete.addHandler(this.syncWithNavTree.bind(this));
     this.navNodeManagerService.onMove.addHandler(this.moveConnectionToFolder.bind(this));
-
-    this.navTreeResource.beforeNodeDelete.addHandler(async (data, contexts) => {
-      if (ExecutorInterrupter.isInterrupted(contexts)) {
-        return;
-      }
-
-      const deleteContext = contexts.getContext(nodeDeleteContext);
-
-      if (deleteContext.confirmed) {
-        return;
-      }
-      await this.connectionFolderResource.load(CachedMapAllKey);
-
-      const nodes = ResourceKeyUtils.filter(data, nodeId => this.connectionFolderResource.fromNodeId(nodeId) !== undefined)
-        .map(nodeId => this.navNodeInfoResource.get(nodeId))
-        .filter<NavNode>(Boolean as any)
-        .map(node => node.name)
-        .join();
-
-      if (!nodes) {
-        return;
-      }
-
-      const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
-        title: 'ui_data_delete_confirmation',
-        message: this.localizationService.translate('plugin_connections_connection_folder_delete_confirmation', undefined, { name: nodes }),
-        confirmActionText: 'ui_delete',
-      });
-
-      if (status === DialogueStateResult.Rejected) {
-        ExecutorInterrupter.interrupt(contexts);
-      } else {
-        deleteContext.confirm();
-      }
-    });
 
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',

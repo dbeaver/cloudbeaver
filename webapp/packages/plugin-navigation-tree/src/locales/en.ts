@@ -1,4 +1,13 @@
 export default [
+  ['plugin_navigation_tree_delete_confirmation', "You're going to delete the selected objects. Are you sure?"],
+  ['plugin_navigation_tree_delete_confirmation_single', 'You\'re going to delete "{arg:name}" {arg:entity}. Are you sure?'],
+  ['plugin_navigation_tree_delete_location', 'Location'],
+  ['plugin_navigation_tree_delete_unavailable', 'Will not be deleted: deletion is unavailable or not permitted.'],
+  ['plugin_navigation_tree_delete_dependent_unavailable', 'Will not be deleted: a selected child cannot be deleted.'],
+  ['plugin_navigation_tree_delete_incomplete', 'Some objects were not deleted'],
+  ['plugin_navigation_tree_delete_failed', 'Deletion failed; a batch may have partially completed. Refresh the tree before trying again.'],
+  ['plugin_navigation_tree_delete_cancelled', 'Deletion was cancelled.'],
+  ['plugin_navigation_tree_delete_skipped', 'Skipped because a selected child was not deleted.'],
   ['plugin_navigation_tree_explorer_tab_title', 'Explorer'],
   ['app_navigationTree_openNodeTab', 'Open'],
   ['app_navigationTree_search', 'Search elements...'],

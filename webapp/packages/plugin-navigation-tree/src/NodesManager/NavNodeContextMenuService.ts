@@ -5,17 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ConfirmationDialogDelete, RenameDialog } from '@cloudbeaver/core-blocks';
+import { RenameDialog } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
   ENodeFeature,
   EObjectFeature,
   getNodePlainName,
+  getNodesFromContext,
   type INodeActions,
   isConnectionFolder,
   type NavNode,
@@ -23,11 +22,9 @@ import {
   NavNodeManagerService,
   NavTreeResource,
   NavTreeSettingsService,
-  nodeDeleteContext,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, EConnectionFeature, isConnectionNode } from '@cloudbeaver/core-connections';
-import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   ACTION_DELETE,
   ACTION_OPEN,
@@ -43,6 +40,7 @@ import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/Na
 import { MENU_NAVIGATION_TREE_CREATE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_CREATE.js';
 import { MENU_NAVIGATION_TREE_MANAGE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_MANAGE.js';
 import { MENU_NAVIGATION_TREE_TOOLS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_TOOLS.js';
+import { NodeDeletionService } from './NodeDeletion/NodeDeletionService.js';
 
 export interface INodeMenuData {
   node: NavNode;
@@ -56,10 +54,10 @@ export interface INodeMenuData {
   NavTreeResource,
   ActionService,
   MenuService,
-  LocalizationService,
   NavNodeInfoResource,
   NavTreeSettingsService,
   ConnectionInfoResource,
+  NodeDeletionService,
 ])
 export class NavNodeContextMenuService extends Bootstrap {
   constructor(
@@ -69,52 +67,45 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly navTreeResource: NavTreeResource,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly nodeDeletionService: NodeDeletionService,
   ) {
     super();
   }
 
   override register(): void {
-    this.navTreeResource.beforeNodeDelete.addPostHandler(async (data, contexts) => {
-      if (ExecutorInterrupter.isInterrupted(contexts)) {
-        return;
-      }
+    this.actionService.addHandler({
+      id: 'nav-node-selection-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isHidden: (context, action) => {
+        if (action === ACTION_DELETE) {
+          return !this.nodeDeletionService.canDelete(getNodesFromContext(context));
+        }
 
-      const deleteContext = contexts.getContext(nodeDeleteContext);
+        return true;
+      },
+      isDisabled: (context, action) => {
+        if (action === ACTION_DELETE) {
+          return this.nodeDeletionService.isDeleting || !this.nodeDeletionService.canDelete(getNodesFromContext(context));
+        }
 
-      if (deleteContext.confirmed) {
-        return;
-      }
-
-      const nodes = ResourceKeyUtils.mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId)).filter<NavNode>(Boolean as any);
-
-      const name = nodes.map(node => node.name).join(', ');
-      const folder = nodes.some(node => node.folder);
-
-      let message: string = this.localizationService.translate('app_navigationTree_node_delete_confirmation', undefined, { name });
-
-      if (folder) {
-        message = message + '\n' + this.localizationService.translate('app_navigationTree_node_folder_delete_confirmation');
-      }
-
-      const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
-        title: 'ui_data_delete_confirmation',
-        message,
-        confirmActionText: 'ui_delete',
-      });
-
-      if (status === DialogueStateResult.Rejected) {
-        ExecutorInterrupter.interrupt(contexts);
-      }
+        return true;
+      },
+      handler: async (context, action) => {
+        if (action === ACTION_DELETE) {
+          await this.nodeDeletionService.delete(getNodesFromContext(context));
+        }
+      },
     });
 
     this.actionService.addHandler({
       id: 'nav-node-base-manage-menu',
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      actions: [ACTION_RENAME, ACTION_DELETE],
+      actions: [ACTION_RENAME],
       contexts: [DATA_CONTEXT_NAV_NODE],
       isActionApplicable: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -129,10 +120,6 @@ export class NavNodeContextMenuService extends Bootstrap {
         if (NodeManagerUtils.isDatabaseObject(node.uri) || isConnectionFolder(node)) {
           if (action === ACTION_RENAME) {
             return node.features?.includes(ENodeFeature.canRename) ?? false;
-          }
-
-          if (action === ACTION_DELETE) {
-            return node.features?.includes(ENodeFeature.canDelete) ?? false;
           }
         }
 
@@ -172,17 +159,6 @@ export class NavNodeContextMenuService extends Bootstrap {
               if (status === DialogueStateResult.Resolved && result !== undefined) {
                 save(result);
               }
-            }
-            break;
-          }
-          case ACTION_DELETE: {
-            try {
-              await this.navTreeResource.deleteNode(node.uri);
-            } catch (exception: any) {
-              this.notificationService.logException(
-                exception,
-                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name }),
-              );
             }
             break;
           }

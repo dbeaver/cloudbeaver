@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,18 +9,35 @@ import { RenameDialog } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, ENodeFeature } from '@cloudbeaver/core-navigation-tree';
 import { isResourceOfType, ProjectInfoResource, type ProjectInfoResourceType } from '@cloudbeaver/core-projects';
-import { getRmResourceKey, isRMResourceNode, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
+import {
+  getRmResourceKey,
+  isRMProjectNode,
+  isRMResourceNode,
+  NAV_NODE_TYPE_RM_FOLDER,
+  NAV_NODE_TYPE_RM_RESOURCE,
+  ResourceManagerResource,
+} from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
-import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '@cloudbeaver/plugin-navigation-tree';
+import { ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_NAV_NODE_ACTIONS, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId.js';
+import { isResourceTypeRootFolder } from './NavNodes/isResourceTypeRootFolder.js';
 import { NavResourceNodeService } from './NavResourceNodeService.js';
 
-@injectable(() => [ActionService, ProjectInfoResource, CommonDialogService, NotificationService, NavResourceNodeService, LocalizationService])
+@injectable(() => [
+  ActionService,
+  ProjectInfoResource,
+  CommonDialogService,
+  NotificationService,
+  NavResourceNodeService,
+  NodeDeletionService,
+  ResourceManagerResource,
+  ResourceManagerService,
+])
 export class NavTreeRMContextMenuBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
@@ -28,12 +45,42 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly localizationService: LocalizationService,
+    private readonly nodeDeletionService: NodeDeletionService,
+    private readonly resourceManagerResource: ResourceManagerResource,
+    private readonly resourceManagerService: ResourceManagerService,
   ) {
     super();
   }
 
   override register(): void {
+    this.nodeDeletionService.registerProvider({
+      isApplicable: node => [NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType ?? ''),
+      isHidden: node => {
+        if (isRMProjectNode(node)) {
+          return true;
+        }
+        const project = node.projectId ? this.projectInfoResource.get(node.projectId) : undefined;
+        return !!project?.resourceTypes.some(type => {
+          const root = this.resourceManagerService.getRootFolder(project, type.id);
+          return isResourceTypeRootFolder(node, project.id, root);
+        });
+      },
+      isDisabled: node => !node.features?.includes(ENodeFeature.canDelete) || !getResourceKeyFromNodeId(node.uri),
+      getInfo: node => ({
+        type: node.folder ? 'ui_folder' : 'plugin_navigation_tree_rm_delete_resource',
+        warning: node.folder ? 'plugin_navigation_tree_rm_delete_folder_warning' : undefined,
+      }),
+      handler: async nodes => {
+        // TODO: Replace individual resource deletes with a bulk RM API when available.
+        const node = nodes[0]!;
+        const key = getResourceKeyFromNodeId(node.uri);
+        if (!key || !node.features?.includes(ENodeFeature.canDelete)) {
+          return false;
+        }
+        await this.resourceManagerResource.deleteResource(key);
+        return true;
+      },
+    });
     this.actionService.addHandler({
       id: 'nav-node-rm-handler',
       contexts: [DATA_CONTEXT_NAV_NODE],
@@ -46,10 +93,6 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_RENAME) {
           return node.features?.includes(ENodeFeature.canRename) ?? false;
-        }
-
-        if (action === ACTION_DELETE) {
-          return node.features?.includes(ENodeFeature.canDelete) ?? false;
         }
 
         return false;
@@ -110,17 +153,6 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
               if (status === DialogueStateResult.Resolved && result !== undefined) {
                 save(result);
               }
-            }
-            break;
-          }
-          case ACTION_DELETE: {
-            try {
-              await this.navResourceNodeService.delete(resourceKey);
-            } catch (exception: any) {
-              this.notificationService.logException(
-                exception,
-                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name: key.name }),
-              );
             }
             break;
           }

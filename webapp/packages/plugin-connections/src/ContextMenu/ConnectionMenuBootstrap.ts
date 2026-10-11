@@ -14,16 +14,26 @@ import {
   createConnectionParam,
   DATA_CONTEXT_CONNECTION,
   DBDriverResource,
+  EConnectionFeature,
+  isConnectionNode,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import {
+  DATA_CONTEXT_NAV_NODE,
+  ENodeFeature,
+  EObjectFeature,
+  isConnectionFolder,
+  type NavNode,
+  NavTreeResource,
+  NodeManagerUtils,
+} from '@cloudbeaver/core-navigation-tree';
+import { getCachedMapResourceLoaderState, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getUniqueName } from '@cloudbeaver/core-utils';
-import { ACTION_DELETE, ActionService, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService.js';
@@ -35,7 +45,7 @@ import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DI
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
-import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree';
+import { MENU_NAVIGATION_TREE_MANAGE, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
 @injectable(() => [
   NotificationService,
@@ -50,6 +60,8 @@ import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree
   ServerConfigResource,
   LocalizationService,
   CommonDialogService,
+  NodeDeletionService,
+  NavTreeResource,
 ])
 export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
@@ -65,11 +77,58 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly nodeDeletionService: NodeDeletionService,
+    private readonly navTreeResource: NavTreeResource,
   ) {
     super();
   }
 
   override register(): void {
+    this.nodeDeletionService.registerProvider({
+      isApplicable: isConnectionNode,
+      isDisabled: node => {
+        const connection =
+          node.projectId && node.objectId ? this.connectionInfoResource.get(createConnectionParam(node.projectId, node.objectId)) : undefined;
+        return !connection?.canDelete;
+      },
+      getInfo: async node => {
+        if (node.projectId && node.objectId) {
+          await this.connectionInfoResource.load(createConnectionParam(node.projectId, node.objectId));
+        }
+        return { type: 'plugin_connections_delete_connection' };
+      },
+      handler: async nodes => {
+        // TODO: Use a bulk connection-delete API when available; keep per-connection lifecycle guards.
+        const node = nodes[0]!;
+        return await this.connectionsManagerService.deleteConnection(createConnectionParam(node.projectId!, node.objectId!));
+      },
+    });
+    const canDelete = (node: NavNode) => {
+      const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
+      const connection = key ? this.connectionInfoResource.get(key) : undefined;
+      return !!node.features?.includes(ENodeFeature.canDelete) && !connection?.features.includes(EConnectionFeature.restrictMetadataEdit);
+    };
+    this.nodeDeletionService.registerProvider({
+      isApplicable: node => !isConnectionNode(node) && !isConnectionFolder(node) && NodeManagerUtils.isDatabaseObject(node.uri),
+      isDisabled: node => !canDelete(node),
+      getInfo: async node => {
+        const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
+        if (key) {
+          await this.connectionInfoResource.load(key);
+        }
+        return {
+          type: 'plugin_connections_delete_database_object',
+          // Keep backend batches within one project/connection.
+          batchKey: JSON.stringify([node.projectId, key?.connectionId]),
+        };
+      },
+      handler: async nodes => {
+        if (!nodes.every(canDelete)) {
+          return false;
+        }
+        return await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.uri)));
+      },
+    });
     this.addConnectionsMenuToTopAppBar();
 
     this.menuService.addCreator({
@@ -95,7 +154,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'connection-menu-management',
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      actions: [ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_DELETE],
+      actions: [ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
@@ -108,10 +167,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (!connection) {
           return true;
-        }
-
-        if (action === ACTION_DELETE) {
-          return !connection.canDelete;
         }
 
         if (action === ACTION_CONNECTION_EDIT) {
@@ -129,14 +184,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         const connection = await this.connectionInfoResource.load(connectionKey);
 
         switch (action) {
-          case ACTION_DELETE: {
-            try {
-              await this.connectionsManagerService.deleteConnection(createConnectionParam(connection));
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'Failed to delete connection');
-            }
-            break;
-          }
           case ACTION_CONNECTION_EDIT: {
             this.publicConnectionFormService.open(connection.projectId, { connectionId: connection.id });
             break;
