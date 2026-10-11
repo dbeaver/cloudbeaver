@@ -70,9 +70,8 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
         type: node.folder ? 'ui_folder' : 'plugin_navigation_tree_rm_delete_resource',
         warning: node.folder ? 'plugin_navigation_tree_rm_delete_folder_warning' : undefined,
       }),
-      handler: async nodes => {
+      deleteNode: async node => {
         // TODO: Replace individual resource deletes with a bulk RM API when available.
-        const node = nodes[0]!;
         const key = getResourceKeyFromNodeId(node.uri);
         if (!key || !node.features?.includes(ENodeFeature.canDelete)) {
           return false;

@@ -124,7 +124,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           batchKey: JSON.stringify([node.projectId, key?.connectionId]),
         };
       },
-      handler: async nodes => {
+      deleteBatch: async nodes => {
         if (!nodes.every(canDelete)) {
           return false;
         }

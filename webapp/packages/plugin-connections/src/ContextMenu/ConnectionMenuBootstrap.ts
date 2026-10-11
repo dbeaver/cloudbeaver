@@ -97,9 +97,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
         return { type: 'plugin_connections_delete_connection' };
       },
-      handler: async nodes => {
+      deleteNode: async node => {
         // TODO: Use a bulk connection-delete API when available; keep per-connection lifecycle guards.
-        const node = nodes[0]!;
         return await this.connectionsManagerService.deleteConnection(createConnectionParam(node.projectId!, node.objectId!));
       },
     });
@@ -122,7 +121,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           batchKey: JSON.stringify([node.projectId, key?.connectionId]),
         };
       },
-      handler: async nodes => {
+      deleteBatch: async nodes => {
         if (!nodes.every(canDelete)) {
           return false;
         }

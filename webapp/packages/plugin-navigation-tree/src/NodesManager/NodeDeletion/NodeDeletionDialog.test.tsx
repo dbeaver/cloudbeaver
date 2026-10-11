@@ -37,7 +37,7 @@ const ITEM: INodeDeletionItem = {
   provider: {
     isApplicable: () => true,
     getInfo: () => ({ type: 'connection' }),
-    handler: () => Promise.resolve(),
+    deleteNode: () => Promise.resolve(),
   },
 };
 

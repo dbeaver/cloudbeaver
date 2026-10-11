@@ -15,7 +15,15 @@ function provider(): INodeDeletionProvider {
   return {
     isApplicable: () => true,
     getInfo: () => ({ type: 'object' }),
-    handler: vi.fn(() => Promise.resolve(true)),
+    deleteNode: vi.fn(() => Promise.resolve(true)),
+  };
+}
+
+function batchProvider(): INodeDeletionProvider {
+  return {
+    isApplicable: () => true,
+    getInfo: () => ({ type: 'object' }),
+    deleteBatch: vi.fn(() => Promise.resolve(true)),
   };
 }
 
@@ -37,8 +45,8 @@ describe('executeNodeDeletionPlan', () => {
   it('deletes database objects before their connection and connection before its folder, without pruning explicit targets', async () => {
     const calls: string[] = [];
     const owner = provider();
-    owner.handler = vi.fn((nodes: NavNode[]) => {
-      calls.push(...nodes.map(node => node.uri));
+    owner.deleteNode = vi.fn((node: NavNode) => {
+      calls.push(node.uri);
       return Promise.resolve(true);
     });
     const folder = item('folder', owner);
@@ -52,8 +60,8 @@ describe('executeNodeDeletionPlan', () => {
   });
 
   it('batches independent targets only within their provider and batch key', async () => {
-    const navigator = provider();
-    const resources = provider();
+    const navigator = batchProvider();
+    const resources = batchProvider();
     const a = item('a', navigator, [], 'project-a');
     const b = item('b', navigator, [], 'project-a');
     const c = item('c', navigator, [], 'project-b');
@@ -61,26 +69,26 @@ describe('executeNodeDeletionPlan', () => {
 
     await executeNodeDeletionPlan([a, c, d, b]);
 
-    expect(navigator.handler).toHaveBeenNthCalledWith(1, [a.node, b.node]);
-    expect(navigator.handler).toHaveBeenNthCalledWith(2, [c.node]);
-    expect(resources.handler).toHaveBeenCalledWith([d.node]);
+    expect(navigator.deleteBatch).toHaveBeenNthCalledWith(1, [a.node, b.node]);
+    expect(navigator.deleteBatch).toHaveBeenNthCalledWith(2, [c.node]);
+    expect(resources.deleteBatch).toHaveBeenCalledWith([d.node]);
   });
 
   it('does not put an ancestor and descendant in the same backend batch', async () => {
-    const owner = provider();
+    const owner = batchProvider();
     const folder = item('folder', owner, [], 'project');
     const child = item('child', owner, ['folder'], 'project');
 
     await executeNodeDeletionPlan([folder, child]);
 
-    expect(owner.handler).toHaveBeenNthCalledWith(1, [child.node]);
-    expect(owner.handler).toHaveBeenNthCalledWith(2, [folder.node]);
+    expect(owner.deleteBatch).toHaveBeenNthCalledWith(1, [child.node]);
+    expect(owner.deleteBatch).toHaveBeenNthCalledWith(2, [folder.node]);
   });
 
   it.each(['failed', 'cancelled'] as const)('continues independent work but skips ancestors after a child is %s', async status => {
     const owner = provider();
-    owner.handler = vi.fn((nodes: NavNode[]) => {
-      if (nodes[0]?.uri === 'child') {
+    owner.deleteNode = vi.fn((node: NavNode) => {
+      if (node.uri === 'child') {
         return status === 'failed' ? Promise.reject(new Error('Cannot delete')) : Promise.resolve(false);
       }
       return Promise.resolve(true);
@@ -96,47 +104,81 @@ describe('executeNodeDeletionPlan', () => {
       ['independent', 'deleted'],
       ['parent', 'skipped'],
     ]);
-    expect(owner.handler).toHaveBeenCalledTimes(2);
+    expect(owner.deleteNode).toHaveBeenCalledTimes(2);
   });
 
   it('skips unavailable targets and their ancestors without preventing independent batches', async () => {
-    const owner = provider();
+    const owner = batchProvider();
     const parent = item('parent', owner, [], 'batch');
     const child = { ...item('child', owner, ['parent']), reason: 'no-permission' };
     const independent = item('independent', owner, [], 'batch');
 
     const results = await executeNodeDeletionPlan([parent, child, independent]);
 
-    expect(owner.handler).toHaveBeenCalledExactlyOnceWith([independent.node]);
+    expect(owner.deleteBatch).toHaveBeenCalledExactlyOnceWith([independent.node]);
     expect(results.find(result => result.item === parent)?.status).toBe('skipped');
   });
 
-  it('falls back to sequential single-target operations when the provider has no batch API', async () => {
+  it('executes the single-node strategy sequentially even when batch keys match', async () => {
     const owner = provider();
     let running = false;
-    owner.handler = vi.fn(async (nodes: NavNode[]) => {
+    owner.deleteNode = vi.fn(async (node: NavNode) => {
       expect(running).toBe(false);
-      expect(nodes).toHaveLength(1);
+      expect(node.uri).toMatch(/^[ab]$/);
       running = true;
       await Promise.resolve();
       running = false;
     });
 
-    await executeNodeDeletionPlan([item('a', owner), item('b', owner)]);
+    const a = item('a', owner, [], 'same-key');
+    const b = item('b', owner, [], 'same-key');
+    await executeNodeDeletionPlan([a, b]);
 
-    expect(owner.handler).toHaveBeenCalledTimes(2);
+    expect(owner.deleteNode).toHaveBeenCalledTimes(2);
+    expect(owner.deleteNode).toHaveBeenNthCalledWith(1, a.node);
+    expect(owner.deleteNode).toHaveBeenNthCalledWith(2, b.node);
   });
 
   it('never retries a failed batch and does not delete its selected parents', async () => {
-    const owner = provider();
-    owner.handler = vi.fn(() => Promise.reject(new Error('Partial batch failure')));
+    const owner = batchProvider();
+    owner.deleteBatch = vi.fn(() => Promise.reject(new Error('Partial batch failure')));
     const a = item('a', owner, ['parent'], 'batch');
     const b = item('b', owner, ['parent'], 'batch');
     const parent = item('parent', owner, [], 'batch');
 
     const results = await executeNodeDeletionPlan([parent, a, b]);
 
-    expect(owner.handler).toHaveBeenCalledExactlyOnceWith([a.node, b.node]);
+    expect(owner.deleteBatch).toHaveBeenCalledExactlyOnceWith([a.node, b.node]);
     expect(results.map(result => result.status)).toEqual(['failed', 'failed', 'skipped']);
+  });
+
+  it('batches independent nodes without requiring an explicit batch key', async () => {
+    const owner = batchProvider();
+    const a = item('a', owner);
+    const b = item('b', owner);
+
+    const results = await executeNodeDeletionPlan([a, b]);
+
+    expect(owner.deleteBatch).toHaveBeenCalledExactlyOnceWith([a.node, b.node]);
+    expect(results.map(result => result.status)).toEqual(['deleted', 'deleted']);
+  });
+
+  it('preserves dependencies between single-node and batch providers', async () => {
+    const atomic = provider();
+    const bulk = batchProvider();
+    atomic.deleteNode = vi.fn().mockResolvedValue(false);
+    const parent = item('parent', bulk);
+    const child = item('child', atomic, ['parent']);
+    const independent = item('independent', bulk);
+
+    const results = await executeNodeDeletionPlan([parent, child, independent]);
+
+    expect(atomic.deleteNode).toHaveBeenCalledExactlyOnceWith(child.node);
+    expect(bulk.deleteBatch).toHaveBeenCalledExactlyOnceWith([independent.node]);
+    expect(results.map(result => [result.item.node.uri, result.status])).toEqual([
+      ['child', 'cancelled'],
+      ['independent', 'deleted'],
+      ['parent', 'skipped'],
+    ]);
   });
 });

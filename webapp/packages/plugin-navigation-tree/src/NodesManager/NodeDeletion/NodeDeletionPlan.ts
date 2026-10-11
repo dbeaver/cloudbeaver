@@ -14,19 +14,31 @@ export interface INodeDeletionTarget {
   warning?: string;
   /** Technical root node omitted from the displayed location. */
   locationRoot?: string;
-  /** Only targets with the same batch key and no dependencies are passed together. */
+  /** Partitions batch deletion; only independent targets with the same key are passed together. */
   batchKey?: string;
 }
 
-export interface INodeDeletionProvider {
+interface INodeDeletionProviderBase {
   isApplicable: (node: NavNode) => boolean;
   /** Exclude the node from confirmation and deletion, including mixed selections. */
   isHidden?: (node: NavNode) => boolean;
   isDisabled?: (node: NavNode) => boolean;
   getInfo: (node: NavNode) => Promise<INodeDeletionTarget> | INodeDeletionTarget;
-  /** Return false when lifecycle guards cancel deletion. Throw on failure. */
-  handler: (nodes: NavNode[]) => Promise<boolean | void>;
 }
+
+/** Supply exactly one strategy. Return false on cancellation; throw on failure. */
+export type INodeDeletionProvider = INodeDeletionProviderBase &
+  (
+    | {
+        /** @deprecated Use deleteBatch when a bulk deletion API is available. */
+        deleteNode: (node: NavNode) => Promise<boolean | void>;
+        deleteBatch?: never;
+      }
+    | {
+        deleteNode?: never;
+        deleteBatch: (nodes: NavNode[]) => Promise<boolean | void>;
+      }
+  );
 
 export interface INodeDeletionItem extends INodeDeletionTarget {
   node: NavNode;
@@ -64,9 +76,8 @@ export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[
 
     while (ready.length) {
       const first = ready[0]!;
-      const group = ready.filter(
-        item => item === first || (first.batchKey !== undefined && item.batchKey === first.batchKey && item.provider === first.provider),
-      );
+      const provider = first.provider!;
+      const group = provider.deleteBatch ? ready.filter(item => item.batchKey === first.batchKey && item.provider === provider) : [first];
       const executable: INodeDeletionItem[] = [];
       const blockedAncestors = new Set(results.filter(result => result.status !== 'deleted').flatMap(result => result.item.ancestors));
 
@@ -86,7 +97,9 @@ export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[
       }
 
       try {
-        const deleted = await first.provider!.handler(executable.map(item => item.node));
+        const deleted = provider.deleteBatch
+          ? await provider.deleteBatch(executable.map(item => item.node))
+          : await provider.deleteNode(executable[0]!.node);
         results.push(...executable.map(item => ({ item, status: deleted === false ? ('cancelled' as const) : ('deleted' as const) })));
       } catch (error) {
         // A failed backend batch may have partially completed; do not retry destructive requests.
