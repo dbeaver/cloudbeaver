@@ -20,14 +20,24 @@ import {
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { DataGrid, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
-import type { INodeDeletionItem } from './NodeDeletionPlan.js';
+export interface INodeDeletionDialogItem {
+  id: string;
+  name: string;
+  icon?: string;
+  type: string;
+  project: string;
+  location: string;
+  warning?: string;
+  reason?: string;
+}
 
 const COLUMNS = [
-  { label: 'ui_name', width: '40%' },
-  { label: 'plugin_navigation_tree_delete_location', width: '60%' },
+  { label: 'ui_name', width: '25%' },
+  { label: 'plugin_navigation_tree_delete_location', width: '30%' },
+  { label: 'plugin_navigation_tree_delete_status', width: '45%' },
 ];
 
-export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionItem[] }, void> = observer(function NodeDeletionDialog({
+export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogItem[] }, void> = observer(function NodeDeletionDialog({
   payload,
   resolveDialog,
   rejectDialog,
@@ -36,28 +46,52 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionItem[] },
   const cellCopy = useCellCopy();
   const rows = payload.items;
   const singleItem = rows.length === 1 ? rows[0] : undefined;
-  const count = rows.length;
+  const count = rows.filter(item => !item.reason).length;
   const columnCount = useCreateGridReactiveValue(() => COLUMNS.length, null, []);
   const rowCount = useCreateGridReactiveValue(() => rows.length, null, [rows]);
   const headerText = useCreateGridReactiveValue(colIdx => translate(COLUMNS[colIdx]?.label) ?? '', null, [translate]);
   const cell = useCreateGridReactiveValue(getCell, null, [rows, translate]);
-  const warnings = [...new Set(rows.map(item => item.warning).filter(Boolean))];
+  const warnings = [
+    ...new Set(
+      rows
+        .filter(item => !item.reason)
+        .map(item => item.warning)
+        .filter(Boolean),
+    ),
+  ];
+  const messages = warnings.map(warning => ({ key: warning, content: <>{translate(warning)}</> }));
+  if (count !== rows.length) {
+    messages.unshift({
+      key: 'selection-summary',
+      content: (
+        <>
+          <strong>{translate('plugin_navigation_tree_delete_selection_count', undefined, { count, total: rows.length })}</strong>{' '}
+          {translate('plugin_navigation_tree_delete_selection_summary')}
+        </>
+      ),
+    });
+  }
 
   function getCell(rowIdx: number, colIdx: number) {
     const item = rows[rowIdx];
     if (!item) {
       return null;
     }
+    const opacity = item.reason ? 'tw:opacity-40' : '';
     if (colIdx === 0) {
       return (
-        <span title={item.node.name} className="tw:flex tw:items-center tw:gap-2">
-          {item.node.icon && <StaticImage icon={item.node.icon} title={translate(item.type)} className="tw:size-4 tw:shrink-0" />}
-          <span>{item.node.name}</span>
+        <span title={item.name} className={`tw:flex tw:items-center tw:gap-2 ${opacity}`}>
+          {item.icon && <StaticImage icon={item.icon} title={translate(item.type)} className="tw:size-4 tw:shrink-0" />}
+          <span>{item.name}</span>
         </span>
       );
     }
-    const value = item.location || '—';
-    return <span title={value}>{value}</span>;
+    const value = colIdx === 2 ? translate(item.reason || 'ui_delete') : item.location || '—';
+    return (
+      <span title={value} className={opacity}>
+        {value}
+      </span>
+    );
   }
 
   return (
@@ -67,14 +101,20 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionItem[] },
         <p className="tw:break-all">
           {singleItem
             ? translate('plugin_navigation_tree_delete_confirmation_single', undefined, {
-                name: singleItem.node.name,
+                name: singleItem.name,
                 entity: translate(singleItem.type).toLowerCase(),
               })
             : translate('plugin_navigation_tree_delete_confirmation')}
         </p>
-        {warnings.map(warning => (
-          <p key={warning}>{translate(warning)}</p>
-        ))}
+        <br />
+        {messages.length > 1 && (
+          <ul className="tw:list-disc tw:pl-5 tw:space-y-2">
+            {messages.map(message => (
+              <li key={message.key}>{message.content}</li>
+            ))}
+          </ul>
+        )}
+        {messages.length === 1 && <p>{messages[0]!.content}</p>}
         {!singleItem && (
           <div role="region" aria-label={translate('ui_data_delete_confirmation')} className="tw:w-full tw:mt-4">
             <DataGrid

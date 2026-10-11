@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 
-import { executeNodeDeletionPlan, type INodeDeletionItem, type INodeDeletionProvider } from './NodeDeletionPlan.js';
+import { executeNodeDeletionPlan, prepareNodeDeletionPlan, type INodeDeletionItem, type INodeDeletionProvider } from './NodeDeletionPlan.js';
 
 type NavNode = INodeDeletionItem['node'];
 
@@ -38,7 +38,7 @@ function item(uri: string, owner: INodeDeletionProvider, ancestors: string[] = [
     filtered: false,
     objectFeatures: [],
   };
-  return { node, provider: owner, ancestors, batchKey, type: 'object', project: 'project', location: '' };
+  return { node, provider: owner, ancestors, batchKey };
 }
 
 describe('executeNodeDeletionPlan', () => {
@@ -110,13 +110,14 @@ describe('executeNodeDeletionPlan', () => {
   it('skips unavailable targets and their ancestors without preventing independent batches', async () => {
     const owner = batchProvider();
     const parent = item('parent', owner, [], 'batch');
-    const child = { ...item('child', owner, ['parent']), reason: 'no-permission' };
+    const child = { node: item('child', owner).node, ancestors: ['parent'], reason: 'no-permission' };
     const independent = item('independent', owner, [], 'batch');
 
-    const results = await executeNodeDeletionPlan([parent, child, independent]);
+    const plan = prepareNodeDeletionPlan([parent, independent], [child]);
+    await executeNodeDeletionPlan(plan.items);
 
     expect(owner.deleteBatch).toHaveBeenCalledExactlyOnceWith([independent.node]);
-    expect(results.find(result => result.item === parent)?.status).toBe('skipped');
+    expect(plan.exclusions).toEqual([child, { node: parent.node, ancestors: [], reason: 'plugin_navigation_tree_delete_dependent_unavailable' }]);
   });
 
   it('executes the single-node strategy sequentially even when batch keys match', async () => {
@@ -149,7 +150,9 @@ describe('executeNodeDeletionPlan', () => {
     const results = await executeNodeDeletionPlan([parent, a, b]);
 
     expect(owner.deleteBatch).toHaveBeenCalledExactlyOnceWith([a.node, b.node]);
-    expect(results.map(result => result.status)).toEqual(['failed', 'failed', 'skipped']);
+    expect(results.map(result => result.status)).toEqual(['unknown', 'unknown', 'skipped']);
+    expect(results[0]?.batch).toEqual([a, b]);
+    expect(results[1]?.batch).toBe(results[0]?.batch);
   });
 
   it('batches independent nodes without requiring an explicit batch key', async () => {

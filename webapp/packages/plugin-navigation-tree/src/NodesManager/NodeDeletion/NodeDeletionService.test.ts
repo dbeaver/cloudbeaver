@@ -12,6 +12,7 @@ import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 
 import type { INodeDeletionItem, INodeDeletionProvider } from './NodeDeletionPlan.js';
+import type { INodeDeletionDialogItem } from './NodeDeletionDialog.js';
 import { NodeDeletionService } from './NodeDeletionService.js';
 
 type Dependencies = ConstructorParameters<typeof NodeDeletionService>;
@@ -125,14 +126,15 @@ describe('NodeDeletionService', () => {
     }
   });
 
-  it('excludes projects entirely and deduplicates selected nodes by URI', async () => {
+  it('explains excluded projects and deduplicates selected nodes by URI', async () => {
     const { service, owner, dialogs } = setup();
     const connection = node('connection');
 
     await service.delete([node('project', 'project'), connection, { ...connection }, node('rm-project', 'rm.project')]);
 
-    const items: INodeDeletionItem[] = dialogs.open.mock.calls[0]![1].items;
-    expect(items.map(item => item.node.uri)).toEqual(['connection']);
+    const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
+    expect(items.map(item => item.id)).toEqual(['project', 'connection', 'rm-project']);
+    expect(items.filter(item => item.reason).map(item => item.id)).toEqual(['project', 'rm-project']);
     expect(items[0]?.project).toBe('Project');
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(connection);
   });
@@ -148,25 +150,32 @@ describe('NodeDeletionService', () => {
     expect(owner.deleteNode).not.toHaveBeenCalled();
   });
 
-  it('omits unavailable nodes from confirmation and deletion', async () => {
+  it('explains unavailable nodes in confirmation without deleting them', async () => {
     const { service, owner, dialogs } = setup();
     const connection = node('connection');
     await service.delete([node('readonly'), connection]);
 
-    const items: INodeDeletionItem[] = dialogs.open.mock.calls[0]![1].items;
-    expect(items.map(item => item.node.uri)).toEqual(['connection']);
+    const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
+    expect(items.map(item => [item.id, item.reason])).toEqual([
+      ['readonly', 'plugin_navigation_tree_delete_unavailable'],
+      ['connection', undefined],
+    ]);
     expect(owner.getInfo).toHaveBeenCalledExactlyOnceWith(connection);
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(connection);
   });
 
-  it('omits unsupported and hidden nodes from confirmation and deletion', async () => {
+  it('explains unsupported and hidden nodes without deleting them', async () => {
     const { service, owner, dialogs } = setup();
     const connection = node('connection');
 
     await service.delete([node('unsupported', 'root'), node('resource-root', 'rm.folder'), connection]);
 
-    const items: INodeDeletionItem[] = dialogs.open.mock.calls[0]![1].items;
-    expect(items.map(item => item.node.uri)).toEqual(['connection']);
+    const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
+    expect(items.map(item => [item.id, !!item.reason])).toEqual([
+      ['unsupported', true],
+      ['resource-root', true],
+      ['connection', false],
+    ]);
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(connection);
   });
 
@@ -181,7 +190,7 @@ describe('NodeDeletionService', () => {
     expect(owner.deleteNode).not.toHaveBeenCalled();
   });
 
-  it('excludes targets rejected during preparation and their dependent parents', async () => {
+  it('explains targets rejected during preparation and their dependent parents', async () => {
     const { service, owner, dialogs, nodes } = setup();
     owner.getInfo = target => ({ type: 'connection', reason: target.uri === 'child' ? 'unavailable' : undefined });
     nodes.resolveParents.mockImplementation((uri: string) => Promise.resolve(uri === 'child' ? ['parent'] : []));
@@ -189,20 +198,25 @@ describe('NodeDeletionService', () => {
 
     await service.delete([node('parent'), node('child'), independent]);
 
-    const items: INodeDeletionItem[] = dialogs.open.mock.calls[0]![1].items;
-    expect(items.map(item => item.node.uri)).toEqual(['independent']);
+    const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
+    expect(items.map(item => [item.id, item.reason])).toEqual([
+      ['parent', 'plugin_navigation_tree_delete_dependent_unavailable'],
+      ['child', 'unavailable'],
+      ['independent', undefined],
+    ]);
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(independent);
   });
 
   it('does not delete a selected parent after excluding a non-deletable child', async () => {
     const { service, owner, dialogs, nodes } = setup();
-    nodes.getParents.mockImplementation((uri: string) => (uri === 'readonly' ? ['parent'] : []));
+    nodes.resolveParents.mockImplementation((uri: string) => Promise.resolve(uri === 'readonly' ? ['parent'] : []));
     const independent = node('independent');
 
     await service.delete([node('parent'), node('readonly'), independent]);
 
-    const items: INodeDeletionItem[] = dialogs.open.mock.calls[0]![1].items;
-    expect(items.map(item => item.node.uri)).toEqual(['independent']);
+    const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
+    expect(items.filter(item => !item.reason).map(item => item.id)).toEqual(['independent']);
+    expect(items.find(item => item.id === 'parent')?.reason).toBe('plugin_navigation_tree_delete_dependent_unavailable');
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(independent);
   });
 
@@ -219,9 +233,10 @@ describe('NodeDeletionService', () => {
 
     await service.delete([node('connection')]);
 
-    const items: INodeDeletionItem[] = dialogs.open.mock.calls[0]![1].items;
+    const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
     expect(items[0]?.location).toBe(`Project/${folderName}`);
-    expect(items[0]?.ancestors).toEqual(ancestors);
+    expect(items[0]).not.toHaveProperty('provider');
+    expect(items[0]).not.toHaveProperty('ancestors');
   });
 
   it('omits the provider technical root without removing equally named folders', async () => {
@@ -239,14 +254,15 @@ describe('NodeDeletionService', () => {
 
     await service.delete([node('connection')]);
 
-    const items: INodeDeletionItem[] = dialogs.open.mock.calls[0]![1].items;
+    const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
     expect(items[0]?.location).toBe('Storage/internal');
-    expect(items[0]?.ancestors).toEqual(ancestors);
   });
 
-  it('honors hidden nodes even when another provider could delete them', async () => {
+  it('uses the same first matching provider for availability and execution', async () => {
     const { service, owner, dialogs } = setup();
-    service.registerProvider({ ...owner, isHidden: () => true });
+    owner.isDisabled = () => true;
+    const alternative = { ...owner, isDisabled: () => false, deleteNode: vi.fn() };
+    service.registerProvider(alternative);
     const selected = [node('connection')];
 
     expect(service.canDelete(selected)).toBe(false);
@@ -254,6 +270,25 @@ describe('NodeDeletionService', () => {
 
     expect(dialogs.open).not.toHaveBeenCalled();
     expect(owner.deleteNode).not.toHaveBeenCalled();
+    expect(alternative.deleteNode).not.toHaveBeenCalled();
+  });
+
+  it('does not let another provider hide nodes it does not own', async () => {
+    const { service, owner } = setup();
+    service.registerProvider({ ...owner, isApplicable: () => false, isHidden: () => true });
+    const selected = node('connection');
+    expect(service.canDelete([selected])).toBe(true);
+    await service.delete([selected]);
+    expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(selected);
+  });
+
+  it('keeps the owning provider hidden even if a later provider accepts the node', async () => {
+    const { service, owner, dialogs } = setup();
+    owner.isHidden = () => true;
+    service.registerProvider({ ...owner, isHidden: () => false });
+    expect(service.canDelete([node('connection')])).toBe(false);
+    await service.delete([node('connection')]);
+    expect(dialogs.open).not.toHaveBeenCalled();
   });
 
   it('rechecks eligibility after loading the deletion description', async () => {
@@ -314,5 +349,22 @@ describe('NodeDeletionService', () => {
       message: 'Project / a: Denied',
     });
     expect(service.isDeleting).toBe(false);
+  });
+
+  it('reports an uncertain batch once, without attributing its error to individual nodes', async () => {
+    const { service, owner, notifications } = setup();
+    const deleteBatch = vi.fn().mockRejectedValue(new Error('Second node failed'));
+    service.registerProvider({
+      isApplicable: target => target.nodeType === 'database',
+      getInfo: () => ({ type: 'object' }),
+      deleteBatch,
+    });
+    await service.delete([node('a', 'database'), node('b', 'database'), node('independent')]);
+    expect(deleteBatch).toHaveBeenCalledTimes(1);
+    expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(node('independent'));
+    expect(notifications.logError).toHaveBeenCalledExactlyOnceWith({
+      title: 'plugin_navigation_tree_delete_incomplete',
+      message: 'Project / a, Project / b: plugin_navigation_tree_delete_unknown\nSecond node failed',
+    });
   });
 });
