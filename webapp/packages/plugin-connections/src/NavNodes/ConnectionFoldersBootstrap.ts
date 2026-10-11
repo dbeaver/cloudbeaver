@@ -191,7 +191,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         );
 
         if (
-          ![isConnectionFolder, isProjectNode].some(check => check(node)) ||
+          ![isConnectionNode, isConnectionFolder, isProjectNode].some(check => check(node)) ||
           !this.userInfoResource.isAuthenticated() ||
           tree.baseRoot !== ROOT_NODE_PATH ||
           targetNode === undefined
