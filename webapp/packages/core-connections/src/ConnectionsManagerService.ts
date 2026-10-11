@@ -13,7 +13,6 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
 import { type ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
-import { resourceKeyList, ResourceKeyUtils, type ResourceKeySimple } from '@cloudbeaver/core-resource';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
@@ -105,40 +104,35 @@ export class ConnectionsManagerService {
     return undefined;
   }
 
-  async deleteConnections(key: ResourceKeySimple<IConnectionInfoParams>, confirmed = false): Promise<void> {
-    const keys = ResourceKeyUtils.toArray(key);
-    const connections = await this.connectionInfoResource.load(resourceKeyList(keys));
+  async deleteConnection(key: IConnectionInfoParams): Promise<void> {
+    const connection = await this.connectionInfoResource.load(key);
 
-    if (!connections.length || connections.some(connection => !connection.canDelete)) {
+    if (!connection.canDelete) {
       return;
     }
 
-    if (!confirmed) {
-      const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
-        title: 'ui_data_delete_confirmation',
-        message: `You're going to delete "${connections.map(connection => connection.name).join(', ')}" connection. Are you sure?`,
-        confirmActionText: 'ui_delete',
-      });
-      if (status !== DialogueStateResult.Resolved) {
-        return;
-      }
+    const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
+      title: 'ui_data_delete_confirmation',
+      message: `You're going to delete "${connection.name}" connection. Are you sure?`,
+      confirmActionText: 'ui_delete',
+    });
+    if (status === DialogueStateResult.Rejected) {
+      return;
     }
 
-    for (const connection of keys) {
-      const contexts = await this.onDelete.execute({
-        connections: [connection],
-        state: 'before',
-      });
+    const contexts = await this.onDelete.execute({
+      connections: [key],
+      state: 'before',
+    });
 
-      if (ExecutorInterrupter.isInterrupted(contexts)) {
-        return;
-      }
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
     }
 
-    await this.connectionInfoResource.deleteConnections(key);
+    await this.connectionInfoResource.deleteConnection(key);
 
     this.onDelete.execute({
-      connections: keys,
+      connections: [key],
       state: 'after',
     });
   }

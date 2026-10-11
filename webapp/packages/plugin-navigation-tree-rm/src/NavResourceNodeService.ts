@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2026 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,23 +28,18 @@ export class NavResourceNodeService {
     return getResourceNodeId(newKey);
   }
 
-  async deleteResources(key: string | string[]) {
-    const keys = typeof key === 'string' ? [key] : key;
+  async delete(key: string) {
     const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
       title: 'ui_data_delete_confirmation',
-      message: this.localizationService.translate('plugin_navigation_tree_rm_delete_confirmation_message', undefined, {
-        name: keys.map(key => getPathName(key)).join(', '),
-      }),
+      message: this.localizationService.translate('plugin_navigation_tree_rm_delete_confirmation_message', undefined, { name: getPathName(key) }),
       confirmActionText: 'ui_delete',
     });
 
-    if (status !== DialogueStateResult.Resolved) {
+    if (status === DialogueStateResult.Rejected) {
       return;
     }
 
-    for (const key of keys) {
-      await this.resourceManagerResource.deleteResource(key);
-    }
+    await this.resourceManagerResource.deleteResource(key);
   }
 
   async read(key: string): Promise<string> {
