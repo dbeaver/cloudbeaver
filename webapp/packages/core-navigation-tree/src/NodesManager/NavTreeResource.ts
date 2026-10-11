@@ -37,7 +37,6 @@ import { isDefined } from '@dbeaver/js-helpers';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService.js';
 import type { NavNode } from './EntityTypes.js';
-import { isConnectionFolder } from './isConnectionFolder.js';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource.js';
 
 // TODO: so much dirty
@@ -344,9 +343,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   moveToNode(key: ResourceKeyList<string>, target: string): void;
   moveToNode(keyObject: ResourceKeySimple<string>, target: string): void;
   moveToNode(keyObject: ResourceKeySimple<string>, target: string): void {
-    const folders = ResourceKeyUtils.filter(keyObject, key => isConnectionFolder(this.navNodeInfoResource.get(key)));
-    const movedNodes = resourceKeyList<string>([]);
-
     ResourceKeyUtils.forEach(keyObject, key => {
       const parentId = this.navNodeInfoResource.getParent(key);
 
@@ -359,20 +355,12 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         }
       }
 
-      if (folders.includes(key)) {
-        this.delete(key);
-        this.navNodeInfoResource.delete(key);
-      } else {
-        this.navNodeInfoResource.setParent(key, target);
-        movedNodes.push(key);
-      }
+      this.navNodeInfoResource.setParent(key, target);
     });
 
-    if (movedNodes.length > 0) {
-      this.pushToNode(target, movedNodes);
-      this.markUpdated(ResourceKeyUtils.join(target, movedNodes));
-      this.onItemUpdate.execute(movedNodes);
-    }
+    this.pushToNode(target, ResourceKeyUtils.toArray(keyObject));
+    this.markUpdated(ResourceKeyUtils.join(target, keyObject));
+    this.onItemUpdate.execute(keyObject);
   }
 
   deleteInNode(key: string, value: string[]): void;
