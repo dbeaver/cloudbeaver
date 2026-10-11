@@ -9,7 +9,8 @@ import { reaction } from 'mobx';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 import type { INodeDeletionItem, INodeDeletionProvider } from './NodeDeletionPlan.js';
 import type { INodeDeletionDialogItem } from './NodeDeletionDialog.js';
@@ -57,6 +58,91 @@ function setup(status = DialogueStateResult.Resolved) {
 }
 
 describe('NodeDeletionService', () => {
+  it('deletes a mixed multi-project selection of nested folders and connections without reloading deleted paths', async () => {
+    const { service, owner, notifications, nodes } = setup();
+    const projectA = { ...node('node://project-a', 'project'), projectId: 'project-a', parentId: ROOT_NODE_PATH };
+    const projectB = { ...node('node://project-b', 'project'), projectId: 'project-b', parentId: ROOT_NODE_PATH };
+    const folder = (uri: string, parentId: string) => ({ ...node(uri, 'folder'), folder: true, parentId, projectId: projectA.projectId });
+    const parent = folder(`${projectA.uri}/datasources/Regression`, projectA.uri);
+    const child = folder(`${parent.uri}/New folder`, parent.uri);
+    const nested = folder(`${child.uri}/New folder`, child.uri);
+    const sibling = folder(`${parent.uri}/Other folder`, parent.uri);
+    const connection = { ...node(`${nested.uri}/connection`), projectId: projectA.projectId, parentId: nested.uri };
+    const otherConnection = { ...node(`${projectB.uri}/datasources/connection`), projectId: projectB.projectId, parentId: projectB.uri };
+    const selection = [projectA, parent, child, nested, connection, sibling, projectB, otherConnection];
+    const cachedNodes = new Map(selection.map(target => [target.uri, target]));
+    const serverNodes = new Set(cachedNodes.keys());
+    const children = new Map<string, string[]>();
+    for (const target of selection) {
+      const siblings = children.get(target.parentId) ?? [];
+      siblings.push(target.uri);
+      children.set(target.parentId, siblings);
+    }
+    nodes.get.mockImplementation((uri: string) => cachedNodes.get(uri));
+    nodes.resolveParents.mockImplementation((uri: string) => {
+      const ancestors: string[] = [];
+      let parentId = cachedNodes.get(uri)?.parentId;
+      while (parentId !== undefined) {
+        ancestors.unshift(parentId);
+        parentId = cachedNodes.get(parentId)?.parentId;
+      }
+      return Promise.resolve(ancestors);
+    });
+
+    const reloadVisibleChildren = () => {
+      for (const paths of children.values()) {
+        for (const path of paths) {
+          if (!serverNodes.has(path)) {
+            throw new Error(`Node '${path}' not found`);
+          }
+        }
+      }
+    };
+    const navDeleteNodes = vi.fn(({ nodePaths }: { nodePaths: string[] }) => {
+      for (const path of nodePaths) {
+        if (!serverNodes.has(path)) {
+          throw new Error(`Node '${path}' not found`);
+        }
+        expect([...serverNodes].some(candidate => candidate.startsWith(`${path}/`))).toBe(false);
+        serverNodes.delete(path);
+      }
+      return Promise.resolve({ navDeleteNodes: nodePaths.length });
+    });
+    const tree: NavTreeResource = Object.assign(Object.create(NavTreeResource.prototype), {
+      graphQLService: { sdk: { navDeleteNodes } },
+      navNodeInfoResource: nodes,
+      performUpdate: (_key: unknown, _includes: unknown, update: () => Promise<void>) => update(),
+      data: children,
+      dataSet: (uri: string, paths: string[]) => children.set(uri, paths),
+      delete: (paths: string[]) =>
+        paths.forEach(path => {
+          children.delete(path);
+          cachedNodes.delete(path);
+        }),
+      markOutdated: reloadVisibleChildren,
+      onDataOutdated: { execute: reloadVisibleChildren },
+      onItemUpdate: { execute: vi.fn() },
+    });
+    owner.deleteNode = vi.fn((target: INodeDeletionItem['node']) => {
+      serverNodes.delete(target.uri);
+      tree.deleteInNode(target.parentId!, [target.uri]);
+      return Promise.resolve(true);
+    });
+    service.registerProvider({
+      isApplicable: target => target.nodeType === 'folder',
+      getInfo: target => ({ type: 'folder', batchKey: target.projectId }),
+      deleteBatch: targets => tree.deleteNode(resourceKeyList(targets.map(target => target.uri))),
+    });
+
+    await service.delete(selection);
+
+    expect(notifications.logException).not.toHaveBeenCalled();
+    expect(notifications.logError).not.toHaveBeenCalled();
+    expect(owner.deleteNode).toHaveBeenCalledTimes(2);
+    expect([...serverNodes]).toEqual([projectA.uri, projectB.uri]);
+    expect(reloadVisibleChildren).not.toThrow();
+  });
+
   it.each([
     ['project', 'project'],
     ['rm-project', 'rm.project'],

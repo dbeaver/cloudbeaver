@@ -32,10 +32,41 @@ function setup() {
     onDataOutdated: { execute: vi.fn() },
     onItemUpdate: { execute: vi.fn() },
   });
-  return { resource, navDeleteNodes, deleted, markOutdated, data };
+  return { resource, navDeleteNodes, deleted, markOutdated, data, nodes };
 }
 
 describe('NavTreeResource deletion', () => {
+  it.each([false, true])('does not leave a deleted nested folder in its parent (with sibling: %s)', async withSibling => {
+    const { resource, navDeleteNodes, deleted, markOutdated, data, nodes } = setup();
+    const parent = 'node://project/datasources/Regression/New folder';
+    const child = `${parent}/New folder`;
+    const sibling = `${parent}/Other folder`;
+    const remaining = withSibling ? [sibling] : [];
+    const serverNodes = new Set([child, ...remaining]);
+    nodes.set(child, { parentId: parent });
+    data.set(parent, [child, ...remaining]);
+    navDeleteNodes.mockImplementation(({ nodePaths }: { nodePaths: string[] }) => {
+      nodePaths.forEach(path => serverNodes.delete(path));
+      return Promise.resolve({ navDeleteNodes: nodePaths.length });
+    });
+
+    const reloadVisibleChildren = () => {
+      for (const path of data.get(parent) ?? []) {
+        if (!serverNodes.has(path)) {
+          throw new Error(`Node '${path}' not found`);
+        }
+      }
+    };
+    // Parent invalidation can synchronously notify consumers that use its cached children.
+    markOutdated.mockImplementation(reloadVisibleChildren);
+
+    await expect(resource.deleteNode(child)).resolves.toBeUndefined();
+
+    expect(reloadVisibleChildren).not.toThrow();
+    expect(data.get(parent)).toEqual(remaining);
+    expect(deleted).toEqual([child]);
+  });
+
   it('sends one batch and removes the deleted nodes from the cache', async () => {
     const { resource, navDeleteNodes, deleted } = setup();
 

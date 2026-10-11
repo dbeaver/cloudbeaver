@@ -222,8 +222,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       } finally {
         // The backend may have partially applied a failed batch. Reload all affected parents.
         const parents = nodePaths.map(path => this.navNodeInfoResource.get(path)?.parentId).filter(isDefined);
-        this.markOutdated(resourceKeyList(parents));
-        this.onDataOutdated.execute(key);
         runInAction(() => {
           const deletedNodes: string[] = [];
           const deletionMap = new Map<string, string[]>();
@@ -236,6 +234,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
               if (node.parentId !== undefined) {
                 const deletedIds = deletionMap.get(node.parentId) ?? [];
+                deletedIds.push(path);
                 deletionMap.set(node.parentId, deletedIds);
               }
             }
@@ -244,9 +243,13 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
           const keys = resourceKeyList([...deletionMap.keys()]);
           const nodes = [...deletionMap.values()];
 
-          this.delete(resourceKeyList(deletedNodes));
+          // deleteInNode removes its children from the resource as well.
+          const deletedInParents = new Set(nodes.flat());
+          this.delete(resourceKeyList(deletedNodes.filter(nodeId => !deletedInParents.has(nodeId))));
           this.deleteInNode(keys, nodes);
         });
+        this.markOutdated(resourceKeyList(parents));
+        this.onDataOutdated.execute(key);
       }
     });
   }
