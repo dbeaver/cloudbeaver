@@ -13,6 +13,8 @@ type ObjectPropertyInfo {
     displayName: String
     "Property description"
     description: String
+    "Documentation path"
+    documentationPath: String @since(version: "26.2.3")
     "Usage hint for the property"
     hint: String @since(version: "23.2.3")
     "Property category (may be used if object has a lot of properties)"
