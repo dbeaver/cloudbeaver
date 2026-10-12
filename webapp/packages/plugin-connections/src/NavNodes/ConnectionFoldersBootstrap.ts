@@ -112,6 +112,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     };
     this.nodeDeletionService.registerProvider({
       isApplicable: node => isConnectionFolder(node) && !isConnectionNode(node),
+      keepChildren: true,
       isDisabled: node => !canDelete(node),
       getInfo: async node => {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;

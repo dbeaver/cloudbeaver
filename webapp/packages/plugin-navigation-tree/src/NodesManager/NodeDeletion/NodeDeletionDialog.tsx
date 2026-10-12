@@ -41,6 +41,7 @@ export interface INodeDeletionDialogItem {
   warning?: string;
   reason?: string;
   ancestors?: string[];
+  keepChildren?: boolean;
 }
 
 const COLUMNS = [
@@ -100,9 +101,9 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
       if (row.reason) {
         continue;
       }
-      if (checked && row.ancestors?.includes(id)) {
+      if (checked && !item?.keepChildren && row.ancestors?.includes(id)) {
         selection.state.add(row.id);
-      } else if (!checked && item?.ancestors?.includes(row.id)) {
+      } else if (!checked && !row.keepChildren && item?.ancestors?.includes(row.id)) {
         selection.state.delete(row.id);
       }
     }

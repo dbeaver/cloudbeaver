@@ -8,9 +8,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { EConnectionFeature, NAV_NODE_TYPE_CONNECTION } from '@cloudbeaver/core-connections';
+import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENodeFeature, EObjectFeature, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import type { INodeDeletionProvider } from '@cloudbeaver/plugin-navigation-tree';
+import { NodeDeletionService, type INodeDeletionProvider } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ConnectionMenuBootstrap } from './ConnectionMenuBootstrap.js';
 
@@ -61,6 +62,46 @@ function setup(features: EConnectionFeature[] = []) {
 }
 
 describe('connection node deletion permissions', () => {
+  it('confirms and deletes a saved connection selected together with a read-only table', async () => {
+    const { providers, manager, tree } = setup([EConnectionFeature.readOnly]);
+    const saved = {
+      ...TABLE,
+      uri: 'node://project/datasources/connection',
+      nodeType: NAV_NODE_TYPE_CONNECTION,
+      objectFeatures: [EObjectFeature.dataSource],
+    };
+    type DeletionDependencies = ConstructorParameters<typeof NodeDeletionService>;
+    const dialogs = {
+      open: vi.fn().mockResolvedValue({ status: DialogueStateResult.Resolved, result: [saved.uri] }),
+    };
+    const notifications = { logSuccess: vi.fn(), logError: vi.fn(), logException: vi.fn() };
+    const service = new NodeDeletionService(
+      dialogs as unknown as DeletionDependencies[0],
+      notifications as unknown as DeletionDependencies[1],
+      { translate: (token: string) => token } as DeletionDependencies[2],
+      {
+        resolveParents: (uri: string) => Promise.resolve(uri === TABLE.uri ? [saved.uri] : []),
+        get: () => saved,
+      } as unknown as DeletionDependencies[3],
+      { get: () => ({ name: 'Project' }) } as unknown as DeletionDependencies[4],
+    );
+    for (const provider of providers) {
+      service.registerProvider(provider);
+    }
+
+    await service.delete([saved, TABLE]);
+
+    expect(dialogs.open).toHaveBeenCalledExactlyOnceWith(expect.anything(), {
+      items: [
+        expect.objectContaining({ id: saved.uri, keepChildren: true }),
+        expect.objectContaining({ id: TABLE.uri, reason: 'plugin_connections_delete_read_only' }),
+      ],
+    });
+    expect(manager.deleteConnection).toHaveBeenCalledExactlyOnceWith({ projectId: 'project', connectionId: 'connection' });
+    expect(tree.deleteNode).not.toHaveBeenCalled();
+    expect(notifications.logException).not.toHaveBeenCalled();
+  });
+
   it.each([EConnectionFeature.readOnly, EConnectionFeature.restrictMetadataEdit])('blocks database-object deletion with %s', async feature => {
     const { provider, tree } = setup([feature]);
 

@@ -21,6 +21,8 @@ export interface INodeDeletionTarget {
 
 interface INodeDeletionProviderBase {
   isApplicable: (node: NavNode) => boolean;
+  /** Deleting this node preserves its descendants, so excluded or failed descendants do not block it. */
+  keepChildren?: boolean;
   /** The owning provider can exclude a node from deletion. Mixed selections still explain the exclusion. */
   isHidden?: (node: NavNode) => boolean;
   isDisabled?: (node: NavNode) => boolean;
@@ -72,12 +74,13 @@ export function prepareNodeDeletionPlan(
   exclusions: readonly INodeDeletionExclusion[],
 ): { items: INodeDeletionItem[]; exclusions: INodeDeletionExclusion[] } {
   const blocked = getBlockedAncestors(exclusions);
+  const isBlocked = (item: INodeDeletionItem) => !item.provider.keepChildren && blocked.has(item.node.uri);
   return {
-    items: items.filter(item => !blocked.has(item.node.uri)),
+    items: items.filter(item => !isBlocked(item)),
     exclusions: [
       ...exclusions,
       ...items
-        .filter(item => blocked.has(item.node.uri))
+        .filter(isBlocked)
         .map(item => ({
           node: item.node,
           ancestors: item.ancestors,
@@ -111,7 +114,7 @@ export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[
       for (const item of group) {
         ready.splice(ready.indexOf(item), 1);
         pending.splice(pending.indexOf(item), 1);
-        const blocked = blockedAncestors.has(item.node.uri);
+        const blocked = !item.provider.keepChildren && blockedAncestors.has(item.node.uri);
         if (blocked) {
           results.push({ item, status: 'skipped' });
         } else {

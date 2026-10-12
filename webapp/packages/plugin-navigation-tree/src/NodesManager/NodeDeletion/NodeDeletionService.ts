@@ -84,6 +84,7 @@ export class NodeDeletionService {
         rows.set(node.uri, {
           id: node.uri,
           ancestors,
+          keepChildren: provider?.keepChildren,
           name: node.name || node.uri,
           icon: node.icon,
           type: target.type,

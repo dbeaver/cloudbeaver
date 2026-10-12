@@ -206,7 +206,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     });
   }
 
-  /** Execute deletion after the caller has confirmed the selected nodes. */
   async deleteNode(key: ResourceKeySimple<string>): Promise<void> {
     const nodePaths = ResourceKeyUtils.toArray(key);
     if (!nodePaths.length) {

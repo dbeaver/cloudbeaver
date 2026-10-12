@@ -42,6 +42,49 @@ function item(uri: string, owner: INodeDeletionProvider, ancestors: string[] = [
 }
 
 describe('executeNodeDeletionPlan', () => {
+  it('keeps non-destructive ancestors eligible while excluding a read-only database subtree', async () => {
+    const connections = Object.assign(provider(), { keepChildren: true });
+    const folders = Object.assign(batchProvider(), { keepChildren: true });
+    const database = batchProvider();
+    const folder = item('folder', folders);
+    const connection = item('connection', connections, ['folder']);
+    const schema = item('schema', database, ['folder', 'connection']);
+    const table = {
+      node: item('table', database).node,
+      ancestors: ['folder', 'connection', 'schema'],
+      reason: 'read-only',
+    };
+
+    const plan = prepareNodeDeletionPlan([folder, connection, schema], [table]);
+    await executeNodeDeletionPlan(plan.items);
+
+    expect(plan.items).toEqual([folder, connection]);
+    expect(plan.exclusions.map(item => item.node.uri)).toEqual(['table', 'schema']);
+    expect(database.deleteBatch).not.toHaveBeenCalled();
+    expect(connections.deleteNode).toHaveBeenCalledExactlyOnceWith(connection.node);
+    expect(folders.deleteBatch).toHaveBeenCalledExactlyOnceWith([folder.node]);
+  });
+
+  it('still removes saved configuration after a database-object batch fails', async () => {
+    const connections = Object.assign(provider(), { keepChildren: true });
+    const folders = Object.assign(batchProvider(), { keepChildren: true });
+    const database = batchProvider();
+    database.deleteBatch = vi.fn().mockRejectedValue(new Error('Cannot drop table'));
+    const folder = item('folder', folders);
+    const connection = item('connection', connections, ['folder']);
+    const table = item('table', database, ['folder', 'connection']);
+
+    const results = await executeNodeDeletionPlan([folder, connection, table]);
+
+    expect(results.map(result => [result.item.node.uri, result.status])).toEqual([
+      ['table', 'unknown'],
+      ['connection', 'deleted'],
+      ['folder', 'deleted'],
+    ]);
+    expect(connections.deleteNode).toHaveBeenCalledExactlyOnceWith(connection.node);
+    expect(folders.deleteBatch).toHaveBeenCalledExactlyOnceWith([folder.node]);
+  });
+
   it('deletes database objects before their connection and connection before its folder, without pruning explicit targets', async () => {
     const calls: string[] = [];
     const owner = provider();

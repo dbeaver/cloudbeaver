@@ -227,6 +227,26 @@ describe('NodeDeletionDialog', () => {
     expect(child?.checked).toBe(true);
   });
 
+  it('allows selecting a saved connection without selecting its database objects', async () => {
+    const connection = { ...ITEM, keepChildren: true };
+    const result = dialogs.open(NodeDeletionDialog, { items: [connection, { ...ITEM, id: 'table', ancestors: [ITEM.id] }] });
+    await act(() => root.render(<DialogsPortal />));
+    await vi.waitFor(() => expect(document.querySelectorAll('input[type="checkbox"]')).toHaveLength(3));
+    const [, parent, child] = [...document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
+
+    await act(() => child?.click());
+    expect(parent?.checked).toBe(true);
+    expect(child?.checked).toBe(false);
+    await act(() => parent?.click());
+    await act(() => parent?.click());
+    expect(parent?.checked).toBe(true);
+    expect(child?.checked).toBe(false);
+
+    const deleteButton = [...document.querySelectorAll('button')].find(button => button.textContent === 'ui_delete (1)')!;
+    await act(() => deleteButton.click());
+    await expect(result).resolves.toMatchObject({ status: DialogueStateResult.Resolved, result: [ITEM.id] });
+  });
+
   it.each([false, true])('uses a list for the folder warning only when a selection summary is also present: %s', async withSummary => {
     const warning = 'plugin_navigation_tree_file_system_delete_folder_warning';
     const items = [{ ...ITEM, warning }];

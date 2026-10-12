@@ -102,7 +102,6 @@ export class ConnectionsManagerService {
     return undefined;
   }
 
-  /** Delete after a caller has confirmed the target, preserving disconnect/editor/transaction guards. */
   async deleteConnection(key: IConnectionInfoParams): Promise<boolean> {
     const connection = await this.connectionInfoResource.load(key);
     if (!connection.canDelete) {

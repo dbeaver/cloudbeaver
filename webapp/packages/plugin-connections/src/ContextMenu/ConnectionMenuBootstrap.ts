@@ -84,8 +84,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
   }
 
   override register(): void {
+    // connections
     this.nodeDeletionService.registerProvider({
       isApplicable: isConnectionNode,
+      keepChildren: true,
       isDisabled: node => {
         const connection =
           node.projectId && node.objectId ? this.connectionInfoResource.get(createConnectionParam(node.projectId, node.objectId)) : undefined;
@@ -108,6 +110,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         !connection?.features.includes(EConnectionFeature.restrictMetadataEdit)
       );
     };
+
+    // connection child nodes
     this.nodeDeletionService.registerProvider({
       isApplicable: node => !isConnectionNode(node) && !isConnectionFolder(node) && NodeManagerUtils.isDatabaseObject(node.uri),
       isDisabled: node => !canDelete(node),
