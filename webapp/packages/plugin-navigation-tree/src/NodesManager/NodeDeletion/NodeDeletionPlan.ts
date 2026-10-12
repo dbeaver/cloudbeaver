@@ -108,7 +108,7 @@ export function prepareNodeDeletionPlan(
 /** Deletes children before parents, batches ready nodes by provider, and continues independent work after failures. */
 export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[]): Promise<INodeDeletionResult[]> {
   const results: INodeDeletionResult[] = [];
-  const pending = [...items];
+  let pending = [...items];
 
   while (pending.length) {
     const pendingParents = getParents(pending);
@@ -119,16 +119,22 @@ export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[
       break;
     }
 
-    while (ready.length) {
-      const first = ready[0]!;
+    pending = pending.filter(item => pendingParents.has(item.node.uri));
+    // Ready nodes are independent, so their outcomes can only block a later round.
+    const blockedParents = getParents(results.filter(result => result.status !== 'deleted').map(result => result.item));
+    const handled = new Set<INodeDeletionProvider>();
+    for (const first of ready) {
       const provider = first.provider;
+      if (handled.has(provider)) {
+        continue;
+      }
+      if (provider.deleteBatch) {
+        handled.add(provider);
+      }
       const group = provider.deleteBatch ? ready.filter(item => item.provider === provider) : [first];
       const executable: INodeDeletionItem[] = [];
-      const blockedParents = getParents(results.filter(result => result.status !== 'deleted').map(result => result.item));
 
       for (const item of group) {
-        ready.splice(ready.indexOf(item), 1);
-        pending.splice(pending.indexOf(item), 1);
         const blocked = !item.provider.keepChildren && blockedParents.has(item.node.uri);
         if (blocked) {
           results.push({ item, status: 'skipped' });
@@ -141,24 +147,24 @@ export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[
         continue;
       }
 
-      try {
-        const deleted = provider.deleteBatch
-          ? await provider.deleteBatch(executable.map(item => item.node))
-          : await provider.deleteNode(executable[0]!.node);
-        results.push(...executable.map(item => ({ item, status: deleted === false ? ('cancelled' as const) : ('deleted' as const) })));
-      } catch (error) {
-        // A failed backend batch may have partially completed; do not retry destructive requests.
-        results.push(
-          ...executable.map(item => ({
-            item,
-            status: provider.deleteBatch ? ('unknown' as const) : ('failed' as const),
-            error,
-            batch: provider.deleteBatch ? executable : undefined,
-          })),
-        );
-      }
+      results.push(...(await deleteItems(provider, executable)));
     }
   }
 
   return results;
+}
+
+/** Executes one provider call without retrying a possibly partially completed batch. */
+async function deleteItems(provider: INodeDeletionProvider, items: INodeDeletionItem[]): Promise<INodeDeletionResult[]> {
+  try {
+    const deleted = provider.deleteBatch ? await provider.deleteBatch(items.map(item => item.node)) : await provider.deleteNode(items[0]!.node);
+    return items.map(item => ({ item, status: deleted === false ? 'cancelled' : 'deleted' }));
+  } catch (error) {
+    return items.map(item => ({
+      item,
+      status: provider.deleteBatch ? 'unknown' : 'failed',
+      error,
+      batch: provider.deleteBatch ? items : undefined,
+    }));
+  }
 }

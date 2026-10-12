@@ -42,6 +42,59 @@ function item(uri: string, owner: INodeDeletionProvider, parents: string[] = [])
 }
 
 describe('executeNodeDeletionPlan', () => {
+  it('skips cyclic ancestry while still deleting independent nodes', async () => {
+    const owner = provider();
+    const a = item('a', owner, ['b']);
+    const b = item('b', owner, ['a']);
+    const independent = item('independent', owner);
+
+    const results = await executeNodeDeletionPlan([a, independent, b]);
+
+    expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(independent.node);
+    expect(results.map(result => [result.item.node.uri, result.status])).toEqual([
+      ['independent', 'deleted'],
+      ['a', 'skipped'],
+      ['b', 'skipped'],
+    ]);
+  });
+
+  it('keeps provider call order when single-node and batch targets are interleaved', async () => {
+    const calls: string[][] = [];
+    const single = provider();
+    const bulk = batchProvider();
+    single.deleteNode = node => {
+      calls.push([node.uri]);
+      return Promise.resolve();
+    };
+    bulk.deleteBatch = nodes => {
+      calls.push(nodes.map(node => node.uri));
+      return Promise.resolve();
+    };
+
+    await executeNodeDeletionPlan([item('a', single), item('b', bulk), item('c', single), item('d', bulk), item('e', single)]);
+
+    expect(calls).toEqual([['a'], ['b', 'd'], ['c'], ['e']]);
+  });
+
+  it('protects all destructive ancestors after cancellation even through a keepChildren parent', async () => {
+    const owner = provider();
+    const connection = Object.assign(provider(), { keepChildren: true });
+    owner.deleteNode = vi.fn().mockResolvedValue(false);
+    const root = item('root', owner);
+    const parent = item('parent', connection, ['root']);
+    const child = item('child', owner, ['root', 'parent']);
+
+    const results = await executeNodeDeletionPlan([root, parent, child]);
+
+    expect(results.map(result => [result.item.node.uri, result.status])).toEqual([
+      ['child', 'cancelled'],
+      ['parent', 'deleted'],
+      ['root', 'skipped'],
+    ]);
+    expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(child.node);
+    expect(connection.deleteNode).toHaveBeenCalledExactlyOnceWith(parent.node);
+  });
+
   it('keeps non-destructive parents eligible while excluding a read-only database subtree', async () => {
     const connections = Object.assign(provider(), { keepChildren: true });
     const folders = Object.assign(batchProvider(), { keepChildren: true });
