@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormState = {
 
 export function useConnectionFormState(params: IConnectionInfoParams, configure?: (state: ConnectionFormState) => any): ConnectionFormState {
   const serviceProvider = useService(IServiceProvider);
-  const service = useService(ConnectionFormService);
+  const connectionFormService = useService(ConnectionFormService);
   const ref = useRef<ConnectionFormState>(null);
 
   if (ref.current?.state.connectionId !== params.connectionId || ref.current?.state.projectId !== params.projectId) {
     ref.current?.dispose();
-    ref.current = new ConnectionFormState(serviceProvider, service, {
+    ref.current = new ConnectionFormState(serviceProvider, connectionFormService, {
       ...EMPTY_CONNECTION_INFO_PARAMS,
       projectId: params.projectId,
       connectionId: params.connectionId,

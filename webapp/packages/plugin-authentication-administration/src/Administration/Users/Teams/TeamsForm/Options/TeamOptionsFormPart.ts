@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ function getInitialState(): ITeamOptionsState {
 export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormState> {
   constructor(
     formState: IFormState<ITeamFormState>,
-    private readonly teamResource: TeamsResource,
-    private readonly teamsMetaParametersResource: TeamInfoMetaParametersResource,
+    private readonly teamsResource: TeamsResource,
+    private readonly teamInfoMetaParametersResource: TeamInfoMetaParametersResource,
     private readonly localizationService: LocalizationService,
   ) {
     super(formState, getInitialState());
@@ -37,8 +37,8 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'edit' && this.formState.state.teamId) {
       const [team, metaParameters] = await Promise.all([
-        this.teamResource.load(this.formState.state.teamId),
-        this.teamsMetaParametersResource.load(this.formState.state.teamId),
+        this.teamsResource.load(this.formState.state.teamId),
+        this.teamInfoMetaParametersResource.load(this.formState.state.teamId),
       ]);
 
       this.setInitialState({
@@ -66,7 +66,7 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
         validation.error('administration_teams_team_info_id_invalid');
       }
 
-      if (this.state.teamId && this.teamResource.has(this.state.teamId)) {
+      if (this.state.teamId && this.teamsResource.has(this.state.teamId)) {
         validation.error(
           this.localizationService.translate('administration_teams_team_info_exists', undefined, {
             teamId: this.state.teamId,
@@ -83,7 +83,7 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
       this.state.teamName = this.state.teamName.trim();
 
       if (this.formState.mode === 'create') {
-        const teamNames = this.teamResource.values.map(team => team.teamName).filter(Boolean) as string[];
+        const teamNames = this.teamsResource.values.map(team => team.teamName).filter(Boolean) as string[];
         this.state.teamName = getUniqueName(this.state.teamName, teamNames);
       }
     }
@@ -113,9 +113,9 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
     };
 
     if (this.formState.mode === 'create') {
-      const team = await this.teamResource.createTeam(teamInfo);
+      const team = await this.teamsResource.createTeam(teamInfo);
       this.formState.setMode(FormMode.Edit);
-      await this.teamsMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters);
+      await this.teamInfoMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters);
 
       this.formState.setState({
         teamId: team.teamId,
@@ -125,8 +125,8 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
     }
 
     await Promise.all([
-      this.teamResource.updateTeam(teamInfo),
-      this.teamsMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters),
+      this.teamsResource.updateTeam(teamInfo),
+      this.teamInfoMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters),
     ]);
   }
 }
