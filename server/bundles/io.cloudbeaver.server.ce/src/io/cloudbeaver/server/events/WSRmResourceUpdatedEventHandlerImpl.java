@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,16 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSResourceUpdatedEvent event) {
-        if (activeUserSession instanceof WebSession) {
-            var webSession = (WebSession) activeUserSession;
+        if (activeUserSession instanceof WebSession webSession) {
+            var project = webSession.getProjectById(event.getProjectId());
+            if (project == null) {
+                log.debug("Project " + event.getProjectId() + " is not found in session " + webSession.getSessionId());
+                return;
+            }
             acceptChangesInNavigatorTree(
                 event.getId(),
                 event.getResourcePath(),
-                webSession.getProjectById(event.getProjectId())
+                project
             );
         }
         activeUserSession.addSessionEvent(event);
