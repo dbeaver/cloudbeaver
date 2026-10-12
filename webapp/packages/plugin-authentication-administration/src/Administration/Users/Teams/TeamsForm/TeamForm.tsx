@@ -25,7 +25,7 @@ interface Props {
 
 export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, className }) {
   const styles = useS(style);
-  const service = useService(TeamsAdministrationFormService);
+  const teamsAdministrationFormService = useService(TeamsAdministrationFormService);
   const notificationService = useService(NotificationService);
   const translate = useTranslate();
   const editing = state.mode === 'edit';
@@ -61,7 +61,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, cla
 
   return (
     <Form context={form} contents>
-      <TabsState container={service.parts} formState={state}>
+      <TabsState container={teamsAdministrationFormService.parts} formState={state}>
         <Container noWrap vertical>
           <Container className={s(styles, { topBar: true })} gap keepSize noWrap>
             <Container fill>

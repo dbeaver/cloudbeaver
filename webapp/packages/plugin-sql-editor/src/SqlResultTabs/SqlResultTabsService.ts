@@ -29,7 +29,7 @@ export class SqlResultTabsService {
   constructor(
     private readonly sqlQueryService: SqlQueryService,
     private readonly sqlQueryResultService: SqlQueryResultService,
-    private readonly sqlOutputLogsService: OutputLogsService,
+    private readonly outputLogsService: OutputLogsService,
   ) {
     this.onResultTabClose = new SyncExecutor();
     this.resultPanels = new PlaceholderContainer();
@@ -95,7 +95,7 @@ export class SqlResultTabsService {
 
     this.sqlQueryService.removeStatisticsTab(state, tab.id);
     this.sqlQueryResultService.removeResultTab(state, tab.id);
-    this.sqlOutputLogsService.removeOutputLogsTab(state, tab.id);
+    this.outputLogsService.removeOutputLogsTab(state, tab.id);
     this.onResultTabClose.execute({ state, tabId: tab.id });
 
     if (state.currentTabId === tab.id) {
