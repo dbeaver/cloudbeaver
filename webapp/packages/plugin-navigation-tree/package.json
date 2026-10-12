@@ -53,7 +53,6 @@
     "@dbeaver/cli": "workspace:*",
     "@dbeaver/react-tests": "workspace:*",
     "@types/react": "^19",
-    "@types/react-dom": "^19",
     "rimraf": "^6",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5",
