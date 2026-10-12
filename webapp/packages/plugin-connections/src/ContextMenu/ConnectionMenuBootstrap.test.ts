@@ -102,12 +102,10 @@ describe('connection node deletion permissions', () => {
     expect(notifications.logException).not.toHaveBeenCalled();
   });
 
-  it.each([EConnectionFeature.readOnly, EConnectionFeature.restrictMetadataEdit])('blocks database-object deletion with %s', async feature => {
-    const { provider, tree } = setup([feature]);
+  it.each([EConnectionFeature.readOnly, EConnectionFeature.restrictMetadataEdit])('blocks database-object deletion with %s', feature => {
+    const { provider } = setup([feature]);
 
     expect(provider.isDisabled?.(TABLE)).toBe(true);
-    await expect(provider.deleteBatch!([TABLE])).resolves.toBe(false);
-    expect(tree.deleteNode).not.toHaveBeenCalled();
   });
 
   it('explains the read-only restriction in confirmation metadata', async () => {
@@ -121,7 +119,7 @@ describe('connection node deletion permissions', () => {
   });
 
   it('rechecks a connection that becomes read-only while loading its metadata', async () => {
-    const { provider, connection, connections, tree } = setup();
+    const { provider, connection, connections } = setup();
     expect(provider.isDisabled?.(TABLE)).toBe(false);
     connections.load.mockImplementation(() => {
       connection.features = [EConnectionFeature.readOnly];
@@ -129,8 +127,7 @@ describe('connection node deletion permissions', () => {
     });
 
     expect((await provider.getInfo(TABLE)).reason).toBe('plugin_connections_delete_read_only');
-    await expect(provider.deleteBatch!([TABLE])).resolves.toBe(false);
-    expect(tree.deleteNode).not.toHaveBeenCalled();
+    expect(provider.isDisabled?.(TABLE)).toBe(true);
   });
 
   it('deletes database objects on a writable connection', async () => {
@@ -140,6 +137,29 @@ describe('connection node deletion permissions', () => {
     await provider.deleteBatch!([TABLE]);
 
     expect(tree.deleteNode).toHaveBeenCalledExactlyOnceWith(resourceKeyList([TABLE.uri]));
+  });
+
+  it('batches database objects across projects through the deletion service', async () => {
+    const { providers, tree } = setup();
+    const other = { ...TABLE, uri: 'node://other/datasources/other-connection/table', projectId: 'other' };
+    type DeletionDependencies = ConstructorParameters<typeof NodeDeletionService>;
+    const notifications = { logSuccess: vi.fn(), logError: vi.fn(), logException: vi.fn() };
+    const service = new NodeDeletionService(
+      {
+        open: vi.fn().mockResolvedValue({ status: DialogueStateResult.Resolved, result: [TABLE.uri, other.uri] }),
+      } as unknown as DeletionDependencies[0],
+      notifications as unknown as DeletionDependencies[1],
+      { translate: (token: string) => token } as DeletionDependencies[2],
+      { resolveParents: () => Promise.resolve([]) } as unknown as DeletionDependencies[3],
+      { get: () => ({ name: 'Project' }) } as unknown as DeletionDependencies[4],
+    );
+    providers.forEach(provider => service.registerProvider(provider));
+
+    await service.delete([TABLE, other]);
+
+    expect(tree.deleteNode).toHaveBeenCalledExactlyOnceWith(resourceKeyList([TABLE.uri, other.uri]));
+    expect(notifications.logError).not.toHaveBeenCalled();
+    expect(notifications.logException).not.toHaveBeenCalled();
   });
 
   it('allows removing the saved read-only connection when its configuration can be deleted', async () => {

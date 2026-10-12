@@ -122,14 +122,27 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         return {
           type: 'ui_folder',
           warning: 'plugin_connections_delete_folder_warning',
-          batchKey: JSON.stringify([node.projectId, key?.connectionId]),
         };
       },
       deleteBatch: async nodes => {
-        if (!nodes.every(canDelete)) {
-          return false;
+        // The backend refreshes only one project's registry per folder-deletion request.
+        const projects = new Map<string | undefined, string[]>();
+        for (const node of nodes) {
+          const paths = projects.get(node.projectId) ?? [];
+          paths.push(node.uri);
+          projects.set(node.projectId, paths);
         }
-        return await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.uri)));
+        const errors: unknown[] = [];
+        for (const paths of projects.values()) {
+          try {
+            await this.navTreeResource.deleteNode(resourceKeyList(paths));
+          } catch (error) {
+            errors.push(error);
+          }
+        }
+        if (errors.length) {
+          throw new AggregateError(errors, errors.map(error => (error instanceof Error ? error.message : String(error))).join('\n'));
+        }
       },
     });
 

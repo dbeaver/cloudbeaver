@@ -248,6 +248,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
           this.deleteInNode(keys, nodes);
         });
         this.markOutdated(resourceKeyList(parents));
+        // Deleted nodes are no longer in their parents' child lists, so parent invalidation misses their cached object properties.
         this.onDataOutdated.execute(key);
       }
     });

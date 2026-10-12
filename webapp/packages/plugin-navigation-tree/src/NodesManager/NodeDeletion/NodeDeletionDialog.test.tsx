@@ -214,8 +214,8 @@ describe('NodeDeletionDialog', () => {
     await expect(result).resolves.toMatchObject({ status: DialogueStateResult.Rejected });
   });
 
-  it('unchecks ancestors when a child is unchecked and selects descendants with their parent', async () => {
-    dialogs.open(NodeDeletionDialog, { items: [ITEM, { ...ITEM, id: 'child', ancestors: [ITEM.id] }] });
+  it('unchecks parents when a child is unchecked and selects descendants with their parent', async () => {
+    dialogs.open(NodeDeletionDialog, { items: [ITEM, { ...ITEM, id: 'child', parents: [ITEM.id] }] });
     await act(() => root.render(<DialogsPortal />));
     await vi.waitFor(() => expect(document.querySelectorAll('input[type="checkbox"]')).toHaveLength(3));
     const [, parent, child] = [...document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
@@ -229,7 +229,7 @@ describe('NodeDeletionDialog', () => {
 
   it('allows selecting a saved connection without selecting its database objects', async () => {
     const connection = { ...ITEM, keepChildren: true };
-    const result = dialogs.open(NodeDeletionDialog, { items: [connection, { ...ITEM, id: 'table', ancestors: [ITEM.id] }] });
+    const result = dialogs.open(NodeDeletionDialog, { items: [connection, { ...ITEM, id: 'table', parents: [ITEM.id] }] });
     await act(() => root.render(<DialogsPortal />));
     await vi.waitFor(() => expect(document.querySelectorAll('input[type="checkbox"]')).toHaveLength(3));
     const [, parent, child] = [...document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];

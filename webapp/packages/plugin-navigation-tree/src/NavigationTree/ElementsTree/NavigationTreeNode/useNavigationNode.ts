@@ -79,6 +79,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     }
   }, [leaf]);
 
+  // Metadata refreshes replace the node object; only a different URI or unmount should clear selection.
   useEffect(
     () => () => {
       if (!contextRef.context?.selectionTree) {

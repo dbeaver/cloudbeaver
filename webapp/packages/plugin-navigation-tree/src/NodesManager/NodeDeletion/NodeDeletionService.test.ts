@@ -65,6 +65,15 @@ function setup(status = DialogueStateResult.Resolved) {
 }
 
 describe('NodeDeletionService', () => {
+  it('does not register the same provider twice', () => {
+    const { service, owner } = setup();
+    owner.isApplicable = vi.fn(() => false);
+    service.registerProvider(owner);
+
+    expect(service.canDelete([node('unsupported')])).toBe(false);
+    expect(owner.isApplicable).toHaveBeenCalledExactlyOnceWith(node('unsupported'));
+  });
+
   it('deletes a mixed multi-project selection of nested folders and connections without reloading deleted paths', async () => {
     const { service, owner, notifications, nodes } = setup();
     const projectA = { ...node('node://project-a', 'project'), projectId: 'project-a', parentId: ROOT_NODE_PATH };
@@ -87,13 +96,13 @@ describe('NodeDeletionService', () => {
     }
     nodes.get.mockImplementation((uri: string) => cachedNodes.get(uri));
     nodes.resolveParents.mockImplementation((uri: string) => {
-      const ancestors: string[] = [];
+      const parents: string[] = [];
       let parentId = cachedNodes.get(uri)?.parentId;
       while (parentId !== undefined) {
-        ancestors.unshift(parentId);
+        parents.unshift(parentId);
         parentId = cachedNodes.get(parentId)?.parentId;
       }
-      return Promise.resolve(ancestors);
+      return Promise.resolve(parents);
     });
 
     const reloadVisibleChildren = () => {
@@ -137,7 +146,7 @@ describe('NodeDeletionService', () => {
     });
     service.registerProvider({
       isApplicable: target => target.nodeType === 'folder',
-      getInfo: target => ({ type: 'folder', batchKey: target.projectId }),
+      getInfo: () => ({ type: 'folder' }),
       deleteBatch: targets => tree.deleteNode(resourceKeyList(targets.map(target => target.uri))),
     });
 
@@ -317,13 +326,13 @@ describe('NodeDeletionService', () => {
 
   it.each(['Folder', '#root'])('omits the synthetic root from the location while keeping project and folder "%s"', async folderName => {
     const { service, dialogs, nodes } = setup();
-    const ancestors = [ROOT_NODE_PATH, 'project-node', 'folder-node'];
+    const parents = [ROOT_NODE_PATH, 'project-node', 'folder-node'];
     const names = new Map([
       [ROOT_NODE_PATH, '#root'],
       ['project-node', 'Project'],
       ['folder-node', folderName],
     ]);
-    nodes.resolveParents.mockResolvedValue(ancestors);
+    nodes.resolveParents.mockResolvedValue(parents);
     nodes.get.mockImplementation((uri: string) => ({ name: names.get(uri) }));
 
     await service.delete([node('connection')]);
@@ -331,12 +340,12 @@ describe('NodeDeletionService', () => {
     const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
     expect(items[0]?.location).toBe(`Project/${folderName}`);
     expect(items[0]).not.toHaveProperty('provider');
-    expect(items[0]?.ancestors).toEqual(ancestors);
+    expect(items[0]?.parents).toEqual(parents);
   });
 
   it('omits the provider technical root without removing equally named folders', async () => {
     const { service, owner, dialogs, nodes } = setup();
-    const ancestors = [ROOT_NODE_PATH, 'provider-root', 'storage', 'folder'];
+    const parents = [ROOT_NODE_PATH, 'provider-root', 'storage', 'folder'];
     const names = new Map([
       [ROOT_NODE_PATH, '#root'],
       ['provider-root', 'internal'],
@@ -344,7 +353,7 @@ describe('NodeDeletionService', () => {
       ['folder', 'internal'],
     ]);
     owner.getInfo = () => ({ type: 'connection', locationRoot: 'provider-root' });
-    nodes.resolveParents.mockResolvedValue(ancestors);
+    nodes.resolveParents.mockResolvedValue(parents);
     nodes.get.mockImplementation((uri: string) => ({ name: names.get(uri) }));
 
     await service.delete([node('connection')]);

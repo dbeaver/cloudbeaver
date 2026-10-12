@@ -91,6 +91,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       isDisabled: node => {
         const connection =
           node.projectId && node.objectId ? this.connectionInfoResource.get(createConnectionParam(node.projectId, node.objectId)) : undefined;
+        // Readonly restricts database edits, not removal of the saved connection configuration.
         return !connection?.canDelete;
       },
       getInfo: async node => {
@@ -123,16 +124,9 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           type: 'plugin_connections_delete_database_object',
           readOnly,
           reason: readOnly ? 'plugin_connections_delete_read_only' : undefined,
-          // Keep backend batches within one project/connection.
-          batchKey: JSON.stringify([node.projectId, key?.connectionId]),
         };
       },
-      deleteBatch: async nodes => {
-        if (!nodes.every(canDelete)) {
-          return false;
-        }
-        return await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.uri)));
-      },
+      deleteBatch: nodes => this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.uri))),
     });
     this.addConnectionsMenuToTopAppBar();
 

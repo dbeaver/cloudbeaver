@@ -16,13 +16,14 @@ import * as DI from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { NavNodeInfoResource, type NavNode } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavTreeResource, type NavNode } from '@cloudbeaver/core-navigation-tree';
 
 import { NodeDeletionDialog } from '../../../NodesManager/NodeDeletion/NodeDeletionDialog.js';
+import { NavigationTreeService } from '../../NavigationTreeService.js';
 import { ElementsTreeContext, type IElementsTreeContext } from '../ElementsTreeContext.js';
 import type { NavTreeControlProps } from '../NavigationNodeComponent.js';
 import { NavigationNodeControlRenderer } from './NavigationNodeControlRenderer.js';
-import type { INavigationNode } from './useNavigationNode.js';
+import { useNavigationNode, type INavigationNode } from './useNavigationNode.js';
 
 describe('navigation node context-menu selection', () => {
   let root: Root;
@@ -155,6 +156,66 @@ describe('navigation node context-menu selection', () => {
     expect(dialogs.dialogs).toHaveLength(0);
     expect([...selected]).toEqual(['a', 'b']);
     expect(select).not.toHaveBeenCalled();
+  });
+
+  it('keeps selection when the same node receives a new metadata object and clears it on unmount', async () => {
+    vi.spyOn(DI, 'useService').mockImplementation(token => {
+      if (token === NavNodeInfoResource || token === NavTreeResource) {
+        return {
+          get: () => undefined,
+          getException: () => null,
+          isLoading: () => false,
+          isLoaded: () => true,
+          isOutdated: () => false,
+        } as unknown as NavNodeInfoResource;
+      }
+      if (token === NavigationTreeService) {
+        return { getChildren: () => [] } as unknown as NavigationTreeService;
+      }
+      throw new Error('Unexpected service in node selection test');
+    });
+    const node: NavNode = {
+      uri: 'a',
+      name: 'A',
+      hasChildren: false,
+      folder: false,
+      inline: false,
+      navigable: true,
+      filtered: false,
+      objectFeatures: [],
+    };
+    const selectNode = vi.fn((node: NavNode) => {
+      selected.delete(node.uri);
+    });
+    const context = {
+      tree: {
+        getNodeState: () => ({}),
+        isNodeExpanded: () => false,
+        isNodeLeaf: () => true,
+        isNodeSelected: (uri: string) => selected.has(uri),
+        isNodeIndeterminateSelected: () => false,
+        select: selectNode,
+      },
+    } as unknown as IElementsTreeContext;
+    function Probe({ node }: { node: NavNode }) {
+      useNavigationNode(node, []);
+      return null;
+    }
+    const render = (node: NavNode) =>
+      root.render(
+        <ElementsTreeContext value={context}>
+          <Probe node={node} />
+        </ElementsTreeContext>,
+      );
+
+    await act(() => render(node));
+    await act(() => render({ ...node, name: 'Updated A' }));
+
+    expect([...selected]).toEqual(['a', 'b']);
+    expect(selectNode).not.toHaveBeenCalled();
+    await act(() => root.render(null));
+    expect([...selected]).toEqual(['b']);
+    expect(selectNode).toHaveBeenCalledExactlyOnceWith(node, true, false);
   });
 
   it('still applies single selection for an ordinary node click', async () => {

@@ -7,8 +7,11 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 
+import { Executor } from '@cloudbeaver/core-executor';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 
+import { DBObjectResource } from './DBObjectResource.js';
+import { NavNodeInfoResource } from './NavNodeInfoResource.js';
 import { NavTreeResource } from './NavTreeResource.js';
 
 function setup() {
@@ -36,6 +39,65 @@ function setup() {
 }
 
 describe('NavTreeResource deletion', () => {
+  it('invalidates cached object properties after removing the object from its parent list', async () => {
+    vi.useFakeTimers();
+    try {
+      type Dependencies = ConstructorParameters<typeof NavTreeResource>;
+      const sdk = { navDeleteNodes: vi.fn().mockResolvedValue({ navDeleteNodes: 1 }) };
+      const graphql = { sdk } as unknown as Dependencies[0];
+      const auth = { requireAuthentication: vi.fn() } as unknown as Dependencies[6];
+      const nodes = new NavNodeInfoResource(graphql, auth);
+      const projects = {
+        outdateResource: vi.fn(),
+        connect: vi.fn(),
+        load: vi.fn().mockResolvedValue(new Map()),
+        onDataOutdated: new Executor(),
+        onDataUpdate: new Executor(),
+        logger: { getName: () => 'projects', logExecutor: () => vi.fn() },
+      } as unknown as Dependencies[5];
+      const tree = new NavTreeResource(
+        graphql,
+        nodes,
+        { childrenLimit: 100 } as Dependencies[2],
+        { onDataOutdated: new Executor() } as unknown as Dependencies[3],
+        { onUserChange: new Executor() } as unknown as Dependencies[4],
+        projects,
+        auth,
+      );
+      const objects = new DBObjectResource(graphql, nodes, tree);
+      const parent = 'node://project/datasources/connection/tables';
+      const table = `${parent}/table`;
+      nodes.set(table, {
+        uri: table,
+        parentId: parent,
+        name: 'table',
+        hasChildren: false,
+        folder: false,
+        inline: false,
+        navigable: true,
+        filtered: false,
+        objectFeatures: [],
+      });
+      tree.set(parent, [table]);
+      tree.markLoaded(parent);
+      tree.markUpdated(parent);
+      objects.set(table, { uri: table, object: { type: 'Table', properties: [] } });
+      objects.markLoaded(table);
+      objects.markUpdated(table);
+      expect(objects.isOutdated(table)).toBe(false);
+
+      await tree.deleteNode(table);
+
+      expect(sdk.navDeleteNodes).toHaveBeenCalledExactlyOnceWith({ nodePaths: [table] });
+      expect(tree.get(parent)).toEqual([]);
+      expect(tree.isOutdated(parent)).toBe(true);
+      expect(objects.isOutdated(table)).toBe(true);
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
+  });
+
   it.each([false, true])('does not leave a deleted nested folder in its parent (with sibling: %s)', async withSibling => {
     const { resource, navDeleteNodes, deleted, markOutdated, data, nodes } = setup();
     const parent = 'node://project/datasources/Regression/New folder';

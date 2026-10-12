@@ -31,7 +31,7 @@ const NodeDeletionDialog = lazy(async () => {
 
 @injectable(() => [CommonDialogService, NotificationService, LocalizationService, NavNodeInfoResource, ProjectInfoResource])
 export class NodeDeletionService {
-  private readonly providers: INodeDeletionProvider[] = [];
+  private readonly providers = new Set<INodeDeletionProvider>();
   private deleting = false;
 
   get isDeleting(): boolean {
@@ -55,7 +55,7 @@ export class NodeDeletionService {
   }
 
   registerProvider(provider: INodeDeletionProvider): void {
-    this.providers.push(provider);
+    this.providers.add(provider);
   }
 
   canDelete(nodes: NavNode[]): boolean {
@@ -74,16 +74,16 @@ export class NodeDeletionService {
       for (const node of new Map(nodes.map(node => [node.uri, node])).values()) {
         const { provider, reason } = this.resolveProvider(node);
         const target = provider && !provider.isHidden?.(node) ? await provider.getInfo(node) : { type: 'plugin_navigation_tree_delete_object' };
-        const ancestors = await this.navNodeInfoResource.resolveParents(node.uri);
+        const parents = await this.navNodeInfoResource.resolveParents(node.uri);
         const unavailable = target.reason ?? reason ?? this.resolveProvider(node).reason;
         if (unavailable || !provider) {
-          exclusions.push({ node, ancestors, reason: unavailable ?? 'plugin_navigation_tree_delete_unavailable' });
+          exclusions.push({ node, parents, reason: unavailable ?? 'plugin_navigation_tree_delete_unavailable' });
         } else {
-          items.push({ node, provider, ancestors, batchKey: target.batchKey });
+          items.push({ node, provider, parents });
         }
         rows.set(node.uri, {
           id: node.uri,
-          ancestors,
+          parents,
           keepChildren: provider?.keepChildren,
           name: node.name || node.uri,
           icon: node.icon,
@@ -91,7 +91,7 @@ export class NodeDeletionService {
           readOnly: target.readOnly,
           warning: target.warning,
           project: (node.projectId && this.projectInfoResource.get(node.projectId)?.name) || node.projectId || '',
-          location: ancestors
+          location: parents
             .filter(id => id !== ROOT_NODE_PATH && id !== target.locationRoot)
             .map(id => this.navNodeInfoResource.get(id)?.name)
             .filter(Boolean)
@@ -173,7 +173,7 @@ export class NodeDeletionService {
   }
 
   private resolveProvider(node: NavNode): { provider?: INodeDeletionProvider; reason?: string } {
-    const provider = isProjectNode(node) ? undefined : this.providers.find(provider => provider.isApplicable(node));
+    const provider = isProjectNode(node) ? undefined : Array.from(this.providers).find(provider => provider.isApplicable(node));
     const unavailable = !provider || provider.isHidden?.(node) || provider.isDisabled?.(node);
     return { provider, reason: unavailable ? 'plugin_navigation_tree_delete_unavailable' : undefined };
   }

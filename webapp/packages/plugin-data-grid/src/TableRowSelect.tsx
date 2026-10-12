@@ -26,13 +26,11 @@ export interface ITableRowRootSelectProps extends BaseProps {
 export interface ITableRowSelectProps extends BaseProps {
   id: string;
   isRoot?: never;
-  onSelect?: (id: string) => void;
 }
 
 const CELL_CLASS_NAME = 'tw:flex tw:w-full tw:h-full tw:items-center tw:justify-center';
 
-export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelectProps>(function TableRowSelect(props) {
-  const { isRoot, id, disabled, title } = props;
+export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelectProps>(function TableRowSelect({ isRoot, id, disabled, title }) {
   const selection = use(TableSelectionContext);
   const translate = useTranslate();
 
@@ -69,7 +67,7 @@ export const TableRowSelect = observer<ITableRowRootSelectProps | ITableRowSelec
       tabIndex={0}
       checked={checked}
       disabled={disabled}
-      onChange={() => (props.onSelect ?? selection.select)(id)}
+      onChange={() => selection.select(id)}
     />
   );
 });

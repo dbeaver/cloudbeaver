@@ -40,7 +40,7 @@ export interface INodeDeletionDialogItem {
   location: string;
   warning?: string;
   reason?: string;
-  ancestors?: string[];
+  parents?: string[];
   keepChildren?: boolean;
 }
 
@@ -101,9 +101,9 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
       if (row.reason) {
         continue;
       }
-      if (checked && !item?.keepChildren && row.ancestors?.includes(id)) {
+      if (checked && !item?.keepChildren && row.parents?.includes(id)) {
         selection.state.add(row.id);
-      } else if (!checked && !row.keepChildren && item?.ancestors?.includes(row.id)) {
+      } else if (!checked && !row.keepChildren && item?.parents?.includes(row.id)) {
         selection.state.delete(row.id);
       }
     }
@@ -115,7 +115,7 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
       return null;
     }
     if (colIdx === 0) {
-      return <TableRowSelect id={item.id} disabled={!!item.reason} title={item.reason ? translate(item.reason) : item.name} onSelect={select} />;
+      return <TableRowSelect id={item.id} disabled={!!item.reason} title={item.reason ? translate(item.reason) : item.name} />;
     }
     const opacity = selected.has(item.id) ? '' : 'tw:opacity-40';
     if (colIdx === 1) {
@@ -158,7 +158,17 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
         {messages.length === 1 && <p>{messages[0]!.content}</p>}
         {!singleItem && (
           <div role="region" aria-label={translate('ui_data_delete_confirmation')} className="tw:w-full tw:mt-4">
-            <TableSelectionContext value={selection}>
+            <TableSelectionContext
+              value={{
+                keys: selection.keys,
+                state: selection.state,
+                list: selection.list,
+                selected: selection.selected,
+                select,
+                selectRoot: selection.selectRoot,
+                clear: selection.clear,
+              }}
+            >
               <DataGrid
                 columnCount={columnCount}
                 rowCount={rowCount}
