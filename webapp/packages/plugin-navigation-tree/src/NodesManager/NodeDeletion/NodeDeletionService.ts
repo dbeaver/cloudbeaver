@@ -165,15 +165,16 @@ export class NodeDeletionService {
         errors.set(item, `${label(item)}: ${reason}`);
       }
     }
-    if (errors.size) {
-      this.notificationService.logError({
-        title: deletedCount > 0 ? 'plugin_navigation_tree_delete_partial' : 'plugin_navigation_tree_delete_incomplete',
-        message: [summary, ...errors.values()].join('\n'),
-      });
-    } else {
+    if (deletedCount > 0) {
       this.notificationService.logSuccess({
         title: 'plugin_navigation_tree_delete_success',
         message: summary,
+      });
+    }
+    if (errors.size) {
+      this.notificationService.logError({
+        title: deletedCount > 0 ? 'plugin_navigation_tree_delete_partial' : 'plugin_navigation_tree_delete_incomplete',
+        message: [...errors.values()].join('\n'),
       });
     }
   }

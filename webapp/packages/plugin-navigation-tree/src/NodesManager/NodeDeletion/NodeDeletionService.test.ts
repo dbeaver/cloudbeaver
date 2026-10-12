@@ -467,7 +467,7 @@ describe('NodeDeletionService', () => {
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(node('a'));
   });
 
-  it('reports partial failure once and continues deleting independent targets', async () => {
+  it('reports successful deletions separately from partial failure and continues independent work', async () => {
     const { service, owner, notifications, localization } = setup();
     owner.deleteNode = vi.fn().mockRejectedValueOnce(new Error('Denied')).mockResolvedValue(true);
 
@@ -476,10 +476,13 @@ describe('NodeDeletionService', () => {
     expect(owner.deleteNode).toHaveBeenCalledTimes(2);
     expect(notifications.logError).toHaveBeenCalledExactlyOnceWith({
       title: 'plugin_navigation_tree_delete_partial',
-      message: 'plugin_navigation_tree_delete_result\nProject / a: Denied',
+      message: 'Project / a: Denied',
     });
     expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result', undefined, { count: 1, total: 2 });
-    expect(notifications.logSuccess).not.toHaveBeenCalled();
+    expect(notifications.logSuccess).toHaveBeenCalledExactlyOnceWith({
+      title: 'plugin_navigation_tree_delete_success',
+      message: 'plugin_navigation_tree_delete_result',
+    });
     expect(service.isDeleting).toBe(false);
   });
 
@@ -496,10 +499,13 @@ describe('NodeDeletionService', () => {
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(node('independent'));
     expect(notifications.logError).toHaveBeenCalledExactlyOnceWith({
       title: 'plugin_navigation_tree_delete_partial',
-      message: 'plugin_navigation_tree_delete_result_confirmed\nProject / a, Project / b: plugin_navigation_tree_delete_unknown\nSecond node failed',
+      message: 'Project / a, Project / b: plugin_navigation_tree_delete_unknown\nSecond node failed',
     });
     expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result_confirmed', undefined, { count: 1, total: 3 });
-    expect(notifications.logSuccess).not.toHaveBeenCalled();
+    expect(notifications.logSuccess).toHaveBeenCalledExactlyOnceWith({
+      title: 'plugin_navigation_tree_delete_success',
+      message: 'plugin_navigation_tree_delete_result_confirmed',
+    });
   });
 
   it('notifies when all selected objects were deleted', async () => {
@@ -537,7 +543,7 @@ describe('NodeDeletionService', () => {
     expect(notifications.logSuccess).not.toHaveBeenCalled();
     expect(notifications.logError).toHaveBeenCalledExactlyOnceWith({
       title: 'plugin_navigation_tree_delete_incomplete',
-      message: 'plugin_navigation_tree_delete_result\nProject / a: Denied\nProject / b: Denied',
+      message: 'Project / a: Denied\nProject / b: Denied',
     });
     expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result', undefined, { count: 0, total: 2 });
   });
