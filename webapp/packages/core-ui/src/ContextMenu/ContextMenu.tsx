@@ -23,8 +23,6 @@ export interface IContextMenuNewProps extends IContextMenuProps {
   gutter?: number;
   autoFocusOnShow?: boolean;
   modal?: boolean;
-  /** For menus opened programmatically, without a rendered trigger button. */
-  hideTrigger?: boolean;
 }
 
 export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuInner({
@@ -39,7 +37,6 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   gutter,
   autoFocusOnShow,
   modal,
-  hideTrigger = false,
   ...rest
 }) {
   const translate = useTranslate();
@@ -77,6 +74,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   );
 
   const showAtPosition = !!contextMenuPosition?.position;
+  const hasTrigger = !!rest.render || React.Children.toArray(children).length > 0;
 
   useLayoutEffect(() => {
     if (showAtPosition) {
@@ -100,7 +98,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   return (
     <MenuContext value={menuContext}>
       <MenuProvider store={menu} setOpen={handlers.handleVisibleSwitch}>
-        {!hideTrigger && (
+        {hasTrigger && (
           <MenuButton {...rest} title={translate(menuData.menu.info.tooltip)}>
             {children}
           </MenuButton>

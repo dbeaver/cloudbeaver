@@ -60,7 +60,6 @@ export const CellMenu = observer<Props>(function CellMenu({ menu }) {
           contextMenuPosition={menu.position}
           visible={!!menu.position.position}
           modal
-          hideTrigger
           autoFocusOnShow
           onVisibleSwitch={handleVisibleSwitch}
         />
