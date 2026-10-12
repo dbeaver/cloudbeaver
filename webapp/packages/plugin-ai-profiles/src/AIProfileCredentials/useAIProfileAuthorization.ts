@@ -31,7 +31,10 @@ export interface IAIProfileAuthorizationState {
   confirmLeave(): Promise<boolean>;
 }
 
-export function useAIProfileAuthorization(formState: IFormState<IAIProfileCredentialsFormState> | null): IAIProfileAuthorizationState {
+export function useAIProfileAuthorization(
+  formState: IFormState<IAIProfileCredentialsFormState> | null,
+  onSuccess?: () => void | Promise<void>,
+): IAIProfileAuthorizationState {
   const aiProfileAuthorizationService = useService(AIProfileAuthorizationService);
   const aiProfilesResource = useService(AIProfilesResource);
   const notificationService = useService(NotificationService);
@@ -56,6 +59,7 @@ export function useAIProfileAuthorization(formState: IFormState<IAIProfileCreden
         try {
           if (await task) {
             notificationService.logSuccess({ title: 'plugin_ai_account_connected', message: aiProfilesResource.get(profileId)?.name });
+            await this.onSuccess?.();
           }
         } catch (exception: any) {
           if (!task.cancelled) {
@@ -96,7 +100,7 @@ export function useAIProfileAuthorization(formState: IFormState<IAIProfileCreden
       },
     }),
     { authorization: observable.ref, task: observable.ref, processing: computed },
-    { formState },
+    { formState, onSuccess },
     ['connect', 'cancel', 'confirmLeave'],
   );
 

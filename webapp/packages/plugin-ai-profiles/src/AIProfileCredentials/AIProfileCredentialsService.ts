@@ -23,7 +23,7 @@ export class AIProfileCredentialsService {
     private readonly aiProfileCredentialsFormService: AIProfileCredentialsFormService,
   ) {}
 
-  async open(profileId: string): Promise<DialogResult<void> | undefined> {
+  async open(profileId: string, onSuccess?: () => void | Promise<void>): Promise<DialogResult<void> | undefined> {
     const profile = await this.aiProfilesResource.load(profileId);
 
     if (!profile) {
@@ -37,7 +37,7 @@ export class AIProfileCredentialsService {
     }
 
     try {
-      return await this.commonDialogService.open(AIProfileCredentialsDialog, { formState }, { persistent: true });
+      return await this.commonDialogService.open(AIProfileCredentialsDialog, { formState, onSuccess }, { persistent: true });
     } finally {
       await formState.dispose();
     }

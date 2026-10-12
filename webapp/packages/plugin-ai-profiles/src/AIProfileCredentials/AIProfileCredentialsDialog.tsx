@@ -36,6 +36,7 @@ import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsForm
 
 export interface IAIProfileCredentialsDialogPayload {
   formState: IFormState<IAIProfileCredentialsFormState>;
+  onSuccess?: () => void | Promise<void>;
 }
 
 export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDialogPayload> = observer(function AIProfileCredentialsDialog({
@@ -51,7 +52,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const aiEnginesResource = useService(AiEnginesResource);
   const profile = aiProfilesResource.get(formState.state.profileId);
   const engine = aiEnginesResource.data.find(engine => engine.id === profile?.engineId);
-  const authorization = useAIProfileAuthorization(formState);
+  const authorization = useAIProfileAuthorization(formState, payload.onSuccess);
   const error = getFirstException(formState.exception);
   const isSaving = !!formState.savingPromise;
   const form = useForm({
