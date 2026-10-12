@@ -13,7 +13,11 @@ import type { IConnectionPreferencesFormState } from './IConnectionPreferencesFo
 import type { ConnectionPreferencesFormService } from './ConnectionPreferencesFormService.js';
 
 export class ConnectionPreferencesFormState extends FormState<IConnectionPreferencesFormState> {
-  constructor(serviceProvider: IServiceProvider, service: ConnectionPreferencesFormService, config: IConnectionPreferencesFormState) {
-    super(serviceProvider, service, config);
+  constructor(
+    serviceProvider: IServiceProvider,
+    connectionPreferencesFormService: ConnectionPreferencesFormService,
+    config: IConnectionPreferencesFormState,
+  ) {
+    super(serviceProvider, connectionPreferencesFormService, config);
   }
 }
