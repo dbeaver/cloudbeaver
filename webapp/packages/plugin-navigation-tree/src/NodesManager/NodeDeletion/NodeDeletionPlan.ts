@@ -10,6 +10,7 @@ import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 export interface INodeDeletionTarget {
   /** Localization token describing the operation, rather than the tree renderer. */
   type: string;
+  readOnly?: boolean;
   reason?: string;
   warning?: string;
   /** Technical root node omitted from the displayed location. */
@@ -23,6 +24,7 @@ interface INodeDeletionProviderBase {
   /** The owning provider can exclude a node from deletion. Mixed selections still explain the exclusion. */
   isHidden?: (node: NavNode) => boolean;
   isDisabled?: (node: NavNode) => boolean;
+  /** Confirmation metadata for visible nodes, including disabled nodes. */
   getInfo: (node: NavNode) => Promise<INodeDeletionTarget> | INodeDeletionTarget;
 }
 

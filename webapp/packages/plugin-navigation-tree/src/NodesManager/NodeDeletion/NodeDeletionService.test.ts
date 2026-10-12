@@ -34,9 +34,16 @@ function node(uri: string, nodeType = 'connection'): INodeDeletionItem['node'] {
 }
 
 function setup(status = DialogueStateResult.Resolved) {
-  const dialogs = { open: vi.fn().mockResolvedValue({ status }) };
-  const notifications = { logError: vi.fn(), logException: vi.fn() };
-  const localization = { translate: (token: string) => token };
+  const dialogs = {
+    open: vi.fn((_dialog: unknown, payload: { items: INodeDeletionDialogItem[] }) =>
+      Promise.resolve({
+        status,
+        result: payload.items.filter(item => !item.reason).map(item => item.id),
+      }),
+    ),
+  };
+  const notifications = { logSuccess: vi.fn(), logError: vi.fn(), logException: vi.fn() };
+  const localization = { translate: vi.fn((token: string) => token) };
   const nodes = { resolveParents: vi.fn().mockResolvedValue([]), getParents: vi.fn().mockReturnValue([]), get: vi.fn() };
   const projects = { get: vi.fn().mockReturnValue({ name: 'Project' }) };
   const service = new NodeDeletionService(
@@ -54,7 +61,7 @@ function setup(status = DialogueStateResult.Resolved) {
     deleteNode: vi.fn().mockResolvedValue(true),
   };
   service.registerProvider(owner);
-  return { service, owner, dialogs, notifications, nodes };
+  return { service, owner, dialogs, notifications, nodes, localization };
 }
 
 describe('NodeDeletionService', () => {
@@ -246,7 +253,9 @@ describe('NodeDeletionService', () => {
       ['readonly', 'plugin_navigation_tree_delete_unavailable'],
       ['connection', undefined],
     ]);
-    expect(owner.getInfo).toHaveBeenCalledExactlyOnceWith(connection);
+    expect(owner.getInfo).toHaveBeenCalledTimes(2);
+    expect(owner.getInfo).toHaveBeenCalledWith(node('readonly'));
+    expect(owner.getInfo).toHaveBeenCalledWith(connection);
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(connection);
   });
 
@@ -322,7 +331,7 @@ describe('NodeDeletionService', () => {
     const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
     expect(items[0]?.location).toBe(`Project/${folderName}`);
     expect(items[0]).not.toHaveProperty('provider');
-    expect(items[0]).not.toHaveProperty('ancestors');
+    expect(items[0]?.ancestors).toEqual(ancestors);
   });
 
   it('omits the provider technical root without removing equally named folders', async () => {
@@ -395,17 +404,43 @@ describe('NodeDeletionService', () => {
   });
 
   it('does not execute any plugin operations when confirmation is cancelled', async () => {
-    const { service, owner, dialogs } = setup(DialogueStateResult.Rejected);
+    const { service, owner, dialogs, notifications } = setup(DialogueStateResult.Rejected);
 
     await service.delete([node('a'), node('b')]);
 
     expect(dialogs.open).toHaveBeenCalledTimes(1);
     expect(owner.deleteNode).not.toHaveBeenCalled();
+    expect(notifications.logSuccess).not.toHaveBeenCalled();
+    expect(notifications.logError).not.toHaveBeenCalled();
+  });
+
+  it('deletes only confirmed IDs and reports the confirmed count', async () => {
+    const { service, owner, dialogs, localization } = setup();
+    dialogs.open.mockResolvedValue({ status: DialogueStateResult.Resolved, result: ['b', 'readonly', 'unknown'] });
+    await service.delete([node('a'), node('b'), node('readonly')]);
+    expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(node('b'));
+    expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result', undefined, { count: 1, total: 1 });
+  });
+
+  it('does not delete or report success for an empty confirmation', async () => {
+    const { service, owner, dialogs, notifications } = setup();
+    dialogs.open.mockResolvedValue({ status: DialogueStateResult.Resolved, result: [] });
+    await service.delete([node('a')]);
+    expect(owner.deleteNode).not.toHaveBeenCalled();
+    expect(notifications.logSuccess).not.toHaveBeenCalled();
+  });
+
+  it('protects an unchecked child from deletion through its parent', async () => {
+    const { service, owner, dialogs, nodes } = setup();
+    nodes.resolveParents.mockImplementation((uri: string) => Promise.resolve(uri === 'child' ? ['parent'] : []));
+    dialogs.open.mockResolvedValue({ status: DialogueStateResult.Resolved, result: ['parent', 'independent'] });
+    await service.delete([node('parent'), node('child'), node('independent')]);
+    expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(node('independent'));
   });
 
   it('ignores repeated activation while confirmation is pending', async () => {
     const { service, owner, dialogs } = setup();
-    let confirm!: (value: { status: DialogueStateResult }) => void;
+    let confirm!: (value: { status: DialogueStateResult; result: string[] }) => void;
     dialogs.open.mockReturnValue(
       new Promise(resolve => {
         confirm = resolve;
@@ -416,7 +451,7 @@ describe('NodeDeletionService', () => {
     await vi.waitFor(() => expect(dialogs.open).toHaveBeenCalledTimes(1));
     await service.delete([node('b')]);
     expect(owner.deleteNode).not.toHaveBeenCalled();
-    confirm({ status: DialogueStateResult.Resolved });
+    confirm({ status: DialogueStateResult.Resolved, result: ['a'] });
     await first;
 
     expect(dialogs.open).toHaveBeenCalledTimes(1);
@@ -424,21 +459,23 @@ describe('NodeDeletionService', () => {
   });
 
   it('reports partial failure once and continues deleting independent targets', async () => {
-    const { service, owner, notifications } = setup();
+    const { service, owner, notifications, localization } = setup();
     owner.deleteNode = vi.fn().mockRejectedValueOnce(new Error('Denied')).mockResolvedValue(true);
 
     await service.delete([node('a'), node('b')]);
 
     expect(owner.deleteNode).toHaveBeenCalledTimes(2);
     expect(notifications.logError).toHaveBeenCalledExactlyOnceWith({
-      title: 'plugin_navigation_tree_delete_incomplete',
-      message: 'Project / a: Denied',
+      title: 'plugin_navigation_tree_delete_partial',
+      message: 'plugin_navigation_tree_delete_result\nProject / a: Denied',
     });
+    expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result', undefined, { count: 1, total: 2 });
+    expect(notifications.logSuccess).not.toHaveBeenCalled();
     expect(service.isDeleting).toBe(false);
   });
 
   it('reports an uncertain batch once, without attributing its error to individual nodes', async () => {
-    const { service, owner, notifications } = setup();
+    const { service, owner, notifications, localization } = setup();
     const deleteBatch = vi.fn().mockRejectedValue(new Error('Second node failed'));
     service.registerProvider({
       isApplicable: target => target.nodeType === 'database',
@@ -449,8 +486,66 @@ describe('NodeDeletionService', () => {
     expect(deleteBatch).toHaveBeenCalledTimes(1);
     expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(node('independent'));
     expect(notifications.logError).toHaveBeenCalledExactlyOnceWith({
-      title: 'plugin_navigation_tree_delete_incomplete',
-      message: 'Project / a, Project / b: plugin_navigation_tree_delete_unknown\nSecond node failed',
+      title: 'plugin_navigation_tree_delete_partial',
+      message: 'plugin_navigation_tree_delete_result_confirmed\nProject / a, Project / b: plugin_navigation_tree_delete_unknown\nSecond node failed',
     });
+    expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result_confirmed', undefined, { count: 1, total: 3 });
+    expect(notifications.logSuccess).not.toHaveBeenCalled();
+  });
+
+  it('notifies when all selected objects were deleted', async () => {
+    const { service, notifications, localization } = setup();
+
+    await service.delete([node('a'), node('b')]);
+
+    expect(notifications.logSuccess).toHaveBeenCalledExactlyOnceWith({
+      title: 'plugin_navigation_tree_delete_success',
+      message: 'plugin_navigation_tree_delete_result',
+    });
+    expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result', undefined, { count: 2, total: 2 });
+    expect(notifications.logError).not.toHaveBeenCalled();
+  });
+
+  it('reports completion for the confirmed deletable objects', async () => {
+    const { service, notifications, localization } = setup();
+
+    await service.delete([node('a'), node('readonly')]);
+
+    expect(notifications.logSuccess).toHaveBeenCalledExactlyOnceWith({
+      title: 'plugin_navigation_tree_delete_success',
+      message: 'plugin_navigation_tree_delete_result',
+    });
+    expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result', undefined, { count: 1, total: 1 });
+    expect(notifications.logError).not.toHaveBeenCalled();
+  });
+
+  it('does not report success when every deletion fails', async () => {
+    const { service, owner, notifications, localization } = setup();
+    owner.deleteNode = vi.fn().mockRejectedValue(new Error('Denied'));
+
+    await service.delete([node('a'), node('b')]);
+
+    expect(notifications.logSuccess).not.toHaveBeenCalled();
+    expect(notifications.logError).toHaveBeenCalledExactlyOnceWith({
+      title: 'plugin_navigation_tree_delete_incomplete',
+      message: 'plugin_navigation_tree_delete_result\nProject / a: Denied\nProject / b: Denied',
+    });
+    expect(localization.translate).toHaveBeenCalledWith('plugin_navigation_tree_delete_result', undefined, { count: 0, total: 2 });
+  });
+
+  it('shows the provider explanation for disabled objects', async () => {
+    const { service, owner, dialogs } = setup();
+    owner.getInfo = target => ({
+      type: 'connection',
+      readOnly: target.uri === 'readonly',
+      reason: target.uri === 'readonly' ? 'read-only-connection' : undefined,
+    });
+
+    await service.delete([node('readonly'), node('a')]);
+
+    const items: INodeDeletionDialogItem[] = dialogs.open.mock.calls[0]![1].items;
+    expect(items[0]?.reason).toBe('read-only-connection');
+    expect(items[0]?.readOnly).toBe(true);
+    expect(owner.deleteNode).toHaveBeenCalledExactlyOnceWith(node('a'));
   });
 });

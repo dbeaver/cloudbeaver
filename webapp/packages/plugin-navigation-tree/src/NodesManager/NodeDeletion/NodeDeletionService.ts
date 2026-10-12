@@ -73,9 +73,9 @@ export class NodeDeletionService {
       const rows = new Map<string, INodeDeletionDialogItem>();
       for (const node of new Map(nodes.map(node => [node.uri, node])).values()) {
         const { provider, reason } = this.resolveProvider(node);
-        const target = provider && !reason ? await provider.getInfo(node) : { type: 'plugin_navigation_tree_delete_object' };
+        const target = provider && !provider.isHidden?.(node) ? await provider.getInfo(node) : { type: 'plugin_navigation_tree_delete_object' };
         const ancestors = await this.navNodeInfoResource.resolveParents(node.uri);
-        const unavailable = reason ?? target.reason ?? this.resolveProvider(node).reason;
+        const unavailable = target.reason ?? reason ?? this.resolveProvider(node).reason;
         if (unavailable || !provider) {
           exclusions.push({ node, ancestors, reason: unavailable ?? 'plugin_navigation_tree_delete_unavailable' });
         } else {
@@ -83,9 +83,11 @@ export class NodeDeletionService {
         }
         rows.set(node.uri, {
           id: node.uri,
+          ancestors,
           name: node.name || node.uri,
           icon: node.icon,
           type: target.type,
+          readOnly: target.readOnly,
           warning: target.warning,
           project: (node.projectId && this.projectInfoResource.get(node.projectId)?.name) || node.projectId || '',
           location: ancestors
@@ -102,11 +104,32 @@ export class NodeDeletionService {
       if (!plan.items.length) {
         return;
       }
-      const { status } = await this.commonDialogService.open(NodeDeletionDialog, { items: [...rows.values()] });
-      if (status !== DialogueStateResult.Resolved) {
+      const { status, result } = await this.commonDialogService.open(NodeDeletionDialog, { items: [...rows.values()] });
+      if (status !== DialogueStateResult.Resolved || !result?.length) {
         return;
       }
-      const results = await executeNodeDeletionPlan(plan.items);
+      const selected = new Set(result);
+      const selectedPlan = prepareNodeDeletionPlan(
+        plan.items.filter(item => selected.has(item.node.uri)),
+        plan.items
+          .filter(item => !selected.has(item.node.uri))
+          .map(item => ({
+            ...item,
+            reason: 'plugin_navigation_tree_delete_not_selected',
+          })),
+      );
+      if (!selectedPlan.items.length) {
+        return;
+      }
+      const results = await executeNodeDeletionPlan(selectedPlan.items);
+      const deletedCount = results.filter(result => result.status === 'deleted').length;
+      const summary = this.localizationService.translate(
+        results.some(result => result.status === 'unknown')
+          ? 'plugin_navigation_tree_delete_result_confirmed'
+          : 'plugin_navigation_tree_delete_result',
+        undefined,
+        { count: deletedCount, total: selectedPlan.items.length },
+      );
       const reportedBatches = new Set<readonly INodeDeletionItem[]>();
       const unresolved = results.filter(result => {
         if (result.status === 'deleted' || (result.batch && reportedBatches.has(result.batch))) {
@@ -119,9 +142,10 @@ export class NodeDeletionService {
       });
       if (unresolved.length) {
         this.notificationService.logError({
-          title: 'plugin_navigation_tree_delete_incomplete',
-          message: unresolved
-            .map(({ item, status, error, batch }) => {
+          title: deletedCount > 0 ? 'plugin_navigation_tree_delete_partial' : 'plugin_navigation_tree_delete_incomplete',
+          message: [
+            summary,
+            ...unresolved.map(({ item, status, error, batch }) => {
               const label = (target: INodeDeletionItem) => `${rows.get(target.node.uri)!.project} / ${target.node.name}`;
               if (status === 'unknown') {
                 const message = this.localizationService.translate('plugin_navigation_tree_delete_unknown');
@@ -129,8 +153,13 @@ export class NodeDeletionService {
               }
               const reason = error instanceof Error ? error.message : this.localizationService.translate(`plugin_navigation_tree_delete_${status}`);
               return `${label(item)}: ${reason}`;
-            })
-            .join('\n'),
+            }),
+          ].join('\n'),
+        });
+      } else {
+        this.notificationService.logSuccess({
+          title: 'plugin_navigation_tree_delete_success',
+          message: summary,
         });
       }
     } catch (exception: any) {

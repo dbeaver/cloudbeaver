@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 
 import type { ITableSelection } from './TableSelectionContext.js';
 
-export function useTableSelection(keys: string[]): ITableSelection {
+export function useTableSelection(keys: string[], defaultSelectedKeys: string[] = []): ITableSelection {
   const selection: ITableSelection = useObservableRef(
     () => ({
       get list() {
@@ -21,7 +21,7 @@ export function useTableSelection(keys: string[]): ITableSelection {
       get selected() {
         return this.list.filter(item => this.keys.includes(item));
       },
-      state: new Set(),
+      state: new Set(defaultSelectedKeys),
       select(id: string) {
         if (this.state.has(id)) {
           this.state.delete(id);

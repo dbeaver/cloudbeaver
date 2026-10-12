@@ -92,10 +92,9 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         return !connection?.canDelete;
       },
       getInfo: async node => {
-        if (node.projectId && node.objectId) {
-          await this.connectionInfoResource.load(createConnectionParam(node.projectId, node.objectId));
-        }
-        return { type: 'plugin_connections_delete_connection' };
+        const connection =
+          node.projectId && node.objectId ? await this.connectionInfoResource.load(createConnectionParam(node.projectId, node.objectId)) : undefined;
+        return { type: 'plugin_connections_delete_connection', readOnly: connection?.features.includes(EConnectionFeature.readOnly) };
       },
       // Keep per-connection lifecycle guards even when deleting a selection.
       deleteNode: async node => await this.connectionsManagerService.deleteConnection(createConnectionParam(node.projectId!, node.objectId!)),
@@ -103,18 +102,23 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     const canDelete = (node: NavNode) => {
       const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
       const connection = key ? this.connectionInfoResource.get(key) : undefined;
-      return !!node.features?.includes(ENodeFeature.canDelete) && !connection?.features.includes(EConnectionFeature.restrictMetadataEdit);
+      return (
+        !!node.features?.includes(ENodeFeature.canDelete) &&
+        !connection?.features.includes(EConnectionFeature.readOnly) &&
+        !connection?.features.includes(EConnectionFeature.restrictMetadataEdit)
+      );
     };
     this.nodeDeletionService.registerProvider({
       isApplicable: node => !isConnectionNode(node) && !isConnectionFolder(node) && NodeManagerUtils.isDatabaseObject(node.uri),
       isDisabled: node => !canDelete(node),
       getInfo: async node => {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
-        if (key) {
-          await this.connectionInfoResource.load(key);
-        }
+        const connection = key ? await this.connectionInfoResource.load(key) : undefined;
+        const readOnly = connection?.features.includes(EConnectionFeature.readOnly);
         return {
           type: 'plugin_connections_delete_database_object',
+          readOnly,
+          reason: readOnly ? 'plugin_connections_delete_read_only' : undefined,
           // Keep backend batches within one project/connection.
           batchKey: JSON.stringify([node.projectId, key?.connectionId]),
         };

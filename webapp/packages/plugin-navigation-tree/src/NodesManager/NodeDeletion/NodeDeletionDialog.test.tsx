@@ -34,7 +34,7 @@ describe('NodeDeletionDialog', () => {
   beforeEach(() => {
     vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
     vi.stubGlobal('_ROOT_URI_', '/');
-    // Give the virtualized grid a viewport wide enough to render all three columns.
+    // Give the virtualized grid a viewport wide enough to render all columns.
     vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(1000);
     dialogs = new CommonDialogService();
     vi.spyOn(DI, 'useService').mockImplementation(token => {
@@ -89,7 +89,7 @@ describe('NodeDeletionDialog', () => {
     await expect(result).resolves.toMatchObject({ status: DialogueStateResult.Rejected });
   });
 
-  it('shows name, location and deletion status columns, with the object type on the icon', async () => {
+  it('shows selection, name and location columns, with the object type on the icon', async () => {
     const second = {
       ...ITEM,
       id: 'connection-2',
@@ -110,18 +110,18 @@ describe('NodeDeletionDialog', () => {
     expect(grid?.closest('[role="region"]')?.getAttribute('aria-label')).toBe('ui_data_delete_confirmation');
     expect(grid?.getAttribute('aria-rowcount')).toBe('3');
     expect(grid?.getAttribute('aria-colcount')).toBe('3');
-    expect(grid?.querySelector('[role="columnheader"][aria-colindex="3"]')?.textContent).toBe('plugin_navigation_tree_delete_status');
-    expect([...grid!.querySelectorAll('[role="gridcell"][aria-colindex="3"]')].map(cell => cell.textContent)).toEqual(['ui_delete', 'ui_delete']);
+    expect(grid?.querySelector('[role="columnheader"][aria-colindex="3"]')?.textContent).toBe('plugin_navigation_tree_delete_location');
+    expect(grid?.querySelector('[role="columnheader"][aria-colindex="4"]')).toBeNull();
     expect(grid?.querySelector('img')?.getAttribute('title')).toBe('connection');
     expect(grid?.querySelector('img')?.getAttribute('alt')).toBe('connection');
     const deleteButton = [...document.querySelectorAll('button')].find(button => button.textContent === 'ui_delete (2)');
     expect(deleteButton?.disabled).toBe(false);
 
     await act(() => deleteButton?.click());
-    await expect(result).resolves.toMatchObject({ status: DialogueStateResult.Resolved });
+    await expect(result).resolves.toMatchObject({ status: DialogueStateResult.Resolved, result: [ITEM.id, second.id] });
   });
 
-  it('dims skipped rows, explains their status in the table and counts only deletable objects', async () => {
+  it('dims skipped rows, keeps the explanation on their checkbox and counts only deletable objects', async () => {
     const result = dialogs.open(NodeDeletionDialog, {
       items: [ITEM, { ...ITEM, id: 'readonly', name: 'Read-only connection', reason: 'plugin_navigation_tree_delete_unavailable' }],
     });
@@ -139,21 +139,92 @@ describe('NodeDeletionDialog', () => {
     const skipped = rows.find(row => row.textContent?.includes('Read-only connection'));
     const skippedCells = [...skipped!.querySelectorAll('[role="gridcell"]')];
     expect(skippedCells).toHaveLength(3);
-    for (const cell of skippedCells) {
+    expect(skipped?.querySelector('input')?.disabled).toBe(true);
+    for (const cell of skippedCells.slice(1)) {
       expect(cell.querySelector('span[title]')?.classList.contains('tw:opacity-40')).toBe(true);
     }
-    const status = skipped?.querySelector('[role="gridcell"][aria-colindex="3"]');
-    expect(status?.textContent).toBe('plugin_navigation_tree_delete_unavailable');
-    expect(status?.querySelector('[title]')?.getAttribute('title')).toBe('plugin_navigation_tree_delete_unavailable');
-    const available = rows.find(row => row.querySelector('[role="gridcell"][aria-colindex="1"]')?.textContent === 'Connection');
+    expect(skippedCells[0]?.querySelector('[title="plugin_navigation_tree_delete_unavailable"]')).not.toBeNull();
+    const available = rows.find(row => row.querySelector('[role="gridcell"][aria-colindex="2"]')?.textContent === 'Connection');
     expect(available).toBeDefined();
-    for (const cell of available!.querySelectorAll('[role="gridcell"]')) {
+    for (const cell of [...available!.querySelectorAll('[role="gridcell"]')].slice(1)) {
       expect(cell.querySelector('span[title]')?.classList.contains('tw:opacity-40')).toBe(false);
     }
     const button = [...document.querySelectorAll('button')].find(button => button.textContent === 'ui_delete (1)');
     expect(button?.disabled).toBe(false);
     await act(() => button?.click());
     await expect(result).resolves.toMatchObject({ status: DialogueStateResult.Resolved });
+  });
+
+  it('updates selection, warnings and the delete action, and resolves only checked IDs', async () => {
+    const warning = 'folder-warning';
+    const result = dialogs.open(NodeDeletionDialog, {
+      items: [ITEM, { ...ITEM, id: 'folder', name: 'Folder', warning }, { ...ITEM, id: 'readonly', reason: 'unavailable' }],
+    });
+    await act(() => root.render(<DialogsPortal />));
+    await vi.waitFor(() => expect(document.querySelectorAll('input[type="checkbox"]')).toHaveLength(4));
+    const [all, first, folder, readonly] = [...document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
+    expect(all?.checked).toBe(true);
+    expect(readonly?.disabled).toBe(true);
+    await act(() => folder?.click());
+    expect(all?.indeterminate).toBe(true);
+    expect(document.querySelector('[role="dialog"]')?.textContent).not.toContain(warning);
+    expect(folder?.checked).toBe(false);
+    const deleteButton = [...document.querySelectorAll('button')].find(button => button.textContent?.startsWith('ui_delete'))!;
+    expect(deleteButton.textContent).toBe('ui_delete (1)');
+    await act(() => first?.click());
+    expect(deleteButton.disabled).toBe(true);
+    expect(deleteButton.textContent).toBe('ui_delete (0)');
+    await act(() => all?.click());
+    expect(deleteButton.textContent).toBe('ui_delete (2)');
+    expect(readonly?.checked).toBe(false);
+    await act(() => all?.click());
+    expect(deleteButton.disabled).toBe(true);
+    await act(() => first?.click());
+    await act(() => deleteButton.click());
+    await expect(result).resolves.toMatchObject({ status: DialogueStateResult.Resolved, result: [ITEM.id] });
+  });
+
+  it.each([false, true])('shows the existing readonly icon independently of deletion permissions: %s', async disabled => {
+    const result = dialogs.open(NodeDeletionDialog, {
+      items: [
+        ITEM,
+        {
+          ...ITEM,
+          id: 'readonly',
+          name: 'Read-only connection',
+          readOnly: true,
+          reason: disabled ? 'plugin_connections_delete_read_only' : undefined,
+        },
+      ],
+    });
+    await act(() => root.render(<DialogsPortal />));
+    await vi.waitFor(async () => {
+      await act(() => Promise.resolve());
+      expect(document.querySelector('[role="grid"] img[src="/icons/lock.png"]')).not.toBeNull();
+    });
+    const grid = document.querySelector('[role="grid"]')!;
+    const readonly = [...grid.querySelectorAll('[role="row"]')].find(row => row.textContent?.includes('Read-only connection'))!;
+    const icon = readonly.querySelector('img[src="/icons/lock.png"]')!;
+    expect(icon.getAttribute('title')).toBe('ui_readonly');
+    expect(icon.getAttribute('alt')).toBe('ui_readonly');
+    expect(readonly.querySelector('img[src="/icons/connection.svg"]')).not.toBeNull();
+    expect(readonly.querySelector('input')?.disabled).toBe(disabled);
+    expect(grid.querySelectorAll('img[src="/icons/lock.png"]')).toHaveLength(1);
+    await act(() => document.querySelector('[role="dialog"]')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    await expect(result).resolves.toMatchObject({ status: DialogueStateResult.Rejected });
+  });
+
+  it('unchecks ancestors when a child is unchecked and selects descendants with their parent', async () => {
+    dialogs.open(NodeDeletionDialog, { items: [ITEM, { ...ITEM, id: 'child', ancestors: [ITEM.id] }] });
+    await act(() => root.render(<DialogsPortal />));
+    await vi.waitFor(() => expect(document.querySelectorAll('input[type="checkbox"]')).toHaveLength(3));
+    const [, parent, child] = [...document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
+    await act(() => child?.click());
+    expect(parent?.checked).toBe(false);
+    expect(child?.checked).toBe(false);
+    await act(() => parent?.click());
+    expect(parent?.checked).toBe(true);
+    expect(child?.checked).toBe(true);
   });
 
   it.each([false, true])('uses a list for the folder warning only when a selection summary is also present: %s', async withSummary => {

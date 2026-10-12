@@ -1,6 +1,7 @@
 export default [
   ['plugin_connections_delete_connection', 'Соединение'],
   ['plugin_connections_delete_database_object', 'Объект базы данных'],
+  ['plugin_connections_delete_read_only', 'Соединение доступно только для чтения.'],
   ['plugin_connections_delete_folder_warning', 'Соединения внутри папок не будут удалены, если они не выбраны.'],
   ['plugin_connections_connection_form_part_main', 'Главное'],
   ['plugin_connections_connection_form_part_properties', 'Параметры драйвера'],
