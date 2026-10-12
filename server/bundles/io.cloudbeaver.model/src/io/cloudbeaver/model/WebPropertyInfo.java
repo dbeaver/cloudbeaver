@@ -96,15 +96,6 @@ public class WebPropertyInfo {
 
     @Nullable
     @Property
-    public String getDocumentationPath() {
-        if (property instanceof ProductSettingDescriptor productSettingDescriptor) {
-            return productSettingDescriptor.getDocumentationPath();
-        }
-        return null;
-    }
-
-    @Nullable
-    @Property
     public String getHint() {
         return property.getHint();
     }
