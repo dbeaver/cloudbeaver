@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import { IDatabaseDataEditAction } from './DatabaseDataModel/Actions/IDatabaseDa
 export class DataViewerDataChangeConfirmationService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
-    private readonly dataViewerTableService: TableViewerStorageService,
+    private readonly tableViewerStorageService: TableViewerStorageService,
     private readonly notificationService: NotificationService,
   ) {
     this.checkUnsavedData = this.checkUnsavedData.bind(this);
@@ -28,7 +28,7 @@ export class DataViewerDataChangeConfirmationService {
 
   // TODO: should be automatically called when the model is created, we can add executor to TableViewerStorageService for that
   trackTableDataUpdate(modelId: string) {
-    const model = this.dataViewerTableService.get(modelId);
+    const model = this.tableViewerStorageService.get(modelId);
 
     if (model && !model.onRequest.hasHandler(this.checkUnsavedData)) {
       model.onRequest.addHandler(executorHandlerFilter(({ operation }) => operation === DatabaseDataSourceOperation.Request, this.checkUnsavedData));

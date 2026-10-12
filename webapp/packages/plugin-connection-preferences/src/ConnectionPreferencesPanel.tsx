@@ -16,14 +16,16 @@ import { ConnectionPreferencesPanelService } from './ConnectionPreferencesPanelS
 import { ConnectionPreferencesFormLoader } from './ConnectionPreferencesForm/ConnectionPreferencesFormLoader.js';
 
 export const ConnectionPreferencesPanel: React.FC = observer(function ConnectionPreferencesPanel() {
-  const service = useService(ConnectionPreferencesPanelService);
+  const connectionPreferencesPanelService = useService(ConnectionPreferencesPanelService);
 
-  const close = useCallback(() => service.close(), [service]);
+  const close = useCallback(() => connectionPreferencesPanelService.close(), [connectionPreferencesPanelService]);
 
   return (
-    <ColoredContainer className='tw:h-full'>
+    <ColoredContainer className="tw:h-full">
       <Loader suspense>
-        {service.formState && <ConnectionPreferencesFormLoader formState={service.formState} onCancel={close} />}
+        {connectionPreferencesPanelService.formState && (
+          <ConnectionPreferencesFormLoader formState={connectionPreferencesPanelService.formState} onCancel={close} />
+        )}
       </Loader>
     </ColoredContainer>
   );

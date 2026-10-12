@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ export class AuthConfigurationParametersResource extends CachedMapResource<
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly sessionDataResource: SessionDataResource,
-    permissionsResource: SessionPermissionsResource,
+    sessionPermissionsResource: SessionPermissionsResource,
   ) {
     super();
 
     this.sessionDataResource.outdateResource(this);
-    permissionsResource.require(this, EAdminPermission.admin);
+    sessionPermissionsResource.require(this, EAdminPermission.admin);
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, AuthProviderConfigurationParametersFragment[]>> {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ interface Hook {
 }
 
 export function useChildren(navNodeId = ROOT_NODE_PATH): Hook {
-  const navTreeService = useService(NavigationTreeService);
+  const navigationTreeService = useService(NavigationTreeService);
   const navTreeResource = useService(NavTreeResource);
-  const children = navTreeService.getChildren(navNodeId);
+  const children = navigationTreeService.getChildren(navNodeId);
   const exception = navTreeResource.getException(navNodeId);
 
   const deps = [navNodeId];

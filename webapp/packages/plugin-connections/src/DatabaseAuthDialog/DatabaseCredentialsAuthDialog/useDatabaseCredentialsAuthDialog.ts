@@ -49,7 +49,7 @@ export function useDatabaseCredentialsAuthDialog(
   const connectionInfoResource = useService(ConnectionInfoResource);
   const dbDriverResource = useService(DBDriverResource);
   const connectionInfoAuthPropertiesResource = useService(ConnectionInfoAuthPropertiesResource);
-  const connectionInfoNetworkHandlersLoader = useService(ConnectionInfoNetworkHandlersResource);
+  const connectionInfoNetworkHandlersResource = useService(ConnectionInfoNetworkHandlersResource);
 
   const state: IState = useObservableRef(
     () => ({
@@ -133,7 +133,7 @@ export function useDatabaseCredentialsAuthDialog(
           await this.connectionInfoResource.init(this.getConfig());
           this.onInit?.();
         } catch (exception: any) {
-            this.authException = exception;
+          this.authException = exception;
         } finally {
           this.authenticating = false;
         }
@@ -188,7 +188,7 @@ export function useDatabaseCredentialsAuthDialog(
       networkHandlers,
       resetCredentials,
       connectionInfoAuthPropertiesResource,
-      connectionInfoNetworkHandlersLoader,
+      connectionInfoNetworkHandlersLoader: connectionInfoNetworkHandlersResource,
       onInit,
     },
   );

@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { copyToClipboard } from '@cloudbeaver/core-utils';
+import { copyToClipboard, isCopyShortcut } from '@cloudbeaver/core-utils';
 import {
   DataViewerService,
   type IGridColumnKey,
@@ -22,10 +22,6 @@ import {
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import type { ITableData } from './TableDataContext.js';
-
-const EVENT_KEY_CODE = {
-  C: 'KeyC',
-};
 
 function getCellCopyValue(tableData: ITableData, key: IGridDataKey): string {
   return tableData.format.getText(tableData.format.get(key));
@@ -75,10 +71,7 @@ export function useGridSelectedCellsCopy(
   const copyEventHandler = useDataViewerCopyHandler();
 
   const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
-    const isCopyShortcut =
-      (event.ctrlKey || event.metaKey) && !event.altKey && (event.key.toLowerCase() === 'c' || event.nativeEvent.code === EVENT_KEY_CODE.C);
-
-    if (isCopyShortcut) {
+    if (isCopyShortcut(event.nativeEvent)) {
       const activeElement = document.activeElement as HTMLElement | null;
       const isEditing = activeElement?.matches('input, textarea, [contenteditable="true"]');
 

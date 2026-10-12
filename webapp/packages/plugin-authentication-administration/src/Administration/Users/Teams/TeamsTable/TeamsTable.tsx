@@ -13,7 +13,7 @@ import { Link, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
-import { DataGrid, useCreateGridReactiveValue, TableRowSelect } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCellCopy, useCreateGridReactiveValue, TableRowSelect } from '@cloudbeaver/plugin-data-grid';
 
 import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
 import { Command } from '@dbeaver/ui-kit';
@@ -32,6 +32,7 @@ const COLUMNS = [SELECT_COLUMN, ID_COLUMN, NAME_COLUMN, DESCRIPTION_COLUMN];
 export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
   const translate = useTranslate();
   const styles = useS(AdministrationTableStyles);
+  const cellCopy = useCellCopy();
   const teamsTableOptionsPanelService = useService(TeamsTableOptionsPanelService);
 
   const columnsCount = useCreateGridReactiveValue(() => COLUMNS.length, null, [COLUMNS]);
@@ -120,6 +121,7 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
         headerElement={headerElement}
         cell={cell}
         className={s(styles, { table: true })}
+        onCellKeyDown={cellCopy.handleKeyDown}
       />
     </div>
   );

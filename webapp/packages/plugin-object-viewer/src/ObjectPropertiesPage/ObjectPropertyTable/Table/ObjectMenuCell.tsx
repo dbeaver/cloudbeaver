@@ -33,13 +33,13 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
 
   const styles = useS(classes);
   const navNodeManagerService = useService(NavNodeManagerService);
-  const connectionsInfoResource = useService(ConnectionInfoResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-  const connection = connectionsInfoResource.getConnectionForNode(node.uri);
+  const connection = connectionInfoResource.getConnectionForNode(node.uri);
   const contextMenuPosition = useContextMenuPosition();
-  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri!);
+  const connectionKey = connectionInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri!);
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);

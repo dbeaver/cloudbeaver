@@ -13,6 +13,11 @@
   border: 2px solid;
   border-radius: 8px;
   background: var(--theme-surface);
+
+  &:focus-within {
+    outline: 2px solid var(--theme-primary);
+    outline-offset: -2px;
+  }
 }
 
 .textareaContainer button {
