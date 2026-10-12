@@ -11,7 +11,7 @@ import { useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
 
 import { Button, Filter, s, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { getObjectPropertyOptionValue } from '@cloudbeaver/core-sdk';
-import { DataGrid, type DataGridRef, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, type DataGridRef, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import classes from './DriverPropertiesTable.module.css';
@@ -39,6 +39,7 @@ interface Props {
 
 export const DriverPropertiesTable = observer<Props>(function DriverPropertiesTable({ properties, propertiesState, readOnly, onAdd, onRemove }) {
   const styles = useS(classes);
+  const cellCopy = useCellCopy();
   const translate = useTranslate();
   const dataGridRef = useRef<DataGridRef>(null);
   const [filterValue, setFilterValue] = useState('');
@@ -256,12 +257,15 @@ export const DriverPropertiesTable = observer<Props>(function DriverPropertiesTa
           getRowClass={rowIdx => (visibleProperties.get()[rowIdx]?.custom ? s(styles, { customRow: true }) : null)}
           headerText={headerText}
           cell={cell}
-          onCellKeyDown={(_, event) => {
+          onCellKeyDown={(position, event) => {
             const target = event.target;
 
             if (event.key !== 'Tab' && target instanceof HTMLElement && target.closest('.rdg-cell') !== target) {
               event.preventGridDefault();
+              return;
             }
+
+            cellCopy.handleKeyDown(position, event);
           }}
         >
           <div className="tw:col-span-full tw:flex tw:h-full tw:w-full">

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,16 @@ interface IViewController {
 }
 
 export function useActiveView<T>(view: IView<T>): IViewController {
-  const activeViewService = useService(ViewService);
+  const viewService = useService(ViewService);
 
   const controller = useObjectRef(
     () => ({
       view,
       focusView() {
-        activeViewService.setPrimaryView(this.view);
+        viewService.setPrimaryView(this.view);
       },
       blurView() {
-        activeViewService.blur(this.view);
+        viewService.blur(this.view);
       },
     }),
     false,
@@ -36,9 +36,9 @@ export function useActiveView<T>(view: IView<T>): IViewController {
   );
 
   useEffect(() => {
-    activeViewService.addActiveView(view);
+    viewService.addActiveView(view);
 
-    return () => activeViewService.removeActiveVew(view);
+    return () => viewService.removeActiveVew(view);
   }, [view]);
 
   return controller;

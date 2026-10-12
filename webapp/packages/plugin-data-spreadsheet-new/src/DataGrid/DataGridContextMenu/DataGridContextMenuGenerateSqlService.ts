@@ -59,7 +59,7 @@ export class DataGridContextMenuGenerateSqlService {
     private readonly menuService: MenuService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
-    private readonly sqlGenerationResource: SqlGeneratorsResource,
+    private readonly sqlGeneratorsResource: SqlGeneratorsResource,
     private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {}
@@ -218,7 +218,7 @@ export class DataGridContextMenuGenerateSqlService {
     }
 
     try {
-      const generators = await this.sqlGenerationResource.load(nodePathList);
+      const generators = await this.sqlGeneratorsResource.load(nodePathList);
       const createGenerator = generators.find(g => g.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
 
       if (!createGenerator) {
@@ -229,7 +229,7 @@ export class DataGridContextMenuGenerateSqlService {
         return;
       }
 
-      const query = await this.sqlGenerationResource.generateEntityQuery(createGenerator.id, nodePathList, getDefaultQueryGeneratorOptions());
+      const query = await this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, getDefaultQueryGeneratorOptions());
 
       await this.commonDialogService.open(GeneratedSqlDialog, {
         query,
@@ -238,7 +238,7 @@ export class DataGridContextMenuGenerateSqlService {
         generatorId: createGenerator.id,
         generatorName: createGenerator.label,
         options: getDefaultQueryGeneratorOptions(),
-        regenerateQuery: genOptions => this.sqlGenerationResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
+        regenerateQuery: genOptions => this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
       });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
@@ -262,7 +262,7 @@ export class DataGridContextMenuGenerateSqlService {
     rows: SqlResultRow[];
     options: SqlQueryGeneratorOptions;
   }): Promise<string> {
-    const query = await this.sqlGenerationResource.generateResultSetSql({
+    const query = await this.sqlGeneratorsResource.generateResultSetSql({
       projectId,
       connectionId,
       contextId,

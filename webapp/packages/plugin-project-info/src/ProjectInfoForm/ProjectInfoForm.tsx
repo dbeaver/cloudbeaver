@@ -15,13 +15,11 @@ import { ProjectInfoFormService } from './ProjectInfoFormService.js';
 import { ProjectInfoFormPanel } from './ProjectInfoFormPanel.js';
 
 export const ProjectInfoForm: React.FC = observer(function ProjectInfoForm() {
-  const service = useService(ProjectInfoFormService);
+  const projectInfoFormService = useService(ProjectInfoFormService);
 
   return (
     <ColoredContainer>
-      <Loader suspense>
-        {service.formState && <ProjectInfoFormPanel formState={service.formState} />}
-      </Loader>
+      <Loader suspense>{projectInfoFormService.formState && <ProjectInfoFormPanel formState={projectInfoFormService.formState} />}</Loader>
     </ColoredContainer>
   );
 });

@@ -7,9 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useState, type PropsWithChildren } from 'react';
+import { useContext, useRef, useState, type PropsWithChildren } from 'react';
 
-import { ActionIconButton, AutoResizeTextarea, Form, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, AutoResizeTextarea, Form, s, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -35,6 +35,18 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const aiChatConversationsResource = useService(AIChatConversationsResource);
 
   const [value, setValue] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useExecutor({
+    executor: aiChatConversationsService.onNewConversation,
+    handlers: [
+      ({ stage }) => {
+        if (stage === 'after') {
+          textareaRef.current?.focus();
+        }
+      },
+    ],
+  });
 
   async function sendMessage() {
     let conversationId = currentConversationId;
@@ -86,6 +98,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
       >
         <div className={s(styles, { textareaContainer: true })}>
           <AutoResizeTextarea
+            ref={textareaRef}
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
             value={value}

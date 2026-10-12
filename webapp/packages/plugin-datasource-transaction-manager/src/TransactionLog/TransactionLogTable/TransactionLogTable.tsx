@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TransactionLogInfoItem } from '@cloudbeaver/core-sdk';
-import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
 import { QueryCell } from './QueryCell.js';
 import { TimeCell } from './TimeCell.js';
@@ -24,6 +24,7 @@ const QUERY_COLUMN_WIDTH = 250;
 
 export const TransactionLogTable = observer<Props>(function TransactionLogTable({ log }) {
   const styles = useS(classes);
+  const cellCopy = useCellCopy();
   const translate = useTranslate();
 
   const columnCount = useCreateGridReactiveValue(() => 6, null, []);
@@ -92,6 +93,7 @@ export const TransactionLogTable = observer<Props>(function TransactionLogTable(
         headerText={headerText}
         getRowHeight={() => 30}
         rowCount={rowCount}
+        onCellKeyDown={cellCopy.handleKeyDown}
       />
     </div>
   );

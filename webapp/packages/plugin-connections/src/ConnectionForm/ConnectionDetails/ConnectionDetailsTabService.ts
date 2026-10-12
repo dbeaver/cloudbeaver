@@ -10,6 +10,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
+import { CONNECTION_FORM_CONNECTION_DETAILS_TAB_ID } from './CONNECTION_FORM_CONNECTION_DETAILS_TAB_ID.js';
 
 const ConnectionDetails = importLazyComponent(() => import('./ConnectionDetails.js').then(m => m.ConnectionDetails));
 const ConnectionDetailsTab = importLazyComponent(() => import('./ConnectionDetailsTab.js').then(m => m.ConnectionDetailsTab));
@@ -22,7 +23,7 @@ export class ConnectionDetailsTabService extends Bootstrap {
 
   override register(): void {
     this.connectionFormService.parts.add({
-      key: 'connection_details',
+      key: CONNECTION_FORM_CONNECTION_DETAILS_TAB_ID,
       name: 'plugin_connections_connection_form_connection_details',
       title: 'plugin_connections_connection_form_connection_details',
       icon: '/icons/core_blocks_key.svg',

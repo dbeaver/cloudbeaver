@@ -50,7 +50,7 @@ const ConnectionIconSmall = importLazyComponent(() =>
 ])
 export class ConnectionSchemaManagerBootstrap extends Bootstrap {
   get connectionSelectorLoading(): boolean {
-    return this.connectionSchemaManagerService.isChangingConnection || this.connectionsManagerService.containerContainers.isLoading();
+    return this.connectionSchemaManagerService.isChangingConnection || this.connectionsManagerService.containerResource.isLoading();
   }
 
   constructor(

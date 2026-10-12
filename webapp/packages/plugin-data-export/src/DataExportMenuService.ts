@@ -105,6 +105,7 @@ export class DataExportMenuService {
               constraints: source.options.constraints,
               where: source.options.whereFilter,
               anyConstraint: source.options.anyConstraint,
+              shouldUseDisjunctive: source.options.shouldUseDisjunctive,
             },
           });
         }

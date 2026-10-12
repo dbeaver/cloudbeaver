@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
   ) {
     const translate = useTranslate();
     const styles = useS(style);
-    const dataViewerView = useService(DataViewerViewService);
+    const dataViewerViewService = useService(DataViewerViewService);
     const dataPresentationService = useService(DataPresentationService);
     const tableViewerStorageService = useService(TableViewerStorageService);
     const dataModel = tableViewerStorageService.get(tableId);
@@ -213,7 +213,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
       !simple;
 
     return (
-      <CaptureView className={s(styles, { captureView: true })} view={dataViewerView}>
+      <CaptureView className={s(styles, { captureView: true })} view={dataViewerViewService}>
         <div ref={mergedRef} tabIndex={0} className={s(styles, { tableViewer: true }, className)} style={{ background: typeColor }}>
           <div className={s(styles, { tableContent: true })}>
             {!isStatistics && (

@@ -9,7 +9,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 
 import { getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { EObjectFeature, type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 
@@ -17,7 +17,6 @@ import { useChildren } from '../../../NodesManager/useChildren.js';
 import { useNode } from '../../../NodesManager/useNode.js';
 import { ElementsTreeContext } from '../ElementsTreeContext.js';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent.js';
-import type { IElementsTree } from '../useElementsTree.js';
 
 export interface INavigationNode {
   ref: React.RefObject<HTMLDivElement | null>;
@@ -55,7 +54,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const loaded = getComputed(() => children.children !== undefined && children.isLoaded() && isLoaded());
   const showInFilter = getComputed(() => contextRef.context?.tree.getNodeState(node.uri).showInFilter || false);
   const isExpanded = getComputed(() => contextRef.context?.tree.isNodeExpanded(node.uri) || false);
-  const leaf = getComputed(() => isLeaf(node, children.children, contextRef.context?.tree, outdated));
+  const leaf = getComputed(() => contextRef.context?.tree.isNodeLeaf(node) ?? !node.hasChildren);
   const group = getComputed(() => contextRef.context?.tree.isGroup?.(node) || false);
   const empty = getComputed(() => children.children?.length === 0);
   const expanded = getComputed(() => isExpanded);
@@ -135,14 +134,4 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
     getSelected,
     setDnDState,
   });
-}
-
-export function isLeaf(node: NavNode, children: string[] | undefined, tree: IElementsTree | undefined, outdated: boolean): boolean {
-  return (
-    (!tree?.settings?.showTableContents &&
-      node.objectFeatures.includes(EObjectFeature.entity) &&
-      !node.objectFeatures.includes(EObjectFeature.keyValue)) ||
-    !node.hasChildren ||
-    (children?.length === 0 && !outdated)
-  );
 }

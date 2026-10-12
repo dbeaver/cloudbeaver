@@ -9,4 +9,5 @@ import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_TREE_CREATE_CONNECTION = createAction('create-tree-connection', {
   label: 'plugin_connections_connection_create_menu_title',
+  icon: '/icons/plugin_connection_new_sm.svg',
 });
