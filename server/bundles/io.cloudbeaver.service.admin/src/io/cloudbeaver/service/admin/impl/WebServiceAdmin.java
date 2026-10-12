@@ -743,7 +743,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @Nullable String projectId,
         @NotNull String connectionId
     ) throws DBWebException {
-        DBPProject globalProject = webSession.getProjectById(projectId);
+        DBPProject globalProject = ServletAppUtils.getProjectById(webSession, projectId);
         if (!WebServiceUtils.isGlobalProject(globalProject)) {
             throw new DBWebException("Project '" + projectId + "'is not global");
         }
@@ -787,7 +787,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     void validateThatConnectionGlobal(WebSession webSession, String projectId, Collection<String> connectionIds) throws DBWebException {
-        DBPProject globalProject = webSession.getProjectById(projectId);
+        DBPProject globalProject = ServletAppUtils.getProjectById(webSession, projectId);
         if (!WebServiceUtils.isGlobalProject(globalProject)) {
             throw new DBWebException("Project '" + projectId + "'is not global");
         }

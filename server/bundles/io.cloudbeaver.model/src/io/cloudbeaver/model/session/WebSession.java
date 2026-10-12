@@ -1016,7 +1016,7 @@ public class WebSession extends BaseWebSession
     }
 
     @Nullable
-    public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
+    public WebSessionProjectImpl getProjectById(@Nullable String projectId) {
         return getWorkspace().getProjectById(projectId);
     }
 
