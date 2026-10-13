@@ -140,8 +140,8 @@ public class WebSessionTest extends CloudbeaverMockTest {
         Mockito.when(accessibleProject.getId()).thenReturn("accessible-project");
 
         WebSessionWorkspace workspace = session.getWorkspace();
-        workspace.addProject(activeProject);
-        workspace.addProject(accessibleProject);
+        session.addSessionProject(activeProject);
+        session.addSessionProject(accessibleProject);
         workspace.setActiveProject(activeProject);
 
         Assertions.assertSame(activeProject, session.getProjectById(null));
