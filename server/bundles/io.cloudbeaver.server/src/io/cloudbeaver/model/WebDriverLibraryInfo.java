@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.List;
 
@@ -40,13 +41,30 @@ public class WebDriverLibraryInfo {
 
 
     @Property
+    @NotNull
     public String getId() {
         return driverLibrary.getId();
     }
 
     @Property
+    @NotNull
     public String getName() {
         return driverLibrary.getDisplayName();
+    }
+
+    @Property
+    @Nullable
+    public String getInstalledVersion() {
+        var libraryFiles = ((DriverDescriptor) driver).getDefaultDriverLoader().getLibraryFiles(driverLibrary);
+        if (libraryFiles == null) {
+            return null;
+        }
+        return libraryFiles.stream()
+            .filter(file -> CommonUtils.equalObjects(file.getId(), driverLibrary.getId()))
+            .map(file -> file.getVersion())
+            .filter(CommonUtils::isNotEmpty)
+            .findFirst()
+            .orElse(null);
     }
 
     @Property

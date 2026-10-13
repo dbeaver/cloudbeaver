@@ -4,6 +4,14 @@ mutation updateAiProfile($config: AIConfigurationProfileInput!) {
     name
     engineId
     global
+    credentialsSaved
+    accountAuthentication
+    deviceAuthorizationAvailable
+    accountProvider
+    tokenSaved
+    account {
+      email
+    }
     configuration {
       ...ObjectPropertyInfo
     }
