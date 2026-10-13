@@ -222,29 +222,39 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
   }
 
   private async closeResults(results: IDatabaseResultSet[]): Promise<void> {
-    if (!this.executionContext?.context) {
+    for (const result of results) {
+      await this.closeResult(result);
+    }
+  }
+
+  private async closeResult(result: IDatabaseResultSet): Promise<void> {
+    const context = this.executionContext?.context;
+    const { id: resultId, projectId, connectionId, contextId } = result;
+
+    // TODO: it's better to track that context is closed with subscription
+    if (!context || resultId === null || contextId !== context.id) {
       return;
     }
 
-    for (const result of results) {
-      // TODO: it's better to track that context is closed with subscription
-      if (result.id === null || this.closingResults.has(result.id) || result.contextId !== this.executionContext.context.id) {
-        continue;
-      }
-      const resultId = result.id;
-      this.closingResults.add(resultId);
-      try {
-        await this.graphQLService.sdk.closeResult({
-          projectId: result.projectId,
-          connectionId: result.connectionId,
-          contextId: result.contextId,
-          resultId: result.id,
-        });
-      } catch (exception: any) {
-        console.log(`Error closing result (${result.id}):`, exception);
-      } finally {
-        this.closingResults.delete(resultId);
-      }
+    const key = JSON.stringify([projectId, connectionId, contextId, resultId]);
+
+    if (this.closingResults.has(key)) {
+      return;
+    }
+
+    this.closingResults.add(key);
+
+    try {
+      await this.graphQLService.sdk.closeResult({
+        projectId,
+        connectionId,
+        contextId,
+        resultId,
+      });
+    } catch (exception: unknown) {
+      console.log(`Error closing result (${resultId}):`, exception);
+    } finally {
+      this.closingResults.delete(key);
     }
   }
 }
