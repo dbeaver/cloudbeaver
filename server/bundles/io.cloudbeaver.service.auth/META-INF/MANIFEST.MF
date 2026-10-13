@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Service - Authentication
 Bundle-SymbolicName: io.cloudbeaver.service.auth;singleton:=true
-Bundle-Version: 1.0.155.qualifier
-Bundle-Release-Date: 20261019
+Bundle-Version: 1.0.156.qualifier
+Bundle-Release-Date: 20261102
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: io.cloudbeaver.server.ce
