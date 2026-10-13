@@ -397,6 +397,8 @@ type DriverLibraryInfo {
     id: ID!
     "Driver library name"
     name: String!
+    "Version of the root driver library recorded in the installed driver files"
+    installedVersion: String @since(version: "26.2.3")
     "Path to the driver library icon"
     icon: String
     "List of files that are used by the driver"
