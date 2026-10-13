@@ -215,7 +215,7 @@ public class WebServiceAI implements DBWServiceAI {
         AISettings aiSettings = AISettingsManager.getInstance().getSettings();
         AIConfigurationProfile profile = aiSettings.getConfigurationOrNull(config.getDefaultConfiguration());
         aiSettings.setDefaultConfiguration(profile);
-        AISettingsManager.getInstance().saveSettings();
+        AISettingsManager.getInstance().saveSettings(aiSettings);
 
         addAISettingsChangedEvent(webSession);
         return new WebAISettingsConfig(
@@ -237,7 +237,7 @@ public class WebServiceAI implements DBWServiceAI {
             AIConfigurationProfile profile = settings.getConfiguration(profileId);
             profile.setConfiguration(toEngineConfiguration(webSession.getProgressMonitor(), profile, engineSettingsInput));
             WebAIProfileUtils.prepareGlobalProfile(webSession, profile);
-            AISettingsManager.getInstance().saveSettings();
+            AISettingsManager.getInstance().saveSettings(settings);
             addAISettingsChangedEvent(webSession);
             return true;
         } catch (DBException e) {
@@ -563,7 +563,7 @@ public class WebServiceAI implements DBWServiceAI {
                 WebAIProfileUtils.validateCredentialsSupport(webSession, profile.getConfiguration());
             }
             WebAIProfileUtils.prepareGlobalProfile(webSession, profile);
-            AISettingsManager.getInstance().saveSettings();
+            AISettingsManager.getInstance().saveSettings(settings);
             addAISettingsChangedEvent(webSession);
             return new WebAIConfigurationProfile(webSession, settings.getConfiguration(input.profileId()));
         } catch (DBException e) {
@@ -590,7 +590,7 @@ public class WebServiceAI implements DBWServiceAI {
                 UUID.randomUUID().toString()
             );
             WebAIProfileUtils.prepareGlobalProfile(webSession, newProfile);
-            AISettingsManager.getInstance().saveSettings();
+            AISettingsManager.getInstance().saveSettings(settings);
             addAISettingsChangedEvent(webSession);
             return new WebAIConfigurationProfile(webSession, newProfile);
         } catch (DBException e) {
@@ -622,7 +622,7 @@ public class WebServiceAI implements DBWServiceAI {
                 WebAIProfileUtils.validateCredentialsSupport(webSession, profile.getConfiguration());
             }
             WebAIProfileUtils.prepareGlobalProfile(webSession, profile);
-            AISettingsManager.getInstance().saveSettings();
+            AISettingsManager.getInstance().saveSettings(settings);
             addAISettingsChangedEvent(webSession);
             return new WebAIConfigurationProfile(webSession, profile);
         } catch (DBException e) {
@@ -638,7 +638,7 @@ public class WebServiceAI implements DBWServiceAI {
             AIConfigurationProfile profile = settings.getConfiguration(profileId);
             WebAIProfileUtils.deleteCredentials(webSession, profile);
             settings.removeConfiguration(profile);
-            AISettingsManager.getInstance().saveSettings();
+            AISettingsManager.getInstance().saveSettings(settings);
             addAISettingsChangedEvent(webSession);
         } catch (DBException e) {
             throw new DBWebException("Error deleting AI configuration " + profileId, e);
