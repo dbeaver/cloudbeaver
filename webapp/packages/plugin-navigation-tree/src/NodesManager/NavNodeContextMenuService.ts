@@ -7,6 +7,7 @@
  */
 import { RenameDialog } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
@@ -14,7 +15,6 @@ import {
   ENodeFeature,
   EObjectFeature,
   getNodePlainName,
-  getNodesFromContext,
   type INodeActions,
   isConnectionFolder,
   type NavNode,
@@ -41,6 +41,7 @@ import { MENU_NAVIGATION_TREE_CREATE } from '../NavigationTree/ElementsTree/Navi
 import { MENU_NAVIGATION_TREE_MANAGE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_MANAGE.js';
 import { MENU_NAVIGATION_TREE_TOOLS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_TOOLS.js';
 import { NodeDeletionService } from './NodeDeletion/NodeDeletionService.js';
+import { DATA_CONTEXT_ELEMENTS_TREE } from '../NavigationTree/ElementsTree/DATA_CONTEXT_ELEMENTS_TREE.js';
 
 export interface INodeMenuData {
   node: NavNode;
@@ -75,6 +76,18 @@ export class NavNodeContextMenuService extends Bootstrap {
     super();
   }
 
+  private getDeletionNodes(context: IDataContextProvider): NavNode[] {
+    const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+    const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+    if (!tree?.isNodeSelected(node.uri)) {
+      return [node];
+    }
+    return tree
+      .getSelected()
+      .map(id => this.navNodeInfoResource.get(id))
+      .filter((node): node is NavNode => !!node);
+  }
+
   override register(): void {
     this.actionService.addHandler({
       id: 'nav-node-selection-delete',
@@ -83,21 +96,21 @@ export class NavNodeContextMenuService extends Bootstrap {
       contexts: [DATA_CONTEXT_NAV_NODE],
       isHidden: (context, action) => {
         if (action === ACTION_DELETE) {
-          return !this.nodeDeletionService.canDelete(getNodesFromContext(context));
+          return !this.nodeDeletionService.canDelete(this.getDeletionNodes(context));
         }
 
         return true;
       },
       isDisabled: (context, action) => {
         if (action === ACTION_DELETE) {
-          return this.nodeDeletionService.isDeleting || !this.nodeDeletionService.canDelete(getNodesFromContext(context));
+          return this.nodeDeletionService.isDeleting || !this.nodeDeletionService.canDelete(this.getDeletionNodes(context));
         }
 
         return true;
       },
       handler: async (context, action) => {
         if (action === ACTION_DELETE) {
-          await this.nodeDeletionService.delete(getNodesFromContext(context));
+          await this.nodeDeletionService.delete(this.getDeletionNodes(context));
         }
       },
     });

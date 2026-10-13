@@ -56,16 +56,12 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
 
     function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
       EventContext.set(event, EventStopPropagationFlag);
-      if (!treeNodeContext.selected) {
-        treeNodeContext.select();
-      }
+      treeNodeContext.select();
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
       contextMenuPosition.open(event);
-      if (!treeNodeContext.selected) {
-        treeNodeContext.select();
-      }
+      treeNodeContext.select();
     }
 
     function handleClick(event: React.MouseEvent<HTMLDivElement>) {
@@ -108,7 +104,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
         </TreeNodeName>
         {!dndPlaceholder && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
-            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} elementsTree={elementsTreeContext} selected={selected} />
+            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} selected={selected} />
           </div>
         )}
       </TreeNodeControl>

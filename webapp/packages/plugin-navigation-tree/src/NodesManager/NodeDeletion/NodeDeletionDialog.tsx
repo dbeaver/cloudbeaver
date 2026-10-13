@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
@@ -30,19 +30,7 @@ import {
   useTableSelection,
 } from '@cloudbeaver/plugin-data-grid';
 
-export interface INodeDeletionDialogItem {
-  id: string;
-  name: string;
-  icon?: string;
-  type: string;
-  readOnly?: boolean;
-  project: string;
-  location: string;
-  warning?: string;
-  reason?: string;
-  parents?: string[];
-  keepChildren?: boolean;
-}
+import type { INodeDeletionDialogItem } from './NodeDeletionPlan.js';
 
 const COLUMNS = [
   { label: 'ui_select_all', width: '40px' },
@@ -60,7 +48,8 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
   const rows = payload.items;
   const singleItem = rows.length === 1 ? rows[0] : undefined;
   const keys = useMemo(() => rows.filter(item => !item.reason).map(item => item.id), [rows]);
-  const selection = useTableSelection(keys, keys);
+  const state = useMemo(() => observable.set(keys), [keys]);
+  const selection = useTableSelection(keys, state);
   const selected = new Set(selection.selected);
   const count = selected.size;
   const columnCount = useCreateGridReactiveValue(() => COLUMNS.length, null, []);
@@ -92,22 +81,6 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
       ),
     });
   }
-
-  const select = action((id: string) => {
-    selection.select(id);
-    const checked = selection.state.has(id);
-    const item = rows.find(item => item.id === id);
-    for (const row of rows) {
-      if (row.reason) {
-        continue;
-      }
-      if (checked && !item?.keepChildren && row.parents?.includes(id)) {
-        selection.state.add(row.id);
-      } else if (!checked && !row.keepChildren && item?.parents?.includes(row.id)) {
-        selection.state.delete(row.id);
-      }
-    }
-  });
 
   function getCell(rowIdx: number, colIdx: number) {
     const item = rows[rowIdx];
@@ -158,17 +131,7 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
         {messages.length === 1 && <p>{messages[0]!.content}</p>}
         {!singleItem && (
           <div role="region" aria-label={translate('ui_data_delete_confirmation')} className="tw:w-full tw:mt-4">
-            <TableSelectionContext
-              value={{
-                keys: selection.keys,
-                state: selection.state,
-                list: selection.list,
-                selected: selection.selected,
-                select,
-                selectRoot: selection.selectRoot,
-                clear: selection.clear,
-              }}
-            >
+            <TableSelectionContext value={selection}>
               <DataGrid
                 columnCount={columnCount}
                 rowCount={rowCount}

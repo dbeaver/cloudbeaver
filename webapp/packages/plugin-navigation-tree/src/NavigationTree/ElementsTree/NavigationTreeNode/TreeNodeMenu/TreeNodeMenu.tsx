@@ -11,17 +11,10 @@ import { getComputed, Icon, type IContextMenuPosition, s, useS } from '@cloudbea
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
-import {
-  DATA_CONTEXT_NAV_NODE,
-  DATA_CONTEXT_NAV_NODES,
-  NavNodeInfoResource,
-  type INodeActions,
-  type NavNode,
-} from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, type INodeActions, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import type { IElementsTreeContext } from '../../ElementsTreeContext.js';
 import { MENU_NAV_TREE } from '../../MENU_NAV_TREE.js';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from './DATA_CONTEXT_NAV_NODE_ACTIONS.js';
 import style from './TreeNodeMenu.module.css';
@@ -29,42 +22,20 @@ import style from './TreeNodeMenu.module.css';
 export interface TreeNodeMenuProps {
   node: NavNode;
   actions?: INodeActions;
-  elementsTree?: IElementsTreeContext | null;
   selected?: boolean;
   contextMenuPosition?: IContextMenuPosition;
   onClose?: () => void;
 }
 
-export const TreeNodeMenu = observer<TreeNodeMenuProps>(function TreeNodeMenu({
-  node,
-  actions,
-  elementsTree,
-  selected,
-  contextMenuPosition,
-  onClose,
-}) {
+export const TreeNodeMenu = observer<TreeNodeMenuProps>(function TreeNodeMenu({ node, actions, selected, contextMenuPosition, onClose }) {
   const styles = useS(style);
   const connectionInfoResource = useService(ConnectionInfoResource);
-  const navNodeInfoResource = useService(NavNodeInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const connectionKey = getComputed(() => connectionInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri));
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
     context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions, id);
-    context.set(
-      DATA_CONTEXT_NAV_NODES,
-      () => {
-        if (!elementsTree?.tree.isNodeSelected(node.uri)) {
-          return [node];
-        }
-        return elementsTree.tree
-          .getSelected()
-          .map(id => navNodeInfoResource.get(id))
-          .filter((node): node is NavNode => !!node);
-      },
-      id,
-    );
 
     if (connectionKey) {
       context.set(DATA_CONTEXT_CONNECTION, connectionKey, id);

@@ -58,6 +58,9 @@ import {
   MENU_NAVIGATION_TREE_CREATE,
   NavigationTreeService,
   NodeDeletionService,
+  nodeDeletionAvailabilityContext,
+  nodeDeletionPlanContext,
+  type INodeDeletionTarget,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -110,40 +113,49 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       const connection = key ? this.connectionInfoResource.get(key) : undefined;
       return !!node.features?.includes(ENodeFeature.canDelete) && !connection?.features.includes(EConnectionFeature.restrictMetadataEdit);
     };
-    this.nodeDeletionService.registerProvider({
-      isApplicable: node => isConnectionFolder(node) && !isConnectionNode(node),
-      keepChildren: true,
-      isDisabled: node => !canDelete(node),
-      getInfo: async node => {
+    const isFolder = (node: NavNode) => isConnectionFolder(node) && !isConnectionNode(node);
+    this.nodeDeletionService.checkDeletion.addHandler((nodes, contexts) => {
+      const available = contexts.getContext(nodeDeletionAvailabilityContext);
+      for (const node of nodes.filter(isFolder)) {
+        if (canDelete(node)) {
+          available.add(node.uri);
+        }
+      }
+    });
+    this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
+      const plan = contexts.getContext(nodeDeletionPlanContext);
+      const projects = new Map<string | undefined, INodeDeletionTarget[]>();
+      for (const node of nodes.filter(isFolder)) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
         if (key) {
           await this.connectionInfoResource.load(key);
         }
-        return {
+        const target = {
+          node,
           type: 'ui_folder',
           warning: 'plugin_connections_delete_folder_warning',
+          keepChildren: true,
         };
-      },
-      deleteBatch: async nodes => {
-        // The backend refreshes only one project's registry per folder-deletion request.
-        const projects = new Map<string | undefined, string[]>();
-        for (const node of nodes) {
-          const paths = projects.get(node.projectId) ?? [];
-          paths.push(node.uri);
-          projects.set(node.projectId, paths);
+        if (!canDelete(node)) {
+          plan.exclude({ ...target, owner: 'connection-folders', reason: 'plugin_navigation_tree_delete_unavailable' });
+          continue;
         }
-        const errors: unknown[] = [];
-        for (const paths of projects.values()) {
-          try {
-            await this.navTreeResource.deleteNode(resourceKeyList(paths));
-          } catch (error) {
-            errors.push(error);
-          }
-        }
-        if (errors.length) {
-          throw new AggregateError(errors, errors.map(error => (error instanceof Error ? error.message : String(error))).join('\n'));
-        }
-      },
+        const targets = projects.get(node.projectId) ?? [];
+        targets.push(target);
+        projects.set(node.projectId, targets);
+      }
+      // Each request refreshes one project's registry and reports its own outcome.
+      for (const [projectId, targets] of projects) {
+        plan.addOperation({
+          id: `delete-connection-folders:${projectId}`,
+          owner: 'connection-folders',
+          targets,
+          execute: async targetIds => {
+            await this.navTreeResource.deleteNode(resourceKeyList(targetIds));
+            return targetIds.map(targetId => ({ targetId, status: 'deleted' }));
+          },
+        });
+      }
     });
 
     this.navNodeInfoResource.onItemUpdate.addHandler(this.syncWithNavTree.bind(this));

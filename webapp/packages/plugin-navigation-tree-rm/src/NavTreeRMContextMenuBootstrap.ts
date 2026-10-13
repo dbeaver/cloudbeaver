@@ -9,7 +9,7 @@ import { RenameDialog } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DATA_CONTEXT_NAV_NODE, ENodeFeature } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, ENodeFeature, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { isResourceOfType, ProjectInfoResource, type ProjectInfoResourceType } from '@cloudbeaver/core-projects';
 import {
   getRmResourceKey,
@@ -21,7 +21,12 @@ import {
 } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_NAV_NODE_ACTIONS, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  DATA_CONTEXT_NAV_NODE_ACTIONS,
+  nodeDeletionAvailabilityContext,
+  nodeDeletionPlanContext,
+  NodeDeletionService,
+} from '@cloudbeaver/plugin-navigation-tree';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId.js';
@@ -53,32 +58,49 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    this.nodeDeletionService.registerProvider({
-      isApplicable: node => [NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType ?? ''),
-      isHidden: node => {
-        if (isRMProjectNode(node)) {
-          return true;
+    const isResource = (node: NavNode) => [NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType ?? '');
+    const canDelete = (node: NavNode) => {
+      if (isRMProjectNode(node)) {
+        return false;
+      }
+      const project = node.projectId ? this.projectInfoResource.get(node.projectId) : undefined;
+      const root = project?.resourceTypes.some(type => {
+        const root = this.resourceManagerService.getRootFolder(project, type.id);
+        return isResourceTypeRootFolder(node, project.id, root);
+      });
+      return !root && !!node.features?.includes(ENodeFeature.canDelete) && !!getResourceKeyFromNodeId(node.uri);
+    };
+    this.nodeDeletionService.checkDeletion.addHandler((nodes, contexts) => {
+      const available = contexts.getContext(nodeDeletionAvailabilityContext);
+      for (const node of nodes.filter(isResource)) {
+        if (canDelete(node)) {
+          available.add(node.uri);
         }
-        const project = node.projectId ? this.projectInfoResource.get(node.projectId) : undefined;
-        return !!project?.resourceTypes.some(type => {
-          const root = this.resourceManagerService.getRootFolder(project, type.id);
-          return isResourceTypeRootFolder(node, project.id, root);
-        });
-      },
-      isDisabled: node => !node.features?.includes(ENodeFeature.canDelete) || !getResourceKeyFromNodeId(node.uri),
-      getInfo: node => ({
-        type: node.folder ? 'ui_folder' : 'plugin_navigation_tree_rm_delete_resource',
-        warning: node.folder ? 'plugin_navigation_tree_rm_delete_folder_warning' : undefined,
-      }),
-      deleteNode: async node => {
-        // TODO: Replace individual resource deletes with a bulk RM API when available.
+      }
+    });
+    this.nodeDeletionService.prepareDeletion.addHandler((nodes, contexts) => {
+      const plan = contexts.getContext(nodeDeletionPlanContext);
+      for (const node of nodes.filter(isResource)) {
+        const target = {
+          node,
+          type: node.folder ? 'ui_folder' : 'plugin_navigation_tree_rm_delete_resource',
+          warning: node.folder ? 'plugin_navigation_tree_rm_delete_folder_warning' : undefined,
+        };
         const key = getResourceKeyFromNodeId(node.uri);
-        if (!key || !node.features?.includes(ENodeFeature.canDelete)) {
-          return false;
+        if (!key || !canDelete(node)) {
+          plan.exclude({ ...target, owner: 'resource-manager', reason: 'plugin_navigation_tree_delete_unavailable' });
+          continue;
         }
-        await this.resourceManagerResource.deleteResource(key);
-        return true;
-      },
+        plan.addOperation({
+          id: `delete-resource:${node.uri}`,
+          owner: 'resource-manager',
+          targets: [target],
+          execute: async () => {
+            await this.resourceManagerResource.deleteResource(key);
+            return [{ targetId: node.uri, status: 'deleted' }];
+          },
+        });
+      }
     });
     this.actionService.addHandler({
       id: 'nav-node-rm-handler',

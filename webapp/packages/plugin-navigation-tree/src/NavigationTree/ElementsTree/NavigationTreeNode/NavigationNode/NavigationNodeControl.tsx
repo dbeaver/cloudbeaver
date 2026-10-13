@@ -126,16 +126,12 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
 
     function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
       EventContext.set(event, EventStopPropagationFlag);
-      if (!treeNodeContext.selected) {
-        treeNodeContext.select();
-      }
+      treeNodeContext.select();
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
       contextMenuPosition.open(event);
-      if (!treeNodeContext.selected) {
-        treeNodeContext.select();
-      }
+      treeNodeContext.select();
     }
 
     const { editing, saving } = editingState;
@@ -173,7 +169,6 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
               contextMenuPosition={contextMenuPosition}
               node={node}
               actions={nodeActions}
-              elementsTree={elementsTreeContext}
               selected={selected}
             />
           </div>

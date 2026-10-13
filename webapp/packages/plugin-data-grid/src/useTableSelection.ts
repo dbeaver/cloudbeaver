@@ -12,7 +12,7 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 
 import type { ITableSelection } from './TableSelectionContext.js';
 
-export function useTableSelection(keys: string[], defaultSelectedKeys: string[] = []): ITableSelection {
+export function useTableSelection(keys: string[], externalState?: Set<string>): ITableSelection {
   const selection: ITableSelection = useObservableRef(
     () => ({
       get list() {
@@ -21,7 +21,7 @@ export function useTableSelection(keys: string[], defaultSelectedKeys: string[] 
       get selected() {
         return this.list.filter(item => this.keys.includes(item));
       },
-      state: new Set(defaultSelectedKeys),
+      state: externalState ?? new Set<string>(),
       select(id: string) {
         if (this.state.has(id)) {
           this.state.delete(id);

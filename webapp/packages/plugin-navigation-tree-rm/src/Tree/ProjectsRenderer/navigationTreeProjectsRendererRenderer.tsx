@@ -10,7 +10,8 @@ import { useContext } from 'react';
 
 import { getComputed, s, SContext, type StyleRegistry, Translate, TreeNodeNestedMessage, useS } from '@cloudbeaver/core-blocks';
 import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
-import { isRMProjectNode } from '@cloudbeaver/core-resource-manager';
+import { isRMProjectNode, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
+import { createPath } from '@cloudbeaver/core-utils';
 import {
   ElementsTreeContext,
   type IElementsTreeCustomRenderer,
@@ -23,7 +24,6 @@ import {
 } from '@cloudbeaver/plugin-navigation-tree';
 import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
-import { isResourceTypeRootFolder } from '../../NavNodes/isResourceTypeRootFolder.js';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl.js';
 import style from './NavigationTreeProjectsRendererRenderer.module.css';
 
@@ -57,7 +57,7 @@ export function navigationTreeProjectsRendererRenderer(
       return ProjectRenderer;
     }
 
-    if (resourceTypeId === undefined) {
+    if (!node?.folder || resourceTypeId === undefined) {
       return undefined;
     }
 
@@ -66,8 +66,10 @@ export function navigationTreeProjectsRendererRenderer(
       return undefined;
     }
 
-    const root = resourceManagerService.getRootFolder(project, resourceTypeId);
-    if (isResourceTypeRootFolder(node, project.id, root)) {
+    const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
+    const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+
+    if (nodeId === folderNodeId) {
       return ProjectRenderer;
     }
 

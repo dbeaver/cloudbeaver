@@ -28,7 +28,6 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { EObjectFeature, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
 
-import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext.js';
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent.js';
 import style from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.module.css';
 import { NavigationNodeExpand } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeExpand.js';
@@ -40,7 +39,6 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     const translate = useTranslate();
     const contextMenuPosition = useContextMenuPosition();
     const treeNodeContext = useContext(TreeNodeContext);
-    const elementsTreeContext = useContext(ElementsTreeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const navTreeResource = useService(NavTreeResource);
     const selected = treeNodeContext.selected;
@@ -62,16 +60,12 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
 
     function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
       EventContext.set(event, EventStopPropagationFlag);
-      if (!treeNodeContext.selected) {
-        treeNodeContext.select();
-      }
+      treeNodeContext.select();
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
       contextMenuPosition.open(event);
-      if (!treeNodeContext.selected) {
-        treeNodeContext.select();
-      }
+      treeNodeContext.select();
     }
 
     const temporary = node.objectFeatures.includes(EObjectFeature.dataSourceTemporary);
@@ -103,7 +97,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
         </TreeNodeName>
         {mountMenu && (
           <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
-            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} elementsTree={elementsTreeContext} selected={selected} />
+            <TreeNodeMenuLoader contextMenuPosition={contextMenuPosition} node={node} selected={selected} />
           </div>
         )}
       </TreeNodeControl>

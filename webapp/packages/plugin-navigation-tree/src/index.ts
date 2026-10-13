@@ -8,7 +8,13 @@
 
 import './module.js';
 export * from './NodesManager/NodeDeletion/NodeDeletionService.js';
-export type { INodeDeletionProvider, INodeDeletionTarget } from './NodesManager/NodeDeletion/NodeDeletionPlan.js';
+export type {
+  INodeDeletionOperation,
+  INodeDeletionOutcome,
+  INodeDeletionPlanBuilder,
+  INodeDeletionTarget,
+} from './NodesManager/NodeDeletion/NodeDeletionPlan.js';
+export * from './NodesManager/NodeDeletion/nodeDeletionPlanContext.js';
 
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings.js';
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';

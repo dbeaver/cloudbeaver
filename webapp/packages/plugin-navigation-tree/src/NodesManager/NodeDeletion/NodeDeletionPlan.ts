@@ -5,9 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { NavNode } from '@cloudbeaver/core-navigation-tree';
+import type { NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
 export interface INodeDeletionTarget {
+  node: NavNode;
+  /** Deleting configuration preserves descendants rather than deleting their contents. */
+  keepChildren?: boolean;
   /** Localization token describing the operation, rather than the tree renderer. */
   type: string;
   /** Shows the readonly indicator; deletion availability is checked separately. */
@@ -20,41 +24,60 @@ export interface INodeDeletionTarget {
   locationRoot?: string;
 }
 
-interface INodeDeletionProviderBase {
-  /** Identifies nodes owned by this provider. The first matching provider wins. */
-  isApplicable: (node: NavNode) => boolean;
-  /** Deleting this node preserves its descendants, so excluded or failed descendants do not block it. */
-  keepChildren?: boolean;
-  /** The owning provider can exclude a node from deletion. Mixed selections still explain the exclusion. */
-  isHidden?: (node: NavNode) => boolean;
-  /** Checks current deletion permissions without loading confirmation metadata. */
-  isDisabled?: (node: NavNode) => boolean;
-  /** Confirmation metadata for visible nodes, including disabled nodes. */
-  getInfo: (node: NavNode) => Promise<INodeDeletionTarget> | INodeDeletionTarget;
+export interface INodeDeletionOperation {
+  id: string;
+  owner: string;
+  targets: INodeDeletionTarget[];
+  /** Only execute the ready, confirmed subset. Preparation must not mutate resources or open dialogs. */
+  execute: (targetIds: string[]) => Promise<INodeDeletionOutcome[]>;
 }
 
-/** Supply exactly one strategy. Return false on cancellation; throw on failure. */
-export type INodeDeletionProvider = INodeDeletionProviderBase &
-  (
-    | {
-        /** Sequential deletion, including any domain-specific lifecycle guards. */
-        deleteNode: (node: NavNode) => Promise<boolean | void>;
-        deleteBatch?: never;
-      }
-    | {
-        deleteNode?: never;
-        /** Deletes independent nodes together; any domain-specific grouping belongs to the provider. */
-        deleteBatch: (nodes: NavNode[]) => Promise<boolean | void>;
-      }
-  );
+export interface INodeDeletionOutcome {
+  targetId: string;
+  status: 'deleted' | 'failed' | 'unknown' | 'cancelled';
+  error?: unknown;
+}
 
-export interface INodeDeletionItem {
+export interface INodeDeletionPlanBuilder {
+  readonly operations: readonly INodeDeletionOperation[];
+  readonly exclusions: readonly INodeDeletionExcludedTarget[];
+  addOperation(operation: INodeDeletionOperation): void;
+  exclude(target: INodeDeletionExcludedTarget): void;
+  validateOwnership(): void;
+  prepare(navNodeInfoResource: NavNodeInfoResource, projectInfoResource: ProjectInfoResource): Promise<INodeDeletionPlan>;
+}
+
+export interface INodeDeletionPlan {
+  items: INodeDeletionItem[];
+  rows: INodeDeletionDialogItem[];
+}
+
+export interface INodeDeletionExcludedTarget extends Partial<Omit<INodeDeletionTarget, 'node'>> {
+  owner: string;
+  node: NavNode;
+  reason: string;
+}
+
+export interface INodeDeletionDialogItem {
+  id: string;
+  name: string;
+  icon?: string;
+  type: string;
+  readOnly?: boolean;
+  project: string;
+  location: string;
+  warning?: string;
+  reason?: string;
+  parents?: string[];
+  keepChildren?: boolean;
+}
+
+export interface INodeDeletionItem extends INodeDeletionTarget {
   /** Explicitly selected node to delete. */
   node: NavNode;
   /** All parent URIs, from the tree root to the immediate parent. */
   parents: string[];
-  /** Provider responsible for executing this node's deletion. */
-  provider: INodeDeletionProvider;
+  operation: INodeDeletionOperation;
 }
 
 export interface INodeDeletionExclusion {
@@ -71,10 +94,10 @@ export interface INodeDeletionResult {
   item: INodeDeletionItem;
   /**
    * Deleted confirms success; failed means a single-node error; unknown means a batch may have partially completed.
-   * Cancelled means the provider returned false; skipped means no request was made because dependencies blocked it.
+   * Cancelled means a lifecycle guard stopped deletion; skipped means dependencies blocked it.
    */
   status: 'deleted' | 'failed' | 'unknown' | 'cancelled' | 'skipped';
-  /** Error thrown by the provider, when deletion failed or its outcome is unknown. */
+  /** Error returned or thrown by the operation. */
   error?: unknown;
   /** Shared identity for reporting a partially completed batch once, without guessing individual outcomes. */
   batch?: readonly INodeDeletionItem[];
@@ -91,7 +114,7 @@ export function prepareNodeDeletionPlan(
   exclusions: readonly INodeDeletionExclusion[],
 ): { items: INodeDeletionItem[]; exclusions: INodeDeletionExclusion[] } {
   const blocked = getParents(exclusions);
-  const isBlocked = (item: INodeDeletionItem) => !item.provider.keepChildren && blocked.has(item.node.uri);
+  const isBlocked = (item: INodeDeletionItem) => !item.keepChildren && blocked.has(item.node.uri);
   return {
     items: items.filter(item => !isBlocked(item)),
     exclusions: [
@@ -105,7 +128,7 @@ export function prepareNodeDeletionPlan(
   };
 }
 
-/** Deletes children before parents, batches ready nodes by provider, and continues independent work after failures. */
+/** Deletes children before parents and continues independent operations after failures. */
 export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[]): Promise<INodeDeletionResult[]> {
   const results: INodeDeletionResult[] = [];
   let pending = [...items];
@@ -122,20 +145,18 @@ export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[
     pending = pending.filter(item => pendingParents.has(item.node.uri));
     // Ready nodes are independent, so their outcomes can only block a later round.
     const blockedParents = getParents(results.filter(result => result.status !== 'deleted').map(result => result.item));
-    const handled = new Set<INodeDeletionProvider>();
+    const handled = new Set<INodeDeletionOperation>();
     for (const first of ready) {
-      const provider = first.provider;
-      if (handled.has(provider)) {
+      const operation = first.operation;
+      if (handled.has(operation)) {
         continue;
       }
-      if (provider.deleteBatch) {
-        handled.add(provider);
-      }
-      const group = provider.deleteBatch ? ready.filter(item => item.provider === provider) : [first];
+      handled.add(operation);
+      const group = ready.filter(item => item.operation === operation);
       const executable: INodeDeletionItem[] = [];
 
       for (const item of group) {
-        const blocked = !item.provider.keepChildren && blockedParents.has(item.node.uri);
+        const blocked = !item.keepChildren && blockedParents.has(item.node.uri);
         if (blocked) {
           results.push({ item, status: 'skipped' });
         } else {
@@ -147,24 +168,28 @@ export async function executeNodeDeletionPlan(items: readonly INodeDeletionItem[
         continue;
       }
 
-      results.push(...(await deleteItems(provider, executable)));
+      results.push(...(await deleteItems(operation, executable)));
     }
   }
 
   return results;
 }
 
-/** Executes one provider call without retrying a possibly partially completed batch. */
-async function deleteItems(provider: INodeDeletionProvider, items: INodeDeletionItem[]): Promise<INodeDeletionResult[]> {
+/** Never retry a possibly partially completed operation or infer success for missing outcomes. */
+async function deleteItems(operation: INodeDeletionOperation, items: INodeDeletionItem[]): Promise<INodeDeletionResult[]> {
   try {
-    const deleted = provider.deleteBatch ? await provider.deleteBatch(items.map(item => item.node)) : await provider.deleteNode(items[0]!.node);
-    return items.map(item => ({ item, status: deleted === false ? 'cancelled' : 'deleted' }));
+    const outcomes = await operation.execute(items.map(item => item.node.uri));
+    return items.map(item => {
+      const matches = outcomes.filter(outcome => outcome.targetId === item.node.uri);
+      const outcome = matches.length === 1 ? matches[0] : undefined;
+      return { item, status: outcome?.status ?? 'unknown', error: outcome?.error };
+    });
   } catch (error) {
     return items.map(item => ({
       item,
-      status: provider.deleteBatch ? 'unknown' : 'failed',
+      status: items.length > 1 ? 'unknown' : 'failed',
       error,
-      batch: provider.deleteBatch ? items : undefined,
+      batch: items.length > 1 ? items : undefined,
     }));
   }
 }
