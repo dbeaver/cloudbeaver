@@ -7,7 +7,10 @@
  */
 
 import type { IFormProps } from '@cloudbeaver/core-ui';
+import type { IAIProfileAuthorizationState } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
-export interface IAIProfileCredentialsFormProps extends IFormProps<IAIProfileCredentialsFormState> {}
+export interface IAIProfileCredentialsFormProps extends IFormProps<IAIProfileCredentialsFormState> {
+  authorization: IAIProfileAuthorizationState;
+}

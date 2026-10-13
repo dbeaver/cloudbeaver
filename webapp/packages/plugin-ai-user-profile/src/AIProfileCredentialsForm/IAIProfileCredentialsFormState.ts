@@ -6,6 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IAIProfileCredentialsFormState {
-  profileId: string;
-}
+export type { IAIProfileCredentialsFormState } from '@cloudbeaver/plugin-ai-profiles';

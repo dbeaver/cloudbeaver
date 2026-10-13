@@ -3,6 +3,7 @@ query getDriverLibraries($id: ID!) {
     driverLibraries {
       id
       name
+      installedVersion
       icon
       libraryFiles {
         id
