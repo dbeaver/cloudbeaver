@@ -22,6 +22,7 @@ export interface IContextMenuNewProps extends IContextMenuProps {
   shift?: number;
   gutter?: number;
   autoFocusOnShow?: boolean;
+  modal?: boolean;
 }
 
 export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuInner({
@@ -35,6 +36,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   shift,
   gutter,
   autoFocusOnShow,
+  modal,
   ...rest
 }) {
   const translate = useTranslate();
@@ -72,6 +74,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   );
 
   const showAtPosition = !!contextMenuPosition?.position;
+  const hasTrigger = !!rest.render || React.Children.toArray(children).length > 0;
 
   useLayoutEffect(() => {
     if (showAtPosition) {
@@ -95,11 +98,14 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   return (
     <MenuContext value={menuContext}>
       <MenuProvider store={menu} setOpen={handlers.handleVisibleSwitch}>
-        <MenuButton {...rest} title={rest.title ?? translate(menuData.menu.info.tooltip || menuData.menu.info.label)}>
-          {children}
-        </MenuButton>
+        {hasTrigger && (
+          <MenuButton {...rest} title={rest.title ?? translate(menuData.menu.info.tooltip || menuData.menu.info.label)}>
+            {children}
+          </MenuButton>
+        )}
         <Menu
-          aria-label={rest['aria-label'] || rest.title || translate(menuData.menu.info.label || menuData.menu.info.tooltip)}
+          modal={modal}
+          aria-label={translate(menuData.menu.info.label)}
           getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
           shift={shift}
           gutter={gutter}
