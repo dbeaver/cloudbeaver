@@ -27,7 +27,13 @@ export function TabListLayout({
         <>
           {/* Keep Ariakit's tab context while separating action buttons from accessible tab ownership. */}
           <div {...tabListProps} />
-          <div className={className} data-dialog-persistent-element={persistent}>
+          <div
+            role="group"
+            aria-label={props['aria-label']}
+            aria-labelledby={props['aria-labelledby']}
+            className={className}
+            data-dialog-persistent-element={persistent}
+          >
             {children}
           </div>
         </>
