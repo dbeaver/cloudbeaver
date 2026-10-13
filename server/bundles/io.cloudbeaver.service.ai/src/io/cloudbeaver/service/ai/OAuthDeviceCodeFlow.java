@@ -28,6 +28,7 @@ import java.util.function.LongSupplier;
 
 public final class OAuthDeviceCodeFlow {
     private static final int POLLING_SAFETY_MARGIN_SECONDS = 3;
+    private static final int EXPIRATION_SAFETY_MARGIN_SECONDS = 3;
     private static final int SLOW_DOWN_INCREMENT_SECONDS = 5;
     private static final Duration CANCELLATION_CHECK_INTERVAL = Duration.ofSeconds(1);
 
@@ -55,21 +56,12 @@ public final class OAuthDeviceCodeFlow {
         @NotNull CompletableFuture<Void> cancellation,
         @NotNull String providerName
     ) throws DBException {
-        long deadline = nanoTime.getAsLong() + Duration.ofSeconds(authorization.expiresInSeconds()).toNanos();
+        long deadlineNanos = nanoTime.getAsLong() + Duration.ofSeconds(
+            Math.max(0, authorization.expiresInSeconds() - EXPIRATION_SAFETY_MARGIN_SECONDS)
+        ).toNanos();
         int intervalSeconds = Math.max(1, authorization.intervalSeconds());
-        while (nanoTime.getAsLong() < deadline) {
+        while (nanoTime.getAsLong() < deadlineNanos) {
             checkCancellation(cancellation, providerName);
-            long remainingNanos = deadline - nanoTime.getAsLong();
-            long waitNanos = Math.min(
-                Duration.ofSeconds(intervalSeconds + POLLING_SAFETY_MARGIN_SECONDS).toNanos(),
-                remainingNanos
-            );
-            sleep(Duration.ofNanos(Math.max(0, waitNanos)), cancellation, providerName);
-            checkCancellation(cancellation, providerName);
-            if (nanoTime.getAsLong() >= deadline) {
-                break;
-            }
-
             AIAccountAuthenticator.DeviceAuthorizationPollResult result =
                 authenticator.pollDeviceAuthorization(authorization, cancellation);
             checkCancellation(cancellation, providerName);
@@ -79,6 +71,16 @@ public final class OAuthDeviceCodeFlow {
             if (result.status() == AIAccountAuthenticator.DeviceAuthorizationPollStatus.SLOW_DOWN) {
                 intervalSeconds += SLOW_DOWN_INCREMENT_SECONDS;
             }
+
+            long remainingNanos = deadlineNanos - nanoTime.getAsLong();
+            if (remainingNanos <= 0) {
+                break;
+            }
+            long waitNanos = Math.min(
+                Duration.ofSeconds(intervalSeconds + POLLING_SAFETY_MARGIN_SECONDS).toNanos(),
+                remainingNanos
+            );
+            sleep(Duration.ofNanos(waitNanos), cancellation, providerName);
         }
         throw new DBException(providerName + " device authorization timed out");
     }

@@ -75,10 +75,10 @@ public class OAuthDeviceCodeFlowTest {
 
         Assertions.assertSame(tokens, result);
         Assertions.assertEquals(
-            List.of(Duration.ofSeconds(5), Duration.ofSeconds(10), Duration.ofSeconds(20)),
+            List.of(Duration.ZERO, Duration.ofSeconds(5), Duration.ofSeconds(15)),
             pollTimes
         );
-        Assertions.assertEquals(Duration.ofSeconds(20), waits.stream().reduce(Duration.ZERO, Duration::plus));
+        Assertions.assertEquals(Duration.ofSeconds(15), waits.stream().reduce(Duration.ZERO, Duration::plus));
         Assertions.assertTrue(waits.stream().allMatch(wait -> wait.compareTo(Duration.ofSeconds(1)) <= 0));
         Mockito.verify(authenticator, Mockito.times(3))
             .pollDeviceAuthorization(Mockito.eq(AUTHORIZATION), Mockito.any());
@@ -86,12 +86,21 @@ public class OAuthDeviceCodeFlowTest {
 
     @Test
     void stopsBeforePollingWhenCancelled() {
-        OAuthDeviceCodeFlow flow = new OAuthDeviceCodeFlow();
+        AtomicLong nanoTime = new AtomicLong();
+        OAuthDeviceCodeFlow flow = new OAuthDeviceCodeFlow(
+            nanoTime::get,
+            duration -> nanoTime.addAndGet(duration.toNanos())
+        );
         AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
 
         DBException exception = Assertions.assertThrows(
             DBException.class,
-            () -> flow.complete(authenticator, AUTHORIZATION, cancellationFuture(() -> true), "Test provider")
+            () -> flow.complete(
+                authenticator,
+                AUTHORIZATION,
+                cancellationFuture(() -> true),
+                "Test provider"
+            )
         );
 
         Assertions.assertEquals("Test provider device authorization was cancelled", exception.getMessage());
@@ -99,7 +108,7 @@ public class OAuthDeviceCodeFlowTest {
     }
 
     @Test
-    void stopsWaitingWhenCancelled() {
+    void stopsWaitingWhenCancelled() throws DBException {
         AtomicLong nanoTime = new AtomicLong();
         AtomicBoolean cancelled = new AtomicBoolean();
         OAuthDeviceCodeFlow flow = new OAuthDeviceCodeFlow(nanoTime::get, duration -> {
@@ -107,19 +116,27 @@ public class OAuthDeviceCodeFlowTest {
             cancelled.set(true);
         });
         AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
+        Mockito.when(authenticator.pollDeviceAuthorization(Mockito.eq(AUTHORIZATION), Mockito.any())).thenReturn(
+            AIAccountAuthenticator.DeviceAuthorizationPollResult.pending()
+        );
 
         DBException exception = Assertions.assertThrows(
             DBException.class,
-            () -> flow.complete(authenticator, AUTHORIZATION, cancellationFuture(cancelled::get), "Test provider")
+            () -> flow.complete(
+                authenticator,
+                AUTHORIZATION,
+                cancellationFuture(cancelled::get),
+                "Test provider"
+            )
         );
 
         Assertions.assertEquals("Test provider device authorization was cancelled", exception.getMessage());
         Assertions.assertEquals(Duration.ofSeconds(1), Duration.ofNanos(nanoTime.get()));
-        Mockito.verifyNoInteractions(authenticator);
+        Mockito.verify(authenticator).pollDeviceAuthorization(Mockito.eq(AUTHORIZATION), Mockito.any());
     }
 
     @Test
-    void stopsAtAuthorizationDeadline() throws DBException {
+    void stopsBeforeAuthorizationExpires() throws DBException {
         AtomicLong nanoTime = new AtomicLong();
         OAuthDeviceCodeFlow flow = new OAuthDeviceCodeFlow(
             nanoTime::get,
@@ -132,7 +149,7 @@ public class OAuthDeviceCodeFlowTest {
                 "user-code",
                 URI.create("https://example.com/device"),
                 5,
-                4
+                9
             );
         Mockito.when(authenticator.pollDeviceAuthorization(Mockito.eq(expiringAuthorization), Mockito.any())).thenReturn(
             AIAccountAuthenticator.DeviceAuthorizationPollResult.pending()
@@ -149,7 +166,8 @@ public class OAuthDeviceCodeFlowTest {
         );
 
         Assertions.assertEquals("Test provider device authorization timed out", exception.getMessage());
-        Mockito.verifyNoInteractions(authenticator);
+        Mockito.verify(authenticator).pollDeviceAuthorization(Mockito.eq(expiringAuthorization), Mockito.any());
+        Assertions.assertEquals(Duration.ofSeconds(6), Duration.ofNanos(nanoTime.get()));
     }
 
     private static CompletableFuture<Void> cancellationFuture(BooleanSupplier cancellation) {
