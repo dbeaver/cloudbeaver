@@ -37,12 +37,20 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
     try {
       if (aiProfileCredentialsService.isRequired(profile)) {
         menu?.hide();
-        const { status } = await aiProfileCredentialsService.open(profile.id);
-        if (status !== DialogueStateResult.Resolved) {
+        const result = await aiProfileCredentialsService.open(profile.id, () => updateProfile(profile.id));
+        if (result?.status !== DialogueStateResult.Resolved) {
           return;
         }
       }
-      await aiChatConversationsService.updateConversationProfile(conversation.id, profile.id);
+      await updateProfile(profile.id);
+    } catch (exception: any) {
+      notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
+    }
+  }
+
+  async function updateProfile(profileId: string): Promise<void> {
+    try {
+      await aiChatConversationsService.updateConversationProfile(conversation.id, profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
     }
@@ -100,7 +108,10 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
                   disabled={disabled}
                   name="edit"
                   viewBox="0 0 13 13"
-                  onClick={() => editCredentials(profile.id)}
+                  onClick={event => {
+                    event.stopPropagation();
+                    editCredentials(profile.id);
+                  }}
                 />
               )}
             </div>
