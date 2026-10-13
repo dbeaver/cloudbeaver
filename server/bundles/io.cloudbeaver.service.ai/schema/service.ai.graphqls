@@ -124,8 +124,34 @@ type AIConfigurationProfileInfo @since(version: "26.1.3") {
     engineId: ID!
     "Whether this profile uses global administrator-managed credentials."
     global: Boolean! @since(version: "26.2.0")
-    "Whether the current user has saved credentials for this profile."
+    "Whether the current user has saved credentials for the selected authentication method. Does not validate provider access."
     credentialsSaved: Boolean! @since(version: "26.2.0")
+    "Whether the current user selected subscription authentication for this non-global profile. Defaults to false."
+    accountAuthentication: Boolean! @since(version: "26.2.0")
+    "Whether device authorization is available for this profile."
+    deviceAuthorizationAvailable: Boolean! @since(version: "26.2.0")
+    "Device authorization provider display name, such as ChatGPT. Null for global profiles and engines without server-side device authorization support."
+    accountProvider: String @since(version: "26.2.0")
+    "Whether the current user has a saved API token, independently of the selected authentication method."
+    tokenSaved: Boolean! @since(version: "26.2.0")
+    "Current user's connected subscription account, independently of the selected authentication method. Null when disconnected; email may be unavailable."
+    account: AIAccountInfo @since(version: "26.2.0")
+}
+
+type AIAccountInfo @since(version: "26.2.0") {
+    "Email reported by the account provider, if available."
+    email: String
+}
+
+type AIDeviceAuthorizationInfo @since(version: "26.2.0") {
+    "Code that the user must enter on the provider verification page."
+    userCode: String!
+    "Provider page where the user confirms device authorization."
+    verificationUri: String!
+    "Number of seconds before the authorization attempt expires."
+    expiresInSeconds: Int!
+    "Asynchronous task that waits for authorization and saves the account credentials."
+    taskInfo: AsyncTaskInfo!
 }
 
 type AIAdminConfigurationProfileInfo @since(version: "26.1.3") {
@@ -137,6 +163,18 @@ type AIAdminConfigurationProfileInfo @since(version: "26.1.3") {
     engineId: ID!
     "Whether this profile uses global administrator-managed credentials."
     global: Boolean! @since(version: "26.2.0")
+    "Whether the current user has saved credentials for the selected authentication method. Does not validate provider access."
+    credentialsSaved: Boolean! @since(version: "26.2.0")
+    "Whether the current user selected subscription authentication for this non-global profile. Defaults to false."
+    accountAuthentication: Boolean! @since(version: "26.2.0")
+    "Whether device authorization is available for this profile."
+    deviceAuthorizationAvailable: Boolean! @since(version: "26.2.0")
+    "Device authorization provider display name, such as ChatGPT. Null for global profiles and engines without server-side device authorization support."
+    accountProvider: String @since(version: "26.2.0")
+    "Whether the current user has a saved API token, independently of the selected authentication method."
+    tokenSaved: Boolean! @since(version: "26.2.0")
+    "Current user's connected subscription account, independently of the selected authentication method. Null when disconnected; email may be unavailable."
+    account: AIAccountInfo @since(version: "26.2.0")
     "Configuration of the AI engine profile."
     configuration: [ObjectPropertyInfo!]!
 }
@@ -237,8 +275,10 @@ input AIConfigurationProfileInput @since(version: "26.1.3") {
 }
 
 input AIProfileCredentialsInput @since(version: "26.2.0") {
-    "Credential property values keyed by AI engine property ID."
+    "Credential property values keyed by AI engine property ID. Omitted properties remain unchanged; an empty token clears only the API token."
     properties: Object!
+    "Selects the current user's authentication method without changing the shared profile. Omit to keep the current selection. Does not delete either kind of credentials."
+    accountAuthentication: Boolean @since(version: "26.2.0")
 }
 
 extend type Query @since(version: "23.2.2") {
@@ -286,6 +326,10 @@ extend type Mutation @since(version: "23.2.2") {
     aiDeleteProfile(profileId: ID!): Boolean! @since(version: "26.1.3")
     "Saves or updates the current user's credentials for a non-global profile. Empty values clear credentials."
     aiSaveProfileCredentials(profileId: ID!, credentials: AIProfileCredentialsInput!): Boolean! @since(version: "26.2.0")
+    "Starts device authorization for the current user and a supported non-global profile, regardless of its configured authentication. Successful completion saves the account and selects subscription authentication for this user. Failure or cancellation leaves existing credentials and selection unchanged."
+    aiStartDeviceAuthorization(profileId: ID!): AIDeviceAuthorizationInfo! @since(version: "26.2.0")
+    "Removes only the current user's account credentials and cancels pending authorization for this non-global profile. Preserves the API token and selected authentication method."
+    aiDisconnectAccount(profileId: ID!): Boolean! @since(version: "26.2.0")
 
     """
     Creates a new AI chat conversation.
