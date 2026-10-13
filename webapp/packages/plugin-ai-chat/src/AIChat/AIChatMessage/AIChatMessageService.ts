@@ -167,9 +167,9 @@ export class AIChatMessageService {
     const profile = conversation.profile ? await this.aiProfilesResource.load(conversation.profile) : undefined;
 
     if (profile && this.aiProfileCredentialsService.isRequired(profile)) {
-      const { status } = await this.aiProfileCredentialsService.open(profile.id);
+      const result = await this.aiProfileCredentialsService.open(profile.id);
 
-      if (status !== DialogueStateResult.Resolved) {
+      if (result?.status !== DialogueStateResult.Resolved) {
         ExecutorInterrupter.interrupt(contexts);
       }
     }

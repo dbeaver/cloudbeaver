@@ -689,6 +689,15 @@ public class WebSession extends BaseWebSession
     @NotNull
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
         AbstractJob job = new AbstractCancelableJob(asyncTask.getName()) {
+            @Override
+            public void cancelJob(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo) {
+                try {
+                    runnable.cancel();
+                } finally {
+                    super.cancelJob(webSession, taskInfo);
+                }
+            }
+
             @NotNull
             @Override
             protected IStatus run(@NotNull DBRProgressMonitor monitor) {

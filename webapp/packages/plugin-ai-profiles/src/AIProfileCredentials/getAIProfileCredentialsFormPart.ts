@@ -9,8 +9,8 @@
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
+import { AIProfilesResource } from '../AIProfilesResource.js';
 import { AIProfileCredentialsFormPart } from './AIProfileCredentialsFormPart.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
 
