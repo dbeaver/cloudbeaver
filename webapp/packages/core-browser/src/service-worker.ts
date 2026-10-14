@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,21 @@ addEventListener('fetch', event => {
 
         const preCachedResponse = await preCachedResponsePromise;
 
-        return preCachedResponse ?? (await fetch(request));
+        if (preCachedResponse) {
+          return preCachedResponse;
+        }
+
+        try {
+          return await fetch(request);
+        } catch (error) {
+          console.error("[ServiceWorker] Failed to load the application page. Check the browser's Network panel for request details.", {
+            path: url.pathname,
+            method: request.method,
+            stage: 'network-fallback',
+            error,
+          });
+          return Response.error();
+        }
       })(),
     );
   }
