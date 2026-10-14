@@ -208,19 +208,17 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
   async deleteNode(key: ResourceKeySimple<string>): Promise<void> {
     const nodePaths = ResourceKeyUtils.toArray(key);
-    if (!nodePaths.length) {
-      return;
-    }
 
     await this.performUpdate(key, [], async () => {
       const deletedPaths: string[] = [];
 
       try {
-        await this.graphQLService.sdk.navDeleteNodes({ nodePaths });
-        deletedPaths.push(...nodePaths);
+        for (const path of nodePaths) {
+          await this.graphQLService.sdk.navDeleteNodes({ nodePaths: [path] });
+          deletedPaths.push(path);
+        }
+        this.onDataOutdated.execute(key);
       } finally {
-        // The backend may have partially applied a failed batch. Reload all affected parents.
-        const parents = nodePaths.map(path => this.navNodeInfoResource.get(path)?.parentId).filter(isDefined);
         runInAction(() => {
           const deletedNodes: string[] = [];
           const deletionMap = new Map<string, string[]>();
@@ -233,7 +231,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
               if (node.parentId !== undefined) {
                 const deletedIds = deletionMap.get(node.parentId) ?? [];
-                deletedIds.push(path);
                 deletionMap.set(node.parentId, deletedIds);
               }
             }
@@ -242,14 +239,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
           const keys = resourceKeyList([...deletionMap.keys()]);
           const nodes = [...deletionMap.values()];
 
-          // deleteInNode removes its children from the resource as well.
-          const deletedInParents = new Set(nodes.flat());
-          this.delete(resourceKeyList(deletedNodes.filter(nodeId => !deletedInParents.has(nodeId))));
+          this.delete(resourceKeyList(deletedNodes));
           this.deleteInNode(keys, nodes);
         });
-        this.markOutdated(resourceKeyList(parents));
-        // Deleted nodes are no longer in their parents' child lists, so parent invalidation misses their cached object properties.
-        this.onDataOutdated.execute(key);
       }
     });
   }

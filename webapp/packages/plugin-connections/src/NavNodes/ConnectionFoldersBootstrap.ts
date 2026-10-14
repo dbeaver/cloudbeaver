@@ -60,7 +60,6 @@ import {
   NodeDeletionService,
   nodeDeletionAvailabilityContext,
   nodeDeletionPlanContext,
-  type INodeDeletionTarget,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -124,7 +123,6 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     });
     this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
       const plan = contexts.getContext(nodeDeletionPlanContext);
-      const projects = new Map<string | undefined, INodeDeletionTarget[]>();
       for (const node of nodes.filter(isFolder)) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
         if (key) {
@@ -140,19 +138,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           plan.exclude({ ...target, owner: 'connection-folders', reason: 'plugin_navigation_tree_delete_unavailable' });
           continue;
         }
-        const targets = projects.get(node.projectId) ?? [];
-        targets.push(target);
-        projects.set(node.projectId, targets);
-      }
-      // Each request refreshes one project's registry and reports its own outcome.
-      for (const [projectId, targets] of projects) {
         plan.addOperation({
-          id: `delete-connection-folders:${projectId}`,
+          id: `delete-connection-folder:${node.uri}`,
           owner: 'connection-folders',
-          targets,
-          execute: async targetIds => {
-            await this.navTreeResource.deleteNode(resourceKeyList(targetIds));
-            return targetIds.map(targetId => ({ targetId, status: 'deleted' }));
+          targets: [target],
+          execute: async () => {
+            await this.navTreeResource.deleteNode(node.uri);
+            return [{ targetId: node.uri, status: 'deleted' }];
           },
         });
       }

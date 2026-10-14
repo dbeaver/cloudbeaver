@@ -30,7 +30,7 @@ import {
   NavTreeResource,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
-import { getCachedMapResourceLoaderState, resourceKeyList } from '@cloudbeaver/core-resource';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import { ActionService, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
@@ -50,7 +50,6 @@ import {
   nodeDeletionAvailabilityContext,
   nodeDeletionPlanContext,
   NodeDeletionService,
-  type INodeDeletionTarget,
 } from '@cloudbeaver/plugin-navigation-tree';
 
 @injectable(() => [
@@ -141,7 +140,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           },
         });
       }
-      const targets: INodeDeletionTarget[] = [];
       for (const node of nodes.filter(isDatabaseNode)) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
         const connection = key ? await this.connectionInfoResource.load(key) : undefined;
@@ -153,18 +151,15 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             owner: 'database-objects',
             reason: readOnly ? 'plugin_connections_delete_read_only' : 'plugin_navigation_tree_delete_unavailable',
           });
-        } else {
-          targets.push(target);
+          continue;
         }
-      }
-      if (targets.length) {
         plan.addOperation({
-          id: 'delete-database-objects',
+          id: `delete-database-object:${node.uri}`,
           owner: 'database-objects',
-          targets,
-          execute: async targetIds => {
-            await this.navTreeResource.deleteNode(resourceKeyList(targetIds));
-            return targetIds.map(targetId => ({ targetId, status: 'deleted' }));
+          targets: [target],
+          execute: async () => {
+            await this.navTreeResource.deleteNode(node.uri);
+            return [{ targetId: node.uri, status: 'deleted' }];
           },
         });
       }
