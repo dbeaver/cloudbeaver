@@ -23,6 +23,7 @@ interface State {
   dialogService: CommonDialogService;
   selection: ITableSelection;
   refresh: () => Promise<void>;
+  clone: (profileId: string) => Promise<void>;
   delete: () => Promise<void>;
 }
 
@@ -46,6 +47,21 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
           this.notificationService.logSuccess({ title: 'plugin_ai_administration_profiles_refresh_success' });
         } catch (exception: any) {
           this.notificationService.logException(exception, 'plugin_ai_administration_profiles_refresh_error');
+        } finally {
+          this.processing = false;
+        }
+      },
+      async clone(profileId) {
+        if (this.processing) {
+          return;
+        }
+
+        try {
+          this.processing = true;
+          const profile = await this.aiProfilesResource.copyProfile(profileId);
+          this.notificationService.logSuccess({ title: 'plugin_ai_administration_profile_clone_success', message: profile.name });
+        } catch (exception: any) {
+          this.notificationService.logException(exception, 'plugin_ai_administration_profile_clone_error');
         } finally {
           this.processing = false;
         }
@@ -102,6 +118,7 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
       processing: observable.ref,
       selection: observable.ref,
       refresh: action.bound,
+      clone: action.bound,
       delete: action.bound,
     },
     { aiProfilesResource, selection, notificationService, dialogService: commonDialogService },

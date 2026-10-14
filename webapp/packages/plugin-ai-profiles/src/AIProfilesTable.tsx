@@ -10,14 +10,14 @@ import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import type { ReactNode } from 'react';
 
-import { IconOrImage, Link, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { DataGrid, TableRowSelect, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
-import { Command } from '@dbeaver/ui-kit';
 
 import { AI_PROFILES_TABLE_ROW_HEIGHT } from './AI_PROFILES_TABLE_ROW_HEIGHT.js';
 import type { AIProfile } from './AIProfilesResource.js';
+import { AIProfileNameCell } from './AIProfileNameCell.js';
 
 export interface IAIProfilesTableColumn {
   key: string;
@@ -40,6 +40,8 @@ export interface IAIProfilesTableProps {
   getSelectionTitle?: (profile: AIProfile) => string | undefined;
   isProfileClickable?: (profile: AIProfile) => boolean;
   getProfileBadge?: (profile: AIProfile) => ReactNode;
+  processing?: boolean;
+  onClone?: (profileId: string) => void;
   onProfileClick?: (profile: AIProfile) => void;
 }
 
@@ -59,6 +61,8 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   getSelectionTitle,
   isProfileClickable,
   getProfileBadge,
+  processing,
+  onClone,
   onProfileClick,
 }) {
   const translate = useTranslate();
@@ -103,31 +107,14 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
 
     if (column.key === NAME_COLUMN.key) {
       const clickable = !!onProfileClick && (isProfileClickable?.(profile) ?? true);
-      const content = (
-        <>
-          {clickable ? <Link truncate>{profile.name}</Link> : <span className="tw:truncate">{profile.name}</span>}
-          {getProfileBadge?.(profile)}
-        </>
-      );
-
-      if (clickable) {
-        return (
-          <Command
-            render={<div />}
-            tabIndex={0}
-            title={profile.name}
-            className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none"
-            onClick={() => onProfileClick(profile)}
-          >
-            {content}
-          </Command>
-        );
-      }
-
       return (
-        <div title={profile.name} className="tw:flex tw:items-center tw:gap-2">
-          {content}
-        </div>
+        <AIProfileNameCell
+          profile={profile}
+          badge={getProfileBadge?.(profile)}
+          disabled={processing}
+          onOpen={clickable ? onProfileClick : undefined}
+          onClone={onClone}
+        />
       );
     }
 
@@ -155,6 +142,8 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     getSelectionTitle,
     isProfileClickable,
     getProfileBadge,
+    processing,
+    onClone,
     onProfileClick,
   ]);
 

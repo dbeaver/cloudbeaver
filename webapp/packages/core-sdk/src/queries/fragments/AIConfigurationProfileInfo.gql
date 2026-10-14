@@ -1,0 +1,14 @@
+fragment AIConfigurationProfileInfo on AIConfigurationProfileInfo {
+  id
+  name
+  engineId
+  global
+  credentialsSaved
+  accountAuthentication
+  deviceAuthorizationAvailable
+  accountProvider
+  tokenSaved
+  account {
+    email
+  }
+}
