@@ -34,6 +34,12 @@ addEventListener('fetch', event => {
   }
 
   const { request } = event;
+
+  // Cache-only reads (for example, from DevTools) must not trigger network requests.
+  if (request.cache === 'only-if-cached') {
+    return;
+  }
+
   const url = new URL(request.url);
 
   if (url.pathname == '/') {
@@ -59,13 +65,7 @@ addEventListener('fetch', event => {
 
         try {
           return await fetch(request);
-        } catch (error) {
-          console.error("[ServiceWorker] Failed to load the application page. Check the browser's Network panel for request details.", {
-            path: url.pathname,
-            method: request.method,
-            stage: 'network-fallback',
-            error,
-          });
+        } catch {
           return Response.error();
         }
       })(),
