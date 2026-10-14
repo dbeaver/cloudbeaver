@@ -97,6 +97,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
             processing={table.processing}
             isDefaultProfile={profileId => profileId === defaultProfileId}
             onClone={table.clone}
+            onDelete={table.delete}
           />
         </TableSelectionContext>
       </Container>

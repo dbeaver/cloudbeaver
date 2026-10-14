@@ -39,9 +39,11 @@ export interface IAIProfilesTableProps {
   isProfileSelectable?: (profile: AIProfile) => boolean;
   getSelectionTitle?: (profile: AIProfile) => string | undefined;
   isProfileClickable?: (profile: AIProfile) => boolean;
+  isProfileDeletable?: (profile: AIProfile) => boolean;
   getProfileBadge?: (profile: AIProfile) => ReactNode;
   processing?: boolean;
   onClone?: (profileId: string) => void;
+  onDelete?: (profileId: string) => void;
   onProfileClick?: (profile: AIProfile) => void;
 }
 
@@ -60,9 +62,11 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   isProfileSelectable,
   getSelectionTitle,
   isProfileClickable,
+  isProfileDeletable,
   getProfileBadge,
   processing,
   onClone,
+  onDelete,
   onProfileClick,
 }) {
   const translate = useTranslate();
@@ -112,8 +116,10 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
           profile={profile}
           badge={getProfileBadge?.(profile)}
           disabled={processing}
+          deletionDisabled={!(isProfileDeletable?.(profile) ?? true)}
           onOpen={clickable ? onProfileClick : undefined}
           onClone={onClone}
+          onDelete={onDelete}
         />
       );
     }
@@ -141,9 +147,11 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     isProfileSelectable,
     getSelectionTitle,
     isProfileClickable,
+    isProfileDeletable,
     getProfileBadge,
     processing,
     onClone,
+    onDelete,
     onProfileClick,
   ]);
 

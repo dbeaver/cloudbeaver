@@ -24,7 +24,7 @@ interface State {
   selection: ITableSelection;
   refresh: () => Promise<void>;
   clone: (profileId: string) => Promise<void>;
-  delete: () => Promise<void>;
+  delete: (profileId?: string) => Promise<void>;
 }
 
 export function useAIProfilesTable(selection: ITableSelection): Readonly<State> {
@@ -66,12 +66,12 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
           this.processing = false;
         }
       },
-      async delete() {
+      async delete(profileId) {
         if (this.processing) {
           return;
         }
 
-        const deletionList = this.selection.selected;
+        const deletionList = profileId === undefined ? this.selection.selected : [profileId];
 
         if (deletionList.length === 0) {
           return;
@@ -108,7 +108,11 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
             });
           }
 
-          this.selection.clear();
+          if (profileId === undefined) {
+            this.selection.clear();
+          } else if (failed.length === 0 && this.selection.list.includes(profileId)) {
+            this.selection.select(profileId);
+          }
         } finally {
           this.processing = false;
         }

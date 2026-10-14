@@ -19,11 +19,21 @@ interface Props {
   profile: AIProfile;
   badge?: ReactNode;
   disabled?: boolean;
+  deletionDisabled?: boolean;
   onOpen?: (profile: AIProfile) => void;
   onClone?: (profileId: string) => void;
+  onDelete?: (profileId: string) => void;
 }
 
-export const AIProfileNameCell = observer<Props>(function AIProfileNameCell({ profile, badge, disabled, onOpen, onClone }) {
+export const AIProfileNameCell = observer<Props>(function AIProfileNameCell({
+  profile,
+  badge,
+  disabled,
+  deletionDisabled,
+  onOpen,
+  onClone,
+  onDelete,
+}) {
   const translate = useTranslate();
   const cell = useContext(DataGridCellInnerContext);
 
@@ -39,7 +49,7 @@ export const AIProfileNameCell = observer<Props>(function AIProfileNameCell({ pr
         )}
         {badge}
       </div>
-      {onClone && (
+      {(onClone || onDelete) && (
         <MenuProvider placement="bottom-end">
           <MenuButton
             render={
@@ -57,11 +67,21 @@ export const AIProfileNameCell = observer<Props>(function AIProfileNameCell({ pr
             }
           />
           <Menu modal>
-            <MenuItem
-              disabled={disabled}
-              render={<MenuItemElement label="plugin_ai_profiles_profile_clone" icon="copy" />}
-              onClick={() => onClone(profile.id)}
-            />
+            {onOpen && <MenuItem disabled={disabled} render={<MenuItemElement label="ui_edit" icon="edit" />} onClick={() => onOpen(profile)} />}
+            {onClone && (
+              <MenuItem
+                disabled={disabled}
+                render={<MenuItemElement label="plugin_ai_profiles_profile_clone" icon="copy" />}
+                onClick={() => onClone(profile.id)}
+              />
+            )}
+            {onDelete && (
+              <MenuItem
+                disabled={disabled || deletionDisabled}
+                render={<MenuItemElement label="ui_delete" icon="delete" />}
+                onClick={() => onDelete(profile.id)}
+              />
+            )}
           </Menu>
         </MenuProvider>
       )}
