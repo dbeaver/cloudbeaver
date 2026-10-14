@@ -689,6 +689,15 @@ public class WebSession extends BaseWebSession
     @NotNull
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
         AbstractJob job = new AbstractCancelableJob(asyncTask.getName()) {
+            @Override
+            public void cancelJob(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo) {
+                try {
+                    runnable.cancel();
+                } finally {
+                    super.cancelJob(webSession, taskInfo);
+                }
+            }
+
             @NotNull
             @Override
             protected IStatus run(@NotNull DBRProgressMonitor monitor) {
@@ -1016,7 +1025,7 @@ public class WebSession extends BaseWebSession
     }
 
     @Nullable
-    public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
+    public WebSessionProjectImpl getProjectById(@Nullable String projectId) {
         return getWorkspace().getProjectById(projectId);
     }
 
