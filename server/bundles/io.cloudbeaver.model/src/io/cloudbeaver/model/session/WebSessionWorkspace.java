@@ -121,7 +121,10 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @Nullable
     @Override
-    public WebSessionProjectImpl getProjectById(@NotNull String projectId) {
+    public WebSessionProjectImpl getProjectById(@Nullable String projectId) {
+        if (projectId == null) {
+            return activeProject;
+        }
         synchronized (accessibleProjects) {
             for (WebSessionProjectImpl project : accessibleProjects) {
                 if (project.getId().equals(projectId)) {
@@ -130,8 +133,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
             }
         }
         log.error("Project ID '" + projectId + "' not found in session workspace");
-        // FIXME: return null here
-        return activeProject;
+        return null;
     }
 
     @NotNull

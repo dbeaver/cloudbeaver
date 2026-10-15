@@ -8,6 +8,7 @@
 
 import noSyncComponentImport from './noSyncComponentImport.js';
 import formPartContract from './formPartContract.js';
+import serviceVariableName from './serviceVariableName.js';
 
 const plugin = {
   meta: {
@@ -18,6 +19,7 @@ const plugin = {
   rules: {
     'no-sync-component-import': noSyncComponentImport,
     'form-part-contract': formPartContract,
+    'service-variable-name': serviceVariableName,
   },
 };
 
@@ -27,6 +29,7 @@ Object.assign(plugin.configs, {
     rules: {
       '@cloudbeaver/no-sync-component-import': 'error',
       '@cloudbeaver/form-part-contract': 'error',
+      '@cloudbeaver/service-variable-name': 'error',
     },
   },
 });

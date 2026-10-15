@@ -1,4 +1,6 @@
 export default [
+  ['plugin_ai_administration_profile_clone_success', 'Профиль клонирован'],
+  ['plugin_ai_administration_profile_clone_error', 'Не удалось клонировать профиль'],
   ['ai_administration_language_model_settings', 'Настройки модели'],
   ['ai_administration_select_language_model_selector_title', 'Модель'],
   ['ai_administration_models_refresh', 'Обновить модели'],

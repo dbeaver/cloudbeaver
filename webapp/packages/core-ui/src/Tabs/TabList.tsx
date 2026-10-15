@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { TabList as BaseTabList, type TabListOptions, type TabStoreState } from '@dbeaver/ui-kit';
+import { type TabListOptions, type TabStoreState } from '@dbeaver/ui-kit';
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 
@@ -19,6 +19,7 @@ import { TabListVerticalRegistry, TabListVerticalRotatedRegistry } from './TabLi
 import verticalStyles from './TabListVertical.module.css';
 import verticalRotatedStyles from './TabListVerticalRotated.module.css';
 import { TabsContext } from './TabsContext.js';
+import { TabListLayout } from './TabListLayout.js';
 
 export interface TabListProps extends Omit<TabListOptions, keyof TabStoreState> {
   'aria-label'?: string;
@@ -71,7 +72,7 @@ export const TabList = observer<React.PropsWithChildren<TabListProps>>(function 
 
     return (
       <SContext registry={registry}>
-        <BaseTabList {...props} className={className} aria-label={translate(props['aria-label'] ?? state.container.areaLabel)}>
+        <TabListLayout {...props} className={className} aria-label={translate(props['aria-label'] ?? state.container.areaLabel)}>
           {childrenFirst && children}
           {displayed
             .map(
@@ -95,16 +96,16 @@ export const TabList = observer<React.PropsWithChildren<TabListProps>>(function 
             )
             .flat()}
           {!childrenFirst && children}
-        </BaseTabList>
+        </TabListLayout>
       </SContext>
     );
   }
 
   return (
     <SContext registry={registry}>
-      <BaseTabList {...props} className={className} aria-label={translate(props['aria-label'])}>
+      <TabListLayout {...props} className={className} aria-label={translate(props['aria-label'])}>
         {children}
-      </BaseTabList>
+      </TabListLayout>
     </SContext>
   );
 });

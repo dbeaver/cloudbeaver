@@ -11,21 +11,21 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
 
-const AIProfileCredentialsFields = importLazyComponent(() =>
-  import('../components/AIProfileCredentialsFields.js').then(module => module.AIProfileCredentialsFields),
+const AIProfileCredentialsTab = importLazyComponent(() =>
+  import('../components/AIProfileCredentialsTab.js').then(module => module.AIProfileCredentialsTab),
 );
 
 @injectable(() => [AIProfileCredentialsPanelService])
 export class AIProfileCredentialsFormTabBootstrap extends Bootstrap {
-  constructor(private readonly credentialsPanelService: AIProfileCredentialsPanelService) {
+  constructor(private readonly aiProfileCredentialsPanelService: AIProfileCredentialsPanelService) {
     super();
   }
 
   override register(): void {
-    this.credentialsPanelService.parts.add({
+    this.aiProfileCredentialsPanelService.parts.add({
       key: 'credentials',
       name: 'plugin_ai_credentials_profile',
-      panel: () => AIProfileCredentialsFields,
+      panel: () => AIProfileCredentialsTab,
     });
   }
 }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const projectsService = useService(ProjectsService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const projectInfoResource = useService(ProjectInfoResource);
-  const navTreeService = useService(NavigationTreeService);
+  const navigationTreeService = useService(NavigationTreeService);
   const resourceManagerService = useService(ResourceManagerService);
   const navTreeResource = useService(NavTreeResource);
   const userInfoResource = useService(UserInfoResource);
@@ -108,15 +108,15 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
       return false;
     }
 
-    return navTreeService.loadNestedNodes(nodeId, manual);
+    return navigationTreeService.loadNestedNodes(nodeId, manual);
   }
 
   return (
-    <CaptureView view={navTreeService} className={s(styles, { captureView: true })}>
+    <CaptureView view={navigationTreeService} className={s(styles, { captureView: true })}>
       <ResourceManagerTreeCaptureViewContext resourceTypeId={resourceTypeId} />
       <ElementsTreeLoader
         root={root}
-        getChildren={navTreeService.getChildren}
+        getChildren={navigationTreeService.getChildren}
         loadChildren={loadChildren}
         settings={settings}
         nodeInfoTransformers={[transformResourceNode]}
@@ -131,7 +131,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
             <div className={s(styles, { message: true })}>{children}</div>
           </div>
         )}
-        onOpen={node => navTreeService.navToNode(node.uri, node.parentId)}
+        onOpen={node => navigationTreeService.navToNode(node.uri, node.parentId)}
       />
     </CaptureView>
   );

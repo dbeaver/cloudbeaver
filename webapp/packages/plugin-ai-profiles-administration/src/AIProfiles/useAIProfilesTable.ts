@@ -23,12 +23,13 @@ interface State {
   dialogService: CommonDialogService;
   selection: ITableSelection;
   refresh: () => Promise<void>;
-  delete: () => Promise<void>;
+  clone: (profileId: string) => Promise<void>;
+  delete: (profileId?: string) => Promise<void>;
 }
 
 export function useAIProfilesTable(selection: ITableSelection): Readonly<State> {
   const notificationService = useService(NotificationService);
-  const dialogService = useService(CommonDialogService);
+  const commonDialogService = useService(CommonDialogService);
   const aiProfilesResource = useService(AIProfilesResource);
   const translate = useTranslate();
 
@@ -50,12 +51,27 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
           this.processing = false;
         }
       },
-      async delete() {
+      async clone(profileId) {
         if (this.processing) {
           return;
         }
 
-        const deletionList = this.selection.selected;
+        try {
+          this.processing = true;
+          const profile = await this.aiProfilesResource.copyProfile(profileId);
+          this.notificationService.logSuccess({ title: 'plugin_ai_administration_profile_clone_success', message: profile.name });
+        } catch (exception: any) {
+          this.notificationService.logException(exception, 'plugin_ai_administration_profile_clone_error');
+        } finally {
+          this.processing = false;
+        }
+      },
+      async delete(profileId) {
+        if (this.processing) {
+          return;
+        }
+
+        const deletionList = profileId === undefined ? this.selection.selected : [profileId];
 
         if (deletionList.length === 0) {
           return;
@@ -92,7 +108,11 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
             });
           }
 
-          this.selection.clear();
+          if (profileId === undefined) {
+            this.selection.clear();
+          } else if (failed.length === 0 && this.selection.list.includes(profileId)) {
+            this.selection.select(profileId);
+          }
         } finally {
           this.processing = false;
         }
@@ -102,8 +122,9 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
       processing: observable.ref,
       selection: observable.ref,
       refresh: action.bound,
+      clone: action.bound,
       delete: action.bound,
     },
-    { aiProfilesResource, selection, notificationService, dialogService },
+    { aiProfilesResource, selection, notificationService, dialogService: commonDialogService },
   );
 }

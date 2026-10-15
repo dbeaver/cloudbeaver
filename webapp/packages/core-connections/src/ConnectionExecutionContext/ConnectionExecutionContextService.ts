@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ export class ConnectionExecutionContextService {
   constructor(
     readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
-    private readonly GraphQLService: GraphQLService,
+    private readonly graphQLService: GraphQLService,
   ) {
     this.contexts = new MetadataMap(
       contextId =>
@@ -33,7 +33,7 @@ export class ConnectionExecutionContextService {
           this.scheduler,
           this.connectionExecutionContextResource,
           this.asyncTaskInfoService,
-          this.GraphQLService,
+          this.graphQLService,
         ),
     );
     this.scheduler = new TaskScheduler((a, b) => a === b);

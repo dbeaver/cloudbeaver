@@ -64,7 +64,7 @@ export class AIChatMessageService {
     private readonly localizationService: LocalizationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly aiProfilesResource: AIProfilesResource,
-    private readonly credentialsService: AIProfileCredentialsService,
+    private readonly aiProfileCredentialsService: AIProfileCredentialsService,
   ) {
     this.onMessageSend = new Executor();
 
@@ -166,10 +166,10 @@ export class AIChatMessageService {
     const conversation = await this.aiChatConversationsResource.load(data.conversationId);
     const profile = conversation.profile ? await this.aiProfilesResource.load(conversation.profile) : undefined;
 
-    if (profile && this.credentialsService.isRequired(profile)) {
-      const { status } = await this.credentialsService.open(profile.id);
+    if (profile && this.aiProfileCredentialsService.isRequired(profile)) {
+      const result = await this.aiProfileCredentialsService.open(profile.id);
 
-      if (status !== DialogueStateResult.Resolved) {
+      if (result?.status !== DialogueStateResult.Resolved) {
         ExecutorInterrupter.interrupt(contexts);
       }
     }

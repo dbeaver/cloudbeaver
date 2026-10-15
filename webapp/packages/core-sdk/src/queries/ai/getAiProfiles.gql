@@ -1,9 +1,5 @@
 query getAiProfiles {
   profiles: aiListProfiles {
-    id
-    name
-    engineId
-    global
-    credentialsSaved
+    ...AIConfigurationProfileInfo
   }
 }
