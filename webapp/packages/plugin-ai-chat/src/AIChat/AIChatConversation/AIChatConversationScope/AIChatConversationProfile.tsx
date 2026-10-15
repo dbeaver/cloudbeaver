@@ -53,7 +53,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
     try {
       await aiChatConversationsService.updateConversationProfile(conversation.id, profileId);
     } catch (exception: any) {
-      notificationService.logException(exception);
+      notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
     }
   }
 

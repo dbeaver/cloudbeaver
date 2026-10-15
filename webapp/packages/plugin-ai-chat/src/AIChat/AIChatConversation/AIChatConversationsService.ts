@@ -11,7 +11,7 @@ import { computed, makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { isDefined } from '@dbeaver/js-helpers';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { DetailsError, type AiDatabaseScope } from '@cloudbeaver/core-sdk';
+import type { AiDatabaseScope } from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AIDefaultProfileService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
@@ -137,11 +137,7 @@ export class AIChatConversationsService {
     this.savingProfile = true;
     try {
       const conversation = await this.aiChatConversationsResource.updateConversation(conversationId, { settings: { profile: profileId } });
-      try {
-        await this.aiDefaultProfileService.setDefaultProfile(profileId);
-      } catch (exception) {
-        throw new DetailsError('plugin_ai_profiles_default_save_failed', { cause: exception });
-      }
+      await this.aiDefaultProfileService.setDefaultProfile(profileId);
       return conversation;
     } finally {
       this.savingProfile = false;
