@@ -108,10 +108,11 @@ export class AIChatConversationsService {
     }
     const selectedId = this.currentConversationId;
     if (selectedId) {
-      const [profile, conversation] = await Promise.all([
-        this.aiDefaultProfileService.loadDefaultProfile(),
-        this.aiChatConversationsResource.load(selectedId),
-      ]);
+      const conversation = this.aiChatConversationsResource.get(selectedId);
+      if (!conversation) {
+        return;
+      }
+      const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
       if (profile && (!conversation.profile || !this.aiProfilesResource.has(conversation.profile))) {
         await this.updateConversation(selectedId, { settings: { profile: profile.id } });
       }
@@ -148,7 +149,7 @@ export class AIChatConversationsService {
   }
 
   async createConversation(key: IConnectionInfoParams | null, generatorId?: EAIConversationPromptGeneratorId): Promise<AIChatConversationInfo> {
-    const profile = await this.aiDefaultProfileService.loadDefaultProfile();
+    const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
     const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId, profile?.id);
     this.conversationId = conversation.id;
     return conversation;
@@ -164,7 +165,7 @@ export class AIChatConversationsService {
     const emptyConversation = await this.getEmptyConversation(this.currentConversationId);
     let conversation = emptyConversation;
     if (conversation) {
-      const profile = await this.aiDefaultProfileService.loadDefaultProfile();
+      const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
       if (profile && conversation.profile !== profile.id) {
         conversation = await this.updateConversation(conversation.id, { settings: { profile: profile.id } });
       }

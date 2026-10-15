@@ -52,15 +52,14 @@ export class AIDefaultProfileService {
   }
 
   async setDefaultProfile(profileId: string | null): Promise<void> {
-    const promise = (this.savingPromise ?? Promise.resolve()).catch(() => {}).then(() => this.saveProfile(profileId));
-    this.savingPromise = promise;
-
+    if (this.savingPromise) {
+      return this.savingPromise;
+    }
     try {
-      await promise;
+      this.savingPromise = this.saveProfile(profileId);
+      await this.savingPromise;
     } finally {
-      if (this.savingPromise === promise) {
-        this.savingPromise = null;
-      }
+      this.savingPromise = null;
     }
   }
 
@@ -73,7 +72,7 @@ export class AIDefaultProfileService {
     );
   }
 
-  async loadDefaultProfile(): Promise<AIProfile | undefined> {
+  async restoreDefaultProfile(): Promise<AIProfile | undefined> {
     await Promise.all([this.userInfoResource.load(), this.aiSettingsResource.load(), this.aiProfilesResource.load(CachedMapAllKey)]);
     return this.defaultProfile;
   }
