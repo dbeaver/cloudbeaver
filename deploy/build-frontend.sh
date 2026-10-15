@@ -36,4 +36,4 @@ echo "Copy static content"
 
 cp -rp ../webapp/packages/product-default/lib/* cloudbeaver/web
 
-echo "Cloudbeaver is ready. Run run-cloudbeaver-server.sh in cloudbeaver folder to start the server."
+echo "Cloudbeaver is ready. Run 'java CloudBeaverLauncher.java' in cloudbeaver folder to start the server."
