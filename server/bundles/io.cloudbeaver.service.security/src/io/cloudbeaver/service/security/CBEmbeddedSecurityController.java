@@ -3070,7 +3070,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
-                setUserTeams(userId, ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new), userId);
+                // A value that is not a team is ignored instead of failing the whole login on a foreign key error
+                var trustedTeams = TrustedTeamsUtils.filterExistingTeams(
+                    ((List<?>) reverseProxyUserTeams).stream().map(String::valueOf).toList(),
+                    readAllTeams()
+                );
+                if (!trustedTeams.unknownValues().isEmpty()) {
+                    log.debug("Ignored values of the trusted teams header that match no team: " + trustedTeams.unknownValues());
+                }
+                setUserTeams(userId, trustedTeams.teamIds().toArray(String[]::new), userId);
             }
         }
         return userId;
