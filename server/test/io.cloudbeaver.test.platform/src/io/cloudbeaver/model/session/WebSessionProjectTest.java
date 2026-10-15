@@ -17,10 +17,13 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.CloudbeaverMockTest;
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebConnectionConfigInputHandler;
 import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.app.ServletAppConfiguration;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -46,12 +49,19 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
     private WebSession webSession;
     @Mock
     private RMProject rmProject;
+    private ServletAppConfiguration appConfiguration;
 
 
     @BeforeEach
     public void setUp() throws Exception {
         var sessionContext = Mockito.mock(SMSessionContext.class);
+        var application = Mockito.mock(ServletApplication.class);
+        appConfiguration = Mockito.mock(ServletAppConfiguration.class);
         Mockito.when(webSession.getSessionContext()).thenReturn(sessionContext);
+        Mockito.when(webSession.getApplication()).thenReturn(application);
+        Mockito.when(application.getAppConfiguration()).thenReturn(appConfiguration);
+        Mockito.when(appConfiguration.isFeatureEnabled(DBWConstants.FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE))
+            .thenReturn(true);
         Mockito.when(rmProject.getType()).thenReturn(RMProjectType.SHARED);
         Mockito.when(rmProject.getName()).thenReturn("p1");
     }
@@ -363,6 +373,49 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         Mockito.verify(registry, Mockito.never()).addDataSource(Mockito.any());
         Mockito.verify(registry, Mockito.never()).updateDataSource(Mockito.any());
         Mockito.verify(registry, Mockito.never()).checkForErrors();
+    }
+
+    @Test
+    public void testUpdateChangedTargetResetsCredentialsWhenFeatureEnabled() throws Exception {
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        WebConnectionConfigInputHandler inputHandler = Mockito.mock(WebConnectionConfigInputHandler.class);
+        Mockito.when(dataSource.getId()).thenReturn("connection");
+        Mockito.when(inputHandler.isConnectionTargetChanged(dataSource)).thenReturn(true);
+
+        WebSessionProjectImpl project = createProject(registry, dataSource, inputHandler);
+        var connectionInfo = project.addConnection(dataSource);
+        connectionInfo.setSavedCredentials(Map.of("password", "value"), List.of());
+
+        project.updateConnection(Map.of("connectionId", "connection"));
+
+        Mockito.verify(inputHandler).clearSecretReferences();
+        Mockito.verify(inputHandler).resetDataSourceCredentials(dataSource);
+        Assertions.assertNull(connectionInfo.getSavedAuthProperties());
+        Assertions.assertNull(connectionInfo.getSavedNetworkCredentials());
+    }
+
+    @Test
+    public void testUpdateChangedTargetPreservesCredentialsWhenFeatureDisabled() throws Exception {
+        Mockito.when(appConfiguration.isFeatureEnabled(DBWConstants.FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE))
+            .thenReturn(false);
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        WebConnectionConfigInputHandler inputHandler = Mockito.mock(WebConnectionConfigInputHandler.class);
+        Mockito.when(dataSource.getId()).thenReturn("connection");
+        Mockito.when(inputHandler.isConnectionTargetChanged(dataSource)).thenReturn(true);
+
+        WebSessionProjectImpl project = createProject(registry, dataSource, inputHandler);
+        var connectionInfo = project.addConnection(dataSource);
+        Map<String, Object> credentials = Map.of("password", "value");
+        connectionInfo.setSavedCredentials(credentials, List.of());
+
+        project.updateConnection(Map.of("connectionId", "connection"));
+
+        Mockito.verify(inputHandler, Mockito.never()).clearSecretReferences();
+        Mockito.verify(inputHandler, Mockito.never()).resetDataSourceCredentials(dataSource);
+        Assertions.assertSame(credentials, connectionInfo.getSavedAuthProperties());
+        Assertions.assertNotNull(connectionInfo.getSavedNetworkCredentials());
     }
 
     @Test

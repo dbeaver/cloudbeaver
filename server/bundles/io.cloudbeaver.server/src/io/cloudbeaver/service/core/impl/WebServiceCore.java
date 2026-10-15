@@ -618,7 +618,10 @@ public class WebServiceCore implements DBWServiceCore {
         boolean resetCredentialsOnTargetChange
     ) throws DBWebException {
         DataSourceDescriptor testDataSource;
-        boolean connectionTargetChanged = resetCredentialsOnTargetChange && dataSource != null &&
+        boolean connectionTargetChanged = resetCredentialsOnTargetChange &&
+            webSession.getApplication().getAppConfiguration()
+                .isFeatureEnabled(DBWConstants.FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE) &&
+            dataSource != null &&
             project.isConnectionTargetChanged(configInput, dataSource);
         if (dataSource != null && !connectionTargetChanged) {
             try {

@@ -350,7 +350,9 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         boolean publishDraft = false;
         try {
             var inputHandler = getInputConfigHandler(config);
-            if (inputHandler.isConnectionTargetChanged(dataSource)) {
+            if (webSession.getApplication().getAppConfiguration()
+                .isFeatureEnabled(DBWConstants.FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE) &&
+                inputHandler.isConnectionTargetChanged(dataSource)) {
                 inputHandler.clearSecretReferences();
                 inputHandler.resetDataSourceCredentials(dataSource);
                 connectionInfo.setSavedCredentials(null, null);
