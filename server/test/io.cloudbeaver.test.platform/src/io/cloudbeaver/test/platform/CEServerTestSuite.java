@@ -24,11 +24,10 @@ import io.cloudbeaver.model.rm.local.LocalResourceControllerTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.model.session.WebSessionProjectTest;
 import io.cloudbeaver.model.session.WebSessionTest;
+import io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdateTest;
 import io.cloudbeaver.service.ai.AIProfileCopyTest;
-import io.cloudbeaver.service.ai.OAuthDeviceCodeFlowTest;
 import io.cloudbeaver.service.ai.WebAIConfigurationProfileTest;
 import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
-import io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdateTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
@@ -60,7 +59,6 @@ import org.junit.platform.suite.api.Suite;
         WSEventHandlerWorkspaceConfigUpdateTest.class,
         WebNavigatorNodeInfoTest.class,
         AIProfileCopyTest.class,
-        OAuthDeviceCodeFlowTest.class,
         WebAIConfigurationProfileTest.class,
         WebAIProfileUtilsTest.class,
         AdminCreateUserTest.class,

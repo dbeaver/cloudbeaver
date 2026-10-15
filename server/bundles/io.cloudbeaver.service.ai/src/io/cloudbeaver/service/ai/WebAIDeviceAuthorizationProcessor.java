@@ -21,6 +21,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
+import org.jkiss.dbeaver.model.ai.engine.OAuthDeviceCodeFlow;
 import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 

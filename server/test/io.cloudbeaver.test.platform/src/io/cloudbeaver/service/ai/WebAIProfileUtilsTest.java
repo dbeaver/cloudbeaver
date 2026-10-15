@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
 import org.jkiss.dbeaver.model.ai.AISettings;
 import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
+import org.jkiss.dbeaver.model.ai.engine.OAuthDeviceCodeFlow;
 import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIConstants;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIProperties;
