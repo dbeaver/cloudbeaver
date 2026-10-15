@@ -16,7 +16,14 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import {
+  EObjectFeature,
+  NavNodeInfoResource,
+  NavNodeManagerService,
+  NavTreeResource,
+  ProjectsNavNodeService,
+  ROOT_NODE_PATH,
+} from '@cloudbeaver/core-navigation-tree';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedResourceOffsetPageKey,
@@ -46,6 +53,7 @@ interface INavigationNodeShowData {
   NavNodeExtensionsService,
   NavNodeInfoResource,
   NavTreeResource,
+  ProjectsNavNodeService,
 ])
 export class NavigationTreeService extends View<string> {
   readonly treeState: MetadataMap<string, ITreeNodeState>;
@@ -59,6 +67,7 @@ export class NavigationTreeService extends View<string> {
     private readonly navNodeExtensionsService: NavNodeExtensionsService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navTreeResource: NavTreeResource,
+    private readonly projectsNavNodeService: ProjectsNavNodeService,
   ) {
     super();
 
@@ -132,11 +141,15 @@ export class NavigationTreeService extends View<string> {
       return false;
     }
 
-    await this.navTreeResource.load(
-      CachedResourceOffsetPageKey(CACHED_RESOURCE_DEFAULT_PAGE_OFFSET, this.navTreeResource.childrenLimit).setParent(
-        CachedResourceOffsetPageTargetKey(id),
-      ),
-    );
+    if (this.isMainNode(id)) {
+      await this.navTreeResource.loadAllChildren(id);
+    } else {
+      await this.navTreeResource.load(
+        CachedResourceOffsetPageKey(CACHED_RESOURCE_DEFAULT_PAGE_OFFSET, this.navTreeResource.childrenLimit).setParent(
+          CachedResourceOffsetPageTargetKey(id),
+        ),
+      );
+    }
 
     return true;
   }
@@ -193,6 +206,18 @@ export class NavigationTreeService extends View<string> {
       id: resourceKeyList(list),
       selected: list.map(() => false),
     });
+  }
+
+  // Main nodes - root, project, file system (dbvfs), scripts or datasets (rm)
+  private isMainNode(id: string): boolean {
+    if (id === ROOT_NODE_PATH) {
+      return true;
+    }
+    const node = this.navNodeInfoResource.get(id);
+    if (!node) {
+      return false;
+    }
+    return node.parentId === ROOT_NODE_PATH || this.projectsNavNodeService.projectTypes.includes(node.nodeType ?? '');
   }
 
   private isConnectionNode(navNodeId: string) {
