@@ -18,6 +18,8 @@ package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebSessionProjectImpl;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPDriver;
@@ -87,6 +89,17 @@ public class WebSessionTest extends CloudbeaverMockTest {
     }
 
     @Test
+    public void asyncTaskCancellationNotifiesProcessor() throws Exception {
+        WebAsyncTaskProcessor<?> processor = Mockito.mock(WebAsyncTaskProcessor.class);
+        WebAsyncTaskInfo taskInfo = session.createAsyncTask("Test task");
+        session.runAsyncTask(taskInfo, processor);
+
+        session.asyncTaskCancel(taskInfo.getId());
+
+        Mockito.verify(processor).cancel();
+    }
+
+    @Test
     public void authInfoIsIdentifiedByProviderAndConfiguration() throws Exception {
         WebAuthInfo firstConfig = mockAuthInfo("ldap", "ldap-1");
         WebAuthInfo secondConfig = mockAuthInfo("ldap", "ldap-2");
@@ -151,6 +164,23 @@ public class WebSessionTest extends CloudbeaverMockTest {
             Mockito.any(),
             Mockito.any()
         );
+    }
+
+    @Test
+    public void projectLookupFallsBackToActiveProjectOnlyForMissingId() {
+        WebSessionProjectImpl activeProject = Mockito.mock(WebSessionProjectImpl.class);
+        WebSessionProjectImpl accessibleProject = Mockito.mock(WebSessionProjectImpl.class);
+        Mockito.when(activeProject.getId()).thenReturn("active-project");
+        Mockito.when(accessibleProject.getId()).thenReturn("accessible-project");
+
+        WebSessionWorkspace workspace = session.getWorkspace();
+        session.addSessionProject(activeProject);
+        session.addSessionProject(accessibleProject);
+        workspace.setActiveProject(activeProject);
+
+        Assertions.assertSame(activeProject, session.getProjectById(null));
+        Assertions.assertSame(accessibleProject, session.getProjectById("accessible-project"));
+        Assertions.assertNull(session.getProjectById("inaccessible-project"));
     }
 
     private WebHttpRequestInfo getFakeRequestInfo() {

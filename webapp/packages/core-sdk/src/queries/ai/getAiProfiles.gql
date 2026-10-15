@@ -5,5 +5,12 @@ query getAiProfiles {
     engineId
     global
     credentialsSaved
+    accountAuthentication
+    deviceAuthorizationAvailable
+    accountProvider
+    tokenSaved
+    account {
+      email
+    }
   }
 }

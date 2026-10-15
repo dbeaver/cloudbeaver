@@ -23,6 +23,7 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   driverId: schema.string().optional(),
   folder: schema.string().optional(),
   host: schema.string().optional(),
+  hidden: schema.boolean().optional(),
   mainPropertyValues: schema.record(schema.string(), schema.any()).optional(),
   expertSettingsValues: schema.record(schema.string(), schema.any()).optional(),
   name: schema.string().optional(),

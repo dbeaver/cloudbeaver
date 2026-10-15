@@ -228,70 +228,72 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
         <Placeholder container={connectionFormService.mainPropertiesContainer} formState={formState} />
 
         {showAuth && (
-          <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-t tw:py-6">
+          <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-2 tw:border-t tw:py-6">
             <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-            {showAuthDetails && serverConfigResource.resource.distributed && isSharedProject && (
-              <FieldCheckbox
-                id={optionsPart.state.connectionId + 'isShared'}
-                name="sharedCredentials"
-                title={translate('connections_connection_share_credentials_tooltip')}
-                state={optionsPart.state}
-                disabled={formState.isDisabled || readonly}
-                keepSize
-              >
-                {translate('connections_connection_share_credentials')}
-              </FieldCheckbox>
-            )}
-            <div className="tw:grid">
-              <ConnectionAuthModelSelector
-                authModelCredentialsState={optionsPart.state}
-                applicableAuthModels={applicableAuthModels}
-                readonlyAuthModelId={!originLocal}
-                readonly={readonly}
-                disabled={formState.isDisabled}
-                onAuthModelChange={handleAuthModelSelect}
-              />
-            </div>
-            {showAuthDetails &&
-              (!sharedCredentials ? (
-                <>
-                  {properties && (
-                    <ConnectionAuthModelCredentialsForm
-                      credentials={optionsPart.state.credentials}
-                      properties={properties}
-                      readonly={readonly}
-                      disabled={formState.isDisabled}
-                    />
+            <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
+              {showAuthDetails && serverConfigResource.resource.distributed && isSharedProject && (
+                <FieldCheckbox
+                  id={optionsPart.state.connectionId + 'isShared'}
+                  name="sharedCredentials"
+                  title={translate('connections_connection_share_credentials_tooltip')}
+                  state={optionsPart.state}
+                  disabled={formState.isDisabled || readonly}
+                  keepSize
+                >
+                  {translate('connections_connection_share_credentials')}
+                </FieldCheckbox>
+              )}
+              <div className="tw:grid">
+                <ConnectionAuthModelSelector
+                  authModelCredentialsState={optionsPart.state}
+                  applicableAuthModels={applicableAuthModels}
+                  readonlyAuthModelId={!originLocal}
+                  readonly={readonly}
+                  disabled={formState.isDisabled}
+                  onAuthModelChange={handleAuthModelSelect}
+                />
+              </div>
+              {showAuthDetails &&
+                (!sharedCredentials ? (
+                  <>
+                    {properties && (
+                      <ConnectionAuthModelCredentialsForm
+                        credentials={optionsPart.state.credentials}
+                        properties={properties}
+                        readonly={readonly}
+                        disabled={formState.isDisabled}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <FormFieldDescription>
+                    {translate('plugin_connections_connection_form_shared_credentials_manage_info')}
+                    <Link inline onClick={openCredentialsTab}>
+                      {translate('plugin_connections_connection_form_shared_credentials_manage_info_tab_link')}
+                    </Link>
+                  </FormFieldDescription>
+                ))}
+              {showAuthDetails && !sharedCredentials && authModel && credentialsSavingEnabled && (
+                <FieldCheckbox
+                  id={optionsPart.state.connectionId + 'authNeeded'}
+                  name="saveCredentials"
+                  state={optionsPart.state}
+                  disabled={formState.isDisabled || readonly || optionsPart.state.sharedCredentials}
+                  title={translate(
+                    !isSharedProject || serverConfigResource.data?.distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+                      : 'connections_connection_edit_save_credentials_shared_tooltip',
                   )}
-                </>
-              ) : (
-                <FormFieldDescription>
-                  {translate('plugin_connections_connection_form_shared_credentials_manage_info')}
-                  <Link inline onClick={openCredentialsTab}>
-                    {translate('plugin_connections_connection_form_shared_credentials_manage_info_tab_link')}
-                  </Link>
-                </FormFieldDescription>
-              ))}
-            {showAuthDetails && !sharedCredentials && authModel && credentialsSavingEnabled && (
-              <FieldCheckbox
-                id={optionsPart.state.connectionId + 'authNeeded'}
-                name="saveCredentials"
-                state={optionsPart.state}
-                disabled={formState.isDisabled || readonly || optionsPart.state.sharedCredentials}
-                title={translate(
-                  !isSharedProject || serverConfigResource.data?.distributed
-                    ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
-                    : 'connections_connection_edit_save_credentials_shared_tooltip',
-                )}
-                keepSize
-              >
-                {translate(
-                  !isSharedProject || serverConfigResource.data?.distributed
-                    ? 'connections_connection_authentication_save_credentials_for_user'
-                    : 'connections_connection_edit_save_credentials_shared',
-                )}
-              </FieldCheckbox>
-            )}
+                  keepSize
+                >
+                  {translate(
+                    !isSharedProject || serverConfigResource.data?.distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user'
+                      : 'connections_connection_edit_save_credentials_shared',
+                  )}
+                </FieldCheckbox>
+              )}
+            </div>
           </section>
         )}
       </ConnectionSectionWrapper>

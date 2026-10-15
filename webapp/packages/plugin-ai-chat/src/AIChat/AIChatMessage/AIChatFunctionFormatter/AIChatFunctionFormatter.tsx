@@ -90,8 +90,10 @@ function getFunctionActionLabel(fn: string, params: unknown, translate: Translat
   }
 
   switch (parsed.fn) {
+    case 'db_uiOpenDBeaverEntityEditor':
     case 'db_openTableDataEditor':
       return `${translate('ui_open')} "${parsed.params.objectName}"`;
+    case 'db_uiOpenDBeaverSQLEditor':
     case 'db_openSQLEditor':
       return `${translate('ui_open')} ${translate('sql_editor_script_editor')}`;
     default:

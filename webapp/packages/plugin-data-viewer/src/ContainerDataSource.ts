@@ -217,6 +217,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
         constraints: options.constraints,
         where: options.whereFilter || undefined,
         anyConstraint: options.anyConstraint,
+        shouldUseDisjunctive: options.shouldUseDisjunctive,
       },
       dataFormat: this.dataFormat,
     };

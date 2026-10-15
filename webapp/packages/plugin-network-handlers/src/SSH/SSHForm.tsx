@@ -165,7 +165,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({
           )}
         </FieldCheckbox>
       )}
-      <Expandable label={translate('plugin_network_handlers_ssh_tunnel_advanced_settings')}>
+      <Expandable label={translate('plugin_network_handlers_ssh_tunnel_advanced_settings')} className="tw:pt-2!">
         <Container gap>
           <InputField type="number" name="aliveInterval" state={state.properties} readOnly={disabledInternal} labelTooltip={aliveIntervalLabel} tiny>
             {aliveIntervalLabel}

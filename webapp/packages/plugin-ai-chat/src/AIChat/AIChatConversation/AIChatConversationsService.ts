@@ -12,6 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { isDefined } from '@dbeaver/js-helpers';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { AiDatabaseScope } from '@cloudbeaver/core-sdk';
+import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 
 import {
   AIChatConversationsResource,
@@ -23,9 +24,16 @@ import {
 import { AIChatContextService } from '../AIChatContext/AIChatContextService.js';
 import { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
 import { AIChatConversationScopeResource, type IAIChatConversationScope } from './AIChatConversationScopeResource.js';
+import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.js';
 
-@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatConversationScopeResource])
+type NewConversationExecutorData =
+  | { stage: 'before'; data: IConnectionInfoParams | null }
+  | { stage: 'after'; data: AIChatConversationInfo };
+
+@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatConversationScopeResource, AIChatMessagesResource])
 export class AIChatConversationsService {
+  readonly onNewConversation: Executor<NewConversationExecutorData>;
+
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
     const conversations = this.aiChatConversationsResource.get(ChatConversationConnectionKey(context?.connectionKey));
@@ -55,7 +63,9 @@ export class AIChatConversationsService {
     private readonly aiChatContextService: AIChatContextService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
     private readonly aiChatConversationScopeResource: AIChatConversationScopeResource,
+    private readonly aiChatMessagesResource: AIChatMessagesResource,
   ) {
+    this.onNewConversation = new Executor();
     this.conversationId = null;
 
     this.aiChatContextService.onContextChange.addHandler(() => {
@@ -105,5 +115,34 @@ export class AIChatConversationsService {
     const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId);
     this.selectConversation(conversation.id);
     return conversation;
+  }
+
+  async newConversation(key: IConnectionInfoParams | null): Promise<AIChatConversationInfo | null> {
+    const contexts = await this.onNewConversation.execute({ stage: 'before', data: key });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return null;
+    }
+
+    const emptyConversation = await this.getEmptyConversation(this.currentConversationId);
+    const conversation = emptyConversation ?? (await this.createConversation(key));
+
+    await this.onNewConversation.execute({ stage: 'after', data: conversation });
+
+    return conversation;
+  }
+
+  private async getEmptyConversation(conversationId: string | null): Promise<AIChatConversationInfo | null> {
+    if (!conversationId) {
+      return null;
+    }
+
+    const messages = await this.aiChatMessagesResource.load(conversationId);
+
+    if (messages.length > 0) {
+      return null;
+    }
+
+    return await this.aiChatConversationsResource.load(conversationId);
   }
 }

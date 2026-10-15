@@ -43,6 +43,7 @@ public class WebSQLDataFilter {
     private int limit;
     private String where;
     private boolean anyConstraint;
+    private boolean shouldUseDisjunctive;
     private final List<WebSQLDataFilterConstraint> constraints = new ArrayList<>();
 
     public WebSQLDataFilter() {
@@ -60,6 +61,7 @@ public class WebSQLDataFilter {
         }
         this.where = CommonUtils.toString(filterProps.get("where"), null);
         this.anyConstraint = CommonUtils.toBoolean(filterProps.get("anyConstraint"));
+        this.shouldUseDisjunctive = CommonUtils.toBoolean(filterProps.get("shouldUseDisjunctive"));
         Object constraints = filterProps.get("constraints");
         if (constraints instanceof Collection<?> col) {
             for (Object constrItem : col) {
@@ -107,6 +109,7 @@ public class WebSQLDataFilter {
         var webFilter = new WebSQLDataFilter();
         webFilter.where = filter.getWhere();
         webFilter.anyConstraint = filter.isAnyConstraint();
+        webFilter.shouldUseDisjunctive = filter.isUseDisjunctiveNormalForm();
         for (DBDAttributeConstraint constraint : filter.getConstraints()) {
             webFilter.constraints.add(WebSQLDataFilterConstraint.from(constraint));
         }
@@ -121,6 +124,7 @@ public class WebSQLDataFilter {
         DBDDataFilter dataFilter = new DBDDataFilter();
         dataFilter.setWhere(where);
         dataFilter.setAnyConstraint(anyConstraint);
+        dataFilter.setUseDisjunctiveNormalForm(shouldUseDisjunctive);
         if (CommonUtils.isEmpty(constraints)) {
             return dataFilter;
         }

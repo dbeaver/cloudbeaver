@@ -30,7 +30,7 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
     private readonly userProfileTabsService: UserProfileTabsService,
     private readonly userInfoResource: UserInfoResource,
     private readonly userProfileOptionsPanelService: UserProfileOptionsPanelService,
-    private readonly userProfileFormAuthenticationPartStateService: UserProfileFormAuthenticationService,
+    private readonly userProfileFormAuthenticationService: UserProfileFormAuthenticationService,
     private readonly commonDialogService: CommonDialogService,
   ) {
     super();
@@ -43,6 +43,7 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
     this.userProfileTabsService.tabContainer.add({
       key: 'authentication',
       name: 'ui_authentication',
+      icon: '/icons/core_blocks_key.svg',
       order: 4,
       isHidden: () => this.userInfoResource.isAnonymous(),
       panel: () => ChangePassword,
@@ -53,7 +54,7 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
     const context = contexts.getContext(userProfileContext);
 
     if (context.force) {
-      this.userProfileFormAuthenticationPartStateService.reset();
+      this.userProfileFormAuthenticationService.reset();
       return;
     }
 
@@ -65,7 +66,7 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
   }
 
   private async confirmDiscardChanges(contexts: IExecutionContextProvider<any>): Promise<void> {
-    if (!this.userProfileFormAuthenticationPartStateService.isEdited()) {
+    if (!this.userProfileFormAuthenticationService.isEdited()) {
       return;
     }
 
@@ -81,6 +82,6 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
       return;
     }
 
-    this.userProfileFormAuthenticationPartStateService.reset();
+    this.userProfileFormAuthenticationService.reset();
   }
 }

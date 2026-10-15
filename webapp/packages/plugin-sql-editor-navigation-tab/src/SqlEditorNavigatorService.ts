@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@ import { NavigationService } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 import { type ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
+  ESqlDataSourceFeatures,
   type ISqlEditorTabState,
   MemorySqlDataSource,
   SqlDataSourceService,
@@ -30,7 +31,7 @@ enum SQLEditorNavigationAction {
   close,
 }
 
-export interface SQLEditorActionContext {
+export interface ISQLEditorActionContext {
   type: SQLEditorNavigationAction;
 }
 
@@ -46,11 +47,11 @@ export interface ISQLEditorOptions {
   metadata?: Record<string, any>;
 }
 
-export interface SQLCreateAction extends SQLEditorActionContext, ISQLEditorOptions {
+export interface ISQLCreateAction extends ISQLEditorActionContext, ISQLEditorOptions {
   type: SQLEditorNavigationAction.create;
 }
 
-export interface SQLEditorAction extends SQLEditorActionContext {
+export interface ISQLEditorAction extends ISQLEditorActionContext {
   type: SQLEditorNavigationAction.close | SQLEditorNavigationAction.select;
 
   editorId: string;
@@ -68,7 +69,7 @@ export interface SQLEditorAction extends SQLEditorActionContext {
   SqlQueryService,
 ])
 export class SqlEditorNavigatorService {
-  private readonly navigator: IExecutor<SQLCreateAction | SQLEditorAction>;
+  private readonly navigator: IExecutor<ISQLCreateAction | ISQLEditorAction>;
 
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
@@ -80,16 +81,39 @@ export class SqlEditorNavigatorService {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlQueryService: SqlQueryService,
   ) {
-    this.navigator = new Executor<SQLCreateAction | SQLEditorAction>(null, (active, current) => active.type === current.type)
+    this.navigator = new Executor<ISQLCreateAction | ISQLEditorAction>(null, (active, current) => active.type === current.type)
       .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
   }
 
-  async openNewEditor(options: ISQLEditorOptions) {
+  async openNewEditor(options: ISQLEditorOptions): Promise<IExecutionContextProvider<ISQLCreateAction | ISQLEditorAction>> {
     return await this.navigator.execute({
       type: SQLEditorNavigationAction.create,
       ...options,
     });
+  }
+
+  openRecentEditor(connectionKey?: IConnectionInfoParams): boolean {
+    for (const tabId of this.navigationTabsService.history.history) {
+      const tab = this.navigationTabsService.getTab(tabId);
+      if (tab && isSQLEditorTab(tab)) {
+        const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+        if (!dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
+          continue;
+        }
+        const executionContext = dataSource.executionContext;
+        if (
+          connectionKey &&
+          (!executionContext ||
+            !this.connectionInfoResource.isKeyEqual(createConnectionParam(executionContext.projectId, executionContext.connectionId), connectionKey))
+        ) {
+          continue;
+        }
+        this.navigationTabsService.selectTab(tab.id);
+        return true;
+      }
+    }
+    return false;
   }
 
   async openEditorResult(editorId: string, resultId: string): Promise<void> {
@@ -128,7 +152,7 @@ export class SqlEditorNavigatorService {
     await this.sqlQueryService.executeQueries(currentTab.handlerState, queries);
   }
 
-  private async navigateHandler(data: SQLCreateAction | SQLEditorAction, contexts: IExecutionContextProvider<SQLCreateAction | SQLEditorAction>) {
+  private async navigateHandler(data: ISQLCreateAction | ISQLEditorAction, contexts: IExecutionContextProvider<ISQLCreateAction | ISQLEditorAction>) {
     try {
       const tabInfo = contexts.getContext(this.navigationTabsService.navigationTabContext);
 

@@ -55,7 +55,7 @@
   .dbv-kit-select__popover {
     z-index: 1000;
     min-width: 100%;
-    max-height: var(--dbv-kit-select-popover-height);
+    max-height: min(var(--dbv-kit-select-popover-height), var(--popover-available-height));
     overflow-y: hidden;
     display: flex;
     flex-direction: column;

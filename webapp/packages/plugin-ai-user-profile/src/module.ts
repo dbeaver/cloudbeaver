@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
+import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 
 import { AIUserProfileBootstrap } from './AIUserProfileBootstrap.js';
 import { AIProfileCredentialsFormTabBootstrap } from './AIProfileCredentialsForm/AIProfileCredentialsFormTabBootstrap.js';
 import { AIProfileCredentialsPanelService } from './AIProfileCredentialsPanelService.js';
+import { AIProfilesSettingsService } from './AIProfilesSettingsService.js';
 import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
@@ -18,6 +19,8 @@ export default ModuleRegistry.add({
 
   configure: serviceCollection => {
     serviceCollection
+      .addSingleton(Dependency, proxy(AIProfilesSettingsService))
+      .addSingleton(AIProfilesSettingsService)
       .addSingleton(AIProfileCredentialsPanelService)
       .addSingleton(Bootstrap, AIProfileCredentialsFormTabBootstrap)
       .addSingleton(Bootstrap, LocaleService)

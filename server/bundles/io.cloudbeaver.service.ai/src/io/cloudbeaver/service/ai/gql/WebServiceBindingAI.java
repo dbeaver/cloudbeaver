@@ -25,6 +25,7 @@ import io.cloudbeaver.service.ai.WebAIFeatureProvider;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
+import io.cloudbeaver.service.ai.model.inputs.WebAIDataSourceSettingsInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIProfileCredentialsInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAiChatCompletionSettingsInput;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
@@ -115,7 +116,7 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                         getWebSession(env),
                         dataSourceId.projectId(),
                         dataSourceId,
-                        JSONUtils.deserializeObject(getArgumentVal(env, "settings"), WebAiChatCompletionSettingsInput.class)
+                        JSONUtils.deserializeObject(getArgumentVal(env, "settings"), WebAIDataSourceSettingsInput.class)
                     );
                 }
             )
@@ -184,6 +185,11 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                     JSONUtils.deserializeObject(getArgumentVal(env, "config"), WebAIConfigurationProfileInput.class)
                 )
             ).dataFetcher(
+                "aiCopyProfile", env -> getService(env).copyProfile(
+                    getWebSession(env),
+                    getArgumentVal(env, "profileId")
+                )
+            ).dataFetcher(
                 "aiUpdateProfile", env -> getService(env).updateProfile(
                     getWebSession(env),
                     JSONUtils.deserializeObject(getArgumentVal(env, "config"), WebAIConfigurationProfileInput.class)
@@ -198,6 +204,16 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                     getWebSession(env),
                     getArgumentVal(env, "profileId"),
                     JSONUtils.deserializeObject(getArgumentVal(env, "credentials"), WebAIProfileCredentialsInput.class)
+                )
+            ).dataFetcher(
+                "aiStartDeviceAuthorization", env -> getService(env).startDeviceAuthorization(
+                    getWebSession(env),
+                    getArgumentVal(env, "profileId")
+                )
+            ).dataFetcher(
+                "aiDisconnectAccount", env -> getService(env).disconnectAccount(
+                    getWebSession(env),
+                    getArgumentVal(env, "profileId")
                 )
             );
     }

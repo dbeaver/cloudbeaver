@@ -1,19 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-  <defs>
-    <style>
-      .cls-1 {
-        fill-rule: evenodd;
-      }
-
-      .cls-1, .cls-2 {
-        fill: #338ecc;
-        stroke-width: 0px;
-      }
-    </style>
-  </defs>
-  <path class="cls-1" d="M13.25,2H2.75c-.92,0-1.75.81-1.75,1.75v3.75h1v-2.5h12v7c0,.6-.41,1-1,1H3c-.59,0-1-.4-1-1v-1.5h-1v1.75c0,.94.83,1.75,1.75,1.75h10.5c.92,0,1.75-.81,1.75-1.75V3.75c0-.94-.83-1.75-1.75-1.75Z"/>
-  <polygon class="cls-2" points="6.05 8.97 3.02 7 3.02 8.5 1 8.5 1 9.5 3.02 9.5 3.02 10.95 6.05 8.97"/>
-  <rect class="cls-2" x="7" y="5" width="1" height="8"/>
-  <rect class="cls-2" x="7.5" y="8.5" width="6.5" height="1"/>
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_11584_12)">
+<g clip-path="url(#clip1_11584_12)">
+<path d="M9 7L14.6425 1.36264" stroke="#3387C5" stroke-miterlimit="10"/>
+<rect x="1" y="1" width="10" height="1" fill="#3387C5"/>
+<rect x="15" y="5" width="10" height="1" transform="rotate(90 15 5)" fill="#3387C5"/>
+<rect x="1" y="14" width="14" height="1" fill="#3387C5"/>
+<rect x="2" y="1" width="14" height="1" transform="rotate(90 2 1)" fill="#3387C5"/>
+<path d="M9 4.5V7H11.5V8H8V4.5H9Z" fill="#3387C5"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_11584_12">
+<rect width="16" height="16" fill="white"/>
+</clipPath>
+<clipPath id="clip1_11584_12">
+<rect width="14" height="14" fill="white" transform="translate(1 1)"/>
+</clipPath>
+</defs>
 </svg>
