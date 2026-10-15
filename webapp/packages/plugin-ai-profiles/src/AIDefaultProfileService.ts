@@ -37,6 +37,8 @@ export class AIDefaultProfileService {
     makeObservable<this, 'savingPromise'>(this, {
       savingPromise: observable.ref,
       saving: computed,
+      defaultProfileId: computed,
+      defaultProfile: computed,
     });
     this.aiProfilesResource.beforeLoad.addHandler(async () => {
       await Promise.all([this.userInfoResource.load(), this.aiSettingsResource.load()]);

@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { AIProfileCredentialsService, AIDefaultProfileService, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfileCredentialsService, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { AIChatConversationInfo } from '../AIChatConversationsResource.js';
 import { AIChatConversationsService } from '../AIChatConversationsService.js';
@@ -30,10 +30,9 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
   const notificationService = useService(NotificationService);
   const aiChatConversationsService = useService(AIChatConversationsService);
   const aiProfileCredentialsService = useService(AIProfileCredentialsService);
-  const aiDefaultProfileService = useService(AIDefaultProfileService);
   const menu = useMenuContext();
   const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
-  const isDisabled = disabled || aiChatConversationsService.profileSaving || aiDefaultProfileService.saving;
+  const isDisabled = disabled || aiChatConversationsService.profileSaving;
 
   async function selectProfile(profile: AIProfile) {
     try {
