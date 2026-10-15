@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@
     --dbv-kit-control-disabled-opacity: 1;
     --dbv-kit-select-disabled-background: var(--theme-input-background-disabled);
 
-    --dbv-kit-select-border-radius: 3px;
+    --dbv-kit-select-border-radius: var(--theme-form-element-radius);
 
     --dbv-kit-control-outline-width: 1px;
     --dbv-kit-control-outline-color: var(--theme-primary);

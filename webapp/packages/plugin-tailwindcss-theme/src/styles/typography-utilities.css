@@ -8,7 +8,7 @@
 
 /* Headline 6 - 1.25rem (20px) */
 @utility typography-headline6 {
-  @apply tw:font-roboto tw:antialiased tw:text-headline6 tw:leading-headline6 tw:font-headline6 tw:tracking-headline6 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+  @apply tw:font-heading tw:antialiased tw:text-headline6 tw:leading-headline6 tw:font-headline6 tw:tracking-headline6 tw:[text-decoration:inherit] tw:[text-transform:inherit];
 }
 
 /* Subtitle 1 - 1rem (16px) */
@@ -53,7 +53,7 @@
   }
 
   .theme-typography--headline6 {
-    @apply tw:font-roboto tw:antialiased tw:text-headline6 tw:leading-headline6 tw:font-headline6 tw:tracking-headline6 tw:[text-decoration:inherit] tw:[text-transform:inherit];
+    @apply tw:font-heading tw:antialiased tw:text-headline6 tw:leading-headline6 tw:font-headline6 tw:tracking-headline6 tw:[text-decoration:inherit] tw:[text-transform:inherit];
   }
 
   .theme-typography--subtitle1 {

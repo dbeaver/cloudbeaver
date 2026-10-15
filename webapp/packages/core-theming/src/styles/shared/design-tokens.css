@@ -1,0 +1,101 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+/* DataDam token snapshot for dbeaver/pro#11139. Keep product accents in color.css.
+   Use a namespace so embedded editors and third-party styles do not see generic
+   shadcn variables such as --background, --input or --primary. */
+@layer base {
+  .theme-light {
+    --theme-design-background: oklch(1 0 0);
+    --theme-design-foreground: oklch(0.148 0.004 228.8);
+    --theme-design-card: oklch(1 0 0);
+    --theme-design-secondary: oklch(0.967 0.001 286.375);
+    --theme-design-secondary-foreground: oklch(0.21 0.006 285.885);
+    --theme-design-muted: oklch(0.963 0.002 197.1);
+    --theme-design-muted-foreground: oklch(0.56 0.021 213.5);
+    --theme-design-border: oklch(0.925 0.005 214.3);
+    --theme-design-input: oklch(0.925 0.005 214.3);
+    --theme-design-sidebar: oklch(0.987 0.002 197.1);
+    --theme-design-destructive: oklch(0.577 0.245 27.325);
+  }
+
+  .theme-dark {
+    --theme-design-background: oklch(0.148 0.004 228.8);
+    --theme-design-foreground: oklch(0.987 0.002 197.1);
+    --theme-design-card: oklch(0.218 0.008 223.9);
+    --theme-design-secondary: oklch(0.274 0.006 286.033);
+    --theme-design-secondary-foreground: oklch(0.985 0 0);
+    --theme-design-muted: oklch(0.275 0.011 216.9);
+    --theme-design-muted-foreground: oklch(0.723 0.014 214.4);
+    --theme-design-border: oklch(1 0 0 / 10%);
+    --theme-design-input: oklch(1 0 0 / 15%);
+    --theme-design-sidebar: oklch(0.218 0.008 223.9);
+    --theme-design-destructive: oklch(0.704 0.191 22.216);
+  }
+
+  .theme-light,
+  .theme-dark {
+    --theme-design-radius: 0.625rem;
+    --theme-design-radius-sm: calc(var(--theme-design-radius) * 0.6);
+    --theme-design-radius-xl: calc(var(--theme-design-radius) * 1.4);
+    --theme-design-radius-2xl: calc(var(--theme-design-radius) * 1.8);
+    --theme-design-radius-3xl: calc(var(--theme-design-radius) * 2.2);
+    --theme-design-radius-4xl: calc(var(--theme-design-radius) * 2.6);
+
+    /* Keep local font fallbacks for scripts not covered by the preferred font. */
+    --theme-font-family: 'Geist Variable', 'Inter Variable', Roboto, sans-serif;
+    --theme-font-family-heading: 'Inter Variable', Roboto, sans-serif;
+    --tw-font-roboto: var(--theme-font-family);
+    --theme-form-element-radius: var(--theme-design-radius-3xl);
+    --theme-group-element-radius: var(--theme-design-radius-xl);
+    --theme-menu-bar-small-action-radius: var(--theme-design-radius-sm);
+
+    /* Adapt the palette to the existing CloudBeaver semantic contract. */
+    --theme-surface: var(--theme-design-background);
+    --theme-on-surface: var(--theme-design-foreground);
+    --theme-secondary: var(--theme-design-secondary);
+    --theme-on-secondary: var(--theme-design-secondary-foreground);
+    --theme-sub-secondary: var(--theme-design-sidebar);
+    --theme-on-sub-secondary: var(--theme-design-foreground);
+    --theme-background: var(--theme-design-muted);
+    --theme-error: var(--theme-design-destructive);
+    --theme-negative: var(--theme-design-destructive);
+
+    --theme-input-color: var(--theme-on-surface);
+    --theme-input-color-placeholder: var(--theme-design-muted-foreground);
+    --theme-input-border: var(--theme-design-input);
+    --theme-input-border-disabled: var(--theme-design-border);
+    --theme-input-border-readonly: var(--theme-design-border);
+    --theme-input-background: var(--theme-surface);
+    --theme-input-background-disabled: var(--theme-background);
+    --theme-input-background-readonly: var(--theme-background);
+
+    /* "on-light" is the legacy name for ink on the current theme's surface. */
+    --theme-text-primary-on-light: var(--theme-design-foreground);
+    --theme-text-secondary-on-light: var(--theme-design-muted-foreground);
+    --theme-text-sub-secondary-on-light: var(--theme-design-muted-foreground);
+    --theme-text-hint-on-light: var(--theme-design-muted-foreground);
+    --theme-text-icon-on-light: var(--theme-design-muted-foreground);
+    --theme-text-negative-on-light: var(--theme-design-destructive);
+    --theme-text-negative-on-dark: var(--theme-design-destructive);
+
+    /* UI-kit aliases must resolve on the themed subtree, not on :root. */
+    --dbv-kit-color-background: var(--theme-surface);
+    --dbv-kit-color-foreground: var(--theme-on-surface);
+    --dbv-kit-control-border-radius: var(--theme-form-element-radius);
+    --dbv-kit-btn-border-radius: var(--theme-design-radius-4xl);
+    --dbv-kit-combobox-border-radius: var(--theme-form-element-radius);
+    --dbv-kit-menu-border-radius: var(--theme-design-radius-2xl);
+    --dbv-kit-menu-item-border-radius: var(--theme-design-radius-sm);
+    --dbv-kit-popover-border-radius: var(--theme-design-radius-2xl);
+    --dbv-kit-dialog-content-border-radius: var(--theme-design-radius-3xl);
+    --dbv-kit-dialog-content-background: var(--theme-design-card);
+    --dbv-kit-dialog-content-foreground: var(--theme-on-surface);
+    --dbv-kit-dialog-heading-color: var(--dbv-kit-dialog-content-foreground);
+  }
+}
