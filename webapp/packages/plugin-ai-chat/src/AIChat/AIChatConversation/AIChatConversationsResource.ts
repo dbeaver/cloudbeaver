@@ -72,11 +72,13 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
   async createConversation(
     connectionKey: IConnectionInfoParams | null,
     generatorId?: EAIConversationPromptGeneratorId,
+    profileId?: string,
   ): Promise<AIChatConversationInfo> {
     const { conversation } = await this.graphQLService.sdk.createChatConversation({
       config: {
         dataSourceId: connectionKey ?? undefined,
         promptGeneratorId: generatorId,
+        settings: profileId ? { profile: profileId } : undefined,
       },
     });
 

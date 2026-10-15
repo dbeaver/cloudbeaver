@@ -11,8 +11,10 @@ import { computed, makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { isDefined } from '@dbeaver/js-helpers';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import type { AiDatabaseScope } from '@cloudbeaver/core-sdk';
+import { DetailsError, type AiDatabaseScope } from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { AIDefaultProfileService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import {
   AIChatConversationsResource,
@@ -26,13 +28,23 @@ import { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGen
 import { AIChatConversationScopeResource, type IAIChatConversationScope } from './AIChatConversationScopeResource.js';
 import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.js';
 
-type NewConversationExecutorData =
-  | { stage: 'before'; data: IConnectionInfoParams | null }
-  | { stage: 'after'; data: AIChatConversationInfo };
+type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
-@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatConversationScopeResource, AIChatMessagesResource])
+@injectable(() => [
+  AIChatContextService,
+  AIChatConversationsResource,
+  AIChatConversationScopeResource,
+  AIChatMessagesResource,
+  AIDefaultProfileService,
+  AIProfilesResource,
+  NotificationService,
+])
 export class AIChatConversationsService {
   readonly onNewConversation: Executor<NewConversationExecutorData>;
+
+  get profileSaving(): boolean {
+    return this.savingProfile;
+  }
 
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
@@ -58,37 +70,51 @@ export class AIChatConversationsService {
   }
 
   private conversationId: string | null;
+  private savingProfile = false;
 
   constructor(
     private readonly aiChatContextService: AIChatContextService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
     private readonly aiChatConversationScopeResource: AIChatConversationScopeResource,
     private readonly aiChatMessagesResource: AIChatMessagesResource,
+    private readonly aiDefaultProfileService: AIDefaultProfileService,
+    private readonly aiProfilesResource: AIProfilesResource,
+    private readonly notificationService: NotificationService,
   ) {
     this.onNewConversation = new Executor();
     this.conversationId = null;
 
-    this.aiChatContextService.onContextChange.addHandler(() => {
-      this.selectConversation(null);
-    });
+    this.aiChatContextService.onContextChange.addHandler(this.resetConversation.bind(this));
 
     this.aiChatConversationsResource.onItemDelete.addHandler(conversationId => {
       if (this.conversationId === conversationId) {
-        this.selectConversation(null);
+        this.resetConversation();
       }
     });
 
-    makeObservable<this, 'conversationId'>(this, {
+    makeObservable<this, 'conversationId' | 'savingProfile'>(this, {
       conversationId: observable.ref,
       currentConversationId: computed,
       defaultConversation: computed,
       processing: computed,
+      savingProfile: observable,
+      profileSaving: computed,
     });
   }
 
-  selectConversation(conversationId: string | null): void {
+  async selectConversation(conversationId: string | null): Promise<void> {
     if (this.conversationId !== conversationId) {
       this.conversationId = conversationId;
+    }
+    const selectedId = this.currentConversationId;
+    if (selectedId) {
+      const [profile, conversation] = await Promise.all([
+        this.aiDefaultProfileService.loadDefaultProfile(),
+        this.aiChatConversationsResource.load(selectedId),
+      ]);
+      if (profile && (!conversation.profile || !this.aiProfilesResource.has(conversation.profile))) {
+        await this.updateConversation(selectedId, { settings: { profile: profile.id } });
+      }
     }
   }
 
@@ -107,13 +133,24 @@ export class AIChatConversationsService {
   }
 
   async updateConversationProfile(conversationId: string, profileId: string): Promise<AIChatConversationInfo> {
-    const conversation = await this.aiChatConversationsResource.updateConversation(conversationId, { settings: { profile: profileId } });
-    return conversation;
+    this.savingProfile = true;
+    try {
+      const conversation = await this.aiChatConversationsResource.updateConversation(conversationId, { settings: { profile: profileId } });
+      try {
+        await this.aiDefaultProfileService.setDefaultProfile(profileId);
+      } catch (exception) {
+        throw new DetailsError('plugin_ai_profiles_default_save_failed', { cause: exception });
+      }
+      return conversation;
+    } finally {
+      this.savingProfile = false;
+    }
   }
 
   async createConversation(key: IConnectionInfoParams | null, generatorId?: EAIConversationPromptGeneratorId): Promise<AIChatConversationInfo> {
-    const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId);
-    this.selectConversation(conversation.id);
+    const profile = await this.aiDefaultProfileService.loadDefaultProfile();
+    const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId, profile?.id);
+    this.conversationId = conversation.id;
     return conversation;
   }
 
@@ -125,11 +162,27 @@ export class AIChatConversationsService {
     }
 
     const emptyConversation = await this.getEmptyConversation(this.currentConversationId);
-    const conversation = emptyConversation ?? (await this.createConversation(key));
+    let conversation = emptyConversation;
+    if (conversation) {
+      const profile = await this.aiDefaultProfileService.loadDefaultProfile();
+      if (profile && conversation.profile !== profile.id) {
+        conversation = await this.updateConversation(conversation.id, { settings: { profile: profile.id } });
+      }
+    } else {
+      conversation = await this.createConversation(key);
+    }
 
     await this.onNewConversation.execute({ stage: 'after', data: conversation });
 
     return conversation;
+  }
+
+  private async resetConversation(): Promise<void> {
+    try {
+      await this.selectConversation(null);
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
+    }
   }
 
   private async getEmptyConversation(conversationId: string | null): Promise<AIChatConversationInfo | null> {

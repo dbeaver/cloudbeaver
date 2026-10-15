@@ -44,6 +44,7 @@ export interface IAIProfilesTableProps {
   processing?: boolean;
   onClone?: (profileId: string) => void;
   onDelete?: (profileId: string) => void;
+  onSetDefault?: (profileId: string) => void;
   onProfileClick?: (profile: AIProfile) => void;
 }
 
@@ -67,6 +68,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   processing,
   onClone,
   onDelete,
+  onSetDefault,
   onProfileClick,
 }) {
   const translate = useTranslate();
@@ -120,6 +122,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
           onOpen={clickable ? onProfileClick : undefined}
           onClone={onClone}
           onDelete={onDelete}
+          onSetDefault={onSetDefault}
         />
       );
     }
@@ -152,6 +155,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     processing,
     onClone,
     onDelete,
+    onSetDefault,
     onProfileClick,
   ]);
 

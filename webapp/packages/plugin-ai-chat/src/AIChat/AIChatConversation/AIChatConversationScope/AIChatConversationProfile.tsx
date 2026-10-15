@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { AIProfileCredentialsService, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfileCredentialsService, AIDefaultProfileService, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { AIChatConversationInfo } from '../AIChatConversationsResource.js';
 import { AIChatConversationsService } from '../AIChatConversationsService.js';
@@ -30,8 +30,10 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
   const notificationService = useService(NotificationService);
   const aiChatConversationsService = useService(AIChatConversationsService);
   const aiProfileCredentialsService = useService(AIProfileCredentialsService);
+  const aiDefaultProfileService = useService(AIDefaultProfileService);
   const menu = useMenuContext();
   const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
+  const isDisabled = disabled || aiChatConversationsService.profileSaving || aiDefaultProfileService.saving;
 
   async function selectProfile(profile: AIProfile) {
     try {
@@ -52,7 +54,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
     try {
       await aiChatConversationsService.updateConversationProfile(conversation.id, profileId);
     } catch (exception: any) {
-      notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
+      notificationService.logException(exception);
     }
   }
 
@@ -86,7 +88,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
             aria-label={profile.name}
             title={profile.name}
             checked={isCurrent}
-            disabled={disabled}
+            disabled={isDisabled}
             className="tw:min-h-7"
             hideOnClick={false}
             onClick={() => selectProfile(profile)}
@@ -105,7 +107,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
                 <ActionIconButton
                   aria-label={translate('plugin_ai_chat_profile_edit_credentials')}
                   title={translate('plugin_ai_chat_profile_edit_credentials')}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   name="edit"
                   viewBox="0 0 13 13"
                   onClick={event => {
