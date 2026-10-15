@@ -1,19 +1,5 @@
 mutation createAiProfile($config: AIConfigurationProfileInput!) {
   profile: aiCreateProfile(config: $config) {
-    id
-    name
-    engineId
-    global
-    credentialsSaved
-    accountAuthentication
-    deviceAuthorizationAvailable
-    accountProvider
-    tokenSaved
-    account {
-      email
-    }
-    configuration {
-      ...ObjectPropertyInfo
-    }
+    ...AIAdminConfigurationProfileInfo
   }
 }

@@ -17,12 +17,18 @@ import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
 interface Props {
   profiles: AIProfile[];
   deletionDisabled: boolean;
+  processing: boolean;
+  onClone: (profileId: string) => void;
+  onDelete: (profileId: string) => void;
   isDefaultProfile: (profileId: string) => boolean;
 }
 
 export const AIProfilesAdministrationTable = observer<Props>(function AIProfilesAdministrationTable({
   profiles,
   deletionDisabled,
+  processing,
+  onClone,
+  onDelete,
   isDefaultProfile,
 }) {
   const translate = useTranslate();
@@ -35,7 +41,9 @@ export const AIProfilesAdministrationTable = observer<Props>(function AIProfiles
       engineLabel="plugin_ai_administration_profile_column_engine"
       emptyPlaceholder="plugin_ai_administration_profiles_table_empty_placeholder"
       selectionDisabled={deletionDisabled}
+      processing={processing}
       isProfileSelectable={profile => !isDefaultProfile(profile.id)}
+      isProfileDeletable={profile => !deletionDisabled && !isDefaultProfile(profile.id)}
       getSelectionTitle={profile =>
         isDefaultProfile(profile.id) ? translate('plugin_ai_administration_profile_default_delete_info') : undefined
       }
@@ -44,6 +52,8 @@ export const AIProfilesAdministrationTable = observer<Props>(function AIProfiles
           <span className="tw:text-xs tw:opacity-60 tw:whitespace-nowrap">{translate('plugin_ai_administration_profile_default_badge')}</span>
         ) : null
       }
+      onClone={onClone}
+      onDelete={onDelete}
       onProfileClick={profile => aiProfileFormService.open(profile.id, profile.name)}
     />
   );
