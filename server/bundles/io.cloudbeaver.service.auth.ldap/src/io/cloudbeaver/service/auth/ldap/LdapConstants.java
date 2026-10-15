@@ -28,9 +28,26 @@ public interface LdapConstants {
     String PARAM_SSL_ENABLE = "ldap-enable-ssl";
     String PARAM_SSL_CERT = "ldap-ssl-cert";
     String PARAM_REFERRAL_HANDLING = "ldap-referral";
+    /** LDAP attribute with the user first name. Empty value disables the mapping. */
+    String PARAM_FIRST_NAME_ATTR = "ldap-first-name-attr";
+    /** LDAP attribute with the user last name. Empty value disables the mapping. */
+    String PARAM_LAST_NAME_ATTR = "ldap-last-name-attr";
+    /** LDAP attribute with the name shown in the UI. Empty value disables the mapping. */
+    String PARAM_DISPLAY_NAME_ATTR = "ldap-display-name-attr";
+    /** Comma separated list of {@code metaParameter=ldapAttribute} pairs to copy into the user profile. */
+    String PARAM_USER_META_ATTRS = "ldap-user-meta-attrs";
+
+    /** Size of the user meta parameter name column in the database. */
+    int MAX_USER_META_PARAMETER_NAME_LENGTH = 32;
+
+    String DEFAULT_FIRST_NAME_ATTR = "givenName";
+    String DEFAULT_LAST_NAME_ATTR = "sn";
+    String DEFAULT_DISPLAY_NAME_ATTR = "displayName";
 
     String CRED_USERNAME = "user";
     String CRED_DISPLAY_NAME = "displayName";
+    /** Human readable name read from the directory, unlike {@link #CRED_DISPLAY_NAME} which holds the login. */
+    String CRED_FULL_NAME = "fullName";
     String CRED_USER_DN = "user-dn";
     String CRED_PASSWORD = "password";
     String CRED_SESSION_ID = "session-id";
