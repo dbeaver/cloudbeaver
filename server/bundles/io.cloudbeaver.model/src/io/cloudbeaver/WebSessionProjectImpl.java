@@ -335,6 +335,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public WebConnectionInfo updateConnection(@Nullable Map<String, Object> configMap) throws DBWebException {
         WebConnectionConfig config = getConnectionConfigInput(configMap);
         WebConnectionInfo connectionInfo = getWebConnectionInfo(config.getConnectionId());
@@ -348,7 +349,13 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         boolean wasHidden = dataSource.isHidden();
         boolean publishDraft = false;
         try {
-            getInputConfigHandler(config).updateDataSource(dataSource);
+            var inputHandler = getInputConfigHandler(config);
+            if (inputHandler.isConnectionTargetChanged(dataSource)) {
+                inputHandler.clearSecretReferences();
+                inputHandler.resetDataSourceCredentials(dataSource);
+                connectionInfo.setSavedCredentials(null, null);
+            }
+            inputHandler.updateDataSource(dataSource);
             if (config.getHidden() != null) {
                 dataSource.setHidden(config.getHidden());
             }

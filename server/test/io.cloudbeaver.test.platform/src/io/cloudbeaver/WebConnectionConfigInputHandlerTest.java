@@ -19,6 +19,9 @@ package io.cloudbeaver;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,5 +47,36 @@ public class WebConnectionConfigInputHandlerTest {
 
         Assertions.assertFalse(config.isSharedCredentials());
         Assertions.assertNull(config.getSelectedSecretId());
+    }
+
+    @Test
+    public void resetsSavedDataSourceCredentials() {
+        WebConnectionConfig config = new WebConnectionConfig(Map.of());
+        WebConnectionConfigInputHandler<WebConnectionConfig, DataSourceDescriptor> handler =
+            new WebConnectionConfigInputHandler<>(
+                Mockito.mock(WebSession.class),
+                Mockito.mock(DBPDataSourceRegistry.class),
+                config
+            );
+        DBPConnectionConfiguration connectionConfiguration = new DBPConnectionConfiguration();
+        DBWHandlerDescriptor handlerDescriptor = Mockito.mock(DBWHandlerDescriptor.class);
+        Mockito.when(handlerDescriptor.getId()).thenReturn("ssh_tunnel");
+        DBWHandlerConfiguration networkHandler = new DBWHandlerConfiguration(handlerDescriptor, null);
+        networkHandler.setSavePassword(true);
+        networkHandler.setPassword("password");
+        networkHandler.setSecureProperty("key", "value");
+        connectionConfiguration.updateHandler(networkHandler);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        Mockito.when(dataSource.getConnectionConfiguration()).thenReturn(connectionConfiguration);
+
+        handler.resetDataSourceCredentials(dataSource);
+
+        Mockito.verify(dataSource).setSavePassword(false);
+        Mockito.verify(dataSource).setSharedCredentials(false);
+        Mockito.verify(dataSource).resetAllSecrets();
+        Mockito.verify(dataSource).resetPassword();
+        Assertions.assertFalse(networkHandler.isSavePassword());
+        Assertions.assertNull(networkHandler.getPassword());
+        Assertions.assertTrue(networkHandler.getSecureProperties().isEmpty());
     }
 }

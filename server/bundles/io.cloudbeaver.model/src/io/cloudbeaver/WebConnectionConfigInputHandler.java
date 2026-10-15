@@ -26,9 +26,12 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
 import org.jkiss.utils.CommonUtils;
+
+import java.util.Map;
 
 public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C extends DataSourceDescriptor> {
     private static final Log log = Log.getLog(WebConnectionConfigInputHandler.class);
@@ -103,6 +106,21 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
     public void clearSecretReferences() {
         input.setSharedCredentials(false);
         input.setSelectedSecretId(null);
+    }
+
+    /**
+     * Removes credentials inherited from a saved data source before applying input credentials.
+     */
+    public void resetDataSourceCredentials(@NotNull C dataSource) {
+        dataSource.setSavePassword(false);
+        dataSource.setSharedCredentials(false);
+        dataSource.resetAllSecrets();
+        dataSource.resetPassword();
+        for (DBWHandlerConfiguration handler : dataSource.getConnectionConfiguration().getHandlers()) {
+            handler.setSavePassword(false);
+            handler.setPassword(null);
+            handler.setSecureProperties(Map.of());
+        }
     }
 
     public boolean isConnectionTargetChanged(@NotNull C dataSource) {
