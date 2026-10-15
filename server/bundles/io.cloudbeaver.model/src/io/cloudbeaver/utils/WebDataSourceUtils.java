@@ -26,10 +26,12 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.DBRuntimeException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
+import org.jkiss.dbeaver.model.access.DBAPermissionRealm;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -290,6 +292,24 @@ public class WebDataSourceUtils {
         @NotNull DBPConnectionConfiguration dsConfig,
         @NotNull WebConnectionConfig config
     ) {
+        try {
+            setConnectionConfiguration(
+                driver,
+                dsConfig,
+                config,
+                DBWorkbench.getPlatform().getWorkspace()
+            );
+        } catch (DBWebException e) {
+            throw new DBRuntimeException(e);
+        }
+    }
+
+    public static void setConnectionConfiguration(
+        @NotNull DBPDriver driver,
+        @NotNull DBPConnectionConfiguration dsConfig,
+        @NotNull WebConnectionConfig config,
+        @NotNull DBAPermissionRealm permissionRealm
+    ) throws DBWebException {
         setMainProperties(dsConfig, config);
         if (config.getProperties() != null) {
             Map<String, String> newProps = new LinkedHashMap<>();
@@ -342,10 +362,14 @@ public class WebDataSourceUtils {
             for (WebNetworkHandlerConfigInput nhc : config.getNetworkHandlersConfig()) {
                 DBWHandlerConfiguration handlerConfig = dsConfig.getHandler(nhc.getId());
                 if (handlerConfig == null) {
-                    NetworkHandlerDescriptor handlerDescriptor = NetworkHandlerRegistry.getInstance().getDescriptor(nhc.getId());
+                    NetworkHandlerDescriptor handlerDescriptor = NetworkHandlerRegistry.getInstance()
+                        .getDescriptor(nhc.getId(), permissionRealm);
                     if (handlerDescriptor == null) {
-                        log.warn("Can't find network handler '" + nhc.getId() + "'");
-                        continue;
+                        if (NetworkHandlerRegistry.getInstance().getRawDescriptor(nhc.getId()) == null) {
+                            log.warn("Can't find network handler '" + nhc.getId() + "'");
+                            continue;
+                        }
+                        throw new DBWebException("No permissions to configure network handler '" + nhc.getId() + "'");
                     } else {
                         handlerConfig = new DBWHandlerConfiguration(handlerDescriptor, null);
                         WebDataSourceUtils.updateHandlerConfig(handlerConfig, nhc);
