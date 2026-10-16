@@ -13,6 +13,7 @@ export default [
   ['plugin_navigation_tree_delete_confirmation', 'Вы собираетесь удалить выбранные объекты. Вы уверены?'],
   ['plugin_navigation_tree_delete_confirmation_single', 'Вы собираетесь удалить "{arg:name}" (тип: {arg:entity}). Вы уверены?'],
   ['plugin_navigation_tree_delete_location', 'Расположение'],
+  ['plugin_navigation_tree_delete_status', 'Статус'],
   ['plugin_navigation_tree_delete_unavailable', 'Удаление недоступно.'],
   ['plugin_navigation_tree_delete_dependent_unavailable', 'Не будет удалён: выбранный вложенный объект нельзя удалить.'],
   ['plugin_navigation_tree_delete_incomplete', 'Удаление не завершено успешно'],

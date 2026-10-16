@@ -39,8 +39,6 @@ export interface INodeDeletionOutcome {
 }
 
 export interface INodeDeletionPlanBuilder {
-  readonly operations: readonly INodeDeletionOperation[];
-  readonly exclusions: readonly INodeDeletionExcludedTarget[];
   addOperation(operation: INodeDeletionOperation): void;
   exclude(target: INodeDeletionExcludedTarget): void;
   validateOwnership(): void;

@@ -110,7 +110,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       const plan = contexts.getContext(nodeDeletionPlanContext);
       for (const node of nodes.filter(isConnectionNode)) {
         const key = node.projectId && node.objectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
-        const connection = key ? await this.connectionInfoResource.load(key) : undefined;
+        const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
         const target = {
           node,
           type: 'plugin_connections_delete_connection',
@@ -134,10 +134,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       }
       for (const node of nodes.filter(node => this.isDatabaseNode(node))) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
-        const connection = key ? await this.connectionInfoResource.load(key) : undefined;
+        const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
         const readOnly = connection?.features.includes(EConnectionFeature.readOnly);
         const target = { node, type: 'plugin_connections_delete_database_object', readOnly };
-        if (!this.canDeleteObject(node)) {
+        if ((key && !connection) || !this.canDeleteObject(node)) {
           plan.exclude({
             ...target,
             owner: 'database-objects',
@@ -350,8 +350,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
   }
 
   private canDeleteObject(node: NavNode): boolean {
-    const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
-    const connection = key ? this.connectionInfoResource.get(key) : undefined;
+    const connection = this.connectionInfoResource.getConnectionForNode(node.uri);
 
     return (
       !!node.features?.includes(ENodeFeature.canDelete) &&

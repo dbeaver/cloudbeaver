@@ -126,16 +126,14 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       const plan = contexts.getContext(nodeDeletionPlanContext);
       for (const node of nodes.filter(node => this.isFolder(node))) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
-        if (key) {
-          await this.connectionInfoResource.load(key);
-        }
         const target = {
           node,
           type: 'ui_folder',
           warning: 'plugin_connections_delete_folder_warning',
           keepChildren: true,
         };
-        if (!this.canDelete(node)) {
+        const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
+        if ((key && !connection) || !this.canDelete(node)) {
           plan.exclude({ ...target, owner: 'connection-folders', reason: 'plugin_navigation_tree_delete_unavailable' });
           continue;
         }
@@ -229,8 +227,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
   }
 
   private canDelete(node: NavNode): boolean {
-    const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
-    const connection = key ? this.connectionInfoResource.get(key) : undefined;
+    const connection = this.connectionInfoResource.getConnectionForNode(node.uri);
 
     return !!node.features?.includes(ENodeFeature.canDelete) && !connection?.features.includes(EConnectionFeature.restrictMetadataEdit);
   }

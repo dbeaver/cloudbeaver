@@ -5,21 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { ConnectionInfoResource, EConnectionFeature } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { DataContext } from '@cloudbeaver/core-data-context';
-import {
-  DATA_CONTEXT_NAV_NODE,
-  DATA_CONTEXT_NAV_NODES,
-  type NavNode,
-  NavTreeResource,
-  NavTreeSettingsService,
-} from '@cloudbeaver/core-navigation-tree';
-import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
-import { MENU_NAVIGATION_TREE_MANAGE, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
+import { DATA_CONTEXT_NAV_NODES, ENodeFeature, type NavNode, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
+import { ACTION_DELETE, ActionService, MenuService } from '@cloudbeaver/core-view';
+import { NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { MENU_OBJECT_VIEWER_FOOTER } from './MENU_OBJECT_VIEWER_FOOTER.js';
 
-@injectable(() => [NavTreeResource, NodeDeletionService, NavTreeSettingsService, MenuService, ActionService])
+@injectable(() => [NavTreeResource, NodeDeletionService, NavTreeSettingsService, MenuService, ActionService, ConnectionInfoResource])
 export class ObjectPropertyTableFooterService {
   constructor(
     private readonly navTreeResource: NavTreeResource,
@@ -27,6 +21,7 @@ export class ObjectPropertyTableFooterService {
     private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {}
 
   registerFooterActions() {
@@ -70,11 +65,12 @@ export class ObjectPropertyTableFooterService {
   }
 
   private canDelete(node: NavNode): boolean {
-    const context = new DataContext();
-    context.set(DATA_CONTEXT_NAV_NODE, node, 'object-viewer-delete');
-    context.set(DATA_CONTEXT_MENU, MENU_NAVIGATION_TREE_MANAGE, 'object-viewer-delete');
+    const connection = this.connectionInfoResource.getConnectionForNode(node.uri);
 
-    const action = this.actionService.getAction(context, ACTION_DELETE);
-    return !!action && !action.isHidden() && !action.isDisabled();
+    return (
+      !!node.features?.includes(ENodeFeature.canDelete) &&
+      !connection?.features.includes(EConnectionFeature.readOnly) &&
+      !connection?.features.includes(EConnectionFeature.restrictMetadataEdit)
+    );
   }
 }

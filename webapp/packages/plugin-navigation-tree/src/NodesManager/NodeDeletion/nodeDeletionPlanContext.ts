@@ -22,9 +22,6 @@ export function nodeDeletionPlanContext(contexts: IExecutionContextProvider<NavN
   const exclusions: INodeDeletionExcludedTarget[] = [];
 
   return {
-    operations,
-    exclusions,
-
     addOperation(operation) {
       operations.push(operation);
     },

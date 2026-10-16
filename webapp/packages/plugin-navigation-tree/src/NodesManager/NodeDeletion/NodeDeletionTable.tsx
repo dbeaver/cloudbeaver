@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useId, useMemo } from 'react';
 
 import { IconOrImage, StaticImage, useTranslate } from '@cloudbeaver/core-blocks';
 import {
@@ -19,28 +20,33 @@ import {
 
 import type { INodeDeletionDialogItem } from './NodeDeletionPlan.js';
 
-const COLUMNS = [
-  { label: 'ui_select_all', width: '40px' },
-  { label: 'ui_name', width: '40%' },
-  { label: 'plugin_navigation_tree_delete_location', width: '60%' },
-];
-
 interface Props {
   items: INodeDeletionDialogItem[];
   selection: ITableSelection;
 }
 
 export const NodeDeletionTable = observer<Props>(function NodeDeletionTable({ items, selection }) {
+  const id = useId();
   const translate = useTranslate();
   const cellCopy = useCellCopy();
   const selected = new Set(selection.selected);
-  const columnCount = useCreateGridReactiveValue(() => COLUMNS.length, null, []);
+  const hasReason = items.some(item => item.reason);
+  const columns = useMemo(
+    () => [
+      { label: 'ui_select_all', width: '40px' },
+      { label: 'ui_name', width: hasReason ? '30%' : '40%' },
+      { label: 'plugin_navigation_tree_delete_location', width: hasReason ? '35%' : '60%' },
+      ...(hasReason ? [{ label: 'plugin_navigation_tree_delete_status', width: '35%' }] : []),
+    ],
+    [hasReason],
+  );
+  const columnCount = useCreateGridReactiveValue(() => columns.length, null, [columns]);
   const rowCount = useCreateGridReactiveValue(() => items.length, null, [items]);
-  const headerText = useCreateGridReactiveValue(colIdx => translate(COLUMNS[colIdx]?.label) ?? '', null, [translate]);
+  const headerText = useCreateGridReactiveValue(colIdx => translate(columns[colIdx]?.label) ?? '', null, [columns, translate]);
   const headerElement = useCreateGridReactiveValue(
-    colIdx => (colIdx === 0 ? <TableRowSelect isRoot /> : (translate(COLUMNS[colIdx]?.label) ?? '')),
+    colIdx => (colIdx === 0 ? <TableRowSelect isRoot /> : (translate(columns[colIdx]?.label) ?? '')),
     null,
-    [translate],
+    [columns, translate],
   );
   const cell = useCreateGridReactiveValue(getCell, null, [items, translate, selection.selected]);
 
@@ -52,7 +58,17 @@ export const NodeDeletionTable = observer<Props>(function NodeDeletionTable({ it
     }
 
     if (colIdx === 0) {
-      return <TableRowSelect id={item.id} disabled={!!item.reason} title={item.reason ? translate(item.reason) : item.name} />;
+      return (
+        <TableRowSelect id={item.id} disabled={!!item.reason} title={item.name} aria-describedby={item.reason ? `${id}-${rowIdx}` : undefined} />
+      );
+    }
+
+    if (colIdx === 3) {
+      return item.reason ? (
+        <span id={`${id}-${rowIdx}`} className="tw:whitespace-normal tw:break-words">
+          {translate(item.reason)}
+        </span>
+      ) : null;
     }
 
     const opacity = selected.has(item.id) ? '' : 'tw:opacity-40';
@@ -85,10 +101,10 @@ export const NodeDeletionTable = observer<Props>(function NodeDeletionTable({ it
           headerText={headerText}
           headerElement={headerElement}
           cell={cell}
-          getHeaderWidth={colIdx => COLUMNS[colIdx]?.width ?? 'auto'}
+          getHeaderWidth={colIdx => columns[colIdx]?.width ?? 'auto'}
           getHeaderPinned={colIdx => colIdx === 0}
           getHeaderResizable={colIdx => colIdx !== 0}
-          getRowHeight={() => 36}
+          getRowHeight={rowIdx => (items[rowIdx]?.reason ? 72 : 36)}
           onCellKeyDown={cellCopy.handleKeyDown}
         />
       </TableSelectionContext>
