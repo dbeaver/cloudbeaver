@@ -27,6 +27,7 @@
 
     <extension point="io.cloudbeaver.feature">
         <feature id="ssh" label="SSH tunnels for databases" description="Enables SSH tunnels for secure database connections, allowing access to remote databases through encrypted channels" enabledByDefault="true"/>
+        <feature id="resetCredentialsOnTargetChange" label="Reset credentials on target change" description="Prevents saved database and network credentials from being reused when the connection host, URL, or network route changes. Disable only when all users who can edit connections are trusted with stored credentials" enabledByDefault="true"/>
     </extension>
 
 

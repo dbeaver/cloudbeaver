@@ -335,6 +335,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public WebConnectionInfo updateConnection(@Nullable Map<String, Object> configMap) throws DBWebException {
         WebConnectionConfig config = getConnectionConfigInput(configMap);
         WebConnectionInfo connectionInfo = getWebConnectionInfo(config.getConnectionId());
@@ -348,7 +349,15 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         boolean wasHidden = dataSource.isHidden();
         boolean publishDraft = false;
         try {
-            getInputConfigHandler(config).updateDataSource(dataSource);
+            var inputHandler = getInputConfigHandler(config);
+            if (webSession.getApplication().getAppConfiguration()
+                .isFeatureEnabled(DBWConstants.FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE) &&
+                inputHandler.isConnectionTargetChanged(dataSource)) {
+                inputHandler.clearSecretReferences();
+                inputHandler.resetDataSourceCredentials(dataSource);
+                connectionInfo.setSavedCredentials(null, null);
+            }
+            inputHandler.updateDataSource(dataSource);
             if (config.getHidden() != null) {
                 dataSource.setHidden(config.getHidden());
             }
@@ -406,6 +415,17 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         @NotNull DataSourceDescriptor dataSource
     ) throws DBWebException {
         getInputConfigHandler(configInput).updateDataSource(dataSource);
+    }
+
+    public void clearSecretReferences(@NotNull WebConnectionConfig configInput) {
+        getInputConfigHandler(configInput).clearSecretReferences();
+    }
+
+    public boolean isConnectionTargetChanged(
+        @NotNull WebConnectionConfig configInput,
+        @NotNull DataSourceDescriptor dataSource
+    ) {
+        return getInputConfigHandler(configInput).isConnectionTargetChanged(dataSource);
     }
 
     @NotNull
