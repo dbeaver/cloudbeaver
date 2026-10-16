@@ -9,34 +9,12 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
-import {
-  Button,
-  CommonDialogBody,
-  CommonDialogFooter,
-  CommonDialogHeader,
-  CommonDialogWrapper,
-  Fill,
-  IconOrImage,
-  StaticImage,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Button, CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, Fill, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
-import {
-  DataGrid,
-  TableRowSelect,
-  TableSelectionContext,
-  useCellCopy,
-  useCreateGridReactiveValue,
-  useTableSelection,
-} from '@cloudbeaver/plugin-data-grid';
+import { useTableSelection } from '@cloudbeaver/plugin-data-grid';
 
 import type { INodeDeletionDialogItem } from './NodeDeletionPlan.js';
-
-const COLUMNS = [
-  { label: 'ui_select_all', width: '40px' },
-  { label: 'ui_name', width: '40%' },
-  { label: 'plugin_navigation_tree_delete_location', width: '60%' },
-];
+import { NodeDeletionTable } from './NodeDeletionTable.js';
 
 export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogItem[] }, string[]> = observer(function NodeDeletionDialog({
   payload,
@@ -44,7 +22,6 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
   rejectDialog,
 }) {
   const translate = useTranslate();
-  const cellCopy = useCellCopy();
   const rows = payload.items;
   const singleItem = rows.length === 1 ? rows[0] : undefined;
   const keys = useMemo(() => rows.filter(item => !item.reason).map(item => item.id), [rows]);
@@ -52,15 +29,6 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
   const selection = useTableSelection(keys, state);
   const selected = new Set(selection.selected);
   const count = selected.size;
-  const columnCount = useCreateGridReactiveValue(() => COLUMNS.length, null, []);
-  const rowCount = useCreateGridReactiveValue(() => rows.length, null, [rows]);
-  const headerText = useCreateGridReactiveValue(colIdx => translate(COLUMNS[colIdx]?.label) ?? '', null, [translate]);
-  const headerElement = useCreateGridReactiveValue(
-    colIdx => (colIdx === 0 ? <TableRowSelect isRoot /> : (translate(COLUMNS[colIdx]?.label) ?? '')),
-    null,
-    [translate],
-  );
-  const cell = useCreateGridReactiveValue(getCell, null, [rows, translate, selection.selected]);
   const warnings = [
     ...new Set(
       rows
@@ -70,6 +38,7 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
     ),
   ];
   const messages = warnings.map(warning => ({ key: warning, content: <>{translate(warning)}</> }));
+
   if (count !== rows.length) {
     messages.unshift({
       key: 'selection-summary',
@@ -82,35 +51,17 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
     });
   }
 
-  function getCell(rowIdx: number, colIdx: number) {
-    const item = rows[rowIdx];
-    if (!item) {
-      return null;
-    }
-    if (colIdx === 0) {
-      return <TableRowSelect id={item.id} disabled={!!item.reason} title={item.reason ? translate(item.reason) : item.name} />;
-    }
-    const opacity = selected.has(item.id) ? '' : 'tw:opacity-40';
-    if (colIdx === 1) {
-      return (
-        <span title={item.name} className={`tw:flex tw:items-center tw:gap-2 ${opacity}`}>
-          {item.icon && <StaticImage icon={item.icon} title={translate(item.type)} className="tw:size-4 tw:shrink-0" />}
-          {item.readOnly && <IconOrImage icon="/icons/lock.png" title={translate('ui_readonly')} className="tw:size-4 tw:shrink-0" />}
-          <span>{item.name}</span>
-        </span>
-      );
-    }
-    const value = item.location || '—';
-    return (
-      <span title={value} className={opacity}>
-        {value}
-      </span>
-    );
+  function handleCancel() {
+    rejectDialog();
+  }
+
+  function handleDelete() {
+    resolveDialog(selection.selected);
   }
 
   return (
     <CommonDialogWrapper fixedWidth={!!singleItem} size={singleItem ? 'small' : 'large'} aria-label={translate('ui_data_delete_confirmation')}>
-      <CommonDialogHeader title="ui_data_delete_confirmation" icon="/icons/preload/error_icon.svg" bigIcon onReject={() => rejectDialog()} />
+      <CommonDialogHeader title="ui_data_delete_confirmation" icon="/icons/preload/error_icon.svg" bigIcon onReject={handleCancel} />
       <CommonDialogBody>
         <p className="tw:break-all">
           {singleItem
@@ -129,31 +80,14 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
           </ul>
         )}
         {messages.length === 1 && <p>{messages[0]!.content}</p>}
-        {!singleItem && (
-          <div role="region" aria-label={translate('ui_data_delete_confirmation')} className="tw:w-full tw:mt-4">
-            <TableSelectionContext value={selection}>
-              <DataGrid
-                columnCount={columnCount}
-                rowCount={rowCount}
-                headerText={headerText}
-                headerElement={headerElement}
-                cell={cell}
-                getHeaderWidth={colIdx => COLUMNS[colIdx]?.width ?? 'auto'}
-                getHeaderPinned={colIdx => colIdx === 0}
-                getHeaderResizable={colIdx => colIdx !== 0}
-                getRowHeight={() => 36}
-                onCellKeyDown={cellCopy.handleKeyDown}
-              />
-            </TableSelectionContext>
-          </div>
-        )}
+        {!singleItem && <NodeDeletionTable items={rows} selection={selection} />}
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
+        <Button type="button" variant="secondary" onClick={handleCancel}>
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />
-        <Button type="button" disabled={!count} onClick={() => resolveDialog(selection.selected)}>
+        <Button type="button" disabled={!count} onClick={handleDelete}>
           {translate('ui_delete')}
           {!singleItem && ` (${count})`}
         </Button>

@@ -7,12 +7,15 @@
  */
 
 import { action, computed, observable } from 'mobx';
+import { useMemo } from 'react';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 
 import type { ITableSelection } from './TableSelectionContext.js';
 
 export function useTableSelection(keys: string[], externalState?: Set<string>): ITableSelection {
+  const state = useMemo(() => observable(externalState ?? new Set<string>()), [externalState]);
+
   const selection: ITableSelection = useObservableRef(
     () => ({
       get list() {
@@ -21,7 +24,6 @@ export function useTableSelection(keys: string[], externalState?: Set<string>): 
       get selected() {
         return this.list.filter(item => this.keys.includes(item));
       },
-      state: externalState ?? new Set<string>(),
       select(id: string) {
         if (this.state.has(id)) {
           this.state.delete(id);
@@ -48,13 +50,13 @@ export function useTableSelection(keys: string[], externalState?: Set<string>): 
     {
       list: computed,
       selected: computed,
-      state: observable,
+      state: observable.ref,
       keys: observable.ref,
       select: action.bound,
       selectRoot: action.bound,
       clear: action.bound,
     },
-    { keys },
+    { keys, state },
   );
 
   return selection;

@@ -8,14 +8,13 @@
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type NavNode, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 
-import {
-  prepareNodeDeletionPlan,
-  type INodeDeletionDialogItem,
-  type INodeDeletionExclusion,
-  type INodeDeletionExcludedTarget,
-  type INodeDeletionItem,
-  type INodeDeletionOperation,
-  type INodeDeletionPlanBuilder,
+import type {
+  INodeDeletionDialogItem,
+  INodeDeletionExclusion,
+  INodeDeletionExcludedTarget,
+  INodeDeletionItem,
+  INodeDeletionOperation,
+  INodeDeletionPlanBuilder,
 } from './NodeDeletionPlan.js';
 
 export function nodeDeletionPlanContext(contexts: IExecutionContextProvider<NavNode[]>, nodes: NavNode[]): INodeDeletionPlanBuilder {
@@ -25,28 +24,35 @@ export function nodeDeletionPlanContext(contexts: IExecutionContextProvider<NavN
   return {
     operations,
     exclusions,
+
     addOperation(operation) {
       operations.push(operation);
     },
+
     exclude(target) {
       exclusions.push(target);
     },
+
     async prepare(navNodeInfoResource, projectInfoResource) {
       this.validateOwnership();
+
       const targets = new Map(operations.flatMap(operation => operation.targets.map(target => [target.node.uri, { target, operation }] as const)));
       const excluded = new Map(exclusions.map(target => [target.node.uri, target]));
       const items: INodeDeletionItem[] = [];
       const unavailable: INodeDeletionExclusion[] = [];
       const rows = new Map<string, INodeDeletionDialogItem>();
+
       for (const node of nodes) {
         const contribution = targets.get(node.uri);
         const target = contribution?.target ?? excluded.get(node.uri);
         const parents = await navNodeInfoResource.resolveParents(node.uri);
+
         if (target?.reason || !contribution) {
           unavailable.push({ node, parents, reason: target?.reason ?? 'plugin_navigation_tree_delete_unavailable' });
         } else {
           items.push({ ...contribution.target, operation: contribution.operation, parents });
         }
+
         rows.set(node.uri, {
           id: node.uri,
           name: node.name || node.uri,
@@ -62,30 +68,49 @@ export function nodeDeletionPlanContext(contexts: IExecutionContextProvider<NavN
             .join('/'),
         });
       }
-      const plan = prepareNodeDeletionPlan(items, unavailable);
-      for (const exclusion of plan.exclusions) {
+
+      const blocked = new Set(unavailable.flatMap(item => item.parents));
+      const ready: INodeDeletionItem[] = [];
+
+      for (const item of items) {
+        if (!item.keepChildren && blocked.has(item.node.uri)) {
+          unavailable.push({ node: item.node, parents: item.parents, reason: 'plugin_navigation_tree_delete_dependent_unavailable' });
+        } else {
+          ready.push(item);
+        }
+      }
+
+      for (const exclusion of unavailable) {
         rows.get(exclusion.node.uri)!.reason = exclusion.reason;
       }
-      return { items: plan.items, rows: [...rows.values()] };
+
+      return { items: ready, rows: [...rows.values()] };
     },
+
     validateOwnership() {
       const selected = new Set(nodes.map(node => node.uri));
       const owners = new Map<string, string>();
       const ids = new Set<string>();
+
       for (const operation of operations) {
         if (ids.has(operation.id)) {
           throw new Error(`Duplicate deletion operation: ${operation.id}`);
         }
+
         ids.add(operation.id);
       }
+
       const targets = [...operations.flatMap(operation => operation.targets.map(target => ({ ...target, owner: operation.owner }))), ...exclusions];
+
       for (const { node, owner } of targets) {
         if (!selected.has(node.uri)) {
           throw new Error(`Deletion target was not selected: ${node.uri}`);
         }
+
         if (owners.has(node.uri)) {
           throw new Error(`Conflicting deletion owners for ${node.uri}: ${owners.get(node.uri)}, ${owner}`);
         }
+
         owners.set(node.uri, owner);
       }
     },
