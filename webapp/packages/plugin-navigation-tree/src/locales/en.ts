@@ -20,6 +20,8 @@ export default [
   ['plugin_navigation_tree_delete_failed', 'Deletion failed.'],
   ['plugin_navigation_tree_delete_cancelled', 'Deletion was cancelled.'],
   ['plugin_navigation_tree_delete_skipped', 'Skipped because a selected child was not deleted.'],
+  ['plugin_navigation_tree_context_menu_title', 'Navigator actions'],
+  ['plugin_navigation_tree_node_menu_title', 'Actions for {arg:name}'],
   ['plugin_navigation_tree_explorer_tab_title', 'Explorer'],
   ['app_navigationTree_openNodeTab', 'Open'],
   ['app_navigationTree_search', 'Search elements...'],
