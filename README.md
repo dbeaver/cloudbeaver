@@ -28,6 +28,25 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.2.2 2026-10-05
+
+- AI Assistant:
+  - AI profiles are now sorted alphabetically in AI Chat and administration settings.
+- Administration:
+  - Added an Administration label and a Connections button to the administration header for easier navigation back to the application.
+- Authorization:
+  - Added the ability to change the database user password from the connection context menu if the “Enable database password change” setting is enabled in the Server configuration.
+- Data Transfer:
+  - Added format settings for data import in CloudBeaver, allowing users to configure how imported data is parsed and processed.
+- General:
+  - Improved performance and keyboard navigation in the Driver Properties tab.
+  - Improved spacing and alignment in the connection form.
+  - User profile tabs were moved to a vertical layout to improve usability and prevent horizontal scrolling on smaller screens.
+  - Added keyboard navigation for the Connection and Scripts trees, including expanding, collapsing, and opening items.
+- Security:
+  - Updated the MariaDB driver to version 3.5.10 to address CVE-2026-55856, CVE-2026-55857, and CVE-2026-55858.
+  - Fixed an LDAP authorization issue related to access filter handling in certain configurations.
+
 ### 26.2.1 2026-09-21
 
 - AI Assistant:

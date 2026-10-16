@@ -18,5 +18,5 @@ export const ConnectionSectionWrapper = observer<React.PropsWithChildren<IConnec
   children,
   className,
 }) {
-  return <div className={clsx('tw:flex tw:w-full tw:max-w-xl tw:flex-col tw:gap-6 tw:p-6', className)}>{children}</div>;
+  return <div className={clsx('tw:flex tw:w-full tw:max-w-xl tw:flex-col tw:gap-4 tw:p-6', className)}>{children}</div>;
 });

@@ -48,12 +48,13 @@ export const AuthDialog: DialogComponent<IAuthOptions> = observer(function AuthD
   const dialogData = useAuthDialogState(accessRequest, providerId, configurationId);
   const errorDetails = useErrorDetails(dialogData.exception);
   const authenticationService = useService(AuthenticationService);
-  const userInfo = useService(UserInfoResource);
+  const userInfoResource = useService(UserInfoResource);
   const commonDialogService = useService(CommonDialogService);
   const translate = useTranslate();
   const state = dialogData.state;
 
-  const additional = userInfo.isAuthenticated() && state.activeProvider?.id !== undefined && !userInfo.hasToken(state.activeProvider.id);
+  const additional =
+    userInfoResource.isAuthenticated() && state.activeProvider?.id !== undefined && !userInfoResource.hasToken(state.activeProvider.id);
 
   const showTabs = getComputed(() => dialogData.tabIds.length > 1);
   const emptyTabs = getComputed(() => dialogData.tabIds.length === 0);

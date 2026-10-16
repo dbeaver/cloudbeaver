@@ -1,4 +1,6 @@
 export default [
+  ['plugin_navigation_tree_context_menu_title', 'Navigator actions'],
+  ['plugin_navigation_tree_node_menu_title', 'Actions for {arg:name}'],
   ['plugin_navigation_tree_explorer_tab_title', 'Explorer'],
   ['app_navigationTree_openNodeTab', 'Open'],
   ['app_navigationTree_search', 'Search elements...'],

@@ -408,6 +408,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       config,
     });
 
+    if (config.hidden) {
+      return connection;
+    }
+
     return this.add(connection, true);
   }
 
@@ -507,16 +511,21 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   async update(key: IConnectionInfoParams, config: ConnectionConfig): Promise<DatabaseConnection> {
-    await this.performUpdate(key, [], async () => {
+    const connection = await this.performUpdate(key, [], async () => {
       const { connection } = await this.graphQLService.sdk.updateConnection({
         projectId: key.projectId,
         config,
       });
 
-      this.set(createConnectionParam(connection), connection);
-      this.onDataOutdated.execute(key);
+      if (!config.hidden) {
+        this.set(createConnectionParam(connection), connection);
+        this.onDataOutdated.execute(key);
+      }
+
+      return connection;
     });
-    return this.get(key)!;
+
+    return config.hidden ? connection : this.get(key)!;
   }
 
   async close(key: IConnectionInfoParams): Promise<Connection> {

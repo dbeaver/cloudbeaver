@@ -7,6 +7,8 @@
  */
 
 export default [
+  ['plugin_ai_profiles_profile_menu', 'Actions du profil'],
+  ['plugin_ai_profiles_profile_clone', 'Cloner'],
   ['plugin_ai_profiles_scope', 'Portée'],
   ['plugin_ai_profiles_scope_global', 'Globale'],
   ['plugin_ai_profiles_scope_user', 'Utilisateur'],

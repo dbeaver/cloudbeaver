@@ -21,11 +21,11 @@ export const TEMPERATURE_PROPERTY_ID = 'temperature';
 export class AIEnginePropertiesResource extends CachedMapResource<string, IObjectPropertyInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    permissionsResource: SessionPermissionsResource,
+    sessionPermissionsResource: SessionPermissionsResource,
   ) {
     super(() => new Map(), []);
 
-    permissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
+    sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
   }
 
   async loadProperties(engineId: string, profileId?: string, settings?: AiEngineConfig): Promise<IObjectPropertyInfo[]> {

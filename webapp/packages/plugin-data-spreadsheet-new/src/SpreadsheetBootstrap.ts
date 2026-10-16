@@ -58,7 +58,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
   constructor(
     private readonly dataPresentationService: DataPresentationService,
     private readonly dataGridSettingsService: DataGridSettingsService,
-    private readonly dataGridContextMenuSortingService: DataGridContextMenuOrderService,
+    private readonly dataGridContextMenuOrderService: DataGridContextMenuOrderService,
     private readonly dataGridContextMenuFilterService: DataGridContextMenuFilterService,
     private readonly dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
     private readonly dataGridContextMenuSaveContentService: DataGridContextMenuSaveContentService,
@@ -82,7 +82,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
       icon: 'table-icon-sm',
     });
 
-    this.dataGridContextMenuSortingService.register();
+    this.dataGridContextMenuOrderService.register();
     this.dataGridContextMenuFilterService.register();
     this.dataGridContextMenuCellEditingService.register();
     this.dataGridContextMenuSaveContentService.register();

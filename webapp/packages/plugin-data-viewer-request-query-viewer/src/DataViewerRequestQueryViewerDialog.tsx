@@ -50,7 +50,7 @@ export const DataViewerRequestQueryViewerDialog: DialogComponent<IPayload> = obs
     const connection = connectionInfoResource.get(key);
     const nodeId = connection?.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.projectId, key.connectionId);
     const container = navNodeManagerService.getNodeContainerInfo(nodeId);
-    const name = connection?.name ? '<' + connection.name + '> ' : 'SQL';
+    const name = connection?.name || 'SQL';
 
     sqlEditorNavigatorService.openNewEditor({
       name,

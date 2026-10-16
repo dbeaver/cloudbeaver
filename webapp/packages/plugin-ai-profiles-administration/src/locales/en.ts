@@ -1,8 +1,12 @@
 export default [
+  ['plugin_ai_administration_profile_clone_success', 'Profile cloned'],
+  ['plugin_ai_administration_profile_clone_error', 'Failed to clone profile'],
   ['ai_administration_language_model_settings', 'Model settings'],
   ['ai_administration_select_language_model_selector_title', 'Model'],
   ['ai_administration_models_refresh', 'Refresh models'],
   ['ai_administration_models_refresh_description', 'Fill in required fields, then refresh to load models'],
+  ['ai_administration_models_manual_description', 'Enter the model name manually'],
+  ['ai_administration_models_select_or_manual_description', 'Select a model from the list or enter its name manually'],
   ['ai_administration_models_refresh_fail', 'Failed to refresh models'],
   ['plugin_ai_administration_profiles_title', 'Profiles'],
   ['plugin_ai_administration_profiles_table_empty_placeholder', 'No profiles found. Create a new profile'],

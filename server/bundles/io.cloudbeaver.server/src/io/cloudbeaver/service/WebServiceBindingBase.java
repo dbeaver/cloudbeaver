@@ -280,7 +280,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     throw new DBException("Web session not instantiated");
                 }
 
-                String projectId = args[objectIdArgumentIndex] == null ? "" : String.valueOf(args[objectIdArgumentIndex]);
+                String projectId = args[objectIdArgumentIndex] == null ? null : String.valueOf(args[objectIdArgumentIndex]);
                 // we should always get the project from the session, even if projectId is null - the active project
                 // will be returned
                 WebProjectImpl project = webSession.getProjectById(projectId);

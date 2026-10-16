@@ -8,6 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import type { AiFunction } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
@@ -25,15 +26,28 @@ const FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA = schema.object({
 
 const FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA = schema.object({
   sqlText: schema.string().optional(),
+  newEditor: schema.boolean().optional(),
 });
 
 const FUNCTION_SCHEMAS = {
+  db_uiOpenDBeaverEntityEditor: FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA,
   db_openTableDataEditor: FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA,
+  db_uiOpenDBeaverSQLEditor: FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA,
   db_openSQLEditor: FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA,
 };
 
 export type AIFunctionName = keyof typeof FUNCTION_SCHEMAS;
 export type AIParamsFor<T extends AIFunctionName> = schema.infer<(typeof FUNCTION_SCHEMAS)[T]>;
+
+export function getCanonicalAIFunctionId(id: string): string {
+  if (id === 'db_openTableDataEditor') {
+    return 'db_uiOpenDBeaverEntityEditor';
+  }
+  if (id === 'db_openSQLEditor') {
+    return 'db_uiOpenDBeaverSQLEditor';
+  }
+  return id;
+}
 
 @injectable(() => [
   NavNodeManagerService,
@@ -55,8 +69,8 @@ export class AIChatFunctionsService {
     private readonly aiChatConversationsResource: AIChatConversationsResource,
   ) {}
 
-  getFunction(id: string) {
-    return this.aiFunctionsResource.data.find(func => func.id === id);
+  getFunction(id: string): AiFunction | undefined {
+    return this.aiFunctionsResource.data.find(func => func.id === getCanonicalAIFunctionId(id));
   }
 
   async executeFunction<T extends AIFunctionName>(functionName: T, params: AIParamsFor<T>): Promise<void> {
@@ -72,16 +86,22 @@ export class AIChatFunctionsService {
   }
 
   private handlers: { [K in AIFunctionName]: (params: AIParamsFor<K>) => void | Promise<void> } = {
+    db_uiOpenDBeaverEntityEditor: params => this.openEntity(params),
     db_openTableDataEditor: params => this.openEntity(params),
+    db_uiOpenDBeaverSQLEditor: params => this.openEditor(params),
     db_openSQLEditor: params => this.openEditor(params),
   };
 
-  private async openEntity(params: AIParamsFor<'db_openTableDataEditor'>) {
+  private async openEntity(params: AIParamsFor<'db_uiOpenDBeaverEntityEditor' | 'db_openTableDataEditor'>) {
     await this.navNodeManagerService.navToNode(params.objectName_nodePath);
   }
 
-  private async openEditor(params: AIParamsFor<'db_openSQLEditor'>) {
+  private async openEditor(params: AIParamsFor<'db_uiOpenDBeaverSQLEditor' | 'db_openSQLEditor'>) {
     const context = this.aiChatContextService.currentContext;
+    if (params.newEditor === false && this.sqlEditorNavigatorService.openRecentEditor(context?.connectionKey || undefined)) {
+      return;
+    }
+
     const conversationId = this.aiChatConversationsService.currentConversationId;
 
     let name = this.localizationService.translate('plugin_ai_chat_editor_name');
@@ -97,7 +117,7 @@ export class AIChatFunctionsService {
     await this.sqlEditorNavigatorService.openNewEditor({
       connectionKey: context?.connectionKey || undefined,
       dataSourceKey: LocalStorageSqlDataSource.key,
-      query: params.sqlText,
+      query: params.newEditor === false ? undefined : params.sqlText,
       name,
     });
   }

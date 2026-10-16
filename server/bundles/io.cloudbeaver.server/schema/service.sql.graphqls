@@ -70,6 +70,8 @@ input SQLDataFilter {
     constraints: [ SQLDataFilterConstraint ]
     "When true constraints are combined with OR instead of AND"
     anyConstraint: Boolean
+    "Pair values from composite-key constraints by row"
+    shouldUseDisjunctive: Boolean @since(version: "26.2.2")
     where: String
     orderBy: String
 }

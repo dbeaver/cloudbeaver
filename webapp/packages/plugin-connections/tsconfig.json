@@ -83,6 +83,9 @@
       "path": "../plugin-authentication"
     },
     {
+      "path": "../plugin-data-grid"
+    },
+    {
       "path": "../plugin-navigation-tree"
     },
     {

@@ -286,24 +286,31 @@ public class WebSQLUtils {
         DBCSession session = null;
         try {
             for (DBDAttributeConstraint constraint : constraints) {
-                if (!(constraint.getValue() instanceof String strValue) ||
-                    !(constraint.getAttribute() instanceof DBDAttributeBinding binding)
-                ) {
+                Object constraintValue = constraint.getValue();
+                if (!(constraintValue instanceof String || constraintValue instanceof Object[]) ||
+                    !(constraint.getAttribute() instanceof DBDAttributeBinding binding)) {
                     continue;
                 }
                 if (session == null) {
                     session = executionContext.openSession(monitor, DBCExecutionPurpose.UTIL, "Convert filter values");
                 }
-                try {
-                    Object value = binding.getValueHandler().getValueFromObject(session, binding, strValue, false, false);
-                    if (value != null) {
-                        constraint.setValue(value);
+                Object[] values = constraintValue instanceof Object[] array ? array : new Object[] { constraintValue };
+                for (int i = 0; i < values.length; i++) {
+                    if (!(values[i] instanceof String strValue)) {
+                        continue;
                     }
-                } catch (Exception e) {
-                    log.debug(
-                        "Can't convert filter value '" + strValue + "' for attribute '"
-                            + binding.getName() + "'", e
-                    );
+                    try {
+                        Object value = binding.getValueHandler().getValueFromObject(session, binding, strValue, false, false);
+                        if (value != null) {
+                            if (constraintValue instanceof String) {
+                                constraint.setValue(value);
+                            } else {
+                                values[i] = value;
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.debug("Can't convert filter value '" + strValue + "' for attribute '" + binding.getName() + "'", e);
+                    }
                 }
             }
         } finally {

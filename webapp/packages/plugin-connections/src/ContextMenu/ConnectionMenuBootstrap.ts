@@ -13,6 +13,7 @@ import {
   ConnectionsSettingsService,
   createConnectionParam,
   DATA_CONTEXT_CONNECTION,
+  DBDriverResource,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -39,6 +40,7 @@ import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree
 @injectable(() => [
   NotificationService,
   ConnectionInfoResource,
+  DBDriverResource,
   ConnectionInfoAuthPropertiesResource,
   ConnectionsManagerService,
   ActionService,
@@ -53,6 +55,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly dbDriverResource: DBDriverResource,
     private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly actionService: ActionService,
@@ -190,22 +193,34 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           const auth = this.connectionInfoAuthPropertiesResource.get(connectionKey);
-          return !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
+          const driver = this.dbDriverResource.get(connection.driverId);
+          return !!driver?.anonymousAccess || !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
         }
 
         if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
-          return !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit;
+          const driver = this.dbDriverResource.get(connection.driverId);
+          return (
+            !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected
+          );
         }
 
         return true;
       },
       getLoader: (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return getCachedMapResourceLoaderState(this.connectionInfoAuthPropertiesResource, () => connectionKey, undefined, true);
+        const loaders = [getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true)];
+
+        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS || action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
+          loaders.push(
+            getCachedMapResourceLoaderState(this.dbDriverResource, () => this.connectionInfoResource.get(connectionKey)?.driverId ?? null),
+          );
         }
 
-        return getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true);
+        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
+          loaders.push(getCachedMapResourceLoaderState(this.connectionInfoAuthPropertiesResource, () => connectionKey, undefined, true));
+        }
+
+        return loaders;
       },
       handler: async (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;

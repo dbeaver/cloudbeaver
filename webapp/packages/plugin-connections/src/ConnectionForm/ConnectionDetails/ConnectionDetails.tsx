@@ -59,7 +59,7 @@ export const ConnectionDetails: TabContainerPanelComponent<IConnectionFormProps>
           </Textarea>
         </section>
 
-        <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-6 tw:border-t tw:pt-6">
+        <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-4 tw:border-t tw:pt-6">
           <ConnectionTypeForm config={optionsPart.state} />
           <Placeholder container={connectionFormService.connectionContainer} formState={formState} />
         </section>

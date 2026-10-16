@@ -24,7 +24,7 @@ export class InitializationSettingsTabService extends Bootstrap {
       key: 'initialization_settings',
       name: 'plugin_connections_connection_form_part_initialization_settings',
       title: 'plugin_connections_connection_form_part_initialization_settings',
-      icon: '/icons/plugin_connection_vertical_sliders.svg',
+      icon: '/icons/core_blocks_sliders.svg',
       order: 10,
       panel: () => InitializationSettings,
     });

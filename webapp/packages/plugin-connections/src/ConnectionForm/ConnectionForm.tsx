@@ -31,7 +31,7 @@ export interface IConnectionFormComponentProps {
 }
 
 export const ConnectionForm = observer<IConnectionFormComponentProps>(function ConnectionForm({ formState, onCancel, onSave = () => {}, className }) {
-  const service = useService(ConnectionFormService);
+  const connectionFormService = useService(ConnectionFormService);
   const styles = useS(style);
   const notificationService = useService(NotificationService);
   const optionsPart = getConnectionFormOptionsPart(formState);
@@ -47,7 +47,7 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
       if (submitType === 'test') {
         submitInfo.setSubmitOnNoChanges(true);
       }
-      const isCreate = formState.mode === FormMode.Create;
+      const isCreate = formState.mode === FormMode.Create || optionsPart.state.hidden === true;
       const saved = await formState.save(context);
 
       if (saved) {
@@ -80,7 +80,7 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
 
   return (
     <Form context={form} contents>
-      <TabsState container={service.parts} localState={formState.parts} orientation="vertical" formState={formState}>
+      <TabsState container={connectionFormService.parts} localState={formState.parts} orientation="vertical" formState={formState}>
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>
             <Container className={s(styles, { connectionTopBarStatus: true })} overflow>
@@ -97,7 +97,7 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
               <div className={s(styles, { connectionTopBarActions: true })}>
                 <Loader suspense inline hideMessage hideException>
                   <ConnectionFormActionsContext.Provider value={actionsContext}>
-                    <Placeholder container={service.actionsContainer} formState={formState} />
+                    <Placeholder container={connectionFormService.actionsContainer} formState={formState} />
                   </ConnectionFormActionsContext.Provider>
                 </Loader>
               </div>
