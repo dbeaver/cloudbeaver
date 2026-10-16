@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,12 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
     <div {...rest} className={s(style, { tableLeftBar: true }, className)}>
       <TabsState currentTabId={presentationId} autoSelect={main}>
         <SContext registry={tablePresentationBarRegistry}>
-          <TabList className={s(style, { tabListFlexible: main })} aria-label="Data Presentations" vertical rotated>
+          <TabList
+            className={s(style, { tabListFlexible: main })}
+            aria-label={main ? 'data_viewer_presentations_label' : 'data_viewer_panels_label'}
+            vertical
+            rotated
+          >
             {presentations.map(presentation => (
               <Tab key={presentation.id} presentation={presentation} model={model} resultIndex={resultIndex} onClick={handleClick} />
             ))}
