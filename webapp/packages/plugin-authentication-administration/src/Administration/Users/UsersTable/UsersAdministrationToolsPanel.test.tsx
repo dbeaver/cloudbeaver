@@ -5,41 +5,26 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { ToolsPanel } from '@cloudbeaver/core-blocks';
+import { type IMenuData, MenuActionItem, MenuBaseItem } from '@cloudbeaver/core-view';
 import { renderInApp } from '@cloudbeaver/tests-runner';
-import { MenuActionItem, MenuBaseItem } from '@cloudbeaver/core-view';
 
-import { UsersAdministrationToolsPanel } from './UsersAdministrationToolsPanel.js';
+import { UsersAdministrationToolsActions } from './UsersAdministrationToolsPanel.js';
 
-const mocks = vi.hoisted(() => ({
-  items: [] as Array<MenuActionItem | MenuBaseItem>,
-  context: { get: vi.fn() },
-}));
+function renderActions(...items: Array<MenuActionItem | MenuBaseItem>) {
+  const menu = { items, context: { get: vi.fn() } } as unknown as IMenuData;
+  const result = renderInApp(
+    <ToolsPanel role="toolbar" aria-label="Users">
+      <UsersAdministrationToolsActions menu={menu} translate={token => token} />
+    </ToolsPanel>,
+  );
 
-vi.mock('@cloudbeaver/core-blocks', async importOriginal => ({
-  ...(await importOriginal<typeof import('@cloudbeaver/core-blocks')>()),
-  useAutoLoad: vi.fn(),
-  useTranslate: () => (key: string) => (key === 'authentication_administration_item_users' ? 'Users' : key),
-}));
+  return { ...result, menu };
+}
 
-vi.mock('@cloudbeaver/core-data-context', async importOriginal => ({
-  ...(await importOriginal<typeof import('@cloudbeaver/core-data-context')>()),
-  useDataContext: () => mocks.context,
-  useDataContextLink: vi.fn(),
-}));
-
-vi.mock('@cloudbeaver/core-view', async importOriginal => ({
-  ...(await importOriginal<typeof import('@cloudbeaver/core-view')>()),
-  useMenu: () => ({ items: mocks.items, context: mocks.context, loaders: [] }),
-}));
-
-describe('UsersAdministrationToolsPanel', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mocks.items = [];
-  });
-
+describe('UsersAdministrationToolsActions', () => {
   it('renders CE actions and EE contributions as direct buttons in menu order', async () => {
     const activate = vi.fn();
     const onImport = vi.fn();
@@ -52,9 +37,8 @@ describe('UsersAdministrationToolsPanel', () => {
       activate,
     } as unknown as ConstructorParameters<typeof MenuActionItem>[0]);
     const importItem = new MenuBaseItem({ id: 'import', label: 'Import' }, { onSelect: onImport });
-    mocks.items = [action, importItem];
 
-    const { getByRole, user } = renderInApp(<UsersAdministrationToolsPanel onUpdate={vi.fn()} />);
+    const { getByRole, user, menu } = renderActions(action, importItem);
     const panel = getByRole('toolbar', { name: 'Users' });
 
     expect(Array.from(panel.children).map(child => child.textContent)).toEqual(['Create', 'Import']);
@@ -68,21 +52,19 @@ describe('UsersAdministrationToolsPanel', () => {
     await user.click(getByRole('button', { name: 'Import' }));
 
     expect(activate).toHaveBeenCalledOnce();
-    expect(onImport).toHaveBeenCalledWith(mocks.context);
+    expect(onImport).toHaveBeenCalledWith(menu.context);
   });
 
   it('hides unavailable actions and disables actions according to the menu', () => {
-    mocks.items = [
-      new MenuActionItem({
-        action: { id: 'hidden' },
-        actionInfo: { label: 'Hidden' },
-        isHidden: () => true,
-        isDisabled: () => false,
-      } as unknown as ConstructorParameters<typeof MenuActionItem>[0]),
-      new MenuBaseItem({ id: 'disabled', label: 'Disabled', disabled: true }),
-    ];
+    const hidden = new MenuActionItem({
+      action: { id: 'hidden' },
+      actionInfo: { label: 'Hidden' },
+      isHidden: () => true,
+      isDisabled: () => false,
+    } as unknown as ConstructorParameters<typeof MenuActionItem>[0]);
+    const disabled = new MenuBaseItem({ id: 'disabled', label: 'Disabled', disabled: true });
 
-    const { queryByRole, getByRole } = renderInApp(<UsersAdministrationToolsPanel onUpdate={vi.fn()} />);
+    const { queryByRole, getByRole } = renderActions(hidden, disabled);
 
     expect(queryByRole('button', { name: 'Hidden' })).toBeNull();
     expect(getByRole('button', { name: 'Disabled' })).toBeDisabled();
