@@ -8,7 +8,13 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
       "path": "../../common-react/@dbeaver/ui-kit"
+    },
+    {
+      "path": "../../common-typescript/@dbeaver/cli"
     },
     {
       "path": "../../common-typescript/@dbeaver/js-helpers"
@@ -75,6 +81,9 @@
     },
     {
       "path": "../plugin-data-grid"
+    },
+    {
+      "path": "../tests-runner"
     }
   ],
   "include": [
