@@ -18,6 +18,8 @@ interface Props {
   onUpdate: () => void;
 }
 
+const ICON_VIEW_BOX = '0 0 24 24';
+
 export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdministrationToolsPanel({ onUpdate }) {
   const context = useDataContext();
   const translate = useTranslate();
@@ -52,7 +54,7 @@ export const UsersAdministrationToolsActions = observer<{ menu: IMenuData; trans
           <ToolsAction
             key={item.id}
             icon={info.icon}
-            viewBox="0 0 24 24"
+            viewBox={ICON_VIEW_BOX}
             title={translate(info.tooltip ?? info.label)}
             disabled={item.disabled}
             loading={getComputed(() => item.action.isLoading())}
@@ -71,7 +73,7 @@ export const UsersAdministrationToolsActions = observer<{ menu: IMenuData; trans
           <ToolsAction
             key={item.id}
             icon={item.icon}
-            viewBox="0 0 24 24"
+            viewBox={ICON_VIEW_BOX}
             title={translate(item.tooltip ?? item.label)}
             disabled={item.disabled}
             onClick={() => item.events?.onSelect?.(menu.context)}
