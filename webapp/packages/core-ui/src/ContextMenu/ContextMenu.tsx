@@ -99,7 +99,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
     <MenuContext value={menuContext}>
       <MenuProvider store={menu} setOpen={handlers.handleVisibleSwitch}>
         {hasTrigger && (
-          <MenuButton {...rest} title={translate(menuData.menu.info.tooltip)}>
+          <MenuButton {...rest} title={rest.title ?? translate(menuData.menu.info.tooltip || menuData.menu.info.label)}>
             {children}
           </MenuButton>
         )}
