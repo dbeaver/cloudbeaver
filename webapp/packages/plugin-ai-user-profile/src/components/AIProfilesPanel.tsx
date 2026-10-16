@@ -47,7 +47,6 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
           <ToolsAction
             title={translate('plugin_ai_user_profile_refresh_tooltip')}
             icon="refresh"
-            viewBox="0 0 24 24"
             disabled={profilesLoader.isLoading() || enginesLoader.isLoading()}
             onClick={refresh}
           >
