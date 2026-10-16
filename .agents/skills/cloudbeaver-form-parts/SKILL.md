@@ -27,3 +27,7 @@ override isLoaded(): boolean {
 ```
 
 After a successful load, `isLoaded()` should be `true` and `isOutdated()` should be `false` until a dependency changes. Auto-loading retries while either condition is unmet. Checking a resource or key that `loader()` never refreshes can cause an infinite reload loop.
+
+## Keep the ESLint contract synchronized
+
+When changing the base `FormPart` API, update `webapp/packages/eslint-plugin/formPartContract.js` and its tests to match, then run `yarn workspace @cloudbeaver/eslint-plugin test` from `webapp/`.
