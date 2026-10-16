@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -76,16 +76,15 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
         <ColoredContainer overflow parent vertical noWrap gap>
           <Group box keepSize>
             <ToolsPanel rounded>
-              <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
+              <ToolsAction icon="admin-save" disabled={!changed} onClick={() => form.submit()}>
                 {translate('ui_processing_save')}
               </ToolsAction>
-              <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" disabled={!changed} onClick={handleReset}>
+              <ToolsAction icon="admin-cancel" disabled={!changed} onClick={handleReset}>
                 {translate('ui_processing_cancel')}
               </ToolsAction>
               {settingsSource?.restoreDefaults && (
                 <ToolsAction
                   icon="/icons/settings_restore_defaults2_m.svg#root"
-                  viewBox="0 0 24 24"
                   disabled={settingsSource.isOverrideDefaults?.() === false}
                   svg
                   onClick={handleRestoreDefaults}

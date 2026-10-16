@@ -40,25 +40,17 @@ export const TeamsPage = observer<Props>(function TeamsPage() {
           <ToolsAction
             title={translate('administration_teams_add_tooltip')}
             icon="add"
-            viewBox="0 0 24 24"
             disabled={!!createTeamService.formState || table.processing}
             onClick={createTeamService.create}
           >
             {translate('ui_create')}
           </ToolsAction>
-          <ToolsAction
-            title={translate('administration_teams_refresh_tooltip')}
-            icon="refresh"
-            viewBox="0 0 24 24"
-            disabled={table.processing}
-            onClick={table.update}
-          >
+          <ToolsAction title={translate('administration_teams_refresh_tooltip')} icon="refresh" disabled={table.processing} onClick={table.update}>
             {translate('ui_refresh')}
           </ToolsAction>
           <ToolsAction
             title={translate('administration_teams_delete_tooltip')}
             icon="trash"
-            viewBox="0 0 24 24"
             disabled={!selection.list.length || table.processing}
             onClick={table.delete}
           >

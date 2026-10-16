@@ -75,16 +75,10 @@ export const AIAdministrationPage = observer<{
       <ColoredContainer vertical wrap parent gap>
         <Group box keepSize>
           <ToolsPanel rounded>
-            <ToolsAction
-              disabled={!changed}
-              title={translate('ui_processing_save')}
-              icon="admin-save"
-              viewBox="0 0 24 24"
-              onClick={() => form.submit()}
-            >
+            <ToolsAction disabled={!changed} title={translate('ui_processing_save')} icon="admin-save" onClick={() => form.submit()}>
               {translate('ui_processing_save')}
             </ToolsAction>
-            <ToolsAction disabled={!changed} title={translate('ui_processing_cancel')} icon="admin-cancel" viewBox="0 0 24 24" onClick={handleReset}>
+            <ToolsAction disabled={!changed} title={translate('ui_processing_cancel')} icon="admin-cancel" onClick={handleReset}>
               {translate('ui_processing_cancel')}
             </ToolsAction>
           </ToolsPanel>

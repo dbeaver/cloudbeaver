@@ -13,12 +13,11 @@ import { type IMenuData, MenuActionItem, MenuBaseItem, useMenu } from '@cloudbea
 
 import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION.js';
 import { DATA_CONTEXT_USERS_ADMINISTRATION_ACTIONS } from './DATA_CONTEXT_USERS_ADMINISTRATION_ACTIONS.js';
+import { getUsersAdministrationToolsActions } from './getUsersAdministrationToolsActions.js';
 
 interface Props {
   onUpdate: () => void;
 }
-
-const ICON_VIEW_BOX = '0 0 24 24';
 
 export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdministrationToolsPanel({ onUpdate }) {
   const context = useDataContext();
@@ -42,48 +41,19 @@ export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdmin
 
 export const UsersAdministrationToolsActions = observer<{ menu: IMenuData; translate: ReturnType<typeof useTranslate> }>(
   function UsersAdministrationToolsActions({ menu, translate }) {
-    return menu.items.map(item => {
-      if (item.hidden) {
-        return null;
-      }
+    const items = menu.items.filter((item): item is MenuActionItem | MenuBaseItem => item instanceof MenuActionItem || item instanceof MenuBaseItem);
 
-      if (item instanceof MenuActionItem) {
-        const info = item.action.actionInfo;
-
-        return (
-          <ToolsAction
-            key={item.id}
-            icon={info.icon}
-            viewBox={ICON_VIEW_BOX}
-            title={translate(info.tooltip ?? info.label)}
-            disabled={item.disabled}
-            loading={getComputed(() => item.action.isLoading())}
-            onClick={() => {
-              item.events?.onSelect?.(menu.context);
-              item.action.activate();
-            }}
-          >
-            {translate(info.label)}
-          </ToolsAction>
-        );
-      }
-
-      if (item instanceof MenuBaseItem) {
-        return (
-          <ToolsAction
-            key={item.id}
-            icon={item.icon}
-            viewBox={ICON_VIEW_BOX}
-            title={translate(item.tooltip ?? item.label)}
-            disabled={item.disabled}
-            onClick={() => item.events?.onSelect?.(menu.context)}
-          >
-            {translate(item.label)}
-          </ToolsAction>
-        );
-      }
-
-      return null;
-    });
+    return getUsersAdministrationToolsActions(items, menu.context, translate).map(action => (
+      <ToolsAction
+        key={action.id}
+        icon={action.icon}
+        title={action.title}
+        disabled={action.disabled}
+        loading={action.isLoading && getComputed(action.isLoading)}
+        onClick={action.onClick}
+      >
+        {action.label}
+      </ToolsAction>
+    ));
   },
 );

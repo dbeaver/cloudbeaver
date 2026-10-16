@@ -122,7 +122,6 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             <ToolsAction
               title={translate('administration_configuration_tools_save_tooltip')}
               icon="admin-save"
-              viewBox="0 0 24 24"
               disabled={!changed}
               onClick={() => form.submit()}
             >
@@ -131,7 +130,6 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             <ToolsAction
               title={translate('administration_configuration_tools_cancel_tooltip')}
               icon="admin-cancel"
-              viewBox="0 0 24 24"
               disabled={!changed}
               onClick={() => formState.reset()}
             >

@@ -62,7 +62,6 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
             <ToolsAction
               title={translate('plugin_ai_administration_profile_add_tooltip')}
               icon="add"
-              viewBox="0 0 24 24"
               disabled={table.processing}
               onClick={() => aiProfileFormService.open(null)}
             >
@@ -71,7 +70,6 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
             <ToolsAction
               title={translate('plugin_ai_administration_profile_refresh_tooltip')}
               icon="refresh"
-              viewBox="0 0 24 24"
               disabled={table.processing}
               onClick={() => table.refresh()}
             >
@@ -80,7 +78,6 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
             <ToolsAction
               title={translate('plugin_ai_administration_profile_delete_tooltip')}
               icon="trash"
-              viewBox="0 0 24 24"
               disabled={!selection.list.length || table.processing}
               onClick={() => table.delete()}
             >

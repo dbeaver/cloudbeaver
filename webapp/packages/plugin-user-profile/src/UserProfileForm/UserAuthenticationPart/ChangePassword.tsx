@@ -69,10 +69,10 @@ export const ChangePassword = observer(function ChangePassword() {
           <ColoredContainer parent overflow compact vertical noWrap gap>
             <Group overflow box keepSize>
               <ToolsPanel rounded minHeight>
-                <ToolsAction icon="admin-save" viewBox="0 0 24 24" onClick={() => form.submit()}>
+                <ToolsAction icon="admin-save" onClick={() => form.submit()}>
                   {translate('plugin_user_profile_authentication_change_password_submit_label')}
                 </ToolsAction>
-                <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" onClick={resetForm}>
+                <ToolsAction icon="admin-cancel" onClick={resetForm}>
                   {translate('ui_clear')}
                 </ToolsAction>
               </ToolsPanel>
