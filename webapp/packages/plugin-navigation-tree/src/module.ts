@@ -19,6 +19,7 @@ import { ElementsTreeService } from './NavigationTree/ElementsTree/ElementsTreeS
 import { TreeToolbarMenuService } from './TreeNew/TreeToolbarMenuService.js';
 import { TreeSettingsMenuService } from './TreeNew/TreeSettingsMenuService.js';
 import { LocaleService } from './LocaleService.js';
+import { NodeDeletionService } from './NodesManager/NodeDeletion/NodeDeletionService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-navigation-tree',
@@ -32,6 +33,7 @@ export default ModuleRegistry.add({
       .addSingleton(NavNodeViewService)
       .addSingleton(NavigationTreeSettingsService)
       .addSingleton(NavNodeContextMenuService)
+      .addSingleton(NodeDeletionService)
       .addSingleton(TreeSelectionService)
       .addSingleton(NavigationTreeBootstrap)
       .addSingleton(NavigationTreeService)
