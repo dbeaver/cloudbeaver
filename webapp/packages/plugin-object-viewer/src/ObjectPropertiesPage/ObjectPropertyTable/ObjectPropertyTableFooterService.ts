@@ -6,9 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { DATA_CONTEXT_NAV_NODES, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
-import { ACTION_DELETE, ActionService, MenuService } from '@cloudbeaver/core-view';
-import { NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
+import { DataContext } from '@cloudbeaver/core-data-context';
+import {
+  DATA_CONTEXT_NAV_NODE,
+  DATA_CONTEXT_NAV_NODES,
+  type NavNode,
+  NavTreeResource,
+  NavTreeSettingsService,
+} from '@cloudbeaver/core-navigation-tree';
+import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { MENU_NAVIGATION_TREE_MANAGE, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { MENU_OBJECT_VIEWER_FOOTER } from './MENU_OBJECT_VIEWER_FOOTER.js';
 
@@ -48,7 +55,7 @@ export class ObjectPropertyTableFooterService {
       isDisabled: (context, action) => {
         if (action === ACTION_DELETE) {
           const selected = context.get(DATA_CONTEXT_NAV_NODES)!();
-          return this.nodeDeletionService.isDeleting || !this.nodeDeletionService.canDelete(selected) || this.navTreeResource.isLoading();
+          return this.nodeDeletionService.isDeleting || this.navTreeResource.isLoading() || !selected.some(node => this.canDelete(node));
         }
 
         return true;
@@ -60,5 +67,14 @@ export class ObjectPropertyTableFooterService {
         }
       },
     });
+  }
+
+  private canDelete(node: NavNode): boolean {
+    const context = new DataContext();
+    context.set(DATA_CONTEXT_NAV_NODE, node, 'object-viewer-delete');
+    context.set(DATA_CONTEXT_MENU, MENU_NAVIGATION_TREE_MANAGE, 'object-viewer-delete');
+
+    const action = this.actionService.getAction(context, ACTION_DELETE);
+    return !!action && !action.isHidden() && !action.isDisabled();
   }
 }

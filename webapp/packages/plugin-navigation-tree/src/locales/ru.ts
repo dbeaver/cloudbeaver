@@ -1,5 +1,4 @@
 export default [
-  ['plugin_navigation_tree_delete_not_selected', 'Не выбран'],
   ['plugin_navigation_tree_delete_success', 'Удаление завершено успешно'],
   ['plugin_navigation_tree_delete_partial', 'Удаление выполнено частично'],
   ['plugin_navigation_tree_delete_result', 'Удалено объектов: {arg:count} из {arg:total}.'],

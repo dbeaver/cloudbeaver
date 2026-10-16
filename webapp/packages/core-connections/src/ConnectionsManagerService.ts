@@ -104,9 +104,11 @@ export class ConnectionsManagerService {
 
   async deleteConnection(key: IConnectionInfoParams): Promise<boolean> {
     const connection = await this.connectionInfoResource.load(key);
+
     if (!connection.canDelete) {
       return false;
     }
+
     const contexts = await this.onDelete.execute({
       connections: [key],
       state: 'before',

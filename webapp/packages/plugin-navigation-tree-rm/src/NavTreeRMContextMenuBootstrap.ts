@@ -17,20 +17,20 @@ import {
   isRMResourceNode,
   NAV_NODE_TYPE_RM_FOLDER,
   NAV_NODE_TYPE_RM_RESOURCE,
+  RESOURCES_NODE_PATH,
   ResourceManagerResource,
 } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
-import { ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_NAV_NODE_ACTIONS,
-  nodeDeletionAvailabilityContext,
+  MENU_NAVIGATION_TREE_MANAGE,
   nodeDeletionPlanContext,
   NodeDeletionService,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId.js';
-import { isResourceTypeRootFolder } from './NavNodes/isResourceTypeRootFolder.js';
 import { NavResourceNodeService } from './NavResourceNodeService.js';
 
 @injectable(() => [
@@ -58,36 +58,27 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    const isResource = (node: NavNode) => [NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType ?? '');
-    const canDelete = (node: NavNode) => {
-      if (isRMProjectNode(node)) {
-        return false;
-      }
-      const project = node.projectId ? this.projectInfoResource.get(node.projectId) : undefined;
-      const root = project?.resourceTypes.some(type => {
-        const root = this.resourceManagerService.getRootFolder(project, type.id);
-        return isResourceTypeRootFolder(node, project.id, root);
-      });
-      return !root && !!node.features?.includes(ENodeFeature.canDelete) && !!getResourceKeyFromNodeId(node.uri);
-    };
-    this.nodeDeletionService.checkDeletion.addHandler((nodes, contexts) => {
-      const available = contexts.getContext(nodeDeletionAvailabilityContext);
-      for (const node of nodes.filter(isResource)) {
-        if (canDelete(node)) {
-          available.add(node.uri);
-        }
-      }
+    this.actionService.addHandler({
+      id: 'resource-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => this.isResource(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isHidden: context => !this.canDelete(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isDisabled: context => this.nodeDeletionService.isDeleting || !this.canDelete(context.get(DATA_CONTEXT_NAV_NODE)!),
+      handler: context => this.nodeDeletionService.deleteSelection(context),
     });
+
     this.nodeDeletionService.prepareDeletion.addHandler((nodes, contexts) => {
       const plan = contexts.getContext(nodeDeletionPlanContext);
-      for (const node of nodes.filter(isResource)) {
+      for (const node of nodes.filter(node => this.isResource(node))) {
         const target = {
           node,
           type: node.folder ? 'ui_folder' : 'plugin_navigation_tree_rm_delete_resource',
           warning: node.folder ? 'plugin_navigation_tree_rm_delete_folder_warning' : undefined,
         };
         const key = getResourceKeyFromNodeId(node.uri);
-        if (!key || !canDelete(node)) {
+        if (!key || !this.canDelete(node)) {
           plan.exclude({ ...target, owner: 'resource-manager', reason: 'plugin_navigation_tree_delete_unavailable' });
           continue;
         }
@@ -180,5 +171,23 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
         }
       },
     });
+  }
+
+  private isResource(node: NavNode): boolean {
+    return [NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType ?? '');
+  }
+
+  private canDelete(node: NavNode): boolean {
+    if (isRMProjectNode(node)) {
+      return false;
+    }
+
+    const project = node.projectId ? this.projectInfoResource.get(node.projectId) : undefined;
+    const root = project?.resourceTypes.some(type => {
+      const root = this.resourceManagerService.getRootFolder(project, type.id);
+      return node.folder && root !== undefined && node.uri === createPath(RESOURCES_NODE_PATH, project.id, root);
+    });
+
+    return !root && !!node.features?.includes(ENodeFeature.canDelete) && !!getResourceKeyFromNodeId(node.uri);
   }
 }

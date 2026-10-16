@@ -49,8 +49,6 @@ export function nodeDeletionPlanContext(contexts: IExecutionContextProvider<NavN
         }
         rows.set(node.uri, {
           id: node.uri,
-          parents,
-          keepChildren: target?.keepChildren,
           name: node.name || node.uri,
           icon: node.icon,
           type: target?.type ?? 'plugin_navigation_tree_delete_object',
@@ -92,9 +90,4 @@ export function nodeDeletionPlanContext(contexts: IExecutionContextProvider<NavN
       }
     },
   };
-}
-
-/** Cached capability checks for menus; handlers own applicability and permissions. */
-export function nodeDeletionAvailabilityContext(): Set<string> {
-  return new Set();
 }

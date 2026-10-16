@@ -51,14 +51,14 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
-import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_ELEMENTS_TREE,
   MENU_ELEMENTS_TREE_TOOLS,
   MENU_NAVIGATION_TREE_CREATE,
+  MENU_NAVIGATION_TREE_MANAGE,
   NavigationTreeService,
   NodeDeletionService,
-  nodeDeletionAvailabilityContext,
   nodeDeletionPlanContext,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
@@ -107,23 +107,24 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    const canDelete = (node: NavNode) => {
-      const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
-      const connection = key ? this.connectionInfoResource.get(key) : undefined;
-      return !!node.features?.includes(ENodeFeature.canDelete) && !connection?.features.includes(EConnectionFeature.restrictMetadataEdit);
-    };
-    const isFolder = (node: NavNode) => isConnectionFolder(node) && !isConnectionNode(node);
-    this.nodeDeletionService.checkDeletion.addHandler((nodes, contexts) => {
-      const available = contexts.getContext(nodeDeletionAvailabilityContext);
-      for (const node of nodes.filter(isFolder)) {
-        if (canDelete(node)) {
-          available.add(node.uri);
-        }
-      }
+    this.navNodeInfoResource.onItemUpdate.addHandler(this.syncWithNavTree.bind(this));
+    this.navNodeInfoResource.onItemDelete.addHandler(this.syncWithNavTree.bind(this));
+    this.navNodeManagerService.onMove.addHandler(this.moveConnectionToFolder.bind(this));
+
+    this.actionService.addHandler({
+      id: 'connection-folder-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => this.isFolder(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isHidden: context => !this.canDelete(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isDisabled: context => this.nodeDeletionService.isDeleting || !this.canDelete(context.get(DATA_CONTEXT_NAV_NODE)!),
+      handler: context => this.nodeDeletionService.deleteSelection(context),
     });
+
     this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
       const plan = contexts.getContext(nodeDeletionPlanContext);
-      for (const node of nodes.filter(isFolder)) {
+      for (const node of nodes.filter(node => this.isFolder(node))) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
         if (key) {
           await this.connectionInfoResource.load(key);
@@ -134,7 +135,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           warning: 'plugin_connections_delete_folder_warning',
           keepChildren: true,
         };
-        if (!canDelete(node)) {
+        if (!this.canDelete(node)) {
           plan.exclude({ ...target, owner: 'connection-folders', reason: 'plugin_navigation_tree_delete_unavailable' });
           continue;
         }
@@ -149,10 +150,6 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         });
       }
     });
-
-    this.navNodeInfoResource.onItemUpdate.addHandler(this.syncWithNavTree.bind(this));
-    this.navNodeInfoResource.onItemDelete.addHandler(this.syncWithNavTree.bind(this));
-    this.navNodeManagerService.onMove.addHandler(this.moveConnectionToFolder.bind(this));
 
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',
@@ -225,6 +222,17 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.elementsTreeActionHandler.bind(this),
     });
+  }
+
+  private isFolder(node: NavNode): boolean {
+    return isConnectionFolder(node) && !isConnectionNode(node);
+  }
+
+  private canDelete(node: NavNode): boolean {
+    const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
+    const connection = key ? this.connectionInfoResource.get(key) : undefined;
+
+    return !!node.features?.includes(ENodeFeature.canDelete) && !connection?.features.includes(EConnectionFeature.restrictMetadataEdit);
   }
 
   private async moveConnectionToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {

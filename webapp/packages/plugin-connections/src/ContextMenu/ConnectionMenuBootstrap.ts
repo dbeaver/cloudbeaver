@@ -33,7 +33,7 @@ import {
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getUniqueName } from '@cloudbeaver/core-utils';
-import { ActionService, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ActionService, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService.js';
@@ -45,12 +45,7 @@ import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DI
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
-import {
-  MENU_NAVIGATION_TREE_MANAGE,
-  nodeDeletionAvailabilityContext,
-  nodeDeletionPlanContext,
-  NodeDeletionService,
-} from '@cloudbeaver/plugin-navigation-tree';
+import { MENU_NAVIGATION_TREE_MANAGE, nodeDeletionPlanContext, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
 @injectable(() => [
   NotificationService,
@@ -89,31 +84,28 @@ export class ConnectionMenuBootstrap extends Bootstrap {
   }
 
   override register(): void {
-    const canDelete = (node: NavNode) => {
-      const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
-      const connection = key ? this.connectionInfoResource.get(key) : undefined;
-      return (
-        !!node.features?.includes(ENodeFeature.canDelete) &&
-        !connection?.features.includes(EConnectionFeature.readOnly) &&
-        !connection?.features.includes(EConnectionFeature.restrictMetadataEdit)
-      );
-    };
-
-    const isDatabaseNode = (node: NavNode) => !isConnectionNode(node) && !isConnectionFolder(node) && NodeManagerUtils.isDatabaseObject(node.uri);
-    this.nodeDeletionService.checkDeletion.addHandler((nodes, contexts) => {
-      const available = contexts.getContext(nodeDeletionAvailabilityContext);
-      for (const node of nodes) {
-        if (isConnectionNode(node)) {
-          const connection =
-            node.projectId && node.objectId ? this.connectionInfoResource.get(createConnectionParam(node.projectId, node.objectId)) : undefined;
-          if (connection?.canDelete) {
-            available.add(node.uri);
-          }
-        } else if (isDatabaseNode(node) && canDelete(node)) {
-          available.add(node.uri);
-        }
-      }
+    this.actionService.addHandler({
+      id: 'connection-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => isConnectionNode(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isHidden: context => !this.canDeleteConnection(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isDisabled: context => this.nodeDeletionService.isDeleting || !this.canDeleteConnection(context.get(DATA_CONTEXT_NAV_NODE)!),
+      handler: context => this.nodeDeletionService.deleteSelection(context),
     });
+
+    this.actionService.addHandler({
+      id: 'database-object-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => this.isDatabaseNode(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isHidden: context => !this.canDeleteObject(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isDisabled: context => this.nodeDeletionService.isDeleting || !this.canDeleteObject(context.get(DATA_CONTEXT_NAV_NODE)!),
+      handler: context => this.nodeDeletionService.deleteSelection(context),
+    });
+
     this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
       const plan = contexts.getContext(nodeDeletionPlanContext);
       for (const node of nodes.filter(isConnectionNode)) {
@@ -140,12 +132,12 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           },
         });
       }
-      for (const node of nodes.filter(isDatabaseNode)) {
+      for (const node of nodes.filter(node => this.isDatabaseNode(node))) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
         const connection = key ? await this.connectionInfoResource.load(key) : undefined;
         const readOnly = connection?.features.includes(EConnectionFeature.readOnly);
         const target = { node, type: 'plugin_connections_delete_database_object', readOnly };
-        if (!canDelete(node)) {
+        if (!this.canDeleteObject(node)) {
           plan.exclude({
             ...target,
             owner: 'database-objects',
@@ -292,7 +284,9 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
           const driver = this.dbDriverResource.get(connection.driverId);
-          return !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
+          return (
+            !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected
+          );
         }
 
         return true;
@@ -342,6 +336,28 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
       },
     });
+  }
+
+  private isDatabaseNode(node: NavNode): boolean {
+    return !isConnectionNode(node) && !isConnectionFolder(node) && NodeManagerUtils.isDatabaseObject(node.uri);
+  }
+
+  private canDeleteConnection(node: NavNode): boolean {
+    const connection =
+      node.projectId && node.objectId ? this.connectionInfoResource.get(createConnectionParam(node.projectId, node.objectId)) : undefined;
+
+    return !!connection?.canDelete;
+  }
+
+  private canDeleteObject(node: NavNode): boolean {
+    const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
+    const connection = key ? this.connectionInfoResource.get(key) : undefined;
+
+    return (
+      !!node.features?.includes(ENodeFeature.canDelete) &&
+      !connection?.features.includes(EConnectionFeature.readOnly) &&
+      !connection?.features.includes(EConnectionFeature.restrictMetadataEdit)
+    );
   }
 
   private addConnectionsMenuToTopAppBar() {

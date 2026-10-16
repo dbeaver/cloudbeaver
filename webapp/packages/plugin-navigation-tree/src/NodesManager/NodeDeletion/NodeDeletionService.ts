@@ -9,20 +9,17 @@ import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 import { lazy } from 'react';
 
 import { injectable } from '@cloudbeaver/core-di';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, SyncExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
-import {
-  executeNodeDeletionPlan,
-  type INodeDeletionItem,
-  type INodeDeletionDialogItem,
-  type INodeDeletionResult,
-} from './NodeDeletionPlan.js';
-import { nodeDeletionAvailabilityContext, nodeDeletionPlanContext } from './nodeDeletionPlanContext.js';
+import { executeNodeDeletionPlan, type INodeDeletionItem, type INodeDeletionDialogItem, type INodeDeletionResult } from './NodeDeletionPlan.js';
+import { nodeDeletionPlanContext } from './nodeDeletionPlanContext.js';
+import { DATA_CONTEXT_ELEMENTS_TREE } from '../../NavigationTree/ElementsTree/DATA_CONTEXT_ELEMENTS_TREE.js';
 
 const NodeDeletionDialog = lazy(async () => {
   const { NodeDeletionDialog } = await import('./NodeDeletionDialog.js');
@@ -32,7 +29,6 @@ const NodeDeletionDialog = lazy(async () => {
 @injectable(() => [CommonDialogService, NotificationService, LocalizationService, NavNodeInfoResource, ProjectInfoResource])
 export class NodeDeletionService {
   readonly prepareDeletion = new Executor<NavNode[]>();
-  readonly checkDeletion = new SyncExecutor<NavNode[]>();
   private deleting = false;
 
   get isDeleting(): boolean {
@@ -53,8 +49,21 @@ export class NodeDeletionService {
     });
   }
 
-  canDelete(nodes: NavNode[]): boolean {
-    return this.checkDeletion.execute(nodes).getContext(nodeDeletionAvailabilityContext).size > 0;
+  async deleteSelection(context: IDataContextProvider): Promise<void> {
+    const node = context.get(DATA_CONTEXT_NAV_NODE);
+    if (!node) {
+      return;
+    }
+
+    const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+    const nodes = tree?.isNodeSelected(node.uri)
+      ? tree
+          .getSelected()
+          .map(id => this.navNodeInfoResource.get(id))
+          .filter((node): node is NavNode => !!node)
+      : [this.navNodeInfoResource.get(node.uri) ?? node];
+
+    await this.delete(nodes);
   }
 
   async delete(nodes: NavNode[]): Promise<void> {

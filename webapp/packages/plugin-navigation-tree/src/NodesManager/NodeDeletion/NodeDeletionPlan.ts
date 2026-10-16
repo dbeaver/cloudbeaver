@@ -68,8 +68,6 @@ export interface INodeDeletionDialogItem {
   location: string;
   warning?: string;
   reason?: string;
-  parents?: string[];
-  keepChildren?: boolean;
 }
 
 export interface INodeDeletionItem extends INodeDeletionTarget {
@@ -108,7 +106,7 @@ function getParents(items: ReadonlyArray<{ parents: string[] }>): Set<string> {
   return new Set(items.flatMap(item => item.parents));
 }
 
-/** Excludes destructive parents of unavailable or unchecked nodes, before and after confirmation. */
+/** Excludes destructive parents of unavailable nodes. */
 export function prepareNodeDeletionPlan(
   items: readonly INodeDeletionItem[],
   exclusions: readonly INodeDeletionExclusion[],

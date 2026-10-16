@@ -1,5 +1,4 @@
 export default [
-  ['plugin_navigation_tree_delete_not_selected', 'Not selected'],
   ['plugin_navigation_tree_delete_success', 'Deletion completed successfully'],
   ['plugin_navigation_tree_delete_partial', 'Deletion partially completed'],
   ['plugin_navigation_tree_delete_result', 'Deleted: {arg:count} of {arg:total} selected objects.'],
