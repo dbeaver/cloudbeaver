@@ -9,6 +9,13 @@
 export default [
   ['plugin_ai_profiles_profile_menu', 'Действия с профилем'],
   ['plugin_ai_profiles_profile_clone', 'Клонировать'],
+  ['plugin_ai_profiles_default_badge', '(По умолчанию)'],
+  [
+    'plugin_ai_profiles_default_description',
+    'Профиль по умолчанию для ваших запросов к ИИ. Чтобы изменить его, выберите профиль в чате или используйте «Сделать по умолчанию».',
+  ],
+  ['plugin_ai_profiles_set_default', 'Сделать по умолчанию'],
+  ['plugin_ai_profiles_default_save_failed', 'Не удалось сохранить ваш профиль ИИ по умолчанию'],
   ['plugin_ai_profiles_scope', 'Область'],
   ['plugin_ai_profiles_scope_global', 'Глобальная'],
   ['plugin_ai_profiles_scope_user', 'Пользовательская'],

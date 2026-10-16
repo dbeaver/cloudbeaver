@@ -32,6 +32,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
   const aiProfileCredentialsService = useService(AIProfileCredentialsService);
   const menu = useMenuContext();
   const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
+  const isDisabled = disabled || aiChatConversationsService.profileSaving;
 
   async function selectProfile(profile: AIProfile) {
     try {
@@ -86,7 +87,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
             aria-label={profile.name}
             title={profile.name}
             checked={isCurrent}
-            disabled={disabled}
+            disabled={isDisabled}
             className="tw:min-h-7"
             hideOnClick={false}
             onClick={() => selectProfile(profile)}
@@ -105,7 +106,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
                 <ActionIconButton
                   aria-label={translate('plugin_ai_chat_profile_edit_credentials')}
                   title={translate('plugin_ai_chat_profile_edit_credentials')}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   name="edit"
                   viewBox="0 0 13 13"
                   onClick={event => {
