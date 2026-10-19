@@ -6,21 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 
-import subscript from 'subscript';
-import { err, token } from 'subscript/parse';
+import { compile, literal, parse } from 'subscript';
 
-import 'subscript/feature/bool.js';
+// Form conditions use both single- and double-quoted strings.
+Object.assign(parse, { string: { '"': true, "'": true } });
 
-const UNDEFINED_MAPPER_VALUE = new Array(2).fill(undefined, 1);
-token('undefined', 20, a => (a ? err() : UNDEFINED_MAPPER_VALUE));
-token('null', 20, a => (a ? err() : UNDEFINED_MAPPER_VALUE));
+literal('true', true);
+literal('false', false);
+literal('undefined', undefined);
+// Preserve the existing interpretation of null as an absent value.
+literal('null', undefined);
 
 interface IContext {
   object: Record<string, any>;
 }
 
 export function evaluate(expression: string, object: Record<string, any>): boolean {
-  const fn = subscript(expression);
+  const fn = compile(parse(expression));
   const context: IContext = {
     object,
   };
