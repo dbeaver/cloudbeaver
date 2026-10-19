@@ -40,6 +40,7 @@ import { AIChatConversationScopeCustomNodeControl } from './AIChatConversationSc
 interface IDialogPayload {
   connectionKey: IConnectionInfoParams;
   nodes: string[];
+  excludedIds: string[];
 }
 
 export const AIChatConversationScopeCustomDialog: DialogComponent<IDialogPayload, string[]> = observer(function AIChatConversationScopeCustomDialog({
@@ -56,32 +57,19 @@ export const AIChatConversationScopeCustomDialog: DialogComponent<IDialogPayload
   const connectionInfoResource = useResource(AIChatConversationScopeCustomDialog, ConnectionInfoResource, key);
   const root = connectionInfoResource.data?.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.projectId, key.connectionId);
 
-  const parents = new Set<string>();
-
-  for (const nodeId of payload.nodes) {
-    const parent = navNodeInfoResource.getParent(nodeId);
-
-    if (parent && parents.has(parent)) {
-      continue;
-    }
-
-    const nodes = navNodeInfoResource.getParents(nodeId);
-
-    for (const node of nodes) {
-      parents.add(node);
-    }
+  const excludedIds = new Set(payload.excludedIds);
+  function isAllowed(nodeId: string) {
+    return !excludedIds.has(nodeId) && !navNodeInfoResource.getParents(nodeId).some(parent => excludedIds.has(parent));
   }
 
-  const treeState = new MetadataMap<string, ITreeNodeState>(nodeId => {
-    const selected = payload.nodes.includes(nodeId);
-    const expanded = parents.has(nodeId) || nodeId === root;
-
-    return {
+  const treeState = useMemo(() => {
+    const parents = new Set(payload.nodes.flatMap(nodeId => navNodeInfoResource.getParents(nodeId)));
+    return new MetadataMap<string, ITreeNodeState>(nodeId => ({
       showInFilter: false,
-      expanded,
-      selected,
-    };
-  });
+      expanded: parents.has(nodeId) || nodeId === root,
+      selected: payload.nodes.includes(nodeId),
+    }));
+  }, [payload.nodes, root, navNodeInfoResource]);
 
   const nodeRenderers: INodeRenderer[] = useMemo(
     () => [
@@ -111,6 +99,7 @@ export const AIChatConversationScopeCustomDialog: DialogComponent<IDialogPayload
       };
     },
     getChildren: (nodeId: string) => navigationTreeService.getChildren(nodeId) || [],
+    childrenTransformers: [(_, nodeId, children) => (isAllowed(nodeId) ? children.filter(isAllowed) : [])],
     getParent: (nodeId: string) => navNodeInfoResource.getParent(nodeId) || null,
     load: async (id: string): Promise<void> => {
       try {
@@ -126,7 +115,7 @@ export const AIChatConversationScopeCustomDialog: DialogComponent<IDialogPayload
     const result = [];
 
     for (const [node, selection] of treeState.entries()) {
-      if (selection.selected) {
+      if (selection.selected && isAllowed(node)) {
         result.push(node);
       }
     }

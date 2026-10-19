@@ -8,7 +8,7 @@
 
 import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-ui';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
-import type { ConnectionInfoAiResource } from '../ConnectionInfoAiResource.js';
+import type { ConnectionInfoAiResource } from '@cloudbeaver/plugin-connection-ai';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { AiDataSourceSettingsInput } from '@cloudbeaver/core-sdk';
 

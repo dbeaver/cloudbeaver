@@ -18,7 +18,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 
-import { ConnectionInfoAiResource } from './ConnectionInfoAiResource.js';
+import { ConnectionInfoAiResource } from '@cloudbeaver/plugin-connection-ai';
 
 const ConnectionAiForm = importLazyComponent(() => import('./connection-form/ConnectionAiForm.js').then(m => m.ConnectionAiForm));
 

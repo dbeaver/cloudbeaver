@@ -125,6 +125,7 @@ import pluginAiAdministration from '@cloudbeaver/plugin-ai-administration/module
 import pluginAiProfilesAdministration from '@cloudbeaver/plugin-ai-profiles-administration/module';
 import pluginAiUserProfile from '@cloudbeaver/plugin-ai-user-profile/module';
 import pluginConnectionFormAi from '@cloudbeaver/plugin-connection-form-ai/module';
+import pluginConnectionAi from '@cloudbeaver/plugin-connection-ai/module';
 
 const core = [
   coreRouting, // important, should be first because the router starts in load phase first after all plugins register phase
@@ -249,4 +250,5 @@ export const commonSet = [
   pluginAiProfilesAdministration,
   pluginAiUserProfile,
   pluginConnectionFormAi,
+  pluginConnectionAi,
 ];

@@ -65,6 +65,9 @@
       "path": "../plugin-codemirror6"
     },
     {
+      "path": "../plugin-connection-ai"
+    },
+    {
       "path": "../plugin-connections"
     }
   ],

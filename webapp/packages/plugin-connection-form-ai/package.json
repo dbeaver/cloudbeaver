@@ -39,6 +39,7 @@
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/plugin-ai-chat": "workspace:*",
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
+    "@cloudbeaver/plugin-connection-ai": "workspace:*",
     "@cloudbeaver/plugin-connections": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",

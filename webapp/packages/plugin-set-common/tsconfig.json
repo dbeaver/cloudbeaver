@@ -158,6 +158,9 @@
       "path": "../plugin-connection-administration"
     },
     {
+      "path": "../plugin-connection-ai"
+    },
+    {
       "path": "../plugin-connection-custom"
     },
     {

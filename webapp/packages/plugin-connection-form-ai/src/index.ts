@@ -8,5 +8,4 @@
 
 import './module.js';
 
-export * from './ConnectionInfoAiResource.js';
 export * from './ConnectionFormAiService.js';

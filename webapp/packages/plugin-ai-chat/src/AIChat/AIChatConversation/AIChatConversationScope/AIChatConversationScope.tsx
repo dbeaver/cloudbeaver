@@ -17,6 +17,7 @@ import { ConnectionsManagerService, ContainerResource } from '@cloudbeaver/core-
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
+import { ConnectionInfoAiResource } from '@cloudbeaver/plugin-connection-ai';
 import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatConversationScopeCustomDialog } from './AIChatConversationScopeCustom/AIChatConversationScopeCustomDialog.js';
@@ -44,6 +45,7 @@ export const AIChatConversationScope = observer<Props>(function AIChatConversati
   const notificationService = useService(NotificationService);
   const connectionsManagerService = useService(ConnectionsManagerService);
   const aiChatConversationsService = useService(AIChatConversationsService);
+  const connectionInfoAiResource = useService(ConnectionInfoAiResource);
 
   const { data: container } = useResource(AIChatConversationScope, ContainerResource, conversation.dataSourceId ?? null);
   const { data: currentScope } = useResource(AIChatConversationScope, AIChatConversationScopeResource, conversation.id);
@@ -64,9 +66,11 @@ export const AIChatConversationScope = observer<Props>(function AIChatConversati
           return;
         }
 
+        const settings = await connectionInfoAiResource.load(conversation.dataSourceId);
         const { status, result } = await commonDialogService.open(AIChatConversationScopeCustomDialog, {
           connectionKey: conversation.dataSourceId,
           nodes,
+          excludedIds: settings.excludedObjectIds,
         });
 
         if (status !== DialogueStateResult.Resolved) {

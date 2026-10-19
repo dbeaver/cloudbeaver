@@ -10,7 +10,7 @@ import type { IFormState } from '@cloudbeaver/core-ui';
 import { type IConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { ConnectionAiPart } from './ConnectionAiPart.js';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
-import { ConnectionInfoAiResource } from '../ConnectionInfoAiResource.js';
+import { ConnectionInfoAiResource } from '@cloudbeaver/plugin-connection-ai';
 
 const DATA_CONTEXT_CONNECTION_FORM_AI_PART = createDataContext<ConnectionAiPart>('Connection Form AI Part');
 
