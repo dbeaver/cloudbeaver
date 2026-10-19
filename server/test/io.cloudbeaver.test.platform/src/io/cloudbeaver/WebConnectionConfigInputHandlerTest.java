@@ -22,9 +22,11 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
+import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.util.Map;
@@ -78,5 +80,33 @@ public class WebConnectionConfigInputHandlerTest {
         Assertions.assertFalse(networkHandler.isSavePassword());
         Assertions.assertNull(networkHandler.getPassword());
         Assertions.assertTrue(networkHandler.getSecureProperties().isEmpty());
+    }
+
+    @Test
+    public void restoresSavedDataSourceCredentials() {
+        WebConnectionConfigInputHandler<WebConnectionConfig, DataSourceDescriptor> handler =
+            new WebConnectionConfigInputHandler<>(
+                Mockito.mock(WebSession.class),
+                Mockito.mock(DBPDataSourceRegistry.class),
+                new WebConnectionConfig(Map.of())
+            );
+        DBPConnectionConfiguration connectionConfiguration = new DBPConnectionConfiguration();
+        connectionConfiguration.setUserPassword("password");
+        DBSSecretValue selectedSecret = Mockito.mock(DBSSecretValue.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        Mockito.when(dataSource.getConnectionConfiguration()).thenReturn(connectionConfiguration);
+        Mockito.when(dataSource.isSavePassword()).thenReturn(true);
+        Mockito.when(dataSource.isSharedCredentials()).thenReturn(true);
+        Mockito.when(dataSource.getSelectedSharedCredentials()).thenReturn(selectedSecret);
+
+        var snapshot = handler.createCredentialsSnapshot(dataSource);
+        snapshot.restore();
+
+        var configurationCaptor = ArgumentCaptor.forClass(DBPConnectionConfiguration.class);
+        Mockito.verify(dataSource).setConnectionInfo(configurationCaptor.capture());
+        Assertions.assertEquals("password", configurationCaptor.getValue().getUserPassword());
+        Mockito.verify(dataSource).setSavePassword(true);
+        Mockito.verify(dataSource).setSharedCredentials(true);
+        Mockito.verify(dataSource).setSelectedSharedCredentials(selectedSecret);
     }
 }

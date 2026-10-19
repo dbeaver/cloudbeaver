@@ -22,10 +22,12 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebConnectionConfigInputHandler;
 import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
@@ -416,6 +418,35 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
         Mockito.verify(inputHandler, Mockito.never()).resetDataSourceCredentials(dataSource);
         Assertions.assertSame(credentials, connectionInfo.getSavedAuthProperties());
         Assertions.assertNotNull(connectionInfo.getSavedNetworkCredentials());
+    }
+
+    @Test
+    public void testFailedTargetUpdateRestoresCredentials() throws Exception {
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        WebConnectionConfigInputHandler inputHandler = Mockito.mock(WebConnectionConfigInputHandler.class);
+        var snapshot = Mockito.mock(WebConnectionConfigInputHandler.CredentialsSnapshot.class);
+        Mockito.when(dataSource.getId()).thenReturn("connection");
+        Mockito.when(inputHandler.isConnectionTargetChanged(dataSource)).thenReturn(true);
+        Mockito.when(inputHandler.createCredentialsSnapshot(dataSource)).thenReturn(snapshot);
+        Mockito.doThrow(new DBException("Update failed")).when(registry).updateDataSource(dataSource);
+
+        WebSessionProjectImpl project = createProject(registry, dataSource, inputHandler);
+        var connectionInfo = project.addConnection(dataSource);
+        Map<String, Object> credentials = Map.of("password", "value");
+        List<WebNetworkHandlerConfigInput> networkCredentials = List.of(
+            new WebNetworkHandlerConfigInput(Map.of("id", "ssh_tunnel"))
+        );
+        connectionInfo.setSavedCredentials(credentials, networkCredentials);
+
+        Assertions.assertThrows(
+            DBWebException.class,
+            () -> project.updateConnection(Map.of("connectionId", "connection"))
+        );
+
+        Mockito.verify(snapshot).restore();
+        Assertions.assertSame(credentials, connectionInfo.getSavedAuthProperties());
+        Assertions.assertSame(networkCredentials, connectionInfo.getSavedNetworkCredentials());
     }
 
     @Test

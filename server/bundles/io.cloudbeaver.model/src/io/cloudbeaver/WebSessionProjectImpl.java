@@ -18,6 +18,7 @@ package io.cloudbeaver;
 
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
@@ -348,11 +349,17 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         boolean wasHidden = dataSource.isHidden();
         boolean publishDraft = false;
+        WebConnectionConfigInputHandler.CredentialsSnapshot credentialsSnapshot = null;
+        Map<String, Object> savedAuthProperties = null;
+        List<WebNetworkHandlerConfigInput> savedNetworkCredentials = null;
+        var inputHandler = getInputConfigHandler(config);
         try {
-            var inputHandler = getInputConfigHandler(config);
             if (webSession.getApplication().getAppConfiguration()
                 .isFeatureEnabled(DBWConstants.FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE) &&
                 inputHandler.isConnectionTargetChanged(dataSource)) {
+                credentialsSnapshot = inputHandler.createCredentialsSnapshot(dataSource);
+                savedAuthProperties = connectionInfo.getSavedAuthProperties();
+                savedNetworkCredentials = connectionInfo.getSavedNetworkCredentials();
                 inputHandler.clearSecretReferences();
                 inputHandler.resetDataSourceCredentials(dataSource);
                 connectionInfo.setSavedCredentials(null, null);
@@ -372,6 +379,10 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
                 registry.checkForErrors();
             }
         } catch (DBException e) {
+            if (credentialsSnapshot != null) {
+                credentialsSnapshot.restore();
+                connectionInfo.setSavedCredentials(savedAuthProperties, savedNetworkCredentials);
+            }
             if (publishDraft) {
                 registry.removeDataSource(dataSource);
             }

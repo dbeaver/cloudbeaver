@@ -123,6 +123,24 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         }
     }
 
+    @NotNull
+    public CredentialsSnapshot createCredentialsSnapshot(@NotNull C dataSource) {
+        var connectionConfiguration = new DBPConnectionConfiguration(dataSource.getConnectionConfiguration());
+        var savePassword = dataSource.isSavePassword();
+        var sharedCredentials = dataSource.isSharedCredentials();
+        var selectedSharedCredentials = dataSource.getSelectedSharedCredentials();
+        return () -> {
+            dataSource.setSharedCredentials(false);
+            dataSource.resetAllSecrets();
+            dataSource.setConnectionInfo(connectionConfiguration);
+            dataSource.setSavePassword(savePassword);
+            dataSource.setSharedCredentials(sharedCredentials);
+            if (selectedSharedCredentials != null) {
+                dataSource.setSelectedSharedCredentials(selectedSharedCredentials);
+            }
+        };
+    }
+
     public boolean isConnectionTargetChanged(@NotNull C dataSource) {
         return WebDataSourceUtils.isConnectionTargetChanged(dataSource.getConnectionConfiguration(), input);
     }
@@ -143,5 +161,8 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         return newDataSource;
     }
 
-
+    @FunctionalInterface
+    public interface CredentialsSnapshot {
+        void restore();
+    }
 }
