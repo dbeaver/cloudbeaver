@@ -8,12 +8,9 @@
 
 import { compile, literal, parse } from 'subscript';
 
-// Form conditions use both single- and double-quoted strings.
-Object.assign(parse, { string: { '"': true, "'": true } });
+// Load the JavaScript-expression preset, including single-quoted strings and literals.
+import 'subscript/justin';
 
-literal('true', true);
-literal('false', false);
-literal('undefined', undefined);
 // Preserve the existing interpretation of null as an absent value.
 literal('null', undefined);
 
