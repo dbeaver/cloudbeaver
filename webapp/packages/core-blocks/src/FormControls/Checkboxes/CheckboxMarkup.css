@@ -66,6 +66,7 @@
     }
 
     & .dbv-kit-checkbox {
+      position: relative;
       display: flex;
       align-items: center;
 

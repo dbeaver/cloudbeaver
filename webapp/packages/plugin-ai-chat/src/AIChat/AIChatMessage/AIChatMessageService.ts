@@ -9,18 +9,22 @@
 import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import type { AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
+import type { AiMessage, AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
 import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatMessagesResource, isFunctionConfirmationMessage, isFunctionMessage, type IMessageParam } from './AIChatMessagesResource.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 
 type IAiSendChatMessageInfo = AiSendChatMessageInfoFragment;
+
+export interface IAIChatMessageFormatterProps {
+  message: AiMessage;
+}
 
 export enum EAiFunctionStatus {
   PENDING = 'PENDING',
@@ -55,6 +59,7 @@ type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExec
   AIProfileCredentialsService,
 ])
 export class AIChatMessageService {
+  readonly formatters: PlaceholderContainer<IAIChatMessageFormatterProps>;
   onMessageSend: Executor<MessageSendExecutorData>;
 
   constructor(
@@ -66,6 +71,7 @@ export class AIChatMessageService {
     private readonly aiProfilesResource: AIProfilesResource,
     private readonly aiProfileCredentialsService: AIProfileCredentialsService,
   ) {
+    this.formatters = new PlaceholderContainer();
     this.onMessageSend = new Executor();
 
     this.onMessageSend.addHandler(this.checkProfileCredentials.bind(this));

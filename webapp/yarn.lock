@@ -2529,6 +2529,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     marked: "npm:^18"
@@ -2542,6 +2543,7 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 

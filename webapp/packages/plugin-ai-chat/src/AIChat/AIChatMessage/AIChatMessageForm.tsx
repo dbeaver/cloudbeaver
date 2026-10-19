@@ -102,6 +102,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
             value={value}
+            readOnly={aiChatConversationsService.processing}
             autoFocus
             onChange={v => setValue(v)}
           />
@@ -110,6 +111,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
           ) : (
             <Command
               className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
+              aria-label={translate('ui_processing_cancel')}
               onClick={cancel}
             >
               <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />
