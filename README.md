@@ -28,6 +28,29 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.2.3 2026-10-19
+
+- AI Assistant:
+  - Added support for authenticating user-created OpenAI profiles with a ChatGPT subscription via a browser or device code.
+- Data Editor
+  - Fixed an issue where setting a cell to NULL from the context menu caused the table to scroll to the top when the Value panel was open.
+- SQL Editor:
+  - Fixed an issue where using a Chinese IME in string literals inserted raw Pinyin characters, potentially replacing or removing existing text.
+- Navigator:
+  - Fixed an issue where folders moved using drag-and-drop were not synchronized between browser tabs.
+  - Added the ability to create new folders from the context menu for the Scripts tabs.
+- Accessibility:
+  - Added the ability to copy content from the administration tables using the standard copying shortcut.
+- Security:
+  - Fixed authorization checks to prevent users from accessing or modifying resources in shared projects without permission.
+  - Fixed one critical and three high vulnerabilities in the shell-quote, source-map-js, @graphql-tools/utils, and @graphql-tools/executor-legacy-ws libraries (CVE-2026-102422, CVE-2026-93749, CVE-2026-104852, and CVE-2026-103921). The libraries were updated to versions 1.12.0, 1.2.2, 12.0.3, and 1.1.37, respectively.
+  - Fixed three high vulnerabilities in the @fastify/busboy and probe-image-size libraries (GHSA-x8mw-p69m-v3mx, GHSA-xjh9-v7x6-24jw, and GHSA-gjj5-9665-rwrc). The libraries were updated to versions 3.2.2 and 7.4.0, respectively.
+- Databases and drivers:
+  - Clickhouse: Added the ability to rename tables from the Navigator tree.
+  - PostgreSQL:
+    - Fixed bulk imports that mishandled literal backslashes or custom CSV escape characters
+    - Fixed SQL formatting for the @? operator
+
 ### 26.2.2 2026-10-05
 
 - AI Assistant:
