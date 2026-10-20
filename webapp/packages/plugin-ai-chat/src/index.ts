@@ -9,6 +9,13 @@
 import './module.js';
 
 export { AIChatSettingsService } from './AIChatSettingsService.js';
+export { AIChatFunctionsService } from './AIChatFunctionsService.js';
+export type {
+  IAIChatFunctionAction,
+  IAIChatFunctionContext,
+  IAIChatFunctionInteractionDefinition,
+  IAIChatFunctionInteractionProps,
+} from './AIChatFunctionsService.js';
 
 export * from './AIChat/AIChatService.js';
 export * from './AIChat/AIChatConversation/AIChatConversationsService.js';

@@ -6,15 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
+import type { ComponentType } from 'react';
+
 import { injectable } from '@cloudbeaver/core-di';
+import { LocalizationService, type TranslateFn } from '@cloudbeaver/core-localization';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import type { AiFunction } from '@cloudbeaver/core-sdk';
+import type { AiFunction, AiFunctionCall } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { AIFunctionsResource } from './AIFunctionsResource.js';
+import type { IAIFunctionConfirmationMessage } from './AIChat/AIChatMessage/AIChatMessagesResource.js';
 import { AIChatContextService } from './AIChat/AIChatContext/AIChatContextService.js';
 import { AIChatConversationsService } from './AIChat/AIChatConversation/AIChatConversationsService.js';
 import { AIChatConversationsResource } from './AIChat/AIChatConversation/AIChatConversationsResource.js';
@@ -29,15 +32,46 @@ const FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA = schema.object({
   newEditor: schema.boolean().optional(),
 });
 
-const FUNCTION_SCHEMAS = {
-  db_uiOpenDBeaverEntityEditor: FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA,
-  db_openTableDataEditor: FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA,
-  db_uiOpenDBeaverSQLEditor: FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA,
-  db_openSQLEditor: FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA,
-};
+export interface IAIChatFunctionContext {
+  message: IAIFunctionConfirmationMessage;
+  functionCall: AiFunctionCall;
+}
 
-export type AIFunctionName = keyof typeof FUNCTION_SCHEMAS;
-export type AIParamsFor<T extends AIFunctionName> = schema.infer<(typeof FUNCTION_SCHEMAS)[T]>;
+export interface IAIChatFunctionInteractionProps<TArguments> extends IAIChatFunctionContext {
+  arguments: TArguments;
+}
+
+export interface IAIChatFunctionAction<T> {
+  id: string;
+  aliases?: readonly string[];
+  parametersSchema: schema.ZodType<T>;
+  execute: (params: T) => void | Promise<void>;
+  getLabel: (params: T, translate: TranslateFn) => string;
+}
+
+export interface IAIChatFunctionInteractionDefinition<TArguments, TResponse> {
+  id: string;
+  argumentsSchema: schema.ZodType<TArguments>;
+  responseSchema: schema.ZodType<TResponse>;
+  component: ComponentType<IAIChatFunctionContext>;
+  respond: (context: IAIChatFunctionInteractionProps<TArguments>, response: TResponse) => Promise<void>;
+}
+
+interface IAIChatFunctionActionHandler {
+  kind: 'action';
+  id: string;
+  execute: (params: unknown) => Promise<void>;
+  getLabel: (params: unknown, translate: TranslateFn) => string | undefined;
+}
+
+interface IAIChatFunctionInteractionHandler {
+  kind: 'interaction';
+  id: string;
+  component: ComponentType<IAIChatFunctionContext>;
+  respond: (context: IAIChatFunctionContext, response: unknown) => Promise<void>;
+}
+
+type AIFunctionHandler = IAIChatFunctionActionHandler | IAIChatFunctionInteractionHandler;
 
 export function getCanonicalAIFunctionId(id: string): string {
   if (id === 'db_openTableDataEditor') {
@@ -59,6 +93,8 @@ export function getCanonicalAIFunctionId(id: string): string {
   AIChatConversationsResource,
 ])
 export class AIChatFunctionsService {
+  private readonly handlers = new Map<string, AIFunctionHandler>();
+
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly aiFunctionsResource: AIFunctionsResource,
@@ -69,34 +105,118 @@ export class AIChatFunctionsService {
     private readonly aiChatConversationsResource: AIChatConversationsResource,
   ) {}
 
+  register(): void {
+    this.registerAction({
+      id: 'db_uiOpenDBeaverEntityEditor',
+      aliases: ['db_openTableDataEditor'],
+      parametersSchema: FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA,
+      execute: params => this.openEntity(params),
+      getLabel: (params, translate) => `${translate('ui_open')} "${params.objectName}"`,
+    });
+
+    this.registerAction({
+      id: 'db_uiOpenDBeaverSQLEditor',
+      aliases: ['db_openSQLEditor'],
+      parametersSchema: FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA,
+      execute: params => this.openEditor(params),
+      getLabel: (params, translate) => `${translate('ui_open')} ${translate('sql_editor_script_editor')}`,
+    });
+  }
+
+  registerAction<T>(definition: IAIChatFunctionAction<T>): void {
+    this.addHandler(
+      {
+        kind: 'action',
+        id: definition.id,
+        execute: async params => {
+          await definition.execute(definition.parametersSchema.parse(params));
+        },
+        getLabel: (params, translate) => {
+          const result = definition.parametersSchema.safeParse(params);
+          return result.success ? definition.getLabel(result.data, translate) : undefined;
+        },
+      },
+      definition.aliases,
+    );
+  }
+
+  registerInteraction<TArguments, TResponse>(definition: IAIChatFunctionInteractionDefinition<TArguments, TResponse>): void {
+    const parseContext = (context: IAIChatFunctionContext): IAIChatFunctionInteractionProps<TArguments> => ({
+      ...context,
+      arguments: definition.argumentsSchema.parse(context.functionCall.arguments),
+    });
+
+    this.addHandler({
+      kind: 'interaction',
+      id: definition.id,
+      component: definition.component,
+      respond: async (context, response) => {
+        await definition.respond(parseContext(context), definition.responseSchema.parse(response));
+      },
+    });
+  }
+
   getFunction(id: string): AiFunction | undefined {
-    return this.aiFunctionsResource.data.find(func => func.id === getCanonicalAIFunctionId(id));
+    const functionId = this.handlers.get(id)?.id ?? getCanonicalAIFunctionId(id);
+    return this.aiFunctionsResource.data.find(func => func.id === functionId);
   }
 
-  async executeFunction<T extends AIFunctionName>(functionName: T, params: AIParamsFor<T>): Promise<void> {
-    if (!isAIFunctionName(functionName)) {
-      throw new Error(`Unknown function: ${functionName}`);
-    }
-
-    if (!isAIFunctionParams(functionName, params)) {
-      throw new Error(`Missing required parameters for function ${functionName}`);
-    }
-
-    await this.handlers[functionName](params);
+  getActionLabel(id: string, params: unknown, translate: TranslateFn): string {
+    const handler = this.handlers.get(id);
+    return handler?.kind === 'action' ? (handler.getLabel(params, translate) ?? id) : id;
   }
 
-  private handlers: { [K in AIFunctionName]: (params: AIParamsFor<K>) => void | Promise<void> } = {
-    db_uiOpenDBeaverEntityEditor: params => this.openEntity(params),
-    db_openTableDataEditor: params => this.openEntity(params),
-    db_uiOpenDBeaverSQLEditor: params => this.openEditor(params),
-    db_openSQLEditor: params => this.openEditor(params),
-  };
+  async executeFunction(id: string, params: unknown): Promise<void> {
+    const action = this.handlers.get(id);
 
-  private async openEntity(params: AIParamsFor<'db_uiOpenDBeaverEntityEditor' | 'db_openTableDataEditor'>) {
+    if (action?.kind !== 'action') {
+      throw new Error(`Function is not an executable action: ${id}`);
+    }
+
+    await action.execute(params);
+  }
+
+  isInteraction(id: string): boolean {
+    return this.handlers.get(id)?.kind === 'interaction';
+  }
+
+  getInteraction(id: string): IAIChatFunctionInteractionHandler {
+    const interaction = this.handlers.get(id);
+
+    if (interaction?.kind !== 'interaction') {
+      throw new Error(`Unknown interaction function: ${id}`);
+    }
+
+    return interaction;
+  }
+
+  async respondToFunction(context: IAIChatFunctionContext, response: unknown): Promise<void> {
+    const interaction = this.handlers.get(context.functionCall.functionName);
+
+    if (interaction?.kind !== 'interaction') {
+      throw new Error(`Unknown interaction function: ${context.functionCall.functionName}`);
+    }
+
+    await interaction.respond(context, response);
+  }
+
+  private addHandler(handler: AIFunctionHandler, aliases: readonly string[] = []): void {
+    const ids = [handler.id, ...aliases];
+
+    if (new Set(ids).size !== ids.length || ids.some(id => this.handlers.has(id))) {
+      throw new Error(`AI function is already registered: ${handler.id}`);
+    }
+
+    for (const id of ids) {
+      this.handlers.set(id, handler);
+    }
+  }
+
+  private async openEntity(params: schema.infer<typeof FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA>) {
     await this.navNodeManagerService.navToNode(params.objectName_nodePath);
   }
 
-  private async openEditor(params: AIParamsFor<'db_uiOpenDBeaverSQLEditor' | 'db_openSQLEditor'>) {
+  private async openEditor(params: schema.infer<typeof FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA>) {
     const context = this.aiChatContextService.currentContext;
     if (params.newEditor === false && this.sqlEditorNavigatorService.openRecentEditor(context?.connectionKey || undefined)) {
       return;
@@ -121,26 +241,4 @@ export class AIChatFunctionsService {
       name,
     });
   }
-}
-
-export function isAIFunctionName(fn: string): fn is AIFunctionName {
-  return fn in FUNCTION_SCHEMAS;
-}
-
-export function isAIFunctionParams<T extends AIFunctionName>(fn: T, params: unknown): params is AIParamsFor<T> {
-  return FUNCTION_SCHEMAS[fn].safeParse(params).success;
-}
-
-export function parseAIFunction(fn: string, params: unknown): { [K in AIFunctionName]: { fn: K; params: AIParamsFor<K> } }[AIFunctionName] | null {
-  if (!isAIFunctionName(fn)) {
-    return null;
-  }
-
-  const result = FUNCTION_SCHEMAS[fn].safeParse(params);
-
-  if (!result.success) {
-    return null;
-  }
-
-  return { fn, params: result.data } as { [K in AIFunctionName]: { fn: K; params: AIParamsFor<K> } }[AIFunctionName];
 }

@@ -37,6 +37,14 @@ export const AIChatFunctionConfirmationFormatter = observer<Props>(function AICh
     return null;
   }
 
+  const interactionCall = calls.find(call => aiChatFunctionsService.isInteraction(call.functionName));
+
+  if (interactionCall && status === EAiFunctionStatus.PENDING) {
+    const { component: Component } = aiChatFunctionsService.getInteraction(interactionCall.functionName);
+
+    return <Component key={message.id} message={message} functionCall={interactionCall} />;
+  }
+
   if (status === EAiFunctionStatus.REJECTED) {
     const names = calls.map(call => aiChatFunctionsService.getFunction(call.functionName)?.name || call.functionName).join(', ');
 
