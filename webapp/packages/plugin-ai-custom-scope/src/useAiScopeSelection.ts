@@ -60,7 +60,7 @@ export function useAiScopeSelection(options: Options): Readonly<IAiScopeSelectio
       getSelection(id: string): INodeSelection {
         return selectionState.get(id);
       },
-      select(id: string, selected?: boolean): Promise<void> {
+      select(id: string, selected?: boolean): void {
         if (optionsRef.canSelect(id) && !this.isInherited(id)) {
           if (selected ?? !this.isSelected(id)) {
             this.selectedIds.add(id);
@@ -68,12 +68,10 @@ export function useAiScopeSelection(options: Options): Readonly<IAiScopeSelectio
             this.selectedIds.delete(id);
           }
         }
-        return Promise.resolve();
       },
-      clear(): Promise<void> {
+      clear(): void {
         this.selectedIds.clear();
         this.allObjects = false;
-        return Promise.resolve();
       },
       selectAll(): void {
         this.allObjects = true;

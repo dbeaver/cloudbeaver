@@ -18,6 +18,7 @@ import {
   CommonDialogWrapper,
   Filter,
   Translate,
+  useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -36,7 +37,6 @@ import { isScopeObject } from './isScopeObject.js';
 import { MORE_PREFIX } from './MORE_PREFIX.js';
 import { useScopeFilter } from './useScopeFilter.js';
 import { AiScopeFilterMenu } from './AiScopeFilterMenu.js';
-import { isScopeNodeAllowed } from './isScopeNodeAllowed.js';
 import type { IAiScopeDialogPayload } from './IAiScopeDialogPayload.js';
 
 export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = observer(function AiScopeDialog({
@@ -49,9 +49,16 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
   const navTreeResource = useService(NavTreeResource);
   const navigationTreeService = useService(NavigationTreeService);
   const notificationService = useService(NotificationService);
-  const [failed, setFailed] = useState(false);
+
+  useResource(AiScopeDialog, navNodeInfoResource, payload.rootId, { forceSuspense: true });
+
   function isAllowed(id: string) {
-    return isScopeNodeAllowed(id, payload.allowedIds, id => navNodeInfoResource.getParents(id));
+    return (
+      payload.allowedIds == null ||
+      payload.allowedIds.some(
+        allowed => allowed === id || navNodeInfoResource.getParents(id).includes(allowed) || navNodeInfoResource.getParents(allowed).includes(id),
+      )
+    );
   }
 
   const [treeState] = useState(() => {
@@ -111,10 +118,9 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
       }
       try {
         if (!(await navigationTreeService.loadNestedNodes(id))) {
-          setFailed(true);
+          notificationService.logException(new Error(translate('plugin_ai_scope_load_error')));
         }
       } catch (exception: any) {
-        setFailed(true);
         notificationService.logException(exception);
       }
     },
@@ -141,11 +147,6 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
               <AiScopeFilterMenu filter={filter} />
             </div>
           </div>
-          {failed && (
-            <p role="alert" className="tw:px-4">
-              {translate('plugin_ai_scope_load_error')}
-            </p>
-          )}
           <Tree
             className="tw:min-h-64 tw:max-h-full tw:grow"
             data={data}
@@ -164,7 +165,7 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
         <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
-        <Button type="button" disabled={failed} onClick={() => resolveDialog([...selection.selectedIds].filter(isAllowed).sort())}>
+        <Button type="button" onClick={() => resolveDialog([...selection.selectedIds].filter(isAllowed).sort())}>
           {translate('ui_apply')}
         </Button>
       </CommonDialogFooter>
