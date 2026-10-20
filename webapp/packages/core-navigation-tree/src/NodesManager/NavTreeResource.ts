@@ -71,7 +71,6 @@ export interface INavNodeRenameData {
   AppAuthService,
 ])
 export class NavTreeResource extends CachedMapResource<string, string[], Record<string, unknown>, INodeMetadata> {
-  readonly beforeNodeDelete: IExecutor<ResourceKeySimple<string>>;
   readonly onNodeRefresh: IExecutor<string>;
   readonly onNodeRename: IExecutor<INavNodeRenameData>;
   readonly onNodeMove: IExecutor<INavNodeMoveData>;
@@ -91,7 +90,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   ) {
     super();
 
-    this.beforeNodeDelete = new Executor();
     this.onNodeRename = new Executor();
     this.onNodeMove = new Executor();
 
@@ -209,12 +207,6 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   async deleteNode(key: ResourceKeySimple<string>): Promise<void> {
-    const contexts = await this.beforeNodeDelete.execute(key);
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
-    }
-
     const nodePaths = ResourceKeyUtils.toArray(key);
 
     await this.performUpdate(key, [], async () => {
