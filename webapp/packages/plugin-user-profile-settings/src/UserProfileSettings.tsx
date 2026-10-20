@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
     <Form context={form} contents>
       <ColoredContainer parent overflow compact vertical noWrap gap>
         <Group overflow box keepSize>
-          <ToolsPanel rounded minHeight>
+          <ToolsPanel className="tw:h-11" rounded>
             <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
               {translate('ui_processing_save')}
             </ToolsAction>

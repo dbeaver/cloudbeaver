@@ -7,16 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import {
-  ColoredContainer,
-  Container,
-  Group,
-  TextPlaceholder,
-  ToolsAction,
-  ToolsPanel,
-  useResource,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, TextPlaceholder, ToolsAction, ToolsPanel, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -43,7 +34,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   return (
     <ColoredContainer parent overflow compact vertical noWrap gap>
       <Group box keepSize>
-        <ToolsPanel rounded>
+        <ToolsPanel className="tw:h-11" rounded>
           <ToolsAction
             title={translate('plugin_ai_user_profile_refresh_tooltip')}
             icon="refresh"
