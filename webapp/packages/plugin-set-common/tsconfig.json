@@ -125,6 +125,9 @@
       "path": "../plugin-ai-chat"
     },
     {
+      "path": "../plugin-ai-custom-scope"
+    },
+    {
       "path": "../plugin-ai-profiles"
     },
     {
