@@ -64,6 +64,7 @@ import org.junit.platform.suite.api.Suite;
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
+        BlankLineDelimiterTest.class,
         GenerateSQLResultSetTest.class,
         WebSQLDataUpdateTest.class,
         WebSQLQueryDataContainerTest.class,
