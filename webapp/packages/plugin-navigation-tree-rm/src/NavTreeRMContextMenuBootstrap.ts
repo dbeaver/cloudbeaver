@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,18 +9,40 @@ import { RenameDialog } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
-import { DATA_CONTEXT_NAV_NODE, ENodeFeature } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, ENodeFeature, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { isResourceOfType, ProjectInfoResource, type ProjectInfoResourceType } from '@cloudbeaver/core-projects';
-import { getRmResourceKey, isRMResourceNode, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
+import {
+  getRmResourceKey,
+  isRMProjectNode,
+  isRMResourceNode,
+  NAV_NODE_TYPE_RM_FOLDER,
+  NAV_NODE_TYPE_RM_RESOURCE,
+  RESOURCES_NODE_PATH,
+  ResourceManagerResource,
+} from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  DATA_CONTEXT_NAV_NODE_ACTIONS,
+  MENU_NAVIGATION_TREE_MANAGE,
+  nodeDeletionPlanContext,
+  NodeDeletionService,
+} from '@cloudbeaver/plugin-navigation-tree';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId.js';
 import { NavResourceNodeService } from './NavResourceNodeService.js';
 
-@injectable(() => [ActionService, ProjectInfoResource, CommonDialogService, NotificationService, NavResourceNodeService, LocalizationService])
+@injectable(() => [
+  ActionService,
+  ProjectInfoResource,
+  CommonDialogService,
+  NotificationService,
+  NavResourceNodeService,
+  NodeDeletionService,
+  ResourceManagerResource,
+  ResourceManagerService,
+])
 export class NavTreeRMContextMenuBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
@@ -28,12 +50,49 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly localizationService: LocalizationService,
+    private readonly nodeDeletionService: NodeDeletionService,
+    private readonly resourceManagerResource: ResourceManagerResource,
+    private readonly resourceManagerService: ResourceManagerService,
   ) {
     super();
   }
 
   override register(): void {
+    this.actionService.addHandler({
+      id: 'resource-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => this.isResource(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isHidden: context => !this.canDelete(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isDisabled: context => this.nodeDeletionService.isDeleting || !this.canDelete(context.get(DATA_CONTEXT_NAV_NODE)!),
+      handler: context => this.nodeDeletionService.deleteSelection(context),
+    });
+
+    this.nodeDeletionService.prepareDeletion.addHandler((nodes, contexts) => {
+      const plan = contexts.getContext(nodeDeletionPlanContext);
+      for (const node of nodes.filter(node => this.isResource(node))) {
+        const target = {
+          node,
+          type: node.folder ? 'ui_folder' : 'plugin_navigation_tree_rm_delete_resource',
+          warning: node.folder ? 'plugin_navigation_tree_rm_delete_folder_warning' : undefined,
+        };
+        const key = getResourceKeyFromNodeId(node.uri);
+        if (!key || !this.canDelete(node)) {
+          plan.exclude({ ...target, owner: 'resource-manager', reason: 'plugin_navigation_tree_delete_unavailable' });
+          continue;
+        }
+        plan.addOperation({
+          id: `delete-resource:${node.uri}`,
+          owner: 'resource-manager',
+          targets: [target],
+          execute: async () => {
+            await this.resourceManagerResource.deleteResource(key);
+            return [{ targetId: node.uri, status: 'deleted' }];
+          },
+        });
+      }
+    });
     this.actionService.addHandler({
       id: 'nav-node-rm-handler',
       contexts: [DATA_CONTEXT_NAV_NODE],
@@ -46,10 +105,6 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_RENAME) {
           return node.features?.includes(ENodeFeature.canRename) ?? false;
-        }
-
-        if (action === ACTION_DELETE) {
-          return node.features?.includes(ENodeFeature.canDelete) ?? false;
         }
 
         return false;
@@ -113,19 +168,26 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
             }
             break;
           }
-          case ACTION_DELETE: {
-            try {
-              await this.navResourceNodeService.delete(resourceKey);
-            } catch (exception: any) {
-              this.notificationService.logException(
-                exception,
-                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name: key.name }),
-              );
-            }
-            break;
-          }
         }
       },
     });
+  }
+
+  private isResource(node: NavNode): boolean {
+    return [NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType ?? '');
+  }
+
+  private canDelete(node: NavNode): boolean {
+    if (isRMProjectNode(node)) {
+      return false;
+    }
+
+    const project = node.projectId ? this.projectInfoResource.get(node.projectId) : undefined;
+    const root = project?.resourceTypes.some(type => {
+      const root = this.resourceManagerService.getRootFolder(project, type.id);
+      return node.folder && root !== undefined && node.uri === createPath(RESOURCES_NODE_PATH, project.id, root);
+    });
+
+    return !root && !!node.features?.includes(ENodeFeature.canDelete) && !!getResourceKeyFromNodeId(node.uri);
   }
 }
