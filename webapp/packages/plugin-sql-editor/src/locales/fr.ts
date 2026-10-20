@@ -1,4 +1,12 @@
 export default [
+  ['sql_editor_settings_blank_line_delimiter_name', 'Ligne vide comme séparateur d’instructions'],
+  [
+    'sql_editor_settings_blank_line_delimiter_desc',
+    'Détermine si les lignes vides séparent les instructions SQL. Sélectionnez « Jamais » pour autoriser les lignes vides dans une instruction.',
+  ],
+  ['sql_editor_settings_blank_line_delimiter_always', 'Toujours'],
+  ['sql_editor_settings_blank_line_delimiter_never', 'Jamais'],
+  ['sql_editor_settings_blank_line_delimiter_smart', 'Intelligent'],
   ['plugin_sql_editor_sql_editor_settings_group', 'Éditeur SQL'],
   ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
   ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],

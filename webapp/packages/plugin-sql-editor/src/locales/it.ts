@@ -1,4 +1,12 @@
 export default [
+  ['sql_editor_settings_blank_line_delimiter_name', 'Riga vuota come delimitatore di istruzioni'],
+  [
+    'sql_editor_settings_blank_line_delimiter_desc',
+    'Determina se le righe vuote separano le istruzioni SQL. Seleziona «Mai» per consentire righe vuote all’interno di un’istruzione.',
+  ],
+  ['sql_editor_settings_blank_line_delimiter_always', 'Sempre'],
+  ['sql_editor_settings_blank_line_delimiter_never', 'Mai'],
+  ['sql_editor_settings_blank_line_delimiter_smart', 'Intelligente'],
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Editor'],
   ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
   ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],
