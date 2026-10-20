@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { type NavNode, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { isConnectionFolder, type NavNode, NodeManagerUtils, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 
 import type {
   INodeDeletionDialogItem,
@@ -66,7 +66,13 @@ export function nodeDeletionPlanContext(contexts: IExecutionContextProvider<NavN
         });
       }
 
-      const blocked = new Set(unavailable.flatMap(item => item.parents));
+      // Virtual database folders (Tables, Views, etc.) cannot be deleted directly,
+      // but must not prevent deleting the database object that contains them.
+      const blocked = new Set(
+        unavailable
+          .filter(({ node }) => !(node.folder && !isConnectionFolder(node) && NodeManagerUtils.isDatabaseObject(node.uri)))
+          .flatMap(item => item.parents),
+      );
       const ready: INodeDeletionItem[] = [];
 
       for (const item of items) {
