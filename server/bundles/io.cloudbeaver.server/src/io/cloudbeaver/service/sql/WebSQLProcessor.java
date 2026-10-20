@@ -226,6 +226,9 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
             if (element instanceof SQLQuery mainQuery) {
+                if (isGenerated) {
+                    dataContainer.setQuery(mainQuery);
+                }
 
                 if (useEvents) {
                     // fill query with parameters
