@@ -48,8 +48,8 @@ export default [
 
   ['plugin_connections_connection_type_label', 'Connection type'],
 
-  ['plugin_connections_change_db_password_menu_title', 'Change database password'],
-  ['plugin_connections_change_db_password_dialog_title', 'Change database password'],
+  ['plugin_connections_change_db_password_menu_title', 'Change current database password'],
+  ['plugin_connections_change_db_password_dialog_title', 'Change current database password'],
   ['plugin_connections_change_db_password_current', 'Current password'],
   ['plugin_connections_change_db_password_new', 'New password'],
   ['plugin_connections_change_db_password_repeat', 'Confirm password'],
