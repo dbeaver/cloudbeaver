@@ -15,6 +15,7 @@ import type { IConnectionFormProps, IConnectionFormState } from '@cloudbeaver/pl
 
 export type ConnectionFormAiContainerProps = {
   formState: IFormState<IConnectionFormState>;
+  metaTransferConfirmed?: boolean;
 };
 
 @injectable(() => [LocalizationService, NotificationService])

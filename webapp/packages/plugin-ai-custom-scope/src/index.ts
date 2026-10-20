@@ -9,3 +9,4 @@
 import './module.js';
 
 export * from './AiScopeDialogLazy.js';
+export * from './getScopeSelectionRoots.js';

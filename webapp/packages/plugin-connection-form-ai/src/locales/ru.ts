@@ -1,4 +1,6 @@
 export default [
+  ['plugin_connection_form_ai_settings_title', 'Настройки AI для этого подключения'],
+  ['plugin_connection_form_ai_settings_description', 'Какие метаданные передаются провайдеру AI'],
   ['plugin_connection_form_ai_name', 'ИИ'],
   ['plugin_connection_form_ai_form_transfer_enabled', 'Передать информацию поставщику ИИ'],
   [

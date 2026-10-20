@@ -38,6 +38,7 @@ import { MORE_PREFIX } from './MORE_PREFIX.js';
 import { useScopeFilter } from './useScopeFilter.js';
 import { AiScopeFilterMenu } from './AiScopeFilterMenu.js';
 import type { IAiScopeDialogPayload } from './IAiScopeDialogPayload.js';
+import { getScopeSelectionRoots } from './getScopeSelectionRoots.js';
 
 export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = observer(function AiScopeDialog({
   payload,
@@ -165,7 +166,12 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
         <Button type="button" variant="secondary" onClick={() => rejectDialog()}>
           {translate('ui_processing_cancel')}
         </Button>
-        <Button type="button" onClick={() => resolveDialog([...selection.selectedIds].filter(isAllowed).sort())}>
+        <Button
+          type="button"
+          onClick={() =>
+            resolveDialog(getScopeSelectionRoots([...selection.selectedIds].filter(isAllowed), id => navNodeInfoResource.getParents(id)).sort())
+          }
+        >
           {translate('ui_apply')}
         </Button>
       </CommonDialogFooter>
