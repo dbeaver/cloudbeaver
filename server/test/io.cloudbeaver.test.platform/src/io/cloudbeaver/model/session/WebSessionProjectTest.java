@@ -450,6 +450,30 @@ public class WebSessionProjectTest extends CloudbeaverMockTest {
     }
 
     @Test
+    public void testChangedTargetCopyDoesNotRequireDriverId() throws Exception {
+        DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        DataSourceDescriptor dataSourceCopy = Mockito.mock(DataSourceDescriptor.class);
+        WebConnectionConfigInputHandler inputHandler = Mockito.mock(WebConnectionConfigInputHandler.class);
+        Mockito.when(dataSource.getRegistry()).thenReturn(registry);
+        Mockito.when(dataSource.createCopy(registry)).thenReturn(dataSourceCopy);
+
+        WebSessionProjectImpl project = createProject(registry, dataSource, inputHandler);
+        WebConnectionConfig config = new WebConnectionConfig(Map.of(
+            "connectionId", "connection",
+            "host", "new-host"
+        ));
+
+        DataSourceDescriptor result = project.getDataSourceContainerFromInput(config, dataSource, true);
+
+        Assertions.assertSame(dataSourceCopy, result);
+        Mockito.verify(inputHandler).clearSecretReferences();
+        Mockito.verify(inputHandler).resetDataSourceCredentials(dataSourceCopy);
+        Mockito.verify(inputHandler).updateDataSource(dataSourceCopy);
+        Mockito.verify(inputHandler, Mockito.never()).createDataSourceContainer();
+    }
+
+    @Test
     public void testVisibleConnectionCannotBeHidden() throws Exception {
         DBPDataSourceRegistry registry = Mockito.mock(DBPDataSourceRegistry.class);
         DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);

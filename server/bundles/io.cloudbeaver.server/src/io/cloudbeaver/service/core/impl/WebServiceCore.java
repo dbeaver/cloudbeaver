@@ -623,17 +623,17 @@ public class WebServiceCore implements DBWServiceCore {
                 .isFeatureEnabled(DBWConstants.FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE) &&
             dataSource != null &&
             project.isConnectionTargetChanged(configInput, dataSource);
-        if (dataSource != null && !connectionTargetChanged) {
-            try {
-                // Check that creds are saved to trigger secrets resolve
-                dataSource.isCredentialsSaved();
-            } catch (DBException e) {
-                throw new DBWebException("Can't determine whether datasource credentials are saved", e);
+        if (dataSource != null) {
+            if (!connectionTargetChanged) {
+                try {
+                    // Check that creds are saved to trigger secrets resolve
+                    dataSource.isCredentialsSaved();
+                } catch (DBException e) {
+                    throw new DBWebException("Can't determine whether datasource credentials are saved", e);
+                }
             }
-
-            testDataSource = (DataSourceDescriptor) dataSource.createCopy(dataSource.getRegistry());
-            project.updateDataSourceContainerFromInput(configInput, testDataSource);
-            if (configInput.getSelectedSecretId() != null) {
+            testDataSource = project.getDataSourceContainerFromInput(configInput, dataSource, connectionTargetChanged);
+            if (!connectionTargetChanged && configInput.getSelectedSecretId() != null) {
                 try {
                     dataSource.listSharedCredentials()
                         .stream()
@@ -655,9 +655,6 @@ public class WebServiceCore implements DBWServiceCore {
                 true
             );
         } else {
-            if (connectionTargetChanged) {
-                project.clearSecretReferences(configInput);
-            }
             testDataSource = project.getDataSourceContainerFromInput(configInput);
         }
         validateDriverLibrariesPresence(testDataSource);

@@ -421,15 +421,27 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         return getInputConfigHandler(configInput).createDataSourceContainer();
     }
 
+    @NotNull
+    public DataSourceDescriptor getDataSourceContainerFromInput(
+        @NotNull WebConnectionConfig configInput,
+        @NotNull DataSourceDescriptor sourceDataSource,
+        boolean resetCredentials
+    ) throws DBWebException {
+        var dataSourceCopy = (DataSourceDescriptor) sourceDataSource.createCopy(sourceDataSource.getRegistry());
+        var inputHandler = getInputConfigHandler(configInput);
+        if (resetCredentials) {
+            inputHandler.clearSecretReferences();
+            inputHandler.resetDataSourceCredentials(dataSourceCopy);
+        }
+        inputHandler.updateDataSource(dataSourceCopy);
+        return dataSourceCopy;
+    }
+
     public void updateDataSourceContainerFromInput(
         @NotNull WebConnectionConfig configInput,
         @NotNull DataSourceDescriptor dataSource
     ) throws DBWebException {
         getInputConfigHandler(configInput).updateDataSource(dataSource);
-    }
-
-    public void clearSecretReferences(@NotNull WebConnectionConfig configInput) {
-        getInputConfigHandler(configInput).clearSecretReferences();
     }
 
     public boolean isConnectionTargetChanged(
