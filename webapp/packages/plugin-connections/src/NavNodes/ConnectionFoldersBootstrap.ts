@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ConfirmationDialogDelete } from '@cloudbeaver/core-blocks';
 import {
   CONNECTION_FOLDER_NAME_VALIDATION,
   ConnectionFolderProjectKey,
@@ -14,6 +13,7 @@ import {
   ConnectionInfoResource,
   createConnectionFolderParam,
   createConnectionParam,
+  EConnectionFeature,
   getConnectionFolderId,
   getConnectionFolderIdFromNodeId,
   type IConnectionFolderParam,
@@ -24,10 +24,11 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
+  ENodeFeature,
   ENodeMoveType,
   getNodesFromContext,
   type INodeMoveData,
@@ -38,7 +39,6 @@ import {
   NavNodeManagerService,
   navNodeMoveContext,
   NavTreeResource,
-  nodeDeleteContext,
   ProjectsNavNodeService,
   ROOT_NODE_PATH,
 } from '@cloudbeaver/core-navigation-tree';
@@ -51,12 +51,15 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
-import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_ELEMENTS_TREE,
   MENU_ELEMENTS_TREE_TOOLS,
   MENU_NAVIGATION_TREE_CREATE,
+  MENU_NAVIGATION_TREE_MANAGE,
   NavigationTreeService,
+  NodeDeletionService,
+  nodeDeletionPlanContext,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -79,6 +82,7 @@ import { ACTION_TREE_CREATE_FOLDER } from '../Actions/ACTION_TREE_CREATE_FOLDER.
   ProjectsNavNodeService,
   NavigationTreeService,
   TreeSelectionService,
+  NodeDeletionService,
 ])
 export class ConnectionFoldersBootstrap extends Bootstrap {
   constructor(
@@ -97,6 +101,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly projectsNavNodeService: ProjectsNavNodeService,
     private readonly navigationTreeService: NavigationTreeService,
     private readonly treeSelectionService: TreeSelectionService,
+    private readonly nodeDeletionService: NodeDeletionService,
   ) {
     super();
   }
@@ -106,38 +111,41 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     this.navNodeInfoResource.onItemDelete.addHandler(this.syncWithNavTree.bind(this));
     this.navNodeManagerService.onMove.addHandler(this.moveConnectionToFolder.bind(this));
 
-    this.navTreeResource.beforeNodeDelete.addHandler(async (data, contexts) => {
-      if (ExecutorInterrupter.isInterrupted(contexts)) {
-        return;
-      }
+    this.actionService.addHandler({
+      id: 'connection-folder-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => this.isFolder(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isHidden: context => !this.canDelete(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isDisabled: context => this.nodeDeletionService.isDeleting || !this.canDelete(context.get(DATA_CONTEXT_NAV_NODE)!),
+      handler: context => this.nodeDeletionService.deleteSelection(context),
+    });
 
-      const deleteContext = contexts.getContext(nodeDeleteContext);
-
-      if (deleteContext.confirmed) {
-        return;
-      }
-      await this.connectionFolderResource.load(CachedMapAllKey);
-
-      const nodes = ResourceKeyUtils.filter(data, nodeId => this.connectionFolderResource.fromNodeId(nodeId) !== undefined)
-        .map(nodeId => this.navNodeInfoResource.get(nodeId))
-        .filter<NavNode>(Boolean as any)
-        .map(node => node.name)
-        .join();
-
-      if (!nodes) {
-        return;
-      }
-
-      const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
-        title: 'ui_data_delete_confirmation',
-        message: this.localizationService.translate('plugin_connections_connection_folder_delete_confirmation', undefined, { name: nodes }),
-        confirmActionText: 'ui_delete',
-      });
-
-      if (status === DialogueStateResult.Rejected) {
-        ExecutorInterrupter.interrupt(contexts);
-      } else {
-        deleteContext.confirm();
+    this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
+      const plan = contexts.getContext(nodeDeletionPlanContext);
+      for (const node of nodes.filter(node => this.isFolder(node))) {
+        const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
+        const target = {
+          node,
+          type: 'ui_folder',
+          warning: 'plugin_connections_delete_folder_warning',
+          keepChildren: true,
+        };
+        const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
+        if ((key && !connection) || !this.canDelete(node)) {
+          plan.exclude({ ...target, owner: 'connection-folders', reason: 'plugin_navigation_tree_delete_unavailable' });
+          continue;
+        }
+        plan.addOperation({
+          id: `delete-connection-folder:${node.uri}`,
+          owner: 'connection-folders',
+          targets: [target],
+          execute: async () => {
+            await this.navTreeResource.deleteNode(node.uri);
+            return [{ targetId: node.uri, status: 'deleted' }];
+          },
+        });
       }
     });
 
@@ -212,6 +220,16 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.elementsTreeActionHandler.bind(this),
     });
+  }
+
+  private isFolder(node: NavNode): boolean {
+    return isConnectionFolder(node) && !isConnectionNode(node);
+  }
+
+  private canDelete(node: NavNode): boolean {
+    const connection = this.connectionInfoResource.getConnectionForNode(node.uri);
+
+    return !!node.features?.includes(ENodeFeature.canDelete) && !connection?.features.includes(EConnectionFeature.restrictMetadataEdit);
   }
 
   private async moveConnectionToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {

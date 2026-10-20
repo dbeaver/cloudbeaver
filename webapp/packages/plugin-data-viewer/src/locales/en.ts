@@ -1,4 +1,6 @@
 export default [
+  ['data_viewer_presentations_label', 'Data Presentations'],
+  ['data_viewer_panels_label', 'Data Panels'],
   ['plugin_data_viewer_data_viewer_settings_group', 'Data Editor'],
   ['table_header_sql_expression', 'Enter a SQL expression to filter results, e.g. column_name=10'],
   ['table_header_sql_expression_not_supported', 'Data filter is not supported'],

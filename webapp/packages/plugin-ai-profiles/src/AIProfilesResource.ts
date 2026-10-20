@@ -59,6 +59,12 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     return profile;
   }
 
+  async copyProfile(profileId: string): Promise<AiAdminConfigurationProfileInfo> {
+    const { profile } = await this.graphQLService.sdk.copyAiProfile({ profileId });
+    this.set(profile.id, profile);
+    return profile;
+  }
+
   async deleteProfile(profileId: string): Promise<void> {
     await this.graphQLService.sdk.deleteAiProfile({ profileId });
     this.delete(profileId);

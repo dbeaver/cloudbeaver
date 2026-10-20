@@ -1,4 +1,8 @@
 export default [
+  ['plugin_connections_delete_connection', 'Connection'],
+  ['plugin_connections_delete_database_object', 'Database object'],
+  ['plugin_connections_delete_read_only', 'Read-only connection.'],
+  ['plugin_connections_delete_folder_warning', "Connections inside the folders won't be deleted unless they are selected."],
   ['plugin_connections_new_connection_dialog_title', 'New connection'],
   ['plugin_connections_connection_form_part_main', 'Main'],
   ['plugin_connections_connection_form_part_main_auth_model', 'Authentication model'],

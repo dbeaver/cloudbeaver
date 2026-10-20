@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
 import org.jkiss.dbeaver.model.ai.AISettings;
 import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
+import org.jkiss.dbeaver.model.ai.engine.OAuthDeviceCodeFlow;
 import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIConstants;
 import org.jkiss.dbeaver.model.ai.engine.openai.OpenAIProperties;
@@ -453,8 +454,10 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
             900
         );
         AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
-        Mockito.when(authenticator.completeDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenReturn(
-            new AIAccountAuthenticator.Tokens("access", "refresh", 3600, null, null)
+        Mockito.when(authenticator.pollDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenReturn(
+            AIAccountAuthenticator.DeviceAuthorizationPollResult.complete(
+                new AIAccountAuthenticator.Tokens("access", "refresh", 3600, null, null)
+            )
         );
         WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
             webSession,
@@ -462,7 +465,8 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
             authenticator,
             authorization,
             "task-id",
-            "ChatGPT"
+            "ChatGPT",
+            immediateDeviceCodeFlow()
         );
         WebAIProfileUtils.registerDeviceAuthorizationAttempt(
             webSession,
@@ -569,9 +573,11 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
             900
         );
         AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
-        Mockito.when(authenticator.completeDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenAnswer(invocation -> {
+        Mockito.when(authenticator.pollDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenAnswer(invocation -> {
             activeUserId.set("other-user");
-            return new AIAccountAuthenticator.Tokens("access", "refresh", 3600, null, null);
+            return AIAccountAuthenticator.DeviceAuthorizationPollResult.complete(
+                new AIAccountAuthenticator.Tokens("access", "refresh", 3600, null, null)
+            );
         });
         WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
             webSession,
@@ -579,7 +585,8 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
             authenticator,
             authorization,
             "task-id",
-            "ChatGPT"
+            "ChatGPT",
+            immediateDeviceCodeFlow()
         );
         WebAIProfileUtils.registerDeviceAuthorizationAttempt(
             webSession,
@@ -608,9 +615,11 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
             900
         );
         AIAccountAuthenticator authenticator = Mockito.mock(AIAccountAuthenticator.class);
-        Mockito.when(authenticator.completeDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenAnswer(invocation -> {
+        Mockito.when(authenticator.pollDeviceAuthorization(Mockito.eq(authorization), Mockito.any())).thenAnswer(invocation -> {
             WebAIProfileUtils.deleteAccountCredentials(webSession, profile);
-            return new AIAccountAuthenticator.Tokens("stale-access", "stale-refresh", 3600, null, null);
+            return AIAccountAuthenticator.DeviceAuthorizationPollResult.complete(
+                new AIAccountAuthenticator.Tokens("stale-access", "stale-refresh", 3600, null, null)
+            );
         });
         WebAIDeviceAuthorizationProcessor processor = new WebAIDeviceAuthorizationProcessor(
             webSession,
@@ -618,7 +627,8 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
             authenticator,
             authorization,
             "task-id",
-            "ChatGPT"
+            "ChatGPT",
+            immediateDeviceCodeFlow()
         );
         WebAIProfileUtils.registerDeviceAuthorizationAttempt(
             webSession,
@@ -834,6 +844,11 @@ public class WebAIProfileUtilsTest extends CloudbeaverMockTest {
         } finally {
             WebAIProfileUtils.restoreAccountProfile(profile);
         }
+    }
+
+    private static OAuthDeviceCodeFlow immediateDeviceCodeFlow() {
+        return new OAuthDeviceCodeFlow(System::nanoTime, duration -> {
+        });
     }
 
     private static String tokenWithClaims(String claims) {
