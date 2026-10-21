@@ -19,7 +19,10 @@ export default [
   ['plugin_ai_administration_profiles_refresh_success', 'Liste des profils mise à jour'],
   ['plugin_ai_administration_profiles_refresh_error', 'Échec de l’actualisation de la liste des profils'],
   ['plugin_ai_administration_profile_delete_confirmation', 'Vous êtes sur le point de supprimer le(s) profil(s) : '],
-  ['plugin_ai_administration_profile_delete_user_credentials_warning', 'Les identifiants enregistrés pour tous les utilisateurs de ces profils seront également supprimés.'],
+  [
+    'plugin_ai_administration_profile_delete_user_credentials_warning',
+    'Les identifiants enregistrés pour tous les utilisateurs de ces profils seront également supprimés.',
+  ],
   ['plugin_ai_administration_profile_delete_success', 'Profils sélectionnés supprimés'],
   ['plugin_ai_administration_profile_delete_error', 'Échec de la suppression des profils'],
   ['plugin_ai_administration_profile_created', 'Profil créé'],
@@ -31,6 +34,15 @@ export default [
   ['plugin_ai_administration_profile_scope', 'Portée'],
   ['plugin_ai_administration_profile_scope_global', 'Globale'],
   ['plugin_ai_administration_profile_scope_user', 'Utilisateur'],
+  [
+    'plugin_ai_administration_profile_scope_global_description',
+    'Un profil global est accessible à tous les utilisateurs avec des identifiants partagés.',
+  ],
+  [
+    'plugin_ai_administration_profile_scope_user_description',
+    'Chaque utilisateur peut configurer ce profil avec son propre jeton API ou abonnement.',
+  ],
+  ['plugin_ai_administration_profile_select_engine_first', 'Sélectionnez d’abord un moteur'],
   ['plugin_ai_administration_profile_user_credentials_unsupported', 'Ce moteur ne prend pas en charge les jetons API fournis par les utilisateurs'],
   ['plugin_ai_administration_profile_form_tab_options', 'Profil'],
   ['plugin_ai_administration_profile_name_max_length', 'Le nom du profil ne doit pas dépasser {arg:length} caractères'],
