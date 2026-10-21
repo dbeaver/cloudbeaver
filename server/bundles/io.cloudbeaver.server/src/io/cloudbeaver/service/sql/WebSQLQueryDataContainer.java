@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
 
     private final DBPDataSource dataSource;
     private final SQLSyntaxManager syntaxManager;
-    private final String query;
     private final SQLQueryDataContainer queryDataContainer;
 
     public WebSQLQueryDataContainer(
@@ -57,12 +56,15 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     ) {
         this.dataSource = dataSource;
         this.syntaxManager = syntaxManager;
-        this.query = query;
 
         SQLScriptContext scriptContext = new SQLScriptContext(null,
             this, null, new PrintWriter(System.err, true), parametersProvider
         );
         queryDataContainer = new SQLQueryDataContainer(this, new SQLQuery(dataSource, query), scriptContext, log);
+    }
+
+    public void setQuery(@NotNull SQLQuery query) {
+        queryDataContainer.setQuery(query);
     }
 
     @Nullable
@@ -74,7 +76,7 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     @NotNull
     @Override
     public String getName() {
-        return query;
+        return queryDataContainer.getQuery().getText();
     }
 
     @Override
@@ -118,6 +120,7 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     @Override
     public long countData(@NotNull DBCExecutionSource source, @NotNull DBCSession session, @Nullable DBDDataFilter dataFilter, long flags) throws DBCException {
         try {
+            String query = queryDataContainer.getQuery().getText();
             String filteredQuery = dataFilter == null ? query : getDataSource().getSQLDialect().addFiltersToQuery(
                 session.getProgressMonitor(),
                 getDataSource(),

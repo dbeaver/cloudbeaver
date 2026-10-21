@@ -21,6 +21,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
+import org.jkiss.dbeaver.model.ai.engine.OAuthDeviceCodeFlow;
 import org.jkiss.dbeaver.model.ai.engine.openai.AIAccountAuthenticator;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
@@ -43,6 +44,8 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
     private final String userId;
     @NotNull
     private final String providerName;
+    @NotNull
+    private final OAuthDeviceCodeFlow deviceCodeFlow;
 
     public WebAIDeviceAuthorizationProcessor(
         @NotNull WebSession webSession,
@@ -52,6 +55,18 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
         @NotNull String taskId,
         @NotNull String providerName
     ) {
+        this(webSession, profile, authenticator, authorization, taskId, providerName, new OAuthDeviceCodeFlow());
+    }
+
+    public WebAIDeviceAuthorizationProcessor(
+        @NotNull WebSession webSession,
+        @NotNull AIConfigurationProfile profile,
+        @NotNull AIAccountAuthenticator authenticator,
+        @NotNull AIAccountAuthenticator.DeviceAuthorization authorization,
+        @NotNull String taskId,
+        @NotNull String providerName,
+        @NotNull OAuthDeviceCodeFlow deviceCodeFlow
+    ) {
         this.webSession = webSession;
         this.profile = profile;
         this.authenticator = authenticator;
@@ -59,6 +74,7 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
         this.taskId = taskId;
         this.userId = Objects.requireNonNull(webSession.getUserId(), "User authentication is required");
         this.providerName = providerName;
+        this.deviceCodeFlow = deviceCodeFlow;
     }
 
     @Override
@@ -72,9 +88,11 @@ public final class WebAIDeviceAuthorizationProcessor extends WebAsyncTaskProcess
                     return monitor.isCanceled() || !isCurrentAttempt() || !isCurrentUser() || super.isCancelled();
                 }
             };
-            AIAccountAuthenticator.Tokens tokens = authenticator.completeDeviceAuthorization(
+            AIAccountAuthenticator.Tokens tokens = deviceCodeFlow.complete(
+                authenticator,
                 authorization,
-                cancellation
+                cancellation,
+                providerName
             );
             validateAttempt(monitor);
             WebAIProfileUtils.saveAuthorizedAccountCredentials(webSession, profile, tokens, userId, taskId);
