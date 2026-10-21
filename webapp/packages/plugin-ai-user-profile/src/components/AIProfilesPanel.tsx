@@ -34,7 +34,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   return (
     <ColoredContainer parent overflow compact vertical noWrap gap>
       <Group box keepSize>
-        <ToolsPanel className="tw:h-11" rounded>
+        <ToolsPanel size="large" rounded>
           <ToolsAction
             title={translate('plugin_ai_user_profile_refresh_tooltip')}
             icon="refresh"
