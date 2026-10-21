@@ -44,7 +44,7 @@
     "react-dom": "^19",
     "react-hotkeys-hook": "^5",
     "react-minisearch": "^7",
-    "subscript": "^10",
+    "subscript": "^9",
     "tslib": "^2"
   },
   "devDependencies": {
