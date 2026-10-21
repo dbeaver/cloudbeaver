@@ -66,22 +66,11 @@ export function nodeDeletionPlanContext(contexts: IExecutionContextProvider<NavN
         });
       }
 
-      const blocked = new Set(unavailable.flatMap(item => item.parents));
-      const ready: INodeDeletionItem[] = [];
-
-      for (const item of items) {
-        if (!item.keepChildren && blocked.has(item.node.uri)) {
-          unavailable.push({ node: item.node, parents: item.parents, reason: 'plugin_navigation_tree_delete_dependent_unavailable' });
-        } else {
-          ready.push(item);
-        }
-      }
-
       for (const exclusion of unavailable) {
         rows.get(exclusion.node.uri)!.reason = exclusion.reason;
       }
 
-      return { items: ready, rows: [...rows.values()] };
+      return { items, rows: [...rows.values()] };
     },
 
     validateOwnership() {

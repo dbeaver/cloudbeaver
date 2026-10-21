@@ -63,7 +63,7 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
     <CommonDialogWrapper fixedWidth={!!singleItem} size={singleItem ? 'small' : 'large'} aria-label={translate('ui_data_delete_confirmation')}>
       <CommonDialogHeader title="ui_data_delete_confirmation" icon="/icons/preload/error_icon.svg" bigIcon onReject={handleCancel} />
       <CommonDialogBody>
-        <p className="tw:break-all">
+        <p>
           {singleItem
             ? translate('plugin_navigation_tree_delete_confirmation_single', undefined, {
                 name: singleItem.name,

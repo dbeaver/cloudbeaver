@@ -160,19 +160,13 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
     });
 
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
-      getItems: (context, items) => [
-        ...items,
-        ACTION_CONNECTION_CHANGE_DB_PASSWORD,
-        ACTION_CONNECTION_CHANGE_CREDENTIALS,
-        ACTION_CONNECTION_DISCONNECT,
-        ACTION_CONNECTION_DISCONNECT_ALL,
-      ],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       orderItems(context, items) {
         const disconnect = menuExtractItems(items, [ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL]);
 
@@ -284,9 +278,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
           const driver = this.dbDriverResource.get(connection.driverId);
-          return (
-            !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected
-          );
+          return !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
         }
 
         return true;

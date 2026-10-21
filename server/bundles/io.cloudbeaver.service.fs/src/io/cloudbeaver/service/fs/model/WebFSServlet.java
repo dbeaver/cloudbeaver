@@ -63,7 +63,7 @@ public class WebFSServlet extends WebServiceServletBase {
             return;
         }
         if (request.getMethod().equals("POST")) {
-            if (DBWorkbench.isDistributed() && !session.hasPermission(DBWConstants.PERMISSION_SQL_RESULT_UPDATE)) {
+            if (DBWorkbench.isDistributed() && !session.hasPermission(DBWConstants.PERMISSION_FS_RESOURCE_EDIT)) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission denied.");
                 return;
             }

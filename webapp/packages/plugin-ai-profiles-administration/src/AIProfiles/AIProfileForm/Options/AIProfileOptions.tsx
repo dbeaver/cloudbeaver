@@ -7,13 +7,14 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import {
   ActionIconButton,
   ColoredContainer,
   Combobox,
   Container,
+  FormFieldDescription,
   Group,
   GroupTitle,
   InputField,
@@ -46,6 +47,7 @@ import { getAIProfileFormPart } from './getAIProfileFormPart.js';
 
 export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> = observer(function AIProfileOptions({ formState }) {
   const translate = useTranslate();
+  const scopeDescriptionId = useId();
   const notificationService = useService(NotificationService);
   const aiProfileCredentialsService = useService(AIProfileCredentialsService);
   const aiEnginePropertiesResource = useService(AIEnginePropertiesResource);
@@ -90,6 +92,18 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
   const userCredentialsSupported = aiProfileCredentialsService.isSupported(propertiesInfo);
   const propertiesBeforeModel = hasModels ? configurableProperties.slice(0, modelPropertyIndex) : configurableProperties;
   const propertiesAfterModel = hasModels ? configurableProperties.slice(modelPropertyIndex + 1) : [];
+
+  function getUserScopeDisabledReason(): string | undefined {
+    if (!part.state.engineId) {
+      return translate('plugin_ai_administration_profile_select_engine_first');
+    }
+
+    if (!userCredentialsSupported) {
+      return translate('plugin_ai_administration_profile_user_credentials_unsupported');
+    }
+
+    return undefined;
+  }
 
   function getModelDescription(): string {
     if (!usesUserCredentials) {
@@ -204,26 +218,45 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
             >
               {translate('plugin_ai_administration_profile_form_field_engine')}
             </Select>
-            <RadioGroup
-              name="profileScope"
-              label={translate('plugin_ai_administration_profile_scope')}
-              value={part.state.global ? 'global' : 'user'}
-              required
-              onChange={handleScopeChange}
-            >
-              <Radio value="global" disabled={formState.isDisabled || isEditMode} small keepSize>
-                {translate('plugin_ai_administration_profile_scope_global')}
-              </Radio>
-              <Radio
-                value="user"
-                disabled={formState.isDisabled || isEditMode || !userCredentialsSupported}
-                title={!userCredentialsSupported ? translate('plugin_ai_administration_profile_user_credentials_unsupported') : undefined}
-                small
-                keepSize
+            <div className="tw:flex tw:flex-col tw:gap-1">
+              <RadioGroup
+                name="profileScope"
+                label={translate('plugin_ai_administration_profile_scope')}
+                value={part.state.global ? 'global' : 'user'}
+                required
+                onChange={handleScopeChange}
               >
-                {translate('plugin_ai_administration_profile_scope_user')}
-              </Radio>
-            </RadioGroup>
+                <Radio
+                  value="global"
+                  disabled={formState.isDisabled || isEditMode || !part.state.engineId}
+                  title={!part.state.engineId ? translate('plugin_ai_administration_profile_select_engine_first') : undefined}
+                  aria-describedby={part.state.global ? scopeDescriptionId : undefined}
+                  small
+                  keepSize
+                >
+                  {translate('plugin_ai_administration_profile_scope_global')}
+                </Radio>
+                <Radio
+                  value="user"
+                  disabled={formState.isDisabled || isEditMode || !part.state.engineId || !userCredentialsSupported}
+                  title={getUserScopeDisabledReason()}
+                  aria-describedby={!part.state.global ? scopeDescriptionId : undefined}
+                  small
+                  keepSize
+                >
+                  {translate('plugin_ai_administration_profile_scope_user')}
+                </Radio>
+              </RadioGroup>
+              <div id={scopeDescriptionId}>
+                <FormFieldDescription>
+                  {translate(
+                    part.state.global
+                      ? 'plugin_ai_administration_profile_scope_global_description'
+                      : 'plugin_ai_administration_profile_scope_user_description',
+                  )}
+                </FormFieldDescription>
+              </div>
+            </div>
           </Container>
         </Group>
         {!!part.state.engineId && (
