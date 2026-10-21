@@ -74,25 +74,16 @@
       "path": "../plugin-ai"
     },
     {
-      "path": "../plugin-ai-custom-scope"
-    },
-    {
       "path": "../plugin-ai-profiles"
     },
     {
       "path": "../plugin-codemirror6"
     },
     {
-      "path": "../plugin-connection-ai"
-    },
-    {
       "path": "../plugin-datasource-context-switch"
     },
     {
       "path": "../plugin-navigation-tabs"
-    },
-    {
-      "path": "../plugin-navigation-tree"
     },
     {
       "path": "../plugin-sql-editor"

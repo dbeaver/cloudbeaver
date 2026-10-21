@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { ConnectionFormService } from '@cloudbeaver/plugin-connections';
-import { getConnectionAiPart } from './connection-form/getConnectionAiPart.js';
+import { getConnectionAiPart } from './getConnectionAiPart.js';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { AIChatMessageService } from '@cloudbeaver/plugin-ai-chat';
@@ -18,9 +18,9 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 
-import { ConnectionInfoAiResource } from '@cloudbeaver/plugin-connection-ai';
+import { ConnectionInfoAiResource } from '../ConnectionInfoAiResource.js';
 
-const ConnectionAiForm = importLazyComponent(() => import('./connection-form/ConnectionAiForm.js').then(m => m.ConnectionAiForm));
+const ConnectionAiForm = importLazyComponent(() => import('./ConnectionAiForm.js').then(m => m.ConnectionAiForm));
 
 @injectable(() => [
   ConnectionFormService,
@@ -31,7 +31,7 @@ const ConnectionAiForm = importLazyComponent(() => import('./connection-form/Con
   CommonDialogService,
   LocalizationService,
 ])
-export class PluginBootstrap extends Bootstrap {
+export class ConnectionFormAiBootstrap extends Bootstrap {
   private readonly key: string;
   constructor(
     private readonly connectionFormService: ConnectionFormService,

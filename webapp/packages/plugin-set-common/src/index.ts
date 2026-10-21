@@ -119,13 +119,11 @@ import pluginScriptExport from '@cloudbeaver/plugin-script-export/module';
 import pluginProjectInfo from '@cloudbeaver/plugin-project-info/module';
 import pluginDataViewerReferences from '@cloudbeaver/plugin-data-viewer-references/module';
 import pluginAi from '@cloudbeaver/plugin-ai/module';
-import pluginAiCustomScope from '@cloudbeaver/plugin-ai-custom-scope/module';
 import pluginAiProfiles from '@cloudbeaver/plugin-ai-profiles/module';
 import pluginAiChat from '@cloudbeaver/plugin-ai-chat/module';
 import pluginAiAdministration from '@cloudbeaver/plugin-ai-administration/module';
 import pluginAiProfilesAdministration from '@cloudbeaver/plugin-ai-profiles-administration/module';
 import pluginAiUserProfile from '@cloudbeaver/plugin-ai-user-profile/module';
-import pluginConnectionFormAi from '@cloudbeaver/plugin-connection-form-ai/module';
 import pluginConnectionAi from '@cloudbeaver/plugin-connection-ai/module';
 
 const core = [
@@ -245,12 +243,10 @@ export const commonSet = [
   pluginConnectionNetworkHandlers,
   pluginDataViewerReferences,
   pluginAi,
-  pluginAiCustomScope,
   pluginAiProfiles,
   pluginAiChat,
   pluginAiAdministration,
   pluginAiProfilesAdministration,
   pluginAiUserProfile,
-  pluginConnectionFormAi,
   pluginConnectionAi,
 ];

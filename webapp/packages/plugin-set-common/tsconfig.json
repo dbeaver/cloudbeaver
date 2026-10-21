@@ -125,9 +125,6 @@
       "path": "../plugin-ai-chat"
     },
     {
-      "path": "../plugin-ai-custom-scope"
-    },
-    {
       "path": "../plugin-ai-profiles"
     },
     {
@@ -165,9 +162,6 @@
     },
     {
       "path": "../plugin-connection-custom"
-    },
-    {
-      "path": "../plugin-connection-form-ai"
     },
     {
       "path": "../plugin-connection-network-handlers"

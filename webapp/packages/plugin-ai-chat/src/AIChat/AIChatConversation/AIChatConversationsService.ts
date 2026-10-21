@@ -33,6 +33,7 @@ type NewConversationExecutorData =
 @injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatConversationScopeResource, AIChatMessagesResource])
 export class AIChatConversationsService {
   readonly onNewConversation: Executor<NewConversationExecutorData>;
+  readonly onScopeSelect: Executor<{ conversation: AIChatConversationInfo; scope: AiDatabaseScope }>;
 
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
@@ -66,6 +67,7 @@ export class AIChatConversationsService {
     private readonly aiChatMessagesResource: AIChatMessagesResource,
   ) {
     this.onNewConversation = new Executor();
+    this.onScopeSelect = new Executor();
     this.conversationId = null;
 
     this.aiChatContextService.onContextChange.addHandler(() => {
@@ -104,6 +106,13 @@ export class AIChatConversationsService {
   async updateConversationScope(conversationId: string, scope: AiDatabaseScope): Promise<IAIChatConversationScope> {
     const result = await this.aiChatConversationScopeResource.updateScope(conversationId, scope);
     return result;
+  }
+
+  async selectScope(conversation: AIChatConversationInfo, scope: AiDatabaseScope): Promise<void> {
+    const contexts = await this.onScopeSelect.execute({ conversation, scope });
+    if (!ExecutorInterrupter.isInterrupted(contexts)) {
+      await this.updateConversationScope(conversation.id, scope);
+    }
   }
 
   async updateConversationProfile(conversationId: string, profileId: string): Promise<AIChatConversationInfo> {
