@@ -34,6 +34,9 @@ export const AIProfileFormPanel = observer<IAIProfileFormProps>(function AIProfi
           title: wasCreating ? 'plugin_ai_administration_profile_created' : 'plugin_ai_administration_profile_updated',
           message: formState.state.name,
         });
+        if (wasCreating) {
+          await aiProfileFormService.close();
+        }
       } else if (exception) {
         notificationService.logException(
           exception,

@@ -1,4 +1,6 @@
 export default [
+  ['data_viewer_presentations_label', 'Представления данных'],
+  ['data_viewer_panels_label', 'Панели данных'],
   ['plugin_data_viewer_data_viewer_settings_group', 'Редактор данных'],
   ['table_header_sql_expression', 'Введите SQL выражение чтобы отфильтровать результаты, например, column_name=10'],
   ['table_header_sql_expression_not_supported', 'Фильтрация данных недоступна'],
