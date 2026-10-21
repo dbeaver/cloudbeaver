@@ -15,7 +15,6 @@ export default [
   ['plugin_navigation_tree_delete_location', 'Location'],
   ['plugin_navigation_tree_delete_status', 'Status'],
   ['plugin_navigation_tree_delete_unavailable', 'Deletion is unavailable.'],
-  ['plugin_navigation_tree_delete_dependent_unavailable', 'Will not be deleted: a selected child cannot be deleted.'],
   ['plugin_navigation_tree_delete_incomplete', 'Deletion did not complete successfully'],
   ['plugin_navigation_tree_delete_failed', 'Deletion failed.'],
   ['plugin_navigation_tree_delete_cancelled', 'Deletion was cancelled.'],
