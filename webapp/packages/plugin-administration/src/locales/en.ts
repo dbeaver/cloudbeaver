@@ -79,7 +79,7 @@ export default [
   ['administration_configuration_wizard_configuration_security_db_user_password_change', 'Allow database user password change'],
   [
     'administration_configuration_wizard_configuration_security_db_user_password_change_description',
-    'Allow users to change the password of the database user currently connected to a database. Users must have permission to edit the connection.',
+    'Enables users to change the password of the user associated with a database connection',
   ],
   ['administration_configuration_wizard_configuration_navigator', 'Navigator'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Hide Folders'],
