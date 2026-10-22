@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { AIChatConversationsService, EAIConversationPromptGeneratorId } from '@cloudbeaver/plugin-ai-chat';
-import { AIChatConversationScope } from './AIChatConversationScopeLazy.js';
+import { LazyAIChatConversationScope } from './AIChatConversationScopeLoader.js';
 
 @injectable(() => [AIChatConversationsService, ConnectionInfoResource])
 export class AIChatScopeService {
@@ -21,7 +21,7 @@ export class AIChatScopeService {
 
   register(): void {
     this.aiChatConversationsService.actions.add(
-      AIChatConversationScope,
+      LazyAIChatConversationScope,
       undefined,
       ({ conversation }) =>
         conversation.promptGeneratorId === EAIConversationPromptGeneratorId.OBJECT_DESCRIBE ||
