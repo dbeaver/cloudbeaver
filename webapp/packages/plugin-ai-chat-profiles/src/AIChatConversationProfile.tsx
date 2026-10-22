@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
 import { MenuGroup, MenuGroupLabel, MenuItemRadio, useMenuContext } from '@dbeaver/ui-kit';
 import { ActionIconButton, IconOrImage, RadioIndicator, useResource, useTranslate } from '@cloudbeaver/core-blocks';
@@ -30,7 +31,8 @@ export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(
   const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
   const aiProfilesResource = useResource(AIChatConversationProfile, AIProfilesResource, CachedMapAllKey);
   const profiles = aiProfilesResource.data.filter(isNotNullDefined);
-  const isDisabled = disabled || aiChatConversationProfileService.saving;
+  const [saving, setSaving] = useState(false);
+  const isDisabled = disabled || saving;
 
   async function selectProfile(profile: AIProfile) {
     try {
@@ -48,10 +50,13 @@ export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(
   }
 
   async function updateProfile(profileId: string): Promise<void> {
+    setSaving(true);
     try {
       await aiChatConversationProfileService.updateConversationProfile(conversation.id, profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
+    } finally {
+      setSaving(false);
     }
   }
 

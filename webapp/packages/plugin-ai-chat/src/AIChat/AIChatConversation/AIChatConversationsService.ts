@@ -13,7 +13,6 @@ import { isDefined } from '@dbeaver/js-helpers';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { AiDatabaseScope } from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { NotificationService } from '@cloudbeaver/core-events';
 
 import {
   AIChatConversationsResource,
@@ -29,7 +28,7 @@ import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.
 
 type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
-@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatConversationScopeResource, AIChatMessagesResource, NotificationService])
+@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatConversationScopeResource, AIChatMessagesResource])
 export class AIChatConversationsService {
   readonly onNewConversation: Executor<NewConversationExecutorData>;
 
@@ -65,7 +64,6 @@ export class AIChatConversationsService {
     private readonly aiChatConversationsResource: AIChatConversationsResource,
     private readonly aiChatConversationScopeResource: AIChatConversationScopeResource,
     private readonly aiChatMessagesResource: AIChatMessagesResource,
-    private readonly notificationService: NotificationService,
   ) {
     this.onNewConversation = new Executor();
     this.conversationId = null;
@@ -136,11 +134,7 @@ export class AIChatConversationsService {
   }
 
   private async resetConversation(): Promise<void> {
-    try {
-      await this.selectConversation(null);
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
-    }
+    await this.selectConversation(null);
   }
 
   private async getEmptyConversation(conversationId: string | null): Promise<AIChatConversationInfo | null> {

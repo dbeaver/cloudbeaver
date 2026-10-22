@@ -22,6 +22,8 @@ const AIChatConversationProfile = importLazyComponent(() => import('./AIChatConv
 
 @injectable(() => [AIChatConversationMenuService, AIChatConversationsResource, AIChatMessageService, AIProfilesResource, AIProfileCredentialsService])
 export class PluginBootstrap extends Bootstrap {
+  private readonly checkCredentials = new Executor<MessageSendExecutorData>();
+
   constructor(
     private readonly aiChatConversationMenuService: AIChatConversationMenuService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
@@ -35,8 +37,7 @@ export class PluginBootstrap extends Bootstrap {
   override register(): void {
     this.aiChatConversationMenuService.sections.add(AIChatConversationProfile);
 
-    const checkCredentials = new Executor<MessageSendExecutorData>();
-    checkCredentials.addHandler(async ({ stage, data }, contexts) => {
+    this.checkCredentials.addHandler(async ({ stage, data }, contexts) => {
       if (stage !== 'before') {
         return;
       }
@@ -52,6 +53,6 @@ export class PluginBootstrap extends Bootstrap {
         }
       }
     });
-    this.aiChatMessageService.onMessageSend.before(checkCredentials);
+    this.aiChatMessageService.onMessageSend.before(this.checkCredentials);
   }
 }
