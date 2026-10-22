@@ -8,4 +8,4 @@
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const AIChatConversationScope = importLazyComponent(() => import('./AIChatConversationScope.js').then(m => m.AIChatConversationScope));
+export const LazyAIChatConversationScope = importLazyComponent(() => import('./AIChatConversationScope.js').then(m => m.AIChatConversationScope));

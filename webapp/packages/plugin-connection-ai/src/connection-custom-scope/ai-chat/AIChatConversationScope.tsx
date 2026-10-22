@@ -7,12 +7,12 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { Menu, MenuProvider, MenuButton, MenuItemRadio, MenuGroup, MenuGroupLabel } from '@dbeaver/ui-kit';
 import { ActionIconButton, RadioIndicator, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ConnectionInfoResource, ConnectionsManagerService, ContainerResource } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, ContainerResource } from '@cloudbeaver/core-connections';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -20,12 +20,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
 import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
-import {
-  AIChatConversationProfile,
-  AIChatConversationsService,
-  EAIConversationPromptGeneratorId,
-  type AIChatHeaderActionsProps,
-} from '@cloudbeaver/plugin-ai-chat';
+import { AIChatConversationProfile, AIChatConversationsService, AIChatContext, type AIChatActionsProps } from '@cloudbeaver/plugin-ai-chat';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { AIChatConversationScopeResource } from './AIChatConversationScopeResource.js';
 import { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
@@ -36,22 +31,9 @@ interface IScopeItem {
   label: string;
 }
 
-export const AIChatConversationScope = observer<AIChatHeaderActionsProps>(function AIChatConversationScope(props) {
-  const { data: connection } = useResource(AIChatConversationScope, ConnectionInfoResource, props.conversation.dataSourceId ?? null);
-
-  if (props.conversation.promptGeneratorId === EAIConversationPromptGeneratorId.OBJECT_DESCRIBE || !connection?.connected) {
-    return null;
-  }
-
-  return <AIChatConversationScopeMenu {...props} />;
-});
-
-const AIChatConversationScopeMenu = observer<AIChatHeaderActionsProps>(function AIChatConversationScopeMenu({
-  conversation,
-  catalog,
-  schema,
-  disabled,
-}) {
+export const AIChatConversationScope = observer<AIChatActionsProps>(function AIChatConversationScope({ conversation }) {
+  const context = useContext(AIChatContext);
+  const { catalog, schema, disabled } = context;
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const connectionsManagerService = useService(ConnectionsManagerService);
@@ -60,9 +42,9 @@ const AIChatConversationScopeMenu = observer<AIChatHeaderActionsProps>(function 
   const aiChatConversationsService = useService(AIChatConversationsService);
   const aiChatConversationScopeResource = useService(AIChatConversationScopeResource);
 
-  const { data: container } = useResource(AIChatConversationScopeMenu, ContainerResource, conversation.dataSourceId ?? null);
-  const { data: currentScope } = useResource(AIChatConversationScopeMenu, AIChatConversationScopeResource, conversation.id);
-  const aiProfilesResource = useResource(AIChatConversationScopeMenu, AIProfilesResource, CachedMapAllKey);
+  const { data: container } = useResource(AIChatConversationScope, ContainerResource, conversation.dataSourceId ?? null);
+  const { data: currentScope } = useResource(AIChatConversationScope, AIChatConversationScopeResource, conversation.id);
+  const aiProfilesResource = useResource(AIChatConversationScope, AIProfilesResource, CachedMapAllKey);
   const profiles = aiProfilesResource.data.filter(isNotNullDefined);
 
   async function selectScope(scope: AiDatabaseScope) {

@@ -27,16 +27,13 @@ import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.
 
 type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
-export type AIChatHeaderActionsProps = {
+export type AIChatActionsProps = {
   conversation: AIChatConversationInfo;
-  catalog?: string;
-  schema?: string;
-  disabled?: boolean;
 };
 
 @injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource])
 export class AIChatConversationsService {
-  readonly headerActions = new PlaceholderContainer<AIChatHeaderActionsProps>();
+  readonly actions = new PlaceholderContainer<AIChatActionsProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
 
   get defaultConversation(): AIChatConversationInfo | null {

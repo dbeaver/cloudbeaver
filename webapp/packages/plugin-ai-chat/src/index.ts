@@ -8,6 +8,8 @@
 
 import './module.js';
 
+export * from './AIChat/AIChatContext.js';
+
 export { AIChatSettingsService } from './AIChatSettingsService.js';
 
 export * from './AIChat/AIChatService.js';

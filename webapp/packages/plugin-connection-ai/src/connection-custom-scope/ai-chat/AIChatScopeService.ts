@@ -7,15 +7,27 @@
  */
 
 import { injectable } from '@cloudbeaver/core-di';
-import { AIChatConversationsService } from '@cloudbeaver/plugin-ai-chat';
-
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { AIChatConversationsService, EAIConversationPromptGeneratorId } from '@cloudbeaver/plugin-ai-chat';
 import { AIChatConversationScope } from './AIChatConversationScopeLazy.js';
 
-@injectable(() => [AIChatConversationsService])
+@injectable(() => [AIChatConversationsService, ConnectionInfoResource])
 export class AIChatScopeService {
-  constructor(private readonly aiChatConversationsService: AIChatConversationsService) {}
+  constructor(
+    private readonly aiChatConversationsService: AIChatConversationsService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+  ) {}
 
   register(): void {
-    this.aiChatConversationsService.headerActions.add(AIChatConversationScope);
+    this.aiChatConversationsService.actions.add(
+      AIChatConversationScope,
+      undefined,
+      ({ conversation }) =>
+        conversation.promptGeneratorId === EAIConversationPromptGeneratorId.OBJECT_DESCRIBE ||
+        !conversation.dataSourceId ||
+        !this.connectionInfoResource.get(conversation.dataSourceId)?.connected,
+      ({ conversation }) => [getCachedMapResourceLoaderState(this.connectionInfoResource, () => conversation.dataSourceId ?? null)],
+    );
   }
 }

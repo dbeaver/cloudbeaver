@@ -7,9 +7,9 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { Suspense, useContext } from 'react';
+import { useContext } from 'react';
 
-import { ActionIconButton, Fill, Loader, Placeholder, RenameDialog, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Fill, Placeholder, RenameDialog, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { Command } from '@dbeaver/ui-kit';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -57,17 +57,7 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
         <AIChatContextManager disabled={disabled} />
 
         <div className="tw:flex tw:items-center">
-          {currentConversation && (
-            <Suspense fallback={<Loader className="tw:h-7 tw:w-7" small />}>
-              <Placeholder
-                container={aiChatConversationsService.headerActions}
-                conversation={currentConversation}
-                catalog={context.catalog}
-                schema={context.schema}
-                disabled={disabled}
-              />
-            </Suspense>
-          )}
+          {currentConversation && <Placeholder container={aiChatConversationsService.actions} conversation={currentConversation} />}
           <AISettings />
         </div>
       </div>
