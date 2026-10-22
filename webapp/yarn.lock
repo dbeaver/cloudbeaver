@@ -3969,6 +3969,7 @@ __metadata:
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"

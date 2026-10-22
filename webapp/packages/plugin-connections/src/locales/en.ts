@@ -1,4 +1,8 @@
 export default [
+  ['plugin_connections_delete_connection', 'Connection'],
+  ['plugin_connections_delete_database_object', 'Database object'],
+  ['plugin_connections_delete_read_only', 'Read-only connection.'],
+  ['plugin_connections_delete_folder_warning', "Connections inside the folders won't be deleted unless they are selected."],
   ['plugin_connections_new_connection_dialog_title', 'New connection'],
   ['plugin_connections_connection_form_part_main', 'Main'],
   ['plugin_connections_connection_form_part_main_auth_model', 'Authentication model'],
@@ -48,8 +52,8 @@ export default [
 
   ['plugin_connections_connection_type_label', 'Connection type'],
 
-  ['plugin_connections_change_db_password_menu_title', 'Change database password'],
-  ['plugin_connections_change_db_password_dialog_title', 'Change database password'],
+  ['plugin_connections_change_db_password_menu_title', 'Change current database password'],
+  ['plugin_connections_change_db_password_dialog_title', 'Change current database password'],
   ['plugin_connections_change_db_password_current', 'Current password'],
   ['plugin_connections_change_db_password_new', 'New password'],
   ['plugin_connections_change_db_password_repeat', 'Confirm password'],

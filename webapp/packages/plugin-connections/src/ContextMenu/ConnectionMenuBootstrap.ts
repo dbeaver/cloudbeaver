@@ -14,12 +14,22 @@ import {
   createConnectionParam,
   DATA_CONTEXT_CONNECTION,
   DBDriverResource,
+  EConnectionFeature,
+  isConnectionNode,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import {
+  DATA_CONTEXT_NAV_NODE,
+  ENodeFeature,
+  EObjectFeature,
+  isConnectionFolder,
+  type NavNode,
+  NavTreeResource,
+  NodeManagerUtils,
+} from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getUniqueName } from '@cloudbeaver/core-utils';
@@ -35,7 +45,7 @@ import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DI
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
-import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree';
+import { MENU_NAVIGATION_TREE_MANAGE, nodeDeletionPlanContext, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
 @injectable(() => [
   NotificationService,
@@ -50,6 +60,8 @@ import { MENU_NAVIGATION_TREE_MANAGE } from '@cloudbeaver/plugin-navigation-tree
   ServerConfigResource,
   LocalizationService,
   CommonDialogService,
+  NodeDeletionService,
+  NavTreeResource,
 ])
 export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
@@ -65,22 +77,96 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly nodeDeletionService: NodeDeletionService,
+    private readonly navTreeResource: NavTreeResource,
   ) {
     super();
   }
 
   override register(): void {
+    this.actionService.addHandler({
+      id: 'connection-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => isConnectionNode(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isHidden: context => !this.canDeleteConnection(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isDisabled: context => this.nodeDeletionService.isDeleting || !this.canDeleteConnection(context.get(DATA_CONTEXT_NAV_NODE)!),
+      handler: context => this.nodeDeletionService.deleteSelection(context),
+    });
+
+    this.actionService.addHandler({
+      id: 'database-object-delete',
+      menus: [MENU_NAVIGATION_TREE_MANAGE],
+      actions: [ACTION_DELETE],
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => this.isDatabaseNode(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isHidden: context => !this.canDeleteObject(context.get(DATA_CONTEXT_NAV_NODE)!),
+      isDisabled: context => this.nodeDeletionService.isDeleting || !this.canDeleteObject(context.get(DATA_CONTEXT_NAV_NODE)!),
+      handler: context => this.nodeDeletionService.deleteSelection(context),
+    });
+
+    this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
+      const plan = contexts.getContext(nodeDeletionPlanContext);
+      for (const node of nodes.filter(isConnectionNode)) {
+        const key = node.projectId && node.objectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
+        const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
+        const target = {
+          node,
+          type: 'plugin_connections_delete_connection',
+          readOnly: connection?.features.includes(EConnectionFeature.readOnly),
+          keepChildren: true,
+        };
+        // Readonly restricts database edits, not removal of the saved connection configuration.
+        if (!key || !connection?.canDelete) {
+          plan.exclude({ ...target, owner: 'connections', reason: 'plugin_navigation_tree_delete_unavailable' });
+          continue;
+        }
+        plan.addOperation({
+          id: `delete-connection:${node.uri}`,
+          owner: 'connections',
+          targets: [target],
+          execute: async () => {
+            const deleted = await this.connectionsManagerService.deleteConnection(key);
+            return [{ targetId: node.uri, status: deleted ? 'deleted' : 'cancelled' }];
+          },
+        });
+      }
+      for (const node of nodes.filter(node => this.isDatabaseNode(node))) {
+        const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
+        const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
+        const readOnly = connection?.features.includes(EConnectionFeature.readOnly);
+        const target = { node, type: 'plugin_connections_delete_database_object', readOnly };
+        if ((key && !connection) || !this.canDeleteObject(node)) {
+          plan.exclude({
+            ...target,
+            owner: 'database-objects',
+            reason: readOnly ? 'plugin_connections_delete_read_only' : 'plugin_navigation_tree_delete_unavailable',
+          });
+          continue;
+        }
+        plan.addOperation({
+          id: `delete-database-object:${node.uri}`,
+          owner: 'database-objects',
+          targets: [target],
+          execute: async () => {
+            await this.navTreeResource.deleteNode(node.uri);
+            return [{ targetId: node.uri, status: 'deleted' }];
+          },
+        });
+      }
+    });
     this.addConnectionsMenuToTopAppBar();
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
     });
 
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_DB_PASSWORD, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       orderItems(context, items) {
         const disconnect = menuExtractItems(items, [ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL]);
 
@@ -95,7 +181,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'connection-menu-management',
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      actions: [ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_DELETE],
+      actions: [ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
@@ -108,10 +194,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (!connection) {
           return true;
-        }
-
-        if (action === ACTION_DELETE) {
-          return !connection.canDelete;
         }
 
         if (action === ACTION_CONNECTION_EDIT) {
@@ -129,14 +211,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         const connection = await this.connectionInfoResource.load(connectionKey);
 
         switch (action) {
-          case ACTION_DELETE: {
-            try {
-              await this.connectionsManagerService.deleteConnection(createConnectionParam(connection));
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'Failed to delete connection');
-            }
-            break;
-          }
           case ACTION_CONNECTION_EDIT: {
             this.publicConnectionFormService.open(connection.projectId, { connectionId: connection.id });
             break;
@@ -168,7 +242,12 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'connection-management',
-      actions: [ACTION_CONNECTION_CHANGE_DB_PASSWORD, ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
+      actions: [
+        ACTION_CONNECTION_CHANGE_DB_PASSWORD,
+        ACTION_CONNECTION_CHANGE_CREDENTIALS,
+        ACTION_CONNECTION_DISCONNECT,
+        ACTION_CONNECTION_DISCONNECT_ALL,
+      ],
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -199,9 +278,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
           const driver = this.dbDriverResource.get(connection.driverId);
-          return (
-            !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected
-          );
+          return !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
         }
 
         return true;
@@ -251,7 +328,27 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
       },
     });
+  }
 
+  private isDatabaseNode(node: NavNode): boolean {
+    return !isConnectionNode(node) && !isConnectionFolder(node) && NodeManagerUtils.isDatabaseObject(node.uri);
+  }
+
+  private canDeleteConnection(node: NavNode): boolean {
+    const connection =
+      node.projectId && node.objectId ? this.connectionInfoResource.get(createConnectionParam(node.projectId, node.objectId)) : undefined;
+
+    return !!connection?.canDelete;
+  }
+
+  private canDeleteObject(node: NavNode): boolean {
+    const connection = this.connectionInfoResource.getConnectionForNode(node.uri);
+
+    return (
+      !!node.features?.includes(ENodeFeature.canDelete) &&
+      !connection?.features.includes(EConnectionFeature.readOnly) &&
+      !connection?.features.includes(EConnectionFeature.restrictMetadataEdit)
+    );
   }
 
   private addConnectionsMenuToTopAppBar() {

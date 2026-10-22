@@ -21,7 +21,6 @@ import {
   useForm,
   useFormCustomInputValidation,
   useObservableRef,
-  usePasswordValidation,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -84,7 +83,6 @@ export const ChangeDatabasePasswordDialog: DialogComponent<ChangeDatabasePasswor
       },
     });
 
-    const passwordValidation = usePasswordValidation(form);
     const repeatValidation = useFormCustomInputValidation<string>(
       value => (isValuesEqual(value, state.newPassword, '') ? null : translate('plugin_connections_change_db_password_mismatch')),
       form,
@@ -99,7 +97,7 @@ export const ChangeDatabasePasswordDialog: DialogComponent<ChangeDatabasePasswor
               <InputField type="password" name="currentPassword" state={state} required>
                 {translate('plugin_connections_change_db_password_current')}
               </InputField>
-              <InputField type="password" name="newPassword" state={state} ref={passwordValidation} onChange={repeatValidation.revalidate} required>
+              <InputField type="password" name="newPassword" state={state} required onChange={repeatValidation.revalidate}>
                 {translate('plugin_connections_change_db_password_new')}
               </InputField>
               <InputField type="password" name="repeatPassword" state={state} ref={repeatValidation.ref} required>
