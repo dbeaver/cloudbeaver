@@ -61,6 +61,8 @@ import org.junit.platform.suite.api.Suite;
         AIProfileCopyTest.class,
         WebAIConfigurationProfileTest.class,
         WebAIProfileUtilsTest.class,
+        LdapTeamRevocationTest.class,
+        AutoAssignedTeamsTest.class,
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,

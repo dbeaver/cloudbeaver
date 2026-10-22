@@ -26,6 +26,7 @@ public class SMAutoAssign {
     private String authRole;
     private String authRoleAssignReason;
     private List<String> externalTeamIds = new ArrayList<>();
+    private boolean externalTeamIdsComplete;
 
     public SMAutoAssign() {
     }
@@ -49,6 +50,19 @@ public class SMAutoAssign {
 
     public void addExternalTeamId(String externalRoleId) {
         this.externalTeamIds.add(externalRoleId);
+    }
+
+    /**
+     * @return true if the provider is sure the external team ids are the complete list, so the teams assigned
+     * automatically before that the user is no longer entitled to may be removed. When false (the default) teams
+     * are only added, e.g. because the lookup in the external system failed.
+     */
+    public boolean isExternalTeamIdsComplete() {
+        return externalTeamIdsComplete;
+    }
+
+    public void setExternalTeamIdsComplete(boolean externalTeamIdsComplete) {
+        this.externalTeamIdsComplete = externalTeamIdsComplete;
     }
 
     @Nullable
