@@ -10,7 +10,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { AIChatConversationsService, EAIConversationPromptGeneratorId } from '@cloudbeaver/plugin-ai-chat';
-import { LazyAIChatConversationScope } from './AIChatConversationScopeLoader.js';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+export const LazyAIChatConversationScope = importLazyComponent(() => import('./AIChatConversationScope.js').then(m => m.AIChatConversationScope))
 
 @injectable(() => [AIChatConversationsService, ConnectionInfoResource])
 export class AIChatScopeService {
