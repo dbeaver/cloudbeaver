@@ -88,6 +88,9 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
       return true;
     }
     async function handleClick(event: React.MouseEvent<HTMLDivElement>) {
+      if (EventContext.has(event, EventStopPropagationFlag)) {
+        return;
+      }
       if (onClick) {
         onClick(event);
       }

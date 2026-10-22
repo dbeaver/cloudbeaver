@@ -70,6 +70,7 @@ import org.junit.platform.suite.api.Suite;
         AdminLastLoginTimeTest.class,
         GenerateSQLResultSetTest.class,
         WebSQLDataUpdateTest.class,
+        WebSQLQueryDataContainerTest.class,
         WebSQLResultsInfoTest.class,
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,
