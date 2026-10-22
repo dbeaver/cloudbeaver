@@ -1,6 +1,6 @@
 export default [
   ['plugin_ai_scope_custom_active', 'Область метаданных · Активна'],
-  ['plugin_ai_scope_not_set', 'Не настроен — AI доступны все схемы и таблицы'],
+  ['plugin_ai_scope_not_set', 'Не настроен — доступ AI не ограничен'],
   ['plugin_ai_scope_configure_action', 'Настроить'],
   ['plugin_ai_scope_custom', 'Область метаданных'],
   ['plugin_ai_scope_preview_more', '{arg:objects} и ещё {arg:count}'],
@@ -8,7 +8,6 @@ export default [
   ['plugin_ai_scope_configure', 'Настроить область метаданных'],
   ['plugin_ai_scope_all', 'Все объекты'],
   ['plugin_ai_scope_selected', 'Выбранные объекты'],
-  ['plugin_ai_scope_unsaved', 'Не сохранено'],
   ['plugin_ai_scope_save_first', 'Сначала сохраните подключение'],
   ['plugin_ai_scope_search', 'Поиск загруженных объектов'],
   ['plugin_ai_scope_filter', 'Фильтр'],

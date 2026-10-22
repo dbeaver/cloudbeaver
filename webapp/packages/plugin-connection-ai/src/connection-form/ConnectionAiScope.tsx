@@ -131,11 +131,6 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
         clearAction={custom ? { label: translate('ui_clear'), disabled, onClick: clear } : undefined}
         editAction={{ label: translate(custom ? 'ui_edit' : 'plugin_ai_scope_configure_action'), disabled, onClick: configure }}
       />
-      {showSelection && part.isChanged && (
-        <div className="tw:text-xs tw:text-(--theme-text-hint-on-light)" role="status">
-          {translate('plugin_ai_scope_unsaved')}
-        </div>
-      )}
     </div>
   );
 });

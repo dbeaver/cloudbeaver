@@ -1,6 +1,6 @@
 export default [
   ['plugin_ai_scope_custom_active', 'Metadata scope · Active'],
-  ['plugin_ai_scope_not_set', 'Not set — AI can access all schemas and tables'],
+  ['plugin_ai_scope_not_set', 'Not set — AI access is unrestricted'],
   ['plugin_ai_scope_configure_action', 'Configure'],
   ['plugin_ai_scope_custom', 'Metadata scope'],
   ['plugin_ai_scope_preview_more', '{arg:objects} and {arg:count} more'],
@@ -8,7 +8,6 @@ export default [
   ['plugin_ai_scope_configure', 'Configure metadata scope'],
   ['plugin_ai_scope_all', 'All objects'],
   ['plugin_ai_scope_selected', 'Selected objects'],
-  ['plugin_ai_scope_unsaved', 'Unsaved'],
   ['plugin_ai_scope_save_first', 'Save the connection first'],
   ['plugin_ai_scope_search', 'Search loaded objects'],
   ['plugin_ai_scope_filter', 'Filter'],
