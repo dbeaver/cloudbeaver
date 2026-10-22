@@ -16,6 +16,7 @@ import { AIChatConversationsService, type AIChatConversationInfo } from '@cloudb
 import { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
 import { AiScopeDialog } from '../AiScopeDialogLazy.js';
 import { AIChatConversationScopeResource } from './AIChatConversationScopeResource.js';
+import { AIChatConversationScope } from './AIChatConversationScopeLazy.js';
 
 @injectable(() => [
   AIChatConversationsService,
@@ -32,6 +33,10 @@ export class AIChatScopeService {
     private readonly commonDialogService: CommonDialogService,
     private readonly aiChatConversationScopeResource: AIChatConversationScopeResource,
   ) {}
+
+  register(): void {
+    this.aiChatConversationsService.headerActions.add(AIChatConversationScope);
+  }
 
   async selectScope(conversation: AIChatConversationInfo, scope: AiDatabaseScope): Promise<void> {
     if (scope === AiDatabaseScope.Custom) {

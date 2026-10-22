@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { ConnectionFormService } from '@cloudbeaver/plugin-connections';
@@ -31,7 +31,7 @@ const ConnectionAiForm = importLazyComponent(() => import('./ConnectionAiForm.js
   CommonDialogService,
   LocalizationService,
 ])
-export class ConnectionFormAiBootstrap extends Bootstrap {
+export class ConnectionAiSettingsService {
   private readonly key: string;
   constructor(
     private readonly connectionFormService: ConnectionFormService,
@@ -42,9 +42,10 @@ export class ConnectionFormAiBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
   ) {
-    super();
     this.key = 'ai';
+  }
 
+  register(): void {
     this.aiChatMessageService.onMessageSend.addHandler(async (data, contexts) => {
       if (data.stage === 'before' && this.isAiEnabled() && data.data.connectionKey) {
         const connection = await this.connectionInfoResource.load(data.data.connectionKey);
@@ -78,9 +79,7 @@ export class ConnectionFormAiBootstrap extends Bootstrap {
         }
       }
     });
-  }
 
-  override register(): void {
     this.connectionFormService.parts.add({
       key: this.key,
       name: 'plugin_connection_form_ai_name',

@@ -15,7 +15,6 @@ import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
 import { AIChatConversationsService, type AIChatHeaderActionsProps } from '@cloudbeaver/plugin-ai-chat';
 
 import type { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
-import { AIChatScopeBootstrap } from './AIChatScopeBootstrap.js';
 import { AIChatConversationScope } from './AIChatConversationScopeLazy.js';
 import { AIChatScopeService } from './AIChatScopeService.js';
 import type { AIChatConversationScopeResource } from './AIChatConversationScopeResource.js';
@@ -37,7 +36,6 @@ function setup() {
   const refresh = vi.fn().mockResolvedValue({ scope: AiDatabaseScope.Custom, customObjectIds: ['allowed-schema'] });
   const open = vi.fn().mockResolvedValue({ status: DialogueStateResult.Resolved, result: ['new-table'] });
 
-  new AIChatScopeBootstrap(conversations).register();
   const service = new AIChatScopeService(
     conversations,
     { requireConnection } as unknown as ConnectionsManagerService,
@@ -45,6 +43,7 @@ function setup() {
     { open } as unknown as CommonDialogService,
     { updateScope: updateConversationScope } as unknown as AIChatConversationScopeResource,
   );
+  service.register();
 
   return {
     headerActions: conversations.headerActions,

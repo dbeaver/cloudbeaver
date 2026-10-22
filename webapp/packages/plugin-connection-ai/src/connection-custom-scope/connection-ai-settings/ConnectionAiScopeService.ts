@@ -7,19 +7,17 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 
 import { ConnectionFormAiService } from '../../connection-ai-settings/ConnectionFormAiService.js';
 
 const ConnectionAiScope = importLazyComponent(() => import('./ConnectionAiScope.js').then(m => m.ConnectionAiScope));
 
 @injectable(() => [ConnectionFormAiService])
-export class ConnectionAiScopeBootstrap extends Bootstrap {
-  constructor(private readonly connectionFormAiService: ConnectionFormAiService) {
-    super();
-  }
+export class ConnectionAiScopeService {
+  constructor(private readonly connectionFormAiService: ConnectionFormAiService) {}
 
-  override register(): void {
+  register(): void {
     this.connectionFormAiService.optionsContainer.add(ConnectionAiScope, 0);
   }
 }

@@ -10,7 +10,7 @@ import { expect, it } from 'vitest';
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 
-import { ConnectionAiScopeBootstrap } from './ConnectionAiScopeBootstrap.js';
+import { ConnectionAiScopeService } from './ConnectionAiScopeService.js';
 import type { ConnectionFormAiService, ConnectionFormAiContainerProps } from '../../connection-ai-settings/ConnectionFormAiService.js';
 
 it('contributes connection scope before other AI settings extensions', () => {
@@ -18,7 +18,7 @@ it('contributes connection scope before other AI settings extensions', () => {
   const extension = () => null;
   optionsContainer.add(extension, 100);
 
-  new ConnectionAiScopeBootstrap({ optionsContainer } as unknown as ConnectionFormAiService).register();
+  new ConnectionAiScopeService({ optionsContainer } as unknown as ConnectionFormAiService).register();
 
   expect(optionsContainer.get()).toHaveLength(2);
   expect(optionsContainer.get()[0]?.order).toBe(0);
