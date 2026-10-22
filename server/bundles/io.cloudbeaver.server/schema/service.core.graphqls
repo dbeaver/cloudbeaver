@@ -578,6 +578,7 @@ type ConnectionInfo {
     canViewSettings: Boolean!
     canEdit: Boolean!
     canDelete: Boolean!
+    hasUserFilters: Boolean! @since(version: "26.2.4")
 
     projectId: ID!
     requiredAuth: String
