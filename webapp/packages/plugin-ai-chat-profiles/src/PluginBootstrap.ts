@@ -10,7 +10,6 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   AIChatConversationMenuService,
   AIChatConversationsResource,
@@ -54,13 +53,5 @@ export class PluginBootstrap extends Bootstrap {
       }
     });
     this.aiChatMessageService.onMessageSend.before(checkCredentials);
-
-    this.aiProfilesResource.onItemDelete.addHandler(key => {
-      const deletedProfileIds = ResourceKeyUtils.toArray(key);
-      const conversations = this.aiChatConversationsResource.values.filter(
-        conversation => conversation.profile && deletedProfileIds.includes(conversation.profile),
-      );
-      this.aiChatConversationsResource.markOutdated(resourceKeyList(conversations.map(conversation => conversation.id)));
-    });
   }
 }

@@ -33,9 +33,7 @@ type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParam
 export class AIChatConversationsService {
   readonly onNewConversation: Executor<NewConversationExecutorData>;
 
-  readonly onBeforeCreateConversation = new Executor<AIChatConversationConfig>();
   readonly onSelectConversation = new Executor<AIChatConversationInfo>();
-  readonly onReuseConversation = new Executor<{ conversation: AIChatConversationInfo }>();
 
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
@@ -117,9 +115,7 @@ export class AIChatConversationsService {
   }
 
   async createConversation(key: IConnectionInfoParams | null, generatorId?: EAIConversationPromptGeneratorId): Promise<AIChatConversationInfo> {
-    const config: AIChatConversationConfig = {};
-    await this.onBeforeCreateConversation.execute(config);
-    const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId, config);
+    const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId);
     this.conversationId = conversation.id;
     return conversation;
   }
@@ -132,14 +128,7 @@ export class AIChatConversationsService {
     }
 
     const emptyConversation = await this.getEmptyConversation(this.currentConversationId);
-    let conversation = emptyConversation;
-    if (conversation) {
-      const data = { conversation };
-      await this.onReuseConversation.execute(data);
-      conversation = data.conversation;
-    } else {
-      conversation = await this.createConversation(key);
-    }
+    const conversation = emptyConversation ?? (await this.createConversation(key));
 
     await this.onNewConversation.execute({ stage: 'after', data: conversation });
 

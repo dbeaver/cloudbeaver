@@ -9,6 +9,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AIDefaultProfileService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatConversationsService, AIChatConversationsResource, type AIChatConversationInfo } from '@cloudbeaver/plugin-ai-chat';
@@ -25,7 +26,20 @@ export class AIChatConversationProfileService {
   ) {
     makeObservable(this, { saving: observable });
 
-    aiChatConversationsService.onBeforeCreateConversation.addHandler(async config => {
+    this.aiChatConversationsResource.sync(
+      aiProfilesResource,
+      () => CachedMapAllKey,
+      key => {
+        const profileIds = ResourceKeyUtils.toArray(aiProfilesResource.aliases.transformToKey(key));
+        return resourceKeyList(
+          this.aiChatConversationsResource.values
+            .filter(conversation => conversation.profile && profileIds.includes(conversation.profile))
+            .map(conversation => conversation.id),
+        );
+      },
+    );
+
+    this.aiChatConversationsResource.onBeforeCreate.addHandler(async config => {
       const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
       if (profile) {
         config.settings = { ...config.settings, profile: profile.id };
@@ -36,13 +50,6 @@ export class AIChatConversationProfileService {
       const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
       if (profile && (!conversation.profile || !aiProfilesResource.has(conversation.profile))) {
         await this.aiChatConversationsResource.updateConversation(conversation.id, { settings: { profile: profile.id } });
-      }
-    });
-
-    aiChatConversationsService.onReuseConversation.addHandler(async data => {
-      const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
-      if (profile && data.conversation.profile !== profile.id) {
-        data.conversation = await this.aiChatConversationsResource.updateConversation(data.conversation.id, { settings: { profile: profile.id } });
       }
     });
   }
