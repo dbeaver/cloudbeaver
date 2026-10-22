@@ -8,7 +8,7 @@
 
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
-import { ConnectionInfoAiResource } from '../ConnectionInfoAiResource.js';
+import { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
 import { getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionAiScopePart } from './ConnectionAiScopePart.js';

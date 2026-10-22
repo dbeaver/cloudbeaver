@@ -9,7 +9,7 @@
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
 import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-ui';
-import type { ConnectionInfoAiResource } from '../ConnectionInfoAiResource.js';
+import type { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 export class ConnectionAiScopePart extends FormPart<{ scope: AiDatabaseScope; customObjectIds: string[] }, IConnectionFormState> {

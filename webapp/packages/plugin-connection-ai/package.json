@@ -37,8 +37,10 @@
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/plugin-ai-chat": "workspace:*",
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*",
     "@cloudbeaver/plugin-connections": "workspace:*",
     "@cloudbeaver/plugin-navigation-tree": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:*",
     "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
@@ -47,10 +49,10 @@
     "tslib": "^2"
   },
   "devDependencies": {
+    "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/core-connections": "workspace:*",
     "@cloudbeaver/core-dialogs": "workspace:*",
-    "@cloudbeaver/core-executor": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/plugin-ai-chat": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",

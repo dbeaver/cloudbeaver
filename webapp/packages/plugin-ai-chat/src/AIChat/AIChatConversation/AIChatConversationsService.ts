@@ -9,9 +9,9 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { isDefined } from '@dbeaver/js-helpers';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import type { AiDatabaseScope } from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 
 import {
@@ -23,17 +23,21 @@ import {
 } from './AIChatConversationsResource.js';
 import { AIChatContextService } from '../AIChatContext/AIChatContextService.js';
 import { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
-import { AIChatConversationScopeResource, type IAIChatConversationScope } from './AIChatConversationScopeResource.js';
 import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.js';
 
-type NewConversationExecutorData =
-  | { stage: 'before'; data: IConnectionInfoParams | null }
-  | { stage: 'after'; data: AIChatConversationInfo };
+type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
-@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatConversationScopeResource, AIChatMessagesResource])
+export type AIChatHeaderActionsProps = {
+  conversation: AIChatConversationInfo;
+  catalog?: string;
+  schema?: string;
+  disabled?: boolean;
+};
+
+@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource])
 export class AIChatConversationsService {
+  readonly headerActions = new PlaceholderContainer<AIChatHeaderActionsProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
-  readonly onScopeSelect: Executor<{ conversation: AIChatConversationInfo; scope: AiDatabaseScope }>;
 
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
@@ -63,11 +67,9 @@ export class AIChatConversationsService {
   constructor(
     private readonly aiChatContextService: AIChatContextService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
-    private readonly aiChatConversationScopeResource: AIChatConversationScopeResource,
     private readonly aiChatMessagesResource: AIChatMessagesResource,
   ) {
     this.onNewConversation = new Executor();
-    this.onScopeSelect = new Executor();
     this.conversationId = null;
 
     this.aiChatContextService.onContextChange.addHandler(() => {
@@ -101,18 +103,6 @@ export class AIChatConversationsService {
   async updateConversation(conversationId: string, config: AIChatConversationConfig): Promise<AIChatConversationInfo> {
     const conversation = await this.aiChatConversationsResource.updateConversation(conversationId, config);
     return conversation;
-  }
-
-  async updateConversationScope(conversationId: string, scope: AiDatabaseScope): Promise<IAIChatConversationScope> {
-    const result = await this.aiChatConversationScopeResource.updateScope(conversationId, scope);
-    return result;
-  }
-
-  async selectScope(conversation: AIChatConversationInfo, scope: AiDatabaseScope): Promise<void> {
-    const contexts = await this.onScopeSelect.execute({ conversation, scope });
-    if (!ExecutorInterrupter.isInterrupted(contexts)) {
-      await this.updateConversationScope(conversation.id, scope);
-    }
   }
 
   async updateConversationProfile(conversationId: string, profileId: string): Promise<AIChatConversationInfo> {

@@ -1,4 +1,11 @@
 export default [
+  ['plugin_ai_chat_scope_change', 'Configure AI context'],
+  ['plugin_ai_chat_scope_change_fail', 'Failed to change context'],
+  ['plugin_ai_chat_scope_connection', 'Connection'],
+  ['plugin_ai_chat_scope_schema', 'Current Schema'],
+  ['plugin_ai_chat_scope_database', 'Current Database'],
+  ['plugin_ai_chat_scope_custom', 'Custom'],
+  ['plugin_ai_chat_scope_custom_dialog_title', 'Custom completion scope'],
   ['plugin_ai_scope_custom_active', 'Metadata scope · Active'],
   ['plugin_ai_scope_not_set', 'Not set — AI access is unrestricted'],
   ['plugin_ai_scope_configure_action', 'Configure'],

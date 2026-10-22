@@ -7,18 +7,21 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 
 import type { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { DialogueStateResult, type CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { Executor } from '@cloudbeaver/core-executor';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
-import { AIChatConversationsService } from '@cloudbeaver/plugin-ai-chat';
+import { AIChatConversationsService, type AIChatHeaderActionsProps } from '@cloudbeaver/plugin-ai-chat';
 
-import type { ConnectionInfoAiResource } from '../ConnectionInfoAiResource.js';
+import type { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
 import { AIChatScopeBootstrap } from './AIChatScopeBootstrap.js';
+import { AIChatConversationScope } from './AIChatConversationScopeLazy.js';
+import { AIChatScopeService } from './AIChatScopeService.js';
+import type { AIChatConversationScopeResource } from './AIChatConversationScopeResource.js';
 
 function setup() {
-  type Conversation = Parameters<AIChatConversationsService['selectScope']>[0];
+  type Conversation = Parameters<AIChatScopeService['selectScope']>[0];
   const conversation = {
     id: 'conversation',
     dataSourceId: { projectId: 'project', connectionId: 'connection' },
@@ -27,23 +30,25 @@ function setup() {
   const updateConversation = vi.fn().mockResolvedValue(conversation);
   const updateConversationScope = vi.fn().mockResolvedValue(undefined);
   const conversations = {
-    onScopeSelect: new Executor<{ conversation: Conversation; scope: AiDatabaseScope }>(),
+    headerActions: new PlaceholderContainer<AIChatHeaderActionsProps>(),
     updateConversation,
-    updateConversationScope,
   } as unknown as AIChatConversationsService;
   const requireConnection = vi.fn().mockResolvedValue({ nodePath: 'connection-root' });
   const refresh = vi.fn().mockResolvedValue({ scope: AiDatabaseScope.Custom, customObjectIds: ['allowed-schema'] });
   const open = vi.fn().mockResolvedValue({ status: DialogueStateResult.Resolved, result: ['new-table'] });
 
-  new AIChatScopeBootstrap(
+  new AIChatScopeBootstrap(conversations).register();
+  const service = new AIChatScopeService(
     conversations,
     { requireConnection } as unknown as ConnectionsManagerService,
     { refresh } as unknown as ConnectionInfoAiResource,
     { open } as unknown as CommonDialogService,
-  ).register();
+    { updateScope: updateConversationScope } as unknown as AIChatConversationScopeResource,
+  );
 
   return {
-    select: (scope = AiDatabaseScope.Custom) => AIChatConversationsService.prototype.selectScope.call(conversations, conversation, scope),
+    headerActions: conversations.headerActions,
+    select: (scope = AiDatabaseScope.Custom) => service.selectScope(conversation, scope),
     updateConversation,
     updateConversationScope,
     requireConnection,
@@ -53,6 +58,12 @@ function setup() {
 }
 
 describe('connection AI chat scope registration', () => {
+  it('contributes the scope menu to the chat header placeholder', () => {
+    const test = setup();
+
+    expect(test.headerActions.get().map(action => action.component)).toEqual([AIChatConversationScope]);
+  });
+
   it('restricts the picker to the connection scope and saves objects before changing scope', async () => {
     const test = setup();
     await test.select();

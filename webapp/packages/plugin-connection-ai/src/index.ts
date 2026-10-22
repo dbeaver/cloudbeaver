@@ -9,4 +9,4 @@
 import './module.js';
 
 export * from './ConnectionInfoAiResource.js';
-export * from './connection-form/ConnectionFormAiService.js';
+export * from './connection-ai-settings/ConnectionFormAiService.js';

@@ -1,4 +1,11 @@
 export default [
+  ['plugin_ai_chat_scope_change', 'Настроить AI контекст'],
+  ['plugin_ai_chat_scope_change_fail', 'Не удалось изменить контекст'],
+  ['plugin_ai_chat_scope_connection', 'Подключение'],
+  ['plugin_ai_chat_scope_schema', 'Текущая схема'],
+  ['plugin_ai_chat_scope_database', 'Текущая база'],
+  ['plugin_ai_chat_scope_custom', 'Пользовательский'],
+  ['plugin_ai_chat_scope_custom_dialog_title', 'Пользовательский контекст'],
   ['plugin_ai_scope_custom_active', 'Область метаданных · Активна'],
   ['plugin_ai_scope_not_set', 'Не настроен — доступ AI не ограничен'],
   ['plugin_ai_scope_configure_action', 'Настроить'],

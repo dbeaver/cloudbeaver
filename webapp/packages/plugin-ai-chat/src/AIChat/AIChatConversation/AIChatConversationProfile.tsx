@@ -16,16 +16,20 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { AIProfileCredentialsService, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
-import type { AIChatConversationInfo } from '../AIChatConversationsResource.js';
-import { AIChatConversationsService } from '../AIChatConversationsService.js';
+import type { AIChatConversationInfo } from './AIChatConversationsResource.js';
+import { AIChatConversationsService } from './AIChatConversationsService.js';
 
-interface Props {
+export interface IAIChatConversationProfileProps {
   conversation: AIChatConversationInfo;
   profiles: AIProfile[];
   disabled?: boolean;
 }
 
-export const AIChatConversationProfile = observer<Props>(function AIChatConversationProfile({ conversation, profiles, disabled }) {
+export const AIChatConversationProfile = observer<IAIChatConversationProfileProps>(function AIChatConversationProfile({
+  conversation,
+  profiles,
+  disabled,
+}) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const aiChatConversationsService = useService(AIChatConversationsService);

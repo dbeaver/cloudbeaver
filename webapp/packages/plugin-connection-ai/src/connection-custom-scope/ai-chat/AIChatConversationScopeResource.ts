@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, resourceKeyList, ResourceKeyUtils, type ResourceKey } from '@cloudbeaver/core-resource';
 import { type AiDatabaseScope, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { AIChatConversationsResource } from './AIChatConversationsResource.js';
+import { AIChatConversationsResource } from '@cloudbeaver/plugin-ai-chat';
 
 export interface IAIChatConversationScope {
   id: string;

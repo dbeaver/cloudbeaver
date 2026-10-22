@@ -14,7 +14,6 @@ import { useService } from '@cloudbeaver/core-di';
 import { useTab, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormAiService } from './ConnectionFormAiService.js';
-import { ConnectionAiScope } from './ConnectionAiScope.js';
 
 export const ConnectionAiForm: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAiForm({ tabId, formState }) {
   const translate = useTranslate();
@@ -39,14 +38,11 @@ export const ConnectionAiForm: TabContainerPanelComponent<IConnectionFormProps> 
           label={translate('plugin_connection_form_ai_form_transfer_enabled')}
         />
         {selected && (
-          <>
-            <ConnectionAiScope formState={formState} metaTransferConfirmed={aiPart.state.metaTransferConfirmed ?? false} />
-            <Placeholder
-              container={connectionFormAiService.optionsContainer}
-              formState={formState}
-              metaTransferConfirmed={aiPart.state.metaTransferConfirmed ?? false}
-            />
-          </>
+          <Placeholder
+            container={connectionFormAiService.optionsContainer}
+            formState={formState}
+            metaTransferConfirmed={aiPart.state.metaTransferConfirmed ?? false}
+          />
         )}
       </ConnectionSectionWrapper>
     </div>

@@ -7,37 +7,38 @@
  */
 
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
-import { AIChatConversationsService } from '@cloudbeaver/plugin-ai-chat';
+import { AIChatConversationsService, type AIChatConversationInfo } from '@cloudbeaver/plugin-ai-chat';
 
-import { ConnectionInfoAiResource } from '../ConnectionInfoAiResource.js';
-import { AiScopeDialog } from './AiScopeDialogLazy.js';
+import { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
+import { AiScopeDialog } from '../AiScopeDialogLazy.js';
+import { AIChatConversationScopeResource } from './AIChatConversationScopeResource.js';
 
-@injectable(() => [AIChatConversationsService, ConnectionsManagerService, ConnectionInfoAiResource, CommonDialogService])
-export class AIChatScopeBootstrap extends Bootstrap {
+@injectable(() => [
+  AIChatConversationsService,
+  ConnectionsManagerService,
+  ConnectionInfoAiResource,
+  CommonDialogService,
+  AIChatConversationScopeResource,
+])
+export class AIChatScopeService {
   constructor(
     private readonly aiChatConversationsService: AIChatConversationsService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly connectionInfoAiResource: ConnectionInfoAiResource,
     private readonly commonDialogService: CommonDialogService,
-  ) {
-    super();
-  }
+    private readonly aiChatConversationScopeResource: AIChatConversationScopeResource,
+  ) {}
 
-  override register(): void {
-    this.aiChatConversationsService.onScopeSelect.addHandler(async ({ conversation, scope }, contexts) => {
-      if (scope !== AiDatabaseScope.Custom) {
-        return;
-      }
-
+  async selectScope(conversation: AIChatConversationInfo, scope: AiDatabaseScope): Promise<void> {
+    if (scope === AiDatabaseScope.Custom) {
       const key = conversation.dataSourceId;
       const connection = key ? await this.connectionsManagerService.requireConnection(key) : null;
+
       if (!key || !connection) {
-        ExecutorInterrupter.interrupt(contexts);
         return;
       }
 
@@ -50,13 +51,14 @@ export class AIChatScopeBootstrap extends Bootstrap {
       });
 
       if (status !== DialogueStateResult.Resolved) {
-        ExecutorInterrupter.interrupt(contexts);
         return;
       }
 
       await this.aiChatConversationsService.updateConversation(conversation.id, {
         settings: { customObjectIds: result },
       });
-    });
+    }
+
+    await this.aiChatConversationScopeResource.updateScope(conversation.id, scope);
   }
 }
