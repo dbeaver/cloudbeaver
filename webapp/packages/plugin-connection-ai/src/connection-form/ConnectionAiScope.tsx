@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2019-2026 DBeaver Corp
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,11 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
   const previewIds = selectedIds.slice(0, 3);
   const remaining = selectedIds.length - previewIds.length;
   const showSelection = !!options.connectionKey && part.isLoaded() && !part.isError();
-  const active = showSelection && metaTransferConfirmed && (!custom || selectedIds.length > 0);
-  const title = translate(custom ? 'plugin_ai_scope_custom' : 'plugin_ai_scope_title');
+  const active = showSelection && metaTransferConfirmed && selectedIds.length > 0;
+  const title = translate(active ? 'plugin_ai_scope_custom_active' : 'plugin_ai_scope_custom');
   let count: number | string = '—';
   if (showSelection) {
-    count = custom ? selectedIds.length : '∞';
+    count = selectedIds.length;
   }
   let summary = '';
   if (!options.connectionKey) {
@@ -53,7 +53,7 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
     summary = translate('ui_processing_loading');
   } else if (showSelection) {
     if (!custom) {
-      summary = translate('plugin_ai_scope_all');
+      summary = translate('plugin_ai_scope_not_set');
     } else if (selectedIds.length === 0) {
       summary = translate('plugin_ai_scope_empty');
     } else {
@@ -88,7 +88,7 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
 
   function clear() {
     runInAction(() => {
-      part.state.scope = AiDatabaseScope.Custom;
+      part.state.scope = AiDatabaseScope.CurrentDatasource;
       part.state.customObjectIds = [];
     });
   }
@@ -121,15 +121,21 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
   }
 
   return (
-    <SelectionSummary
-      title={title}
-      summary={summary}
-      count={count}
-      countLabel={custom ? `${translate('plugin_ai_scope_selected')}: ${selectedIds.length}` : translate('plugin_ai_scope_all')}
-      hint={showSelection && part.isChanged ? translate('plugin_ai_scope_unsaved') : undefined}
-      active={active}
-      clearAction={{ label: translate('ui_clear'), disabled: disabled || (custom && selectedIds.length === 0), onClick: clear }}
-      editAction={{ label: translate('ui_edit'), disabled, onClick: configure }}
-    />
+    <div className="theme-border-color-background tw:ml-2 tw:min-w-0 tw:border-l-2 tw:pl-5 tw:flex tw:flex-col tw:gap-3">
+      <SelectionSummary
+        title={title}
+        summary={summary}
+        count={custom ? count : undefined}
+        countLabel={`${translate('plugin_ai_scope_selected')}: ${selectedIds.length}`}
+        active={active}
+        clearAction={custom ? { label: translate('ui_clear'), disabled, onClick: clear } : undefined}
+        editAction={{ label: translate(custom ? 'ui_edit' : 'plugin_ai_scope_configure_action'), disabled, onClick: configure }}
+      />
+      {showSelection && part.isChanged && (
+        <div className="tw:text-xs tw:text-(--theme-text-hint-on-light)" role="status">
+          {translate('plugin_ai_scope_unsaved')}
+        </div>
+      )}
+    </div>
   );
 });

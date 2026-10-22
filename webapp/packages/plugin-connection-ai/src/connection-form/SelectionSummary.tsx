@@ -19,11 +19,11 @@ interface SummaryAction {
 interface Props {
   title: string;
   summary: string;
-  count: number | string;
+  count?: number | string;
   countLabel: string;
   hint?: string;
   active?: boolean;
-  clearAction: SummaryAction;
+  clearAction?: SummaryAction;
   editAction: SummaryAction;
 }
 
@@ -32,29 +32,31 @@ export function SelectionSummary({ title, summary, count, countLabel, hint, acti
   const summaryId = useId();
 
   return (
-    <div className="theme-border-color-background tw:ml-2 tw:min-w-0 tw:border-l-2 tw:pl-5">
-      <section
-        aria-labelledby={titleId}
-        className={`${active ? 'theme-border-color-primary' : 'theme-border-color-background'} tw:flex tw:min-w-0 tw:items-center tw:gap-4 tw:rounded-md tw:border tw:p-4 tw:flex-wrap`}
-      >
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:basis-56 tw:items-center tw:gap-4" role="status">
+    <section
+      aria-labelledby={titleId}
+      className={`${active ? 'theme-border-color-primary tw:bg-[color-mix(in_srgb,var(--theme-primary)_5%,transparent)]' : 'theme-border-color-background'} ${count === undefined ? 'tw:border-dashed' : ''} tw:flex tw:min-w-0 tw:items-center tw:gap-4 tw:rounded-md tw:border tw:p-4 tw:flex-wrap`}
+    >
+      <div className="tw:flex tw:min-w-0 tw:flex-1 tw:basis-56 tw:items-center tw:gap-4" role="status">
+        {count !== undefined && (
           <div
             className="tw:flex tw:h-8 tw:min-w-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-(--theme-primary) tw:px-1 tw:text-(--theme-on-primary) tw:font-semibold"
             aria-label={countLabel}
           >
             {count}
           </div>
-          <div className="tw:min-w-0 tw:flex-1">
-            <div id={titleId} className="tw:font-semibold">
-              {title}
-            </div>
-            <div id={summaryId} title={summary} className="tw:mt-1 tw:truncate tw:text-(--theme-text-hint-on-light)">
-              {summary}
-            </div>
-            {hint && <div className="tw:mt-1 tw:text-xs tw:text-(--theme-text-hint-on-light)">{hint}</div>}
+        )}
+        <div className="tw:min-w-0 tw:flex-1">
+          <div id={titleId} className="tw:font-semibold">
+            {title}
           </div>
+          <div id={summaryId} title={summary} className="tw:mt-1 tw:truncate tw:text-(--theme-text-hint-on-light)">
+            {summary}
+          </div>
+          {hint && <div className="tw:mt-1 tw:text-xs tw:text-(--theme-text-hint-on-light)">{hint}</div>}
         </div>
-        <div className="tw:ml-auto tw:flex tw:shrink-0 tw:items-center tw:gap-2">
+      </div>
+      <div className="tw:ml-auto tw:flex tw:shrink-0 tw:items-center tw:gap-2">
+        {clearAction && (
           <Button
             className="tw:uppercase"
             type="button"
@@ -65,19 +67,19 @@ export function SelectionSummary({ title, summary, count, countLabel, hint, acti
           >
             {clearAction.label}
           </Button>
-          <Button
-            className="theme-border-color-primary theme-text-primary tw:uppercase"
-            type="button"
-            variant="secondary"
-            disabled={editAction.disabled}
-            aria-describedby={summaryId}
-            loader
-            onClick={editAction.onClick}
-          >
-            {editAction.label}
-          </Button>
-        </div>
-      </section>
-    </div>
+        )}
+        <Button
+          className="theme-border-color-primary theme-text-primary tw:uppercase"
+          type="button"
+          variant="secondary"
+          disabled={editAction.disabled}
+          aria-describedby={summaryId}
+          loader
+          onClick={editAction.onClick}
+        >
+          {editAction.label}
+        </Button>
+      </div>
+    </section>
   );
 }
