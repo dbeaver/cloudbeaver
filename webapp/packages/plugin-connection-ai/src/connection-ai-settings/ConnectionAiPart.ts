@@ -12,11 +12,10 @@ import type { ConnectionInfoAiResource } from '../ConnectionInfoAiResource.js';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { AiDataSourceSettingsInput } from '@cloudbeaver/core-sdk';
 
-type ConnectionAiPartState = AiDataSourceSettingsInput;
+type ConnectionAiPartState = Pick<AiDataSourceSettingsInput, 'metaTransferConfirmed'>;
 
 function defaultStateGetter(): ConnectionAiPartState {
   return {
-    mcpEnabled: false,
     metaTransferConfirmed: false,
   };
 }
