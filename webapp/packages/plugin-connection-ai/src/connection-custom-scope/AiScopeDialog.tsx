@@ -72,7 +72,6 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
   });
   const selection = useAiScopeSelection({
     selectedIds: payload.selectedIds.filter(isAllowed),
-    allObjects: false,
     getParents: id => navNodeInfoResource.getParents(id),
     canSelect: id => isAllowed(id) && isScopeObject(navNodeInfoResource.get(id)),
   });

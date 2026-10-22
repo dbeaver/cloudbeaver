@@ -15,15 +15,12 @@ import type { INodeSelection, ITreeCheckboxSelection } from '@cloudbeaver/plugin
 
 interface Options {
   selectedIds: string[];
-  allObjects: boolean;
   getParents(id: string): string[];
   canSelect(id: string): boolean;
 }
 
 interface IAiScopeSelection extends ITreeCheckboxSelection {
   readonly selectedIds: ObservableSet<string>;
-  allObjects: boolean;
-  setAllObjects(value: boolean): void;
   isInherited(id: string): boolean;
 }
 
@@ -47,12 +44,8 @@ export function useAiScopeSelection(options: Options): Readonly<IAiScopeSelectio
       type: 'checkbox',
       selectionState,
       selectedIds: observable.set(optionsRef.selectedIds),
-      allObjects: optionsRef.allObjects,
-      setAllObjects(value: boolean): void {
-        this.allObjects = value;
-      },
       isInherited(id: string): boolean {
-        return this.allObjects || optionsRef.getParents(id).some(parent => this.selectedIds.has(parent));
+        return optionsRef.getParents(id).some(parent => this.selectedIds.has(parent));
       },
       isSelected(id: string): boolean {
         return this.selectedIds.has(id) || this.isInherited(id);
@@ -71,13 +64,14 @@ export function useAiScopeSelection(options: Options): Readonly<IAiScopeSelectio
       },
       clear(): void {
         this.selectedIds.clear();
-        this.allObjects = false;
       },
       selectAll(): void {
-        this.allObjects = true;
+        for (const id of selectionState.keys()) {
+          this.select(id, true);
+        }
       },
     }),
-    { allObjects: observable.ref, setAllObjects: action.bound, select: action.bound, clear: action.bound, selectAll: action.bound },
+    { select: action.bound, clear: action.bound, selectAll: action.bound },
     false,
     ['getSelection', 'isSelected', 'isInherited'],
   );
