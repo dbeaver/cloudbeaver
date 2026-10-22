@@ -12,6 +12,8 @@ export { AIChatSettingsService } from './AIChatSettingsService.js';
 
 export * from './AIChat/AIChatService.js';
 export * from './AIChat/AIChatConversation/AIChatConversationsService.js';
+export * from './AIChat/AIChatConversation/AIChatConversationsResource.js';
+export * from './AIChat/AIChatConversation/AIChatConversationMenuService.js';
 export * from './AIChat/AIChatContext/AIChatContextService.js';
 export * from './AIChat/AIChatMessage/AIChatMessageService.js';
 export * from './AIChat/AIChatMessage/AIChatMessagesResource.js';

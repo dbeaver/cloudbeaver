@@ -14,7 +14,6 @@ import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { AiDatabaseScope } from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AIDefaultProfileService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import {
   AIChatConversationsResource,
@@ -30,21 +29,13 @@ import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.
 
 type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
-@injectable(() => [
-  AIChatContextService,
-  AIChatConversationsResource,
-  AIChatConversationScopeResource,
-  AIChatMessagesResource,
-  AIDefaultProfileService,
-  AIProfilesResource,
-  NotificationService,
-])
+@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatConversationScopeResource, AIChatMessagesResource, NotificationService])
 export class AIChatConversationsService {
   readonly onNewConversation: Executor<NewConversationExecutorData>;
 
-  get profileSaving(): boolean {
-    return this.savingProfile;
-  }
+  readonly onBeforeCreateConversation = new Executor<AIChatConversationConfig>();
+  readonly onSelectConversation = new Executor<AIChatConversationInfo>();
+  readonly onReuseConversation = new Executor<{ conversation: AIChatConversationInfo }>();
 
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
@@ -70,15 +61,12 @@ export class AIChatConversationsService {
   }
 
   private conversationId: string | null;
-  private savingProfile = false;
 
   constructor(
     private readonly aiChatContextService: AIChatContextService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
     private readonly aiChatConversationScopeResource: AIChatConversationScopeResource,
     private readonly aiChatMessagesResource: AIChatMessagesResource,
-    private readonly aiDefaultProfileService: AIDefaultProfileService,
-    private readonly aiProfilesResource: AIProfilesResource,
     private readonly notificationService: NotificationService,
   ) {
     this.onNewConversation = new Executor();
@@ -92,13 +80,11 @@ export class AIChatConversationsService {
       }
     });
 
-    makeObservable<this, 'conversationId' | 'savingProfile'>(this, {
+    makeObservable<this, 'conversationId'>(this, {
       conversationId: observable.ref,
       currentConversationId: computed,
       defaultConversation: computed,
       processing: computed,
-      savingProfile: observable,
-      profileSaving: computed,
     });
   }
 
@@ -112,10 +98,7 @@ export class AIChatConversationsService {
       if (!conversation) {
         return;
       }
-      const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
-      if (profile && (!conversation.profile || !this.aiProfilesResource.has(conversation.profile))) {
-        await this.updateConversation(selectedId, { settings: { profile: profile.id } });
-      }
+      await this.onSelectConversation.execute(conversation);
     }
   }
 
@@ -133,20 +116,10 @@ export class AIChatConversationsService {
     return result;
   }
 
-  async updateConversationProfile(conversationId: string, profileId: string): Promise<AIChatConversationInfo> {
-    this.savingProfile = true;
-    try {
-      const conversation = await this.aiChatConversationsResource.updateConversation(conversationId, { settings: { profile: profileId } });
-      await this.aiDefaultProfileService.setDefaultProfile(profileId);
-      return conversation;
-    } finally {
-      this.savingProfile = false;
-    }
-  }
-
   async createConversation(key: IConnectionInfoParams | null, generatorId?: EAIConversationPromptGeneratorId): Promise<AIChatConversationInfo> {
-    const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
-    const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId, profile?.id);
+    const config: AIChatConversationConfig = {};
+    await this.onBeforeCreateConversation.execute(config);
+    const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId, config);
     this.conversationId = conversation.id;
     return conversation;
   }
@@ -161,10 +134,9 @@ export class AIChatConversationsService {
     const emptyConversation = await this.getEmptyConversation(this.currentConversationId);
     let conversation = emptyConversation;
     if (conversation) {
-      const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
-      if (profile && conversation.profile !== profile.id) {
-        conversation = await this.updateConversation(conversation.id, { settings: { profile: profile.id } });
-      }
+      const data = { conversation };
+      await this.onReuseConversation.execute(data);
+      conversation = data.conversation;
     } else {
       conversation = await this.createConversation(key);
     }

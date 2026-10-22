@@ -14,25 +14,23 @@ import { useService } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { AIProfileCredentialsService, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfileCredentialsService, AIProfilesResource, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
+import type { IAIChatConversationMenuProps } from '@cloudbeaver/plugin-ai-chat';
 
-import type { AIChatConversationInfo } from '../AIChatConversationsResource.js';
-import { AIChatConversationsService } from '../AIChatConversationsService.js';
+import { AIChatConversationProfileService } from './AIChatConversationProfileService.js';
 
-interface Props {
-  conversation: AIChatConversationInfo;
-  profiles: AIProfile[];
-  disabled?: boolean;
-}
-
-export const AIChatConversationProfile = observer<Props>(function AIChatConversationProfile({ conversation, profiles, disabled }) {
+export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(function AIChatConversationProfile({ conversation, disabled }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const aiChatConversationsService = useService(AIChatConversationsService);
+  const aiChatConversationProfileService = useService(AIChatConversationProfileService);
   const aiProfileCredentialsService = useService(AIProfileCredentialsService);
   const menu = useMenuContext();
   const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
-  const isDisabled = disabled || aiChatConversationsService.profileSaving;
+  const aiProfilesResource = useResource(AIChatConversationProfile, AIProfilesResource, CachedMapAllKey);
+  const profiles = aiProfilesResource.data.filter(isNotNullDefined);
+  const isDisabled = disabled || aiChatConversationProfileService.saving;
 
   async function selectProfile(profile: AIProfile) {
     try {
@@ -51,7 +49,7 @@ export const AIChatConversationProfile = observer<Props>(function AIChatConversa
 
   async function updateProfile(profileId: string): Promise<void> {
     try {
-      await aiChatConversationsService.updateConversationProfile(conversation.id, profileId);
+      await aiChatConversationProfileService.updateConversationProfile(conversation.id, profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
     }

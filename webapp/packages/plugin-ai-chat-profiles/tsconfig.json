@@ -1,0 +1,60 @@
+{
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
+      "path": "../../common-react/@dbeaver/ui-kit"
+    },
+    {
+      "path": "../../common-typescript/@dbeaver/cli"
+    },
+    {
+      "path": "../../common-typescript/@dbeaver/js-helpers"
+    },
+    {
+      "path": "../core-blocks"
+    },
+    {
+      "path": "../core-cli"
+    },
+    {
+      "path": "../core-di"
+    },
+    {
+      "path": "../core-dialogs"
+    },
+    {
+      "path": "../core-events"
+    },
+    {
+      "path": "../core-executor"
+    },
+    {
+      "path": "../core-resource"
+    },
+    {
+      "path": "../plugin-ai"
+    },
+    {
+      "path": "../plugin-ai-chat"
+    },
+    {
+      "path": "../plugin-ai-profiles"
+    }
+  ],
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "name": "@cloudbeaver/plugin-ai-chat-profiles",
+  "type": "module",
+  "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
+    "src/**/*.css",
+    "public/**/*"
+  ],
+  "version": "0.1.0",
+  "description": "AI profile integration for chat",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./lib/index.js",
+    "./module": "./lib/module.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf --glob lib",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "test": "dbeaver-test",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-dialogs": "workspace:*",
+    "@cloudbeaver/core-events": "workspace:*",
+    "@cloudbeaver/core-executor": "workspace:*",
+    "@cloudbeaver/core-resource": "workspace:*",
+    "@cloudbeaver/plugin-ai": "workspace:*",
+    "@cloudbeaver/plugin-ai-chat": "workspace:*",
+    "@cloudbeaver/plugin-ai-profiles": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:*",
+    "mobx": "^6",
+    "mobx-react-lite": "^4",
+    "react": "^19",
+    "react-dom": "^19",
+    "tslib": "^2"
+  },
+  "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:*",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "rimraf": "^6",
+    "typescript": "^5",
+    "vitest": "^4"
+  }
+}
