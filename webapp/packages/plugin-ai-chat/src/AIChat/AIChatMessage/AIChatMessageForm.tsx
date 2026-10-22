@@ -18,7 +18,6 @@ import { Command } from '@dbeaver/ui-kit';
 import { AIChatMessageService } from './AIChatMessageService.js';
 import { AIChatConversationsService } from '../AIChatConversation/AIChatConversationsService.js';
 import { AIChatContext } from '../AIChatContext.js';
-import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 import classes from './AIChatMessageForm.module.css';
 
 interface Props {
@@ -32,7 +31,6 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const notificationService = useService(NotificationService);
   const aiChatMessageService = useService(AIChatMessageService);
   const aiChatConversationsService = useService(AIChatConversationsService);
-  const aiChatConversationsResource = useService(AIChatConversationsResource);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -72,7 +70,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   async function cancel() {
     if (currentConversationId) {
       try {
-        await aiChatConversationsResource.cancelConversation(currentConversationId);
+        await aiChatConversationsService.cancelConversation(currentConversationId);
       } catch (exception: any) {
         notificationService.logException(exception, 'plugin_ai_chat_conversation_cancel_failed');
       }
