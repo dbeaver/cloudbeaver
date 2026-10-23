@@ -158,10 +158,10 @@
       "path": "../plugin-connection-administration"
     },
     {
-      "path": "../plugin-connection-custom"
+      "path": "../plugin-connection-ai"
     },
     {
-      "path": "../plugin-connection-form-ai"
+      "path": "../plugin-connection-custom"
     },
     {
       "path": "../plugin-connection-network-handlers"

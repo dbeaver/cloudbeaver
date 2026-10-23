@@ -60,15 +60,15 @@ public class WebAIDataSourceSettings {
 
     @NotNull
     @Property
-    public List<String> getExcludedObjectIds() {
-        String[] excludedObjectIds = settings.getExcludedObjectIds();
-        if (excludedObjectIds == null || excludedObjectIds.length == 0) {
+    public List<String> getCustomObjectIds() {
+        String[] customObjectIds = settings.getCustomObjectIds();
+        if (customObjectIds == null || customObjectIds.length == 0) {
             return List.of();
         }
         return WebAIUtils.convertObjectIdsToNodePaths(
             webSession.getProgressMonitor(),
             settings.getDataSourceContainer().getProject(),
-            excludedObjectIds
+            customObjectIds
         );
     }
 

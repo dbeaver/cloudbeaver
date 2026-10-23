@@ -46,7 +46,6 @@ import org.jkiss.dbeaver.model.ai.engine.*;
 import org.jkiss.dbeaver.model.ai.internal.AIChatMessages;
 import org.jkiss.dbeaver.model.ai.prompt.AIPromptGenerateSql;
 import org.jkiss.dbeaver.model.ai.registry.*;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.logical.DBSLogicalDataSource;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -497,12 +496,6 @@ public class WebServiceAI implements DBWServiceAI {
     ) throws DBWebException {
         DBPDataSourceContainer dataSourceContainer = getDataSource(webSession, dataSourceId);
         AIContextSettingsDataSource aiSettings = new AIContextSettingsDataSource(dataSourceContainer);
-        String[] excludedObjectIds = settingsInput.excludedObjectIds() == null ? null :
-            WebAIUtils.convertNodePathsToObjectIds(
-                webSession,
-                dataSourceContainer.getProject(),
-                settingsInput.excludedObjectIds()
-            );
         if (settingsInput.mcpEnabled() != null) {
             aiSettings.setMcpEnabled(settingsInput.mcpEnabled());
         }
@@ -516,13 +509,10 @@ public class WebServiceAI implements DBWServiceAI {
             aiSettings.setCustomObjectIds(
                 WebAIUtils.convertNodePathsToObjectIds(
                     webSession,
-                    dataSourceContainer.getProject(),
+                    dataSourceContainer,
                     settingsInput.customObjectIds()
                 )
             );
-        }
-        if (excludedObjectIds != null) {
-            aiSettings.setExcludedObjectIds(excludedObjectIds);
         }
         aiSettings.saveSettings();
         String userOrigin = ServletAppUtils.getOriginFromRequest(request);
@@ -849,9 +839,13 @@ public class WebServiceAI implements DBWServiceAI {
             settings.setScope(settingsInput.scope());
         }
         if (settingsInput.customObjectIds() != null) {
-            DBPProject project = conversation.getDataSource() == null ? null : conversation.getDataSource().getProject();
-            if (project != null) {
-                settings.setCustomObjectIds(WebAIUtils.convertNodePathsToObjectIds(webSession, project, settingsInput.customObjectIds()));
+            DBPDataSourceContainer dataSource = conversation.getDataSource();
+            if (dataSource != null) {
+                settings.setCustomObjectIds(WebAIUtils.convertNodePathsToObjectIds(
+                    webSession,
+                    dataSource,
+                    settingsInput.customObjectIds()
+                ));
             }
         }
         try {
