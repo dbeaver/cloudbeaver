@@ -27,10 +27,6 @@ import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.
 
 type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
-export type AIChatActionsProps = {
-  conversation: AIChatConversationInfo;
-};
-
 export interface IAIChatConversationMenuProps {
   conversation: AIChatConversationInfo;
   disabled?: boolean;
@@ -38,7 +34,6 @@ export interface IAIChatConversationMenuProps {
 
 @injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource])
 export class AIChatConversationsService {
-  readonly actions = new PlaceholderContainer<AIChatActionsProps>();
   readonly menuSections = new PlaceholderContainer<IAIChatConversationMenuProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
 
