@@ -9,22 +9,19 @@
 import { observer } from 'mobx-react-lite';
 import { Suspense, useContext } from 'react';
 
-import { ActionIconButton, Fill, Loader, RenameDialog, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Fill, Loader, Placeholder, RenameDialog, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { Command } from '@dbeaver/ui-kit';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 
 import { AIChatContextManager } from './AIChatContext/AIChatContextManager.js';
 import { AIChatConversationsResource, type AIChatConversationInfo } from './AIChatConversation/AIChatConversationsResource.js';
 import { AIChatConversationsService } from './AIChatConversation/AIChatConversationsService.js';
 import { AIChatConversationsHistory } from './AIChatConversationsHistory.js';
 import { AIChatContext } from './AIChatContext.js';
-import { AIChatConversationScope } from './AIChatConversation/AIChatConversationScope/AIChatConversationScope.js';
 import { AIChatConversationType } from './AIChatConversation/AIChatConversationType.js';
 import { AISettings } from './AISettings.js';
 import classes from './AIChatHeader.module.css';
-import { EAIConversationPromptGeneratorId } from '../EAIConversationPromptGeneratorId.js';
 
 interface Props {
   currentConversationId: string | null;
@@ -40,8 +37,6 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
   const aiChatConversationResource = useResource(AIChatHeader, AIChatConversationsResource, currentConversationId);
   const currentConversation = aiChatConversationResource.data;
 
-  const connectionInfoResource = useResource(AIChatHeader, ConnectionInfoResource, currentConversation?.dataSourceId ?? null);
-
   async function newConversation() {
     await aiChatConversationsService.newConversation(context.connectionKey ?? null);
   }
@@ -55,10 +50,6 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
   }
 
   const disabled = context.disabled;
-  const isScope =
-    currentConversation &&
-    currentConversation.promptGeneratorId !== EAIConversationPromptGeneratorId.OBJECT_DESCRIBE &&
-    connectionInfoResource.data?.connected;
 
   return (
     <div className={s(styles, { container: true })}>
@@ -66,9 +57,9 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
         <AIChatContextManager disabled={disabled} />
 
         <div className="tw:flex tw:items-center">
-          {isScope && (
+          {currentConversation && (
             <Suspense fallback={<Loader className="tw:h-7 tw:w-7" small />}>
-              <AIChatConversationScope conversation={currentConversation} catalog={context.catalog} schema={context.schema} disabled={disabled} />
+              <Placeholder container={aiChatConversationsService.actions} conversation={currentConversation} />
             </Suspense>
           )}
           <AISettings />
@@ -77,11 +68,7 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
 
       <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
         {currentConversation && (
-          <Command
-            className={s(styles, { title: true })}
-            title={currentConversation.caption}
-            onClick={() => updateCaption(currentConversation)}
-          >
+          <Command className={s(styles, { title: true })} title={currentConversation.caption} onClick={() => updateCaption(currentConversation)}>
             <AIChatConversationType conversation={currentConversation} />
             <span className="tw:truncate">{currentConversation.caption}</span>
           </Command>

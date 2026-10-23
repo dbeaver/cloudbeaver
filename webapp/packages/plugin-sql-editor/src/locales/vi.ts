@@ -1,4 +1,12 @@
 export default [
+  ['sql_editor_settings_blank_line_delimiter_name', 'Dòng trống là dấu phân cách câu lệnh'],
+  [
+    'sql_editor_settings_blank_line_delimiter_desc',
+    'Xác định xem dòng trống có phân cách các câu lệnh SQL hay không. Chọn “Không bao giờ” để cho phép dòng trống bên trong câu lệnh.',
+  ],
+  ['sql_editor_settings_blank_line_delimiter_always', 'Luôn luôn'],
+  ['sql_editor_settings_blank_line_delimiter_never', 'Không bao giờ'],
+  ['sql_editor_settings_blank_line_delimiter_smart', 'Thông minh'],
   ['plugin_sql_editor_sql_editor_settings_group', 'Trình Soạn Thảo SQL'],
   ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
   ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],

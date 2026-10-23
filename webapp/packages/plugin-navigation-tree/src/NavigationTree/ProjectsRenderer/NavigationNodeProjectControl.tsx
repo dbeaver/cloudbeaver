@@ -39,12 +39,16 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
 
     function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
       EventContext.set(event, EventStopPropagationFlag);
-      treeNodeContext.select();
+      if (!treeNodeContext.selected) {
+        treeNodeContext.select();
+      }
     }
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
       contextMenuPosition.open(event);
-      treeNodeContext.select();
+      if (!treeNodeContext.selected) {
+        treeNodeContext.select();
+      }
     }
 
     function handleClick(event: React.MouseEvent<HTMLDivElement>) {
