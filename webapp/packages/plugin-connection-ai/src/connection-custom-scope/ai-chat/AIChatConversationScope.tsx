@@ -18,7 +18,7 @@ import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
 
-import { AIChatConversationMenuService, AIChatConversationsService, AIChatContext, type AIChatActionsProps } from '@cloudbeaver/plugin-ai-chat';
+import { AIChatConversationsService, AIChatContext, type AIChatActionsProps } from '@cloudbeaver/plugin-ai-chat';
 
 import { AIChatConversationScopeResource } from './AIChatConversationScopeResource.js';
 import { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
@@ -38,7 +38,6 @@ export const AIChatConversationScope = observer<AIChatActionsProps>(function AIC
   const connectionInfoAiResource = useService(ConnectionInfoAiResource);
   const commonDialogService = useService(CommonDialogService);
   const aiChatConversationsService = useService(AIChatConversationsService);
-  const aiChatConversationMenuService = useService(AIChatConversationMenuService);
   const aiChatConversationScopeResource = useService(AIChatConversationScopeResource);
 
   const { data: container } = useResource(AIChatConversationScope, ContainerResource, conversation.dataSourceId ?? null);
@@ -132,7 +131,7 @@ export const AIChatConversationScope = observer<AIChatActionsProps>(function AIC
           })}
         </MenuGroup>
 
-        <Placeholder container={aiChatConversationMenuService.sections} conversation={conversation} disabled={disabled} />
+        <Placeholder container={aiChatConversationsService.menuSections} conversation={conversation} disabled={disabled} />
       </Menu>
     </MenuProvider>
   );

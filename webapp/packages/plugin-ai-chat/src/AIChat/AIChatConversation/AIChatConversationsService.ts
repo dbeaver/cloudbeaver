@@ -31,9 +31,15 @@ export type AIChatActionsProps = {
   conversation: AIChatConversationInfo;
 };
 
+export interface IAIChatConversationMenuProps {
+  conversation: AIChatConversationInfo;
+  disabled?: boolean;
+}
+
 @injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource])
 export class AIChatConversationsService {
   readonly actions = new PlaceholderContainer<AIChatActionsProps>();
+  readonly menuSections = new PlaceholderContainer<IAIChatConversationMenuProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
 
   get defaultConversation(): AIChatConversationInfo | null {
@@ -102,7 +108,7 @@ export class AIChatConversationsService {
 
   async createConversation(key: IConnectionInfoParams | null, generatorId?: EAIConversationPromptGeneratorId): Promise<AIChatConversationInfo> {
     const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId);
-    this.conversationId = conversation.id;
+    this.selectConversation(conversation.id);
     return conversation;
   }
 

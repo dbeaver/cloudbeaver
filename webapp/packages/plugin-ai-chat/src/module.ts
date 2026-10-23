@@ -22,7 +22,6 @@ import { AIChatContextService } from './AIChat/AIChatContext/AIChatContextServic
 import { AIChatConversationMetricsResource } from './AIChat/AIChatConversation/AIChatConversationMetricsResource.js';
 import { AIChatFunctionsService } from './AIChatFunctionsService.js';
 import { AIFunctionsResource } from './AIFunctionsResource.js';
-import { AIChatConversationMenuService } from './AIChat/AIChatConversation/AIChatConversationMenuService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-chat',
@@ -35,7 +34,6 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(AIChatSettingsService))
       .addSingleton(Dependency, proxy(AIChatMessagesResource))
       .addSingleton(Dependency, proxy(AIChatConversationsResource))
-      .addSingleton(AIChatConversationMenuService)
       .addSingleton(AIChatContextService)
       .addSingleton(AIChatTabService)
       .addSingleton(AIChatSettingsService)
