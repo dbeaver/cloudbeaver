@@ -6,6 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
-
-export const AIChatConversationProfile = importLazyComponent(() => import('./AIChatConversationProfile.js').then(m => m.AIChatConversationProfile));
+import './module.js';

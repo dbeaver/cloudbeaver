@@ -12,6 +12,7 @@ import { AIProfileCredentialsService } from './AIProfileCredentials/AIProfileCre
 import { AIProfileAuthorizationService } from './AIProfileCredentials/AIProfileAuthorizationService.js';
 import { AIProfileCredentialsFormService } from './AIProfileCredentials/AIProfileCredentialsFormService.js';
 import { AIProfilesResource } from './AIProfilesResource.js';
+import { AIDefaultProfileService } from './AIDefaultProfileService.js';
 import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
@@ -22,6 +23,8 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Dependency, proxy(AIProfilesResource))
       .addSingleton(AIProfilesResource)
+      .addSingleton(Dependency, proxy(AIDefaultProfileService))
+      .addSingleton(AIDefaultProfileService)
       .addSingleton(AIProfileCredentialsFormService)
       .addSingleton(AIProfileAuthorizationService)
       .addSingleton(AIProfileCredentialsService);

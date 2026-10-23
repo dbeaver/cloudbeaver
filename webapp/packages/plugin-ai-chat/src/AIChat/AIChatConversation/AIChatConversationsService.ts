@@ -33,9 +33,15 @@ export type AIChatActionsProps = {
   conversation: AIChatConversationInfo;
 };
 
+export interface IAIChatConversationMenuProps {
+  conversation: AIChatConversationInfo;
+  disabled?: boolean;
+}
+
 @injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource])
 export class AIChatConversationsService {
   readonly actions = new PlaceholderContainer<AIChatActionsProps>();
+  readonly menuSections = new PlaceholderContainer<IAIChatConversationMenuProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
   readonly onCancelConversation: Executor<CancelConversationExecutorData>;
 
@@ -73,13 +79,11 @@ export class AIChatConversationsService {
     this.onCancelConversation = new Executor();
     this.conversationId = null;
 
-    this.aiChatContextService.onContextChange.addHandler(() => {
-      this.selectConversation(null);
-    });
+    this.aiChatContextService.onContextChange.addHandler(this.resetConversation.bind(this));
 
     this.aiChatConversationsResource.onItemDelete.addHandler(conversationId => {
       if (this.conversationId === conversationId) {
-        this.selectConversation(null);
+        this.resetConversation();
       }
     });
 
@@ -118,11 +122,6 @@ export class AIChatConversationsService {
     return conversation;
   }
 
-  async updateConversationProfile(conversationId: string, profileId: string): Promise<AIChatConversationInfo> {
-    const conversation = await this.aiChatConversationsResource.updateConversation(conversationId, { settings: { profile: profileId } });
-    return conversation;
-  }
-
   async createConversation(key: IConnectionInfoParams | null, generatorId?: EAIConversationPromptGeneratorId): Promise<AIChatConversationInfo> {
     const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId);
     this.selectConversation(conversation.id);
@@ -142,6 +141,10 @@ export class AIChatConversationsService {
     await this.onNewConversation.execute({ stage: 'after', data: conversation });
 
     return conversation;
+  }
+
+  private resetConversation(): void {
+    this.selectConversation(null);
   }
 
   private async getEmptyConversation(conversationId: string | null): Promise<AIChatConversationInfo | null> {

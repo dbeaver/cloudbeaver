@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
 import { MenuGroup, MenuGroupLabel, MenuItemRadio, useMenuContext } from '@dbeaver/ui-kit';
 import { ActionIconButton, IconOrImage, RadioIndicator, useResource, useTranslate } from '@cloudbeaver/core-blocks';
@@ -14,28 +15,24 @@ import { useService } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { AIProfileCredentialsService, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfileCredentialsService, AIProfilesResource, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
+import type { IAIChatConversationMenuProps } from '@cloudbeaver/plugin-ai-chat';
 
-import type { AIChatConversationInfo } from './AIChatConversationsResource.js';
-import { AIChatConversationsService } from './AIChatConversationsService.js';
+import { AIChatConversationProfileService } from './AIChatConversationProfileService.js';
 
-export interface IAIChatConversationProfileProps {
-  conversation: AIChatConversationInfo;
-  profiles: AIProfile[];
-  disabled?: boolean;
-}
-
-export const AIChatConversationProfile = observer<IAIChatConversationProfileProps>(function AIChatConversationProfile({
-  conversation,
-  profiles,
-  disabled,
-}) {
+export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(function AIChatConversationProfile({ conversation, disabled }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const aiChatConversationsService = useService(AIChatConversationsService);
+  const aiChatConversationProfileService = useService(AIChatConversationProfileService);
   const aiProfileCredentialsService = useService(AIProfileCredentialsService);
   const menu = useMenuContext();
   const aiEnginesResource = useResource(AIChatConversationProfile, AiEnginesResource, undefined);
+  const aiProfilesResource = useResource(AIChatConversationProfile, AIProfilesResource, CachedMapAllKey);
+  const profiles = aiProfilesResource.data.filter(isNotNullDefined);
+  const [saving, setSaving] = useState(false);
+  const isDisabled = disabled || saving;
 
   async function selectProfile(profile: AIProfile) {
     try {
@@ -53,10 +50,13 @@ export const AIChatConversationProfile = observer<IAIChatConversationProfileProp
   }
 
   async function updateProfile(profileId: string): Promise<void> {
+    setSaving(true);
     try {
-      await aiChatConversationsService.updateConversationProfile(conversation.id, profileId);
+      await aiChatConversationProfileService.updateConversationProfile(conversation.id, profileId);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -90,7 +90,7 @@ export const AIChatConversationProfile = observer<IAIChatConversationProfileProp
             aria-label={profile.name}
             title={profile.name}
             checked={isCurrent}
-            disabled={disabled}
+            disabled={isDisabled}
             className="tw:min-h-7"
             hideOnClick={false}
             onClick={() => selectProfile(profile)}
@@ -109,7 +109,7 @@ export const AIChatConversationProfile = observer<IAIChatConversationProfileProp
                 <ActionIconButton
                   aria-label={translate('plugin_ai_chat_profile_edit_credentials')}
                   title={translate('plugin_ai_chat_profile_edit_credentials')}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   name="edit"
                   viewBox="0 0 13 13"
                   onClick={event => {

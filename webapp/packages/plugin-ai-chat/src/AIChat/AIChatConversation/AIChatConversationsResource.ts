@@ -9,6 +9,7 @@
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { isConnectionInfoParamEqual, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { Executor } from '@cloudbeaver/core-executor';
 import {
   CachedMapResource,
   isResourceAlias,
@@ -18,7 +19,6 @@ import {
   type ResourceKey,
 } from '@cloudbeaver/core-resource';
 import { type AiChatConversationFragment, type AiChatConversationInput, GraphQLService } from '@cloudbeaver/core-sdk';
-import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import type { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
 
@@ -33,25 +33,18 @@ export const ChatConversationConnectionKey = resourceKeyListAliasFactory(
   }),
 );
 
-@injectable(() => [GraphQLService, UserInfoResource, AIProfilesResource])
+@injectable(() => [GraphQLService, UserInfoResource])
 export class AIChatConversationsResource extends CachedMapResource<string, AIChatConversationInfo> {
+  readonly onBeforeCreate = new Executor<AIChatConversationConfig>();
+
   constructor(
     private readonly graphQLService: GraphQLService,
     userInfoResource: UserInfoResource,
-    aiProfilesResource: AIProfilesResource,
   ) {
     super();
 
     userInfoResource.onUserChange.addHandler(() => {
       this.clear();
-    });
-
-    aiProfilesResource.onItemDelete.addHandler(key => {
-      const deletedProfileIds = ResourceKeyUtils.toArray(key);
-      const conversations = this.values.filter(conversation => conversation.profile && deletedProfileIds.includes(conversation.profile));
-      const conversationIds = conversations.map(conversation => conversation.id);
-
-      this.markOutdated(resourceKeyList(conversationIds));
     });
 
     this.aliases.add(ChatConversationConnectionKey, param =>
@@ -72,9 +65,12 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
   async createConversation(
     connectionKey: IConnectionInfoParams | null,
     generatorId?: EAIConversationPromptGeneratorId,
+    config: AIChatConversationConfig = {},
   ): Promise<AIChatConversationInfo> {
+    await this.onBeforeCreate.execute(config);
     const { conversation } = await this.graphQLService.sdk.createChatConversation({
       config: {
+        ...config,
         dataSourceId: connectionKey ?? undefined,
         promptGeneratorId: generatorId,
       },
