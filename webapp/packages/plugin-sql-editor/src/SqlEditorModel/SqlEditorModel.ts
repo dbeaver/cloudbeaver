@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ import { SqlEditorService } from '../SqlEditorService.js';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { computed, makeObservable, observable, reaction } from 'mobx';
 import { debouncePromise, memoizeLast } from '@dbeaver/js-helpers';
+import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 
 const ZERO_CURSOR: ISqlEditorCursor = { anchor: 0, head: 0 };
 
-@injectable(() => [SqlDataSourceService, SqlEditorService, NotificationService])
+@injectable(() => [SqlDataSourceService, SqlEditorService, NotificationService, SqlEditorSettingsService])
 export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposable implements ISqlEditorModel<TDataSource> {
   state: ISqlEditorTabState | null;
   get cursor(): ISqlEditorCursor {
@@ -45,8 +46,14 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
 
   readonly onUpdate: SyncExecutor;
 
-  private parserFn: (script: string, projectId: string, connectionId: string) => Promise<IQueryInfo[]>;
-  private getSqlQueryAtPos: typeof this.sqlEditorService.parseSQLQuery;
+  private parserFn: (script: string, projectId: string, connectionId: string, delimiterMode: string) => Promise<IQueryInfo[]>;
+  private getSqlQueryAtPos: (
+    projectId: string,
+    connectionId: string,
+    script: string,
+    position: number,
+    delimiterMode: string,
+  ) => Promise<IQueryInfo>;
   private dataSourceListener;
   private updateParserScriptsDebounced: typeof this.updateParserScripts;
 
@@ -54,11 +61,13 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorService: SqlEditorService,
     private readonly notificationService: NotificationService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
   ) {
     super();
     this.state = null;
     this.parser = new SQLParser();
     this.onUpdate = new SyncExecutor();
+    // Both caches include delimiterMode; the parsing methods ignore it because the server reads the preference.
     this.parserFn = (script, projectId, connectionId) =>
       this.sqlEditorService.parseSQLScript(projectId, connectionId, script).then(({ queries }) => queries);
 
@@ -107,7 +116,13 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
         return this.getQuery();
       }
 
-      const result = await this.getSqlQueryAtPos(projectId, connectionId, currentScript, this.cursor.anchor);
+      const result = await this.getSqlQueryAtPos(
+        projectId,
+        connectionId,
+        currentScript,
+        this.cursor.anchor,
+        this.sqlEditorSettingsService.blankLineDelimiter,
+      );
 
       if (currentScript !== this.parser.actualScript) {
         continue;
@@ -135,7 +150,7 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
     }
 
     try {
-      await this.parser.parse(this.parserFn, projectId, connectionId);
+      await this.parser.parse(this.parserFn, projectId, connectionId, this.sqlEditorSettingsService.blankLineDelimiter);
       this.onUpdate.execute();
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to parse SQL script');

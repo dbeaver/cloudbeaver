@@ -129,6 +129,10 @@ export class SqlEditorSettingsService {
     return this.settings.getValue('sql.parameter.enabled');
   }
 
+  get blankLineDelimiter(): SqlEditorSettings['script.sql.delimiter.blank'] {
+    return this.settings.getValue('script.sql.delimiter.blank');
+  }
+
   get variablesEnabled(): boolean {
     return this.settings.getValue('sql.variables.enabled');
   }
