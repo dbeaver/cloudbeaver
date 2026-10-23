@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -24,6 +25,9 @@ import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebObjectFeatureProviderDescriptor;
 import io.cloudbeaver.registry.WebObjectFeatureRegistry;
+import io.cloudbeaver.service.security.SMUtils;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
@@ -37,6 +41,8 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNUtils;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.utils.CommonUtils;
@@ -151,6 +157,22 @@ public class WebNavigatorNodeInfo {
     }
 
     @Property
+    public boolean isUserFiltered() throws DBWebException {
+        if (!(node instanceof DBNDatabaseNode dbNode)) {
+            return false;
+        }
+        try {
+            DBSObjectFilter filter = dbNode.getUserNodeFilter(
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
+                true
+            );
+            return filter != null && !filter.isNotApplicable();
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
+    }
+
+    @Property
     public boolean isHasChildren() {
         return node.hasChildren(true);
     }
@@ -215,13 +237,59 @@ public class WebNavigatorNodeInfo {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
         try {
-            DBSObjectFilter filter = dbNode.getNodeFilter(
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
-                true);
-            return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+            DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode);
+            if (hasDataSourceEditAccess(dbNode)) {
+                return getApplicableFilter(dbNode.getConnectionNodeFilter(itemsMeta, true));
+            }
+            DBSObjectFilter userFilter = getApplicableFilter(dbNode.getUserNodeFilter(itemsMeta, true));
+            if (userFilter != null) {
+                return userFilter;
+            }
+            return getApplicableFilter(dbNode.getConnectionNodeFilter(itemsMeta, true));
         } catch (DBException e) {
             throw new DBWebException(e);
         }
+    }
+
+    @Property
+    @Nullable
+    public DBSObjectFilter getConnectionFilter() throws DBWebException {
+        if (!(node instanceof DBNDatabaseNode dbNode)) {
+            return null;
+        }
+        try {
+            return getApplicableFilter(dbNode.getConnectionNodeFilter(
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
+                true));
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
+    }
+
+    @Property
+    @Nullable
+    public DBSObjectFilter getUserFilter() throws DBWebException {
+        if (!(node instanceof DBNDatabaseNode dbNode)) {
+            return null;
+        }
+        try {
+            return getApplicableFilter(dbNode.getUserNodeFilter(
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
+                true
+            ));
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
+    }
+
+    @Nullable
+    private static DBSObjectFilter getApplicableFilter(@Nullable DBSObjectFilter filter) {
+        return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+    }
+
+    private boolean hasDataSourceEditAccess(@NotNull DBNNode node) {
+        return node.getOwnerProject() instanceof BaseWebProjectImpl webProject &&
+            SMUtils.hasProjectPermission(session, webProject.getRMProject(), RMProjectPermission.DATA_SOURCES_EDIT);
     }
 
     @Override
