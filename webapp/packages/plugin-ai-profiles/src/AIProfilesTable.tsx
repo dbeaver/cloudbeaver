@@ -83,8 +83,8 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
       label: 'plugin_ai_profiles_scope',
       render: profile => (
         <div className="tw:flex tw:items-center tw:gap-2">
-          <span>{translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user')}</span>
           {profile.global && <IconOrImage icon="document-global" width={16} />}
+          <span>{translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user')}</span>
         </div>
       ),
     },
@@ -129,8 +129,8 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
       const title = engine?.name ?? profile.engineId;
       return (
         <div title={title} className="tw:flex tw:items-center tw:gap-2">
-          <span className="tw:truncate">{title}</span>
           {engine?.icon && <IconOrImage icon={engine.icon} width={16} />}
+          <span className="tw:truncate">{title}</span>
         </div>
       );
     }
