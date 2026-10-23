@@ -14,6 +14,10 @@
   border-radius: 8px;
   background: var(--theme-surface);
 
+  &:has(textarea[readonly]) {
+    background: var(--theme-input-background-readonly);
+  }
+
   &:focus-within {
     outline: 2px solid var(--theme-primary);
     outline-offset: -2px;
@@ -34,6 +38,7 @@
 }
 
 .textarea textarea {
+  --theme-input-background-readonly: transparent;
   border: none;
   resize: none;
   background: none;

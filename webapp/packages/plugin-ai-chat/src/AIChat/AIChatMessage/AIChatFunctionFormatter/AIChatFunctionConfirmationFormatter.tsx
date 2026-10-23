@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { type IAIFunctionConfirmationMessage } from '../AIChatMessagesResource.js';
 import { AIChatMessageService, EAiFunctionStatus } from '../AIChatMessageService.js';
-import { AIChatFunctionsService } from '../../../AIChatFunctionsService.js';
+import { AIChatFunctionRegistryService } from '../../../AIChatFunctionRegistryService.js';
 import { AIChatFunctionCalls } from './AIChatFunctionCalls.js';
 import { AIChatFunctionConfirmationActions } from './AIChatFunctionConfirmationActions.js';
 
@@ -28,7 +28,7 @@ const CONTAINER_CLASSES =
 export const AIChatFunctionConfirmationFormatter = observer<Props>(function AIChatFunctionConfirmationFormatter({ message }) {
   const translate = useTranslate();
   const aiChatMessageService = useService(AIChatMessageService);
-  const aiChatFunctionsService = useService(AIChatFunctionsService);
+  const aiChatFunctionRegistryService = useService(AIChatFunctionRegistryService);
 
   const calls = message.functionConfirmation?.functionCalls;
   const status = aiChatMessageService.getFunctionStatus(message);
@@ -37,8 +37,16 @@ export const AIChatFunctionConfirmationFormatter = observer<Props>(function AICh
     return null;
   }
 
+  const interactionCall = calls.find(call => aiChatFunctionRegistryService.isInteraction(call.functionName));
+
+  if (interactionCall && status === EAiFunctionStatus.PENDING) {
+    const { component: Component } = aiChatFunctionRegistryService.getInteraction(interactionCall.functionName);
+
+    return <Component key={message.id} message={message} functionCall={interactionCall} />;
+  }
+
   if (status === EAiFunctionStatus.REJECTED) {
-    const names = calls.map(call => aiChatFunctionsService.getFunction(call.functionName)?.name || call.functionName).join(', ');
+    const names = calls.map(call => aiChatFunctionRegistryService.getFunction(call.functionName)?.name || call.functionName).join(', ');
 
     return (
       <div className="tw:my-2">
@@ -69,7 +77,7 @@ export const AIChatFunctionConfirmationFormatter = observer<Props>(function AICh
 
   if (calls.length === 1) {
     const call = calls[0]!;
-    const func = aiChatFunctionsService.getFunction(call.functionName);
+    const func = aiChatFunctionRegistryService.getFunction(call.functionName);
     const name = func?.name || call.functionName;
 
     return (
