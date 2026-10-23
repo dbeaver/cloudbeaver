@@ -47,13 +47,7 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
   readonly onUpdate: SyncExecutor;
 
   private parserFn: (script: string, projectId: string, connectionId: string, delimiterMode: string) => Promise<IQueryInfo[]>;
-  private getSqlQueryAtPos: (
-    projectId: string,
-    connectionId: string,
-    script: string,
-    position: number,
-    delimiterMode: string,
-  ) => Promise<IQueryInfo>;
+  private getSqlQueryAtPos: (projectId: string, connectionId: string, script: string, position: number, delimiterMode: string) => Promise<IQueryInfo>;
   private dataSourceListener;
   private updateParserScriptsDebounced: typeof this.updateParserScripts;
 
@@ -67,7 +61,6 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
     this.state = null;
     this.parser = new SQLParser();
     this.onUpdate = new SyncExecutor();
-    // Both caches include delimiterMode; the parsing methods ignore it because the server reads the preference.
     this.parserFn = (script, projectId, connectionId) =>
       this.sqlEditorService.parseSQLScript(projectId, connectionId, script).then(({ queries }) => queries);
 
