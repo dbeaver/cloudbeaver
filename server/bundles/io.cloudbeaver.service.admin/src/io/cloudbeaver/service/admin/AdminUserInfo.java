@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
+import org.jkiss.dbeaver.model.security.user.SMUserTeam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,11 @@ public class AdminUserInfo {
     @Property
     public String[] getGrantedTeams() {
         return user.getTeams();
+    }
+
+    @Property
+    public SMUserTeam[] getGrantedTeamsInfo() throws DBException {
+        return session.getAdminSecurityController().getUserTeams(getUserId());
     }
 
     @Property
