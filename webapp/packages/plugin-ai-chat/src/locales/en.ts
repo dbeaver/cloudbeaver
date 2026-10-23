@@ -1,4 +1,5 @@
 export default [
+  ['plugin_ai_chat_configuration', 'Configure AI'],
   ['plugin_ai_chat_label', 'AI Chat'],
   ['plugin_ai_chat_tooltip', 'Activate AI Database assistant'],
   ['plugin_ai_chat_no_messages_placeholder', 'Get insights from your data. Ask AI to generate a query for your database.'],

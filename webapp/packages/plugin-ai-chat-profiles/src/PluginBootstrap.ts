@@ -11,13 +11,20 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { AIChatConversationsService, AIChatMessageService, type MessageSendExecutorData } from '@cloudbeaver/plugin-ai-chat';
-import { AIProfileCredentialsService } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { AIChatConversationProfileService } from './AIChatConversationProfileService.js';
 
 const AIChatConversationProfile = importLazyComponent(() => import('./AIChatConversationProfile.js').then(m => m.AIChatConversationProfile));
 
-@injectable(() => [AIChatConversationsService, AIChatConversationProfileService, AIChatMessageService, AIProfileCredentialsService])
+@injectable(() => [
+  AIChatConversationsService,
+  AIChatConversationProfileService,
+  AIChatMessageService,
+  AIProfileCredentialsService,
+  AIProfilesResource,
+])
 export class PluginBootstrap extends Bootstrap {
   private readonly checkCredentials = new Executor<MessageSendExecutorData>();
 
@@ -26,12 +33,18 @@ export class PluginBootstrap extends Bootstrap {
     private readonly aiChatConversationProfileService: AIChatConversationProfileService,
     private readonly aiChatMessageService: AIChatMessageService,
     private readonly aiProfileCredentialsService: AIProfileCredentialsService,
+    private readonly aiProfilesResource: AIProfilesResource,
   ) {
     super();
   }
 
   override register(): void {
-    this.aiChatConversationsService.menuSections.add(AIChatConversationProfile);
+    this.aiChatConversationsService.menuSections.add(
+      AIChatConversationProfile,
+      1,
+      () => this.aiProfilesResource.values.length === 0,
+      () => [getCachedMapResourceLoaderState(this.aiProfilesResource, () => CachedMapAllKey)],
+    );
 
     this.checkCredentials.addHandler(this.restoreProfileAndCheckCredentials.bind(this));
     this.aiChatMessageService.onMessageSend.before(this.checkCredentials);

@@ -20,6 +20,7 @@ import { AIChatConversationsService } from './AIChatConversation/AIChatConversat
 import { AIChatConversationsHistory } from './AIChatConversationsHistory.js';
 import { AIChatContext } from './AIChatContext.js';
 import { AIChatConversationType } from './AIChatConversation/AIChatConversationType.js';
+import { AIChatConversationMenu } from './AIChatConversation/AIChatConversationMenu.js';
 import { AISettings } from './AISettings.js';
 import classes from './AIChatHeader.module.css';
 
@@ -60,6 +61,7 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
           {currentConversation && (
             <Suspense fallback={<Loader className="tw:h-7 tw:w-7" small />}>
               <Placeholder container={aiChatConversationsService.actions} conversation={currentConversation} />
+              <AIChatConversationMenu conversation={currentConversation} disabled={disabled} />
             </Suspense>
           )}
           <AISettings />

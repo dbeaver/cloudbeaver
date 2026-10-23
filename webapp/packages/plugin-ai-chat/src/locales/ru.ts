@@ -1,4 +1,5 @@
 export default [
+  ['plugin_ai_chat_configuration', 'Настроить ИИ'],
   ['plugin_ai_chat_label', 'AI Чат'],
   ['plugin_ai_chat_tooltip', 'Включить AI помощника базы данных'],
   ['plugin_ai_chat_no_messages_placeholder', 'Получайте полезную информацию из данных. Попросите AI создать запрос к вашей базе данных.'],

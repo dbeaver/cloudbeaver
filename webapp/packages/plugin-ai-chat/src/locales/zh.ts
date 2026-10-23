@@ -1,4 +1,5 @@
 export default [
+  ['plugin_ai_chat_configuration', '配置 AI'],
   ['plugin_ai_chat_label', 'AI Chat'],
   ['plugin_ai_chat_tooltip', 'Activate AI Database assistant'],
   ['plugin_ai_chat_no_messages_placeholder', '从数据中获取洞察。让 AI 为您的数据库生成查询。'],

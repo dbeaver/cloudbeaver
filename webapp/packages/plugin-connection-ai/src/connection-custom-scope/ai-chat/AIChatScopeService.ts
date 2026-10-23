@@ -22,9 +22,9 @@ export class AIChatScopeService {
   ) {}
 
   register(): void {
-    this.aiChatConversationsService.actions.add(
+    this.aiChatConversationsService.menuSections.add(
       LazyAIChatConversationScope,
-      undefined,
+      0,
       ({ conversation }) =>
         conversation.promptGeneratorId === EAIConversationPromptGeneratorId.OBJECT_DESCRIBE ||
         !conversation.dataSourceId ||
