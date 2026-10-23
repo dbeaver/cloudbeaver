@@ -36,8 +36,6 @@ export class AIChatConversationsService {
   readonly actions = new PlaceholderContainer<AIChatActionsProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
 
-  readonly onSelectConversation = new Executor<AIChatConversationInfo>();
-
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
     const conversations = this.aiChatConversationsResource.get(ChatConversationConnectionKey(context?.connectionKey));
@@ -87,17 +85,9 @@ export class AIChatConversationsService {
     });
   }
 
-  async selectConversation(conversationId: string | null): Promise<void> {
+  selectConversation(conversationId: string | null): void {
     if (this.conversationId !== conversationId) {
       this.conversationId = conversationId;
-    }
-    const selectedId = this.currentConversationId;
-    if (selectedId) {
-      const conversation = this.aiChatConversationsResource.get(selectedId);
-      if (!conversation) {
-        return;
-      }
-      await this.onSelectConversation.execute(conversation);
     }
   }
 
@@ -131,8 +121,8 @@ export class AIChatConversationsService {
     return conversation;
   }
 
-  private async resetConversation(): Promise<void> {
-    await this.selectConversation(null);
+  private resetConversation(): void {
+    this.selectConversation(null);
   }
 
   private async getEmptyConversation(conversationId: string | null): Promise<AIChatConversationInfo | null> {

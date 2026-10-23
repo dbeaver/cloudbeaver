@@ -10,6 +10,7 @@ import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-
 
 import { AIChatConversationProfileService } from './AIChatConversationProfileService.js';
 import { PluginBootstrap } from './PluginBootstrap.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-chat-profiles',
@@ -17,6 +18,7 @@ export default ModuleRegistry.add({
     serviceCollection
       .addSingleton(Dependency, proxy(AIChatConversationProfileService))
       .addSingleton(AIChatConversationProfileService)
+      .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, PluginBootstrap);
   },
 });

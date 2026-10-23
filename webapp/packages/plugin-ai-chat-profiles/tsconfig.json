@@ -32,6 +32,9 @@
       "path": "../core-executor"
     },
     {
+      "path": "../core-localization"
+    },
+    {
       "path": "../core-resource"
     },
     {

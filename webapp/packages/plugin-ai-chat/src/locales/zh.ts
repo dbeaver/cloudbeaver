@@ -46,11 +46,6 @@ export default [
 
   ['plugin_ai_chat_conversation_cancel_failed', '无法取消对话'],
 
-  ['plugin_ai_chat_profile_group', 'Active configuration'],
-  ['plugin_ai_chat_profile_change_fail', 'Failed to change AI profile'],
-  ['plugin_ai_chat_profile_edit_credentials', '编辑凭据'],
-  ['plugin_ai_chat_profile_credentials_edit_fail', '无法编辑 AI 配置文件凭据'],
-
   ['plugin_ai_chat_settings', '聊天设置'],
   ['plugin_ai_chat_settings_metrics_enable', '启用指标'],
   ['plugin_ai_chat_settings_metrics_tokens', 'Token'],

@@ -15,7 +15,6 @@ import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { NotificationService } from '@cloudbeaver/core-events';
 
 import { AIChatConversationsService } from './AIChatConversation/AIChatConversationsService.js';
 import {
@@ -42,7 +41,6 @@ export const AIChatConversationsHistory = observer<Props>(function AIChatConvers
   const translate = useTranslate();
   const aiChatConversationsService = useService(AIChatConversationsService);
   const commonDialogService = useService(CommonDialogService);
-  const notificationService = useService(NotificationService);
 
   const aiChatConversationsResource = useResource(
     AIChatConversationsHistory,
@@ -52,12 +50,8 @@ export const AIChatConversationsHistory = observer<Props>(function AIChatConvers
 
   const conversations = aiChatConversationsResource.data.filter(isNotNullDefined).sort(compareConversations);
 
-  async function selectConversation(conversationId: string): Promise<void> {
-    try {
-      await aiChatConversationsService.selectConversation(conversationId);
-    } catch (exception: any) {
-      notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
-    }
+  function selectConversation(conversationId: string): void {
+    aiChatConversationsService.selectConversation(conversationId);
   }
 
   async function deleteConversation(conversation: AIChatConversationInfo) {

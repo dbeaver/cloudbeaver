@@ -8,7 +8,7 @@
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { AIDefaultProfileService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { AIDefaultProfileService, AIProfilesResource, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatConversationsService, AIChatConversationsResource, type AIChatConversationInfo } from '@cloudbeaver/plugin-ai-chat';
 
@@ -18,7 +18,7 @@ export class AIChatConversationProfileService {
     aiChatConversationsService: AIChatConversationsService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
     private readonly aiDefaultProfileService: AIDefaultProfileService,
-    aiProfilesResource: AIProfilesResource,
+    private readonly aiProfilesResource: AIProfilesResource,
   ) {
     this.aiChatConversationsResource.sync(
       aiProfilesResource,
@@ -34,18 +34,42 @@ export class AIChatConversationProfileService {
     );
 
     this.aiChatConversationsResource.onBeforeCreate.addHandler(async config => {
+      if (config.settings?.profile) {
+        return;
+      }
+
       const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
       if (profile) {
         config.settings = { ...config.settings, profile: profile.id };
       }
     });
 
-    aiChatConversationsService.onSelectConversation.addHandler(async conversation => {
+    aiChatConversationsService.onNewConversation.addHandler(async ({ stage, data }) => {
+      if (stage !== 'after') {
+        return;
+      }
+
       const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
-      if (profile && (!conversation.profile || !aiProfilesResource.has(conversation.profile))) {
-        await this.aiChatConversationsResource.updateConversation(conversation.id, { settings: { profile: profile.id } });
+      if (profile && data.profile !== profile.id) {
+        await this.aiChatConversationsResource.updateConversation(data.id, { settings: { profile: profile.id } });
       }
     });
+  }
+
+  async restoreConversationProfile(conversationId: string): Promise<AIProfile | undefined> {
+    const conversation = await this.aiChatConversationsResource.load(conversationId);
+    const defaultProfile = await this.aiDefaultProfileService.restoreDefaultProfile();
+    const profile = conversation.profile ? this.aiProfilesResource.get(conversation.profile) : undefined;
+
+    if (profile) {
+      return profile;
+    }
+
+    if (defaultProfile) {
+      await this.aiChatConversationsResource.updateConversation(conversationId, { settings: { profile: defaultProfile.id } });
+    }
+
+    return defaultProfile;
   }
 
   async updateConversationProfile(conversationId: string, profileId: string): Promise<AIChatConversationInfo> {

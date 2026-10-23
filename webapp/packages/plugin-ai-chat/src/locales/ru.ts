@@ -46,11 +46,6 @@ export default [
 
   ['plugin_ai_chat_conversation_cancel_failed', 'Не удалось отменить разговор'],
 
-  ['plugin_ai_chat_profile_group', 'Активная конфигурация'],
-  ['plugin_ai_chat_profile_change_fail', 'Не удалось изменить AI профиль'],
-  ['plugin_ai_chat_profile_edit_credentials', 'Редактировать учетные данные'],
-  ['plugin_ai_chat_profile_credentials_edit_fail', 'Не удалось изменить учетные данные профиля ИИ'],
-
   ['plugin_ai_chat_settings', 'Настройки чата'],
   ['plugin_ai_chat_settings_metrics_enable', 'Включить метрики'],
   ['plugin_ai_chat_settings_metrics_tokens', 'Токены'],
