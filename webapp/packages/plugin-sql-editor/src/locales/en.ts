@@ -1,4 +1,12 @@
 export default [
+  ['sql_editor_settings_blank_line_delimiter_name', 'Blank line is statement delimiter'],
+  [
+    'sql_editor_settings_blank_line_delimiter_desc',
+    'Controls whether blank lines separate SQL statements. Select Never to allow blank lines within a statement.',
+  ],
+  ['sql_editor_settings_blank_line_delimiter_always', 'Always'],
+  ['sql_editor_settings_blank_line_delimiter_never', 'Never'],
+  ['sql_editor_settings_blank_line_delimiter_smart', 'Smart'],
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Editor'],
   ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
   ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],
