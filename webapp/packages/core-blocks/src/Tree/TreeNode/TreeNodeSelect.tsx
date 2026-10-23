@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,19 @@ interface Props {
   disabled?: boolean;
   loadIndicator?: boolean;
   className?: string;
+  'aria-label'?: string;
+  title?: string;
 }
 
-export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({ onSelect, selected, indeterminate, disabled, loadIndicator, className }) {
+export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
+  onSelect,
+  selected,
+  indeterminate,
+  disabled,
+  loadIndicator,
+  className,
+  ...rest
+}) {
   const styles = useS(style);
   const context = useContext(TreeNodeContext);
 
@@ -46,7 +56,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({ onSelect
       {loading ? (
         <Loader className={s(styles, { loader: true })} small />
       ) : (
-        <Checkbox checked={selected} indeterminate={indeterminate} disabled={disabled} onChange={handleSelect} />
+        <Checkbox {...rest} checked={selected} indeterminate={indeterminate} disabled={disabled} onChange={handleSelect} />
       )}
     </div>
   );

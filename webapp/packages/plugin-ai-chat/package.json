@@ -42,7 +42,6 @@
     "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*",
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
-    "@cloudbeaver/plugin-navigation-tree": "workspace:*",
     "@cloudbeaver/plugin-sql-editor": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*",

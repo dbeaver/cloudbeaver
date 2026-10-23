@@ -46,17 +46,10 @@ export default [
 
   ['plugin_ai_chat_conversation_cancel_failed', 'Не удалось отменить разговор'],
 
-  ['plugin_ai_chat_scope_change', 'Настроить AI контекст'],
-  ['plugin_ai_chat_scope_change_fail', 'Не удалось изменить контекст'],
   ['plugin_ai_chat_profile_group', 'Активная конфигурация'],
   ['plugin_ai_chat_profile_change_fail', 'Не удалось изменить AI профиль'],
   ['plugin_ai_chat_profile_edit_credentials', 'Редактировать учетные данные'],
   ['plugin_ai_chat_profile_credentials_edit_fail', 'Не удалось изменить учетные данные профиля ИИ'],
-  ['plugin_ai_chat_scope_connection', 'Подключение'],
-  ['plugin_ai_chat_scope_schema', 'Текущая схема'],
-  ['plugin_ai_chat_scope_database', 'Текущая база'],
-  ['plugin_ai_chat_scope_custom', 'Пользовательский'],
-  ['plugin_ai_chat_scope_custom_dialog_title', 'Пользовательский контекст'],
 
   ['plugin_ai_chat_settings', 'Настройки чата'],
   ['plugin_ai_chat_settings_metrics_enable', 'Включить метрики'],

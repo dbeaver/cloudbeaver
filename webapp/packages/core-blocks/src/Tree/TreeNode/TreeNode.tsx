@@ -79,9 +79,6 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
           });
         },
         async select(multiple?: boolean, nested?: boolean) {
-          if (this.selected && !multiple && !nested) {
-            return;
-          }
           await this.processAction(async () => {
             await handlersRef.onSelect?.(multiple, nested);
           });

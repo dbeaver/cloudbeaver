@@ -85,28 +85,30 @@ public class WebAIUtils {
     @NotNull
     public static String[] convertNodePathsToObjectIds(
         @NotNull WebSession session,
-        @NotNull DBPProject project,
+        @NotNull DBPDataSourceContainer dataSource,
         @NotNull String[] nodePaths
-    ) {
-        List<DBNNode> nodes = new ArrayList<>();
+    ) throws DBWebException {
+        List<String> objectIds = new ArrayList<>();
         for (String nodePath : nodePaths) {
             if (nodePath != null && !nodePath.isEmpty()) {
                 try {
-                    DBNNode node = session.getNavigatorModelOrThrow().getNodeByPath(session.getProgressMonitor(), project, nodePath);
-                    if (node != null) {
-                        nodes.add(node);
+                    DBNNode node = session.getNavigatorModelOrThrow().getNodeByPath(
+                        session.getProgressMonitor(),
+                        dataSource.getProject(),
+                        nodePath
+                    );
+                    if (!(node instanceof DBNDatabaseNode databaseNode) ||
+                        !(databaseNode.getValueObject() instanceof DBSObject object) ||
+                        DBUtils.getContainer(object) != dataSource) {
+                        throw new DBWebException("Invalid database object path: " + nodePath);
                     }
+                    objectIds.add(DBUtils.getObjectFullId(object));
                 } catch (DBException e) {
-                    log.error("Error finding object by ID: " + nodePath, e);
+                    throw new DBWebException("Error resolving database object path: " + nodePath, e);
                 }
             }
         }
-        return nodes.stream()
-            .map(DBNDatabaseNode.class::cast)
-            .map(DBNDatabaseNode::getValueObject)
-            .map(DBSObject.class::cast)
-            .map(DBUtils::getObjectFullId)
-            .toArray(String[]::new);
+        return objectIds.toArray(String[]::new);
     }
 
     @Nullable

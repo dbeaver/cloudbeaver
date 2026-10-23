@@ -2,7 +2,7 @@
 # Manual changes might be lost - proceed with caution!
 
 __metadata:
-  version: 9
+  version: 10
   cacheKey: 10c0
 
 "@adobe/css-tools@npm:^4.4.0":
@@ -2548,7 +2548,6 @@ __metadata:
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
-    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
@@ -2909,6 +2908,45 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-connection-ai@workspace:*, @cloudbeaver/plugin-connection-ai@workspace:packages/plugin-connection-ai":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-connection-ai@workspace:packages/plugin-connection-ai"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-ai-chat": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    vitest: "npm:^4"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-connection-custom@workspace:*, @cloudbeaver/plugin-connection-custom@workspace:packages/plugin-connection-custom":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connection-custom@workspace:packages/plugin-connection-custom"
@@ -2941,43 +2979,6 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
-  languageName: unknown
-  linkType: soft
-
-"@cloudbeaver/plugin-connection-form-ai@workspace:*, @cloudbeaver/plugin-connection-form-ai@workspace:packages/plugin-connection-form-ai":
-  version: 0.0.0-use.local
-  resolution: "@cloudbeaver/plugin-connection-form-ai@workspace:packages/plugin-connection-form-ai"
-  dependencies:
-    "@cloudbeaver/core-blocks": "workspace:*"
-    "@cloudbeaver/core-cli": "workspace:*"
-    "@cloudbeaver/core-connections": "workspace:*"
-    "@cloudbeaver/core-data-context": "workspace:*"
-    "@cloudbeaver/core-di": "workspace:*"
-    "@cloudbeaver/core-dialogs": "workspace:*"
-    "@cloudbeaver/core-events": "workspace:*"
-    "@cloudbeaver/core-executor": "workspace:*"
-    "@cloudbeaver/core-links": "workspace:*"
-    "@cloudbeaver/core-localization": "workspace:*"
-    "@cloudbeaver/core-projects": "workspace:*"
-    "@cloudbeaver/core-resource": "workspace:*"
-    "@cloudbeaver/core-root": "workspace:*"
-    "@cloudbeaver/core-sdk": "workspace:*"
-    "@cloudbeaver/core-ui": "workspace:*"
-    "@cloudbeaver/core-utils": "workspace:*"
-    "@cloudbeaver/plugin-ai-chat": "workspace:*"
-    "@cloudbeaver/plugin-codemirror6": "workspace:*"
-    "@cloudbeaver/plugin-connections": "workspace:*"
-    "@cloudbeaver/tsconfig": "workspace:*"
-    "@dbeaver/cli": "workspace:*"
-    "@types/react": "npm:^19"
-    "@types/react-dom": "npm:^19"
-    mobx: "npm:^6"
-    mobx-react-lite: "npm:^4"
-    react: "npm:^19"
-    react-dom: "npm:^19"
-    rimraf: "npm:^6"
-    tslib: "npm:^2"
-    typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -4426,8 +4427,8 @@ __metadata:
     "@cloudbeaver/plugin-browser": "workspace:*"
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-connection-administration": "workspace:*"
+    "@cloudbeaver/plugin-connection-ai": "workspace:*"
     "@cloudbeaver/plugin-connection-custom": "workspace:*"
-    "@cloudbeaver/plugin-connection-form-ai": "workspace:*"
     "@cloudbeaver/plugin-connection-network-handlers": "workspace:*"
     "@cloudbeaver/plugin-connection-preferences": "workspace:*"
     "@cloudbeaver/plugin-connection-search": "workspace:*"
@@ -18042,7 +18043,7 @@ __metadata:
 
 "resolve@patch:resolve@npm%3A^1.22.1#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.11#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.8#optional!builtin<compat/resolve>":
   version: 1.22.12
-  resolution: "resolve@patch:resolve@npm%3A1.22.12#optional!builtin<compat/resolve>::version=1.22.12&hash=c3c19d"
+  resolution: "resolve@patch:resolve@npm%3A1.22.12#optional!builtin<compat/resolve>::version=1.22.12&hash=9bd1a5"
   dependencies:
     es-errors: "npm:^1.3.0"
     is-core-module: "npm:^2.16.1"
@@ -18050,13 +18051,13 @@ __metadata:
     supports-preserve-symlinks-flag: "npm:^1.0.0"
   bin:
     resolve: bin/resolve
-  checksum: 10c0/fc6519984ae1f894d877c0060ba8b1f5ba3bc0e85a02f74e141929c118c23d74d9735619a9cc2965397387e514884245c65d72a40731dcb6cfc84c7bcdc8321e
+  checksum: 10c0/e12af106e16e652bd83060e8afacece4ee3dcbd0f4cf028e3d9ad178e6ced9ecb1c87ee60158b239582313902a717f8adc57a9b76ea54b1994141ba15f420c65
   languageName: node
   linkType: hard
 
 "resolve@patch:resolve@npm%3A^2.0.0-next.5#optional!builtin<compat/resolve>":
   version: 2.0.0-next.7
-  resolution: "resolve@patch:resolve@npm%3A2.0.0-next.7#optional!builtin<compat/resolve>::version=2.0.0-next.7&hash=c3c19d"
+  resolution: "resolve@patch:resolve@npm%3A2.0.0-next.7#optional!builtin<compat/resolve>::version=2.0.0-next.7&hash=9bd1a5"
   dependencies:
     es-errors: "npm:^1.3.0"
     is-core-module: "npm:^2.16.2"
@@ -18066,7 +18067,7 @@ __metadata:
     supports-preserve-symlinks-flag: "npm:^1.0.0"
   bin:
     resolve: bin/resolve
-  checksum: 10c0/6bb6f1d8a1789f7a5b4e35d950e76bc0ba632ff7d51fe86b6f34fb5f41e1ce0f7b884ec166828cfc0728ddffeaee49527711d752d12398297f90c51acd22195e
+  checksum: 10c0/911e8321c64ec2a723247dbeabfcb7663577adf52af642bfda61ddee686fbef2255ad529ff57ee8e3884ee23186b85b2637988bfafc0a9a3a81a98bd4af1e2fc
   languageName: node
   linkType: hard
 

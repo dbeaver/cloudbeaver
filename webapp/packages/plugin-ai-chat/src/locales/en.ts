@@ -46,17 +46,10 @@ export default [
 
   ['plugin_ai_chat_conversation_cancel_failed', 'Failed to cancel the conversation'],
 
-  ['plugin_ai_chat_scope_change', 'Configure AI context'],
-  ['plugin_ai_chat_scope_change_fail', 'Failed to change context'],
   ['plugin_ai_chat_profile_group', 'Active configuration'],
   ['plugin_ai_chat_profile_change_fail', 'Failed to change AI profile'],
   ['plugin_ai_chat_profile_edit_credentials', 'Edit credentials'],
   ['plugin_ai_chat_profile_credentials_edit_fail', 'Failed to edit AI profile credentials'],
-  ['plugin_ai_chat_scope_connection', 'Connection'],
-  ['plugin_ai_chat_scope_schema', 'Current Schema'],
-  ['plugin_ai_chat_scope_database', 'Current Database'],
-  ['plugin_ai_chat_scope_custom', 'Custom'],
-  ['plugin_ai_chat_scope_custom_dialog_title', 'Custom completion scope'],
 
   ['plugin_ai_chat_settings', 'Chat settings'],
   ['plugin_ai_chat_settings_metrics_enable', 'Enable metrics'],
