@@ -26,9 +26,12 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
 import org.jkiss.utils.CommonUtils;
+
+import java.util.Map;
 
 public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C extends DataSourceDescriptor> {
     private static final Log log = Log.getLog(WebConnectionConfigInputHandler.class);
@@ -97,6 +100,51 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         preferenceStore.setProperties(input.getDefaultUserPreferences());
     }
 
+    /**
+     * Removes references to credentials resolved on the server.
+     */
+    public void clearSecretReferences() {
+        input.setSharedCredentials(false);
+        input.setSelectedSecretId(null);
+    }
+
+    /**
+     * Removes credentials inherited from a saved data source before applying input credentials.
+     */
+    public void resetDataSourceCredentials(@NotNull C dataSource) {
+        dataSource.setSavePassword(false);
+        dataSource.setSharedCredentials(false);
+        dataSource.resetAllSecrets();
+        dataSource.resetPassword();
+        for (DBWHandlerConfiguration handler : dataSource.getConnectionConfiguration().getHandlers()) {
+            handler.setSavePassword(false);
+            handler.setPassword(null);
+            handler.setSecureProperties(Map.of());
+        }
+    }
+
+    @NotNull
+    public CredentialsSnapshot createCredentialsSnapshot(@NotNull C dataSource) {
+        var connectionConfiguration = new DBPConnectionConfiguration(dataSource.getConnectionConfiguration());
+        var savePassword = dataSource.isSavePassword();
+        var sharedCredentials = dataSource.isSharedCredentials();
+        var selectedSharedCredentials = dataSource.getSelectedSharedCredentials();
+        return () -> {
+            dataSource.setSharedCredentials(false);
+            dataSource.resetAllSecrets();
+            dataSource.setConnectionInfo(connectionConfiguration);
+            dataSource.setSavePassword(savePassword);
+            dataSource.setSharedCredentials(sharedCredentials);
+            if (selectedSharedCredentials != null) {
+                dataSource.setSelectedSharedCredentials(selectedSharedCredentials);
+            }
+        };
+    }
+
+    public boolean isConnectionTargetChanged(@NotNull C dataSource) {
+        return WebDataSourceUtils.isConnectionTargetChanged(dataSource.getConnectionConfiguration(), input);
+    }
+
     @NotNull
     protected C createDataSourceContainerFromInput(@NotNull DBPDriver driver) {
         DBPConnectionConfiguration dsConfig = new DBPConnectionConfiguration();
@@ -113,5 +161,8 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         return newDataSource;
     }
 
-
+    @FunctionalInterface
+    public interface CredentialsSnapshot {
+        void restore();
+    }
 }
