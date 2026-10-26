@@ -174,7 +174,7 @@ public class WebConnectionConfigInputHandlerTest {
         }
 
         @NotNull
-        @Property
+        @Property(name = "Client ID")
         public String getClientId() {
             return clientId;
         }
@@ -184,7 +184,7 @@ public class WebConnectionConfigInputHandlerTest {
         }
 
         @Nullable
-        @Property(password = true)
+        @Property(name = "Client secret", password = true)
         public String getClientSecret() {
             return clientSecret;
         }

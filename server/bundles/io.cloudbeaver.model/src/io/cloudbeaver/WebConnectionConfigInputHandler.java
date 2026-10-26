@@ -133,6 +133,9 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         @NotNull C dataSource,
         @NotNull DBPConnectionConfiguration connectionConfiguration
     ) {
+        if (connectionConfiguration.getAuthProperties().isEmpty()) {
+            return;
+        }
         DBAAuthModel<DBAAuthCredentials> authModel = connectionConfiguration.getAuthModel();
         DBAAuthCredentials sanitizedCredentials = authModel.loadCredentials(dataSource, connectionConfiguration);
         Map<String, Object> secureProperties = new LinkedHashMap<>();
