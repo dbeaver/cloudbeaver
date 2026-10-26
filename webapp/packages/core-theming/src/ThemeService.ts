@@ -23,6 +23,7 @@ import './styles/UiSpinner.css';
 import './styles/UiInput.css';
 import './styles/UISearch.css';
 import './styles/UiPopover.css';
+import './styles/UiMenu.css';
 import './styles/UiColorPicker.css';
 import './styles/UiSwitch.css';
 import './styles/form-controls.css';

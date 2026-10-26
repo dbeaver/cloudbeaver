@@ -12,10 +12,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
-import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIChatMessagesResource, isFunctionConfirmationMessage, isFunctionMessage, type IMessageParam } from './AIChatMessagesResource.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
@@ -43,7 +42,7 @@ interface IMessageSendExecutorAfterData {
   data: IAiSendChatMessageInfo;
 }
 
-type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExecutorAfterData;
+export type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExecutorAfterData;
 
 @injectable(() => [
   AIChatMessagesResource,
@@ -51,8 +50,6 @@ type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExec
   CommonDialogService,
   LocalizationService,
   ConnectionsManagerService,
-  AIProfilesResource,
-  AIProfileCredentialsService,
 ])
 export class AIChatMessageService {
   onMessageSend: Executor<MessageSendExecutorData>;
@@ -63,12 +60,9 @@ export class AIChatMessageService {
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
-    private readonly aiProfilesResource: AIProfilesResource,
-    private readonly aiProfileCredentialsService: AIProfileCredentialsService,
   ) {
     this.onMessageSend = new Executor();
 
-    this.onMessageSend.addHandler(this.checkProfileCredentials.bind(this));
     this.onMessageSend.addHandler(this.updateConversation.bind(this));
   }
 
@@ -153,26 +147,6 @@ export class AIChatMessageService {
     await this.onMessageSend.execute({ stage: 'after', data: message });
 
     return message;
-  }
-
-  private async checkProfileCredentials(
-    { stage, data }: MessageSendExecutorData,
-    contexts: IExecutionContextProvider<MessageSendExecutorData>,
-  ): Promise<void> {
-    if (stage !== 'before') {
-      return;
-    }
-
-    const conversation = await this.aiChatConversationsResource.load(data.conversationId);
-    const profile = conversation.profile ? await this.aiProfilesResource.load(conversation.profile) : undefined;
-
-    if (profile && this.aiProfileCredentialsService.isRequired(profile)) {
-      const result = await this.aiProfileCredentialsService.open(profile.id);
-
-      if (result?.status !== DialogueStateResult.Resolved) {
-        ExecutorInterrupter.interrupt(contexts);
-      }
-    }
   }
 
   private updateConversation({ stage, data }: MessageSendExecutorData): void {
