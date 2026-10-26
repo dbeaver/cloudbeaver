@@ -68,6 +68,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   async deleteProfile(profileId: string): Promise<void> {
     await this.graphQLService.sdk.deleteAiProfile({ profileId });
     this.delete(profileId);
+    this.onDataOutdated.execute(profileId);
   }
 
   saveCredentials(profileId: string, token: string, accountAuthentication = false): Promise<void> {

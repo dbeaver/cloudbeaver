@@ -7,6 +7,12 @@
  */
 
 export default [
+  ['plugin_ai_profiles_default_badge', '（默认）'],
+  ['plugin_ai_profiles_default_description', '用于您的 AI 请求的默认配置文件。要更改默认配置文件，请在聊天中选择配置文件，或使用“设为默认”。'],
+  ['plugin_ai_profiles_set_default', '设为默认'],
+  ['plugin_ai_profiles_default_save_failed', '无法保存您的默认 AI 配置文件'],
+  ['plugin_ai_profiles_profile_menu', '配置文件操作'],
+  ['plugin_ai_profiles_profile_clone', '克隆'],
   ['plugin_ai_profiles_scope', '范围'],
   ['plugin_ai_profiles_scope_global', '全局'],
   ['plugin_ai_profiles_scope_user', '用户'],

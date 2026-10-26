@@ -50,6 +50,9 @@
       "path": "../core-sdk"
     },
     {
+      "path": "../core-settings"
+    },
+    {
       "path": "../core-ui"
     },
     {

@@ -1,4 +1,5 @@
 export default [
+  ['plugin_ai_chat_configuration', 'Configure AI'],
   ['plugin_ai_chat_label', 'AI Chat'],
   ['plugin_ai_chat_tooltip', 'Activate AI Database assistant'],
   ['plugin_ai_chat_no_messages_placeholder', 'Get insights from your data. Ask AI to generate a query for your database.'],
@@ -45,11 +46,6 @@ export default [
   ['plugin_ai_chat_conversation_history_date_group_over_week_ago', 'Over a week ago'],
 
   ['plugin_ai_chat_conversation_cancel_failed', 'Failed to cancel the conversation'],
-
-  ['plugin_ai_chat_profile_group', 'Active configuration'],
-  ['plugin_ai_chat_profile_change_fail', 'Failed to change AI profile'],
-  ['plugin_ai_chat_profile_edit_credentials', 'Edit credentials'],
-  ['plugin_ai_chat_profile_credentials_edit_fail', 'Failed to edit AI profile credentials'],
 
   ['plugin_ai_chat_settings', 'Chat settings'],
   ['plugin_ai_chat_settings_metrics_enable', 'Enable metrics'],
