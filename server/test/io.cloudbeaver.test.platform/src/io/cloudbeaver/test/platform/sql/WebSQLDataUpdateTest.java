@@ -20,14 +20,18 @@ import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLExecuteInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsRow;
+import io.cloudbeaver.service.sql.WebSQLUtils;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.platform.CloudbeaverDBTest;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.data.DBDDocument;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCResultSet;
 import org.jkiss.dbeaver.model.exec.jdbc.JDBCStatement;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -35,6 +39,23 @@ import java.util.List;
 import java.util.Map;
 
 public class WebSQLDataUpdateTest extends CloudbeaverDBTest {
+
+    @Test
+    public void wholeDocumentUpdateReplacesOriginalDocument() throws Exception {
+        DBDAttributeBinding documentAttribute = Mockito.mock(DBDAttributeBinding.class);
+        DBDDocument originalDocument = Mockito.mock(DBDDocument.class);
+        DBDDocument updatedDocument = Mockito.mock(DBDDocument.class);
+
+        DBDDocument result = WebSQLUtils.applyDocumentUpdate(
+            originalDocument,
+            documentAttribute,
+            documentAttribute,
+            updatedDocument
+        );
+
+        Assertions.assertSame(updatedDocument, result);
+        Mockito.verifyNoInteractions(originalDocument);
+    }
 
     @Test
     public void webValuesAreConvertedAndPersisted() throws Exception {
