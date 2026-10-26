@@ -8,10 +8,22 @@
 
 import './module.js';
 
+export * from './AIChat/AIChatContext.js';
+
 export { AIChatSettingsService } from './AIChatSettingsService.js';
+export { AIChatFunctionsService } from './AIChatFunctionsService.js';
+export { AIChatFunctionRegistryService } from './AIChatFunctionRegistryService.js';
+export type {
+  IAIChatFunctionAction,
+  IAIChatFunctionContext,
+  IAIChatFunctionInteractionDefinition,
+  IAIChatFunctionInteractionProps,
+} from './AIChatFunctionRegistryService.js';
 
 export * from './AIChat/AIChatService.js';
 export * from './AIChat/AIChatConversation/AIChatConversationsService.js';
+export * from './AIChat/AIChatConversation/AIChatConversationProfileLazy.js';
+export * from './AIChat/AIChatConversation/AIChatConversationsResource.js';
 export * from './AIChat/AIChatContext/AIChatContextService.js';
 export * from './AIChat/AIChatMessage/AIChatMessageService.js';
 export * from './AIChat/AIChatMessage/AIChatMessagesResource.js';
