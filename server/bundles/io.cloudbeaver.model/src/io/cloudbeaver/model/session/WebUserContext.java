@@ -124,6 +124,7 @@ public class WebUserContext implements SMCredentialsProvider {
         if (isSessionChanged) {
             if (smAuthPermissions.getUserId() != null) {
                 this.preferenceStore.updateAllUserPreferences(securityController.getCurrentUserParameters());
+                this.preferenceStore.updateAllUISettings(securityController.getCurrentUserUISettings());
             } else {
                 this.preferenceStore.updateAllUserPreferences(Map.of());
             }
@@ -159,6 +160,7 @@ public class WebUserContext implements SMCredentialsProvider {
      * reset the state as if the user is not logged in
      */
     public synchronized void reset() throws DBException {
+        boolean authenticatedUserWasActive = smCredentials != null && smCredentials.getUserId() != null;
         try {
             if (this.smCredentials != null) {
                 this.securityController.logout();
@@ -172,6 +174,9 @@ public class WebUserContext implements SMCredentialsProvider {
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = null;
         this.secretController = null;
+        if (authenticatedUserWasActive) {
+            this.preferenceStore.updateAllUISettings(Map.of());
+        }
     }
 
     @NotNull

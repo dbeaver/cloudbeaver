@@ -86,6 +86,9 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             .dataFetcher("setUserPreferences",
                 env -> getService(env).setUserConfigurationParameters(getWebSession(env),
                     getArgumentVal(env, "preferences")))
+            .dataFetcher("authSetUserUISettings",
+                env -> getService(env).updateUserUISettings(getWebSession(env),
+                    getArgumentVal(env, "settings")))
             .dataFetcher("federatedLogin", env -> getService(env).federatedLogin(
                 GraphQLEndpoint.getServletRequestOrThrow(env),
                 getWebSession(env, false),

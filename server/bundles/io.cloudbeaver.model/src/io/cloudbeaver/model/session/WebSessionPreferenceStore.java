@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
+import io.cloudbeaver.model.utils.JSONMergePatch;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.impl.preferences.AbstractUserPreferenceStore;
@@ -23,12 +24,15 @@ import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
 
     @NotNull
     private final WebUserContext userContext;
+    @NotNull
+    private final Map<String, Object> uiSettings = new LinkedHashMap<>();
 
     public WebSessionPreferenceStore(
         @NotNull WebUserContext userContext,
@@ -41,6 +45,38 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
     @NotNull
     public Map<String, Object> getCustomUserParameters() {
         return userPreferences;
+    }
+
+    @NotNull
+    public synchronized Map<String, Object> getUISettings() {
+        return JSONMergePatch.apply(uiSettings, Map.of());
+    }
+
+    @NotNull
+    public synchronized Map<String, Object> refreshUISettings() throws DBException {
+        var credentials = userContext.getActiveUserCredentials();
+        if (credentials != null && credentials.getUserId() != null) {
+            updateAllUISettings(userContext.getSecurityController().getCurrentUserUISettings());
+        }
+        return getUISettings();
+    }
+
+    public synchronized void updateAllUISettings(@NotNull Map<String, Object> settings) {
+        uiSettings.clear();
+        uiSettings.putAll(JSONMergePatch.apply(Map.of(), settings));
+    }
+
+    @NotNull
+    public synchronized Map<String, Object> updateUISettings(@NotNull Map<String, Object> patch) throws DBException {
+        Map<String, Object> updatedSettings;
+        var credentials = userContext.getActiveUserCredentials();
+        if (credentials == null || credentials.getUserId() == null) {
+            updatedSettings = JSONMergePatch.apply(uiSettings, patch);
+        } else {
+            updatedSettings = userContext.getSecurityController().updateCurrentUserUISettings(patch);
+        }
+        updateAllUISettings(updatedSettings);
+        return getUISettings();
     }
 
     // to avoid redundant sm api call

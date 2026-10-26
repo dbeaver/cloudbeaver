@@ -22,6 +22,7 @@ import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.test.WebGQLClient;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class AuthenticationTest extends CloudbeaverMockTest {
+    private static final String TEST_UI_SETTING = "authenticationTest";
     private static final String GQL_OPEN_SESSION = """
         mutation openSession($defaultLocale: String) {
           result: openSession(defaultLocale: $defaultLocale) {
@@ -53,6 +55,31 @@ public class AuthenticationTest extends CloudbeaverMockTest {
               sameTabRedirect
             }
           }
+        }""";
+    private static final String GQL_ACTIVE_USER_UI_SETTINGS = """
+        query activeUserUISettings {
+          result: activeUser {
+            uiSettings
+          }
+        }""";
+    private static final String GQL_UPDATE_USER_UI_SETTINGS = """
+        mutation updateUserUISettings($settings: Object!) {
+          result: authSetUserUISettings(settings: $settings)
+        }""";
+    private static final String GQL_PATCH_USER_UI_SETTINGS = """
+        mutation patchUserUISettings {
+          result: authSetUserUISettings(settings: {
+            authenticationTest: {
+              panel: {
+                active: null
+                visible: true
+              }
+            }
+          })
+        }""";
+    private static final String GQL_DELETE_USER_UI_SETTINGS = """
+        mutation deleteUserUISettings {
+          result: authSetUserUISettings(settings: { authenticationTest: null })
         }""";
 
     @Test
@@ -102,5 +129,77 @@ public class AuthenticationTest extends CloudbeaverMockTest {
 
         Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
         Assertions.assertEquals(testUserId, JSONUtils.getString(activeUser, "userId"));
+    }
+
+    @Test
+    public void testUserUISettingsPersistenceAndMerge() throws Exception {
+        WebGQLClient client = CEAppStarter.createClient();
+        CEAppStarter.authenticateTestUser(client);
+        WebGQLClient nextClient = CEAppStarter.createClient();
+        CEAppStarter.authenticateTestUser(nextClient);
+        try {
+            Map<String, Object> initialSettings = updateUISettings(client, Map.of(
+                TEST_UI_SETTING,
+                Map.of(
+                    "panel", Map.of("active", true, "visible", false),
+                    "mode", "initial"
+                )
+            ));
+            Assertions.assertTrue(JSONUtils.getBoolean(
+                JSONUtils.getObject(JSONUtils.getObject(initialSettings, TEST_UI_SETTING), "panel"),
+                "active"
+            ));
+
+            Map<String, Object> updatedSettings = client.sendQuery(GQL_PATCH_USER_UI_SETTINGS, null);
+            Map<String, Object> updatedTestSettings = JSONUtils.getObject(updatedSettings, TEST_UI_SETTING);
+            Map<String, Object> updatedPanel = JSONUtils.getObject(updatedTestSettings, "panel");
+            Assertions.assertFalse(updatedPanel.containsKey("active"));
+            Assertions.assertTrue(JSONUtils.getBoolean(updatedPanel, "visible"));
+            Assertions.assertEquals("initial", JSONUtils.getString(updatedTestSettings, "mode"));
+
+            Map<String, Object> activeUser = nextClient.sendQuery(GQL_ACTIVE_USER_UI_SETTINGS, null);
+            Map<String, Object> persistedSettings = JSONUtils.getObject(activeUser, "uiSettings");
+            Assertions.assertEquals(updatedTestSettings, JSONUtils.getObject(persistedSettings, TEST_UI_SETTING));
+        } finally {
+            client.sendQuery(GQL_DELETE_USER_UI_SETTINGS, null);
+        }
+    }
+
+    @Test
+    public void testAnonymousUISettingsAreSessionScoped() throws Exception {
+        WebGQLClient client = CEAppStarter.createClient();
+        client.sendQuery(GQL_OPEN_SESSION, null);
+        updateUISettings(client, Map.of(TEST_UI_SETTING, Map.of("active", true)));
+
+        Map<String, Object> currentSettings = updateUISettings(client, Map.of());
+        Assertions.assertTrue(JSONUtils.getBoolean(JSONUtils.getObject(currentSettings, TEST_UI_SETTING), "active"));
+
+        WebGQLClient nextClient = CEAppStarter.createClient();
+        nextClient.sendQuery(GQL_OPEN_SESSION, null);
+        Map<String, Object> nextSessionSettings = updateUISettings(nextClient, Map.of());
+        Assertions.assertFalse(nextSessionSettings.containsKey(TEST_UI_SETTING));
+    }
+
+    @Test
+    public void testAnonymousUISettingsSurviveFailedLogin() throws Exception {
+        WebGQLClient client = CEAppStarter.createClient();
+        client.sendQuery(GQL_OPEN_SESSION, null);
+        updateUISettings(client, Map.of(TEST_UI_SETTING, Map.of("active", true)));
+
+        Assertions.assertThrows(DBException.class, () -> CEAppStarter.authenticateTestUser(client, Map.of(
+            LocalAuthProvider.CRED_USER, "test",
+            LocalAuthProvider.CRED_PASSWORD, SecurityUtils.makeDigest("invalid")
+        )));
+
+        Map<String, Object> currentSettings = updateUISettings(client, Map.of());
+        Assertions.assertTrue(JSONUtils.getBoolean(JSONUtils.getObject(currentSettings, TEST_UI_SETTING), "active"));
+    }
+
+    @NotNull
+    private static Map<String, Object> updateUISettings(
+        @NotNull WebGQLClient client,
+        @NotNull Map<String, Object> settings
+    ) throws Exception {
+        return client.sendQuery(GQL_UPDATE_USER_UI_SETTINGS, Map.of("settings", settings));
     }
 }

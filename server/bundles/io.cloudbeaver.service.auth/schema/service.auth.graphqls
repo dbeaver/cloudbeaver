@@ -160,6 +160,8 @@ type UserInfo {
     metaParameters: Object!
     "User configuration parameters"
     configurationParameters: Object!
+    "Web UI settings"
+    uiSettings: Object! @since(version: "26.2.4")
     "User teams"
     teams: [UserTeamInfo!]!
 
@@ -214,6 +216,8 @@ extend type Mutation {
     setUserConfigurationParameter(name: String!, value: Object): Boolean!
     "Updates user preferences"
     setUserPreferences(preferences: Object!): UserInfo! @since(version: "24.0.1")
+    "Applies a merge patch to web UI settings and returns the resulting settings"
+    authSetUserUISettings(settings: Object!): Object! @since(version: "26.2.4")
 
     "Creates async task for federated login. Returns redirect link to the task info page."
     federatedLogin(

@@ -402,6 +402,19 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
     }
 
+    @NotNull
+    @Override
+    public Map<String, Object> updateUserUISettings(
+        @NotNull WebSession webSession,
+        @NotNull Map<String, Object> settings
+    ) throws DBWebException {
+        try {
+            return webSession.getUserContext().getPreferenceStore().updateUISettings(settings);
+        } catch (DBException | IllegalArgumentException e) {
+            throw new DBWebException("Error updating user UI settings", e);
+        }
+    }
+
     @Nullable
     private WebUserInfo getAnonymousUserInfo(@NotNull WebSession webSession) {
         ServletApplication application = webSession.getApplication();
