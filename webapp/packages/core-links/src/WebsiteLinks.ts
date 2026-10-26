@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ export const WEBSITE_LINKS = {
   SSL_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/SSL-Configuration/',
   SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas',
   DATABASE_NAVIGATOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Database-Navigator/',
+  USERS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Users/',
   AWS_DEPLOY_UPDATE_PAGE: 'https://github.com/dbeaver/cloudbeaver-deploy?tab=readme-ov-file#updating-the-cluster',
   PROXY_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Proxy-Configuration/',
   API_TOKEN_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Generate-API-access-token/',

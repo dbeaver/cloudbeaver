@@ -14,6 +14,13 @@ import { Button, clsx } from '@dbeaver/ui-kit';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useCreateGridReactiveValue, type IDataGridCellRenderer } from '@dbeaver/react-data-grid';
+import {
+  ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH,
+  AdministrationTable,
+  AdministrationTableStyles,
+} from '@cloudbeaver/core-administration';
 
 import { DataGrid } from './DataGridLazy.js';
 import { useTableSelection } from './useTableSelection.js';
@@ -59,7 +66,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   getCell,
 }: IGrantManagementTableProps<T>) {
   const translate = useTranslate();
-  const styles = useS(classes);
+  const styles = useS(AdministrationTableStyles, classes);
   const cellCopy = useCellCopy();
 
   const [sort, setSort] = useState<{ colIdx: number; order: 'asc' | 'desc' } | null>({ colIdx: 1, order: 'desc' });
@@ -193,6 +200,10 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
       return <TableRowSelect isRoot />;
     }
 
+    if (allColumns[colIdx]?.key === STATUS_COLUMN_KEY) {
+      return <div className="tw:text-center">{getHeaderText(colIdx)}</div>;
+    }
+
     return getHeaderText(colIdx);
   }
 
@@ -236,7 +247,7 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
   }
 
   return (
-    <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-2 tw:max-w-max tw:overflow-auto">
+    <div className="tw:flex-1 tw:flex tw:flex-col tw:gap-2 tw:min-w-0 tw:overflow-auto">
       <div className="tw:flex tw:items-center tw:gap-6">
         <Filter value={filter} placeholder={translate('ui_search')} onChange={setFilter} />
 
@@ -253,23 +264,26 @@ export const GrantManagementTable = observer(function GrantManagementTable<T>({
         )}
       </div>
       <TableSelectionContext value={selection}>
-        <div className={s(styles, { table: true })}>
+        <AdministrationTable>
           <DataGrid
             columnCount={columnsCount}
             rowCount={rowsCount}
             getHeaderResizable={colIdx => colIdx > 1}
-            getRowHeight={() => 32}
+            getHeaderHeight={() => ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT}
+            getRowHeight={() => ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT}
+            getHeaderWidth={colIdx => (colIdx === 0 ? ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH : 'auto')}
             getHeaderPinned={colIdx => colIdx <= 1}
             headerElement={headerElement}
             headerText={headerText}
             cell={cell}
             cellElement={cellElement}
+            className={s(styles, { table: true })}
             columnSortable={columnSortable}
             columnSortingState={columnSortingState}
             onColumnSort={handleSort}
             onCellKeyDown={cellCopy.handleKeyDown}
           />
-        </div>
+        </AdministrationTable>
       </TableSelectionContext>
     </div>
   );

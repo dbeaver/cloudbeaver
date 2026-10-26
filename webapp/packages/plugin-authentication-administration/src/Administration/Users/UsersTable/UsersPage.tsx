@@ -9,8 +9,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, Container, Group, Loader, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
+import { Group, Loader, Placeholder, s, useAutoLoad, useResource, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { MenuBar } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
 import { Spinner } from '@dbeaver/ui-kit';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
@@ -21,6 +23,10 @@ import { UsersAdministrationToolsPanel } from './UsersAdministrationToolsPanel.j
 import { useUsersTable } from './useUsersTable.js';
 import { UsersTable } from './UsersTable.js';
 import { UsersAdministrationService } from '../UsersAdministrationService.js';
+import style from '../shared/UsersAdministration.module.css';
+import toolsPanelStyles from './UsersAdministrationToolsPanel.module.css';
+import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION.js';
+import { UsersAdministrationHeaderActions } from '../UsersAdministrationHeaderActions.js';
 
 interface Props {
   param?: string | null;
@@ -31,6 +37,8 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const authRolesResource = useResource(UsersPage, AuthRolesResource, undefined);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
   const usersAdministrationService = useService(UsersAdministrationService);
+  const styles = useS(style, toolsPanelStyles);
+  const menu = useMenu({ menu: MENU_USERS_ADMINISTRATION });
 
   useAutoLoad(UsersPage, administrationUsersManagementService.loaders);
   const filters = useUsersTableFilters();
@@ -41,37 +49,29 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const isManageable = !administrationUsersManagementService.externalUserProviderEnabled;
 
   return (
-    <ColoredContainer vertical wrap gap parent maximum>
+    <div className={s(styles, { page: true })}>
+      <UsersAdministrationHeaderActions>
+        <div className={s(styles, { headerActions: true })}>
+          <Loader suspense inline>
+            <Placeholder container={usersAdministrationService.statisticsPlaceholder} />
+          </Loader>
+          <MenuBar menu={menu} className={s(styles, { menuBar: true })} compact={false} />
+        </div>
+      </UsersAdministrationHeaderActions>
       {usersAdministrationService.informationPlaceholder.getDisplayed({}).length > 0 && (
         <Group keepSize box maximum>
           <Placeholder container={usersAdministrationService.informationPlaceholder} />
         </Group>
       )}
 
-      <Group keepSize box>
-        <UsersAdministrationToolsPanel onUpdate={table.update} />
-      </Group>
+      <UsersTableFilters filters={filters} actionsSlot={<UsersAdministrationToolsPanel onUpdate={table.update} />} />
 
-      {usersAdministrationService.statisticsPlaceholder.getDisplayed({}).length > 0 && (
-        <Group keepSize box maximum>
-          <Loader suspense>
-            <Placeholder container={usersAdministrationService.statisticsPlaceholder} />
-          </Loader>
-        </Group>
-      )}
+      <Placeholder container={createUserService.toolsContainer} param={param} />
 
-      <Group keepSize box maximum>
-        <UsersTableFilters filters={filters} />
-      </Group>
-
-      <Container overflow gap maximum>
-        <Placeholder container={createUserService.toolsContainer} param={param} />
-
-        <div className="tw:h-full tw:relative">
-          <UsersTable users={table.users} isManageable={isManageable} displayAuthRole={displayAuthRole} onLoadMore={table.loadMore} />
-          <Spinner className="tw:absolute tw:bottom-4 tw:right-8" active={loading} />
-        </div>
-      </Container>
-    </ColoredContainer>
+      <div className={s(styles, { tableContainer: true })}>
+        <UsersTable users={table.users} isManageable={isManageable} displayAuthRole={displayAuthRole} onLoadMore={table.loadMore} />
+        <Spinner className="tw:absolute tw:bottom-4 tw:right-8" active={loading} />
+      </div>
+    </div>
   );
 });

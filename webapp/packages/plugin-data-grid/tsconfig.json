@@ -17,6 +17,9 @@
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
+      "path": "../core-administration"
+    },
+    {
       "path": "../core-blocks"
     },
     {

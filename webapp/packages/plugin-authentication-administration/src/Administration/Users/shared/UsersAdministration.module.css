@@ -1,15 +1,89 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-/* TODO: same styles in cloudbeaver/webapp/packages/plugin-product-information-administration/src/shared/ProductInfoPage.module.css */
+.administration {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 28px 32px 24px;
+  background: var(--theme-sub-secondary);
+  color: var(--theme-on-surface);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-bottom: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+}
+
 .tabList {
   position: relative;
   flex-shrink: 0;
+  height: 44px;
   align-items: center;
-  padding: 0 24px;
+  gap: 24px;
+  padding: 0;
+  border-bottom: 1px solid var(--theme-background);
+  overflow-x: auto;
+}
+
+.page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  gap: 20px;
+  padding-top: 20px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-shrink: 0;
+}
+
+.tableContainer {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 104px;
+}
+
+@media (max-width: 720px) {
+  .administration {
+    padding: 20px 16px;
+  }
+
+  .headerActions {
+    gap: 16px;
+  }
 }

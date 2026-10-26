@@ -7,71 +7,86 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useDeferredValue, useState } from 'react';
 
-import { ColoredContainer, Container, Group, ToolsAction, ToolsPanel, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Filter, IconOrImage, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { TableSelectionContext, useTableSelection } from '@cloudbeaver/plugin-data-grid';
 import { compareTeams, TeamsResource } from '@cloudbeaver/core-authentication';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { isDefined } from '@dbeaver/js-helpers';
 import { useService } from '@cloudbeaver/core-di';
+import { isDefined } from '@dbeaver/js-helpers';
 
+import { TeamsTable } from './TeamsTable.js';
+import style from '../../shared/UsersAdministration.module.css';
+import { FiltersActionButton } from '../../UsersTable/Filters/FiltersActionButton.js';
 import { CreateTeamService } from './CreateTeamService.js';
 import { useTeamsTable } from './useTeamsTable.js';
-import { TeamsTable } from './TeamsTable.js';
+import { UsersAdministrationHeaderActions } from '../../UsersAdministrationHeaderActions.js';
 
-interface Props {
-  param?: string | null;
-}
-
-export const TeamsPage = observer<Props>(function TeamsPage() {
+export const TeamsPage = observer(function TeamsPage() {
   const translate = useTranslate();
+  const styles = useS(style);
   const createTeamService = useService(CreateTeamService);
-
+  const [search, setSearch] = useState('');
+  const deferredSearch = useDeferredValue(search).trim().toLowerCase();
   const teamsLoader = useResource(TeamsPage, TeamsResource, CachedMapAllKey);
-  const teams = teamsLoader.data.filter(isDefined).sort(compareTeams);
-
-  const selection = useTableSelection(teams.map(t => t.teamId));
+  const teams = teamsLoader.data
+    .filter(isDefined)
+    .filter(team => [team.teamId, team.teamName, team.description].some(value => value?.toLowerCase().includes(deferredSearch)))
+    .sort(compareTeams);
+  const selection = useTableSelection(teams.map(team => team.teamId));
   const table = useTeamsTable(selection);
 
   return (
-    <ColoredContainer vertical wrap gap parent maximum>
-      <Group box keepSize>
-        <ToolsPanel rounded>
-          <ToolsAction
-            title={translate('administration_teams_add_tooltip')}
-            icon="add"
-            viewBox="0 0 24 24"
-            disabled={!!createTeamService.formState || table.processing}
-            onClick={createTeamService.create}
-          >
-            {translate('ui_create')}
-          </ToolsAction>
-          <ToolsAction
-            title={translate('administration_teams_refresh_tooltip')}
-            icon="refresh"
-            viewBox="0 0 24 24"
-            disabled={table.processing}
-            onClick={table.update}
-          >
-            {translate('ui_refresh')}
-          </ToolsAction>
-          <ToolsAction
+    <div className={s(styles, { page: true })}>
+      <UsersAdministrationHeaderActions>
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
+          <Button
+            variant="secondary"
+            className="tw:normal-case! tw:tracking-normal! tw:font-semibold"
             title={translate('administration_teams_delete_tooltip')}
             icon="trash"
-            viewBox="0 0 24 24"
             disabled={!selection.list.length || table.processing}
             onClick={table.delete}
           >
             {translate('ui_delete')}
-          </ToolsAction>
-        </ToolsPanel>
-      </Group>
+          </Button>
+          <Button
+            variant="primary"
+            className="tw:normal-case! tw:tracking-normal! tw:font-semibold"
+            title={translate('administration_teams_add_tooltip')}
+            icon="add"
+            disabled={!!createTeamService.formState || table.processing}
+            onClick={createTeamService.create}
+          >
+            {translate('administration_teams_create')}
+          </Button>
+        </div>
+      </UsersAdministrationHeaderActions>
+      <div className={s(styles, { toolbar: true })}>
+        <Filter
+          className="tw:w-full tw:max-w-sm"
+          placeholder={translate('administration_teams_search_placeholder')}
+          value={search}
+          onChange={setSearch}
+        />
+        <div className="tw:ml-auto">
+          <FiltersActionButton
+            aria-label={translate('administration_teams_refresh_tooltip')}
+            title={translate('administration_teams_refresh_tooltip')}
+            disabled={table.processing}
+            onClick={table.update}
+          >
+            <IconOrImage className="tw:w-full tw:h-full" icon="refresh" viewBox="0 0 24 24" />
+          </FiltersActionButton>
+        </div>
+      </div>
 
-      <Container overflow gap maximum>
+      <div className={s(styles, { tableContainer: true })}>
         <TableSelectionContext value={selection}>
           <TeamsTable teams={teams} />
         </TableSelectionContext>
-      </Container>
-    </ColoredContainer>
+      </div>
+    </div>
   );
 });

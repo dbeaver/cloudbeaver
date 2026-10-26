@@ -6,4 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const AI_PROFILES_TABLE_ROW_HEIGHT = 36;
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+export const AdministrationTable = importLazyComponent(() => import('./AdministrationTable.js').then(module => module.AdministrationTable));

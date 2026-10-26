@@ -18,6 +18,7 @@ export default [
   ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
   ['authentication_administration_user_auth_method_no_details', 'No details available'],
   ['authentication_administration_item', 'Users and Teams'],
+  ['authentication_administration_create_user', 'Create user'],
   ['authentication_administration_item_users', 'Users'],
   ['authentication_administration_item_metaParameters', 'Meta Parameters'],
   ['authentication_administration_tools_add_tooltip', 'Create new user'],
@@ -103,6 +104,8 @@ export default [
 
   ['administration_teams_tab_title', 'Teams'],
   ['administration_teams_tab_description', 'Team management'],
+  ['administration_teams_search_placeholder', 'Search teams...'],
+  ['administration_teams_create', 'Create team'],
   ['administration_teams_team_creation', 'Team Creation'],
   ['administration_teams_team_id', 'Team ID'],
   ['administration_teams_team_name', 'Team Name'],
@@ -128,7 +131,10 @@ export default [
   ['administration_teams_team_granted_users_user_name', 'User name'],
   ['administration_teams_team_granted_users_empty', 'No available users'],
   ['administration_teams_team_granted_users_permission_denied', "You can't edit your own permissions"],
-  ['administration_teams_team_granted_users_only_admin_team', "You can't manage your own permissions because it is the only admin team you participate in"],
+  [
+    'administration_teams_team_granted_users_only_admin_team',
+    "You can't manage your own permissions because it is the only admin team you participate in",
+  ],
 
   ['administration_teams_team_granted_connections_tab_title', 'Connections'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Search for connection name...'],

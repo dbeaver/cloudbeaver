@@ -1413,6 +1413,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-administration@workspace:packages/core-administration"
   dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-data-context": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
@@ -2741,6 +2742,7 @@ __metadata:
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-projects": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
@@ -3250,6 +3252,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-grid@workspace:packages/plugin-data-grid"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,4 +21,5 @@ export * from './PermissionsResource.js';
 export * from './ADMINISTRATION_SETTINGS_GROUP.js';
 
 export { default as AdministrationTableStyles } from './AdministrationTable/AdministrationTable.module.css';
-export { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT } from './AdministrationTable/ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT.js';
+export * from './AdministrationTable/ADMINISTRATION_TABLE_CONFIG.js';
+export { AdministrationTable } from './AdministrationTable/AdministrationTableLazy.js';

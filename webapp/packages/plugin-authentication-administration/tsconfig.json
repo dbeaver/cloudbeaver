@@ -44,6 +44,9 @@
       "path": "../core-executor"
     },
     {
+      "path": "../core-links"
+    },
+    {
       "path": "../core-localization"
     },
     {

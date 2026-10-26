@@ -8,5 +8,8 @@
 
 /* TODO: same styles cloudbeaver/webapp/packages/plugin-product-information-administration/src/shared/ProductInfoPageTabPanel.module.css */
 .tabPanel {
+  min-width: 0;
+  min-height: 0;
   overflow: auto;
+  background: transparent;
 }

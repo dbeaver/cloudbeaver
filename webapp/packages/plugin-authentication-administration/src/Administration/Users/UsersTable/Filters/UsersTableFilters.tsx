@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
+import { type ReactNode, useCallback, useMemo, useState } from 'react';
 
-import { Filter, Group, Loader, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, Loader, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { UsersAdministrationService } from '../../UsersAdministrationService.js';
@@ -16,12 +16,14 @@ import styles from './UsersTableFilters.module.css';
 import { UsersTableFiltersDetails } from './UsersTableFiltersDetails.js';
 import { UsersTableFiltersOpenContext } from './UsersTableFiltersOpenContext.js';
 import { type IUserFilters } from './useUsersTableFilters.js';
+import { UsersTableFilterButton } from './UsersTableFilterButton.js';
 
 interface Props {
   filters: IUserFilters;
+  actionsSlot?: ReactNode;
 }
 
-export const UsersTableFilters = observer<Props>(function UsersTableFilters({ filters }) {
+export const UsersTableFilters = observer<Props>(function UsersTableFilters({ filters, actionsSlot }) {
   const translate = useTranslate();
   const style = useS(styles);
   const usersAdministrationService = useService(UsersAdministrationService);
@@ -31,7 +33,7 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
   const openContext = useMemo(() => ({ open, onToggle }), [open, onToggle]);
 
   return (
-    <Group parent compact gap>
+    <div className={s(style, { filters: true })}>
       <div className={s(style, { filterContainer: true })}>
         <Filter
           className={s(style, { filter: true })}
@@ -39,11 +41,13 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           value={filters.search}
           onChange={filters.setSearch}
         />
-        <div className={s(style, { actions: true })}>
-          <UsersTableFiltersOpenContext.Provider value={openContext}>
+        <UsersTableFiltersOpenContext.Provider value={openContext}>
+          <UsersTableFilterButton filters={filters} />
+          <div className={s(style, { actions: true })}>
+            {actionsSlot}
             <Placeholder container={usersAdministrationService.actionButtonsPlaceholder} filters={filters} />
-          </UsersTableFiltersOpenContext.Provider>
-        </div>
+          </div>
+        </UsersTableFiltersOpenContext.Provider>
       </div>
 
       {open && (
@@ -51,6 +55,6 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           <UsersTableFiltersDetails filters={filters} />
         </Loader>
       )}
-    </Group>
+    </div>
   );
 });

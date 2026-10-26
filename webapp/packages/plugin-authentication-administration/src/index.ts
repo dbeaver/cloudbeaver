@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@ import './module.js';
 export * from './Administration/Users/UsersAdministrationNavigationService.js';
 export * from './Administration/Users/UsersTable/CreateUserService.js';
 export * from './Administration/Users/UsersAdministrationService.js';
+export { UsersAdministrationHeaderActions } from './Administration/Users/UsersAdministrationHeaderActionsLazy.js';
 export * from './Administration/Users/UserForm/AdministrationUserFormService.js';
 export * from './Administration/Users/UserForm/AdministrationUserFormState.js';
 export * from './Administration/Users/UserForm/Info/getUserFormInfoPart.js';
