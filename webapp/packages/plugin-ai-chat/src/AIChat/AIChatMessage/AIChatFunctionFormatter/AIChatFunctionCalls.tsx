@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { Expandable } from '@cloudbeaver/core-blocks';
 import type { AiFunctionCall } from '@cloudbeaver/core-sdk';
 
-import { AIChatFunctionsService } from '../../../AIChatFunctionsService.js';
+import { AIChatFunctionRegistryService } from '../../../AIChatFunctionRegistryService.js';
 import { AIChatFunctionParams } from './AIChatFunctionParams.js';
 
 interface Props {
@@ -21,11 +21,11 @@ interface Props {
 }
 
 export const AIChatFunctionCalls = observer<PropsWithChildren<Props>>(function AIChatFunctionCalls({ calls, children }) {
-  const aiChatFunctionsService = useService(AIChatFunctionsService);
+  const aiChatFunctionRegistryService = useService(AIChatFunctionRegistryService);
 
   if (calls.length === 1) {
     const call = calls[0]!;
-    const func = aiChatFunctionsService.getFunction(call.functionName);
+    const func = aiChatFunctionRegistryService.getFunction(call.functionName);
     const args: Array<[string, any]> = Object.entries(call.arguments || {});
 
     return (
@@ -44,7 +44,7 @@ export const AIChatFunctionCalls = observer<PropsWithChildren<Props>>(function A
   return (
     <div className="tw:flex tw:flex-col tw:gap-2">
       {calls.map((call, index) => {
-        const func = aiChatFunctionsService.getFunction(call.functionName);
+        const func = aiChatFunctionRegistryService.getFunction(call.functionName);
         const name = func?.name || call.functionName;
         const args: Array<[string, any]> = Object.entries(call.arguments || {});
         const firstArg = args[0]?.[1];

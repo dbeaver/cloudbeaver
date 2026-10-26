@@ -27,6 +27,8 @@ import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.
 
 type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
+type CancelConversationExecutorData = { stage: 'before' | 'after'; data: { conversationId: string } };
+
 export interface IAIChatConversationMenuProps {
   conversation: AIChatConversationInfo;
   disabled?: boolean;
@@ -36,6 +38,7 @@ export interface IAIChatConversationMenuProps {
 export class AIChatConversationsService {
   readonly menuSections = new PlaceholderContainer<IAIChatConversationMenuProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
+  readonly onCancelConversation: Executor<CancelConversationExecutorData>;
 
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
@@ -68,6 +71,7 @@ export class AIChatConversationsService {
     private readonly aiChatMessagesResource: AIChatMessagesResource,
   ) {
     this.onNewConversation = new Executor();
+    this.onCancelConversation = new Executor();
     this.conversationId = null;
 
     this.aiChatContextService.onContextChange.addHandler(this.resetConversation.bind(this));
@@ -94,6 +98,18 @@ export class AIChatConversationsService {
 
   async deleteConversation(conversationId: string): Promise<void> {
     await this.aiChatConversationsResource.deleteConversation(conversationId);
+  }
+
+  async cancelConversation(conversationId: string): Promise<void> {
+    const contexts = await this.onCancelConversation.execute({ stage: 'before', data: { conversationId } });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
+    await this.aiChatConversationsResource.cancelConversation(conversationId);
+
+    await this.onCancelConversation.execute({ stage: 'after', data: { conversationId } });
   }
 
   async updateConversation(conversationId: string, config: AIChatConversationConfig): Promise<AIChatConversationInfo> {

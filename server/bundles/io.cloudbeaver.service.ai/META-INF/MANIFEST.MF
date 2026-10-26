@@ -11,4 +11,5 @@ Require-Bundle: org.jkiss.dbeaver.model.ai;visibility:=reexport,
  io.cloudbeaver.server.ce;visibility:=reexport
 Export-Package: io.cloudbeaver.service.ai,
  io.cloudbeaver.service.ai.model,
+ io.cloudbeaver.service.ai.model.events,
  io.cloudbeaver.service.ai.model.inputs

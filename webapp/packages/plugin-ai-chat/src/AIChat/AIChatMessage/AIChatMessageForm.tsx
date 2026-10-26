@@ -18,7 +18,6 @@ import { Command } from '@dbeaver/ui-kit';
 import { AIChatMessageService } from './AIChatMessageService.js';
 import { AIChatConversationsService } from '../AIChatConversation/AIChatConversationsService.js';
 import { AIChatContext } from '../AIChatContext.js';
-import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 import classes from './AIChatMessageForm.module.css';
 
 interface Props {
@@ -32,7 +31,6 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const notificationService = useService(NotificationService);
   const aiChatMessageService = useService(AIChatMessageService);
   const aiChatConversationsService = useService(AIChatConversationsService);
-  const aiChatConversationsResource = useService(AIChatConversationsResource);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -72,7 +70,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   async function cancel() {
     if (currentConversationId) {
       try {
-        await aiChatConversationsResource.cancelConversation(currentConversationId);
+        await aiChatConversationsService.cancelConversation(currentConversationId);
       } catch (exception: any) {
         notificationService.logException(exception, 'plugin_ai_chat_conversation_cancel_failed');
       }
@@ -102,6 +100,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
             value={value}
+            readOnly={aiChatConversationsService.processing}
             autoFocus
             onChange={v => setValue(v)}
           />
@@ -110,6 +109,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
           ) : (
             <Command
               className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
+              aria-label={translate('ui_processing_cancel')}
               onClick={cancel}
             >
               <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />
