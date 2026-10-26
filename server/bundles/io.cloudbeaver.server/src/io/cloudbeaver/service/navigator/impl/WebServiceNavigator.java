@@ -230,12 +230,16 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
                 }
                 dbNode.getDataSourceContainer().persistConfiguration();
-            } else {
-                checkAuthenticatedUser(webSession);
+            } else if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
                 if (!dbNode.setUserNodeFilter(itemsMeta, createFilter(include, exclude, true))) {
                     throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
                 }
                 UserDBSObjectFilterUtils.updateUserObjectFilters(dbNode.getDataSourceContainer());
+            } else {
+                // Anonymous users have no persistent user settings, so keep their filters in the session model only.
+                if (!dbNode.setNodeFilter(itemsMeta, createFilter(include, exclude, false), false)) {
+                    throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
+                }
             }
         } catch (DBException e) {
             if (e instanceof DBWebException) {
