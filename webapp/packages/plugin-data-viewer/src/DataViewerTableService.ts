@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { reaction } from 'mobx';
-
 import { type Connection, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { EObjectFeature, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -16,7 +14,6 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { ContainerDataSource } from './ContainerDataSource.js';
 import { DatabaseDataModel } from './DatabaseDataModel/DatabaseDataModel.js';
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
-import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource.js';
 import { DataViewerService } from './DataViewerService.js';
 import { DataViewerSettingsService } from './DataViewerSettingsService.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
@@ -70,12 +67,7 @@ export class DataViewerTableService {
       .setCountGain(this.dataViewerSettingsService.getDefaultRowsCount())
       .setSlice(0);
 
-    const disposeAccessReaction = reaction(
-      () => this.dataViewerService.isDataEditable(connection),
-      editable => dataModel.setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly),
-      { fireImmediately: true },
-    );
-    dataModel.onDispose.addHandler(() => disposeAccessReaction());
+    this.dataViewerService.trackDataAccess(dataModel);
 
     return dataModel;
   }

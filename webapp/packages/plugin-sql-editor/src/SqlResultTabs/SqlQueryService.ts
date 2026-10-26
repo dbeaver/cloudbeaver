@@ -13,7 +13,6 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoEventHandler, AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import {
-  DatabaseDataAccessMode,
   DatabaseDataModel,
   DataViewerDataChangeConfirmationService,
   DataViewerService,
@@ -171,6 +170,7 @@ export class SqlQueryService {
           this.asyncTaskInfoService,
         );
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
+        this.dataViewerService.trackDataAccess(model);
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
         tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
         this.switchTabToActiveRequest(editorState, tabGroup, model);
@@ -182,12 +182,10 @@ export class SqlQueryService {
         tabGroup.query = query;
       }
 
-      const editable = this.dataViewerService.isDataEditable(connectionInfo);
       const isOutputLogsTabOpened = !!editorState.outputLogsTab;
 
-      model
-        .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
-        .source.setExecutionContext(executionContext)
+      model.source
+        .setExecutionContext(executionContext)
         .setSupportedDataFormats(connectionInfo.supportedDataFormats)
         .setKeepExecutionContextOnDispose(true)
         .setOptions({
@@ -274,16 +272,15 @@ export class SqlQueryService {
             this.asyncTaskInfoService,
           );
           model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
+          this.dataViewerService.trackDataAccess(model);
           this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
         }
         statistics.modelId = model.id;
 
-        const editable = this.dataViewerService.isDataEditable(connectionInfo);
         const isOutputLogsTabOpened = !!editorState.outputLogsTab;
 
-        model
-          .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
-          .source.setExecutionContext(executionContext)
+        model.source
+          .setExecutionContext(executionContext)
           .setSupportedDataFormats(connectionInfo.supportedDataFormats)
           .setKeepExecutionContextOnDispose(true)
           .setOptions({
@@ -339,6 +336,7 @@ export class SqlQueryService {
       statistics.modelId = null;
 
       if (model) {
+        await model.dispose();
         this.tableViewerStorageService.remove(model.id);
       }
     } catch (exception: any) {
