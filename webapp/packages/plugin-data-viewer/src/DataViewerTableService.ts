@@ -1,10 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { reaction } from 'mobx';
+
 import { type Connection, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { EObjectFeature, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -63,12 +65,17 @@ export class DataViewerTableService {
       .setSupportedDataFormats(connection.supportedDataFormats)
       .setConstraintsAvailable(node?.objectFeatures.includes(EObjectFeature.supportsDataFilter) ?? true);
 
-    const editable = this.dataViewerService.isDataEditable(connection);
     const dataModel = this.tableViewerStorageService
       .add(new DatabaseDataModel(source))
       .setCountGain(this.dataViewerSettingsService.getDefaultRowsCount())
-      .setSlice(0)
-      .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly);
+      .setSlice(0);
+
+    const disposeAccessReaction = reaction(
+      () => this.dataViewerService.isDataEditable(connection),
+      editable => dataModel.setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly),
+      { fireImmediately: true },
+    );
+    dataModel.onDispose.addHandler(() => disposeAccessReaction());
 
     return dataModel;
   }
