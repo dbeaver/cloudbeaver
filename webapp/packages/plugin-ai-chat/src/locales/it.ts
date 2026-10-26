@@ -1,4 +1,5 @@
 export default [
+  ['plugin_ai_chat_configuration', 'Configura IA'],
   ['plugin_ai_chat_label', 'AI Chat'],
   ['plugin_ai_chat_tooltip', 'Activate AI Database assistant'],
   ['plugin_ai_chat_no_messages_placeholder', "Ottieni informazioni dai tuoi dati. Chiedi all'AI di generare una query per il tuo database."],
@@ -45,18 +46,6 @@ export default [
   ['plugin_ai_chat_conversation_history_date_group_over_week_ago', 'Over a week ago'],
 
   ['plugin_ai_chat_conversation_cancel_failed', 'Impossibile annullare la conversazione'],
-
-  ['plugin_ai_chat_scope_change', 'Configure AI context'],
-  ['plugin_ai_chat_scope_change_fail', 'Failed to change context'],
-  ['plugin_ai_chat_profile_group', 'Active configuration'],
-  ['plugin_ai_chat_profile_change_fail', 'Failed to change AI profile'],
-  ['plugin_ai_chat_profile_edit_credentials', 'Modifica credenziali'],
-  ['plugin_ai_chat_profile_credentials_edit_fail', 'Impossibile modificare le credenziali del profilo IA'],
-  ['plugin_ai_chat_scope_connection', 'Connection'],
-  ['plugin_ai_chat_scope_schema', 'Current Schema'],
-  ['plugin_ai_chat_scope_database', 'Current Database'],
-  ['plugin_ai_chat_scope_custom', 'Custom'],
-  ['plugin_ai_chat_scope_custom_dialog_title', 'Custom completion scope'],
 
   ['plugin_ai_chat_settings', 'Impostazioni chat'],
   ['plugin_ai_chat_settings_metrics_enable', 'Abilita metriche'],

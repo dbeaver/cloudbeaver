@@ -1,4 +1,9 @@
 export default [
+  ['sql_editor_settings_blank_line_delimiter_name', '将空行作为语句分隔符'],
+  ['sql_editor_settings_blank_line_delimiter_desc', '控制是否使用空行分隔 SQL 语句。选择“从不”可允许语句内部包含空行。'],
+  ['sql_editor_settings_blank_line_delimiter_always', '始终'],
+  ['sql_editor_settings_blank_line_delimiter_never', '从不'],
+  ['sql_editor_settings_blank_line_delimiter_smart', '智能'],
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL编辑器'],
   ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
   ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],

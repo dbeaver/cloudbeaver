@@ -18,10 +18,20 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 import { AIChatService } from './AIChat/AIChatService.js';
 import { ACTION_TOGGLE_AI_CHAT } from './actions/ACTION_TOGGLE_AI_CHAT.js';
 import { AIChatTabService } from './AIChatTabService.js';
+import { AIChatFunctionsService } from './AIChatFunctionsService.js';
 
 const WelcomeAIChat = importLazyComponent(() => import('./WelcomeAIChat.js').then(m => m.WelcomeAIChat));
 
-@injectable(() => [MenuService, ActionService, AIChatService, UserInfoResource, SqlDataSourceService, NavigationTabsService, AIChatTabService])
+@injectable(() => [
+  MenuService,
+  ActionService,
+  AIChatService,
+  UserInfoResource,
+  SqlDataSourceService,
+  NavigationTabsService,
+  AIChatTabService,
+  AIChatFunctionsService,
+])
 export class AIChatServiceBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
@@ -31,11 +41,14 @@ export class AIChatServiceBootstrap extends Bootstrap {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly navigationTabsService: NavigationTabsService,
     private readonly aiChatTabService: AIChatTabService,
+    private readonly aiChatFunctionsService: AIChatFunctionsService,
   ) {
     super();
   }
 
   override register(): void {
+    this.aiChatFunctionsService.register();
+
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [...items, ACTION_TOGGLE_AI_CHAT],

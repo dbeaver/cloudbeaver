@@ -49,6 +49,7 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
       defaultState={defaultCredentials}
       disabled={disabled}
       readOnly={readonly}
+      isRequired={property => property.required && !(property.features.includes('password') && property.value)}
       getLayoutSize={getLayoutSize}
       autocompletePasswordType="new-password"
       showRememberTip

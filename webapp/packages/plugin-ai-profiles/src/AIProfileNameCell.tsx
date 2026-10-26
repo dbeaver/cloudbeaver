@@ -23,6 +23,7 @@ interface Props {
   onOpen?: (profile: AIProfile) => void;
   onClone?: (profileId: string) => void;
   onDelete?: (profileId: string) => void;
+  onSetDefault?: (profileId: string) => void;
 }
 
 export const AIProfileNameCell = observer<Props>(function AIProfileNameCell({
@@ -33,6 +34,7 @@ export const AIProfileNameCell = observer<Props>(function AIProfileNameCell({
   onOpen,
   onClone,
   onDelete,
+  onSetDefault,
 }) {
   const translate = useTranslate();
   const cell = useContext(DataGridCellInnerContext);
@@ -49,9 +51,10 @@ export const AIProfileNameCell = observer<Props>(function AIProfileNameCell({
         )}
         {badge}
       </div>
-      {(onClone || onDelete) && (
+      {(onClone || onDelete || onSetDefault) && (
         <MenuProvider placement="bottom-end">
           <MenuButton
+            disabled={disabled}
             render={
               <IconButton
                 name="snack"
@@ -68,6 +71,13 @@ export const AIProfileNameCell = observer<Props>(function AIProfileNameCell({
           />
           <Menu modal>
             {onOpen && <MenuItem disabled={disabled} render={<MenuItemElement label="ui_edit" icon="edit" />} onClick={() => onOpen(profile)} />}
+            {onSetDefault && (
+              <MenuItem
+                disabled={disabled}
+                render={<MenuItemElement label="plugin_ai_profiles_set_default" icon="star" />}
+                onClick={() => onSetDefault(profile.id)}
+              />
+            )}
             {onClone && (
               <MenuItem
                 disabled={disabled}
