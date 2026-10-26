@@ -10,14 +10,13 @@ import { observer } from 'mobx-react-lite';
 
 import { Expandable, Link, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import type { TranslateFn } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiFunctionType } from '@cloudbeaver/core-sdk';
 
 import { UnstyledButton } from '@dbeaver/ui-kit';
 
 import type { IAIFunctionMessage } from '../AIChatMessagesResource.js';
-import { AIChatFunctionsService, parseAIFunction, type AIFunctionName, type AIParamsFor } from '../../../AIChatFunctionsService.js';
+import { AIChatFunctionRegistryService } from '../../../AIChatFunctionRegistryService.js';
 import { AIChatFunctionCalls } from './AIChatFunctionCalls.js';
 
 interface Props {
@@ -26,11 +25,11 @@ interface Props {
 
 export const AIChatFunctionFormatter = observer<Props>(function AIChatFunctionFormatter({ message }) {
   const translate = useTranslate();
-  const aiChatFunctionsService = useService(AIChatFunctionsService);
+  const aiChatFunctionRegistryService = useService(AIChatFunctionRegistryService);
   const notificationService = useService(NotificationService);
 
   if (message.functionResult.type !== AiFunctionType.Action) {
-    const func = aiChatFunctionsService.getFunction(message.functionCall.functionName);
+    const func = aiChatFunctionRegistryService.getFunction(message.functionCall.functionName);
     const name = func?.name || message.functionCall.functionName;
     const resultValue =
       typeof message.functionResult.value === 'string' ? message.functionResult.value : JSON.stringify(message.functionResult.value);
@@ -63,7 +62,7 @@ export const AIChatFunctionFormatter = observer<Props>(function AIChatFunctionFo
 
   function executeFunction(functionName: string, params: unknown) {
     try {
-      aiChatFunctionsService.executeFunction(functionName as AIFunctionName, params as AIParamsFor<AIFunctionName>);
+      aiChatFunctionRegistryService.executeFunction(functionName, params);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_function_execution_fail');
     }
@@ -76,27 +75,8 @@ export const AIChatFunctionFormatter = observer<Props>(function AIChatFunctionFo
         render={<Link />}
         onClick={() => executeFunction(message.functionCall.functionName, message.functionResult.value)}
       >
-        {getFunctionActionLabel(message.functionCall.functionName, message.functionResult.value, translate)}
+        {aiChatFunctionRegistryService.getActionLabel(message.functionCall.functionName, message.functionResult.value, translate)}
       </UnstyledButton>
     </div>
   );
 });
-
-function getFunctionActionLabel(fn: string, params: unknown, translate: TranslateFn): string {
-  const parsed = parseAIFunction(fn, params);
-
-  if (!parsed) {
-    return fn;
-  }
-
-  switch (parsed.fn) {
-    case 'db_uiOpenDBeaverEntityEditor':
-    case 'db_openTableDataEditor':
-      return `${translate('ui_open')} "${parsed.params.objectName}"`;
-    case 'db_uiOpenDBeaverSQLEditor':
-    case 'db_openSQLEditor':
-      return `${translate('ui_open')} ${translate('sql_editor_script_editor')}`;
-    default:
-      return translate('plugin_ai_chat_action_unknown');
-  }
-}

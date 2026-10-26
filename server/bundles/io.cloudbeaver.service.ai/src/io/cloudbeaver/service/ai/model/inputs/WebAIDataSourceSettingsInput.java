@@ -23,7 +23,6 @@ public record WebAIDataSourceSettingsInput(
     @Nullable Boolean metaTransferConfirmed,
     @Nullable AIDatabaseScope scope,
     @Nullable String[] customObjectIds,
-    @Nullable Boolean mcpEnabled,
-    @Nullable String[] excludedObjectIds
+    @Nullable Boolean mcpEnabled
 ) {
 }
