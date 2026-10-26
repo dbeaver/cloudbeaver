@@ -29,9 +29,9 @@ interface IScopeItem {
   label: string;
 }
 
-export const AIChatConversationScope = observer<IAIChatConversationMenuProps>(function AIChatConversationScope({ conversation, disabled }) {
+export const AIChatConversationScope = observer<IAIChatConversationMenuProps>(function AIChatConversationScope({ conversation }) {
   const context = useContext(AIChatContext);
-  const { catalog, schema } = context;
+  const { catalog, schema, disabled } = context;
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const connectionsManagerService = useService(ConnectionsManagerService);

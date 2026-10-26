@@ -7,14 +7,17 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 
 import { Menu, MenuProvider, MenuButton } from '@dbeaver/ui-kit';
 import { ActionIconButton, usePlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AIChatConversationsService, type IAIChatConversationMenuProps } from './AIChatConversationsService.js';
+import { AIChatContext } from '../AIChatContext.js';
 
 export const AIChatConversationMenu = observer<IAIChatConversationMenuProps>(function AIChatConversationMenu(props) {
+  const { disabled } = useContext(AIChatContext);
   const translate = useTranslate();
   const aiChatConversationsService = useService(AIChatConversationsService);
   const sections = usePlaceholder({ container: aiChatConversationsService.menuSections, props });
@@ -27,7 +30,7 @@ export const AIChatConversationMenu = observer<IAIChatConversationMenuProps>(fun
 
   return (
     <MenuProvider placement="bottom-end">
-      <MenuButton render={<ActionIconButton disabled={props.disabled} title={label} aria-label={label} name="/icons/scope.svg" img />} />
+      <MenuButton render={<ActionIconButton disabled={disabled} title={label} aria-label={label} name="/icons/scope.svg" img />} />
       <Menu modal fitViewport>
         {sections.map(({ id, component: Section }) => (
           <Section key={id} {...props} />

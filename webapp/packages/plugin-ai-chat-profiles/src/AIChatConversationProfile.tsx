@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { MenuGroup, MenuGroupLabel, MenuItemRadio, useMenuContext } from '@dbeaver/ui-kit';
 import { ActionIconButton, IconOrImage, RadioIndicator, useResource, useTranslate } from '@cloudbeaver/core-blocks';
@@ -18,11 +18,12 @@ import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { AIProfileCredentialsService, AIProfilesResource, compareAIProfiles, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
-import type { IAIChatConversationMenuProps } from '@cloudbeaver/plugin-ai-chat';
+import { AIChatContext, type IAIChatConversationMenuProps } from '@cloudbeaver/plugin-ai-chat';
 
 import { AIChatConversationProfileService } from './AIChatConversationProfileService.js';
 
-export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(function AIChatConversationProfile({ conversation, disabled }) {
+export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(function AIChatConversationProfile({ conversation }) {
+  const { disabled } = useContext(AIChatContext);
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const aiChatConversationProfileService = useService(AIChatConversationProfileService);

@@ -10,7 +10,12 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AIDefaultProfileService, AIProfilesResource, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
-import { AIChatConversationsService, AIChatConversationsResource, type AIChatConversationInfo } from '@cloudbeaver/plugin-ai-chat';
+import {
+  AIChatConversationsService,
+  AIChatConversationsResource,
+  conversationConfigContext,
+  type AIChatConversationInfo,
+} from '@cloudbeaver/plugin-ai-chat';
 
 @injectable(() => [AIChatConversationsService, AIChatConversationsResource, AIDefaultProfileService, AIProfilesResource])
 export class AIChatConversationProfileService {
@@ -33,7 +38,12 @@ export class AIChatConversationProfileService {
       },
     );
 
-    this.aiChatConversationsResource.onBeforeCreate.addHandler(async config => {
+    aiChatConversationsService.onCreateConversation.addHandler(async ({ stage }, contexts) => {
+      if (stage !== 'before') {
+        return;
+      }
+
+      const config = contexts.getContext(conversationConfigContext);
       if (config.settings?.profile) {
         return;
       }

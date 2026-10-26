@@ -60,7 +60,7 @@ export const AIChatHeader = observer<Props>(function AIChatHeader({ currentConve
         <div className="tw:flex tw:items-center">
           {currentConversation && (
             <Suspense fallback={<Loader className="tw:h-7 tw:w-7" small />}>
-              <AIChatConversationMenu conversation={currentConversation} disabled={disabled} />
+              <AIChatConversationMenu conversation={currentConversation} />
             </Suspense>
           )}
           <AISettings />

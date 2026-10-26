@@ -9,7 +9,6 @@
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { isConnectionInfoParamEqual, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor } from '@cloudbeaver/core-executor';
 import {
   CachedMapResource,
   isResourceAlias,
@@ -35,8 +34,6 @@ export const ChatConversationConnectionKey = resourceKeyListAliasFactory(
 
 @injectable(() => [GraphQLService, UserInfoResource])
 export class AIChatConversationsResource extends CachedMapResource<string, AIChatConversationInfo> {
-  readonly onBeforeCreate = new Executor<AIChatConversationConfig>();
-
   constructor(
     private readonly graphQLService: GraphQLService,
     userInfoResource: UserInfoResource,
@@ -67,7 +64,6 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
     generatorId?: EAIConversationPromptGeneratorId,
     config: AIChatConversationConfig = {},
   ): Promise<AIChatConversationInfo> {
-    await this.onBeforeCreate.execute(config);
     const { conversation } = await this.graphQLService.sdk.createChatConversation({
       config: {
         ...config,

@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { computed, makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable, toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { isDefined } from '@dbeaver/js-helpers';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { ExecutionContext, Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 
 import {
   AIChatConversationsResource,
@@ -24,14 +24,18 @@ import {
 import { AIChatContextService } from '../AIChatContext/AIChatContextService.js';
 import { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
 import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.js';
+import { conversationConfigContext } from './conversationConfigContext.js';
 
 type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
 type CancelConversationExecutorData = { stage: 'before' | 'after'; data: { conversationId: string } };
 
+type CreateConversationExecutorData =
+  | { stage: 'before'; data: { key: IConnectionInfoParams | null; generatorId?: EAIConversationPromptGeneratorId; config: AIChatConversationConfig } }
+  | { stage: 'after'; data: AIChatConversationInfo };
+
 export interface IAIChatConversationMenuProps {
   conversation: AIChatConversationInfo;
-  disabled?: boolean;
 }
 
 @injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource])
@@ -39,6 +43,7 @@ export class AIChatConversationsService {
   readonly menuSections = new PlaceholderContainer<IAIChatConversationMenuProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
   readonly onCancelConversation: Executor<CancelConversationExecutorData>;
+  readonly onCreateConversation: Executor<CreateConversationExecutorData>;
 
   get defaultConversation(): AIChatConversationInfo | null {
     const context = this.aiChatContextService.currentContext;
@@ -72,6 +77,7 @@ export class AIChatConversationsService {
   ) {
     this.onNewConversation = new Executor();
     this.onCancelConversation = new Executor();
+    this.onCreateConversation = new Executor();
     this.conversationId = null;
 
     this.aiChatContextService.onContextChange.addHandler(this.resetConversation.bind(this));
@@ -117,9 +123,24 @@ export class AIChatConversationsService {
     return conversation;
   }
 
-  async createConversation(key: IConnectionInfoParams | null, generatorId?: EAIConversationPromptGeneratorId): Promise<AIChatConversationInfo> {
-    const conversation = await this.aiChatConversationsResource.createConversation(key, generatorId);
+  async createConversation(
+    key: IConnectionInfoParams | null,
+    generatorId?: EAIConversationPromptGeneratorId,
+    config: AIChatConversationConfig = {},
+  ): Promise<AIChatConversationInfo> {
+    const data: CreateConversationExecutorData = { stage: 'before', data: { key, generatorId, config } };
+    const executionContext = new ExecutionContext<CreateConversationExecutorData>(data);
+    executionContext.contexts.set(conversationConfigContext, structuredClone(toJS(config)));
+
+    await this.onCreateConversation.execute(data, executionContext);
+
+    const conversation = await this.aiChatConversationsResource.createConversation(
+      key,
+      generatorId,
+      executionContext.getContext(conversationConfigContext),
+    );
     this.selectConversation(conversation.id);
+    await this.onCreateConversation.execute({ stage: 'after', data: conversation }, executionContext);
     return conversation;
   }
 
