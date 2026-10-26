@@ -37,6 +37,7 @@ import { Button } from '../../Button.js';
 
 interface RenderFieldProps {
   property: IObjectPropertyInfo;
+  isRequired: boolean;
   state?: Record<string, any>;
   context?: Record<string, any>;
   defaultState?: Record<string, any>;
@@ -54,6 +55,7 @@ interface RenderFieldProps {
 
 export const RenderField = observer<RenderFieldProps>(function RenderField({
   property,
+  isRequired,
   state,
   defaultState,
   context,
@@ -89,7 +91,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     }
   }
 
-  const required = property.required && !readonly;
+  const required = isRequired && !readonly;
   const value = getObjectPropertyValue(property);
   const defaultValue = getObjectPropertyDefaultValue(property);
   const hint = property.hint === property.displayName ? undefined : property.hint;
