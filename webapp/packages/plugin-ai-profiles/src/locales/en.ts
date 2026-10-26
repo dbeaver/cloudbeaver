@@ -9,6 +9,10 @@
 export default [
   ['plugin_ai_profiles_profile_menu', 'Profile actions'],
   ['plugin_ai_profiles_profile_clone', 'Clone'],
+  ['plugin_ai_profiles_default_badge', '(Default)'],
+  ['plugin_ai_profiles_default_description', 'Default profile for your AI requests. Select a profile in chat or use Set as default to change it.'],
+  ['plugin_ai_profiles_set_default', 'Set as default'],
+  ['plugin_ai_profiles_default_save_failed', 'Failed to save your default AI profile'],
   ['plugin_ai_profiles_scope', 'Scope'],
   ['plugin_ai_profiles_scope_global', 'Global'],
   ['plugin_ai_profiles_scope_user', 'User'],
