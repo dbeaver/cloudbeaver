@@ -47,7 +47,7 @@
     "@types/js-yaml": "^4",
     "@types/node": "^22",
     "enquirer": "^2",
-    "execa": "^9",
+    "execa": "^10",
     "glob": "^13",
     "hygen": "^6",
     "typescript": "^5"
