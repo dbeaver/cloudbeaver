@@ -130,7 +130,7 @@ export class AIChatConversationsService {
   ): Promise<AIChatConversationInfo> {
     const data: CreateConversationExecutorData = { stage: 'before', data: { key, generatorId, config } };
     const executionContext = new ExecutionContext<CreateConversationExecutorData>(data);
-    executionContext.contexts.set(conversationConfigContext, structuredClone(toJS(config)));
+    executionContext.contexts.set(conversationConfigContext, toJS(config));
 
     await this.onCreateConversation.execute(data, executionContext);
 
