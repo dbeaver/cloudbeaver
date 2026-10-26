@@ -18,10 +18,16 @@ package io.cloudbeaver;
 
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
+import org.jkiss.dbeaver.model.access.DBAAuthModel;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.junit.jupiter.api.Assertions;
@@ -83,6 +89,51 @@ public class WebConnectionConfigInputHandlerTest {
     }
 
     @Test
+    public void resetsOnlySecureAuthModelCredentials() {
+        WebSession webSession = Mockito.mock(WebSession.class);
+        Mockito.when(webSession.getProgressMonitor()).thenReturn(Mockito.mock(DBRProgressMonitor.class));
+        final WebConnectionConfigInputHandler<WebConnectionConfig, DataSourceDescriptor> handler =
+            new WebConnectionConfigInputHandler<>(
+                webSession,
+                Mockito.mock(DBPDataSourceRegistry.class),
+                new WebConnectionConfig(Map.of())
+            );
+        DBAAuthModel<DBAAuthCredentials> authModel = Mockito.mock(DBAAuthModel.class);
+        DBPConnectionConfiguration connectionConfiguration = new TestConnectionConfiguration(authModel);
+        connectionConfiguration.setAuthProperty("stored-client-id", "client-id");
+        connectionConfiguration.setAuthProperty("stored-client-secret", "client-secret");
+        DataSourceDescriptor dataSource = Mockito.mock(DataSourceDescriptor.class);
+        Mockito.when(dataSource.getConnectionConfiguration()).thenReturn(connectionConfiguration);
+        Mockito.when(authModel.loadCredentials(dataSource, connectionConfiguration)).thenAnswer(invocation ->
+            new TestCredentials(
+                connectionConfiguration.getAuthProperty("stored-client-id"),
+                connectionConfiguration.getAuthProperty("stored-client-secret")
+            )
+        );
+        Mockito.doAnswer(invocation -> {
+            DBPConnectionConfiguration configuration = invocation.getArgument(1);
+            TestCredentials credentials = invocation.getArgument(2);
+            configuration.setAuthProperty("stored-client-id", credentials.getClientId());
+            configuration.setAuthProperty("stored-client-secret", credentials.getClientSecret());
+            return null;
+        }).when(authModel).saveCredentials(
+            Mockito.eq(dataSource),
+            Mockito.any(DBPConnectionConfiguration.class),
+            Mockito.any(DBAAuthCredentials.class)
+        );
+
+        handler.resetDataSourceCredentials(dataSource);
+
+        Assertions.assertEquals("client-id", connectionConfiguration.getAuthProperty("stored-client-id"));
+        Assertions.assertNull(connectionConfiguration.getAuthProperty("stored-client-secret"));
+        Mockito.verify(authModel).saveCredentials(
+            Mockito.eq(dataSource),
+            Mockito.argThat(configuration -> configuration != connectionConfiguration),
+            Mockito.any(DBAAuthCredentials.class)
+        );
+    }
+
+    @Test
     public void restoresSavedDataSourceCredentials() {
         WebConnectionConfigInputHandler<WebConnectionConfig, DataSourceDescriptor> handler =
             new WebConnectionConfigInputHandler<>(
@@ -108,5 +159,59 @@ public class WebConnectionConfigInputHandlerTest {
         Mockito.verify(dataSource).setSavePassword(true);
         Mockito.verify(dataSource).setSharedCredentials(true);
         Mockito.verify(dataSource).setSelectedSharedCredentials(selectedSecret);
+    }
+
+    /** Credentials with persistence keys that differ from their property names. */
+    public static class TestCredentials implements DBAAuthCredentials {
+        @NotNull
+        private String clientId;
+        @Nullable
+        private String clientSecret;
+
+        private TestCredentials(@NotNull String clientId, @Nullable String clientSecret) {
+            this.clientId = clientId;
+            this.clientSecret = clientSecret;
+        }
+
+        @NotNull
+        @Property
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(@NotNull String clientId) {
+            this.clientId = clientId;
+        }
+
+        @Nullable
+        @Property(password = true)
+        public String getClientSecret() {
+            return clientSecret;
+        }
+
+        public void setClientSecret(@Nullable String clientSecret) {
+            this.clientSecret = clientSecret;
+        }
+
+        @Override
+        public boolean isComplete() {
+            return clientId != null && clientSecret != null;
+        }
+    }
+
+    private static class TestConnectionConfiguration extends DBPConnectionConfiguration {
+        @NotNull
+        private final DBAAuthModel<DBAAuthCredentials> authModel;
+
+        private TestConnectionConfiguration(@NotNull DBAAuthModel<DBAAuthCredentials> authModel) {
+            this.authModel = authModel;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T extends DBAAuthCredentials> DBAAuthModel<T> getAuthModel() {
+            return (DBAAuthModel<T>) authModel;
+        }
     }
 }

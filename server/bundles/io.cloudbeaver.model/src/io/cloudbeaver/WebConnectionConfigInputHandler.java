@@ -23,14 +23,18 @@ import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
+import org.jkiss.dbeaver.model.access.DBAAuthModel;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
+import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C extends DataSourceDescriptor> {
@@ -115,12 +119,58 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         dataSource.setSavePassword(false);
         dataSource.setSharedCredentials(false);
         dataSource.resetAllSecrets();
+        DBPConnectionConfiguration connectionConfiguration = dataSource.getConnectionConfiguration();
+        resetSecureAuthModelCredentials(dataSource, connectionConfiguration);
         dataSource.resetPassword();
-        for (DBWHandlerConfiguration handler : dataSource.getConnectionConfiguration().getHandlers()) {
+        for (DBWHandlerConfiguration handler : connectionConfiguration.getHandlers()) {
             handler.setSavePassword(false);
             handler.setPassword(null);
             handler.setSecureProperties(Map.of());
         }
+    }
+
+    private void resetSecureAuthModelCredentials(
+        @NotNull C dataSource,
+        @NotNull DBPConnectionConfiguration connectionConfiguration
+    ) {
+        DBAAuthModel<DBAAuthCredentials> authModel = connectionConfiguration.getAuthModel();
+        DBAAuthCredentials sanitizedCredentials = authModel.loadCredentials(dataSource, connectionConfiguration);
+        Map<String, Object> secureProperties = new LinkedHashMap<>();
+        ObjectPropertyDescriptor.extractAnnotations(
+                null,
+                ObjectPropertyDescriptor.getObjectClass(sanitizedCredentials),
+                (object, property) -> true,
+                null
+            ).stream()
+            .filter(ObjectPropertyDescriptor::isPassword)
+            .forEach(property -> secureProperties.put(CommonUtils.toString(property.getId()), null));
+        if (!secureProperties.isEmpty()) {
+            WebDataSourceUtils.updateCredentialsFromProperties(
+                webSession.getProgressMonitor(),
+                sanitizedCredentials,
+                secureProperties
+            );
+            Map<String, String> sanitizedProperties = serializeAuthProperties(
+                dataSource,
+                connectionConfiguration,
+                authModel,
+                sanitizedCredentials
+            );
+            connectionConfiguration.setAuthProperties(sanitizedProperties);
+        }
+    }
+
+    @NotNull
+    private Map<String, String> serializeAuthProperties(
+        @NotNull C dataSource,
+        @NotNull DBPConnectionConfiguration connectionConfiguration,
+        @NotNull DBAAuthModel<DBAAuthCredentials> authModel,
+        @NotNull DBAAuthCredentials credentials
+    ) {
+        DBPConnectionConfiguration configurationCopy = new DBPConnectionConfiguration(connectionConfiguration);
+        configurationCopy.setAuthProperties(null);
+        authModel.saveCredentials(dataSource, configurationCopy, credentials);
+        return configurationCopy.getAuthProperties();
     }
 
     @NotNull
