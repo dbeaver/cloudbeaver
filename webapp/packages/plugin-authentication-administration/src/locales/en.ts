@@ -1,4 +1,14 @@
 export default [
+  ['plugin_authentication_administration_team_grant_source', 'Membership source'],
+  ['plugin_authentication_administration_team_grant_manual', 'Added by an administrator'],
+  ['plugin_authentication_administration_team_grant_provider', 'Via provider'],
+  ['plugin_authentication_administration_team_grant_none', 'Not a team member'],
+  ['plugin_authentication_administration_team_grant_default', 'Automatic: default team'],
+  [
+    'plugin_authentication_administration_team_grant_default_tooltip',
+    'The user was added automatically because this team is configured as the default team for users.',
+  ],
+  ['plugin_authentication_administration_team_grant_provider_tooltip', 'Assigned by the authentication provider and synchronized on login.'],
   ['authentication_administration_pages_label', 'Pages'],
   ['authentication_administration_user_connections_user_add', 'User Creation'],
   ['authentication_administration_user_connections_user_new', 'New user'],
@@ -128,7 +138,10 @@ export default [
   ['administration_teams_team_granted_users_user_name', 'User name'],
   ['administration_teams_team_granted_users_empty', 'No available users'],
   ['administration_teams_team_granted_users_permission_denied', "You can't edit your own permissions"],
-  ['administration_teams_team_granted_users_only_admin_team', "You can't manage your own permissions because it is the only admin team you participate in"],
+  [
+    'administration_teams_team_granted_users_only_admin_team',
+    "You can't manage your own permissions because it is the only admin team you participate in",
+  ],
 
   ['administration_teams_team_granted_connections_tab_title', 'Connections'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Search for connection name...'],

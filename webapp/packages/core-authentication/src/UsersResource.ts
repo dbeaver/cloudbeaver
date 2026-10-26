@@ -104,6 +104,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return {
       userId: '',
       grantedTeams: [],
+      grantedTeamsInfo: [],
       grantedConnections: [],
       configurationParameters: {},
       metaParameters: {},
