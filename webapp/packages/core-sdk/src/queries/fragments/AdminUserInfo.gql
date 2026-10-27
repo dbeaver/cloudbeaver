@@ -1,12 +1,6 @@
 fragment AdminUserInfo on AdminUserInfo {
   userId
   grantedTeams
-  grantedTeamsInfo {
-    teamId
-    teamRole
-    grantType
-    grantedBy
-  }
   linkedAuthProviders
 
   origins {

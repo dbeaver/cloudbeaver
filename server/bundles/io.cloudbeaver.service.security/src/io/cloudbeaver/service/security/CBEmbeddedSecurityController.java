@@ -741,13 +741,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         if (ArrayUtils.isEmpty(teamIds)) {
             return false;
         }
-        Map<String, UserTeamGrant> currentGrants = getCurrentUserTeamGrants(dbCon, userId);
-        for (String teamId : teamIds) {
-            UserTeamGrant grant = currentGrants.get(teamId);
-            if (grant != null && grant.grantType() == SMTeamGrantType.AUTH_PROVIDER) {
-                throw new SMException("Cannot manually delete auth provider managed user team: " + teamId);
-            }
-        }
         String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
                 "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 

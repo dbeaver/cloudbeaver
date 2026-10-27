@@ -1,8 +1,6 @@
 export default [
-  ['plugin_authentication_administration_team_grant_source', 'Источник членства'],
   ['plugin_authentication_administration_team_grant_manual', 'Добавлен администратором'],
   ['plugin_authentication_administration_team_grant_provider', 'Через провайдера'],
-  ['plugin_authentication_administration_team_grant_none', 'Не состоит в команде'],
   ['plugin_authentication_administration_team_grant_default', 'Автоматически: команда по умолчанию'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',

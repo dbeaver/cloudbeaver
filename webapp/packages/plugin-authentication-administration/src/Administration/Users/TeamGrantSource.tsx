@@ -8,33 +8,16 @@
 import { observer } from 'mobx-react-lite';
 
 import { useTranslate } from '@cloudbeaver/core-blocks';
-import type { AdminUserTeamInfo } from '@cloudbeaver/core-sdk';
+
+import { useTeamGrantLabel, type ITeamGrantSource } from './useTeamGrantLabel.js';
 
 interface Props {
-  grant: { grantType?: `${AdminUserTeamInfo['grantType']}`; grantedBy?: AdminUserTeamInfo['grantedBy'] } | undefined;
+  grant: ITeamGrantSource | undefined;
 }
 
 export const TeamGrantSource = observer<Props>(function TeamGrantSource({ grant }) {
   const translate = useTranslate();
-
-  function getLabel(): string {
-    if (!grant) {
-      return translate('plugin_authentication_administration_team_grant_none');
-    }
-
-    switch (grant.grantType ?? 'MANUAL') {
-      case 'AUTH_PROVIDER': {
-        const label = translate('plugin_authentication_administration_team_grant_provider');
-        return grant.grantedBy ? `${label}: ${grant.grantedBy}` : label;
-      }
-      case 'DEFAULT':
-        return translate('plugin_authentication_administration_team_grant_default');
-      case 'MANUAL':
-        return translate('plugin_authentication_administration_team_grant_manual');
-      default:
-        return '-';
-    }
-  }
+  const getLabel = useTeamGrantLabel();
 
   function getTooltip(): string | undefined {
     switch (grant?.grantType) {
@@ -47,5 +30,5 @@ export const TeamGrantSource = observer<Props>(function TeamGrantSource({ grant 
     }
   }
 
-  return <span title={getTooltip()}>{getLabel()}</span>;
+  return <span title={getTooltip()}>{getLabel(grant)}</span>;
 });

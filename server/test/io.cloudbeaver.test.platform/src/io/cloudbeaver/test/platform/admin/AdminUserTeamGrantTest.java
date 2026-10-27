@@ -23,7 +23,6 @@ import io.cloudbeaver.service.auth.ldap.LdapConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMTeamGrantType;
-import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.user.SMUserTeam;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -125,7 +124,7 @@ public class AdminUserTeamGrantTest extends CloudbeaverMockTest {
     }
 
     @Test
-    public void testProviderGrantCannotBeDeletedManually() throws Exception {
+    public void testProviderGrantCanBeDeletedManually() throws Exception {
         securityController.setUserTeams(
             userId,
             new String[]{providerTeamOne},
@@ -133,11 +132,8 @@ public class AdminUserTeamGrantTest extends CloudbeaverMockTest {
             SMTeamGrantType.AUTH_PROVIDER
         );
 
-        Assertions.assertThrows(
-            SMException.class,
-            () -> securityController.deleteUserTeams(userId, new String[]{providerTeamOne})
-        );
-        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
+        securityController.deleteUserTeams(userId, new String[]{providerTeamOne});
+        Assertions.assertFalse(getGrants().containsKey(providerTeamOne));
     }
 
     @Test

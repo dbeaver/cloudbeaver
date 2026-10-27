@@ -1,8 +1,6 @@
 export default [
-  ['plugin_authentication_administration_team_grant_source', 'Nguồn tư cách thành viên'],
   ['plugin_authentication_administration_team_grant_manual', 'Được quản trị viên thêm'],
   ['plugin_authentication_administration_team_grant_provider', 'Qua nhà cung cấp'],
-  ['plugin_authentication_administration_team_grant_none', 'Không phải thành viên nhóm'],
   ['plugin_authentication_administration_team_grant_default', 'Tự động: nhóm mặc định'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',

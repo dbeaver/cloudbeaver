@@ -1,8 +1,6 @@
 export default [
-  ['plugin_authentication_administration_team_grant_source', 'Origine dell’appartenenza'],
   ['plugin_authentication_administration_team_grant_manual', 'Aggiunto da un amministratore'],
   ['plugin_authentication_administration_team_grant_provider', 'Tramite provider'],
-  ['plugin_authentication_administration_team_grant_none', 'Non fa parte del team'],
   ['plugin_authentication_administration_team_grant_default', 'Automatico: team predefinito'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',
