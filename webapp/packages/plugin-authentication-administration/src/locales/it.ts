@@ -1,6 +1,6 @@
 export default [
   ['plugin_authentication_administration_team_grant_manual', 'Amministratore'],
-  ['plugin_authentication_administration_team_grant_provider', 'Provider'],
+  ['plugin_authentication_administration_team_grant_provider', 'Provider di autenticazione'],
   ['plugin_authentication_administration_team_grant_default', 'Team predefinito'],
   ['plugin_authentication_administration_team_grant_manual_tooltip', 'Aggiunto manualmente da un amministratore.'],
   [

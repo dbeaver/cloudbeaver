@@ -1,6 +1,6 @@
 export default [
   ['plugin_authentication_administration_team_grant_manual', 'Administrator'],
-  ['plugin_authentication_administration_team_grant_provider', 'Provider'],
+  ['plugin_authentication_administration_team_grant_provider', 'Auth provider'],
   ['plugin_authentication_administration_team_grant_default', 'Default team'],
   ['plugin_authentication_administration_team_grant_manual_tooltip', 'Added manually by an administrator.'],
   [

@@ -28,7 +28,7 @@ export function useTeamGrantLabel() {
       case 'AUTH_PROVIDER': {
         const label = translate('plugin_authentication_administration_team_grant_provider');
         const providerName = (grant.grantedBy && providers.resource.get(grant.grantedBy)?.label) || grant.grantedBy;
-        return providerName ? `${label}: ${providerName}` : label;
+        return providerName ? `${label} (${providerName})` : label;
       }
       case 'DEFAULT':
         return translate('plugin_authentication_administration_team_grant_default');

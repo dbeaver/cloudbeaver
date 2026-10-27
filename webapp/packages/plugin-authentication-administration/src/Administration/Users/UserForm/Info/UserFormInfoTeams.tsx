@@ -78,7 +78,9 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
               name="teams"
               state={tabState.state}
               value={team.teamId}
-              caption={isGranted ? getGrantLabel(grant) : undefined}
+              caption={
+                isGranted ? `${translate('authentication_administration_user_connections_access_granted_by')}: ${getGrantLabel(grant)}` : undefined
+              }
               readOnly={isDefault}
               disabled={disabled}
             />
