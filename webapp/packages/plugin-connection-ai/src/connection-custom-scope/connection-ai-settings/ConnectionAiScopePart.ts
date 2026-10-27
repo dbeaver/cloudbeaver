@@ -8,7 +8,7 @@
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
-import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, formSubmitContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import type { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
 import type { ConnectionInfoAiScopeResource } from '../../ConnectionInfoAiScopeResource.js';
 import type { ConnectionInfoResource } from '@cloudbeaver/core-connections';
@@ -66,7 +66,7 @@ export class ConnectionAiScopePart extends FormPart<{ scope: AiDatabaseScope; cu
   protected override async loader(): Promise<void> {
     const key = this.optionsPart.connectionKey;
     let scope = AiDatabaseScope.CurrentDatasource;
-    let customObjectIds: string[] = [];
+    let customObjectIds = this.initialState.customObjectIds;
 
     if (key) {
       const settings = await this.connectionInfoAiResource.load(key);
@@ -74,11 +74,23 @@ export class ConnectionAiScopePart extends FormPart<{ scope: AiDatabaseScope; cu
 
       if (this.connectionInfoResource.isConnected(key)) {
         const connectionScope = await this.connectionInfoAiScopeResource.load(key);
-        customObjectIds = [...(connectionScope?.customObjectIds ?? [])].sort();
+        if (connectionScope && this.connectionInfoResource.isConnected(key)) {
+          customObjectIds = [...(connectionScope.customObjectIds ?? [])].sort();
+        }
       }
     }
 
     this.setInitialState({ scope, customObjectIds });
+  }
+
+  protected override validate(
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
+  ): void {
+    const key = this.optionsPart.connectionKey;
+    if (key && this.isChanged && !this.connectionInfoResource.isConnected(key)) {
+      contexts.getContext(formValidationContext).error('plugin_ai_scope_connect_before_save');
+    }
   }
 
   protected override async saveChanges(
