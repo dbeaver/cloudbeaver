@@ -40,6 +40,7 @@ export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   canShowPassword?: boolean;
   autocompletePasswordType?: AutocompletePasswordType;
   isSaved?: (property: IObjectPropertyInfo) => boolean;
+  isRequired?: (property: IObjectPropertyInfo) => boolean;
   getLayoutSize?: (property: IObjectPropertyInfo) => ILayoutSizeProps;
   onFocus?: (name: string) => void;
 }
@@ -76,6 +77,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   canShowPassword,
   autocompletePasswordType = 'on',
   isSaved,
+  isRequired,
   getLayoutSize,
   onFocus,
   ...rest
@@ -110,6 +112,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             key={property.id}
             className={s(sizeStyles, { ...(getLayoutSize ? getLayoutSize(property) : layoutProps) }, className)}
             property={property}
+            isRequired={isRequired?.(property) ?? property.required}
             state={state}
             context={context}
             defaultState={defaults}

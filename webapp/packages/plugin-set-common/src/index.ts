@@ -121,6 +121,7 @@ import pluginDataViewerReferences from '@cloudbeaver/plugin-data-viewer-referenc
 import pluginAi from '@cloudbeaver/plugin-ai/module';
 import pluginAiProfiles from '@cloudbeaver/plugin-ai-profiles/module';
 import pluginAiChat from '@cloudbeaver/plugin-ai-chat/module';
+import pluginAiChatProfiles from '@cloudbeaver/plugin-ai-chat-profiles/module';
 import pluginAiAdministration from '@cloudbeaver/plugin-ai-administration/module';
 import pluginAiProfilesAdministration from '@cloudbeaver/plugin-ai-profiles-administration/module';
 import pluginAiUserProfile from '@cloudbeaver/plugin-ai-user-profile/module';
@@ -245,6 +246,7 @@ export const commonSet = [
   pluginAi,
   pluginAiProfiles,
   pluginAiChat,
+  pluginAiChatProfiles,
   pluginAiAdministration,
   pluginAiProfilesAdministration,
   pluginAiUserProfile,

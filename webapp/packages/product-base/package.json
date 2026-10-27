@@ -38,11 +38,11 @@
     "@tailwindcss/vite": "4.0.7",
     "@vitejs/plugin-react": "^5",
     "@wroud/vite-plugin-asset-resolver": "^0",
-    "@wroud/vite-plugin-tsc": "^0",
+    "@wroud/vite-plugin-tsc": "^1",
     "fs-extra": "^11",
     "tslib": "^2",
     "vite": "^7",
     "vite-multiple-assets": "^2",
-    "vite-plugin-pwa": "^1"
+    "vite-plugin-pwa": "^2"
   }
 }
