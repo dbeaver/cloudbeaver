@@ -28,6 +28,8 @@ import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
+import org.jkiss.dbeaver.runtime.DBSecurityException;
 import org.jkiss.utils.CommonUtils;
 
 public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C extends DataSourceDescriptor> {
@@ -67,6 +69,18 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
     }
 
     public void updateDataSource(@NotNull C dataSource) throws DBWebException {
+        DBPConnectionConfiguration storedConfiguration = new DBPConnectionConfiguration(
+            dataSource.getConnectionConfiguration()
+        );
+        DBPConnectionConfiguration updatedConfiguration = new DBPConnectionConfiguration(storedConfiguration);
+        WebDataSourceUtils.setConnectionConfiguration(
+            dataSource.getDriver(),
+            updatedConfiguration,
+            input,
+            registry.getProject()
+        );
+        validateHandlerConfigurationUpdate(storedConfiguration, updatedConfiguration);
+
         dataSource.setId(dataSource.getId());
         if (!CommonUtils.isEmpty(input.getName())) {
             dataSource.setName(input.getName());
@@ -81,8 +95,10 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         WebDataSourceUtils.setConnectionConfiguration(
             dataSource.getDriver(),
             dataSource.getConnectionConfiguration(),
-            input
+            input,
+            registry.getProject()
         );
+        validateHandlerConfigurationUpdate(storedConfiguration, dataSource.getConnectionConfiguration());
         WebDataSourceUtils.saveAuthProperties(
             webSession.getProgressMonitor(),
             dataSource,
@@ -97,10 +113,25 @@ public class WebConnectionConfigInputHandler<T extends WebConnectionConfig, C ex
         preferenceStore.setProperties(input.getDefaultUserPreferences());
     }
 
+    private void validateHandlerConfigurationUpdate(
+        @NotNull DBPConnectionConfiguration storedConfiguration,
+        @NotNull DBPConnectionConfiguration updatedConfiguration
+    ) throws DBWebException {
+        try {
+            NetworkHandlerRegistry.getInstance().validateHandlerConfigurationUpdate(
+                storedConfiguration,
+                updatedConfiguration,
+                registry.getProject()::hasRealmPermission
+            );
+        } catch (DBSecurityException e) {
+            throw new DBWebException(e.getMessage(), e);
+        }
+    }
+
     @NotNull
-    protected C createDataSourceContainerFromInput(@NotNull DBPDriver driver) {
+    protected C createDataSourceContainerFromInput(@NotNull DBPDriver driver) throws DBWebException {
         DBPConnectionConfiguration dsConfig = new DBPConnectionConfiguration();
-        WebDataSourceUtils.setConnectionConfiguration(driver, dsConfig, input);
+        WebDataSourceUtils.setConnectionConfiguration(driver, dsConfig, input, registry.getProject());
         C newDataSource = registry.createDataSource(driver, dsConfig);
 
         newDataSource.setSavePassword(true);
