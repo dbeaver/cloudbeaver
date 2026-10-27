@@ -25,6 +25,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
 import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
+import org.jkiss.dbeaver.model.ai.registry.AISettingsManager;
 
 public class WebAIConfigurationProfile {
 
@@ -55,6 +56,11 @@ public class WebAIConfigurationProfile {
 
     public boolean isGlobal() {
         return profile.isGlobal();
+    }
+
+    public boolean getIsDefault() {
+        AIConfigurationProfile defaultProfile = AISettingsManager.getInstance().getSettings().getDefaultConfigurationOrNull();
+        return defaultProfile != null && profile.getProfileId().equals(defaultProfile.getProfileId());
     }
 
     public boolean isCredentialsSaved() throws DBException {

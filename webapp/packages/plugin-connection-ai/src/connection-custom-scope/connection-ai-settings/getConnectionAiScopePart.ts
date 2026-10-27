@@ -9,6 +9,8 @@
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
+import { ConnectionInfoAiScopeResource } from '../../ConnectionInfoAiScopeResource.js';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionAiScopePart } from './ConnectionAiScopePart.js';
@@ -17,7 +19,13 @@ const SCOPE_PART = createDataContext<ConnectionAiScopePart>('Connection AI custo
 
 export function getConnectionAiScopePart(formState: IFormState<IConnectionFormState>): ConnectionAiScopePart {
   return formState.getPart(SCOPE_PART, context => {
-    const resource = context.get(DATA_CONTEXT_DI_PROVIDER)!.getService(ConnectionInfoAiResource);
-    return new ConnectionAiScopePart(formState, getConnectionFormOptionsPart(formState), resource);
+    const provider = context.get(DATA_CONTEXT_DI_PROVIDER)!;
+    return new ConnectionAiScopePart(
+      formState,
+      getConnectionFormOptionsPart(formState),
+      provider.getService(ConnectionInfoAiResource),
+      provider.getService(ConnectionInfoAiScopeResource),
+      provider.getService(ConnectionInfoResource),
+    );
   });
 }

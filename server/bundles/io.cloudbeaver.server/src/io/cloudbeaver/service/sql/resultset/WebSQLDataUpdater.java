@@ -249,10 +249,10 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
             DBDAttributeBinding identifierAttribute = identifierAttributes.get(position);
             if (!added && attribute.getDataKind() == DBPDataKind.DOCUMENT
                 && attribute.getDataContainer() instanceof DBSDocumentLocator documentLocator) {
-                DBDDocument document = resolveDocumentValue(session, row, documentLocator);
-                resultRowValues[position] = document;
+                ResolvedDocument resolvedDocument = resolveDocumentValue(session, row, documentLocator);
+                resultRowValues[position] = resolvedDocument.updatedValue();
                 if (identifierAttribute != null) {
-                    originalValues.put(position, document);
+                    originalValues.put(position, resolvedDocument.originalValue());
                 }
             } else {
                 if (identifierAttribute != null) {
@@ -295,7 +295,7 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
     }
 
     @NotNull
-    private DBDDocument resolveDocumentValue(
+    private ResolvedDocument resolveDocumentValue(
         @NotNull DBCSession session,
         @NotNull WebSQLResultsRow row,
         @NotNull DBSDocumentLocator documentLocator
@@ -307,16 +307,23 @@ public class WebSQLDataUpdater extends DBDResultSetDataUpdater<WebSQLDataStateme
             row,
             row.getMetaData()
         );
-        if (document instanceof DBDComposite composite) {
-            for (Map.Entry<String, Object> entry : row.getUpdateValues().entrySet()) {
-                DBDAttributeBinding updateAttribute = model.getAttributes()[CommonUtils.toInt(entry.getKey())];
-                composite.setAttributeValue(
-                    updateAttribute,
-                    convertInputCellValue(session, updateAttribute, entry.getValue())
-                );
-            }
+        DBDDocument updatedDocument = document;
+        for (Map.Entry<String, Object> entry : row.getUpdateValues().entrySet()) {
+            DBDAttributeBinding updateAttribute = model.getAttributes()[CommonUtils.toInt(entry.getKey())];
+            updatedDocument = WebSQLUtils.applyDocumentUpdate(
+                updatedDocument,
+                resultsInfo.getDocumentAttribute(),
+                updateAttribute,
+                convertInputCellValue(session, updateAttribute, entry.getValue())
+            );
         }
-        return document;
+        return new ResolvedDocument(document, updatedDocument);
+    }
+
+    private record ResolvedDocument(
+        @NotNull DBDDocument originalValue,
+        @NotNull DBDDocument updatedValue
+    ) {
     }
 
     @Nullable
