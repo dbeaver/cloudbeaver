@@ -1,7 +1,8 @@
 export default [
-  ['plugin_authentication_administration_team_grant_manual', '由管理员添加'],
-  ['plugin_authentication_administration_team_grant_provider', '通过提供商'],
-  ['plugin_authentication_administration_team_grant_default', '自动：默认团队'],
+  ['plugin_authentication_administration_team_grant_manual', '管理员'],
+  ['plugin_authentication_administration_team_grant_provider', '提供商'],
+  ['plugin_authentication_administration_team_grant_default', '默认团队'],
+  ['plugin_authentication_administration_team_grant_manual_tooltip', '由管理员手动添加。'],
   ['plugin_authentication_administration_team_grant_default_tooltip', '此团队在设置中被配置为用户的默认团队，因此用户被自动添加。'],
   ['plugin_authentication_administration_team_grant_provider_tooltip', '由身份验证提供商分配，并在登录时同步。'],
   ['authentication_administration_pages_label', '页面'],

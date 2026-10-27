@@ -1,7 +1,8 @@
 export default [
-  ['plugin_authentication_administration_team_grant_manual', 'Добавлен администратором'],
-  ['plugin_authentication_administration_team_grant_provider', 'Через провайдера'],
-  ['plugin_authentication_administration_team_grant_default', 'Автоматически: команда по умолчанию'],
+  ['plugin_authentication_administration_team_grant_manual', 'Администратор'],
+  ['plugin_authentication_administration_team_grant_provider', 'Провайдер'],
+  ['plugin_authentication_administration_team_grant_default', 'Команда по умолчанию'],
+  ['plugin_authentication_administration_team_grant_manual_tooltip', 'Добавлен вручную администратором.'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',
     'Пользователь добавлен автоматически, потому что эта команда выбрана в настройках как команда пользователей по умолчанию.',

@@ -20,7 +20,13 @@ export const TeamGrantSource = observer<Props>(function TeamGrantSource({ grant 
   const getLabel = useTeamGrantLabel();
 
   function getTooltip(): string | undefined {
-    switch (grant?.grantType) {
+    if (!grant) {
+      return undefined;
+    }
+
+    switch (grant.grantType ?? 'MANUAL') {
+      case 'MANUAL':
+        return translate('plugin_authentication_administration_team_grant_manual_tooltip');
       case 'AUTH_PROVIDER':
         return translate('plugin_authentication_administration_team_grant_provider_tooltip');
       case 'DEFAULT':

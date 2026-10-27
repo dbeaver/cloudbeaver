@@ -1,7 +1,8 @@
 export default [
-  ['plugin_authentication_administration_team_grant_manual', 'Được quản trị viên thêm'],
-  ['plugin_authentication_administration_team_grant_provider', 'Qua nhà cung cấp'],
-  ['plugin_authentication_administration_team_grant_default', 'Tự động: nhóm mặc định'],
+  ['plugin_authentication_administration_team_grant_manual', 'Quản trị viên'],
+  ['plugin_authentication_administration_team_grant_provider', 'Nhà cung cấp'],
+  ['plugin_authentication_administration_team_grant_default', 'Nhóm mặc định'],
+  ['plugin_authentication_administration_team_grant_manual_tooltip', 'Được quản trị viên thêm thủ công.'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',
     'Người dùng được thêm tự động vì nhóm này được cấu hình làm nhóm mặc định cho người dùng.',

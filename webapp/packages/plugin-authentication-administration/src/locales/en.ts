@@ -1,7 +1,8 @@
 export default [
-  ['plugin_authentication_administration_team_grant_manual', 'Added by an administrator'],
-  ['plugin_authentication_administration_team_grant_provider', 'Via provider'],
-  ['plugin_authentication_administration_team_grant_default', 'Automatic: default team'],
+  ['plugin_authentication_administration_team_grant_manual', 'Administrator'],
+  ['plugin_authentication_administration_team_grant_provider', 'Provider'],
+  ['plugin_authentication_administration_team_grant_default', 'Default team'],
+  ['plugin_authentication_administration_team_grant_manual_tooltip', 'Added manually by an administrator.'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',
     'The user was added automatically because this team is configured as the default team for users.',

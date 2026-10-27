@@ -1,7 +1,8 @@
 export default [
-  ['plugin_authentication_administration_team_grant_manual', 'Ajouté par un administrateur'],
-  ['plugin_authentication_administration_team_grant_provider', 'Via le fournisseur'],
-  ['plugin_authentication_administration_team_grant_default', 'Automatique : équipe par défaut'],
+  ['plugin_authentication_administration_team_grant_manual', 'Administrateur'],
+  ['plugin_authentication_administration_team_grant_provider', 'Fournisseur'],
+  ['plugin_authentication_administration_team_grant_default', 'Équipe par défaut'],
+  ['plugin_authentication_administration_team_grant_manual_tooltip', 'Ajouté manuellement par un administrateur.'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',
     'L’utilisateur a été ajouté automatiquement car cette équipe est configurée comme équipe par défaut pour les utilisateurs.',

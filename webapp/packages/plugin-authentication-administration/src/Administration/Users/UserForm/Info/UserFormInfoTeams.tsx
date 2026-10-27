@@ -49,6 +49,10 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
       return `${tooltip}\n${translate('plugin_authentication_administration_team_grant_provider_tooltip')}`;
     }
 
+    if (grant && (grant.grantType ?? 'MANUAL') === 'MANUAL') {
+      return `${tooltip}\n${translate('plugin_authentication_administration_team_grant_manual_tooltip')}`;
+    }
+
     return tooltip;
   }
 
