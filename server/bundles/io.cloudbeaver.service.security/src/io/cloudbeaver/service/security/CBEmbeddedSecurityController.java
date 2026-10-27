@@ -392,7 +392,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         saveSubjectMetas(dbCon, userId, metaParameters);
         String defaultTeamName = getDefaultUserTeam();
         if (!CommonUtils.isEmpty(defaultTeamName)) {
-            setUserTeams(dbCon, userId, new String[]{defaultTeamName}, userId, SMTeamGrantType.DEFAULT);
+            setUserTeamsInternal(dbCon, userId, new String[]{defaultTeamName}, userId, SMTeamGrantType.DEFAULT);
         }
     }
 
@@ -556,7 +556,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @Override
-    public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
+    public void setUserTeams(
+        @NotNull String userId,
+        @NotNull String[] teamIds,
+        @NotNull String grantorId
+    ) throws DBCException {
         setUserTeams(userId, teamIds, grantorId, SMTeamGrantType.MANUAL);
     }
 
@@ -574,7 +578,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean changed;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                changed = setUserTeams(dbCon, userId, teamIds, grantorId, grantType);
+                changed = setUserTeamsInternal(dbCon, userId, teamIds, grantorId, grantType);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -590,7 +594,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean changed;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                changed = addUserTeams(dbCon, userId, teamIds, grantorId);
+                changed = addUserTeamsInternal(dbCon, userId, teamIds, grantorId);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -606,7 +610,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean changed;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                changed = deleteUserTeams(dbCon, userId, teamIds);
+                changed = deleteUserTeamsInternal(dbCon, userId, teamIds);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -651,13 +655,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         ));
     }
 
-    protected boolean setUserTeams(
+    private boolean setUserTeamsInternal(
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds,
         @NotNull String grantorId,
         @NotNull SMTeamGrantType grantType
     ) throws SQLException {
+        lockUserTeamGrants(dbCon, userId);
         Set<String> targetTeamIds = new LinkedHashSet<>(Arrays.asList(teamIds));
         String defaultUserTeam = getDefaultUserTeam();
         if (CommonUtils.isNotEmpty(defaultUserTeam)) {
@@ -695,12 +700,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return changed;
     }
 
-    protected boolean addUserTeams(
+    private boolean addUserTeamsInternal(
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds,
         @NotNull String grantorId
     ) throws SQLException {
+        lockUserTeamGrants(dbCon, userId);
         Map<String, UserTeamGrant> currentGrants = getCurrentUserTeamGrants(dbCon, userId);
         List<String> resultTeamIds = new ArrayList<>();
         boolean changed = false;
@@ -722,11 +728,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return changed;
     }
 
-    protected boolean deleteUserTeams(
+    private boolean deleteUserTeamsInternal(
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds
     ) throws SQLException, DBCException {
+        lockUserTeamGrants(dbCon, userId);
         String defaultTeam = getDefaultUserTeam();
         if (ArrayUtils.contains(teamIds, defaultTeam)) {
             throw new SMException("Cannot delete default user team: " + defaultTeam);
@@ -756,6 +763,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
         log.info(String.format("User deleted from team: [userId=%s,teamIds=%s]", userId, String.join(",", teamIds)));
         return changed;
+    }
+
+    private void lockUserTeamGrants(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        // Serialize team grant updates for a user across application nodes without relying on database-specific lock syntax.
+        JDBCUtils.executeUpdate(
+            dbCon,
+            "UPDATE {table_prefix}CB_USER SET USER_ID=USER_ID WHERE USER_ID=?",
+            userId
+        );
     }
 
     private boolean ensureDefaultUserTeam(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
@@ -845,35 +861,59 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     @Override
-    public SMUserTeam[] getUserTeams(String userId) throws DBException {
-        Map<String, SMUserTeam> teams = new LinkedHashMap<>();
+    public SMUserTeam[] getUserTeams(@NotNull String userId) throws DBException {
+        return getUsersTeams(Set.of(userId)).getOrDefault(userId, new SMUserTeam[0]);
+    }
+
+    @NotNull
+    @Override
+    public Map<String, SMUserTeam[]> getUsersTeams(@NotNull Set<String> userIds) throws DBException {
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, SMTeam> teamsById = new LinkedHashMap<>();
+        for (SMTeam team : readAllTeams()) {
+            teamsById.put(team.getTeamId(), team);
+        }
+
+        List<String> requestedUserIds = new ArrayList<>(userIds);
+        Map<String, Map<String, SMUserTeam>> usersTeams = new LinkedHashMap<>();
+        String userParameters = SQLUtils.generateParamList(requestedUserIds.size());
         String defaultUserTeam = getDefaultUserTeam();
-        SMTeam defaultTeam = CommonUtils.isEmpty(defaultUserTeam) ? null : findTeam(defaultUserTeam);
         try (Connection dbCon = database.openConnection()) {
-            boolean userExists;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT 1 FROM {table_prefix}CB_USER WHERE USER_ID=?")
+                "SELECT USER_ID FROM {table_prefix}CB_USER WHERE USER_ID IN (" + userParameters + ")")
             ) {
-                dbStat.setString(1, userId);
+                int index = 1;
+                for (String userId : requestedUserIds) {
+                    dbStat.setString(index++, userId);
+                }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
-                    userExists = dbResult.next();
+                    while (dbResult.next()) {
+                        usersTeams.put(dbResult.getString("USER_ID"), new LinkedHashMap<>());
+                    }
                 }
             }
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT R.*,S.IS_SECRET_STORAGE,UR.TEAM_ROLE,UR.GRANT_TYPE,UR.GRANTED_BY " +
-                    "FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
-                    "{table_prefix}CB_AUTH_SUBJECT S " +
-                        "WHERE UR.USER_ID=? AND UR.TEAM_ID = R.TEAM_ID " +
-                        "AND S.SUBJECT_ID IN (R.TEAM_ID,?)")
+                "SELECT USER_ID,TEAM_ID,TEAM_ROLE,GRANT_TYPE,GRANTED_BY " +
+                    "FROM {table_prefix}CB_USER_TEAM WHERE USER_ID IN (" + userParameters + ")")
             ) {
-                dbStat.setString(1, userId);
-                dbStat.setString(2, defaultUserTeam);
+                int index = 1;
+                for (String userId : requestedUserIds) {
+                    dbStat.setString(index++, userId);
+                }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        var team = fetchTeam(dbResult);
+                        String userId = dbResult.getString("USER_ID");
+                        Map<String, SMUserTeam> userTeams = usersTeams.get(userId);
+                        SMTeam team = teamsById.get(dbResult.getString("TEAM_ID"));
+                        if (userTeams == null || team == null) {
+                            continue;
+                        }
                         String teamRole = dbResult.getString("TEAM_ROLE");
                         boolean isDefaultTeam = team.getTeamId().equals(defaultUserTeam);
-                        teams.put(team.getTeamId(), new SMUserTeam(
+                        userTeams.put(team.getTeamId(), new SMUserTeam(
                             team,
                             teamRole,
                             isDefaultTeam
@@ -884,17 +924,34 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     }
                 }
             }
-            if (userExists && defaultTeam != null && !teams.containsKey(defaultUserTeam)) {
-                teams.put(defaultUserTeam, new SMUserTeam(defaultTeam, null, SMTeamGrantType.DEFAULT, userId));
+
+            SMTeam defaultTeam = teamsById.get(defaultUserTeam);
+            Map<String, SMUserTeam[]> result = new LinkedHashMap<>();
+            for (String userId : requestedUserIds) {
+                Map<String, SMUserTeam> userTeams = usersTeams.get(userId);
+                if (userTeams == null) {
+                    result.put(userId, new SMUserTeam[0]);
+                    continue;
+                }
+                if (defaultTeam != null) {
+                    userTeams.putIfAbsent(
+                        defaultUserTeam,
+                        new SMUserTeam(defaultTeam, null, SMTeamGrantType.DEFAULT, userId)
+                    );
+                }
+                result.put(userId, userTeams.values().toArray(new SMUserTeam[0]));
             }
-            readSubjectsMetas(dbCon, SMSubjectType.team, null, teams);
-            return teams.values().toArray(new SMUserTeam[0]);
+            return result;
         } catch (SQLException e) {
-            throw new DBCException("Error while reading user teams", e);
+            throw new DBCException("Error while reading users teams", e);
         }
     }
 
-    private Set<String> getAllLinkedSubjects(Connection dbCon, String subjectId) throws SQLException {
+    @NotNull
+    private Set<String> getAllLinkedSubjects(
+        @NotNull Connection dbCon,
+        @NotNull String subjectId
+    ) throws SQLException {
         Set<String> allSubjects = new HashSet<>();
         allSubjects.add(subjectId);
         try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -3035,6 +3092,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean changed = false;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                lockUserTeamGrants(dbCon, userId);
                 Set<String> mappedTeamIds = new LinkedHashSet<>(Arrays.asList(teamIds));
                 Set<String> managedTeamIds = new LinkedHashSet<>(Arrays.asList(providerManagedTeamIds));
                 managedTeamIds.addAll(mappedTeamIds);

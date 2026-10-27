@@ -20,6 +20,7 @@ import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.service.auth.ldap.LdapAuthProvider;
 import io.cloudbeaver.service.auth.ldap.LdapConstants;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMTeamGrantType;
 import org.jkiss.dbeaver.model.security.exception.SMException;
@@ -190,16 +191,17 @@ public class AdminUserTeamGrantTest extends CloudbeaverMockTest {
         assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
     }
 
+    @NotNull
     private Map<String, SMUserTeam> getGrants() throws Exception {
         return Arrays.stream(securityController.getUserTeams(userId))
             .collect(Collectors.toMap(SMUserTeam::getTeamId, Function.identity()));
     }
 
     private static void assertGrant(
-        Map<String, SMUserTeam> grants,
-        String teamId,
-        SMTeamGrantType grantType,
-        String grantedBy
+        @NotNull Map<String, SMUserTeam> grants,
+        @NotNull String teamId,
+        @NotNull SMTeamGrantType grantType,
+        @NotNull String grantedBy
     ) {
         SMUserTeam grant = grants.get(teamId);
         Assertions.assertNotNull(grant, "Team grant not found: " + teamId);

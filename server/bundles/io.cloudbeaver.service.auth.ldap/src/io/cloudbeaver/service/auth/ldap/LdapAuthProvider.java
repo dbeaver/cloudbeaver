@@ -557,7 +557,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
-    protected void doCustomModifyUserDataAfterAuthentication(LdapSettings ldapSettings, Attributes attributes, Map<String, Object> userData) {
+    protected void doCustomModifyUserDataAfterAuthentication(
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Attributes attributes,
+        @NotNull Map<String, Object> userData
+    ) {
     }
 
     @NotNull
@@ -596,7 +600,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return new LdapTeamAssignments(result, groupAssignments.authoritative());
     }
 
-    private String getUserDN(LdapSettings ldapSettings, String displayName) {
+    @Nullable
+    private String getUserDN(@NotNull LdapSettings ldapSettings, @Nullable String displayName) {
         DirContext context;
         try {
             context = initConnection(creteAuthEnvironment(ldapSettings));
@@ -608,15 +613,19 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     }
 
     @NotNull
-    protected List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
+    protected List<String> getGroupForMember(
+        @NotNull String fullDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Map<String, Object> authParameters
+    ) {
         return resolveGroupsForMember(fullDN, ldapSettings, authParameters).teamIds();
     }
 
     @NotNull
     protected LdapTeamAssignments resolveGroupsForMember(
-        String fullDN,
-        LdapSettings ldapSettings,
-        Map<String, Object> authParameters
+        @NotNull String fullDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Map<String, Object> authParameters
     ) {
         DirContext context = null;
         Set<String> result = new LinkedHashSet<>();
@@ -691,13 +700,19 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return new LdapTeamAssignments(teamIds, authoritative);
     }
 
-    protected List<String> findGroupsByMemberOfAttribute(String fullDN, DirContext context) throws NamingException {
+    @NotNull
+    protected List<String> findGroupsByMemberOfAttribute(
+        @NotNull String fullDN,
+        @NotNull DirContext context
+    ) throws NamingException {
         return findGroupsByMemberOfAttributeResult(fullDN, context).teamIds();
     }
 
     @NotNull
-    private LdapTeamAssignments findGroupsByMemberOfAttributeResult(String fullDN, DirContext context)
-        throws NamingException {
+    private LdapTeamAssignments findGroupsByMemberOfAttributeResult(
+        @NotNull String fullDN,
+        @NotNull DirContext context
+    ) throws NamingException {
         List<String> result = new ArrayList<>();
         boolean authoritative = true;
         SearchControls memberOfSearch = new SearchControls();
@@ -730,15 +745,20 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return new LdapTeamAssignments(result, authoritative);
     }
 
-    protected List<String> findGroupsByMemberAttribute(String fullDN, LdapSettings ldapSettings, DirContext context) throws NamingException {
+    @NotNull
+    protected List<String> findGroupsByMemberAttribute(
+        @NotNull String fullDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull DirContext context
+    ) throws NamingException {
         return findGroupsByMemberAttributeResult(fullDN, ldapSettings, context).teamIds();
     }
 
     @NotNull
     private LdapTeamAssignments findGroupsByMemberAttributeResult(
-        String fullDN,
-        LdapSettings ldapSettings,
-        DirContext context
+        @NotNull String fullDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull DirContext context
     ) throws NamingException {
         List<String> result = new ArrayList<>();
         boolean authoritative = true;
@@ -775,7 +795,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return new LdapTeamAssignments(result, authoritative);
     }
 
-    public DirContext initConnection(Map<String, String> environment) throws DBException {
+    @NotNull
+    public DirContext initConnection(@NotNull Map<String, String> environment) throws DBException {
         //this hack is needed for correct LDAPS working. JNDI uses ContextClassLoader instead of OSGI loader
         ClassLoader previous = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
