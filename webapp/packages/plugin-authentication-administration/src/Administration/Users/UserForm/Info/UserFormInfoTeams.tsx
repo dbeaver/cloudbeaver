@@ -8,14 +8,14 @@
 import { observer } from 'mobx-react-lite';
 
 import { compareTeams, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { FieldCheckbox, Group, GroupTitle, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { isDefined } from '@dbeaver/js-helpers';
 
 import type { UserFormProps } from '../AdministrationUserFormService.js';
 import type { UserFormInfoPart } from './UserFormInfoPart.js';
-import { getUserFormTeamPresentation } from './getUserFormTeamPresentation.js';
+import { UserFormInfoTeam } from './UserFormInfoTeam.js';
 
 interface Props extends UserFormProps {
   tabState: UserFormInfoPart;
@@ -37,31 +37,17 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
     <>
       <GroupTitle>{translate('authentication_user_team')}</GroupTitle>
       <Group boxNoOverflow box gap dense>
-        {teams.map(team => {
-          const grant = user.data?.grantedTeamsInfo.find(grant => grant.teamId === team.teamId);
-          const isDefault = team.teamId === defaultTeam;
-          const { label, caption, tooltip } = getUserFormTeamPresentation(translate, {
-            team,
-            grant,
-            isDefault,
-            isGranted: tabState.state.teams.includes(team.teamId),
-          });
-
-          return (
-            <FieldCheckbox
-              key={team.teamId}
-              id={`${formState.id}_${team.teamId}`}
-              title={tooltip}
-              label={label}
-              name="teams"
-              state={tabState.state}
-              value={team.teamId}
-              caption={caption}
-              readOnly={isDefault}
-              disabled={disabled}
-            />
-          );
-        })}
+        {teams.map(team => (
+          <UserFormInfoTeam
+            key={team.teamId}
+            id={`${formState.id}_${team.teamId}`}
+            team={team}
+            grant={user.data?.grantedTeamsInfo.find(grant => grant.teamId === team.teamId)}
+            state={tabState.state}
+            isDefault={team.teamId === defaultTeam}
+            disabled={disabled}
+          />
+        ))}
       </Group>
     </>
   );
