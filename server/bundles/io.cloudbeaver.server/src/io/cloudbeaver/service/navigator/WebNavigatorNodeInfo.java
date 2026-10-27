@@ -239,13 +239,13 @@ public class WebNavigatorNodeInfo {
         try {
             DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode);
             if (hasDataSourceEditAccess(dbNode)) {
-                return getApplicableFilter(dbNode.getConnectionNodeFilter(itemsMeta, true));
+                return getApplicableFilter(dbNode.getNodeFilter(itemsMeta, true));
             }
             DBSObjectFilter userFilter = getApplicableFilter(dbNode.getUserNodeFilter(itemsMeta, true));
             if (userFilter != null) {
                 return userFilter;
             }
-            return getApplicableFilter(dbNode.getConnectionNodeFilter(itemsMeta, true));
+            return getApplicableFilter(dbNode.getNodeFilter(itemsMeta, true));
         } catch (DBException e) {
             throw new DBWebException(e);
         }
@@ -258,7 +258,7 @@ public class WebNavigatorNodeInfo {
             return null;
         }
         try {
-            return getApplicableFilter(dbNode.getConnectionNodeFilter(
+            return getApplicableFilter(dbNode.getNodeFilter(
                 DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
                 true));
         } catch (DBException e) {

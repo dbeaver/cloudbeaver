@@ -94,7 +94,7 @@ public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
 
         try (MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class)) {
             dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)).thenReturn(itemsMeta);
-            Mockito.when(dbNode.getConnectionNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
+            Mockito.when(dbNode.getNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
             Mockito.when(dbNode.getUserNodeFilter(itemsMeta, true)).thenReturn(userFilter);
 
             WebNavigatorNodeInfo info = new WebNavigatorNodeInfo(session, dbNode);
@@ -137,7 +137,7 @@ public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
                 rmProject,
                 RMProjectPermission.DATA_SOURCES_EDIT
             )).thenReturn(true);
-            Mockito.when(dbNode.getConnectionNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
+            Mockito.when(dbNode.getNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
             Mockito.when(dbNode.getUserNodeFilter(itemsMeta, true)).thenReturn(userFilter);
 
             Assertions.assertSame(connectionFilter, new WebNavigatorNodeInfo(session, dbNode).getFilter());
@@ -157,7 +157,7 @@ public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
 
         try (MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class)) {
             dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)).thenReturn(itemsMeta);
-            Mockito.when(dbNode.getConnectionNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
+            Mockito.when(dbNode.getNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
             Mockito.when(dbNode.getUserNodeFilter(itemsMeta, true)).thenReturn(userFilter);
 
             Assertions.assertSame(connectionFilter, new WebNavigatorNodeInfo(session, dbNode).getFilter());
