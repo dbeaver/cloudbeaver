@@ -13,6 +13,9 @@
     "./*": "./*"
   },
   "description": "ESLint for CloudBeaver",
+  "scripts": {
+    "test": "node --test flat.test.js"
+  },
   "license": "Apache-2.0",
   "files": [
     "eslint-config.json",
