@@ -26,15 +26,18 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPAdaptable;
+import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNObjectFilterProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.security.SMControllerUtils;
+import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -48,6 +51,14 @@ import java.util.*;
 
 public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptable {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
+    private static final DBNObjectFilterProvider OBJECT_FILTER_PROVIDER = (node, meta, connectionFilter) -> {
+        DBSObjectFilter userFilter = node.getUserNodeFilter(meta, false);
+        DBPDataSource dataSource = node.getDataSource();
+        if (userFilter != null && dataSource != null) {
+            userFilter.setCaseSensitive(dataSource.getSQLDialect().hasCaseSensitiveFiltration());
+        }
+        return DBNObjectFilterProvider.createFilterMatcher(connectionFilter, userFilter);
+    };
 
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
@@ -114,6 +125,9 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     public <T> T getAdapter(@NotNull Class<T> adapter) {
         if (adapter == DBPObjectSettingsProvider.class) {
             return adapter.cast(projectSettings);
+        }
+        if (adapter == DBNObjectFilterProvider.class) {
+            return adapter.cast(OBJECT_FILTER_PROVIDER);
         }
         return null;
     }
