@@ -59,7 +59,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
           dropAfter: dropAllowed && dropPosition === 'after',
         })}
         onMouseUp={onMouseUpHandler}
-        onContextMenu={tab.state.enableContextMenu && !disabled ? contextMenuPosition.open : undefined}
+        onContextMenu={tab.state.enabledContextMenu && !disabled ? contextMenuPosition.open : undefined}
         {...dragProps}
         {...dropProps}
       >
@@ -81,7 +81,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
             className={s(styles, { actions: true })}
             state={tab.state}
             menuContext={props.menuContext}
-            contextMenuPosition={tab.state.enableContextMenu ? contextMenuPosition : undefined}
+            contextMenuPosition={tab.state.enabledContextMenu ? contextMenuPosition : undefined}
             canClose={canClose}
             tabId={tabId}
             handleClose={tab.handleClose}

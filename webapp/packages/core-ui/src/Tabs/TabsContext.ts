@@ -25,7 +25,7 @@ export interface ITabsContext<T = Record<string, any>> {
   closable: boolean;
   tabList?: string[];
   enabledBaseActions?: boolean;
-  enableContextMenu?: boolean;
+  enabledContextMenu?: boolean;
   context: IDataContext;
   canClose: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<T> | undefined;

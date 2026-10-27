@@ -37,7 +37,7 @@ export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
     tabList?: string[];
     enabledBaseActions?: boolean;
     /** Open the tab menu on right-click. Disabled by default for each tab group. */
-    enableContextMenu?: boolean;
+    enabledContextMenu?: boolean;
     reorderStateKey?: string;
     sortFunction?: (tabs: string[]) => string[];
     canClose?: (tab: ITabData<T>) => boolean;
@@ -57,7 +57,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   autoSelect = true,
   tabList,
   enabledBaseActions,
-  enableContextMenu = false,
+  enabledContextMenu = false,
   reorderStateKey,
   sortFunction,
   onChange: onOpen,
@@ -276,7 +276,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closable: observable.ref,
       tabList: observable.ref,
       enabledBaseActions: observable.ref,
-      enableContextMenu: observable.ref,
+      enabledContextMenu: observable.ref,
       reorderStateKey: observable.ref,
       sortFunction: observable.ref,
       getTabInfo: action.bound,
@@ -299,7 +299,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closable,
       tabList,
       enabledBaseActions,
-      enableContextMenu,
+      enabledContextMenu,
       reorderStateKey,
       sortFunction,
     },
