@@ -11,7 +11,7 @@ import { useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminUserTeamInfo } from '@cloudbeaver/core-sdk';
 
 interface Props {
-  grant: Pick<AdminUserTeamInfo, 'grantType' | 'grantedBy'> | undefined;
+  grant: { grantType?: `${AdminUserTeamInfo['grantType']}`; grantedBy?: AdminUserTeamInfo['grantedBy'] } | undefined;
 }
 
 export const TeamGrantSource = observer<Props>(function TeamGrantSource({ grant }) {
