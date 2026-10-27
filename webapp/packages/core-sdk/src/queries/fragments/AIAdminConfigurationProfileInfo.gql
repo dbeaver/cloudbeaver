@@ -1,5 +1,6 @@
 fragment AIAdminConfigurationProfileInfo on AIAdminConfigurationProfileInfo {
   id
+  isDefault
   name
   engineId
   global
