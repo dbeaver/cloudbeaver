@@ -107,7 +107,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         const context = this.connectionExecutionContextService.get(this.model.dataSource.executionContext.id);
 
-        return context?.executing || false;
+        return this.executingScript || context?.executing || false;
       },
 
       get isIncomingChanges(): boolean {

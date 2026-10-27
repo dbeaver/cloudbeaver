@@ -7,6 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -28,8 +29,11 @@ import { QueryDataSource } from '../QueryDataSource.js';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SqlEditorPermissionService } from '../SqlEditorPermissionService.js';
+import type { SqlScriptErrorAction } from './SqlScriptErrorDialog.js';
+
+const SqlScriptErrorDialog = importLazyComponent(() => import('./SqlScriptErrorDialog.js').then(module => module.SqlScriptErrorDialog));
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -259,6 +263,7 @@ export class SqlQueryService {
       let source: QueryDataSource | undefined;
       let model: IDatabaseDataModel<QueryDataSource> | undefined;
       let resultCount = 0;
+      let skipErrors = false;
 
       for (let i = 0; i < queries.length; i++) {
         const query = queries[i]!;
@@ -325,14 +330,31 @@ export class SqlQueryService {
             break;
           }
         } catch (exception: any) {
+          options?.onQueryExecuted?.(query, i, false);
+
+          let action: SqlScriptErrorAction = source?.cancelled ? 'stop' : 'skip';
+
+          if (action !== 'stop' && !skipErrors) {
+            const { status, result } = await this.commonDialogService.open(SqlScriptErrorDialog, { query, error: exception });
+            action = status === DialogueStateResult.Resolved ? (result ?? 'stop') : 'stop';
+          }
+
+          if (action === 'retry') {
+            i--;
+            continue;
+          }
+
+          skipErrors ||= action === 'skip-all';
+
           if (model) {
             const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
             this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true, resultCount);
 
             model = source = undefined;
           }
-          options?.onQueryExecuted?.(query, i, false);
-          break;
+          if (action === 'stop') {
+            break;
+          }
         }
       }
 
