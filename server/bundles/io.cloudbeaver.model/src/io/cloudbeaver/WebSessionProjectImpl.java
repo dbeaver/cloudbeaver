@@ -18,6 +18,7 @@ package io.cloudbeaver;
 
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
@@ -335,6 +336,7 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public WebConnectionInfo updateConnection(@Nullable Map<String, Object> configMap) throws DBWebException {
         WebConnectionConfig config = getConnectionConfigInput(configMap);
         WebConnectionInfo connectionInfo = getWebConnectionInfo(config.getConnectionId());
@@ -347,8 +349,22 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         boolean wasHidden = dataSource.isHidden();
         boolean publishDraft = false;
+        WebConnectionConfigInputHandler.CredentialsSnapshot credentialsSnapshot = null;
+        Map<String, Object> savedAuthProperties = null;
+        List<WebNetworkHandlerConfigInput> savedNetworkCredentials = null;
+        var inputHandler = getInputConfigHandler(config);
         try {
-            getInputConfigHandler(config).updateDataSource(dataSource);
+            if (webSession.getApplication().getAppConfiguration()
+                .isFeatureEnabled(DBWConstants.FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE) &&
+                inputHandler.isConnectionTargetChanged(dataSource)) {
+                credentialsSnapshot = inputHandler.createCredentialsSnapshot(dataSource);
+                savedAuthProperties = connectionInfo.getSavedAuthProperties();
+                savedNetworkCredentials = connectionInfo.getSavedNetworkCredentials();
+                inputHandler.clearSecretReferences();
+                inputHandler.resetDataSourceCredentials(dataSource);
+                connectionInfo.setSavedCredentials(null, null);
+            }
+            inputHandler.updateDataSource(dataSource);
             if (config.getHidden() != null) {
                 dataSource.setHidden(config.getHidden());
             }
@@ -363,6 +379,10 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
                 registry.checkForErrors();
             }
         } catch (DBException e) {
+            if (credentialsSnapshot != null) {
+                credentialsSnapshot.restore();
+                connectionInfo.setSavedCredentials(savedAuthProperties, savedNetworkCredentials);
+            }
             if (publishDraft) {
                 registry.removeDataSource(dataSource);
             }
@@ -401,11 +421,34 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
         return getInputConfigHandler(configInput).createDataSourceContainer();
     }
 
+    @NotNull
+    public DataSourceDescriptor getDataSourceContainerFromInput(
+        @NotNull WebConnectionConfig configInput,
+        @NotNull DataSourceDescriptor sourceDataSource,
+        boolean resetCredentials
+    ) throws DBWebException {
+        var dataSourceCopy = (DataSourceDescriptor) sourceDataSource.createCopy(sourceDataSource.getRegistry());
+        var inputHandler = getInputConfigHandler(configInput);
+        if (resetCredentials) {
+            inputHandler.clearSecretReferences();
+            inputHandler.resetDataSourceCredentials(dataSourceCopy);
+        }
+        inputHandler.updateDataSource(dataSourceCopy);
+        return dataSourceCopy;
+    }
+
     public void updateDataSourceContainerFromInput(
         @NotNull WebConnectionConfig configInput,
         @NotNull DataSourceDescriptor dataSource
     ) throws DBWebException {
         getInputConfigHandler(configInput).updateDataSource(dataSource);
+    }
+
+    public boolean isConnectionTargetChanged(
+        @NotNull WebConnectionConfig configInput,
+        @NotNull DataSourceDescriptor dataSource
+    ) {
+        return getInputConfigHandler(configInput).isConnectionTargetChanged(dataSource);
     }
 
     @NotNull

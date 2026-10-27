@@ -17,7 +17,6 @@ import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { GraphQLService, type SqlDataFilterConstraint, type SqlReferenceColumnMapping } from '@cloudbeaver/core-sdk';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import {
-  DatabaseDataAccessMode,
   DatabaseDataModel,
   DataViewerService,
   DataViewerSettingsService,
@@ -87,11 +86,8 @@ export function useReferencesDataModel(
       // eslint-disable-next-line react-hooks/immutability
       state.modelId = model.id;
 
-      const editable = connectionInfo ? dataViewerService.isDataEditable(connectionInfo) : false;
-      model
-        .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
-        .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
-        .setSlice(0);
+      model.setCountGain(dataViewerSettingsService.getDefaultRowsCount()).setSlice(0);
+      dataViewerService.trackDataAccess(model);
 
       return {
         source,

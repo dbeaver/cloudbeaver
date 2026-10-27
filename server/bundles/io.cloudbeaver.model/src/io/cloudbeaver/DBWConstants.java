@@ -38,6 +38,8 @@ public interface DBWConstants {
     String GLOBAL_PERMISSION_DATA_EDITOR_IMPORT = "permission.data-editor.import";
     String GLOBAL_PERMISSION_DATA_EDITOR_EDITING = "permission.data-editor.editing";
 
+    String FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE = "resetCredentialsOnTargetChange";
+
     String PERMISSION_EDIT_STRUCTURE = "edit-meta";
     String PERMISSION_EDIT_DATA = "edit-data";
 
