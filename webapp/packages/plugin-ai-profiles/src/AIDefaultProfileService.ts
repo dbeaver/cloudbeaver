@@ -13,7 +13,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { SettingsProviderService, type SettingsProvider } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
-import { AISettingsResource } from '@cloudbeaver/plugin-ai';
 
 import { AIProfilesResource, type AIProfile } from './AIProfilesResource.js';
 
@@ -22,14 +21,13 @@ const settingsSchema = schema.object({
   [DEFAULT_PROFILE_KEY]: schema.string().nullable().default(null),
 });
 
-@injectable(() => [AIProfilesResource, AISettingsResource, UserInfoResource, SettingsProviderService])
+@injectable(() => [AIProfilesResource, UserInfoResource, SettingsProviderService])
 export class AIDefaultProfileService {
   private readonly settings: SettingsProvider<typeof settingsSchema>;
   private savingPromise: Promise<void> | null = null;
 
   constructor(
     private readonly aiProfilesResource: AIProfilesResource,
-    private readonly aiSettingsResource: AISettingsResource,
     private readonly userInfoResource: UserInfoResource,
     settingsProviderService: SettingsProviderService,
   ) {
@@ -41,7 +39,7 @@ export class AIDefaultProfileService {
       defaultProfile: computed,
     });
     this.aiProfilesResource.beforeLoad.addHandler(async () => {
-      await Promise.all([this.userInfoResource.load(), this.aiSettingsResource.load()]);
+      await this.userInfoResource.load();
     });
   }
 
@@ -69,13 +67,13 @@ export class AIDefaultProfileService {
     const profileId = this.defaultProfileId;
     return (
       this.aiProfilesResource.values.find(profile => profile.id === profileId) ??
-      this.aiProfilesResource.values.find(profile => profile.id === this.aiSettingsResource.data?.defaultConfiguration) ??
+      this.aiProfilesResource.values.find(profile => profile.isDefault) ??
       this.aiProfilesResource.values[0]
     );
   }
 
   async restoreDefaultProfile(): Promise<AIProfile | undefined> {
-    await Promise.all([this.userInfoResource.load(), this.aiSettingsResource.load(), this.aiProfilesResource.load(CachedMapAllKey)]);
+    await Promise.all([this.userInfoResource.load(), this.aiProfilesResource.load(CachedMapAllKey)]);
     return this.defaultProfile;
   }
 
