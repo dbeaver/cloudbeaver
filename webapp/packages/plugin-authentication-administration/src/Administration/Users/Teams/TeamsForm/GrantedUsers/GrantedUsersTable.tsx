@@ -27,8 +27,7 @@ import {
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
-import { getTeamGrantLabelKey } from '../../../getTeamGrantLabelKey.js';
-import { getTeamGrantTooltipKey } from '../../../getTeamGrantTooltipKey.js';
+import { TeamGrantSource } from '../../../TeamGrantSource.js';
 
 const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'userId',
@@ -153,18 +152,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     }
 
     if (colKey === GRANT_TYPE_COLUMN.key) {
-      const grant = grantedUsersIdsMap.get(user.userId);
-      if (!grant) {
-        return translate('plugin_authentication_administration_team_grant_none');
-      }
-
-      const labelKey = getTeamGrantLabelKey(grant.grantType ?? 'MANUAL');
-      const tooltipKey = getTeamGrantTooltipKey(grant.grantType);
-      const label = labelKey ? translate(labelKey) : '-';
-      const tooltip = tooltipKey ? translate(tooltipKey) : undefined;
-      const provider = grant.grantType === 'AUTH_PROVIDER' && grant.grantedBy ? `: ${grant.grantedBy}` : '';
-
-      return <span title={tooltip}>{`${label}${provider}`}</span>;
+      return <TeamGrantSource grant={grantedUsersIdsMap.get(user.userId)} />;
     }
 
     if (colKey === LAST_LOGIN_COLUMN.key) {

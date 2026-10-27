@@ -11,8 +11,6 @@ import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import { FieldCheckbox, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminUserTeamInfo } from '@cloudbeaver/core-sdk';
 
-import { getTeamGrantLabelKey } from '../../getTeamGrantLabelKey.js';
-import { getTeamGrantTooltipKey } from '../../getTeamGrantTooltipKey.js';
 import type { UserFormInfoPart } from './UserFormInfoPart.js';
 
 interface Props {
@@ -27,39 +25,50 @@ interface Props {
 export const UserFormInfoTeam = observer<Props>(function UserFormInfoTeam({ id, team, grant, state, isDefault, disabled }) {
   const translate = useTranslate();
   const grantType = isDefault ? 'DEFAULT' : (grant?.grantType ?? 'MANUAL');
-  const labelKey = getTeamGrantLabelKey(grantType);
-  const tooltipKey = getTeamGrantTooltipKey(grantType);
-  const grantLabel = labelKey ? translate(labelKey) : '-';
-  const grantTooltip = tooltipKey ? translate(tooltipKey) : undefined;
-  const label = `${team.teamId}${team.teamName && team.teamName !== team.teamId ? ' (' + team.teamName + ')' : ''}`;
+  const isGranted = isDefault || state.teams.includes(team.teamId);
+
+  function getLabel(): string {
+    return `${team.teamId}${team.teamName && team.teamName !== team.teamId ? ' (' + team.teamName + ')' : ''}`;
+  }
 
   function getCaption(): string | undefined {
-    if (isDefault) {
-      return `${grantLabel}. ${translate('plugin_authentication_administration_user_team_default_readonly_tooltip')}`;
-    }
-
-    if (!state.teams.includes(team.teamId)) {
+    if (!isGranted) {
       return undefined;
     }
 
-    if (grantType === 'AUTH_PROVIDER') {
-      const provider = grant?.grantedBy ? `: ${grant.grantedBy}` : '';
-      return `${grantLabel}${provider}. ${grantTooltip}`;
+    switch (grantType) {
+      case 'AUTH_PROVIDER': {
+        const label = translate('plugin_authentication_administration_team_grant_provider');
+        return grant?.grantedBy ? `${label}: ${grant.grantedBy}` : label;
+      }
+      case 'DEFAULT':
+        return translate('plugin_authentication_administration_team_grant_default');
+      case 'MANUAL':
+        return translate('plugin_authentication_administration_team_grant_manual');
+      default:
+        return '-';
     }
-
-    return grantLabel;
   }
 
   function getTooltip(): string {
-    const tooltip = `${label}${team.description ? '\n' + team.description : ''}`;
-    return isDefault ? `${tooltip}\n${grantTooltip}` : tooltip;
+    const tooltip = `${getLabel()}${team.description ? '\n' + team.description : ''}`;
+
+    if (isDefault) {
+      return `${tooltip}\n${translate('plugin_authentication_administration_team_grant_default_tooltip')}\n${translate('plugin_authentication_administration_user_team_default_readonly_tooltip')}`;
+    }
+
+    if (isGranted && grantType === 'AUTH_PROVIDER') {
+      return `${tooltip}\n${translate('plugin_authentication_administration_team_grant_provider_tooltip')}`;
+    }
+
+    return tooltip;
   }
 
   return (
     <FieldCheckbox
       id={id}
       title={getTooltip()}
-      label={label}
+      label={getLabel()}
       name="teams"
       state={state}
       value={team.teamId}
