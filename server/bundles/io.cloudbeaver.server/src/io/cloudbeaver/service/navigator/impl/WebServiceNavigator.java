@@ -23,10 +23,7 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.navigator.DBWServiceNavigator;
-import io.cloudbeaver.service.navigator.WebCatalog;
-import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
-import io.cloudbeaver.service.navigator.WebStructContainers;
+import io.cloudbeaver.service.navigator.*;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
@@ -54,6 +51,7 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
+import org.jkiss.dbeaver.registry.NavigatorObjectFilterUtils;
 import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -225,9 +223,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBNDatabaseNode dbNode = getDatabaseNode(webSession, nodePath);
             DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), dbNode);
-            if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM() &&
-                hasDataSourceEditAccess(dbNode, webSession)
-            ) {
+            if (WebNavigatorFilterUtils.usesConnectionFilter(webSession, dbNode)) {
                 if (!dbNode.setNodeFilter(itemsMeta, createFilter(include, exclude, false), false)) {
                     throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
                 }
@@ -305,26 +301,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         return filter;
     }
 
-    private boolean hasDataSourceEditAccess(@NotNull DBNNode node, @NotNull WebSession session) {
-        return node.getOwnerProject() instanceof BaseWebProjectImpl webProject &&
-            SMUtils.hasProjectPermission(session, webProject.getRMProject(), RMProjectPermission.DATA_SOURCES_EDIT);
-    }
-
     private void setUserFilter(
         @NotNull DBNDatabaseNode node,
         @NotNull DBXTreeItem itemsMeta,
         @Nullable DBSObjectFilter filter
     ) throws DBException {
-        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
-        if (childClass == null) {
+        if (!NavigatorObjectFilterUtils.setUserFilter(node, itemsMeta, filter)) {
             throw new DBWebException("Navigator node '" + node.getNodeUri() + "' does not support object filters");
         }
-        UserDBSObjectFilterUtils.setUserObjectFilter(
-            node.getDataSourceContainer(),
-            childClass,
-            node.getFilterObject(),
-            filter
-        );
     }
 
     @Override

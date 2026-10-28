@@ -18,6 +18,7 @@ package io.cloudbeaver.service.navigator;
 
 import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.CloudbeaverMockTest;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebUserContext;
@@ -42,6 +43,102 @@ import org.mockito.Mockito;
 import java.util.List;
 
 public class WebServiceNavigatorTest extends CloudbeaverMockTest {
+
+    @Test
+    void legacyReadAndMutationUseTheSamePermissionRouting() throws Exception {
+        assertLegacyPermissionRouting(false, false);
+        assertLegacyPermissionRouting(false, true);
+        assertLegacyPermissionRouting(true, false);
+        assertLegacyPermissionRouting(true, true);
+    }
+
+    private void assertLegacyPermissionRouting(boolean authorized, boolean canEditDataSources) throws Exception {
+        WebSession session = Mockito.mock(WebSession.class);
+        WebUserContext userContext = Mockito.mock(WebUserContext.class);
+        DBNModel navigatorModel = Mockito.mock(DBNModel.class);
+        DBNDatabaseNode node = Mockito.mock(DBNDatabaseNode.class);
+        BaseWebProjectImpl project = Mockito.mock(BaseWebProjectImpl.class);
+        RMProject rmProject = Mockito.mock(RMProject.class);
+        DBPDataSourceContainer dataSource = Mockito.mock(DBPDataSourceContainer.class);
+        DBXTreeItem itemsMeta = Mockito.mock(DBXTreeItem.class);
+        DBSObjectFilter connectionFilter = new DBSObjectFilter();
+        connectionFilter.addInclude("prod_%");
+        DBSObjectFilter userFilter = new DBSObjectFilter();
+        userFilter.addInclude("prod_eu_%");
+        userFilter.setUserFilter(true);
+
+        Mockito.when(session.getUserContext()).thenReturn(userContext);
+        Mockito.when(userContext.isNonAnonymousUserAuthorizedInSM()).thenReturn(authorized);
+        Mockito.when(session.getNavigatorModelOrThrow()).thenReturn(navigatorModel);
+        Mockito.when(navigatorModel.getNodeByPath(session.getProgressMonitor(), "node")).thenReturn(node);
+        Mockito.when(node.getOwnerProject()).thenReturn(project);
+        Mockito.when(project.getRMProject()).thenReturn(rmProject);
+        Mockito.when(node.getDataSourceContainer()).thenReturn(dataSource);
+        Mockito.doReturn(DBSObject.class).when(node).getChildrenOrFolderClass(itemsMeta);
+        Mockito.when(node.getNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
+        Mockito.when(node.setNodeFilter(Mockito.eq(itemsMeta), Mockito.any(), Mockito.eq(false))).thenReturn(true);
+
+        try (MockedStatic<SMUtils> smUtils = Mockito.mockStatic(SMUtils.class);
+             MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class);
+             MockedStatic<UserDBSObjectFilterUtils> filterUtils = Mockito.mockStatic(UserDBSObjectFilterUtils.class)) {
+            smUtils.when(() -> SMUtils.hasProjectPermission(
+                session, rmProject, RMProjectPermission.DATA_SOURCES_EDIT
+            )).thenReturn(canEditDataSources);
+            dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), node)).thenReturn(itemsMeta);
+            filterUtils.when(() -> UserDBSObjectFilterUtils.getUserObjectFilter(
+                dataSource, DBSObject.class, null, true
+            )).thenReturn(userFilter);
+
+            boolean connectionRoute = authorized && canEditDataSources;
+            Assertions.assertSame(
+                connectionRoute ? connectionFilter : userFilter,
+                new WebNavigatorNodeInfo(session, node).getFilter()
+            );
+            Assertions.assertTrue(
+                new WebServiceNavigator().setNavigatorNodeFilter(session, "node", List.of("new_%"), null)
+            );
+
+            if (connectionRoute) {
+                Mockito.verify(node).setNodeFilter(Mockito.eq(itemsMeta), Mockito.any(), Mockito.eq(false));
+                Mockito.verify(dataSource).persistConfiguration();
+                filterUtils.verifyNoInteractions();
+            } else {
+                filterUtils.verify(() -> UserDBSObjectFilterUtils.setUserObjectFilter(
+                    Mockito.eq(dataSource), Mockito.eq(DBSObject.class), Mockito.isNull(), Mockito.any(DBSObjectFilter.class)
+                ));
+                Mockito.verify(node, Mockito.never()).setNodeFilter(Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                Mockito.verify(dataSource, Mockito.never()).persistConfiguration();
+            }
+            if (!authorized) {
+                smUtils.verifyNoInteractions();
+            }
+        }
+    }
+
+    @Test
+    void unsupportedUserFilterPreservesWebException() throws Exception {
+        WebSession session = Mockito.mock(WebSession.class);
+        WebUserContext userContext = Mockito.mock(WebUserContext.class);
+        DBNModel navigatorModel = Mockito.mock(DBNModel.class);
+        DBNDatabaseNode node = Mockito.mock(DBNDatabaseNode.class);
+        DBXTreeItem itemsMeta = Mockito.mock(DBXTreeItem.class);
+        Mockito.when(session.getUserContext()).thenReturn(userContext);
+        Mockito.when(session.getNavigatorModelOrThrow()).thenReturn(navigatorModel);
+        Mockito.when(navigatorModel.getNodeByPath(session.getProgressMonitor(), "node")).thenReturn(node);
+        Mockito.when(node.getNodeUri()).thenReturn("node://node");
+
+        try (MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class);
+             MockedStatic<UserDBSObjectFilterUtils> filterUtils = Mockito.mockStatic(UserDBSObjectFilterUtils.class)) {
+            dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), node)).thenReturn(itemsMeta);
+            WebServiceNavigator service = new WebServiceNavigator();
+            String expectedMessage = "Navigator node 'node://node' does not support object filters";
+            Assertions.assertEquals(expectedMessage, Assertions.assertThrows(DBWebException.class,
+                () -> service.setNavigatorNodeFilter(session, "node", List.of("prod_%"), null)).getMessage());
+            Assertions.assertEquals(expectedMessage, Assertions.assertThrows(DBWebException.class,
+                () -> service.setUserNavigatorNodeFilter(session, "node", List.of("prod_%"), null)).getMessage());
+            filterUtils.verifyNoInteractions();
+        }
+    }
 
     @Test
     void legacyMutationStoresUserFilterWithoutDataSourceEditPermission() throws Exception {
