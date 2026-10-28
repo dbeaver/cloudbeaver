@@ -46,8 +46,6 @@ import java.util.Map;
 public class WebDatabaseDriverInfo {
 
     private static final Log log = Log.getLog(WebDatabaseDriverInfo.class);
-    private static final String INFLUXDB2_PROVIDER_ID = "influxdb2";
-    private static final String INFLUXDB2_ORG_PROPERTY = "influx.org";
     public static final String URL_SERVER_FIELD = "{server}";
     public static final String URL_DATABASE_FIELD = ".*(?:\\{(?:database|file|folder)}).*";
     private final WebSession webSession;
@@ -257,27 +255,7 @@ public class WebDatabaseDriverInfo {
     @Property
     public WebPropertyInfo[] getProviderProperties() {
         return Arrays.stream(driver.getProviderPropertyDescriptors())
-            .map(p -> {
-                if (INFLUXDB2_PROVIDER_ID.equals(driver.getProviderId()) && INFLUXDB2_ORG_PROPERTY.equals(p.getId())) {
-                    return new WebPropertyInfo(webSession, p, null) {
-                        @Override
-                        @Property
-                        public boolean isRequired() {
-                            return true;
-                        }
-
-                        @NotNull
-                        @Override
-                        @Property
-                        public String[] getFeatures() {
-                            String[] features = super.getFeatures();
-                            return ArrayUtils.contains(features, FEATURE_MAIN) ? features :
-                                ArrayUtils.concatArrays(features, new String[]{FEATURE_MAIN});
-                        }
-                    };
-                }
-                return new WebPropertyInfo(webSession, p, null);
-            })
+            .map(p -> new WebPropertyInfo(webSession, p, null))
             .toArray(WebPropertyInfo[]::new);
     }
 
