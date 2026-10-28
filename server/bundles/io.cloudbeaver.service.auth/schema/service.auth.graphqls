@@ -160,7 +160,7 @@ type UserInfo {
     metaParameters: Object!
     "User configuration parameters"
     configurationParameters: Object!
-    "Web UI settings"
+    "Web UI settings of the authenticated non-anonymous user; an empty object if none have been saved"
     uiSettings: Object! @since(version: "26.2.4")
     "User teams"
     teams: [UserTeamInfo!]!
@@ -216,7 +216,7 @@ extend type Mutation {
     setUserConfigurationParameter(name: String!, value: Object): Boolean!
     "Updates user preferences"
     setUserPreferences(preferences: Object!): UserInfo! @since(version: "24.0.1")
-    "Applies a merge patch to web UI settings and returns the resulting settings"
+    "Replaces all web UI settings of the authenticated non-anonymous user and returns the saved object. An empty object clears settings. The compact UTF-8 JSON must not exceed 64000 bytes."
     authSetUserUISettings(settings: Object!): Object! @since(version: "26.2.4")
 
     "Creates async task for federated login. Returns redirect link to the task info page."

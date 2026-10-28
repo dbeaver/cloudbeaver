@@ -18,13 +18,14 @@ package io.cloudbeaver.service.security;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import com.google.gson.ToNumberPolicy;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.*;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
-import io.cloudbeaver.model.utils.JSONMergePatch;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
@@ -66,6 +67,7 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -88,6 +90,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
+    private static final Gson UI_SETTINGS_GSON = new GsonBuilder()
+        .serializeNulls()
+        .setObjectToNumberStrategy(ToNumberPolicy.BIG_DECIMAL)
+        .create();
+    private static final int MAX_UI_SETTINGS_BYTES = 64_000;
 
     protected final T application;
     protected final CBDatabase database;
@@ -1153,7 +1160,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             return readUserUISettings(dbCon, userId);
-        } catch (SQLException e) {
+        } catch (SQLException | JsonParseException e) {
             throw new DBCException("Error while loading user UI settings", e);
         }
     }
@@ -1162,40 +1169,35 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public Map<String, Object> updateCurrentUserUISettings(@NotNull Map<String, Object> settings) throws DBException {
         String userId = getUserIdOrThrow();
-        for (String settingId : settings.keySet()) {
-            if (settingId.length() > 255) {
-                throw new DBException("UI setting ID is too long: " + settingId);
-            }
+        String configuration;
+        try {
+            configuration = UI_SETTINGS_GSON.toJson(settings);
+        } catch (IllegalArgumentException e) {
+            throw new DBException("Invalid user UI settings", e);
         }
+        if (configuration.getBytes(StandardCharsets.UTF_8).length > MAX_UI_SETTINGS_BYTES) {
+            throw new DBException("User UI settings exceed the maximum size of " + MAX_UI_SETTINGS_BYTES + " UTF-8 bytes");
+        }
+        Map<String, Object> savedSettings = UI_SETTINGS_GSON.fromJson(configuration, MAP_STRING_OBJECT_TYPE);
 
         try (Connection dbCon = database.openConnection();
              JDBCTransaction txn = new JDBCTransaction(dbCon)
         ) {
             try {
                 lockUserUISettings(dbCon, userId);
-                Map<String, Object> updatedSettings = JSONMergePatch.apply(readUserUISettings(dbCon, userId), settings);
                 try (PreparedStatement deleteStatement = dbCon.prepareStatement(
-                    "DELETE FROM {table_prefix}CB_USER_UI_SETTINGS WHERE USER_ID=? AND SETTING_ID=?");
+                    "DELETE FROM {table_prefix}CB_USER_STATE WHERE USER_ID=?");
                      PreparedStatement insertStatement = dbCon.prepareStatement(
-                         "INSERT INTO {table_prefix}CB_USER_UI_SETTINGS " +
-                             "(USER_ID,SETTING_ID,SETTING_VALUE,UPDATE_TIME) VALUES(?,?,?,CURRENT_TIMESTAMP)")) {
-                    for (String settingId : settings.keySet()) {
-                        deleteStatement.setString(1, userId);
-                        deleteStatement.setString(2, settingId);
-                        deleteStatement.addBatch();
-
-                        if (updatedSettings.containsKey(settingId)) {
-                            insertStatement.setString(1, userId);
-                            insertStatement.setString(2, settingId);
-                            insertStatement.setString(3, gson.toJson(updatedSettings.get(settingId)));
-                            insertStatement.addBatch();
-                        }
-                    }
-                    deleteStatement.executeBatch();
-                    insertStatement.executeBatch();
+                         "INSERT INTO {table_prefix}CB_USER_STATE " +
+                             "(USER_ID,USER_CONFIGURATION,UPDATE_TIME) VALUES(?,?,CURRENT_TIMESTAMP)")) {
+                    deleteStatement.setString(1, userId);
+                    deleteStatement.executeUpdate();
+                    insertStatement.setString(1, userId);
+                    insertStatement.setString(2, configuration);
+                    insertStatement.executeUpdate();
                 }
                 txn.commit();
-                return updatedSettings;
+                return savedSettings;
             } catch (SQLException | RuntimeException e) {
                 try {
                     txn.rollback();
@@ -1210,7 +1212,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     private void lockUserUISettings(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
-        // Lock the parent user row to serialize read/merge/write across sessions and server nodes.
+        // Lock the parent row even before the first save to serialize replacements across server nodes.
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=IS_ACTIVE WHERE USER_ID=?")) {
             dbStat.setString(1, userId);
@@ -1220,18 +1222,24 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     private Map<String, Object> readUserUISettings(@NotNull Connection dbCon, @NotNull String userId)
-        throws SQLException {
-        Map<String, Object> result = new LinkedHashMap<>();
+        throws SQLException, DBException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "SELECT SETTING_ID,SETTING_VALUE FROM {table_prefix}CB_USER_UI_SETTINGS WHERE USER_ID=?")) {
+            "SELECT USER_CONFIGURATION FROM {table_prefix}CB_USER_STATE WHERE USER_ID=?")) {
             dbStat.setString(1, userId);
             try (ResultSet dbResult = dbStat.executeQuery()) {
-                while (dbResult.next()) {
-                    result.put(dbResult.getString(1), gson.fromJson(dbResult.getString(2), Object.class));
+                if (dbResult.next()) {
+                    String configuration = dbResult.getString(1);
+                    if (configuration != null) {
+                        Map<String, Object> settings = UI_SETTINGS_GSON.fromJson(configuration, MAP_STRING_OBJECT_TYPE);
+                        if (settings == null) {
+                            throw new DBException("Stored user UI settings must be a JSON object");
+                        }
+                        return settings;
+                    }
                 }
             }
         }
-        return result;
+        return Map.of();
     }
 
     public void enableUser(

@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DBWebExceptionAccessDenied;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
@@ -95,8 +96,11 @@ public class WebUserInfo {
     @NotNull
     @Property
     public Map<String, Object> getUiSettings() throws DBWebException {
+        if (!session.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+            throw new DBWebExceptionAccessDenied("Access denied: user not authenticated");
+        }
         try {
-            return session.getUserContext().getPreferenceStore().refreshUISettings();
+            return session.getSecurityController().getCurrentUserUISettings();
         } catch (DBException e) {
             throw new DBWebException("Error reading user UI settings", e);
         }

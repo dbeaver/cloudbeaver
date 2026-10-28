@@ -226,9 +226,6 @@ public class CBSessionManager implements WebAppSessionManager {
         } catch (DBException e) {
             throw new DBWebException(e);
         }
-        newWebSession.getUserContext().getPreferenceStore().updateAllUISettings(
-            oldWebSession.getUserContext().getPreferenceStore().getUISettings()
-        );
         oldWebSession.migrateEventHandlersTo(newWebSession);
         oldWebSession.getEventsFilter().migrateTo(newWebSession.getEventsFilter());
         String oldSessionId = oldWebSession.getSessionId();
