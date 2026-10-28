@@ -7,9 +7,12 @@
  */
 import React from 'react';
 
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
+
+const MainProviderPropertiesForm = importLazyComponent(() => import('./MainProviderPropertiesForm.js').then(m => m.MainProviderPropertiesForm));
 
 export const Options = React.lazy(async () => {
   const { OptionsPanel } = await import('./OptionsPanel.js');
@@ -23,6 +26,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
   }
 
   override register(): void {
+    this.connectionFormService.mainPropertiesContainer.add(MainProviderPropertiesForm);
     this.connectionFormService.parts.add({
       key: 'options',
       name: 'plugin_connections_connection_form_part_main',

@@ -43,6 +43,7 @@ import { getConnectionName } from './getConnectionName.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
+import { getMainProviderProperties, hasMissingMainProviderProperties } from '../providerProperties.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -519,6 +520,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
       if (!driver.configurationTypes.includes(this.state.configurationType)) {
         validation.error('plugin_connections_connection_form_host_configuration_invalid');
+      }
+
+      if (hasMissingMainProviderProperties(getMainProviderProperties(driver, this.state.configurationType), this.state.providerProperties)) {
+        validation.error('plugin_connections_connection_form_organization_required');
       }
     }
 

@@ -8,31 +8,28 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, GroupTitle, ObjectPropertyInfoForm, useObjectPropertyCategories, useTranslate } from '@cloudbeaver/core-blocks';
+import type { DBDriver } from '@cloudbeaver/core-connections';
 import { type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
-import { isProviderPropertySupported } from './isProviderPropertySupported.js';
+import { getAdvancedProviderProperties } from '../providerProperties.js';
 
 type DriverPropertyInfo = DriverPropertyInfoFragment;
 
 interface Props {
   formState: IFormState<IConnectionFormState>;
-  properties: DriverPropertyInfo[];
+  driver: DBDriver;
   readonly?: boolean;
 }
 
-export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({ properties, readonly, formState }) {
+export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({ driver, readonly, formState }) {
   const translate = useTranslate();
   const config = getConnectionFormOptionsPart(formState).state;
   const disabled = formState.isDisabled;
   const configurationType = config.configurationType;
 
-  let supportedProperties: DriverPropertyInfo[] = [];
-
-  if (configurationType !== undefined) {
-    supportedProperties = properties.filter(property => isProviderPropertySupported(property, configurationType));
-  }
+  const supportedProperties = getAdvancedProviderProperties(driver, configurationType);
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(supportedProperties);
 
