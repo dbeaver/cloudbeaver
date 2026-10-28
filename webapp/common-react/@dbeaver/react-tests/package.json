@@ -28,7 +28,7 @@
     "@dbeaver/cli": "workspace:^",
     "@dbeaver/tsconfig": "workspace:^",
     "@testing-library/dom": "^10",
-    "@testing-library/jest-dom": "^6",
+    "@testing-library/jest-dom": "^7",
     "@testing-library/react": "^16",
     "@types/node": "^22",
     "@types/ws": "^8",

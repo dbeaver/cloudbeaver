@@ -32,10 +32,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
-import org.jkiss.dbeaver.model.connection.DBPConnectionType;
-import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.*;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
@@ -390,6 +387,69 @@ public class WebDataSourceUtils {
         if (config.getServerName() != null) {
             dsConfig.setServerName(config.getServerName());
         }
+    }
+
+    public static boolean isConnectionTargetChanged(
+        @NotNull DBPConnectionConfiguration connectionConfiguration,
+        @NotNull WebConnectionConfig config
+    ) {
+        if (CommonUtils.isNotEmpty(config.getUrl())) {
+            return !Objects.equals(connectionConfiguration.getUrl(), config.getUrl()) ||
+                isNetworkHandlerTargetChanged(connectionConfiguration, config.getNetworkHandlersConfig());
+        }
+        if (connectionConfiguration.getConfigurationType() == DBPDriverConfigurationType.URL ||
+            config.getConfigurationType() == DBPDriverConfigurationType.URL) {
+            return true;
+        }
+        if (config.getMainPropertyValues() != null) {
+            Object host = config.getMainPropertyValues().get(DBConstants.PROP_HOST);
+            if (host != null && !Objects.equals(connectionConfiguration.getHostName(), CommonUtils.toString(host))) {
+                return true;
+            }
+        } else if (config.getHost() != null && !Objects.equals(connectionConfiguration.getHostName(), config.getHost())) {
+            return true;
+        }
+        // A database port change on the same host is intentionally allowed to reuse saved credentials.
+        return isNetworkHandlerTargetChanged(connectionConfiguration, config.getNetworkHandlersConfig());
+    }
+
+    private static boolean isNetworkHandlerTargetChanged(
+        @NotNull DBPConnectionConfiguration connectionConfiguration,
+        @Nullable List<WebNetworkHandlerConfigInput> handlers
+    ) {
+        if (CommonUtils.isEmpty(handlers)) {
+            return false;
+        }
+        for (WebNetworkHandlerConfigInput handlerInput : handlers) {
+            DBWHandlerConfiguration handler = connectionConfiguration.getHandler(handlerInput.getId());
+            Boolean inputEnabled = handlerInput.isEnabled();
+            boolean enabled = inputEnabled != null ?
+                CommonUtils.toBoolean(inputEnabled) :
+                handler != null && handler.isEnabled();
+            if (handler == null) {
+                if (enabled) {
+                    return true;
+                }
+                continue;
+            }
+            if (inputEnabled != null && CommonUtils.toBoolean(inputEnabled) != handler.isEnabled()) {
+                return true;
+            }
+            Map<String, Object> properties = handlerInput.getProperties();
+            if (!enabled || properties == null) {
+                continue;
+            }
+            if (properties.containsKey(DBWHandlerConfiguration.PROP_HOST) && !Objects.equals(
+                CommonUtils.toString(handler.getProperty(DBWHandlerConfiguration.PROP_HOST), null),
+                CommonUtils.toString(properties.get(DBWHandlerConfiguration.PROP_HOST), null)
+            ) || properties.containsKey(DBWHandlerConfiguration.PROP_PORT) && !Objects.equals(
+                CommonUtils.toString(handler.getProperty(DBWHandlerConfiguration.PROP_PORT), null),
+                CommonUtils.toString(properties.get(DBWHandlerConfiguration.PROP_PORT), null)
+            )) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @NotNull

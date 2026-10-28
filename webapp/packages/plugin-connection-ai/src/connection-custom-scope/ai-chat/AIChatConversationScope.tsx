@@ -9,21 +9,20 @@
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 
-import { Menu, MenuProvider, MenuButton, MenuItemRadio, MenuGroup, MenuGroupLabel } from '@dbeaver/ui-kit';
-import { ActionIconButton, RadioIndicator, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { MenuItemRadio, MenuGroup, MenuGroupLabel } from '@dbeaver/ui-kit';
+import { RadioIndicator, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ConnectionsManagerService, ContainerResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, ContainerResource } from '@cloudbeaver/core-connections';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { AiDatabaseScope } from '@cloudbeaver/core-sdk';
-import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
 
-import { AIChatConversationProfile, AIChatConversationsService, AIChatContext, type AIChatActionsProps } from '@cloudbeaver/plugin-ai-chat';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
+import { AIChatConversationsService, AIChatContext, type IAIChatConversationMenuProps } from '@cloudbeaver/plugin-ai-chat';
+
 import { AIChatConversationScopeResource } from './AIChatConversationScopeResource.js';
 import { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
+import { ConnectionInfoAiScopeResource } from '../../ConnectionInfoAiScopeResource.js';
 import { AiScopeDialog } from '../AiScopeDialogLazy.js';
 
 interface IScopeItem {
@@ -31,21 +30,21 @@ interface IScopeItem {
   label: string;
 }
 
-export const AIChatConversationScope = observer<AIChatActionsProps>(function AIChatConversationScope({ conversation }) {
+export const AIChatConversationScope = observer<IAIChatConversationMenuProps>(function AIChatConversationScope({ conversation }) {
   const context = useContext(AIChatContext);
   const { catalog, schema, disabled } = context;
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const connectionsManagerService = useService(ConnectionsManagerService);
+  const connectionInfoResource = useService(ConnectionInfoResource);
   const connectionInfoAiResource = useService(ConnectionInfoAiResource);
+  const connectionInfoAiScopeResource = useService(ConnectionInfoAiScopeResource);
   const commonDialogService = useService(CommonDialogService);
   const aiChatConversationsService = useService(AIChatConversationsService);
   const aiChatConversationScopeResource = useService(AIChatConversationScopeResource);
 
   const { data: container } = useResource(AIChatConversationScope, ContainerResource, conversation.dataSourceId ?? null);
   const { data: currentScope } = useResource(AIChatConversationScope, AIChatConversationScopeResource, conversation.id);
-  const aiProfilesResource = useResource(AIChatConversationScope, AIProfilesResource, CachedMapAllKey);
-  const profiles = aiProfilesResource.data.filter(isNotNullDefined);
 
   async function selectScope(scope: AiDatabaseScope) {
     if (!conversation.dataSourceId) {
@@ -62,11 +61,16 @@ export const AIChatConversationScope = observer<AIChatActionsProps>(function AIC
         }
 
         const settings = await connectionInfoAiResource.refresh(key);
+        const allowedScope = settings.scope === AiDatabaseScope.Custom ? await connectionInfoAiScopeResource.load(key) : null;
+        if (!connectionInfoResource.isConnected(key)) {
+          return;
+        }
+
         const { status, result } = await commonDialogService.open(AiScopeDialog, {
           rootId: connection.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.projectId, key.connectionId),
           selectedIds: conversation.settings?.customObjectIds ?? [],
           title: 'plugin_ai_chat_scope_custom_dialog_title',
-          allowedIds: settings.scope === AiDatabaseScope.Custom ? (settings.customObjectIds ?? []) : null,
+          allowedIds: allowedScope ? (allowedScope.customObjectIds ?? []) : null,
         });
 
         if (status !== DialogueStateResult.Resolved) {
@@ -103,40 +107,33 @@ export const AIChatConversationScope = observer<AIChatActionsProps>(function AIC
   }, [container, catalog, schema, translate]);
 
   return (
-    <MenuProvider placement="bottom-end">
-      <MenuButton render={<ActionIconButton disabled={disabled} title={translate('plugin_ai_chat_scope_change')} name="/icons/scope.svg" img />} />
-      <Menu modal fitViewport>
-        <MenuGroup className="tw:flex tw:flex-col tw:gap-1">
-          <MenuGroupLabel>{translate('plugin_ai_chat_scope_change')}</MenuGroupLabel>
+    <MenuGroup className="tw:flex tw:flex-col tw:gap-1">
+      <MenuGroupLabel>{translate('plugin_ai_chat_scope_change')}</MenuGroupLabel>
 
-          {scopes.map(scope => {
-            const isCurrent = currentScope?.scope === scope.id;
-            const label = scope.label;
+      {scopes.map(scope => {
+        const isCurrent = currentScope?.scope === scope.id;
+        const label = scope.label;
 
-            return (
-              <MenuItemRadio
-                key={scope.id}
-                value={label}
-                name={scope.id}
-                aria-label={label}
-                title={label}
-                checked={isCurrent}
-                disabled={disabled}
-                className="tw:min-h-7"
-                hideOnClick={scope.id === AiDatabaseScope.Custom}
-                onClick={() => selectScope(scope.id)}
-              >
-                <div className="tw:flex tw:items-center tw:gap-2 tw:overflow-hidden">
-                  <RadioIndicator size="small" checked={isCurrent} />
-                  <span className="tw:truncate">{label}</span>
-                </div>
-              </MenuItemRadio>
-            );
-          })}
-        </MenuGroup>
-
-        <AIChatConversationProfile conversation={conversation} profiles={profiles} disabled={disabled} />
-      </Menu>
-    </MenuProvider>
+        return (
+          <MenuItemRadio
+            key={scope.id}
+            value={label}
+            name={scope.id}
+            aria-label={label}
+            title={label}
+            checked={isCurrent}
+            disabled={disabled}
+            className="tw:min-h-7"
+            hideOnClick={scope.id === AiDatabaseScope.Custom}
+            onClick={() => selectScope(scope.id)}
+          >
+            <div className="tw:flex tw:items-center tw:gap-2 tw:overflow-hidden">
+              <RadioIndicator size="small" checked={isCurrent} />
+              <span className="tw:truncate">{label}</span>
+            </div>
+          </MenuItemRadio>
+        );
+      })}
+    </MenuGroup>
   );
 });

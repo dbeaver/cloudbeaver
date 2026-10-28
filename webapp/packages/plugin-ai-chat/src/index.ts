@@ -22,8 +22,8 @@ export type {
 
 export * from './AIChat/AIChatService.js';
 export * from './AIChat/AIChatConversation/AIChatConversationsService.js';
-export * from './AIChat/AIChatConversation/AIChatConversationProfileLazy.js';
 export * from './AIChat/AIChatConversation/AIChatConversationsResource.js';
+export * from './AIChat/AIChatConversation/conversationConfigContext.js';
 export * from './AIChat/AIChatContext/AIChatContextService.js';
 export * from './AIChat/AIChatMessage/AIChatMessageService.js';
 export * from './AIChat/AIChatMessage/AIChatMessagesResource.js';

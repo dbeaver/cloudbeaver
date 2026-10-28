@@ -578,6 +578,22 @@ public class WebSQLUtils {
     }
 
     @NotNull
+    public static DBDDocument applyDocumentUpdate(
+        @NotNull DBDDocument document,
+        @Nullable DBDAttributeBinding documentAttribute,
+        @NotNull DBDAttributeBinding updateAttribute,
+        @Nullable Object value
+    ) throws DBCException {
+        if (updateAttribute == documentAttribute && value instanceof DBDDocument updatedDocument) {
+            return updatedDocument;
+        }
+        if (document instanceof DBDComposite composite) {
+            composite.setAttributeValue(updateAttribute, value);
+        }
+        return document;
+    }
+
+    @NotNull
     public static DBDDocument makeDocumentInputValue(
         @NotNull DBCSession session,
         @NotNull DBSDocumentLocator dataContainer,

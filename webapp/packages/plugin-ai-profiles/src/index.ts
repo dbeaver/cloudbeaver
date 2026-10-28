@@ -16,5 +16,6 @@ export * from './AIProfileCredentials/useAIProfileAuthorization.js';
 export type { IAIProfileCredentialsFormState } from './AIProfileCredentials/IAIProfileCredentialsFormState.js';
 export { AIProfileCredentialsFields } from './AIProfileCredentials/AIProfileCredentialsFieldsLazy.js';
 export * from './AIProfilesResource.js';
+export * from './AIDefaultProfileService.js';
 export { AIProfilesTable } from './AIProfilesTableLazy.js';
 export type { IAIProfilesTableColumn, IAIProfilesTableProps } from './AIProfilesTable.js';

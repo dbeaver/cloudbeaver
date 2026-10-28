@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { runInAction } from 'mobx';
 
 import { Button, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
-import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -23,12 +23,15 @@ import { getScopeSelectionRoots } from '../getScopeSelectionRoots.js';
 
 import { getConnectionAiScopePart } from './getConnectionAiScopePart.js';
 import { SelectionSummary } from './SelectionSummary.js';
+import { ConnectionInfoAiResource } from '../../ConnectionInfoAiResource.js';
 
 export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(function ConnectionAiScope({ formState, metaTransferConfirmed = false }) {
   const translate = useTranslate();
   const part = getConnectionAiScopePart(formState);
   const options = getConnectionFormOptionsPart(formState);
   const connectionsManagerService = useService(ConnectionsManagerService);
+  const connectionInfoResource = useService(ConnectionInfoResource);
+  const connectionInfoAiResource = useService(ConnectionInfoAiResource);
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -40,7 +43,8 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
   const selectedIds = custom ? getScopeSelectionRoots(part.state.customObjectIds, id => navNodeInfoResource.getParents(id)) : [];
   const previewIds = selectedIds.slice(0, 3);
   const remaining = selectedIds.length - previewIds.length;
-  const showSelection = !!options.connectionKey && part.isLoaded() && !part.isError();
+  const connected = !!options.connectionKey && !!connectionInfoResource.get(options.connectionKey)?.connected;
+  const showSelection = connected && part.isLoaded() && !part.isError();
   const active = showSelection && metaTransferConfirmed && selectedIds.length > 0;
   const title = translate(active ? 'plugin_ai_scope_custom_active' : 'plugin_ai_scope_custom');
 
@@ -54,6 +58,8 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
 
   if (!options.connectionKey) {
     summary = translate('plugin_ai_scope_save_first');
+  } else if (!connected) {
+    summary = translate('plugin_ai_scope_disconnected');
   } else if (!part.isLoaded()) {
     summary = translate('ui_processing_loading');
   } else if (showSelection) {
@@ -118,6 +124,17 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
         return;
       }
 
+      connectionInfoAiResource.markOutdated(key);
+      await part.load();
+
+      if (part.exception) {
+        throw part.exception;
+      }
+
+      if (!connectionInfoResource.isConnected(key)) {
+        return;
+      }
+
       const rootId = connection.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.projectId, key.connectionId);
       const { status, result } = await commonDialogService.open(AiScopeDialog, {
         rootId,
@@ -145,7 +162,7 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
           custom ? (
             <div
               className="tw:flex tw:h-8 tw:min-w-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-(--theme-primary) tw:px-1 tw:text-(--theme-on-primary) tw:font-semibold"
-              aria-label={`${translate('plugin_ai_scope_selected')}: ${selectedIds.length}`}
+              aria-label={`${translate('plugin_ai_scope_selected')}: ${count}`}
             >
               {count}
             </div>
@@ -155,7 +172,7 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
       >
         {summaryId => (
           <>
-            {custom && (
+            {custom && showSelection && (
               <Button className="tw:uppercase" type="button" variant="ghost" disabled={disabled} aria-describedby={summaryId} onClick={clear}>
                 {translate('ui_clear')}
               </Button>
@@ -169,7 +186,7 @@ export const ConnectionAiScope = observer<ConnectionFormAiContainerProps>(functi
               loader
               onClick={configure}
             >
-              {translate(custom ? 'ui_edit' : 'plugin_ai_scope_configure_action')}
+              {translate('ui_edit')}
             </Button>
           </>
         )}
