@@ -32,9 +32,6 @@
       "path": "../core-resource"
     },
     {
-      "path": "../core-resource-manager"
-    },
-    {
       "path": "../core-root"
     },
     {

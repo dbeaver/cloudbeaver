@@ -8,9 +8,6 @@
   },
   "references": [
     {
-      "path": "../core-administration"
-    },
-    {
       "path": "../core-cli"
     },
     {

@@ -21,7 +21,6 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-administration": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-navigation-tree": "workspace:*",
@@ -31,7 +30,6 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
-    "mobx": "^6",
     "tslib": "^2"
   },
   "devDependencies": {

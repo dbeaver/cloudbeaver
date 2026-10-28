@@ -28,8 +28,8 @@ import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.utils.SecurityUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -59,16 +60,11 @@ public class RMNIOTest extends CloudbeaverMockTest {
         String sessionId = client.getSessionIdCookie();
         webSession = (WebSession) CEAppStarter.getTestApp().getSessionManager().getSession(sessionId);
         Assertions.assertNotNull(webSession);
-        var projectName = "NIO_Test" + SecurityUtils.generateUniqueId();
-        testProject = webSession.getRmController().createProject(projectName, null);
+        testProject = Arrays.stream(webSession.getRmController().listAccessibleProjects())
+            .filter(project -> project.getType() == RMProjectType.USER)
+            .findFirst()
+            .orElseThrow();
         rmFsProvider = new RMNIOFileSystemProvider(webSession.getRmController());
-    }
-
-    @AfterAll
-    public static void destroy() throws Exception {
-        if (webSession != null && testProject != null) {
-            webSession.getUserContext().getRmController().deleteProject(testProject.getId());
-        }
     }
 
     @Test
@@ -91,22 +87,15 @@ public class RMNIOTest extends CloudbeaverMockTest {
     }
 
     @Test
-    public void testNioProjectOperations() throws IOException, DBException {
+    public void testNioProjectOperations() {
         var randomName = SecurityUtils.generateUniqueId();
         String randomProject = "s_random_project_" + randomName;
 
         RMPath newProjectPath = new RMPath(new RMNIOFileSystem(randomProject, rmFsProvider));
         Assertions.assertFalse(Files.exists(newProjectPath));
 
-        //create project via nio
-        Files.createDirectory(newProjectPath);
-        Assertions.assertTrue(Files.exists(newProjectPath));
-        Assertions.assertNotNull(webSession.getRmController().getProject(randomProject, false, false));
-
-        //delete project via nio
-        Files.delete(newProjectPath);
+        Assertions.assertThrows(IOException.class, () -> Files.createDirectory(newProjectPath));
         Assertions.assertFalse(Files.exists(newProjectPath));
-        Assertions.assertNull(webSession.getRmController().getProject(randomProject, false, false));
     }
 
     @Test

@@ -8,8 +8,6 @@
 
 import './module.js';
 export * from './RESOURCE_MANAGER_SETTINGS_GROUP.js';
-export * from './SharedProjectsResource.js';
-export * from './ProjectPermissionsResource.js';
 export * from './ResourceManagerEventHandler.js';
 export * from './ResourceManagerResource.js';
 export * from './EProjectPermission.js';

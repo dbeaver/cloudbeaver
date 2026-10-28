@@ -67,6 +67,26 @@ public class ResourceManagerTest extends CloudbeaverMockTest {
             folder
           }
         }""";
+    private static final String GQL_PROJECT_CREATE = """
+        mutation {
+          result: rmCreateProject(projectName: "CE project") {
+            id
+          }
+        }""";
+    private static final String GQL_PROJECT_PERMISSIONS = """
+        query {
+          result: rmListProjectPermissions {
+            id
+          }
+        }""";
+    private static final String GQL_PROJECT_PERMISSIONS_ADD = """
+        mutation {
+          result: rmAddProjectsPermissions(
+            projectIds: ["s_project"]
+            subjectIds: ["test"]
+            permissions: ["project-resource-edit"]
+          )
+        }""";
 
     @BeforeAll
     public static void init() throws Exception {
@@ -96,6 +116,15 @@ public class ResourceManagerTest extends CloudbeaverMockTest {
             DBException.class,
             () -> client.sendQuery(GQL_RESOURCES_LIST, Map.of("projectId", "")),
             "Project id is empty"
+        );
+    }
+
+    @Test
+    public void projectManagementApiIsNotAvailable() {
+        Assertions.assertAll(
+            () -> Assertions.assertThrows(DBException.class, () -> client.sendQuery(GQL_PROJECT_CREATE, null)),
+            () -> Assertions.assertThrows(DBException.class, () -> client.sendQuery(GQL_PROJECT_PERMISSIONS, null)),
+            () -> Assertions.assertThrows(DBException.class, () -> client.sendQuery(GQL_PROJECT_PERMISSIONS_ADD, null))
         );
     }
 
