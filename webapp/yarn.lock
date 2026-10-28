@@ -3205,10 +3205,17 @@ __metadata:
     "@cloudbeaver/plugin-projects": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
     "@dbeaver/jdbc-uri-parser": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
+    "@testing-library/dom": "npm:^10"
+    "@testing-library/jest-dom": "npm:^7"
+    "@testing-library/react": "npm:^16"
+    "@testing-library/user-event": "npm:^14"
     "@types/react": "npm:^19"
+    axe-core: "npm:^4.10.2"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
@@ -3217,6 +3224,7 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 
