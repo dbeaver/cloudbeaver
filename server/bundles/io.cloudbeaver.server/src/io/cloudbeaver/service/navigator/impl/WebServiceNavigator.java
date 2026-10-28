@@ -225,21 +225,15 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBNDatabaseNode dbNode = getDatabaseNode(webSession, nodePath);
             DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), dbNode);
-            if (hasDataSourceEditAccess(dbNode, webSession)) {
+            if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM() &&
+                hasDataSourceEditAccess(dbNode, webSession)
+            ) {
                 if (!dbNode.setNodeFilter(itemsMeta, createFilter(include, exclude, false), false)) {
                     throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
                 }
                 dbNode.getDataSourceContainer().persistConfiguration();
-            } else if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
-                if (!dbNode.setUserNodeFilter(itemsMeta, createFilter(include, exclude, true))) {
-                    throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
-                }
-                UserDBSObjectFilterUtils.updateUserObjectFilters(dbNode.getDataSourceContainer());
             } else {
-                // Anonymous users have no persistent user settings, so keep their filters in the session model only.
-                if (!dbNode.setNodeFilter(itemsMeta, createFilter(include, exclude, false), false)) {
-                    throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
-                }
+                setUserFilter(dbNode, itemsMeta, createFilter(include, exclude, true));
             }
         } catch (DBException e) {
             if (e instanceof DBWebException) {
@@ -257,14 +251,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         @Nullable List<String> include,
         @Nullable List<String> exclude
     ) throws DBWebException {
-        checkAuthenticatedUser(webSession);
         try {
             DBNDatabaseNode dbNode = getDatabaseNode(webSession, nodePath);
             DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), dbNode);
-            if (!dbNode.setUserNodeFilter(itemsMeta, createFilter(include, exclude, true))) {
-                throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
-            }
-            UserDBSObjectFilterUtils.updateUserObjectFilters(dbNode.getDataSourceContainer());
+            setUserFilter(dbNode, itemsMeta, createFilter(include, exclude, true));
             return true;
         } catch (DBException e) {
             if (e instanceof DBWebException) {
@@ -279,7 +269,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         @NotNull WebSession webSession,
         @NotNull WebConnectionInfo connectionInfo
     ) throws DBWebException {
-        checkAuthenticatedUser(webSession);
         try {
             UserDBSObjectFilterUtils.clearUserObjectFilters(connectionInfo.getDataSourceContainer());
             return true;
@@ -316,15 +305,26 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         return filter;
     }
 
-    private void checkAuthenticatedUser(@NotNull WebSession webSession) throws DBWebExceptionAccessDenied {
-        if (!webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
-            throw new DBWebExceptionAccessDenied("Anonymous access restricted");
-        }
-    }
-
     private boolean hasDataSourceEditAccess(@NotNull DBNNode node, @NotNull WebSession session) {
         return node.getOwnerProject() instanceof BaseWebProjectImpl webProject &&
             SMUtils.hasProjectPermission(session, webProject.getRMProject(), RMProjectPermission.DATA_SOURCES_EDIT);
+    }
+
+    private void setUserFilter(
+        @NotNull DBNDatabaseNode node,
+        @NotNull DBXTreeItem itemsMeta,
+        @Nullable DBSObjectFilter filter
+    ) throws DBException {
+        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
+        if (childClass == null) {
+            throw new DBWebException("Navigator node '" + node.getNodeUri() + "' does not support object filters");
+        }
+        UserDBSObjectFilterUtils.setUserObjectFilter(
+            node.getDataSourceContainer(),
+            childClass,
+            node.getFilterObject(),
+            filter
+        );
     }
 
     @Override

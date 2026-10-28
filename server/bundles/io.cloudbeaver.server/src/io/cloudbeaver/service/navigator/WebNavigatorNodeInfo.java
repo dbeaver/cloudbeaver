@@ -45,6 +45,7 @@ import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
+import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -162,9 +163,9 @@ public class WebNavigatorNodeInfo {
             return false;
         }
         try {
-            DBSObjectFilter filter = dbNode.getUserNodeFilter(
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
-                true
+            DBSObjectFilter filter = getUserNodeFilter(
+                dbNode,
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)
             );
             return filter != null && !filter.isNotApplicable();
         } catch (DBException e) {
@@ -238,10 +239,10 @@ public class WebNavigatorNodeInfo {
         }
         try {
             DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode);
-            if (hasDataSourceEditAccess(dbNode)) {
+            if (session.getUserContext().isNonAnonymousUserAuthorizedInSM() && hasDataSourceEditAccess(dbNode)) {
                 return getApplicableFilter(dbNode.getNodeFilter(itemsMeta, true));
             }
-            DBSObjectFilter userFilter = getApplicableFilter(dbNode.getUserNodeFilter(itemsMeta, true));
+            DBSObjectFilter userFilter = getApplicableFilter(getUserNodeFilter(dbNode, itemsMeta));
             if (userFilter != null) {
                 return userFilter;
             }
@@ -273,9 +274,9 @@ public class WebNavigatorNodeInfo {
             return null;
         }
         try {
-            return getApplicableFilter(dbNode.getUserNodeFilter(
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
-                true
+            return getApplicableFilter(getUserNodeFilter(
+                dbNode,
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)
             ));
         } catch (DBException e) {
             throw new DBWebException(e);
@@ -285,6 +286,23 @@ public class WebNavigatorNodeInfo {
     @Nullable
     private static DBSObjectFilter getApplicableFilter(@Nullable DBSObjectFilter filter) {
         return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+    }
+
+    @Nullable
+    private static DBSObjectFilter getUserNodeFilter(
+        @NotNull DBNDatabaseNode node,
+        @NotNull DBXTreeItem itemsMeta
+    ) {
+        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
+        if (childClass == null) {
+            return null;
+        }
+        return UserDBSObjectFilterUtils.getUserObjectFilter(
+            node.getDataSourceContainer(),
+            childClass,
+            node.getFilterObject(),
+            true
+        );
     }
 
     private boolean hasDataSourceEditAccess(@NotNull DBNNode node) {

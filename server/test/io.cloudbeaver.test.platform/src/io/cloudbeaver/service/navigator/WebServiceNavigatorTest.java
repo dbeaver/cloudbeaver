@@ -18,7 +18,6 @@ package io.cloudbeaver.service.navigator;
 
 import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.CloudbeaverMockTest;
-import io.cloudbeaver.DBWebExceptionAccessDenied;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebUserContext;
@@ -31,6 +30,7 @@ import org.jkiss.dbeaver.model.navigator.DBNUtils;
 import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
+import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 import org.junit.jupiter.api.Assertions;
@@ -71,17 +71,21 @@ public class WebServiceNavigatorTest extends CloudbeaverMockTest {
                 RMProjectPermission.DATA_SOURCES_EDIT
             )).thenReturn(false);
             dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), node)).thenReturn(itemsMeta);
-            Mockito.when(node.setUserNodeFilter(Mockito.eq(itemsMeta), Mockito.any())).thenReturn(true);
+            Mockito.doReturn(DBSObject.class).when(node).getChildrenOrFolderClass(itemsMeta);
 
             Assertions.assertTrue(
                 new WebServiceNavigator().setNavigatorNodeFilter(session, "node", List.of("prod_%"), null)
             );
 
             ArgumentCaptor<DBSObjectFilter> filterCaptor = ArgumentCaptor.forClass(DBSObjectFilter.class);
-            Mockito.verify(node).setUserNodeFilter(Mockito.eq(itemsMeta), filterCaptor.capture());
+            filterUtils.verify(() -> UserDBSObjectFilterUtils.setUserObjectFilter(
+                Mockito.eq(dataSource),
+                Mockito.eq(DBSObject.class),
+                Mockito.isNull(),
+                filterCaptor.capture()
+            ));
             Assertions.assertEquals(List.of("prod_%"), filterCaptor.getValue().getInclude());
             Assertions.assertTrue(filterCaptor.getValue().isUserFilter());
-            filterUtils.verify(() -> UserDBSObjectFilterUtils.updateUserObjectFilters(dataSource));
         }
 
         Mockito.verify(node, Mockito.never()).setNodeFilter(Mockito.any(), Mockito.any(), Mockito.anyBoolean());
@@ -91,6 +95,7 @@ public class WebServiceNavigatorTest extends CloudbeaverMockTest {
     @Test
     void connectionFilterIsPersistedAfterPermissionCheck() throws Exception {
         WebSession session = Mockito.mock(WebSession.class);
+        WebUserContext userContext = Mockito.mock(WebUserContext.class);
         DBNModel navigatorModel = Mockito.mock(DBNModel.class);
         DBNDatabaseNode node = Mockito.mock(DBNDatabaseNode.class);
         BaseWebProjectImpl project = Mockito.mock(BaseWebProjectImpl.class);
@@ -99,6 +104,8 @@ public class WebServiceNavigatorTest extends CloudbeaverMockTest {
         DBXTreeItem itemsMeta = Mockito.mock(DBXTreeItem.class);
 
         Mockito.when(session.getNavigatorModelOrThrow()).thenReturn(navigatorModel);
+        Mockito.when(session.getUserContext()).thenReturn(userContext);
+        Mockito.when(userContext.isNonAnonymousUserAuthorizedInSM()).thenReturn(true);
         Mockito.when(navigatorModel.getNodeByPath(session.getProgressMonitor(), "node")).thenReturn(node);
         Mockito.when(node.getOwnerProject()).thenReturn(project);
         Mockito.when(node.getDataSourceContainer()).thenReturn(dataSource);
@@ -131,7 +138,7 @@ public class WebServiceNavigatorTest extends CloudbeaverMockTest {
     }
 
     @Test
-    void anonymousUserStoresLegacyFilterInSession() throws Exception {
+    void anonymousUserStoresLegacyFilterInSessionSettings() throws Exception {
         WebSession session = Mockito.mock(WebSession.class);
         WebUserContext userContext = Mockito.mock(WebUserContext.class);
         DBNModel navigatorModel = Mockito.mock(DBNModel.class);
@@ -156,9 +163,9 @@ public class WebServiceNavigatorTest extends CloudbeaverMockTest {
                 session,
                 rmProject,
                 RMProjectPermission.DATA_SOURCES_EDIT
-            )).thenReturn(false);
+            )).thenReturn(true);
             dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), node)).thenReturn(itemsMeta);
-            Mockito.when(node.setNodeFilter(Mockito.eq(itemsMeta), Mockito.any(), Mockito.eq(false))).thenReturn(true);
+            Mockito.doReturn(DBSObject.class).when(node).getChildrenOrFolderClass(itemsMeta);
 
             Assertions.assertTrue(new WebServiceNavigator().setNavigatorNodeFilter(
                 session,
@@ -168,31 +175,50 @@ public class WebServiceNavigatorTest extends CloudbeaverMockTest {
             ));
 
             ArgumentCaptor<DBSObjectFilter> filterCaptor = ArgumentCaptor.forClass(DBSObjectFilter.class);
-            Mockito.verify(node).setNodeFilter(Mockito.eq(itemsMeta), filterCaptor.capture(), Mockito.eq(false));
+            filterUtils.verify(() -> UserDBSObjectFilterUtils.setUserObjectFilter(
+                Mockito.eq(dataSource),
+                Mockito.eq(DBSObject.class),
+                Mockito.isNull(),
+                filterCaptor.capture()
+            ));
             Assertions.assertEquals(List.of("prod_%"), filterCaptor.getValue().getInclude());
             Assertions.assertEquals(List.of("prod_internal%"), filterCaptor.getValue().getExclude());
-            Assertions.assertFalse(filterCaptor.getValue().isUserFilter());
-            filterUtils.verify(
-                () -> UserDBSObjectFilterUtils.updateUserObjectFilters(dataSource),
-                Mockito.never()
-            );
+            Assertions.assertTrue(filterCaptor.getValue().isUserFilter());
         }
 
-        Mockito.verify(node, Mockito.never()).setUserNodeFilter(Mockito.any(), Mockito.any());
+        Mockito.verify(node, Mockito.never()).setNodeFilter(Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         Mockito.verify(dataSource, Mockito.never()).persistConfiguration();
     }
 
     @Test
-    void anonymousUserCannotChangeUserFilter() {
+    void anonymousUserCanChangeSessionUserFilter() throws Exception {
         WebSession session = Mockito.mock(WebSession.class);
         WebUserContext userContext = Mockito.mock(WebUserContext.class);
+        DBNModel navigatorModel = Mockito.mock(DBNModel.class);
+        DBNDatabaseNode node = Mockito.mock(DBNDatabaseNode.class);
+        DBPDataSourceContainer dataSource = Mockito.mock(DBPDataSourceContainer.class);
+        DBXTreeItem itemsMeta = Mockito.mock(DBXTreeItem.class);
         Mockito.when(session.getUserContext()).thenReturn(userContext);
         Mockito.when(userContext.isNonAnonymousUserAuthorizedInSM()).thenReturn(false);
+        Mockito.when(session.getNavigatorModelOrThrow()).thenReturn(navigatorModel);
+        Mockito.when(navigatorModel.getNodeByPath(session.getProgressMonitor(), "node")).thenReturn(node);
+        Mockito.when(node.getDataSourceContainer()).thenReturn(dataSource);
 
-        Assertions.assertThrows(
-            DBWebExceptionAccessDenied.class,
-            () -> new WebServiceNavigator().setUserNavigatorNodeFilter(session, "node", List.of("prod_%"), null)
-        );
+        try (MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class);
+             MockedStatic<UserDBSObjectFilterUtils> filterUtils = Mockito.mockStatic(UserDBSObjectFilterUtils.class)) {
+            dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), node)).thenReturn(itemsMeta);
+            Mockito.doReturn(DBSObject.class).when(node).getChildrenOrFolderClass(itemsMeta);
+
+            Assertions.assertTrue(
+                new WebServiceNavigator().setUserNavigatorNodeFilter(session, "node", List.of("prod_%"), null)
+            );
+            filterUtils.verify(() -> UserDBSObjectFilterUtils.setUserObjectFilter(
+                Mockito.eq(dataSource),
+                Mockito.eq(DBSObject.class),
+                Mockito.isNull(),
+                Mockito.any(DBSObjectFilter.class)
+            ));
+        }
     }
 
     @Test
@@ -213,7 +239,7 @@ public class WebServiceNavigatorTest extends CloudbeaverMockTest {
         try (MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class);
              MockedStatic<UserDBSObjectFilterUtils> filterUtils = Mockito.mockStatic(UserDBSObjectFilterUtils.class)) {
             dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), node)).thenReturn(itemsMeta);
-            Mockito.when(node.setUserNodeFilter(Mockito.eq(itemsMeta), Mockito.any())).thenReturn(true);
+            Mockito.doReturn(DBSObject.class).when(node).getChildrenOrFolderClass(itemsMeta);
 
             Assertions.assertTrue(new WebServiceNavigator().setUserNavigatorNodeFilter(
                 session,
@@ -223,11 +249,15 @@ public class WebServiceNavigatorTest extends CloudbeaverMockTest {
             ));
 
             ArgumentCaptor<DBSObjectFilter> filterCaptor = ArgumentCaptor.forClass(DBSObjectFilter.class);
-            Mockito.verify(node).setUserNodeFilter(Mockito.eq(itemsMeta), filterCaptor.capture());
+            filterUtils.verify(() -> UserDBSObjectFilterUtils.setUserObjectFilter(
+                Mockito.eq(dataSource),
+                Mockito.eq(DBSObject.class),
+                Mockito.isNull(),
+                filterCaptor.capture()
+            ));
             Assertions.assertEquals(List.of("prod_%"), filterCaptor.getValue().getInclude());
             Assertions.assertEquals(List.of("prod_internal%"), filterCaptor.getValue().getExclude());
             Assertions.assertTrue(filterCaptor.getValue().isUserFilter());
-            filterUtils.verify(() -> UserDBSObjectFilterUtils.updateUserObjectFilters(dataSource));
         }
     }
 

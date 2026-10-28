@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
+import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 import org.jkiss.dbeaver.registry.project.BaseProjectSettings;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -52,7 +53,13 @@ import java.util.*;
 public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptable {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     private static final DBNObjectFilterProvider OBJECT_FILTER_PROVIDER = (node, meta, connectionFilter) -> {
-        DBSObjectFilter userFilter = node.getUserNodeFilter(meta, false);
+        Class<?> childClass = node.getChildrenOrFolderClass(meta);
+        DBSObjectFilter userFilter = childClass == null ? null : UserDBSObjectFilterUtils.getUserObjectFilter(
+            node.getDataSourceContainer(),
+            childClass,
+            node.getFilterObject(),
+            false
+        );
         DBPDataSource dataSource = node.getDataSource();
         if (userFilter != null && dataSource != null) {
             userFilter.setCaseSensitive(dataSource.getSQLDialect().hasCaseSensitiveFiltration());
