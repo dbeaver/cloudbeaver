@@ -1,5 +1,4 @@
 export default [
-  ['plugin_connections_connection_form_organization_required', 'Необходимо указать организацию'],
   ['plugin_connections_delete_connection', 'Соединение'],
   ['plugin_connections_delete_database_object', 'Объект базы данных'],
   ['plugin_connections_delete_read_only', 'Соединение доступно только для чтения.'],

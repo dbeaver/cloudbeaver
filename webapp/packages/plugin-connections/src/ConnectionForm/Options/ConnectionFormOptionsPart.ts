@@ -43,7 +43,7 @@ import { getConnectionName } from './getConnectionName.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
-import { getMainProviderProperties, hasMissingMainProviderProperties } from '../providerProperties.js';
+import { isProviderPropertySupported } from '../AdvancedSettings/isProviderPropertySupported.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -522,8 +522,20 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         validation.error('plugin_connections_connection_form_host_configuration_invalid');
       }
 
-      if (hasMissingMainProviderProperties(getMainProviderProperties(driver, this.state.configurationType), this.state.providerProperties)) {
-        validation.error('plugin_connections_connection_form_organization_required');
+      for (const property of driver.providerProperties) {
+        if (
+          !property.id ||
+          !property.required ||
+          !property.features.includes('main') ||
+          !isProviderPropertySupported(property, this.state.configurationType)
+        ) {
+          continue;
+        }
+
+        const value = this.state.providerProperties?.[property.id];
+        if (value === undefined || value === null || (typeof value === 'string' && value.trim().length === 0)) {
+          validation.error(`${property.displayName || property.id}: ${this.localizationService.translate('ui_field_is_required')}`);
+        }
       }
     }
 

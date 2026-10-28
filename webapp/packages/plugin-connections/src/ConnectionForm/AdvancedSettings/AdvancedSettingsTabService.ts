@@ -13,7 +13,7 @@ import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
-import { getAdvancedProviderProperties } from '../providerProperties.js';
+import { isProviderPropertySupported } from './isProviderPropertySupported.js';
 
 const AdvancedSettings = importLazyComponent(() => import('./AdvancedSettings.js').then(m => m.AdvancedSettings));
 
@@ -60,7 +60,9 @@ export class AdvancedSettingsTabService extends Bootstrap {
           return true;
         }
 
-        return getAdvancedProviderProperties(driver ?? undefined, configurationType).length === 0;
+        return !driver?.providerProperties?.some(
+          property => !property.features.includes('main') && isProviderPropertySupported(property, configurationType),
+        );
       },
     });
   }

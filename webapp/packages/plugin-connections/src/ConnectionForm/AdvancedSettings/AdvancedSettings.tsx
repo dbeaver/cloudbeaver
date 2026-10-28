@@ -38,7 +38,9 @@ export const AdvancedSettings: TabContainerPanelComponent<IConnectionFormProps> 
     <Form ref={formRef} className="tw:flex tw:flex-1 tw:overflow-auto" disabled={driverResource.isLoading()}>
       <ConnectionSectionWrapper>
         <Placeholder container={connectionFormService.providerPropertiesContainer} formState={formState} />
-        {driverResource.data?.providerProperties && <ProviderPropertiesForm formState={formState} driver={driverResource.data} readonly={readonly} />}
+        {driverResource.data?.providerProperties && (
+          <ProviderPropertiesForm formState={formState} properties={driverResource.data.providerProperties} readonly={readonly} />
+        )}
       </ConnectionSectionWrapper>
     </Form>
   );

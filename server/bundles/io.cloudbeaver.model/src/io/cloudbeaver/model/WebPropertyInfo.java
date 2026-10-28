@@ -43,6 +43,9 @@ import java.util.*;
  * Web connection info
  */
 public class WebPropertyInfo {
+    /** Provider property displayed on the main connection page, retaining providerProperties storage. */
+    public static final String FEATURE_MAIN = "main";
+
     @NotNull
     private final WebSession session;
     @NotNull
@@ -219,7 +222,7 @@ public class WebPropertyInfo {
     }
 
     public boolean hasFeature(@NotNull String feature) {
-        return property.hasFeature(feature);
+        return ArrayUtils.contains(getFeatures(), feature);
     }
 
     public boolean hasAnyFeature(@NotNull List<String> features) {
