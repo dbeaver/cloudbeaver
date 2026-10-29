@@ -1,4 +1,13 @@
 export default [
+  ['plugin_authentication_administration_team_grant_manual', 'Quản trị viên'],
+  ['plugin_authentication_administration_team_grant_provider', 'Nhà cung cấp xác thực'],
+  ['plugin_authentication_administration_team_grant_default', 'Nhóm mặc định'],
+  ['plugin_authentication_administration_team_grant_manual_tooltip', 'Được quản trị viên thêm thủ công.'],
+  [
+    'plugin_authentication_administration_team_grant_default_tooltip',
+    'Người dùng được thêm tự động vì nhóm này được cấu hình làm nhóm mặc định cho người dùng.',
+  ],
+  ['plugin_authentication_administration_team_grant_provider_tooltip', 'Được chỉ định bởi nhà cung cấp xác thực và đồng bộ khi đăng nhập.'],
   ['authentication_administration_pages_label', 'Pages'],
   ['authentication_administration_user_connections_user_add', 'Tạo Người dùng'],
   ['authentication_administration_user_connections_user_new', 'Người dùng mới'],
@@ -126,7 +135,10 @@ export default [
   ['administration_teams_team_granted_users_user_name', 'Tên Người dùng'],
   ['administration_teams_team_granted_users_empty', 'Không có người dùng nào khả dụng'],
   ['administration_teams_team_granted_users_permission_denied', 'Bạn không thể chỉnh sửa quyền của chính mình'],
-  ['administration_teams_team_granted_users_only_admin_team', 'Bạn không thể quản lý quyền của chính mình vì đây là nhóm quản trị viên duy nhất mà bạn tham gia'],
+  [
+    'administration_teams_team_granted_users_only_admin_team',
+    'Bạn không thể quản lý quyền của chính mình vì đây là nhóm quản trị viên duy nhất mà bạn tham gia',
+  ],
   ['administration_teams_team_granted_connections_tab_title', 'Kết nối'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Tìm kiếm tên kết nối...'],
   ['administration_teams_team_granted_connections_empty', 'Không có kết nối nào khả dụng'],
