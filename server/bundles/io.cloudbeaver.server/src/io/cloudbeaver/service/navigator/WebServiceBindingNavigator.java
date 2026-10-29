@@ -83,7 +83,8 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
             ))
             .dataFetcher("navResetUserFilters", env -> getService(env).resetUserNavigatorFilters(
                 getWebSession(env),
-                getWebConnection(env)
+                getWebConnection(env),
+                getArgument(env, "nodePath")
             ))
             .dataFetcher("navRenameNode", env -> getService(env).renameNode(
                 getWebSession(env),

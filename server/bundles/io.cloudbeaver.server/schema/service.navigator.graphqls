@@ -178,7 +178,11 @@ extend type Mutation {
     """
     navSetUserFolderFilter( nodePath: ID!, include: [String!], exclude: [String!]): Boolean! @since(version: "26.2.4")
 
-    "Removes all current user filters for the connection. Connection navigator nodes must be refreshed afterwards."
-    navResetUserFilters( projectId: ID!, connectionId: ID!): Boolean! @since(version: "26.2.4")
+    """
+    Removes the current user's filter defined on nodePath when provided; the node must belong to the specified connection.
+    Does not remove filters of other nodes or inherited filters. When nodePath is omitted or null, removes all current
+    user filters for the connection. Affected navigator nodes must be refreshed afterwards.
+    """
+    navResetUserFilters( projectId: ID!, connectionId: ID!, nodePath: ID): Boolean! @since(version: "26.2.4")
 
 }

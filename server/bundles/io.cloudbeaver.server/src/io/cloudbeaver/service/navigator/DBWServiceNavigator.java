@@ -66,7 +66,8 @@ public interface DBWServiceNavigator extends DBWService {
     @WebAction
     boolean resetUserNavigatorFilters(
         @NotNull WebSession webSession,
-        @NotNull WebConnectionInfo connectionInfo) throws DBWebException;
+        @NotNull WebConnectionInfo connectionInfo,
+        @Nullable String nodePath) throws DBWebException;
 
     @WebAction
     WebNavigatorNodeInfo refreshNavigatorNode(

@@ -277,12 +277,29 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Override
     public boolean resetUserNavigatorFilters(
         @NotNull WebSession webSession,
-        @NotNull WebConnectionInfo connectionInfo
+        @NotNull WebConnectionInfo connectionInfo,
+        @Nullable String nodePath
     ) throws DBWebException {
         try {
-            UserDBSObjectFilterUtils.clearUserObjectFilters(connectionInfo.getDataSourceContainer());
+            if (nodePath == null) {
+                UserDBSObjectFilterUtils.clearUserObjectFilters(connectionInfo.getDataSourceContainer());
+            } else {
+                DBNDatabaseNode node = getDatabaseNode(webSession, nodePath);
+                DBPDataSourceContainer dataSource = node.getDataSourceContainer();
+                DBPDataSourceContainer connection = connectionInfo.getDataSourceContainer();
+                if (!dataSource.getId().equals(connection.getId()) ||
+                    !dataSource.getProject().getId().equals(connection.getProject().getId())
+                ) {
+                    throw new DBWebException("Navigator node '" + nodePath + "' does not belong to the specified connection");
+                }
+                DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), node);
+                WebNavigatorFilterUtils.setUserFilter(node, itemsMeta, null);
+            }
             return true;
         } catch (DBException e) {
+            if (e instanceof DBWebException) {
+                throw (DBWebException) e;
+            }
             throw new DBWebException("Error resetting user filters for connection '" + connectionInfo.getId() + "'", e);
         }
     }

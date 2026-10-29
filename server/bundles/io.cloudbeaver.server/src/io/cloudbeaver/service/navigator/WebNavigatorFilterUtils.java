@@ -54,17 +54,8 @@ public final class WebNavigatorFilterUtils {
         if (childClass == null || !(node.getDataSourceContainer() instanceof DataSourceDescriptor dataSource)) {
             return null;
         }
-        DBPObjectSettingsProvider provider = DBUtils.getAdapter(DBPObjectSettingsProvider.class, dataSource.getProject());
-        Map<String, String> settings = provider == null ? null
-            : provider.getObjectSettings(SMObjectType.datasource, dataSource.getId());
-        if (settings == null ||
-            settings.keySet().stream().noneMatch(key -> key.startsWith(UserDBSObjectFilterUtils.USER_FILTER_KEY))
-        ) {
-            return null;
-        }
-        FilterLookupDataSource filters = new FilterLookupDataSource(dataSource);
-        UserDBSObjectFilterUtils.setUserObjectFilters(filters, settings);
-        return filters.getObjectFilter(childClass, node.getFilterObject(), true);
+        FilterLookupDataSource filters = readUserFilters(dataSource);
+        return filters == null ? null : filters.getObjectFilter(childClass, node.getFilterObject(), true);
     }
 
     @Nullable
@@ -107,40 +98,68 @@ public final class WebNavigatorFilterUtils {
         @Nullable DBXTreeItem itemsMeta,
         @Nullable DBSObjectFilter filter
     ) throws DBException {
-        if (node.getChildrenOrFolderClass(itemsMeta) == null ||
+        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
+        if (childClass == null ||
             !(node.getDataSourceContainer() instanceof DataSourceDescriptor dataSource)
         ) {
             throw new DBWebException("Navigator node '" + node.getNodeUri() + "' does not support object filters");
         }
-        DBSObjectFilter previousFilter = node.getNodeFilter(itemsMeta, true);
-        if (filter == null && (previousFilter == null || !previousFilter.isUserFilter())) {
-            // Removing a personal filter must not remove a connection filter or an inherited filter.
+        if (filter == null) {
+            // Remove from saved personal settings, not from the overlaid runtime mapping. The runtime
+            // filter may be shared, disabled, or different from the saved personal filter.
+            FilterLookupDataSource filters = readUserFilters(dataSource);
+            if (filters == null || filters.getObjectFilter(childClass, node.getFilterObject(), true) == null) {
+                return;
+            }
+            filters.setObjectFilter(childClass, node.getFilterObject(), null);
+            saveUserFilters(filters);
             return;
         }
+        DBSObjectFilter previousFilter = node.getNodeFilter(itemsMeta, true);
         DBPObjectSettingsProvider settings = DBUtils.getAdapter(DBPObjectSettingsProvider.class, dataSource.getProject());
         if (settings == null) {
             throw new DBWebException("Personal settings are not available for navigator node '" + node.getNodeUri() + "'");
         }
         // Initialize the cache before writing, including anonymous users' session-only settings.
         settings.getObjectSettings(SMObjectType.datasource, dataSource.getId());
-        if (filter != null) {
-            filter.setUserFilter(true);
-        }
+        filter.setUserFilter(true);
         if (!node.setNodeFilter(itemsMeta, filter, false)) {
             throw new DBWebException("Navigator node '" + node.getNodeUri() + "' does not support object filters");
         }
         try {
+            saveUserFilters(dataSource);
+        } catch (DBException e) {
+            node.setNodeFilter(itemsMeta, previousFilter, false);
+            throw new DBWebException("Error saving personal navigator filters", e);
+        }
+    }
+
+    @Nullable
+    private static FilterLookupDataSource readUserFilters(@NotNull DataSourceDescriptor dataSource) {
+        DBPObjectSettingsProvider provider = DBUtils.getAdapter(DBPObjectSettingsProvider.class, dataSource.getProject());
+        Map<String, String> settings = provider == null ? null
+            : provider.getObjectSettings(SMObjectType.datasource, dataSource.getId());
+        if (settings == null ||
+            settings.keySet().stream().noneMatch(key -> key.startsWith(UserDBSObjectFilterUtils.USER_FILTER_KEY))
+        ) {
+            return null;
+        }
+        FilterLookupDataSource filters = new FilterLookupDataSource(dataSource);
+        UserDBSObjectFilterUtils.setUserObjectFilters(filters, settings);
+        return filters;
+    }
+
+    private static void saveUserFilters(@NotNull DataSourceDescriptor dataSource) throws DBException {
+        try {
             String serialized = new FilterSerializer<DataSourceDescriptor>().serializeCustomUserFilters(dataSource);
             if (serialized.isEmpty() || "[]".equals(serialized)) {
-                // Removing the last filter also removes the saved setting. The existing settings callback
-                // reloads the connection configuration and restores the original connection filters.
+                // Existing settings callbacks reload the saved connection configuration and restore its filters.
                 UserDBSObjectFilterUtils.clearUserObjectFilters(dataSource);
             } else {
                 UserDBSObjectFilterUtils.updateUserObjectFilters(dataSource);
             }
-        } catch (IOException | DBException e) {
-            node.setNodeFilter(itemsMeta, previousFilter, false);
-            throw new DBWebException("Error saving personal navigator filters", e);
+        } catch (IOException e) {
+            throw new DBWebException("Error serializing personal navigator filters", e);
         }
     }
 

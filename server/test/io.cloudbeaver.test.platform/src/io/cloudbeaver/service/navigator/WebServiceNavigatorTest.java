@@ -16,17 +16,25 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import graphql.GraphQLContext;
+import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.idl.RuntimeWiring;
+import graphql.schema.idl.TypeRuntimeWiring;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.cli.CloudbeaverCliConstants;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebUserContext;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.server.events.WSObjectSettingsEventHandler;
+import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.navigator.impl.WebServiceNavigator;
 import io.cloudbeaver.service.security.SMUtils;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
@@ -167,7 +175,7 @@ public class WebServiceNavigatorTest {
         assertFilter(f.info().getUserFilter(), true, null, "hidden_%");
         WebConnectionInfo connection = mock(WebConnectionInfo.class);
         when(connection.getDataSourceContainer()).thenReturn(f.dataSource);
-        assertTrue(service.resetUserNavigatorFilters(f.session, connection));
+        assertTrue(service.resetUserNavigatorFilters(f.session, connection, null));
         assertFalse(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
         assertEquals(Map.of("unrelated", "keep"), f.settings());
         assertNull(f.dataSource.getObjectFilter(DBSSchema.class, null, true));
@@ -176,6 +184,372 @@ public class WebServiceNavigatorTest {
         assertEquals(connectionBeforeReset, f.info().getFilter());
         assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
         f.assertNoSharedSave();
+    }
+
+    @Test
+    void nodeResetPreservesOtherNodesObjectTypesAndUnrelatedSettings() throws Exception {
+        Fixture f = new Fixture(true);
+        f.localShared();
+        DBNDatabaseNode second = f.node("second", "other_schema");
+        f.seedOtherSettings();
+        service.setUserNavigatorNodeFilter(f.session, "node", List.of("first_%"), null);
+        service.setUserNavigatorNodeFilter(f.session, "second", List.of("second_%"), List.of("second_hidden%"));
+        clearInvocations(f.security, f.registry);
+
+        assertTrue(service.resetUserNavigatorFilters(f.session, f.connection(), "node"));
+
+        assertNull(f.info().getUserFilter());
+        assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
+        assertFilter(f.info().getFilter(), false, "shared_%", "shared_hidden%");
+        assertFilter(new WebNavigatorNodeInfo(f.session, second).getUserFilter(), true, "second_%", "second_hidden%");
+        assertFilter(second.getNodeFilter(f.meta, true), true, "second_%", "second_hidden%");
+        assertFilter(f.dataSource.getObjectFilter(DBSSchema.class, null, true), true, "other_%", null);
+        var saved = f.serializer.deserializeObjectFilterConfig(f.savedFilters());
+        assertEquals(2, saved.size());
+        assertTrue(saved.stream().anyMatch(c -> DBSTable.class.getName().equals(c.typeName()) && "other_schema".equals(c.objectID())));
+        assertTrue(saved.stream().anyMatch(c -> DBSSchema.class.getName().equals(c.typeName()) && c.objectID() == null));
+        assertFalse(f.savedFilters().contains("shared_%"));
+        assertEquals("keep", f.settings().get("unrelated"));
+        assertTrue(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+        verify(f.security).setObjectSettings("project", SMObjectType.datasource, "connection", Map.of(FILTER_KEY, f.savedFilters()));
+        verify(f.registry).refreshConfig(List.of("connection"));
+        f.assertNoSharedSave();
+    }
+
+    @Test
+    void nodeResetOfLastPersonalFilterClearsFlagAndRestoresSharedThroughSettingsReload() throws Exception {
+        Fixture f = new Fixture(true);
+        f.localShared();
+        f.savePersonalFilters(List.of(filterConfig("schema", "personal_%", null)));
+        f.project.getProjectSettings().setObjectSettings(SMObjectType.datasource, "connection", Map.of("unrelated", "keep"));
+        clearInvocations(f.security, f.registry, f.node);
+
+        assertTrue(service.resetUserNavigatorFilters(f.session, f.connection(), "node"));
+
+        assertFalse(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+        assertNull(f.savedFilters());
+        assertEquals(Map.of("unrelated", "keep"), f.settings());
+        assertNull(f.info().getUserFilter());
+        assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
+        verify(f.security).setObjectSettings("project", SMObjectType.datasource, "connection",
+            java.util.Collections.singletonMap(FILTER_KEY, null));
+        verify(f.registry).refreshConfig(List.of("connection"));
+        verify(f.node, never()).setNodeFilter(any(), any(), anyBoolean());
+        f.assertNoSharedSave();
+    }
+
+    @Test
+    void nodeResetWithoutSavedLocalFilterPreservesSharedAndGlobalPersonalFiltersWithoutWriting() throws Exception {
+        Fixture f = new Fixture(true);
+        f.localShared();
+        f.seedOtherSettings();
+        f.savePersonalFilters(List.of(
+            filterConfig(null, "personal_global_%", null),
+            filterConfig("other_schema", "other_personal_%", null)));
+        Map<String, String> before = Map.copyOf(f.settings());
+        DBSObjectFilter global = f.dataSource.getObjectFilter(DBSTable.class, null, true);
+        clearInvocations(f.security, f.registry, f.node, f.dataSource);
+
+        assertTrue(service.resetUserNavigatorFilters(f.session, f.connection(), "node"));
+        assertTrue(service.setUserNavigatorNodeFilter(f.session, "node", null, null));
+
+        assertEquals(before, f.settings());
+        assertTrue(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+        assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
+        assertSame(global, f.dataSource.getObjectFilter(DBSTable.class, null, true));
+        assertFilter(global, true, "personal_global_%", null);
+        assertNull(f.info().getUserFilter());
+        verifyNoInteractions(f.security);
+        verify(f.registry, never()).refreshConfig(any());
+        verify(f.node, never()).setNodeFilter(any(), any(), anyBoolean());
+        verify(f.dataSource, never()).setObjectFilter(any(Class.class), any(), any());
+        f.assertNoSharedSave();
+    }
+
+    @Test
+    void nodeResetAndNullIncludeDeletionRemoveDisabledSavedLocalFilter() throws Exception {
+        Map<String, Object> disabled = filterConfig("schema", "disabled_%", null);
+        disabled.put("enabled", false);
+        assertInactiveSavedFilterRemoval(disabled);
+    }
+
+    @Test
+    void nodeResetAndNullIncludeDeletionRemoveStoredEmptyLocalFilter() throws Exception {
+        assertInactiveSavedFilterRemoval(filterConfig("schema", null, null));
+    }
+
+    private void assertInactiveSavedFilterRemoval(Map<String, Object> inactive) throws Exception {
+        for (boolean reset : List.of(true, false)) {
+            Fixture f = new Fixture(true);
+            f.localShared();
+            f.savePersonalFilters(List.of(filterConfig(null, "personal_global_%", null), inactive));
+            DBSObjectFilter runtime = f.node.getNodeFilter(f.meta, true);
+            assertNotNull(runtime);
+            assertTrue(runtime.isEmpty() || !runtime.isEnabled());
+            assertNull(f.info().getUserFilter());
+            clearInvocations(f.security, f.registry);
+
+            assertTrue(reset
+                ? service.resetUserNavigatorFilters(f.session, f.connection(), "node")
+                : service.setUserNavigatorNodeFilter(f.session, "node", null, null));
+
+            var saved = f.serializer.deserializeObjectFilterConfig(f.savedFilters());
+            assertEquals(1, saved.size());
+            assertNull(saved.getFirst().objectID());
+            assertFilter(saved.getFirst().filter(), false, "personal_global_%", null);
+            assertNull(f.info().getUserFilter());
+            assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
+            assertFilter(f.dataSource.getObjectFilter(DBSTable.class, null, true), true, "personal_global_%", null);
+            assertTrue(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+            verify(f.security).setObjectSettings("project", SMObjectType.datasource, "connection", Map.of(FILTER_KEY, f.savedFilters()));
+            verify(f.registry).refreshConfig(List.of("connection"));
+            f.assertNoSharedSave();
+        }
+    }
+
+    @Test
+    void nodeResetAndNullIncludeDeletionUseSavedPersonalFilterAfterRuntimeSharedOverwrite() throws Exception {
+        for (boolean reset : List.of(true, false)) {
+            Fixture f = new Fixture(true);
+            f.localShared();
+            f.savePersonalFilters(List.of(filterConfig("schema", "saved_personal_%", "saved_hidden%")));
+            f.dataSource.setObjectFilter(DBSTable.class, f.parent, f.shared);
+            assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
+            assertFilter(f.info().getUserFilter(), true, "saved_personal_%", "saved_hidden%");
+            clearInvocations(f.security, f.registry, f.node);
+
+            assertTrue(reset
+                ? service.resetUserNavigatorFilters(f.session, f.connection(), "node")
+                : service.setUserNavigatorNodeFilter(f.session, "node", null, null));
+
+            assertNull(f.savedFilters());
+            assertFalse(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+            assertNull(f.info().getUserFilter());
+            assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
+            assertFilter(f.info().getFilter(), false, "shared_%", "shared_hidden%");
+            verify(f.security).setObjectSettings("project", SMObjectType.datasource, "connection",
+                java.util.Collections.singletonMap(FILTER_KEY, null));
+            verify(f.registry).refreshConfig(List.of("connection"));
+            verify(f.node, never()).setNodeFilter(any(), any(), anyBoolean());
+            f.assertNoSharedSave();
+        }
+    }
+
+    @Test
+    void nodeResetRejectsMissingInvalidNonDatabaseAndEmptyPathsWithoutClearingConnection() throws Exception {
+        Fixture f = new Fixture(true);
+        f.seedOtherSettings();
+        service.setUserNavigatorNodeFilter(f.session, "node", List.of("personal_%"), null);
+        when(f.model.getNodeByPath(f.session.getProgressMonitor(), "plain")).thenReturn(mock(DBNNode.class));
+        Map<String, String> before = Map.copyOf(f.settings());
+        DBSObjectFilter runtime = f.node.getNodeFilter(f.meta, true);
+        clearInvocations(f.security, f.registry);
+
+        for (String path : List.of("missing", "not/a/valid/node", "plain", "")) {
+            assertThrows(DBWebException.class, () -> service.resetUserNavigatorFilters(f.session, f.connection(), path), path);
+            assertEquals(before, f.settings(), path);
+            assertSame(runtime, f.node.getNodeFilter(f.meta, true), path);
+            assertTrue(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+        }
+        verifyNoInteractions(f.security);
+        verify(f.registry, never()).refreshConfig(any());
+        f.assertNoSharedSave();
+    }
+
+    @Test
+    void nodeResetRejectsUnsupportedDatabaseNodeWithoutClearingConnection() throws Exception {
+        Fixture f = new Fixture(true);
+        f.seedOtherSettings();
+        service.setUserNavigatorNodeFilter(f.session, "node", List.of("personal_%"), null);
+        Map<String, String> before = Map.copyOf(f.settings());
+        doReturn(null).when(f.node).getChildrenOrFolderClass(f.meta);
+        clearInvocations(f.security, f.registry);
+
+        assertThrows(DBWebException.class, () -> service.resetUserNavigatorFilters(f.session, f.connection(), "node"));
+
+        assertEquals(before, f.settings());
+        verifyNoInteractions(f.security);
+        verify(f.registry, never()).refreshConfig(any());
+        f.assertNoSharedSave();
+    }
+
+    @Test
+    void nodeResetRejectsForeignConnectionWithoutWritingEitherConnectionsSettings() throws Exception {
+        assertForeignNodeResetRejected("project", "other_connection");
+    }
+
+    @Test
+    void nodeResetRejectsSameConnectionIdInForeignProjectWithoutWritingEitherProjectsSettings() throws Exception {
+        assertForeignNodeResetRejected("other_project", "connection");
+    }
+
+    private void assertForeignNodeResetRejected(String projectId, String connectionId) throws Exception {
+        Fixture f = new Fixture(true);
+        Fixture foreign = new Fixture(true, projectId, connectionId);
+        f.seedOtherSettings();
+        foreign.seedOtherSettings();
+        service.setUserNavigatorNodeFilter(f.session, "node", List.of("personal_%"), null);
+        service.setUserNavigatorNodeFilter(foreign.session, "node", List.of("foreign_%"), null);
+        when(f.model.getNodeByPath(f.session.getProgressMonitor(), "foreign")).thenReturn(foreign.node);
+        Map<String, String> before = Map.copyOf(f.settings());
+        Map<String, String> foreignBefore = Map.copyOf(foreign.settings());
+        DBSObjectFilter runtime = f.node.getNodeFilter(f.meta, true);
+        DBSObjectFilter foreignRuntime = foreign.node.getNodeFilter(foreign.meta, true);
+        clearInvocations(f.security, foreign.security, f.registry, foreign.registry);
+
+        assertThrows(DBWebException.class, () -> service.resetUserNavigatorFilters(f.session, f.connection(), "foreign"));
+
+        assertEquals(before, f.settings());
+        assertEquals(foreignBefore, foreign.settings());
+        assertSame(runtime, f.node.getNodeFilter(f.meta, true));
+        assertSame(foreignRuntime, foreign.node.getNodeFilter(foreign.meta, true));
+        verifyNoInteractions(f.security, foreign.security);
+        verify(f.registry, never()).refreshConfig(any());
+        verify(foreign.registry, never()).refreshConfig(any());
+        f.assertNoSharedSave();
+        foreign.assertNoSharedSave();
+    }
+
+    @Test
+    void failedNodeResetAndNullIncludeDeletionPreserveSavedSettingsAndRuntimeFilters() throws Exception {
+        for (boolean reset : List.of(true, false)) {
+            for (boolean lastFilter : List.of(true, false)) {
+                Fixture f = new Fixture(true);
+                f.localShared();
+                f.project.getProjectSettings().setObjectSettings(SMObjectType.datasource, "connection", Map.of("unrelated", "keep"));
+                if (!lastFilter) {
+                    f.seedOtherSettings();
+                }
+                service.setUserNavigatorNodeFilter(f.session, "node", List.of("personal_%"), List.of("hidden%"));
+                Map<String, String> before = Map.copyOf(f.settings());
+                DBSObjectFilter runtime = f.node.getNodeFilter(f.meta, true);
+                DBSObjectFilter other = f.dataSource.getObjectFilter(DBSSchema.class, null, true);
+                clearInvocations(f.security, f.registry, f.node, f.dataSource);
+                DBException failure = new DBException("storage unavailable");
+                doThrow(failure).when(f.security).setObjectSettings(anyString(), any(), anyString(), anyMap());
+
+                DBWebException error = assertThrows(DBWebException.class, () -> {
+                    if (reset) {
+                        service.resetUserNavigatorFilters(f.session, f.connection(), "node");
+                    } else {
+                        service.setUserNavigatorNodeFilter(f.session, "node", null, null);
+                    }
+                });
+
+                assertSame(failure, error.getCause());
+                assertEquals(before, f.settings());
+                assertTrue(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+                assertSame(runtime, f.node.getNodeFilter(f.meta, true));
+                assertFilter(runtime, true, "personal_%", "hidden%");
+                assertSame(other, f.dataSource.getObjectFilter(DBSSchema.class, null, true));
+                assertFilter(f.info().getUserFilter(), true, "personal_%", "hidden%");
+                assertFilter(f.shared, false, "shared_%", "shared_hidden%");
+                verify(f.registry, never()).refreshConfig(any());
+                verify(f.node, never()).setNodeFilter(any(), any(), anyBoolean());
+                verify(f.dataSource, never()).setObjectFilter(any(Class.class), any(), any());
+                verify(f.security).setObjectSettings(eq("project"), eq(SMObjectType.datasource), eq("connection"), anyMap());
+                f.assertNoSharedSave();
+            }
+        }
+    }
+
+    @Test
+    void bindingWithOmittedNodePathUsesFullConnectionReset() throws Exception {
+        assertBindingFullReset(Map.of());
+    }
+
+    @Test
+    void bindingWithExplicitNullNodePathUsesFullConnectionReset() throws Exception {
+        assertBindingFullReset(java.util.Collections.singletonMap("nodePath", null));
+    }
+
+    private void assertBindingFullReset(Map<String, Object> arguments) throws Exception {
+        Fixture f = new Fixture(true);
+        f.seedOtherSettings();
+        service.setUserNavigatorNodeFilter(f.session, "node", List.of("personal_%"), null);
+        clearInvocations(f.security, f.registry);
+
+        assertEquals(true, invokeBoundReset(f, arguments));
+
+        assertFalse(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+        assertNull(f.info().getUserFilter());
+        assertNull(f.dataSource.getObjectFilter(DBSSchema.class, null, true));
+        assertEquals(Map.of("unrelated", "keep"), f.settings());
+        assertSame(f.shared, f.node.getNodeFilter(f.meta, false));
+        verify(f.security).setObjectSettings("project", SMObjectType.datasource, "connection",
+            java.util.Collections.singletonMap(FILTER_KEY, null));
+        verify(f.registry).refreshConfig(List.of("connection"));
+        f.assertNoSharedSave();
+    }
+
+    @Test
+    void bindingWithNodePathResetsOnlyTargetNode() throws Exception {
+        Fixture f = new Fixture(true);
+        f.seedOtherSettings();
+        service.setUserNavigatorNodeFilter(f.session, "node", List.of("personal_%"), null);
+        clearInvocations(f.security, f.registry);
+
+        assertEquals(true, invokeBoundReset(f, Map.of("nodePath", "node")));
+
+        assertNull(f.info().getUserFilter());
+        assertSame(f.shared, f.node.getNodeFilter(f.meta, false));
+        assertFilter(f.dataSource.getObjectFilter(DBSSchema.class, null, true), true, "other_%", null);
+        assertEquals(1, f.serializer.deserializeObjectFilterConfig(f.savedFilters()).size());
+        assertTrue(UserDBSObjectFilterUtils.hasUserFilters(f.dataSource));
+        assertEquals("keep", f.settings().get("unrelated"));
+        verify(f.security).setObjectSettings("project", SMObjectType.datasource, "connection", Map.of(FILTER_KEY, f.savedFilters()));
+        verify(f.registry).refreshConfig(List.of("connection"));
+        f.assertNoSharedSave();
+    }
+
+    @Test
+    void bindingWithEmptyNodePathRejectsItWithoutFallingBackToConnectionReset() throws Exception {
+        Fixture f = new Fixture(true);
+        f.seedOtherSettings();
+        service.setUserNavigatorNodeFilter(f.session, "node", List.of("personal_%"), null);
+        Map<String, String> before = Map.copyOf(f.settings());
+        DBSObjectFilter runtime = f.node.getNodeFilter(f.meta, true);
+        clearInvocations(f.security, f.registry);
+
+        assertThrows(DBWebException.class, () -> invokeBoundReset(f, Map.of("nodePath", "")));
+
+        assertEquals(before, f.settings());
+        assertSame(runtime, f.node.getNodeFilter(f.meta, true));
+        verifyNoInteractions(f.security);
+        verify(f.registry, never()).refreshConfig(any());
+        f.assertNoSharedSave();
+    }
+
+    private Object invokeBoundReset(Fixture f, Map<String, Object> optionalArguments) throws Exception {
+        WebApplication application = mock(WebApplication.class);
+        // As in ConfigurationModeAccessTest, supply the application while retaining the real service proxy.
+        WebServiceBindingNavigator binding = new WebServiceBindingNavigator() {
+            @NotNull
+            @Override
+            protected WebApplication getApplication() {
+                return application;
+            }
+        };
+        DBWBindingContext context = mock(DBWBindingContext.class);
+        TypeRuntimeWiring.Builder mutations = TypeRuntimeWiring.newTypeWiring("Mutation");
+        when(context.getMutationType()).thenReturn(mutations);
+        when(context.getQueryType()).thenReturn(TypeRuntimeWiring.newTypeWiring("Query"));
+        when(context.getRuntimeWiring()).thenReturn(RuntimeWiring.newRuntimeWiring());
+        binding.bindWiring(context);
+        DataFetcher<?> reset = mutations.build().getFieldDataFetchers().get("navResetUserFilters");
+        assertNotNull(reset);
+
+        Map<String, Object> arguments = new LinkedHashMap<>(optionalArguments);
+        arguments.put("projectId", f.projectId);
+        arguments.put("connectionId", f.connectionId);
+        DataFetchingEnvironment environment = mock(DataFetchingEnvironment.class);
+        when(environment.getArgument(anyString())).thenAnswer(invocation -> arguments.get(invocation.getArgument(0)));
+        when(environment.getGraphQlContext()).thenReturn(GraphQLContext.newContext()
+            .of(CloudbeaverCliConstants.CLI_MODE, true, WebSession.class.getName(), f.session).build());
+        when(f.session.isAuthorizedInSecurityManager()).thenReturn(true);
+        when(f.session.getAccessibleProjectById(f.projectId)).thenReturn(f.project);
+        doReturn(f.connection()).when(f.project).getWebConnectionInfo(f.connectionId);
+        return reset.get(environment);
     }
 
     @Test
@@ -626,17 +1000,25 @@ public class WebServiceNavigatorTest {
         final DBSObject parent = mock(DBSObject.class, withSettings().extraInterfaces(DBPQualifiedObject.class));
         final WebSessionProjectImpl project;
         final DataSourceDescriptor dataSource;
+        final String projectId;
+        final String connectionId;
         boolean sharedGlobal = true;
         boolean sharedLocal;
 
         Fixture(boolean authorized) throws Exception {
+            this(authorized, "project", "connection");
+        }
+
+        Fixture(boolean authorized, String projectId, String connectionId) throws Exception {
+            this.projectId = projectId;
+            this.connectionId = connectionId;
             when(session.getUserContext()).thenReturn(user);
             when(user.isNonAnonymousUserAuthorizedInSM()).thenReturn(authorized);
             when(session.getSecurityController()).thenReturn(security);
             when(session.getRmController()).thenReturn(rm);
             when(session.getSessionContext()).thenReturn(mock(SMSessionContext.class));
             RMProject rmProject = mock(RMProject.class);
-            when(rmProject.getId()).thenReturn("project");
+            when(rmProject.getId()).thenReturn(projectId);
             project = spy(new WebSessionProjectImpl(session, rmProject, Path.of("navigator-test")) {
                 @Override
                 public DBPDataSourceRegistry getDataSourceRegistry() {
@@ -645,9 +1027,9 @@ public class WebServiceNavigatorTest {
             });
             when(registry.getProject()).thenReturn(project);
             dataSource = spy(new DataSourceDescriptor(registry, mock(DBPDataSourceConfigurationStorage.class),
-                DataSourceOriginLocal.INSTANCE, "connection", mock(DBPDriver.class), new DBPConnectionConfiguration()));
+                DataSourceOriginLocal.INSTANCE, connectionId, mock(DBPDriver.class), new DBPConnectionConfiguration()));
             connectionFilters(List.of(filterConfig(null, "shared_%", null)));
-            when(registry.getDataSource("connection")).thenReturn(dataSource);
+            when(registry.getDataSource(connectionId)).thenReturn(dataSource);
             dataSource.setObjectFilter(DBSTable.class, null, shared);
             // Model the registry's configuration reload: shared config first, then the actual saved personal JSON.
             doAnswer(invocation -> {
@@ -660,8 +1042,8 @@ public class WebServiceNavigatorTest {
                 }
                 UserDBSObjectFilterUtils.setUserObjectFilters(dataSource, settings());
                 return null;
-            }).when(registry).refreshConfig(List.of("connection"));
-            when(session.getProjectById("project")).thenReturn(project);
+            }).when(registry).refreshConfig(List.of(connectionId));
+            when(session.getProjectById(projectId)).thenReturn(project);
             when(session.getNavigatorModelOrThrow()).thenReturn(model);
             when(model.getNodeByPath(session.getProgressMonitor(), "node")).thenReturn(node);
             when(node.getDataSourceContainer()).thenReturn(dataSource);
@@ -685,8 +1067,15 @@ public class WebServiceNavigatorTest {
             return new WebNavigatorNodeInfo(session, node);
         }
 
+        WebConnectionInfo connection() {
+            WebConnectionInfo connection = mock(WebConnectionInfo.class);
+            when(connection.getId()).thenReturn(connectionId);
+            when(connection.getDataSourceContainer()).thenReturn(dataSource);
+            return connection;
+        }
+
         Map<String, String> settings() {
-            Map<String, String> settings = project.getProjectSettings().getObjectSettings(SMObjectType.datasource, "connection");
+            Map<String, String> settings = project.getProjectSettings().getObjectSettings(SMObjectType.datasource, connectionId);
             return settings == null ? Map.of() : settings;
         }
 
@@ -695,8 +1084,8 @@ public class WebServiceNavigatorTest {
         }
 
         void connectionFilters(List<Map<String, Object>> filters) throws Exception {
-            when(rm.getProjectsDataSources("project", new String[] {"connection"})).thenReturn(
-                JSONUtils.GSON.toJson(Map.of("connections", Map.of("connection", Map.of("filters", filters)))));
+            when(rm.getProjectsDataSources(projectId, new String[] {connectionId})).thenReturn(
+                JSONUtils.GSON.toJson(Map.of("connections", Map.of(connectionId, Map.of("filters", filters)))));
         }
 
         void localShared() throws Exception {
@@ -710,7 +1099,7 @@ public class WebServiceNavigatorTest {
 
         void savePersonalFilters(List<Map<String, Object>> filters) throws Exception {
             settings();
-            project.getProjectSettings().setObjectSettings(SMObjectType.datasource, "connection",
+            project.getProjectSettings().setObjectSettings(SMObjectType.datasource, connectionId,
                 Map.of(FILTER_KEY, JSONUtils.GSON.toJson(filters)));
         }
 
@@ -729,6 +1118,7 @@ public class WebServiceNavigatorTest {
             doReturn(DBSTable.class).when(other).getChildrenOrFolderClass(meta);
             when(other.getNodeUri()).thenReturn("node://" + path);
             doCallRealMethod().when(other).getNodeFilter(any(), anyBoolean());
+            doCallRealMethod().when(other).setNodeFilter(any(), any(), anyBoolean());
             doCallRealMethod().when(other).getFilterObject();
             return other;
         }
@@ -736,7 +1126,7 @@ public class WebServiceNavigatorTest {
         void seedOtherSettings() throws Exception {
             settings();
             dataSource.setObjectFilter(DBSSchema.class, null, filter("other_%", true));
-            project.getProjectSettings().setObjectSettings(SMObjectType.datasource, "connection",
+            project.getProjectSettings().setObjectSettings(SMObjectType.datasource, connectionId,
                 Map.of("unrelated", "keep", FILTER_KEY, serializer.serializeCustomUserFilters(dataSource)));
         }
 
