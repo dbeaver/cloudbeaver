@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,9 @@ const statusGutterState = StateField.define<RangeSet<GutterMarker>>({
 
           set = set.update({ add: markers });
         } else {
-          set = set.update({ filter: () => false });
+          set = set.update({
+            filter: (_from, _to, marker) => marker !== (effect.value.type === 'run' ? RUN_QUERY_MARKER : ERROR_QUERY_MARKER),
+          });
         }
       }
     }
