@@ -5,26 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { DATA_CONTEXT_NAV_NODE, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { getCachedMapResourceLoaderState, resourceKeyList } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
-import { getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { getSqlGenerationActions, getSqlGenerationNodes, isSqlGenerationNode } from './sqlGenerationSelection.js';
+import { SqlGenerationService } from './SqlGenerationService.js';
 
-const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
-
-@injectable(() => [SqlGeneratorsResource, CommonDialogService, MenuService, NotificationService])
+@injectable(() => [SqlGeneratorsResource, SqlGenerationService, MenuService, NavNodeInfoResource])
 export class SqlGeneratorsBootstrap extends Bootstrap {
   constructor(
     private readonly sqlGeneratorsResource: SqlGeneratorsResource,
-    private readonly commonDialogService: CommonDialogService,
+    private readonly sqlGenerationService: SqlGenerationService,
     private readonly menuService: MenuService,
-    private readonly notificationService: NotificationService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
   }
@@ -34,29 +31,17 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       id: 'node-sql-generators',
       menus: [MENU_SQL_GENERATORS],
       contexts: [DATA_CONTEXT_NAV_NODE],
-      isDisabled: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-
-        return this.sqlGeneratorsResource.get(node.uri)?.length === 0;
-      },
       getLoader: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+        const nodes = getSqlGenerationNodes(context, this.navNodeInfoResource);
+        const keys = nodes.filter(isSqlGenerationNode).map(node => node.uri);
 
-        return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.uri);
+        return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => resourceKeyList(keys));
       },
     });
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
-      isApplicable: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-
-        if (!(node.objectFeatures.includes(EObjectFeature.entity) || node.objectFeatures.includes(EObjectFeature.script))) {
-          return false;
-        }
-
-        return true;
-      },
+      isApplicable: context => isSqlGenerationNode(context.get(DATA_CONTEXT_NAV_NODE)!),
       getItems: (context, items) => [...items, MENU_SQL_GENERATORS],
     });
 
@@ -64,9 +49,8 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       menus: [MENU_SQL_GENERATORS],
       contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-
-        const actions = this.sqlGeneratorsResource.get(node.uri) || [];
+        const nodes = getSqlGenerationNodes(context, this.navNodeInfoResource);
+        const actions = getSqlGenerationActions(nodes.map(node => this.sqlGeneratorsResource.get(node.uri) ?? []));
 
         return [
           ...items,
@@ -79,22 +63,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
                   tooltip: action.description,
                 },
                 {
-                  onSelect: async () => {
-                    try {
-                      const query = await this.sqlGeneratorsResource.generateEntityQuery(action.id, node.uri, getDefaultQueryGeneratorOptions());
-                      await this.commonDialogService.open(GeneratedSqlDialog, {
-                        query,
-                        nodeId: node.uri,
-                        nodeName: node.name,
-                        generatorId: action.id,
-                        generatorName: action.label,
-                        options: getDefaultQueryGeneratorOptions(),
-                        regenerateQuery: options => this.sqlGeneratorsResource.generateEntityQuery(action.id, node.uri, options),
-                      });
-                    } catch (e: any) {
-                      this.notificationService.logException(e, 'app_shared_sql_generators_error_title');
-                    }
-                  },
+                  onSelect: () => this.sqlGenerationService.open(nodes, action),
                 },
               ),
           ),

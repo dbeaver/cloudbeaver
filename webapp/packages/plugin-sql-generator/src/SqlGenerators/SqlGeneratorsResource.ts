@@ -15,6 +15,7 @@ import {
   type SqlQueryGenerator,
   type SqlQueryGeneratorOptions,
 } from '@cloudbeaver/core-sdk';
+import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
 
 export const MAX_GENERATORS_LENGTH = 15;
 export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => ({
@@ -37,7 +38,7 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     this.navNodeInfoResource.deleteInResource(this);
   }
 
-  async generateEntityQuery(generatorId: string, nodePathList: string | string[], options?: SqlQueryGeneratorOptions): Promise<string> {
+  generateEntityQuery(generatorId: string, nodePathList: string | string[], options?: SqlQueryGeneratorOptions): ITask<string> {
     const task = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncSqlGenerateEntityQuery({
         generatorId,
@@ -48,10 +49,30 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
       return taskInfo;
     });
 
-    const info = await this.asyncTaskInfoService.run(task);
-    await this.asyncTaskInfoService.remove(task.id);
-
-    return info.taskResult;
+    const operation = new AutoRunningTask<string>(
+      async () => {
+        try {
+          const info = await this.asyncTaskInfoService.run(task);
+          return info.taskResult;
+        } finally {
+          if (!task.pending) {
+            await this.asyncTaskInfoService.remove(task.id);
+          }
+        }
+      },
+      async () => {
+        try {
+          if (task.pending && !task.cancelled) {
+            await this.asyncTaskInfoService.cancel(task.id);
+          }
+        } catch (exception) {
+          // Task.cancel marks itself cancelled before calling the server; allow a retry on failure.
+          operation.cancelled = false;
+          throw exception;
+        }
+      },
+    );
+    return operation;
   }
 
   async generateResultSetSql(params: SqlGenerateResultSetQueryQueryVariables): Promise<string | null> {

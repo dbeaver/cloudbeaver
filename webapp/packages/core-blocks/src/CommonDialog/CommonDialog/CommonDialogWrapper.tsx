@@ -28,6 +28,7 @@ export interface CommonDialogWrapperProps {
   autoFocusOnHide?: boolean | ((element: HTMLElement | null) => boolean) | undefined;
   autoFocusOnShow?: boolean | ((element: HTMLElement | null) => boolean) | undefined;
   initialFocus?: HTMLElement | React.RefObject<HTMLElement | null> | null | undefined;
+  onClose?: () => void;
 }
 
 export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(
@@ -42,6 +43,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
       autoFocusOnShow = true,
       className,
       initialFocus,
+      onClose,
       children,
     },
     ref,
@@ -51,7 +53,11 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
 
     function handleClose() {
       if (!context.dialog.options?.persistent) {
-        context.reject();
+        if (onClose) {
+          onClose();
+        } else {
+          context.reject();
+        }
       }
     }
 
