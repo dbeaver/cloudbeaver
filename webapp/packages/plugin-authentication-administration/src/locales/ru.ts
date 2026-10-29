@@ -18,6 +18,7 @@ export default [
   ['authentication_administration_user_auth_methods_empty', 'Нет доступных способов входа'],
   ['authentication_administration_user_auth_method_no_details', 'Дополнительная информация не доступна'],
   ['authentication_administration_item', 'Пользователи и команды'],
+  ['authentication_administration_create_user', 'Создать пользователя'],
   ['authentication_administration_item_users', 'Пользователи'],
   ['authentication_administration_item_metaParameters', 'Свойства Пользователей'],
   ['authentication_administration_tools_add_tooltip', 'Создать нового пользователя'],
@@ -105,6 +106,8 @@ export default [
 
   ['administration_teams_tab_title', 'Команды'],
   ['administration_teams_tab_description', 'Управление командами'],
+  ['administration_teams_search_placeholder', 'Поиск команд...'],
+  ['administration_teams_create', 'Создать команду'],
   ['administration_teams_team_creation', 'Создание Команды'],
   ['administration_teams_team_id', 'ID Команды'],
   ['administration_teams_team_name', 'Название команды'],

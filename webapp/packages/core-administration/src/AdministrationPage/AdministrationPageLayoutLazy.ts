@@ -9,8 +9,3 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 export const AdministrationPageLayout = importLazyComponent(() => import('./AdministrationPageLayout.js').then(m => m.AdministrationPageLayout));
-export const AdministrationPageHeader = importLazyComponent(() => import('./AdministrationPageLayout.js').then(m => m.AdministrationPageHeader));
-export const AdministrationPageNavigation = importLazyComponent(() =>
-  import('./AdministrationPageLayout.js').then(m => m.AdministrationPageNavigation),
-);
-export const AdministrationPageContent = importLazyComponent(() => import('./AdministrationPageLayout.js').then(m => m.AdministrationPageContent));

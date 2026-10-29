@@ -17,6 +17,7 @@ export default [
   ['authentication_administration_user_auth_method_no_details', '无可用详情'],
   ['authentication_administration_user_local', '本地用户'],
   ['authentication_administration_item', '用户和群组'],
+  ['authentication_administration_create_user', '创建用户'],
   ['authentication_administration_item_users', '用户'],
   ['authentication_administration_item_metaParameters', '元参数'],
   ['authentication_administration_tools_add_tooltip', '添加新用户'],
@@ -94,6 +95,8 @@ export default [
   ['administration_identity_providers_configuration_list_update_fail', '配置列表刷新失败'],
   ['administration_identity_providers_service_link', '编辑配置'],
 
+  ['administration_teams_search_placeholder', '搜索群组...'],
+  ['administration_teams_create', '创建群组'],
   ['administration_teams_team_description', '描述'],
   ['administration_teams_team_permissions', 'Permissions'],
   ['administration_teams_team_info_created', 'Team created'],

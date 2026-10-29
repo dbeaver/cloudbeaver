@@ -8,12 +8,13 @@
 import { observer } from 'mobx-react-lite';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 
-import { Filter, Loader, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 import { UsersAdministrationService } from '../../UsersAdministrationService.js';
 import styles from './UsersTableFilters.module.css';
-import { UsersTableFiltersDetails } from './UsersTableFiltersDetails.js';
+import { UsersTableFiltersDialog } from './UsersTableFiltersDialog.js';
 import { UsersTableFiltersOpenContext } from './UsersTableFiltersOpenContext.js';
 import { type IUserFilters } from './useUsersTableFilters.js';
 import { UsersTableFilterButton } from './UsersTableFilterButton.js';
@@ -27,9 +28,17 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
   const translate = useTranslate();
   const style = useS(styles);
   const usersAdministrationService = useService(UsersAdministrationService);
+  const commonDialogService = useService(CommonDialogService);
 
   const [open, setOpen] = useState(false);
-  const onToggle = useCallback(() => setOpen(open => !open), []);
+  const onToggle = useCallback(async () => {
+    setOpen(true);
+    try {
+      await commonDialogService.open(UsersTableFiltersDialog, filters);
+    } finally {
+      setOpen(false);
+    }
+  }, [commonDialogService, filters]);
   const openContext = useMemo(() => ({ open, onToggle }), [open, onToggle]);
 
   return (
@@ -49,12 +58,6 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           </div>
         </UsersTableFiltersOpenContext.Provider>
       </div>
-
-      {open && (
-        <Loader suspense inline>
-          <UsersTableFiltersDetails filters={filters} />
-        </Loader>
-      )}
     </div>
   );
 });

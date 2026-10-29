@@ -7,6 +7,8 @@
  */
 
 .tableContainer {
+  --administration-table-border-radius: 10px;
+
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -15,7 +17,7 @@
   max-width: 100%;
   overflow: hidden;
   border: 1px solid var(--theme-background);
-  border-radius: 10px;
+  border-radius: var(--administration-table-border-radius);
   background: var(--theme-surface);
   color: var(--theme-on-surface);
   box-shadow: none;
@@ -30,6 +32,14 @@
     color: var(--theme-on-secondary);
     font-weight: 600;
     text-transform: none;
+
+    &:first-child {
+      border-start-start-radius: calc(var(--administration-table-border-radius) - 1px);
+    }
+
+    &:last-child {
+      border-start-end-radius: calc(var(--administration-table-border-radius) - 1px);
+    }
   }
 
   & :global(.rdg-cell) {

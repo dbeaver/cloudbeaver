@@ -20,13 +20,12 @@ export * from './AdministrationLocaleService.js';
 export * from './PermissionsResource.js';
 export * from './ADMINISTRATION_SETTINGS_GROUP.js';
 export { AdministrationPageTitle } from './AdministrationPage/AdministrationPageTitleLazy.js';
-export {
-  AdministrationPageLayout,
-  AdministrationPageHeader,
-  AdministrationPageNavigation,
-  AdministrationPageContent,
-} from './AdministrationPage/AdministrationPageLayoutLazy.js';
-export type { IAdministrationPageLayoutProps, IAdministrationPageHeaderProps } from './AdministrationPage/AdministrationPageLayout.js';
+export { AdministrationPageLayout } from './AdministrationPage/AdministrationPageLayoutLazy.js';
+export { AdministrationPageHeader } from './AdministrationPage/AdministrationPageHeaderLazy.js';
+export { AdministrationPageNavigation } from './AdministrationPage/AdministrationPageNavigationLazy.js';
+export { AdministrationPageContent } from './AdministrationPage/AdministrationPageContentLazy.js';
+export type { AdministrationPageLayoutProps } from './AdministrationPage/AdministrationPageLayout.js';
+export type { IAdministrationPageHeaderProps } from './AdministrationPage/AdministrationPageHeader.js';
 
 export { default as AdministrationTableStyles } from './AdministrationTable/AdministrationTable.module.css';
 export * from './AdministrationTable/ADMINISTRATION_TABLE_CONFIG.js';
