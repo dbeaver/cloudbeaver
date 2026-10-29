@@ -32,6 +32,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { MenuActionElement } from './MenuActionElement.js';
 import { MenuContext, type IMenuContext } from './MenuContext.js';
 import { use, useCallback, useMemo } from 'react';
+import { isMenuEmpty } from './isMenuEmpty.js';
 
 interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   menuData: IMenuData;
@@ -68,18 +69,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
 
   const handler = subMenuData.handler;
 
-  // NOTE: some menus rely on lazy loading. When items are not loaded yet `items` may be empty,
-  // but the submenu still must be rendered to allow opening it and triggering loaders.
-  const hidden = getComputed(() => {
-    if (handler?.isHidden?.(subMenuData.context)) {
-      return true;
-    }
-
-    const hasVisibleItems = subMenuData.items.some(item => !item.hidden);
-    const canLazyLoadItems = subMenuData.loaders.length > 0;
-
-    return !hasVisibleItems && !canLazyLoadItems;
-  });
+  const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context) || isMenuEmpty(subMenuData));
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
   // TODO: fix, this triggers `Cannot update a component (`SubMenuElement`) while rendering a different component`
