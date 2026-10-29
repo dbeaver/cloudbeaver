@@ -222,7 +222,7 @@ export class DataGridContextMenuGenerateSqlService {
     }
 
     try {
-      const generators = await this.sqlGeneratorsResource.load(nodePathList);
+      const generators = await this.sqlGeneratorsResource.load({ nodeIds: [nodePathList] });
       const createGenerator = generators.find(g => g.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
 
       if (!createGenerator) {

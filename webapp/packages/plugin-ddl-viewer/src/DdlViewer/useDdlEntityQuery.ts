@@ -27,7 +27,7 @@ interface IState extends ILoadableState {
 
 export function useDdlEntityQuery(nodeId: string): IState {
   const ddlViewerFooterService = useService(DDLViewerFooterService);
-  const sqlGeneratorsResource = useResource(useDdlEntityQuery, SqlGeneratorsResource, nodeId);
+  const sqlGeneratorsResource = useResource(useDdlEntityQuery, SqlGeneratorsResource, { nodeIds: [nodeId] });
   const ddlGenerator = sqlGeneratorsResource.data?.find(generator => generator.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
   const ddlGeneratorId = ddlGenerator?.id ?? null;
 

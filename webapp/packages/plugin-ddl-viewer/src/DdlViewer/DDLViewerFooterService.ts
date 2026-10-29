@@ -144,7 +144,7 @@ export class DDLViewerFooterService {
   private isFullDDLSupported(nodeId: string): boolean {
     const supportsFullDdl = this.navNodeInfoResource.get(nodeId)?.objectFeatures.includes(EObjectFeature.supportsFullDdl) ?? false;
     const ddlGenerator = this.sqlGeneratorsResource
-      .get(nodeId)
+      .get({ nodeIds: [nodeId] })
       ?.find(generator => generator.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
 
     return supportsFullDdl && !!ddlGenerator;

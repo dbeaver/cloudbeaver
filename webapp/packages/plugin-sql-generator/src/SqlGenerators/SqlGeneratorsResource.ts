@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -16,6 +16,11 @@ import {
   type SqlQueryGeneratorOptions,
 } from '@cloudbeaver/core-sdk';
 import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
+
+export interface ISqlGeneratorsKey {
+  nodeIds: string[];
+}
 
 export const MAX_GENERATORS_LENGTH = 15;
 export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => ({
@@ -26,16 +31,20 @@ export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => (
 export const DDL_GENERATOR_ID = 'tableDDL';
 
 @injectable(() => [GraphQLService, AsyncTaskInfoService, NavNodeInfoResource])
-export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {
+export class SqlGeneratorsResource extends CachedMapResource<ISqlGeneratorsKey, SqlQueryGenerator[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
-    private readonly navNodeInfoResource: NavNodeInfoResource,
+    navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
 
-    this.navNodeInfoResource.outdateResource(this);
-    this.navNodeInfoResource.deleteInResource(this);
+    const mapKeys = (key: ResourceKey<string>) => {
+      const nodeIds = new Set(ResourceKeyUtils.toArray(navNodeInfoResource.aliases.transformToKey(key)));
+      return resourceKeyList(this.keys.filter(selection => selection.nodeIds.some(id => nodeIds.has(id))));
+    };
+    navNodeInfoResource.outdateResource(this, mapKeys);
+    navNodeInfoResource.deleteInResource(this, mapKeys);
   }
 
   generateEntityQuery(generatorId: string, nodePathList: string | string[], options?: SqlQueryGeneratorOptions): ITask<string> {
@@ -81,24 +90,21 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     return response.sqlGenerateResultSetQuery;
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, SqlQueryGenerator[]>> {
-    if (isResourceAlias(key)) {
-      throw new Error('Aliases not supported by this resource.');
-    }
-    const values = new Map();
+  override isKeyEqual(first: ISqlGeneratorsKey, second: ISqlGeneratorsKey): boolean {
+    return isArraysEqual(first.nodeIds, second.nodeIds);
+  }
 
-    await ResourceKeyUtils.forEachAsync(key, async key => {
+  protected async loader(key: ResourceKey<ISqlGeneratorsKey>): Promise<Map<ISqlGeneratorsKey, SqlQueryGenerator[]>> {
+    await ResourceKeyUtils.forEachAsync(this.aliases.transformToKey(key), async selection => {
       const { generators } = await this.graphQLService.sdk.sqlEntityQueryGenerators({
-        nodePathList: key,
+        nodePathList: [...selection.nodeIds],
       });
-      values.set(key, generators);
+      this.set(selection, generators);
     });
-
-    this.set(resourceKeyList(Array.from(values.keys())), Array.from(values.values()));
     return this.data;
   }
 
-  protected validateKey(key: string): boolean {
-    return typeof key === 'string';
+  protected validateKey(key: ISqlGeneratorsKey): boolean {
+    return Array.isArray(key.nodeIds) && key.nodeIds.length > 0 && key.nodeIds.every(id => typeof id === 'string');
   }
 }
