@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,12 @@ public class SMAutoAssign {
     private String authRole;
     private String authRoleAssignReason;
     private List<String> externalTeamIds = new ArrayList<>();
+    /**
+     * Whether {@link #externalTeamIds} is a complete snapshot of the current authentication provider's team
+     * assignments. An authoritative result, including an empty list, may be used to remove stale assignments.
+     * A non-authoritative result is treated as partial and must only add or update the assignments it contains.
+     */
+    private boolean teamAssignmentsAuthoritative;
 
     public SMAutoAssign() {
     }
@@ -49,6 +55,14 @@ public class SMAutoAssign {
 
     public void addExternalTeamId(String externalRoleId) {
         this.externalTeamIds.add(externalRoleId);
+    }
+
+    public boolean isTeamAssignmentsAuthoritative() {
+        return teamAssignmentsAuthoritative;
+    }
+
+    public void setTeamAssignmentsAuthoritative(boolean teamAssignmentsAuthoritative) {
+        this.teamAssignmentsAuthoritative = teamAssignmentsAuthoritative;
     }
 
     @Nullable
