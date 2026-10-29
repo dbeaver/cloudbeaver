@@ -44,7 +44,7 @@ export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
   readonly informationPlaceholder: PlaceholderContainer;
-  readonly statisticsPlaceholder = new PlaceholderContainer();
+  readonly actions = new PlaceholderContainer();
   readonly actionButtonsPlaceholder: PlaceholderContainer<IUsersActionButtonProps>;
   administrationItem!: IAdministrationItem;
 

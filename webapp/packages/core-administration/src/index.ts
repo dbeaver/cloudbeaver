@@ -19,6 +19,14 @@ export * from './DataContext/DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE.js';
 export * from './AdministrationLocaleService.js';
 export * from './PermissionsResource.js';
 export * from './ADMINISTRATION_SETTINGS_GROUP.js';
+export { AdministrationPageTitle } from './AdministrationPage/AdministrationPageTitleLazy.js';
+export {
+  AdministrationPageLayout,
+  AdministrationPageHeader,
+  AdministrationPageNavigation,
+  AdministrationPageContent,
+} from './AdministrationPage/AdministrationPageLayoutLazy.js';
+export type { IAdministrationPageLayoutProps, IAdministrationPageHeaderProps } from './AdministrationPage/AdministrationPageLayout.js';
 
 export { default as AdministrationTableStyles } from './AdministrationTable/AdministrationTable.module.css';
 export * from './AdministrationTable/ADMINISTRATION_TABLE_CONFIG.js';

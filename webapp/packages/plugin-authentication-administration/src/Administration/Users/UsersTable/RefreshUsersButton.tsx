@@ -15,7 +15,7 @@ interface Props {
   onUpdate: () => void;
 }
 
-export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdministrationToolsPanel({ onUpdate }) {
+export const RefreshUsersButton = observer<Props>(function RefreshUsersButton({ onUpdate }) {
   const translate = useTranslate();
   const label = translate('authentication_administration_tools_refresh_tooltip');
 

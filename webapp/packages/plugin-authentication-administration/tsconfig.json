@@ -68,9 +68,6 @@
       "path": "../core-utils"
     },
     {
-      "path": "../core-view"
-    },
-    {
       "path": "../plugin-administration"
     },
     {

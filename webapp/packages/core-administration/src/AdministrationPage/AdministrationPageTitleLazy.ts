@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.menuBar {
-  height: initial;
-  flex-wrap: wrap;
-  gap: 12px;
-}
+
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+export const AdministrationPageTitle = importLazyComponent(() => import('./AdministrationPageTitle.js').then(m => m.AdministrationPageTitle));

@@ -29,6 +29,7 @@ export const WEBSITE_LINKS = {
   SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas',
   DATABASE_NAVIGATOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Database-Navigator/',
   USERS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Users/',
+  TEAMS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Teams/',
   AWS_DEPLOY_UPDATE_PAGE: 'https://github.com/dbeaver/cloudbeaver-deploy?tab=readme-ov-file#updating-the-cluster',
   PROXY_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Proxy-Configuration/',
   API_TOKEN_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Generate-API-access-token/',
