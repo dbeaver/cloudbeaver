@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DBWebExceptionAccessDenied;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
@@ -90,6 +91,19 @@ public class WebUserInfo {
     @Property
     public Map<String, Object> getConfigurationParameters() throws DBWebException {
         return session.getUserContext().getPreferenceStore().getCustomUserParameters();
+    }
+
+    @NotNull
+    @Property
+    public Map<String, Object> getUserConfiguration() throws DBWebException {
+        if (!session.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+            throw new DBWebExceptionAccessDenied("Access denied: user not authenticated");
+        }
+        try {
+            return session.getSecurityController().getCurrentUserUISettings();
+        } catch (DBException e) {
+            throw new DBWebException("Error reading user configuration", e);
+        }
     }
 
     @NotNull
