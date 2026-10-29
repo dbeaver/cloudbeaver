@@ -98,10 +98,8 @@ type NavigatorNodeInfo {
     inline: Boolean!
     navigable: Boolean!
     filtered: Boolean!
-    "Whether an enabled personal filter applies to this node's children, including global fallback"
-    userFiltered: Boolean! @since(version: "26.2.4")
 
-    "Reads node filter. Expensive invocation, read only when it is really needed"
+    "Reads the saved connection-level filter defined on this node, before personal settings are applied. Expensive invocation, read only when it is really needed"
     filter: NavigatorNodeFilter
     "Reads the current user's filter defined on this node, without global fallback. Expensive invocation, read only when it is really needed"
     userFilter: NavigatorNodeFilter @since(version: "26.2.4")

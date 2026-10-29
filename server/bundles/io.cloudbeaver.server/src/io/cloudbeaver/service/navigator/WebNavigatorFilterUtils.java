@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWebException;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -23,17 +24,22 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.FilterSerializer;
+import org.jkiss.dbeaver.registry.RegistryConstants;
 import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.Map;
 
 /**
- * Personal filter API backed by the existing Team Edition datasource filter mechanism.
+ * Reads connection and personal filter settings independently, preserving the existing runtime filter mechanism.
  */
 public final class WebNavigatorFilterUtils {
     private WebNavigatorFilterUtils() {
@@ -42,11 +48,58 @@ public final class WebNavigatorFilterUtils {
     @Nullable
     public static DBSObjectFilter getUserFilter(
         @NotNull DBNDatabaseNode node,
-        @Nullable DBXTreeItem itemsMeta,
-        boolean firstMatch
+        @Nullable DBXTreeItem itemsMeta
     ) {
-        DBSObjectFilter filter = node.getNodeFilter(itemsMeta, firstMatch);
-        return filter != null && filter.isUserFilter() ? filter : null;
+        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
+        if (childClass == null || !(node.getDataSourceContainer() instanceof DataSourceDescriptor dataSource)) {
+            return null;
+        }
+        DBPObjectSettingsProvider provider = DBUtils.getAdapter(DBPObjectSettingsProvider.class, dataSource.getProject());
+        Map<String, String> settings = provider == null ? null
+            : provider.getObjectSettings(SMObjectType.datasource, dataSource.getId());
+        if (settings == null ||
+            settings.keySet().stream().noneMatch(key -> key.startsWith(UserDBSObjectFilterUtils.USER_FILTER_KEY))
+        ) {
+            return null;
+        }
+        FilterLookupDataSource filters = new FilterLookupDataSource(dataSource);
+        UserDBSObjectFilterUtils.setUserObjectFilters(filters, settings);
+        return filters.getObjectFilter(childClass, node.getFilterObject(), true);
+    }
+
+    @Nullable
+    public static DBSObjectFilter getConnectionFilter(
+        @NotNull DBNDatabaseNode node,
+        @Nullable DBXTreeItem itemsMeta
+    ) throws DBException {
+        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
+        if (childClass == null || !(node.getDataSourceContainer() instanceof DataSourceDescriptor dataSource)) {
+            return null;
+        }
+        if (dataSource.isHidden() || dataSource.getProject().isInMemory()) {
+            // Draft/session-only connections have no saved configuration to query. Never return a personal
+            // runtime filter as a connection filter.
+            DBSObjectFilter filter = node.getNodeFilter(itemsMeta, true);
+            return filter == null || filter.isUserFilter() ? null : new DBSObjectFilter(filter);
+        }
+        if (!(dataSource.getProject() instanceof BaseWebProjectImpl project)) {
+            throw new DBWebException("Cannot read connection filters for navigator node '" + node.getNodeUri() + "'");
+        }
+        // Read the canonical configuration through RM, not the user's overlaid session registry. Deserialize
+        // only the filters; do not copy credentials or install any settings in the live datasource.
+        String configuration = project.getResourceController().getProjectsDataSources(
+            project.getId(), new String[] {dataSource.getId()});
+        Map<String, Object> root = JSONUtils.parseMap(JSONUtils.GSON, new StringReader(configuration));
+        Map<String, Object> connection = JSONUtils.getObject(JSONUtils.getObject(root, "connections"), dataSource.getId());
+        if (JSONUtils.getObjectList(connection, RegistryConstants.TAG_FILTERS).isEmpty()) {
+            return null;
+        }
+        FilterLookupDataSource filters = new FilterLookupDataSource(dataSource);
+        FilterSerializer<DataSourceDescriptor> serializer = new FilterSerializer<>();
+        for (Map<String, Object> filter : JSONUtils.getObjectList(connection, RegistryConstants.TAG_FILTERS)) {
+            filters.addFilter(serializer.deserializeObjectFilterConfig(filter));
+        }
+        return filters.getObjectFilter(childClass, node.getFilterObject(), true);
     }
 
     public static void setUserFilter(
@@ -88,6 +141,20 @@ public final class WebNavigatorFilterUtils {
         } catch (IOException | DBException e) {
             node.setNodeFilter(itemsMeta, previousFilter, false);
             throw new DBWebException("Error saving personal navigator filters", e);
+        }
+    }
+
+    /** Unregistered, credential-free filter mapping that reuses the core's type and parent lookup rules. */
+    private static class FilterLookupDataSource extends DataSourceDescriptor {
+        private FilterLookupDataSource(@NotNull DataSourceDescriptor source) {
+            super(source.getRegistry(), source.getConfigurationStorage(), source.getOrigin(), source.getId(),
+                source.getDriver(), new DBPConnectionConfiguration());
+        }
+
+        private void addFilter(@NotNull FilterSerializer.FilterConfiguration configuration) {
+            if (configuration.typeNamePresent()) {
+                setObjectFilter(configuration.typeName(), configuration.objectID(), configuration.filter());
+            }
         }
     }
 }

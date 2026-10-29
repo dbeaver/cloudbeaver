@@ -152,23 +152,6 @@ public class WebNavigatorNodeInfo {
     }
 
     @Property
-    public boolean isUserFiltered() throws DBWebException {
-        if (!(node instanceof DBNDatabaseNode dbNode)) {
-            return false;
-        }
-        try {
-            DBSObjectFilter filter = WebNavigatorFilterUtils.getUserFilter(
-                dbNode,
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
-                false
-            );
-            return filter != null && !filter.isNotApplicable();
-        } catch (DBException e) {
-            throw new DBWebException(e);
-        }
-    }
-
-    @Property
     public boolean isHasChildren() {
         return node.hasChildren(true);
     }
@@ -233,10 +216,10 @@ public class WebNavigatorNodeInfo {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
         try {
-            DBSObjectFilter filter = dbNode.getNodeFilter(
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
-                true);
-            return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+            return getApplicableFilter(WebNavigatorFilterUtils.getConnectionFilter(
+                dbNode,
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)
+            ));
         } catch (DBException e) {
             throw new DBWebException(e);
         }
@@ -251,8 +234,7 @@ public class WebNavigatorNodeInfo {
         try {
             return getApplicableFilter(WebNavigatorFilterUtils.getUserFilter(
                 dbNode,
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
-                true
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)
             ));
         } catch (DBException e) {
             throw new DBWebException(e);
