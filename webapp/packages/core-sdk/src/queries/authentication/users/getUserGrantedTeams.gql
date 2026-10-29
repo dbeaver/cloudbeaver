@@ -1,0 +1,10 @@
+query getUserGrantedTeams($userId: ID!) {
+  user: adminUserInfo(userId: $userId) {
+    grantedTeamsInfo {
+      teamId
+      teamRole
+      grantType
+      grantedBy
+    }
+  }
+}

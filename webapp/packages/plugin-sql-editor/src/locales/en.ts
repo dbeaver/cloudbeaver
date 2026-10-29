@@ -34,6 +34,9 @@ export default [
   ['sql_editor_sql_statistics_unavailable', 'Statistics is not available'],
   ['sql_editor_sql_execution_executed_queries', 'Executed queries:'],
   ['sql_editor_sql_execution_executing', 'Executing...'],
+  ['sql_editor_script_error_title', 'Script execution error'],
+  ['sql_editor_script_error_message', 'An error occurred while executing this statement. Choose how to continue the script.'],
+  ['sql_editor_script_error_skip_all', 'Skip all'],
   ['sql_editor_upload_script_tooltip', 'Upload sql script'],
   ['sql_editor_download_script_tooltip', 'Download sql script'],
   [
