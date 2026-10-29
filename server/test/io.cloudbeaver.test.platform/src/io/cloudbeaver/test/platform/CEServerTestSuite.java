@@ -33,6 +33,7 @@ import io.cloudbeaver.service.navigator.WebServiceNavigatorTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
+import io.cloudbeaver.test.platform.admin.AdminUserTeamGrantTest;
 import io.cloudbeaver.test.platform.fs.FileSystemSecurityTest;
 import io.cloudbeaver.test.platform.sql.*;
 import io.cloudbeaver.utils.WebDataSourceUtilsTest;
@@ -70,6 +71,7 @@ import org.junit.platform.suite.api.Suite;
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
+        AdminUserTeamGrantTest.class,
         BlankLineDelimiterTest.class,
         GenerateSQLResultSetTest.class,
         WebSQLDataUpdateTest.class,
