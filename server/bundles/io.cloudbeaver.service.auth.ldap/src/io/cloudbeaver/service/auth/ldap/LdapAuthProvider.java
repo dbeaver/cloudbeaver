@@ -57,6 +57,9 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
+    // Whether the group lookup of the current thread finished without an error, see detectAutoAssignments.
+    // The lookup methods return plain lists, this is how they tell if the list can be trusted.
+    private static final ThreadLocal<Boolean> GROUP_LOOKUP_COMPLETE = new ThreadLocal<>();
     public static final String LDAP_AUTH_PROVIDER_ID = "ldap";
     private static final int DEFAULT_TIME_LIMIT = 30_000;
 
@@ -118,9 +121,21 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull SMAuthProviderCustomConfiguration providerConfig,
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
-        List<String> autoAssignmentTeamIds = detectAutoAssignmentTeam(new LdapSettings(providerConfig), authParameters);
+        GROUP_LOOKUP_COMPLETE.remove();
+        List<String> autoAssignmentTeamIds;
+        boolean lookupComplete;
+        try {
+            autoAssignmentTeamIds = detectAutoAssignmentTeam(new LdapSettings(providerConfig), authParameters);
+            // Stays unknown, i.e. not trusted, if the lookup is done by an implementation that doesn't report it
+            lookupComplete = Boolean.TRUE.equals(GROUP_LOOKUP_COMPLETE.get());
+        } finally {
+            GROUP_LOOKUP_COMPLETE.remove();
+        }
         SMAutoAssign smAutoAssign = new SMAutoAssign();
         autoAssignmentTeamIds.forEach(smAutoAssign::addExternalTeamId);
+        // Only the teams assigned automatically are ever removed, and only when every group query finished
+        // without an error or a referral. A failed or partial lookup keeps all the teams of the user.
+        smAutoAssign.setExternalTeamIdsComplete(lookupComplete);
         return smAutoAssign;
     }
 
@@ -598,6 +613,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     protected List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
         DirContext context = null;
         Set<String> result = new LinkedHashSet<>();
+        GROUP_LOOKUP_COMPLETE.set(Boolean.TRUE);
         try {
             Map<String, String> environment = creteAuthEnvironment(ldapSettings);
             if (CommonUtils.isEmpty(ldapSettings.getBindUserDN())) {
@@ -625,6 +641,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 result.addAll(groupsByMemberOfAttribute);
             } catch (Exception e) {
                 log.error("Failed to fetch groups by memberOf attribute. " + e.getMessage());
+                markGroupLookupIncomplete();
             }
             try {
                 List<String> groupsByMemberAttribute = findGroupsByMemberAttribute(fullDN, ldapSettings, context);
@@ -632,9 +649,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 result.addAll(groupsByMemberAttribute);
             } catch (Exception e) {
                 log.error("Failed to fetch groups by member attribute. " + e.getMessage());
+                markGroupLookupIncomplete();
             }
         } catch (Exception e) {
             log.error("Group not found. " + e.getMessage());
+            markGroupLookupIncomplete();
         } finally {
             try {
                 if (context != null) {
@@ -646,6 +665,10 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
         log.debug("Resolved " + result.size() + " external group id(s) for member '" + fullDN + "': " + result);
         return new ArrayList<>(result);
+    }
+
+    private static void markGroupLookupIncomplete() {
+        GROUP_LOOKUP_COMPLETE.set(Boolean.FALSE);
     }
 
     protected List<String> findGroupsByMemberOfAttribute(String fullDN, DirContext context) throws NamingException {
@@ -670,6 +693,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
         } catch (PartialResultException e) {
           log.debug("Ignoring LDAP continuation references while reading memberOf for '" + fullDN + "'");
+          markGroupLookupIncomplete();
         } finally {
             if (userRecord != null) {
                 userRecord.close();
@@ -704,6 +728,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
         } catch (PartialResultException e) {
             log.debug("Ignoring LDAP continuation references during member group search for '" + fullDN + "'");
+            markGroupLookupIncomplete();
         } finally {
             if (searchResults != null) {
                 searchResults.close();
