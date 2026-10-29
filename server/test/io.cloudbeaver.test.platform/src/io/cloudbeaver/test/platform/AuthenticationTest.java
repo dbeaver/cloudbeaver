@@ -66,19 +66,6 @@ public class AuthenticationTest extends CloudbeaverMockTest {
         mutation updateUserConfiguration($configuration: Object!) {
           result: authSetUserConfiguration(configuration: $configuration)
         }""";
-    private static final String GQL_NULL_USER_CONFIGURATION = """
-        mutation nullUserConfiguration {
-          result: authSetUserConfiguration(configuration: {
-            nullValue: null
-            authenticationTest: {
-              panel: {
-                active: null
-                visible: true
-              }
-              items: [null, { value: null }, [null, "value"], 42]
-            }
-          })
-        }""";
     private static final String GQL_CREATE_USER = """
         query createUser($userId: ID!, $enabled: Boolean!, $authRole: String) {
           result: createUser(userId: $userId, enabled: $enabled, authRole: $authRole) { userId }
@@ -224,8 +211,8 @@ public class AuthenticationTest extends CloudbeaverMockTest {
                 "items", Arrays.asList(null, nullValue, Arrays.asList(null, "value"), 42.0)
             ));
 
-            // WebGQLClient omits null map values in variables, so send nulls as GraphQL literals.
-            Map<String, Object> result = client.sendQuery(GQL_NULL_USER_CONFIGURATION, null);
+            // Variables preserve JSON nulls without invoking the scalar's inline-array coercion.
+            Map<String, Object> result = updateUISettings(client, expected);
             Assertions.assertEquals(expected, result);
             Assertions.assertEquals(expected, readUISettings(client));
             WebGQLClient nextClient = CEAppStarter.createClient();
@@ -279,13 +266,15 @@ public class AuthenticationTest extends CloudbeaverMockTest {
         try {
             Map<String, Object> previousSettings = Map.of(TEST_UI_SETTING, Map.of("preserved", true));
             updateUISettings(client, previousSettings);
-            for (Object invalidRoot : List.of("invalid", List.of(), List.of(Map.of("key", true)), true, 42.0)) {
+            for (Object invalidRoot : Arrays.asList(null, "invalid", List.of(), List.of(Map.of("key", true)), true, 42.0)) {
+                Map<String, Object> variables = new HashMap<>();
+                variables.put("configuration", invalidRoot);
                 Assertions.assertThrows(DBException.class, () -> client.sendQuery(
-                    GQL_UPDATE_USER_CONFIGURATION, Map.of("configuration", invalidRoot)
+                    GQL_UPDATE_USER_CONFIGURATION, variables
                 ));
                 Assertions.assertEquals(previousSettings, readUISettings(client));
             }
-            // A literal distinguishes explicit null from an omitted variable in WebGQLClient.
+            // Keep root-literal validation covered independently of the variable-based requests.
             for (String invalidRoot : List.of("null", "\"invalid\"", "[]", "[{}]", "true", "42")) {
                 Assertions.assertThrows(DBException.class, () -> client.sendQuery(
                     "mutation { result: authSetUserConfiguration(configuration: " + invalidRoot + ") }", null
