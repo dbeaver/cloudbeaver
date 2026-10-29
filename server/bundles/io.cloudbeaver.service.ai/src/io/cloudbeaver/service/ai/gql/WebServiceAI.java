@@ -821,8 +821,7 @@ public class WebServiceAI implements DBWServiceAI {
         @NotNull AIChatConversation conversation,
         @Nullable WebAiChatCompletionSettingsInput settingsInput
     ) throws DBWebException {
-        AIContextSettingsChatConversation settings = WebAIUtils.getConversationSettings(session, conversation);
-        if (settings == null || settingsInput == null) {
+        if (settingsInput == null) {
             return;
         }
         if (settingsInput.profile() != null) {
@@ -831,6 +830,10 @@ public class WebServiceAI implements DBWServiceAI {
                 throw new DBWebException("Invalid AI configuration profile " + settingsInput.profile());
             }
             conversation.setProfile(profile);
+        }
+        AIContextSettingsChatConversation settings = WebAIUtils.getConversationSettings(session, conversation);
+        if (settings == null) {
+            return;
         }
         if (settingsInput.metaTransferConfirmed() != null) {
             settings.setMetaTransferConfirmed(settingsInput.metaTransferConfirmed());

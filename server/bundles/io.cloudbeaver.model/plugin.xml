@@ -6,7 +6,7 @@
     <extension-point id="io.cloudbeaver.feature" name="Web features" schema="schema/io.cloudbeaver.feature.exsd"/>
     <extension-point id="io.cloudbeaver.server.feature" name="Web server features" schema="schema/io.cloudbeaver.server.feature.exsd"/>
     <extension-point id="io.cloudbeaver.valueSerializer" name="Web value serializers" schema="schema/io.cloudbeaver.valueSerializer.exsd"/>
-    <extension-point id="org.jkiss.dbeaver.auth.provider" name="%extension-point.org.jkiss.dbeaver.authProvider.name" schema="schema/org.jkiss.dbeaver.authProvider.exsd"/>
+    <extension-point id="org.jkiss.dbeaver.auth.provider" name="Authentication provider" schema="schema/org.jkiss.dbeaver.authProvider.exsd"/>
     <extension-point id="io.cloudbeaver.metaParameters" name="Meta parameters" schema="schema/io.cloudbeaver.metaParameters.exsd"/>
     <extension-point id="io.cloudbeaver.rm.file.handler" name="RM file operations handler"
                      schema="schema/io.cloudbeaver.rmFileHandler.exsd"/>
@@ -27,6 +27,7 @@
 
     <extension point="io.cloudbeaver.feature">
         <feature id="ssh" label="SSH tunnels for databases" description="Enables SSH tunnels for secure database connections, allowing access to remote databases through encrypted channels" enabledByDefault="true"/>
+        <feature id="resetCredentialsOnTargetChange" label="Reset credentials on target change" description="Prevents saved database and network credentials from being reused when the connection host, URL, or network route changes. Disable only when all users who can edit connections are trusted with stored credentials" enabledByDefault="true"/>
     </extension>
 
 

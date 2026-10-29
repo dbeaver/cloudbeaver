@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.WebConnectionConfigInputHandlerTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.navigator.WebNavigatorNodeInfoTest;
 import io.cloudbeaver.model.rm.RMNIOTest;
@@ -31,8 +32,10 @@ import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
+import io.cloudbeaver.test.platform.admin.AdminUserTeamGrantTest;
 import io.cloudbeaver.test.platform.fs.FileSystemSecurityTest;
 import io.cloudbeaver.test.platform.sql.*;
+import io.cloudbeaver.utils.WebDataSourceUtilsTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -56,6 +59,8 @@ import org.junit.platform.suite.api.Suite;
         CBSecretControllerEmbeddedTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
+        WebConnectionConfigInputHandlerTest.class,
+        WebDataSourceUtilsTest.class,
         WSEventHandlerWorkspaceConfigUpdateTest.class,
         WebNavigatorNodeInfoTest.class,
         AIProfileCopyTest.class,
@@ -64,6 +69,7 @@ import org.junit.platform.suite.api.Suite;
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
+        AdminUserTeamGrantTest.class,
         BlankLineDelimiterTest.class,
         GenerateSQLResultSetTest.class,
         WebSQLDataUpdateTest.class,

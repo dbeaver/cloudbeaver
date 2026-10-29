@@ -9,6 +9,7 @@
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 
 import { ConnectionInfoAiResource } from './ConnectionInfoAiResource.js';
+import { ConnectionInfoAiScopeResource } from './ConnectionInfoAiScopeResource.js';
 import { ConnectionAiSettingsService } from './connection-ai-settings/ConnectionAiSettingsService.js';
 import { ConnectionFormAiService } from './connection-ai-settings/ConnectionFormAiService.js';
 import { ConnectionAiScopeService } from './connection-custom-scope/connection-ai-settings/ConnectionAiScopeService.js';
@@ -24,6 +25,7 @@ export default ModuleRegistry.add({
     serviceCollection
       .addSingleton(Dependency, proxy(ConnectionInfoAiResource))
       .addSingleton(ConnectionInfoAiResource)
+      .addSingleton(ConnectionInfoAiScopeResource)
       .addSingleton(ConnectionFormAiService)
       .addSingleton(AIChatScopeService)
       .addSingleton(AIChatConversationScopeResource)

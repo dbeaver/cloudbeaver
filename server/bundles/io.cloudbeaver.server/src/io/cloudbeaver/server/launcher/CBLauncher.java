@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package io.cloudbeaver.server.launcher;
 
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +33,11 @@ public class CBLauncher {
         Map<String, String> props = new HashMap<>();
 
         EclipseStarter.setInitialProperties(props);
-        BundleContext context = EclipseStarter.startup(
+        EclipseStarter.startup(
             new String[]{},
             null);
 
-        ServiceReference<DBPPlatform> platformRef = context.getServiceReference(DBPPlatform.class);
-        return context.getService(platformRef);
+        return DBWorkbench.getPlatform();
     }
 
     public static void main(String[] args) throws Exception {

@@ -31,6 +31,8 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
+import org.jkiss.dbeaver.model.access.DBAAuthModelExternal;
+import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.admin.sessions.DBAServerSessionManager;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
@@ -403,15 +405,32 @@ public class WebConnectionInfo {
         // Fill user provided credentials
         DBPConnectionConfiguration configWithAuth = new DBPConnectionConfiguration(dataSourceContainer.getConnectionConfiguration());
 
-        // show all properties if it is a manual connection
-        Predicate<DBPPropertyDescriptor> predicate = CommonUtils.isEmpty(getRequiredAuth())
-            ? p -> true
-            : p -> WebCommonUtils.isAuthPropertyApplicable(p, session.getContextCredentialsProviders());
+        DBACredentialsProvider additionalCredentialsProvider = getAdditionalAuthPropertyCredentialsProvider();
+        Collection<DBACredentialsProvider> contextCredentialsProviders = CommonUtils.notNull(
+            session.getContextCredentialsProviders(),
+            Collections.emptyList()
+        );
+        Collection<DBACredentialsProvider> credentialsProviders;
+        if (additionalCredentialsProvider != null) {
+            credentialsProviders = new ArrayList<>(contextCredentialsProviders);
+            credentialsProviders.add(additionalCredentialsProvider);
+        } else {
+            credentialsProviders = contextCredentialsProviders;
+        }
+        boolean filterAuthProperties = additionalCredentialsProvider != null || !CommonUtils.isEmpty(getRequiredAuth());
+        Predicate<DBPPropertyDescriptor> predicate = filterAuthProperties
+            ? p -> WebCommonUtils.isAuthPropertyApplicable(p, credentialsProviders)
+            : p -> true;
 
         DBPPropertySource credentialsSource = authModel.createCredentialsSource(dataSourceContainer, configWithAuth);
         return Arrays.stream(credentialsSource.getProperties())
             .filter(predicate)
             .map(p -> new WebPropertyInfo(session, p, credentialsSource)).toArray(WebPropertyInfo[]::new);
+    }
+
+    @Nullable
+    protected DBACredentialsProvider getAdditionalAuthPropertyCredentialsProvider() {
+        return null;
     }
 
     @Property
@@ -525,6 +544,19 @@ public class WebConnectionInfo {
     @Property
     public String getRequiredAuth() {
         return dataSourceContainer.getRequiredExternalAuth();
+    }
+
+    @Nullable
+    protected String getRequiredAuthFromConnectionConfiguration() {
+        DBPConnectionConfiguration connectionConfiguration = dataSourceContainer.getConnectionConfiguration();
+        String requiredAuthProvider = connectionConfiguration.getAuthModelDescriptor().getRequiredAuthProviderId();
+        if (!CommonUtils.isEmpty(requiredAuthProvider)) {
+            return requiredAuthProvider;
+        }
+        if (connectionConfiguration.getAuthModel() instanceof DBAAuthModelExternal<?> externalAuthModel) {
+            return externalAuthModel.getRequiredExternalAuth(connectionConfiguration);
+        }
+        return null;
     }
 
     private boolean hasProjectPermission(@NotNull RMProjectPermission projectPermission) {
