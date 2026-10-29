@@ -89,12 +89,12 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             .dataFetcher("setUserPreferences",
                 env -> getService(env).setUserConfigurationParameters(getWebSession(env),
                     getArgumentVal(env, "preferences")))
-            .dataFetcher("authSetUserUISettings", env -> {
-                Object settings = getArgumentVal(env, "settings");
-                if (!(settings instanceof Map<?, ?>)) {
-                    throw new DBWebException("User UI settings must be a JSON object");
+            .dataFetcher("authSetUserConfiguration", env -> {
+                Object configuration = getArgumentVal(env, "configuration");
+                if (!(configuration instanceof Map<?, ?>)) {
+                    throw new DBWebException("User configuration must be a JSON object");
                 }
-                return getService(env).updateUserUISettings(getWebSession(env), getArgumentVal(env, "settings"));
+                return getService(env).updateUserConfiguration(getWebSession(env), getArgumentVal(env, "configuration"));
             })
             .dataFetcher("federatedLogin", env -> getService(env).federatedLogin(
                 GraphQLEndpoint.getServletRequestOrThrow(env),

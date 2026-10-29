@@ -30,11 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class AuthenticationTest extends CloudbeaverMockTest {
     private static final String TEST_UI_SETTING = "authenticationTest";
@@ -60,19 +56,19 @@ public class AuthenticationTest extends CloudbeaverMockTest {
             }
           }
         }""";
-    private static final String GQL_ACTIVE_USER_UI_SETTINGS = """
-        query activeUserUISettings {
+    private static final String GQL_ACTIVE_USER_CONFIGURATION = """
+        query activeUserConfiguration {
           result: activeUser {
-            uiSettings
+            userConfiguration
           }
         }""";
-    private static final String GQL_UPDATE_USER_UI_SETTINGS = """
-        mutation updateUserUISettings($settings: Object!) {
-          result: authSetUserUISettings(settings: $settings)
+    private static final String GQL_UPDATE_USER_CONFIGURATION = """
+        mutation updateUserConfiguration($configuration: Object!) {
+          result: authSetUserConfiguration(configuration: $configuration)
         }""";
-    private static final String GQL_NULL_USER_UI_SETTINGS = """
-        mutation nullUserUISettings {
-          result: authSetUserUISettings(settings: {
+    private static final String GQL_NULL_USER_CONFIGURATION = """
+        mutation nullUserConfiguration {
+          result: authSetUserConfiguration(configuration: {
             nullValue: null
             authenticationTest: {
               panel: {
@@ -229,7 +225,7 @@ public class AuthenticationTest extends CloudbeaverMockTest {
             ));
 
             // WebGQLClient omits null map values in variables, so send nulls as GraphQL literals.
-            Map<String, Object> result = client.sendQuery(GQL_NULL_USER_UI_SETTINGS, null);
+            Map<String, Object> result = client.sendQuery(GQL_NULL_USER_CONFIGURATION, null);
             Assertions.assertEquals(expected, result);
             Assertions.assertEquals(expected, readUISettings(client));
             WebGQLClient nextClient = CEAppStarter.createClient();
@@ -285,14 +281,14 @@ public class AuthenticationTest extends CloudbeaverMockTest {
             updateUISettings(client, previousSettings);
             for (Object invalidRoot : List.of("invalid", List.of(), List.of(Map.of("key", true)), true, 42.0)) {
                 Assertions.assertThrows(DBException.class, () -> client.sendQuery(
-                    GQL_UPDATE_USER_UI_SETTINGS, Map.of("settings", invalidRoot)
+                    GQL_UPDATE_USER_CONFIGURATION, Map.of("configuration", invalidRoot)
                 ));
                 Assertions.assertEquals(previousSettings, readUISettings(client));
             }
             // A literal distinguishes explicit null from an omitted variable in WebGQLClient.
             for (String invalidRoot : List.of("null", "\"invalid\"", "[]", "[{}]", "true", "42")) {
                 Assertions.assertThrows(DBException.class, () -> client.sendQuery(
-                    "mutation { result: authSetUserUISettings(settings: " + invalidRoot + ") }", null
+                    "mutation { result: authSetUserConfiguration(configuration: " + invalidRoot + ") }", null
                 ));
                 Assertions.assertEquals(previousSettings, readUISettings(client));
             }
@@ -363,10 +359,10 @@ public class AuthenticationTest extends CloudbeaverMockTest {
 
     @NotNull
     private static Map<String, Object> readUISettings(@NotNull WebGQLClient client) throws Exception {
-        Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER_UI_SETTINGS, null);
+        Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER_CONFIGURATION, null);
         Assertions.assertNotNull(activeUser);
-        Assertions.assertInstanceOf(Map.class, activeUser.get("uiSettings"));
-        return JSONUtils.getObject(activeUser, "uiSettings");
+        Assertions.assertInstanceOf(Map.class, activeUser.get("userConfiguration"));
+        return JSONUtils.getObject(activeUser, "userConfiguration");
     }
 
     @NotNull
@@ -374,6 +370,6 @@ public class AuthenticationTest extends CloudbeaverMockTest {
         @NotNull WebGQLClient client,
         @NotNull Map<String, Object> settings
     ) throws Exception {
-        return client.sendQuery(GQL_UPDATE_USER_UI_SETTINGS, Map.of("settings", settings));
+        return client.sendQuery(GQL_UPDATE_USER_CONFIGURATION, Map.of("configuration", settings));
     }
 }

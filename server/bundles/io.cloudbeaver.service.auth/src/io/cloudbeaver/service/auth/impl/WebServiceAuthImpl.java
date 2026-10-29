@@ -405,17 +405,17 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @NotNull
     @Override
-    public Map<String, Object> updateUserUISettings(
+    public Map<String, Object> updateUserConfiguration(
         @NotNull WebSession webSession,
-        @NotNull Map<String, Object> settings
+        @NotNull Map<String, Object> configuration
     ) throws DBWebException {
         if (!webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
             throw new DBWebExceptionAccessDenied("Access denied: user not authenticated");
         }
         try {
-            return webSession.getSecurityController().updateCurrentUserUISettings(settings);
+            return webSession.getSecurityController().updateCurrentUserUISettings(configuration);
         } catch (DBException | IllegalArgumentException e) {
-            throw new DBWebException("Error updating user UI settings", e);
+            throw new DBWebException("Error updating user configuration", e);
         }
     }
 

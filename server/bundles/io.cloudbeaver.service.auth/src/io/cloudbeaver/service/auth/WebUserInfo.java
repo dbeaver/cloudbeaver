@@ -95,14 +95,14 @@ public class WebUserInfo {
 
     @NotNull
     @Property
-    public Map<String, Object> getUiSettings() throws DBWebException {
+    public Map<String, Object> getUserConfiguration() throws DBWebException {
         if (!session.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
             throw new DBWebExceptionAccessDenied("Access denied: user not authenticated");
         }
         try {
             return session.getSecurityController().getCurrentUserUISettings();
         } catch (DBException e) {
-            throw new DBWebException("Error reading user UI settings", e);
+            throw new DBWebException("Error reading user configuration", e);
         }
     }
 

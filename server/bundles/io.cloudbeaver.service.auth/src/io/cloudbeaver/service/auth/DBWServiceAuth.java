@@ -104,9 +104,9 @@ public interface DBWServiceAuth extends DBWService {
 
     @NotNull
     @WebAction
-    Map<String, Object> updateUserUISettings(
+    Map<String, Object> updateUserConfiguration(
         @NotNull WebSession webSession,
-        @NotNull Map<String, Object> settings
+        @NotNull Map<String, Object> configuration
     ) throws DBWebException;
 
 }
