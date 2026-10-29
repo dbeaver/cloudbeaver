@@ -98,13 +98,12 @@ type NavigatorNodeInfo {
     inline: Boolean!
     navigable: Boolean!
     filtered: Boolean!
+    "Whether an enabled personal filter applies to this node's children, including global fallback"
     userFiltered: Boolean! @since(version: "26.2.4")
 
-    "Reads the filter used by legacy clients: connection filter for data source editors; otherwise the applicable current user's filter, falling back to the connection filter"
+    "Reads node filter. Expensive invocation, read only when it is really needed"
     filter: NavigatorNodeFilter
-    "Reads the connection-level node filter. Expensive invocation, read only when it is really needed"
-    connectionFilter: NavigatorNodeFilter @since(version: "26.2.4")
-    "Reads the current user's node filter. Expensive invocation, read only when it is really needed"
+    "Reads the current user's filter defined on this node, without global fallback. Expensive invocation, read only when it is really needed"
     userFilter: NavigatorNodeFilter @since(version: "26.2.4")
 }
 
@@ -170,8 +169,7 @@ extend type Mutation {
     navMoveNodesToFolder( nodePaths: [ID!]!, folderPath: ID!): Boolean!
 
     """
-    Sets the connection filter for users with datasource edit permission, otherwise sets the current user's filter.
-    If both include and exclude are null then the selected filter is removed.
+    Sets filter for the folder node. If both include and exclude are null then filter is removed.
     Node must be refreshed after applying filters. Node children can be changed
     """
     navSetFolderFilter( nodePath: ID!, include: [String!], exclude: [String!]): Boolean!

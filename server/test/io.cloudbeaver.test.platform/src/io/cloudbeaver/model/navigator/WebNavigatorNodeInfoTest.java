@@ -16,25 +16,14 @@
  */
 package io.cloudbeaver.model.navigator;
 
-import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.session.WebUserContext;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
-import io.cloudbeaver.service.security.SMUtils;
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.navigator.DBNUtils;
-import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
-import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
-import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
@@ -82,111 +71,5 @@ public class WebNavigatorNodeInfoTest extends CloudbeaverMockTest {
         Assertions.assertEquals("DBNodeName1", info.getName());
 
 
-    }
-
-    @Test
-    public void testConnectionAndUserFiltersAreExposedSeparately() throws Exception {
-        WebSession session = Mockito.mock(WebSession.class);
-        WebUserContext userContext = Mockito.mock(WebUserContext.class);
-        DBNDatabaseNode dbNode = Mockito.mock(DBNDatabaseNode.class);
-        DBPDataSourceContainer dataSource = Mockito.mock(DBPDataSourceContainer.class);
-        DBXTreeItem itemsMeta = Mockito.mock(DBXTreeItem.class);
-        DBSObjectFilter connectionFilter = new DBSObjectFilter();
-        connectionFilter.addInclude("prod_%");
-        DBSObjectFilter userFilter = new DBSObjectFilter();
-        userFilter.addInclude("prod_eu_%");
-        userFilter.setUserFilter(true);
-
-        Mockito.when(dbNode.getDataSourceContainer()).thenReturn(dataSource);
-        Mockito.doReturn(DBSObject.class).when(dbNode).getChildrenOrFolderClass(itemsMeta);
-        Mockito.when(session.getUserContext()).thenReturn(userContext);
-
-        try (MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class);
-             MockedStatic<UserDBSObjectFilterUtils> filterUtils = Mockito.mockStatic(UserDBSObjectFilterUtils.class)) {
-            dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)).thenReturn(itemsMeta);
-            Mockito.when(dbNode.getNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
-            filterUtils.when(() -> UserDBSObjectFilterUtils.getUserObjectFilter(
-                dataSource,
-                DBSObject.class,
-                null,
-                true
-            )).thenReturn(userFilter);
-
-            WebNavigatorNodeInfo info = new WebNavigatorNodeInfo(session, dbNode);
-
-            Assertions.assertSame(userFilter, info.getFilter());
-            Assertions.assertSame(connectionFilter, info.getConnectionFilter());
-            Assertions.assertSame(userFilter, info.getUserFilter());
-            Assertions.assertTrue(info.isUserFiltered());
-        }
-    }
-
-    @Test
-    public void testUserFilterIsNullForNonDatabaseNode() throws Exception {
-        WebSession session = Mockito.mock(WebSession.class);
-        DBNNode node = Mockito.mock(DBNNode.class);
-
-        Assertions.assertNull(new WebNavigatorNodeInfo(session, node).getUserFilter());
-    }
-
-    @Test
-    public void testLegacyFilterMatchesConnectionMutationForDataSourceEditors() throws Exception {
-        WebSession session = Mockito.mock(WebSession.class);
-        WebUserContext userContext = Mockito.mock(WebUserContext.class);
-        DBNDatabaseNode dbNode = Mockito.mock(DBNDatabaseNode.class);
-        DBXTreeItem itemsMeta = Mockito.mock(DBXTreeItem.class);
-        BaseWebProjectImpl project = Mockito.mock(BaseWebProjectImpl.class);
-        RMProject rmProject = Mockito.mock(RMProject.class);
-        DBSObjectFilter connectionFilter = new DBSObjectFilter();
-        connectionFilter.addInclude("prod_%");
-        Mockito.when(dbNode.getOwnerProject()).thenReturn(project);
-        Mockito.when(project.getRMProject()).thenReturn(rmProject);
-        Mockito.when(session.getUserContext()).thenReturn(userContext);
-        Mockito.when(userContext.isNonAnonymousUserAuthorizedInSM()).thenReturn(true);
-
-        try (MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class);
-             MockedStatic<SMUtils> smUtils = Mockito.mockStatic(SMUtils.class)) {
-            dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)).thenReturn(itemsMeta);
-            smUtils.when(() -> SMUtils.hasProjectPermission(
-                session,
-                rmProject,
-                RMProjectPermission.DATA_SOURCES_EDIT
-            )).thenReturn(true);
-            Mockito.when(dbNode.getNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
-
-            Assertions.assertSame(connectionFilter, new WebNavigatorNodeInfo(session, dbNode).getFilter());
-        }
-    }
-
-    @Test
-    public void testLegacyFilterFallsBackToConnectionForDisabledUserFilter() throws Exception {
-        WebSession session = Mockito.mock(WebSession.class);
-        WebUserContext userContext = Mockito.mock(WebUserContext.class);
-        DBNDatabaseNode dbNode = Mockito.mock(DBNDatabaseNode.class);
-        DBPDataSourceContainer dataSource = Mockito.mock(DBPDataSourceContainer.class);
-        DBXTreeItem itemsMeta = Mockito.mock(DBXTreeItem.class);
-        DBSObjectFilter connectionFilter = new DBSObjectFilter();
-        connectionFilter.addInclude("prod_%");
-        DBSObjectFilter userFilter = new DBSObjectFilter();
-        userFilter.addInclude("prod_eu_%");
-        userFilter.setEnabled(false);
-
-        Mockito.when(dbNode.getDataSourceContainer()).thenReturn(dataSource);
-        Mockito.doReturn(DBSObject.class).when(dbNode).getChildrenOrFolderClass(itemsMeta);
-        Mockito.when(session.getUserContext()).thenReturn(userContext);
-
-        try (MockedStatic<DBNUtils> dbnUtils = Mockito.mockStatic(DBNUtils.class);
-             MockedStatic<UserDBSObjectFilterUtils> filterUtils = Mockito.mockStatic(UserDBSObjectFilterUtils.class)) {
-            dbnUtils.when(() -> DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)).thenReturn(itemsMeta);
-            Mockito.when(dbNode.getNodeFilter(itemsMeta, true)).thenReturn(connectionFilter);
-            filterUtils.when(() -> UserDBSObjectFilterUtils.getUserObjectFilter(
-                dataSource,
-                DBSObject.class,
-                null,
-                true
-            )).thenReturn(userFilter);
-
-            Assertions.assertSame(connectionFilter, new WebNavigatorNodeInfo(session, dbNode).getFilter());
-        }
     }
 }

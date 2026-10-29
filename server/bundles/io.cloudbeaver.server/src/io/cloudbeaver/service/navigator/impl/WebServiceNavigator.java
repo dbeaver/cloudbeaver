@@ -41,6 +41,7 @@ import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
+import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -51,7 +52,6 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
-import org.jkiss.dbeaver.registry.NavigatorObjectFilterUtils;
 import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -221,15 +221,29 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         @Nullable List<String> include,
         @Nullable List<String> exclude) throws DBWebException {
         try {
-            DBNDatabaseNode dbNode = getDatabaseNode(webSession, nodePath);
-            DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), dbNode);
-            if (WebNavigatorFilterUtils.usesConnectionFilter(webSession, dbNode)) {
-                if (!dbNode.setNodeFilter(itemsMeta, createFilter(include, exclude, false), false)) {
-                    throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
+            DBRProgressMonitor monitor = webSession.getProgressMonitor();
+
+            DBNNode node = webSession.getNavigatorModelOrThrow().getNodeByPath(monitor, nodePath);
+            if (node == null) {
+                throw new DBWebException("Navigator node '"  + nodePath + "' not found");
+            }
+            DBSObjectFilter filter = new DBSObjectFilter();
+            if (!CommonUtils.isEmpty(include)) {
+                filter.setInclude(include);
+            }
+            if (!CommonUtils.isEmpty(exclude)) {
+                filter.setExclude(exclude);
+            }
+            filter.setEnabled(true);
+            if (node instanceof DBNDatabaseNode dbNode) {
+                DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), dbNode);
+                dbNode.setNodeFilter(itemsMeta, filter, true);
+                if (node.getOwnerProject() instanceof RMControllerProvider rmControllerProvider &&
+                    hasNodeEditPermission(webSession, node, rmControllerProvider.getRMProject())
+                ) {
+                    // Save settings
+                    dbNode.getDataSourceContainer().persistConfiguration();
                 }
-                dbNode.getDataSourceContainer().persistConfiguration();
-            } else {
-                setUserFilter(dbNode, itemsMeta, createFilter(include, exclude, true));
             }
         } catch (DBException e) {
             if (e instanceof DBWebException) {
@@ -250,7 +264,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBNDatabaseNode dbNode = getDatabaseNode(webSession, nodePath);
             DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), dbNode);
-            setUserFilter(dbNode, itemsMeta, createFilter(include, exclude, true));
+            WebNavigatorFilterUtils.setUserFilter(dbNode, itemsMeta, createFilter(include, exclude));
             return true;
         } catch (DBException e) {
             if (e instanceof DBWebException) {
@@ -288,8 +302,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     @Nullable
     private DBSObjectFilter createFilter(
         @Nullable List<String> include,
-        @Nullable List<String> exclude,
-        boolean userFilter
+        @Nullable List<String> exclude
     ) {
         if (CommonUtils.isEmpty(include) && CommonUtils.isEmpty(exclude)) {
             return null;
@@ -297,18 +310,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         DBSObjectFilter filter = new DBSObjectFilter();
         filter.setInclude(include);
         filter.setExclude(exclude);
-        filter.setUserFilter(userFilter);
         return filter;
-    }
-
-    private void setUserFilter(
-        @NotNull DBNDatabaseNode node,
-        @NotNull DBXTreeItem itemsMeta,
-        @Nullable DBSObjectFilter filter
-    ) throws DBException {
-        if (!NavigatorObjectFilterUtils.setUserFilter(node, itemsMeta, filter)) {
-            throw new DBWebException("Navigator node '" + node.getNodeUri() + "' does not support object filters");
-        }
     }
 
     @Override

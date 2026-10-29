@@ -32,7 +32,6 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.navigator.DBNObjectFilterProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.security.SMControllerUtils;
@@ -40,7 +39,6 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.dbeaver.registry.NavigatorObjectFilterUtils;
 import org.jkiss.dbeaver.registry.project.BaseProjectSettings;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -116,9 +114,6 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPAdaptabl
     public <T> T getAdapter(@NotNull Class<T> adapter) {
         if (adapter == DBPObjectSettingsProvider.class) {
             return adapter.cast(projectSettings);
-        }
-        if (adapter == DBNObjectFilterProvider.class) {
-            return adapter.cast(NavigatorObjectFilterUtils.FILTER_PROVIDER);
         }
         return null;
     }

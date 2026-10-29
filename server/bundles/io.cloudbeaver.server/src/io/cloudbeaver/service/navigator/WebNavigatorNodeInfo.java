@@ -38,10 +38,8 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.DBNUtils;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
-import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
-import org.jkiss.dbeaver.registry.NavigatorObjectFilterUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -159,9 +157,10 @@ public class WebNavigatorNodeInfo {
             return false;
         }
         try {
-            DBSObjectFilter filter = NavigatorObjectFilterUtils.getUserFilter(
+            DBSObjectFilter filter = WebNavigatorFilterUtils.getUserFilter(
                 dbNode,
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
+                false
             );
             return filter != null && !filter.isNotApplicable();
         } catch (DBException e) {
@@ -234,30 +233,10 @@ public class WebNavigatorNodeInfo {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
         try {
-            DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode);
-            if (WebNavigatorFilterUtils.usesConnectionFilter(session, dbNode)) {
-                return getApplicableFilter(dbNode.getNodeFilter(itemsMeta, true));
-            }
-            DBSObjectFilter userFilter = getApplicableFilter(NavigatorObjectFilterUtils.getUserFilter(dbNode, itemsMeta));
-            if (userFilter != null) {
-                return userFilter;
-            }
-            return getApplicableFilter(dbNode.getNodeFilter(itemsMeta, true));
-        } catch (DBException e) {
-            throw new DBWebException(e);
-        }
-    }
-
-    @Property
-    @Nullable
-    public DBSObjectFilter getConnectionFilter() throws DBWebException {
-        if (!(node instanceof DBNDatabaseNode dbNode)) {
-            return null;
-        }
-        try {
-            return getApplicableFilter(dbNode.getNodeFilter(
+            DBSObjectFilter filter = dbNode.getNodeFilter(
                 DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
-                true));
+                true);
+            return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
         } catch (DBException e) {
             throw new DBWebException(e);
         }
@@ -270,9 +249,10 @@ public class WebNavigatorNodeInfo {
             return null;
         }
         try {
-            return getApplicableFilter(NavigatorObjectFilterUtils.getUserFilter(
+            return getApplicableFilter(WebNavigatorFilterUtils.getUserFilter(
                 dbNode,
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
+                true
             ));
         } catch (DBException e) {
             throw new DBWebException(e);
