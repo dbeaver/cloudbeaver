@@ -175,24 +175,28 @@ export class DataGridContextMenuGenerateSqlService {
         return;
       }
 
-      await this.commonDialogService.open(GeneratedSqlDialog, {
-        query,
-        nodeId: nodePath ?? connectionId,
-        nodeName: this.getEntityNameFromNodePath(containerNodePath, model.name),
-        generatorId,
-        generatorName: this.localizationService.translate(generatorLabel),
-        options: getDefaultQueryGeneratorOptions(),
-        regenerateQuery: options =>
-          this.generateQuery({
-            projectId,
-            connectionId,
-            contextId,
-            resultId,
-            generatorId,
-            rows,
-            options,
-          }),
-      });
+      await this.commonDialogService.open(
+        GeneratedSqlDialog,
+        {
+          query,
+          nodeId: nodePath ?? connectionId,
+          nodeName: this.getEntityNameFromNodePath(containerNodePath, model.name),
+          generatorId,
+          generatorName: this.localizationService.translate(generatorLabel),
+          options: getDefaultQueryGeneratorOptions(),
+          regenerateQuery: options =>
+            this.generateQuery({
+              projectId,
+              connectionId,
+              contextId,
+              resultId,
+              generatorId,
+              rows,
+              options,
+            }),
+        },
+        { persistent: true },
+      );
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
     }
@@ -231,15 +235,19 @@ export class DataGridContextMenuGenerateSqlService {
 
       const query = await this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, getDefaultQueryGeneratorOptions());
 
-      await this.commonDialogService.open(GeneratedSqlDialog, {
-        query,
-        nodeId: nodePathList,
-        nodeName: this.getEntityNameFromNodePath(nodePathList, model.name),
-        generatorId: createGenerator.id,
-        generatorName: createGenerator.label,
-        options: getDefaultQueryGeneratorOptions(),
-        regenerateQuery: genOptions => this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
-      });
+      await this.commonDialogService.open(
+        GeneratedSqlDialog,
+        {
+          query,
+          nodeId: nodePathList,
+          nodeName: this.getEntityNameFromNodePath(nodePathList, model.name),
+          generatorId: createGenerator.id,
+          generatorName: createGenerator.label,
+          options: getDefaultQueryGeneratorOptions(),
+          regenerateQuery: genOptions => this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
+        },
+        { persistent: true },
+      );
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
     }

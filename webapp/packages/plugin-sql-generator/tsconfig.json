@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
@@ -21,9 +24,6 @@
     },
     {
       "path": "../core-connections"
-    },
-    {
-      "path": "../core-data-context"
     },
     {
       "path": "../core-di"

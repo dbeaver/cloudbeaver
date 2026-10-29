@@ -52,12 +52,20 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
         ? payload.regenerateQuery
         : options => sqlGeneratorsResource.generateEntityQuery(payload.generatorId, [...payload.nodeIds], options),
   });
-  const { loading, busy } = state;
+  const { loading } = state;
 
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorNavigatorService = useService(SqlEditorNavigatorService);
   const navNodeManagerService = useService(NavNodeManagerService);
-  const { nodeIds, connection, catalogId, schemaId, hasFullDdl } = getGeneratedSqlContext(payload, navNodeManagerService, connectionInfoResource);
+  const nodeIds = 'nodeIds' in payload ? payload.nodeIds : [payload.nodeId];
+  const { connection, catalogId, schemaId, hasFullDdl } = getGeneratedSqlContext(
+    payload.generatorId,
+    nodeIds.map(id => ({
+      connection: connectionInfoResource.getConnectionForNode(id),
+      container: navNodeManagerService.getNodeContainerInfo(id),
+      objectFeatures: navNodeManagerService.getNode(id)?.objectFeatures ?? [],
+    })),
+  );
 
   const connectionKey = connection ? createConnectionParam(connection) : null;
   const connectionDialectResource = useResource(GeneratedSqlDialog, ConnectionDialectResource, connectionKey);
@@ -74,21 +82,26 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
     if (closing.current) {
       return;
     }
+    // Capture this dialog before confirmation becomes the active dialog.
+    const dialog = commonDialogService.dialogs.find(dialog => dialog.payload === payload);
+    if (!dialog) {
+      return;
+    }
     closing.current = true;
     try {
-      if (loading && state.canCancel) {
+      if (loading) {
         const { status } = await commonDialogService.open(ConfirmationDialog, {
           title: 'app_shared_sql_generators_cancel_title',
           message: 'app_shared_sql_generators_cancel_message',
-          confirmActionText: 'ui_cancel',
-          cancelActionText: 'ui_continue',
+          confirmActionText: 'ui_yes',
+          cancelActionText: 'ui_no',
         });
         if (status !== DialogueStateResult.Resolved) {
           return;
         }
       }
+      commonDialogService.rejectDialog(dialog.promise);
       await state.cancel();
-      rejectDialog();
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_title');
     } finally {
@@ -118,21 +131,21 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
   }
 
   return (
-    <CommonDialogWrapper size="large" aria-label={title} onClose={handleClose}>
+    <CommonDialogWrapper size="large" aria-label={title}>
       <CommonDialogHeader title={title} icon="sql-script" onReject={handleClose} />
       <CommonDialogBody noOverflow noBodyPadding>
-        {busy && (
+        {loading && (
           <div role="status" className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:w-full">
             <Loader message="app_shared_sql_generators_generating" />
           </div>
         )}
-        {!busy && state.error && !state.query && (
+        {!loading && state.error && !state.query && (
           <div role="alert" className="tw:p-4">
             {translate('app_shared_sql_generators_error_title')}
             <Button onClick={() => state.generate()}>{translate('app_shared_sql_generators_retry')}</Button>
           </div>
         )}
-        {!busy && (!state.error || !!state.query) && (
+        {!loading && (!state.error || !!state.query) && (
           <div className="tw:flex tw:items-center tw:h-full tw:w-full tw:overflow-auto">
             <SQLCodeEditor className="tw:h-full tw:w-full" value={state.query} extensions={extensions} readonly />
           </div>
@@ -144,14 +157,14 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
             <div className="tw:flex tw:flex-row tw:gap-3 tw:w-full">
               <Checkbox
                 id="use-fully-qualified-names"
-                disabled={busy}
+                disabled={loading}
                 checked={state.options.useFullyQualifiedNames ?? true}
                 label={translate('app_shared_sql_generators_use_fully_qualified_names')}
                 onChange={value => state.generate({ ...state.options, useFullyQualifiedNames: value })}
               />
               <Checkbox
                 id="compact-sql"
-                disabled={busy}
+                disabled={loading}
                 checked={state.options.compactSql ?? false}
                 label={translate('app_shared_sql_generators_compact_sql')}
                 onChange={value => state.generate({ ...state.options, compactSql: value })}
@@ -159,7 +172,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
               {hasFullDdl && (
                 <Checkbox
                   id="show-full-ddl"
-                  disabled={busy}
+                  disabled={loading}
                   checked={state.options.showFullDdl ?? false}
                   label={translate('app_shared_sql_generators_full_ddl')}
                   onChange={value => state.generate({ ...state.options, showFullDdl: value })}
@@ -173,7 +186,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
                 variant="secondary"
                 icon="/icons/export.svg"
                 title={translate('ui_download')}
-                disabled={!state.query || busy}
+                disabled={!state.query || loading}
                 className="tw:aspect-square tw:!min-w-0 tw:!px-0"
                 onClick={handleSaveToFile}
               />
@@ -181,13 +194,13 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
                 variant="secondary"
                 icon="copy"
                 title={translate('ui_copy_to_clipboard')}
-                disabled={!state.query || busy}
+                disabled={!state.query || loading}
                 className="tw:aspect-square tw:!min-w-0 tw:!px-0"
                 onClick={() => copy(state.query, true)}
               />
             </div>
             <div className="tw:flex tw:items-center tw:gap-6">
-              <Button variant="secondary" disabled={!state.query || busy} onClick={handleOpenInEditor}>
+              <Button variant="secondary" disabled={!state.query || loading} onClick={handleOpenInEditor}>
                 {translate('app_shared_sql_generators_open_in_editor')}
               </Button>
               <Button onClick={handleClose}>{translate('ui_close')}</Button>

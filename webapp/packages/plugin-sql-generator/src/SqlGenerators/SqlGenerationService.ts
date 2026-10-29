@@ -12,37 +12,37 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 import type { SqlQueryGenerator } from '@cloudbeaver/core-sdk';
 
-import { getDefaultQueryGeneratorOptions, SqlGeneratorsResource } from './SqlGeneratorsResource.js';
+import { getDefaultQueryGeneratorOptions } from './SqlGeneratorsResource.js';
 import { isSqlGenerationNode } from './sqlGenerationSelection.js';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
-@injectable(() => [SqlGeneratorsResource, CommonDialogService, NotificationService])
+@injectable(() => [CommonDialogService, NotificationService])
 export class SqlGenerationService {
   constructor(
-    private readonly sqlGeneratorsResource: SqlGeneratorsResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
   ) {}
 
   async open(nodes: readonly NavNode[], generator: SqlQueryGenerator): Promise<void> {
     try {
-      let selected = nodes.filter(isSqlGenerationNode);
-      if (nodes.length > 1) {
-        const generators = await Promise.all(selected.map(node => this.sqlGeneratorsResource.load(node.uri)));
-        selected = selected.filter((_, index) => generators[index]!.some(candidate => candidate.id === generator.id));
-      }
+      // The server generator checks applicability for each object in the batch.
+      const selected = nodes.filter(isSqlGenerationNode);
 
       const [first, ...rest] = selected;
       if (!first) {
         return;
       }
-      await this.commonDialogService.open(GeneratedSqlDialog, {
-        nodeIds: [first.uri, ...rest.map(node => node.uri)],
-        nodeName: first.name,
-        generatorId: generator.id,
-        generatorName: generator.label,
-        options: getDefaultQueryGeneratorOptions(),
-      });
+      await this.commonDialogService.open(
+        GeneratedSqlDialog,
+        {
+          nodeIds: [first.uri, ...rest.map(node => node.uri)],
+          nodeName: first.name,
+          generatorId: generator.id,
+          generatorName: generator.label,
+          options: getDefaultQueryGeneratorOptions(),
+        },
+        { persistent: true },
+      );
     } catch (error: any) {
       this.notificationService.logException(error, 'app_shared_sql_generators_error_title');
     }

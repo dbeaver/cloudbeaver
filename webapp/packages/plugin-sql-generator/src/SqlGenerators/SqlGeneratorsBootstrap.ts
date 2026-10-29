@@ -7,12 +7,13 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { getCachedMapResourceLoaderState, resourceKeyList } from '@cloudbeaver/core-resource';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_ELEMENTS_TREE } from '@cloudbeaver/plugin-navigation-tree';
 
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
-import { getSqlGenerationActions, getSqlGenerationNodes, isSqlGenerationNode } from './sqlGenerationSelection.js';
+import { getSqlGenerationNodes, isSqlGenerationNode } from './sqlGenerationSelection.js';
 import { SqlGenerationService } from './SqlGenerationService.js';
 
 @injectable(() => [SqlGeneratorsResource, SqlGenerationService, MenuService, NavNodeInfoResource])
@@ -32,10 +33,9 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       menus: [MENU_SQL_GENERATORS],
       contexts: [DATA_CONTEXT_NAV_NODE],
       getLoader: context => {
-        const nodes = getSqlGenerationNodes(context, this.navNodeInfoResource);
-        const keys = nodes.filter(isSqlGenerationNode).map(node => node.uri);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => resourceKeyList(keys));
+        return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.uri);
       },
     });
     this.menuService.addCreator({
@@ -49,8 +49,11 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       menus: [MENU_SQL_GENERATORS],
       contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        const nodes = getSqlGenerationNodes(context, this.navNodeInfoResource);
-        const actions = getSqlGenerationActions(nodes.map(node => this.sqlGeneratorsResource.get(node.uri) ?? []));
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+        // Node menus do not always expose DATA_CONTEXT_NAV_NODES.
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+        const nodes = getSqlGenerationNodes(node, tree?.getSelected().map(id => this.navNodeInfoResource.get(id)) ?? []);
+        const actions = this.sqlGeneratorsResource.get(node.uri) ?? [];
 
         return [
           ...items,

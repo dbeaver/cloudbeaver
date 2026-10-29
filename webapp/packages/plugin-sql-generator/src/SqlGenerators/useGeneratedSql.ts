@@ -25,8 +25,6 @@ interface IGeneratedSql {
   readonly options: Readonly<SqlQueryGeneratorOptions>;
   readonly error: boolean;
   readonly loading: boolean;
-  readonly busy: boolean;
-  readonly canCancel: boolean;
   generate(options?: SqlQueryGeneratorOptions): Promise<void>;
   cancel(): Promise<void>;
 }
@@ -38,8 +36,8 @@ interface IGeneratedSqlState extends ILoadableState {
   task: ITask<string> | null;
   loaded: boolean;
   loading: boolean;
-  cancelling: boolean;
   closed: boolean;
+  cancelling: boolean;
   generate(options?: SqlQueryGeneratorOptions): Promise<void>;
   cancel(): Promise<void>;
 }
@@ -54,10 +52,10 @@ export function useGeneratedSql(source: IGeneratedSqlSource): IGeneratedSql {
       task: null,
       loaded: source.query !== undefined,
       loading: false,
-      cancelling: false,
       closed: false,
+      cancelling: false,
       isLoading(): boolean {
-        return this.loading || (!this.loaded && !this.error && !this.closed);
+        return this.loading || this.cancelling || (!this.loaded && !this.error && !this.closed);
       },
       isLoaded(): boolean {
         return this.loaded;
@@ -105,14 +103,12 @@ export function useGeneratedSql(source: IGeneratedSqlSource): IGeneratedSql {
         }
       },
       async cancel(): Promise<void> {
+        this.closed = true;
         this.cancelling = true;
         try {
           if (this.task?.executing && this.task.cancellable) {
             await this.task.cancel();
           }
-          runInAction(() => {
-            this.closed = true;
-          });
         } finally {
           runInAction(() => {
             this.cancelling = false;
@@ -127,8 +123,8 @@ export function useGeneratedSql(source: IGeneratedSqlSource): IGeneratedSql {
       task: observable.ref,
       loaded: observable.ref,
       loading: observable.ref,
-      cancelling: observable.ref,
       closed: observable.ref,
+      cancelling: observable.ref,
       load: action.bound,
       generate: action.bound,
       cancel: action.bound,
@@ -143,8 +139,6 @@ export function useGeneratedSql(source: IGeneratedSqlSource): IGeneratedSql {
     options: state.options,
     error: state.error,
     loading: state.isLoading(),
-    busy: state.isLoading() || state.cancelling,
-    canCancel: state.task?.cancellable ?? false,
     generate: state.generate,
     cancel: state.cancel,
   };
