@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -196,6 +196,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         if (state.activeProvider) {
           return !authProvidersResource.resource.isAuthEnabled(state.activeProvider.id);
         }
+
         return false;
       },
       async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<void> {
@@ -297,6 +298,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   useEffect(
     () => () => {
       data.destroyed = true;
+
       if (data.authTask?.executing) {
         data.authTask?.cancel();
       }
@@ -327,6 +329,7 @@ function compareProviders(providerA: AuthProvider, providerB: AuthProvider): num
   if (providerA.defaultProvider) {
     return -1;
   }
+
   return 1;
 }
 
@@ -334,5 +337,6 @@ export function getAuthProviderTabId(provider: AuthProvider, configuration?: Aut
   if (!configuration) {
     return provider.id;
   }
+
   return provider.id + '_' + configuration.id;
 }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -111,6 +111,7 @@ export class Christmas {
     if (this.mouseMovingTimeoutId) {
       clearTimeout(this.mouseMovingTimeoutId);
     }
+
     this.mouseMovingTimeoutId = window.setTimeout(() => {
       this.isMouseMoving = false;
     }, 100);
@@ -120,6 +121,7 @@ export class Christmas {
 
   private onResize() {
     this.calculateMaxFlakesCount(window.innerWidth, window.innerHeight);
+
     if (this.canvas) {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
@@ -199,6 +201,7 @@ export class Christmas {
       if (flake.velY < flake.speed) {
         flake.velY = flake.speed;
       }
+
       flake.velX += Math.cos((flake.step += Math.random() * 0.03)) * flake.stepSize;
     }
 
@@ -247,11 +250,13 @@ export class Christmas {
     if (!this.ctx || !this.canvas) {
       return;
     }
+
     // Skip frame, keep 60 FPS
     if (timestamp - this.lastFrameTime < FRAME_DURATION) {
       requestAnimationFrame(this.renderSnow.bind(this));
       return;
     }
+
     this.lastFrameTime = timestamp;
     this.adjustFlakesCount(timestamp);
 
@@ -275,6 +280,7 @@ export class Christmas {
   start() {
     this.calculateMaxFlakesCount(window.innerWidth, window.innerHeight);
     this.isSnowFalling = true;
+
     if (!this.canvas) {
       this.createCanvas();
     }

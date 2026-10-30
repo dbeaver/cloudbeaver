@@ -33,11 +33,13 @@ const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   label: 'administration_teams_team_granted_users_user_id',
   compare: compareUsersById,
 };
+
 const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'lastLogin',
   label: 'plugin_authentication_administration_user_last_login',
   compare: compareUsersByLastLogin,
 };
+
 const TEAM_ROLE_COLUMN_KEY = 'teamRole';
 
 const COLUMNS: IGrantManagementTableColumn<AdminUser>[] = [USER_ID_COLUMN, LAST_LOGIN_COLUMN];
@@ -57,6 +59,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
   const usersLoader = useResource(GrantedUsersTable, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active,
   });
+
   const grantedUsersIdsMap = useMemo(() => new Map(tabState.state.grantedUsers.map(user => [user.userId, user])), [tabState.state.grantedUsers]);
 
   useAutoLoad(GrantedUsersTable, tabState, active);
@@ -86,11 +89,13 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     }
 
     const teamId = formState.state.teamId;
+
     if (!teamId || !user.grantedTeams.includes(teamId)) {
       return true;
     }
 
     const currentTeam = teamsResource.resource.values.find(team => team.teamId === teamId);
+
     if (!currentTeam) {
       return false;
     }

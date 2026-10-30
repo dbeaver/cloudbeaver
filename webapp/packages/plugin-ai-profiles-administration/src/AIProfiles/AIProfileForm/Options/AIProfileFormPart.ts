@@ -86,6 +86,7 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
       this.state.properties = getObjectPropertiesValues(propertiesInfo ?? []);
       this.state.global = this.state.properties[GLOBAL_PROPERTY_ID] !== false;
       this.state.properties[GLOBAL_PROPERTY_ID] = this.state.global;
+
       if (!this.aiProfileCredentialsService.isSupported(propertiesInfo ?? [])) {
         this.state.global = true;
       }
@@ -111,6 +112,7 @@ export class AIProfileFormPart extends FormPart<IAIProfileOptionsState, IAIProfi
 
   protected override validate(_: IFormState<IAIProfileFormState>, contexts: IExecutionContextProvider<IFormState<IAIProfileFormState>>): void {
     const properties = this.aiEnginePropertiesResource.get(this.state.engineId) ?? [];
+
     if (!this.state.global && !this.aiProfileCredentialsService.isSupported(properties)) {
       contexts.getContext(formValidationContext).error('plugin_ai_administration_profile_user_credentials_unsupported');
     }

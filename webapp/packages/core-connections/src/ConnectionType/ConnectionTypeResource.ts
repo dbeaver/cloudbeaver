@@ -45,6 +45,7 @@ export class ConnectionTypeResource extends CachedMapResource<string, Connection
     const { types } = await this.graphQLService.sdk.getConnectionTypes();
 
     const key = resourceKeyList(types.map(type => type.id));
+
     if (all) {
       this.replace(key, types);
     } else {

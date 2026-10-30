@@ -19,6 +19,7 @@ export const FinishPage = observer(function FinishPage() {
   const [focus] = useFocus<HTMLDivElement>({
     focusFirstChild: true,
   });
+
   const style = useS(styles);
 
   return (

@@ -56,6 +56,7 @@ export class TableHeaderService extends Bootstrap {
       1,
       props => !isResultSetDataSource(props.model.source) || props.model.source.hasFeature(DatabaseDataFeature.References),
     );
+
     this.tableHeaderPlaceholder.add(TableHeaderMenu, 2, props => props.model.source.hasFeature(DatabaseDataFeature.References));
 
     this.actionService.addHandler({

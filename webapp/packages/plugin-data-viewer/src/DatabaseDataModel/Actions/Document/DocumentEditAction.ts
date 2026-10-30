@@ -139,6 +139,7 @@ export class DocumentEditAction<
       if (document !== undefined) {
         this.data.set(id, document);
       }
+
       rowIndex++;
     }
   }
@@ -152,8 +153,10 @@ export class DocumentEditAction<
       if (document !== undefined) {
         this.data.set(id, document);
       }
+
       rowIndex++;
     }
+
     this.clear();
   }
 
@@ -184,6 +187,7 @@ export class DocumentEditAction<
       if (batch.updatedRows === undefined) {
         batch.updatedRows = [];
       }
+
       const updatedRows = batch.updatedRows as SqlResultRow[];
 
       updatedRows.push({

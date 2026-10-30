@@ -113,6 +113,7 @@ export class DataImportService {
       await this.asyncTaskInfoService.run(task);
 
       controller.resolve('plugin_data_import_process_success');
+
       return true;
     } catch (exception: any) {
       controller.reject(exception, 'plugin_data_import_process_fail');

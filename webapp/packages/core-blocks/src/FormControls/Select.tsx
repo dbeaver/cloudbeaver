@@ -118,9 +118,11 @@ export const Select: ISelectType = observer(function Select({
     if (state && changed) {
       state[name] = id;
     }
+
     if (onSelect && changed) {
       onSelect(id, name, value);
     }
+
     if (context && changed) {
       context.change(id, name);
     }

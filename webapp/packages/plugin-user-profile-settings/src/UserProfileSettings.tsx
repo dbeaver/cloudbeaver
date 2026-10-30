@@ -28,6 +28,7 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
     if (!changed) {
       return;
     }
+
     try {
       await userSettingsService.save();
       notificationService.logSuccess({ title: 'plugin_user_profile_settings_save_success' });

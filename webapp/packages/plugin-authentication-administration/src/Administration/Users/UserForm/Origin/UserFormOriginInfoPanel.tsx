@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -50,9 +50,11 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
     },
     false,
   );
+
   const userInfoLoader = useResource(UserFormOriginInfoPanel, UsersResource, state.userId, {
     active: editing,
   });
+
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const origins = userInfoLoader.data?.origins ?? [];
@@ -60,6 +62,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
   const usersOriginDetailsResource = useResource(UserFormOriginInfoPanel, UsersOriginDetailsResource, state.userId, {
     active: editing,
   });
+
   const originDetails = usersOriginDetailsResource.data?.origins?.[localState.selectedOrigin as any]?.details ?? [];
 
   const { selected } = useTab(tabId);

@@ -65,6 +65,7 @@ export class ConnectionPreferencesInfoResource extends CachedMapResource<IConnec
 
     await ResourceKeyUtils.forEachAsync(key, async connectionKey => {
       let connectionId: string | undefined;
+
       if (!isResourceAlias(connectionKey)) {
         projectId = connectionKey.projectId;
         connectionId = connectionKey.connectionId;
@@ -104,9 +105,11 @@ export class ConnectionPreferencesInfoResource extends CachedMapResource<IConnec
 
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+
     if (!parse.success) {
       this.logger.warn(`Invalid resource key ${(schemaValidationError(parse.error).toString(), { prefix: null })}`);
     }
+
     return parse.success;
   }
 }

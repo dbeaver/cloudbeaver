@@ -83,6 +83,7 @@ export const NavigationTree = observer(function NavigationTree() {
     () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
     [navNodeInfoResource, projectsService, projectsNavNodeService],
   );
+
   const transformFilteredNode = useMemo(() => transformFilteredNodeInfo(navNodeInfoResource), [navNodeInfoResource]);
   const transformDescriptionNode = useMemo(() => transformDescriptionNodeInfo(navNodeInfoResource), [navNodeInfoResource]);
   const projectFilter = useMemo(

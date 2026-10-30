@@ -57,6 +57,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
 
   async function restoreTabs() {
     setRestoring(true);
+
     try {
       await navigationTabsService.restoreTabs();
     } finally {

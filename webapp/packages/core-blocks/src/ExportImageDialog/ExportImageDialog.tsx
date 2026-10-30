@@ -58,6 +58,7 @@ export const ExportImageDialog = observer<DialogComponentProps<ExportImagePayloa
     },
     false,
   );
+
   const errorDetails = useErrorDetails(state.error);
 
   async function onExportHandler() {

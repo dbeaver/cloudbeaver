@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -50,14 +50,18 @@ export class ResourceAliases<TKey> {
   ): ResourceAlias<TKey, TOptions> | undefined {
     if (isResourceAlias(key)) {
       key = this.transformToAlias(key);
+
       if (this.has(key)) {
         if (aliasToCompare === undefined) {
           return key as ResourceAlias<TKey, TOptions>;
         }
+
         return key.find(aliasToCompare);
       }
+
       throw new Error(`Alias ${key.toString()} is not registered in ${this.logger.getName()}`);
     }
+
     return undefined;
   }
 
@@ -98,6 +102,7 @@ export class ResourceAliases<TKey> {
         if (isResourceKeyList(key) || isResourceAlias(key)) {
           paramString = key.toString();
         }
+
         this.logger.warn(`Invalid resource key ${paramString}`);
       }
 
@@ -110,6 +115,7 @@ export class ResourceAliases<TKey> {
           } else {
             return key;
           }
+
           deep++;
           break transform;
         }
@@ -117,12 +123,14 @@ export class ResourceAliases<TKey> {
     } else {
       this.logger.error('Alias transform deep limit reached');
     }
+
     return key;
   }
   transformToKey(param: ResourceKey<TKey>): TKey | ResourceKeyList<TKey> {
     let deep = 0;
 
     const transforms: Array<{ key: ResourceKeyAlias<TKey, any> | ResourceKeyListAlias<TKey, any>; alias: IParamAlias<TKey> }> = [];
+
     while (deep < 10) {
       if (!this.validateResourceKey(param)) {
         let paramString = JSON.stringify(toJS(param));
@@ -130,6 +138,7 @@ export class ResourceAliases<TKey> {
         if (isResourceKeyList(param)) {
           paramString = param.toString();
         }
+
         this.logger.warn(`Invalid resource key ${paramString}`);
       }
 
@@ -193,6 +202,7 @@ export class ResourceAliases<TKey> {
     if (isResourceKeyList(param)) {
       return param.length === 0 || param.every(this.validateKey.bind(this));
     }
+
     return this.validateKey(param);
   }
 }

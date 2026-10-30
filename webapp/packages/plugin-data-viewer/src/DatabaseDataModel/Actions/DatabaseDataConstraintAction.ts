@@ -28,6 +28,7 @@ export function persistDataFilterConstraints<TOptions extends IDatabaseDataOptio
   source: IDatabaseDataSource<TOptions, IDatabaseResultSet>,
 ): void {
   const options = source.options;
+
   if (!options) {
     return;
   }
@@ -40,6 +41,7 @@ export function applyPersistedDataFilterConstraints<TOptions extends IDatabaseDa
   source: IDatabaseDataSource<TOptions, IDatabaseResultSet>,
 ): void {
   const options = source.options;
+
   if (!options) {
     return;
   }
@@ -142,6 +144,7 @@ export class DatabaseDataConstraintAction
 
   deleteFilter(attributePosition: number): void {
     const constraint = this.get(attributePosition);
+
     if (constraint) {
       deleteLogicalOperationFromConstraint(constraint);
       this.deleteEmptyConstraint(attributePosition);
@@ -157,6 +160,7 @@ export class DatabaseDataConstraintAction
 
     for (const constraint of this.source.options.constraints) {
       deleteLogicalOperationFromConstraint(constraint);
+
       if (isOrderConstraint(constraint)) {
         newConstraints.push(constraint);
       }
@@ -174,6 +178,7 @@ export class DatabaseDataConstraintAction
 
     for (const constraint of this.source.options.constraints) {
       deleteOrderFromConstraint(constraint);
+
       if (isFilterConstraint(constraint)) {
         newConstraints.push(constraint);
       }
@@ -184,6 +189,7 @@ export class DatabaseDataConstraintAction
 
   deleteOrder(attributePosition: number): void {
     const constraint = this.get(attributePosition);
+
     if (constraint) {
       deleteOrderFromConstraint(constraint);
       this.deleteEmptyConstraint(attributePosition);
@@ -230,11 +236,13 @@ export class DatabaseDataConstraintAction
     if (currentConstraint) {
       currentConstraint.operator = operator;
       currentConstraint.attributeName = this.getColumnNameAt(attributePosition);
+
       if (value !== undefined) {
         currentConstraint.value = value;
       } else if (currentConstraint.value !== undefined) {
         delete currentConstraint.value;
       }
+
       return;
     }
 
@@ -273,6 +281,7 @@ export class DatabaseDataConstraintAction
           orderAsc: order === EOrder.asc,
         });
       }
+
       return;
     }
 
@@ -280,6 +289,7 @@ export class DatabaseDataConstraintAction
       if (!isOrderConstraint(currentConstraint)) {
         currentConstraint.orderPosition = this.getMaxOrderPosition();
       }
+
       currentConstraint.orderAsc = order === EOrder.asc;
     } else {
       if (isFilterConstraint(currentConstraint)) {
@@ -414,11 +424,13 @@ export function isOrderConstraint(constraint: SqlDataFilterConstraint): boolean 
 function deleteOrderFromConstraint(constraint: SqlDataFilterConstraint) {
   delete constraint.orderAsc;
   delete constraint.orderPosition;
+
   return constraint;
 }
 
 function deleteLogicalOperationFromConstraint(constraint: SqlDataFilterConstraint) {
   delete constraint.operator;
   delete constraint.value;
+
   return constraint;
 }

@@ -409,9 +409,11 @@ export class GridEditAction<
       if (update.type === DatabaseEditChangeType.add) {
         return offset + 1;
       }
+
       if (update.type === DatabaseEditChangeType.delete) {
         return offset - 1;
       }
+
       return offset;
     }, 0);
 
@@ -425,6 +427,7 @@ export class GridEditAction<
           if (value) {
             this.data.setRowValue(update.update.row, value);
           }
+
           this.applyResultToUpdate(update.update, value);
           this.shiftRow(update.update.row, offset);
           this.removeEmptyUpdate(update.update);
@@ -435,6 +438,7 @@ export class GridEditAction<
           if (value) {
             this.data.insertRow(update.update.row, value, 1);
           }
+
           this.applyResultToUpdate(update.update, value);
           this.shiftRow(update.update.row, offset);
           this.removeEmptyUpdate(update.update);
@@ -480,9 +484,11 @@ export class GridEditAction<
     const historyUpdates: IGridHistoryRevertData<TKey, TCell>['updates'] = updates.filter(({ key }) =>
       allKeys.has(GridDataKeysUtils.serialize(key.row)),
     );
+
     const historyDeletions: IGridHistoryRevertData<TKey, TCell>['deletions'] = deletions.filter(({ key }) =>
       allKeys.has(GridDataKeysUtils.serialize(key.row)),
     );
+
     const historyAdditions: IGridHistoryRevertData<TKey, TCell>['additions'] = additions.filter(({ key }) =>
       allKeys.has(GridDataKeysUtils.serialize(key.row)),
     );
@@ -635,9 +641,11 @@ export class GridEditAction<
   private _setRows(rows: Array<{ key: TKey; value: TCell[] }>): void {
     for (const { key, value } of rows) {
       const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
+
       for (let i = 0; i < value.length; i++) {
         update.update[i] = value[i]!;
       }
+
       this.removeEmptyUpdate(update);
     }
   }
@@ -678,6 +686,7 @@ export class GridEditAction<
 
   private getNextRowAdd(row: IGridRowKey): IGridRowKey {
     let i = row.subIndex + 1;
+
     while (this.editorData.has(GridDataKeysUtils.serialize({ ...row, subIndex: i }))) {
       i++;
     }
@@ -694,6 +703,7 @@ export class GridEditAction<
         index: update.row.index + shift,
         subIndex: 0,
       };
+
       this.editorData.delete(key);
       this.editorData.set(GridDataKeysUtils.serialize(update.row), update);
     }
@@ -728,6 +738,7 @@ export class GridEditAction<
         source,
         update: observable([...(source || update || [])]),
       });
+
       created = true;
     }
 

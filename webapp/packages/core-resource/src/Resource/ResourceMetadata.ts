@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -60,11 +60,13 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
   every(param: ResourceKey<TKey> | ((metadata: TMetadata) => boolean), predicate?: (metadata: TMetadata) => boolean): boolean {
     if (!predicate) {
       predicate = param as (metadata: TMetadata) => boolean;
+
       for (const metadata of this.values()) {
         if (!predicate(metadata)) {
           return false;
         }
       }
+
       return true;
     }
 
@@ -83,11 +85,13 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
   some(param: ResourceKey<TKey> | MetadataCallback<TMetadata, boolean>, predicate?: MetadataCallback<TMetadata, boolean>): boolean {
     if (!predicate) {
       predicate = param as (metadata: TMetadata) => boolean;
+
       for (const metadata of this.values()) {
         if (predicate(metadata)) {
           return true;
         }
       }
+
       return false;
     }
 
@@ -131,6 +135,7 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
       if (!this.has(key)) {
         return map(undefined);
       }
+
       return map(this.get(key));
     };
 
@@ -165,9 +170,11 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
   update(key: ResourceKey<TKey> | MetadataCallback<TMetadata>, callback?: MetadataCallback<TMetadata>): void {
     if (!callback) {
       callback = key as MetadataCallback<TMetadata>;
+
       for (const metadata of this.values()) {
         callback(metadata);
       }
+
       return;
     }
 

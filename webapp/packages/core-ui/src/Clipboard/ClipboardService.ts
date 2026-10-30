@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ export class ClipboardService {
   write(value: string, notify: boolean): void {
     try {
       copyToClipboard(value);
+
       if (notify) {
         this.notificationService.notify({ title: 'ui_copy_to_clipboard_copied' }, ENotificationType.Info);
       }
@@ -75,6 +76,7 @@ export class ClipboardService {
 
     this.clipboardAvailable = true;
     await this.updatePermissionStatus();
+
     if (this.readPermission) {
       this.readPermission.addEventListener('change', () => {
         this.permissionUpdate++;

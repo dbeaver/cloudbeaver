@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ export class ScriptPreviewService {
       if (script === null) {
         throw new Error('Script is not provided');
       }
+
       let connectionKey: IConnectionInfoParams | null = null;
 
       if (model.source.executionContext?.context) {
@@ -65,6 +66,7 @@ export class ScriptPreviewService {
       contextId: executionContext.id,
       resultsId: result.id,
     };
+
     let editor: ResultSetEditAction | DocumentEditAction | undefined;
 
     if (result.dataFormat === ResultDataFormat.Resultset) {

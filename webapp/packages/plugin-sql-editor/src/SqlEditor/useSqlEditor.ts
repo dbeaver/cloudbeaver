@@ -76,14 +76,18 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
   const key = getComputed(() => {
     const executionContext = model.dataSource?.executionContext;
+
     if (executionContext) {
       const context = connectionExecutionContextService.get(executionContext.id)?.context;
+
       if (context) {
         return createConnectionParam(context.projectId, context.connectionId);
       }
     }
+
     return null;
   });
+
   const connectionDialectLoader = useResource(useSqlEditor, ConnectionDialectResource, key);
 
   const data = useObservableRef<ISQLEditorDataPrivate>(
@@ -138,6 +142,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         const key = createConnectionParam(executionContext.projectId, executionContext.connectionId);
+
         return (
           !!this.model.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.sqlEditorPermissionService.isScriptExecutionEnabled(key)
         );
@@ -189,6 +194,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         this.onExecute.execute(true);
+
         try {
           this.readonlyState = true;
           const formatted = await this.sqlDialectInfoService.formatScript(this.model.dataSource.executionContext, script.query);
@@ -325,10 +331,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.onExecute.execute(true);
 
         const id = setTimeout(() => this.onSegmentExecute.execute({ segment, type: 'start' }), 250);
+
         try {
           const result = await action(segment);
           clearTimeout(id);
           this.onSegmentExecute.execute({ segment, type: 'end' });
+
           return result;
         } catch (exception: any) {
           clearTimeout(id);

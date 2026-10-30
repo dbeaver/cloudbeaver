@@ -72,6 +72,7 @@ export class AIChatFunctionsService {
 
   private async openEditor(params: schema.infer<typeof FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA>) {
     const context = this.aiChatContextService.currentContext;
+
     if (params.newEditor === false && this.sqlEditorNavigatorService.openRecentEditor(context?.connectionKey || undefined)) {
       return;
     }

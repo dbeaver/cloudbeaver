@@ -169,6 +169,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         } else {
           key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
         }
+
         selectionAction.focus(key as IGridDataKey);
       }
 
@@ -179,6 +180,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         } else {
           focusSyncRef.current = null;
         }
+
         return;
       }
 
@@ -204,6 +206,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     edit(position) {
       const colIdx = tableData.getColumnIndexFromColumnKey(position.column);
       const rowIdx = tableData.getRowIndexFromKey(position.row);
+
       if (colIdx !== -1) {
         dataGridRef.current?.openEditor({ colIdx, rowIdx });
       }
@@ -314,6 +317,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       dataGridRef.current?.refreshSearch();
 
       const key = getKeyFromHistoryEntry(entry);
+
       if (!key) {
         return;
       }
@@ -360,6 +364,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const handleScrollToBottom = useCallback(async () => {
     const result = model.source.getResult(resultIndex);
+
     if (result?.loadedFully) {
       return;
     }
@@ -386,16 +391,19 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     onValueChange => reaction(() => tableData.columns.length, onValueChange),
     [tableData],
   );
+
   const rowsCount = useCreateGridReactiveValue(
     () => tableData.rows.length,
     onValueChange => reaction(() => tableData.rows.length, onValueChange),
     [tableData],
   );
+
   const headerHeight = getComputed(() => (tableData.hasDescription ? HEADER_WITH_DESC_HEIGHT : HEADER_HEIGHT));
 
   function getCell(rowIdx: number, colIdx: number) {
     return <CellFormatter rowIdx={rowIdx} colIdx={colIdx} />;
   }
+
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), []);
 
   function getCellText(rowIdx: number, colIdx: number) {
@@ -419,6 +427,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (colIdx === 0) {
       return 60;
     }
+
     return null;
   }
 
@@ -479,7 +488,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (!isResultSetDataModel(model)) {
       return false;
     }
+
     const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
+
     return (
       Boolean(tableData.getColumn(colIdx) && constraintsAction?.supported && isResultSetDataModel(model) && !model.isDisabled(resultIndex)) &&
       colIdx !== 0
@@ -496,12 +507,16 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     if (!isResultSetDataModel(model)) {
       return null;
     }
+
     const constraintsAction = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
     const column = tableData.getColumn(colIdx)?.key;
+
     if (!column || !constraintsAction?.supported) {
       return null;
     }
+
     const resultColumn = tableData.getColumnInfo(column);
+
     return resultColumn ? constraintsAction?.getOrder(resultColumn.position) : null;
   }
 
@@ -524,6 +539,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   async function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
     const column = tableData.getColumn(colIdx)?.key;
+
     if (!column) {
       return;
     }

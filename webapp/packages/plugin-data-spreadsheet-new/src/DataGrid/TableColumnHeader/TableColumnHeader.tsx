@@ -51,11 +51,13 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
 
     return '';
   });
+
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
   const hasElementIdentifier = getComputed(() => {
     const source = model.source;
     return isResultSetDataSource(source) ? source.hasElementIdentifier(resultIndex) : false;
   });
+
   const rowIdentifierInfo = getComputed(() => {
     const source = model.source;
     return isResultSetDataSource(source) ? source.getRowIdentifierInfo(resultIndex) : null;
@@ -93,11 +95,14 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
 
   const isKeyColumn = getComputed(() => {
     const identifier = rowIdentifierInfo?.identifier;
+
     if (!identifier || !columnRawName) {
       return false;
     }
+
     return identifier.attributes.some(attr => attr.name === columnRawName);
   });
+
   const keyTooltip = isKeyColumn
     ? translate(rowIdentifierInfo?.state === 'VIRTUAL_KEY' ? 'data_grid_table_virtual_key_tooltip' : 'data_grid_table_key_column_tooltip')
     : undefined;

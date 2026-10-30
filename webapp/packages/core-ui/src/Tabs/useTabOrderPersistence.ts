@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ export function useTabOrderPersistence(persistenceKey: string, getTabIds: () => 
       tabs.toSorted((a, b) => {
         const orderA = tabsPersisted[a] ?? Number.MAX_SAFE_INTEGER;
         const orderB = tabsPersisted[b] ?? Number.MAX_SAFE_INTEGER;
+
         return orderA - orderB;
       }),
     [tabsPersisted],
@@ -40,6 +41,7 @@ export function useTabOrderPersistence(persistenceKey: string, getTabIds: () => 
         },
         {} as Record<string, number>,
       );
+
       Object.assign(tabsPersisted, orderMap);
     },
     [getTabIds, sortTabs, tabsPersisted],

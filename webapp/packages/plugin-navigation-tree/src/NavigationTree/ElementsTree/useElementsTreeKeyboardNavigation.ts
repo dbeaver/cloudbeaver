@@ -28,6 +28,7 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
 
     if (node) {
       expandingNodes.add(nodeId);
+
       try {
         await tree.expand(node, state);
       } finally {
@@ -88,6 +89,7 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
         if (nextNodeId) {
           await selectAndFocus(nextNodeId);
         }
+
         return;
       }
 
@@ -103,11 +105,13 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
               await selectAndFocus(parentId);
             }
           }
+
           break;
         case 'ArrowRight':
           if (node.hasChildren) {
             await expandNode(nodeId, true);
           }
+
           break;
         case 'Enter':
           await tree.open(node, navNodeInfoResource.getParents(nodeId), !node.hasChildren);

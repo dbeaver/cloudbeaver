@@ -32,6 +32,7 @@ export class AIProfileCredentialsService {
     }
 
     const formState = this.aiProfileCredentialsFormService.create(profile.id);
+
     if (!formState) {
       return;
     }

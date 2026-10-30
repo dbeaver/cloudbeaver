@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ interface Props {
 export const SettingsGroupTitle = observer<Props>(function SettingsGroupTitle({ group }) {
   const translate = useTranslate();
   const styles = useS(style);
+
   return (
     <div className={s(styles, { box: true })}>
       {group.parent && group.parent !== ROOT_SETTINGS_GROUP && (

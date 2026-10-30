@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -84,12 +84,15 @@ export class GridConditionalFormattingAction<
       type: 'single',
       parameters: observable({}),
     });
+
     this.rules.push(rule);
+
     return rule;
   }
 
   deleteRule(id: string): void {
     const index = this.rules.findIndex(rule => rule.id === id);
+
     if (index >= 0) {
       this.rules.splice(index, 1);
     }
@@ -109,12 +112,14 @@ export class GridConditionalFormattingAction<
 
     const formatting: ICellFormatting = {};
     let formatted = false;
+
     for (const rule of this.rules) {
       if (rule.column && !GridDataKeysUtils.isEqual(rule.column, ALL_COLUMNS.key) && !GridDataKeysUtils.isEqual(rule.column, key.column)) {
         continue;
       }
 
       const ruleData = rule.type === 'scale' ? COLOR_SCALE_RULE : DEFAULT_FORMAT_RULES.find(r => r.id === rule.ruleId);
+
       if (!ruleData) {
         continue;
       }
@@ -130,11 +135,13 @@ export class GridConditionalFormattingAction<
             ruleData.formatting,
             'text-decoration',
           );
+
           formatting.textDecoration = Array.isArray(textDecoration) ? textDecoration.join(' ') : textDecoration;
           formatted = true;
         }
       } else if (this.format.isNumber(holder)) {
         const cellValue = valueGetter.number;
+
         if (isNaN(cellValue)) {
           continue;
         }
@@ -185,13 +192,16 @@ export class GridConditionalFormattingAction<
   private getSortedValuesCache(key: TKey): number[] {
     const cacheKey = GridDataKeysUtils.serializeElementKey(key);
     let cached = this.sortedValueCache.get(cacheKey);
+
     if (!cached) {
       cached = this.view.rowKeys
         .map(row => this.format.getNumber(this.format.get({ row, column: key.column } as TKey)))
         .filter(v => !isNaN(v))
         .sort((a, b) => a - b);
+
       this.sortedValueCache.set(cacheKey, cached);
     }
+
     return cached;
   }
 

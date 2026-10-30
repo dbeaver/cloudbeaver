@@ -54,6 +54,7 @@ export class CoreSessionActionsBootstrap extends Bootstrap {
           });
 
           this.sessionActionsEventHandler.cancelAuth(actionId);
+
           return;
         }
       }

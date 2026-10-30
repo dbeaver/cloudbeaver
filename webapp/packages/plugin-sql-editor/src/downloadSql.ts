@@ -30,5 +30,6 @@ export function downloadSql(name: string, script: string): void {
   const blob = new Blob([script], {
     type: 'application/sql',
   });
+
   download(blob, `${sanitizedName}.sql`);
 }

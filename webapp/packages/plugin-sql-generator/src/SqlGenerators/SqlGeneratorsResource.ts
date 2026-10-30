@@ -22,6 +22,7 @@ export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => (
   compactSql: false,
   showFullDdl: false,
 });
+
 export const DDL_GENERATOR_ID = 'tableDDL';
 
 @injectable(() => [GraphQLService, AsyncTaskInfoService, NavNodeInfoResource])
@@ -64,16 +65,19 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     if (isResourceAlias(key)) {
       throw new Error('Aliases not supported by this resource.');
     }
+
     const values = new Map();
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const { generators } = await this.graphQLService.sdk.sqlEntityQueryGenerators({
         nodePathList: key,
       });
+
       values.set(key, generators);
     });
 
     this.set(resourceKeyList(Array.from(values.keys())), Array.from(values.values()));
+
     return this.data;
   }
 

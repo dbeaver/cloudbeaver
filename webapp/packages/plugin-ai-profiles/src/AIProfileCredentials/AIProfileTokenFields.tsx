@@ -37,10 +37,13 @@ export const AIProfileTokenFields = observer<Props>(function AIProfileTokenField
       message: 'plugin_ai_credentials_reset_confirmation',
       confirmActionText: 'plugin_ai_credentials_reset',
     });
+
     if (status !== DialogueStateResult.Resolved) {
       return;
     }
+
     setResetting(true);
+
     try {
       await aiProfilesResource.resetCredentials(profile.id);
     } catch (exception: any) {

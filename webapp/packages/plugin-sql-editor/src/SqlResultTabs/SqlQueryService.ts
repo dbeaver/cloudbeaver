@@ -108,11 +108,13 @@ export class SqlQueryService {
     }
 
     let first = true;
+
     for (const model of databaseModels) {
       this.tableViewerStorageService.add(model);
       this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
 
       let tabGroup = this.sqlQueryResultService.getModelGroup(editorState, model.id);
+
       if (!tabGroup) {
         tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, model.source.options?.query ?? '');
 
@@ -128,6 +130,7 @@ export class SqlQueryService {
             }
           }
         });
+
         first = false;
       }
     }
@@ -169,6 +172,7 @@ export class SqlQueryService {
           this.graphQLService,
           this.asyncTaskInfoService,
         );
+
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerService.trackDataAccess(model);
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
@@ -209,16 +213,19 @@ export class SqlQueryService {
         this.sqlQueryResultService.removeGroup(editorState, tabGroup!.groupId);
         const message = 'Query execution has been canceled';
         this.notificationService.logException(exception, 'Query execution Error', message);
+
         return;
       } else if (!source) {
         this.notificationService.logException(exception, 'Query execution Error', exception.message);
       }
+
       throw exception;
     }
   }
 
   async executeQueries(editorState: ISqlEditorTabState, queries: string[], options?: IQueryExecutionOptions): Promise<void> {
     await this.onQueryExecution.execute(editorState);
+
     try {
       const dataSource = this.sqlDataSourceService.get(editorState.editorId);
 
@@ -271,10 +278,12 @@ export class SqlQueryService {
             this.graphQLService,
             this.asyncTaskInfoService,
           );
+
           model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
           this.dataViewerService.trackDataAccess(model);
           this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
         }
+
         statistics.modelId = model.id;
 
         const isOutputLogsTabOpened = !!editorState.outputLogsTab;
@@ -328,6 +337,7 @@ export class SqlQueryService {
 
             model = source = undefined;
           }
+
           options?.onQueryExecuted?.(query, i, false);
           break;
         }
@@ -354,6 +364,7 @@ export class SqlQueryService {
     model.onRequest.addPostHandler(({ stage }) => {
       if (stage === 'request') {
         const activeGroupId = this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId;
+
         for (const result of model.source.getResults()) {
           const editor = model.source.tryGetAction(result, IDatabaseDataEditAction);
 

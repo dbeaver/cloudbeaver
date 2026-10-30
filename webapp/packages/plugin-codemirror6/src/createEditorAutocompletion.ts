@@ -19,11 +19,13 @@ export const EDITOR_START_COMPLETION_KEYBINDING: KeyBinding = {
   run: startCompletion,
   preventDefault: true,
 };
+
 export const EDITOR_ACCEPT_COMPLETION_KEYBINDING: KeyBinding = {
   key: 'Tab',
   run: acceptCompletion,
   preventDefault: true,
 };
+
 export const EDITOR_ACCEPT_COMPLETION_ALTERNATIVE_KEYBINDING: KeyBinding = {
   key: 'Enter',
   run: acceptCompletion,

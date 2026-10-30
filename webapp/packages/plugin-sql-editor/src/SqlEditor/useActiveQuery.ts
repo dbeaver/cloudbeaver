@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -67,18 +67,21 @@ export function useActiveQuery(state: ISQLEditorData): void {
             } else {
               sqlEditorData.setScript(query, undefined, sqlEditorData.model.cursor);
             }
+
             break;
           case 'append':
             {
               const newScript = sqlEditorData.value + query;
               sqlEditorData.setScript(newScript, undefined, { anchor: newScript.length, head: newScript.length });
             }
+
             break;
           case 'prepend':
             {
               const newScript = query + sqlEditorData.value;
               sqlEditorData.setScript(newScript, undefined, { anchor: 0, head: 0 });
             }
+
             break;
         }
       },

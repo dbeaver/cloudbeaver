@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ const DEFAULT_CONTENT_TYPE = 'text/plain';
 
 export function useContentType({ model, formatAction, currentContentType, elementKey, displayed }: UseContentTypeArgs): string {
   const autoContentType = useAutoContentType({ displayed, formatAction, model, elementKey });
+
   if (displayed.length === 0) {
     return currentContentType || DEFAULT_CONTENT_TYPE;
   }

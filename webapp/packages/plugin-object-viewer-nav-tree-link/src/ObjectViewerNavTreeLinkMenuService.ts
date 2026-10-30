@@ -37,6 +37,7 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
         const navNode = this.connectionSchemaManagerService.activeNavNode;
+
         return !navNode?.nodeId.startsWith(tree.baseRoot);
       },
       handler: this.elementsTreeActionHandler.bind(this),
@@ -78,6 +79,7 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
         for (const loader of this.connectionSchemaManagerService.currentObjectLoaders) {
           await loader.load();
         }
+
         const navNode = this.connectionSchemaManagerService.activeNavNode;
 
         if (navNode) {
