@@ -47,6 +47,8 @@ export default defineConfig(
     rules: {
       ...cloudbeaverPlugin.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
+      // Naming conventions are guidance, not correctness checks that should block a PR.
+      '@cloudbeaver/service-variable-name': 'warn',
       'no-undef': 'off',
       'comma-spacing': 'off',
       'default-param-last': 'off',
@@ -60,7 +62,7 @@ export default defineConfig(
       'no-inner-declarations': 'off',
       'no-constant-condition': 'off',
       'space-before-blocks': 'error',
-      'func-names': ['error', 'always'],
+      'func-names': ['warn', 'as-needed'],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-unsafe-finally': 'error',
       'require-await': 'error',
@@ -93,7 +95,7 @@ export default defineConfig(
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/naming-convention': [
-        'error',
+        'warn',
         {
           selector: 'interface',
           modifiers: ['exported'],

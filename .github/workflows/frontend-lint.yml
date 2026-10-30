@@ -37,6 +37,7 @@ jobs:
 
       - run: |
           yarn install --immutable
+          yarn workspace @cloudbeaver/eslint-config test
           git fetch origin "${{ github.base_ref }}" --depth=1
           FILES=$(git diff --name-only 'origin/${{ github.base_ref }}' ${{ github.sha }} -- . | sed 's|^webapp/||')
           if [ -n "$FILES" ]; then
