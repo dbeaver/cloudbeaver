@@ -112,6 +112,7 @@ export class NavNodeContextMenuService extends Bootstrap {
                   return false;
                 }
               }
+
               return true;
             };
 
@@ -130,6 +131,7 @@ export class NavNodeContextMenuService extends Bootstrap {
                 save(result);
               }
             }
+
             break;
           }
         }
@@ -166,6 +168,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             } catch (exception: any) {
               this.notificationService.logException(exception, 'app_navigationTree_refresh_error');
             }
+
             break;
           }
         }
@@ -224,6 +227,7 @@ export class NavNodeContextMenuService extends Bootstrap {
           if (items.length > 0) {
             items.push(new MenuSeparatorItem());
           }
+
           items.push(...actionsRefresh);
         }
 

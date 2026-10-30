@@ -15,6 +15,7 @@ export function validateSSHConfig(state: NetworkHandlerConfigInput, initialState
   }
 
   const port = Number(String(state.properties?.['port'] ?? '').trim());
+
   if (isNaN(port) || port < 1) {
     errors.push("Field SSH 'Port' must be a positive number");
   }

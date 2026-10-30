@@ -53,6 +53,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
       const teamIndex = COLUMNS.findIndex(column => column.key === TEAM_COLUMN.key);
 
       result.splice(teamIndex + 1, 0, ROLE_COLUMN);
+
       return result;
     }
 
@@ -138,6 +139,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
     if (column.key === LAST_LOGIN_COLUMN.key) {
       const lastLoginFullTime = row.lastLoginTime ? new Date(row.lastLoginTime).toLocaleString() : '-';
       const lastLoginDate = row.lastLoginTime ? new Date(row.lastLoginTime).toLocaleDateString() : '-';
+
       return <span title={lastLoginFullTime}>{lastLoginDate}</span>;
     }
 

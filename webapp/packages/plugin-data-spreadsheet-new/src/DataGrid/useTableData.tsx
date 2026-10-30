@@ -114,6 +114,7 @@ export function useTableData(
 
         const firstIndex = Math.min(startIndex, endIndex);
         const lastIndex = Math.max(startIndex, endIndex);
+
         return this.columns.slice(firstIndex, lastIndex + 1);
       },
       getEditionState(key) {
@@ -146,11 +147,13 @@ export function useTableData(
 
         const source = dataContent.source;
         const hasElementIdentifier = isResultSetDataSource(source) ? source.hasElementIdentifier(this.view.resultIndex) : false;
+
         if (!hasElementIdentifier && editionState !== DatabaseEditChangeType.add) {
           return false;
         }
 
         const holder = this.getCellHolder(key);
+
         if (this.format.isBinary(holder) || this.format.isGeometry(holder) || this.dataContent.isTextTruncated(holder)) {
           return false;
         }

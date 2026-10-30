@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,11 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   dataFormat,
 }) {
   const model = unknownModel as any;
+
   if (!isResultSetDataModel(model)) {
     throw new Error('TextValuePresentation can be used only with ResultSetDataSource');
   }
+
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const dataViewerService = useService(DataViewerService);
@@ -58,9 +60,11 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       },
     }),
   );
+
   const cellHolder = (firstSelectedCell ? formatAction.get(firstSelectedCell) : undefined) as
     | IDatabaseValueHolder<IGridDataKey, IResultSetValue>
     | undefined;
+
   const textValueGetter = useTextValueGetter({
     cellHolder,
     contentAction,
@@ -69,6 +73,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     dataFormat,
     contentType: tabId,
   });
+
   const autoLineWrapping = getDefaultLineWrapping(tabId);
   const lineWrapping = state.lineWrapping ?? autoLineWrapping;
   const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cellHolder, formatAction, editAction });

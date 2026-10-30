@@ -78,6 +78,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         if (this.column.key === null || this.row === undefined) {
           return undefined;
         }
+
         return { row: this.row, column: this.column.key };
       },
       get isSelected(): boolean {
@@ -158,6 +159,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
             event.shiftKey,
             false,
           );
+
           return;
         }
 

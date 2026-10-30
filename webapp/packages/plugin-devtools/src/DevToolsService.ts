@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ export class DevToolsService {
     if (!this.isOverride) {
       return this.serverConfigResource.data?.configurationMode ?? false;
     }
+
     return this.settings.configuration ?? this.serverConfigResource.data?.configurationMode ?? false;
   }
 
@@ -57,6 +58,7 @@ export class DevToolsService {
     makeObservable<this, 'settings'>(this, {
       settings: observable,
     });
+
     this.storageService.registerSettings(DEVTOOLS, this.settings, getDefaultDevToolsSettings);
     this.serverConfigResource.onDataUpdate.addHandler(this.syncSettingsOverride.bind(this));
   }
@@ -87,6 +89,7 @@ export class DevToolsService {
         if (this.settings.distributed !== null) {
           this.serverConfigResource.data.distributed = this.isDistributed;
         }
+
         if (this.settings.configuration !== null) {
           this.serverConfigResource.data.configurationMode = this.isConfiguration;
         }

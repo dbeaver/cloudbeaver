@@ -28,6 +28,7 @@ export class AIProfilesAdministrationBootstrap extends Bootstrap {
       order: 2,
       panel: () => AIProfilesPanel,
     });
+
     this.aiAdministrationBootstrap.administrationItem.sub.push({ name: EAIAdministrationSub.Profiles });
   }
 }

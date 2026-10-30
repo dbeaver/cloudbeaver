@@ -65,7 +65,9 @@ export function useForm(options?: IOptions): IFormContext {
           if (this.ref) {
             this.ref.removeEventListener('submit', this.submit);
           }
+
           this.ref = ref;
+
           if (ref) {
             ref.addEventListener('submit', this.submit);
           }
@@ -84,12 +86,14 @@ export function useForm(options?: IOptions): IFormContext {
           (event.ctrlKey || event.metaKey) &&
           this.disableEnterSubmit === false &&
           event.target instanceof HTMLTextAreaElement;
+
         const isEnterSubmit = event.key === 'Enter' && this.disableEnterSubmit === false && event.target instanceof HTMLInputElement;
 
         if (this.parent) {
           this.parent.keyDown(event);
         } else if (isCtrlEnterSubmit || isEnterSubmit) {
           event.preventDefault();
+
           if (this.ref) {
             this.ref?.requestSubmit();
           } else {
@@ -112,6 +116,7 @@ export function useForm(options?: IOptions): IFormContext {
         if (this.parent) {
           return this.parent.reportValidity();
         }
+
         return this.ref?.reportValidity() ?? false;
       },
       validate() {
@@ -124,6 +129,7 @@ export function useForm(options?: IOptions): IFormContext {
           if (interrupted) {
             context.ref?.reportValidity();
           }
+
           return interrupted === false;
         }
       },

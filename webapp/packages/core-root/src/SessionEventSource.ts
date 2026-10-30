@@ -163,6 +163,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
         } catch (err) {
           observer.error(err);
         }
+
         subscription.unsubscribe();
       };
     });
@@ -188,6 +189,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
       if (this.disconnected) {
         return this.disconnectSubject.pipe(filter(disconnected => !disconnected));
       }
+
       return of(true);
     });
   }
@@ -222,10 +224,12 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     if (isNetworkFetchError(error)) {
       const networkError = new NetworkError('Server is not available. Please check your network connection and try again.', { cause: error });
       this.errorSubject.next(networkError);
+
       return throwError(() => networkError);
     }
 
     this.errorSubject.next(new ServiceError('Transport error', { cause: error }));
+
     return throwError(() => error);
   }
 }

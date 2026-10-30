@@ -255,6 +255,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       async closeOthers(tabId: string) {
         if (dynamic.tabList) {
           const tabs = dynamic.tabList.filter(tab => tab !== tabId);
+
           for (const tab of tabs) {
             await this.close(tab);
           }

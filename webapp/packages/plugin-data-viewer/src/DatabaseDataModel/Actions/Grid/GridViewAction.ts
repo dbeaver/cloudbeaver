@@ -100,20 +100,24 @@ export class GridViewAction<
 
   get columnsOrder(): number[] {
     const stored = this.readRefs(COLUMN_ORDER_KEY);
+
     if (stored.length === 0) {
       return this.defaultOrder;
     }
+
     return this.resolveRefs(stored) ?? this.defaultOrder;
   }
 
   get pinnedColumns(): ReadonlySet<string> {
     const resolved = this.resolveRefs(this.readRefs(PINNED_COLUMNS_KEY));
     const pinned = new Set<string>();
+
     if (resolved) {
       for (const index of resolved) {
         pinned.add(GridDataKeysUtils.serialize({ index }));
       }
     }
+
     return pinned;
   }
 
@@ -168,12 +172,14 @@ export class GridViewAction<
 
   setColumnOrder(key: IGridColumnKey, index: number): void {
     const ref = this.getColumnRef(key);
+
     if (!ref) {
       return;
     }
 
     const current = this.columnKeys.map(k => this.getColumnRef(k)).filter(isDefined);
     const from = current.findIndex(r => isSameRef(r, ref));
+
     if (from === -1) {
       return;
     }
@@ -209,6 +215,7 @@ export class GridViewAction<
         row = this.rowKeys[this.rowKeys.length - 1];
       }
     }
+
     if (columnKeyIndex === -1 && column) {
       column = this.columnKeys.find(key => key.index >= column!.index);
 
@@ -256,6 +263,7 @@ export class GridViewAction<
     this.mutatePinned(columns => {
       for (const key of keys) {
         const ref = this.getColumnRef(key);
+
         if (ref && !columns.some(r => isSameRef(r, ref))) {
           columns.push(ref);
         }
@@ -267,10 +275,13 @@ export class GridViewAction<
     this.mutatePinned(columns => {
       for (const key of keys) {
         const ref = this.getColumnRef(key);
+
         if (!ref) {
           continue;
         }
+
         const idx = columns.findIndex(r => isSameRef(r, ref));
+
         if (idx !== -1) {
           columns.splice(idx, 1);
         }
@@ -315,6 +326,7 @@ export class GridViewAction<
     if (key.index < 0 || key.index >= this.data.columns.length) {
       throw new Error('Column is out of range');
     }
+
     return this.data.getColumn(key)!;
   }
 
@@ -323,6 +335,7 @@ export class GridViewAction<
 
     for (const key of [COLUMN_ORDER_KEY, PINNED_COLUMNS_KEY]) {
       const stored = this.readRefs(key);
+
       if (stored.length > 0 && this.resolveRefs(stored) === null) {
         this.source.persistedState.set(key, []);
       }
@@ -346,9 +359,11 @@ export class GridViewAction<
 
   private readRefs(key: string): IColumnRef[] {
     const stored = this.source.persistedState.get<unknown>(key);
+
     if (!Array.isArray(stored)) {
       return [];
     }
+
     return stored.filter(isColumnRef);
   }
 
@@ -357,6 +372,7 @@ export class GridViewAction<
       .filter(key => this.isColumnPinned(key))
       .map(key => this.getColumnRef(key))
       .filter(isDefined);
+
     mutate(columns);
     this.source.persistedState.set(PINNED_COLUMNS_KEY, columns);
   }
@@ -367,13 +383,17 @@ export class GridViewAction<
     }
 
     const byKey = new Map<string, number[]>();
+
     for (let i = 0; i < this.data.columns.length; i++) {
       const current = this.getColumnRef({ index: i });
+
       if (!current) {
         continue;
       }
+
       const k = refKey(current);
       const list = byKey.get(k);
+
       if (list) {
         list.push(i);
       } else {
@@ -386,13 +406,17 @@ export class GridViewAction<
 
     for (const ref of refs) {
       const candidates = byKey.get(refKey(ref));
+
       if (!candidates) {
         return null;
       }
+
       const available = candidates.filter(i => !used.has(i));
+
       if (available.length !== 1) {
         return null;
       }
+
       resolved.push(available[0]!);
       used.add(available[0]!);
     }

@@ -61,9 +61,11 @@ export function isBindingPressed<T extends HTMLElement>(event: KeyboardEvent<T>,
     if (!!parsed.shift !== event.shiftKey) {
       return false;
     }
+
     if (!!parsed.alt !== event.altKey) {
       return false;
     }
+
     if (parsed.mod) {
       if (!mod) {
         return false;
@@ -72,6 +74,7 @@ export function isBindingPressed<T extends HTMLElement>(event: KeyboardEvent<T>,
       if (event.ctrlKey !== !!parsed.ctrl) {
         return false;
       }
+
       if (event.metaKey !== !!parsed.meta) {
         return false;
       }

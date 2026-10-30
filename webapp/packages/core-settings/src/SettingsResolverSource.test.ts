@@ -55,6 +55,7 @@ export class MemorySettingsService extends EditableSettingsSource {
   restoreDefaults() {
     this.update(() => {
       this.clear();
+
       for (const key of this.settings.keys()) {
         this.resetValue(key);
       }

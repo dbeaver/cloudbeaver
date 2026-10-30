@@ -95,6 +95,7 @@ export class AIChatMessageActionsService {
           [AI_CHAT_ID_METADATA_KEY]: conversationId,
         },
       });
+
       const tabContext = contextProvider.getContext(this.navigationTabsService.navigationTabContext);
 
       if (tabContext.tab) {
@@ -137,9 +138,11 @@ export class AIChatMessageActionsService {
     const isScriptTab = this.isApplicableSqlEditorTab(connectionKey, conversationId, 'editor');
 
     const tabs = [...this.navigationTabsService.findTabs<ISqlEditorTabState>(isScriptTab)];
+
     if (currentTab && isScriptTab(currentTab)) {
       tabs.unshift(currentTab);
     }
+
     const tab = tabs.find(tab => tab.handlerState.metadata?.[AI_CHAT_ID_METADATA_KEY] === conversationId) ?? tabs[0];
 
     if (tab) {
@@ -175,6 +178,7 @@ export class AIChatMessageActionsService {
           [AI_CHAT_ID_METADATA_KEY]: conversationId,
         },
       });
+
       const tabContext = contextProvider.getContext(this.navigationTabsService.navigationTabContext);
 
       if (!tabContext.tab) {
@@ -193,6 +197,7 @@ export class AIChatMessageActionsService {
         name += ` (${conversation.caption})`;
       }
     }
+
     return name;
   }
 
@@ -217,6 +222,7 @@ export class AIChatMessageActionsService {
 
       // Check if connection matches
       let isSameConnection = false;
+
       if (dataSource?.executionContext && connectionKey) {
         const param = createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId);
         isSameConnection = isConnectionInfoParamEqual(param, connectionKey);

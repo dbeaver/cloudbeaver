@@ -31,6 +31,7 @@ export function compareUsersById<T extends Pick<AdminUser, 'userId'>>(a: T, b: T
 export function compareUsersByLastLogin<T extends Pick<AdminUser, 'lastLoginTime'>>(a: T, b: T): number {
   const aTime = a.lastLoginTime ? new Date(a.lastLoginTime).getTime() : 0;
   const bTime = b.lastLoginTime ? new Date(b.lastLoginTime).getTime() : 0;
+
   return aTime - bTime;
 }
 

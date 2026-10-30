@@ -27,6 +27,7 @@ export class ConnectionAiScopePart extends FormPart<{ scope: AiDatabaseScope; cu
 
   override isOutdated(): boolean {
     const key = this.optionsPart.connectionKey;
+
     if (super.isOutdated()) {
       return true;
     }
@@ -46,6 +47,7 @@ export class ConnectionAiScopePart extends FormPart<{ scope: AiDatabaseScope; cu
 
   override isLoaded(): boolean {
     const key = this.optionsPart.connectionKey;
+
     if (!super.isLoaded()) {
       return false;
     }
@@ -74,6 +76,7 @@ export class ConnectionAiScopePart extends FormPart<{ scope: AiDatabaseScope; cu
 
       if (this.connectionInfoResource.isConnected(key)) {
         const connectionScope = await this.connectionInfoAiScopeResource.load(key);
+
         if (connectionScope && this.connectionInfoResource.isConnected(key)) {
           customObjectIds = [...(connectionScope.customObjectIds ?? [])].sort();
         }
@@ -88,6 +91,7 @@ export class ConnectionAiScopePart extends FormPart<{ scope: AiDatabaseScope; cu
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void {
     const key = this.optionsPart.connectionKey;
+
     if (key && this.isChanged && !this.connectionInfoResource.isConnected(key)) {
       contexts.getContext(formValidationContext).error('plugin_ai_scope_connect_before_save');
     }
@@ -98,9 +102,11 @@ export class ConnectionAiScopePart extends FormPart<{ scope: AiDatabaseScope; cu
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const key = this.optionsPart.connectionKey;
+
     if (!key || contexts.getContext(formSubmitContext).type === 'test') {
       return;
     }
+
     await this.connectionInfoAiResource.save(key, {
       scope: this.state.scope,
       customObjectIds: this.connectionInfoResource.isConnected(key) ? this.state.customObjectIds : undefined,

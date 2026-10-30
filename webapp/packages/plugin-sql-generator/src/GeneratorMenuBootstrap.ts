@@ -69,10 +69,13 @@ export class GeneratorMenuBootstrap extends Bootstrap {
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
         if (model.isLoading() || model.isDisabled(resultIndex) || !model.source.hasResult(resultIndex)) {
           return true;
         }
+
         const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
+
         return !editor?.isEdited();
       },
       handler: context => {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ export class CommonDialogService {
       options,
       promise,
     };
+
     this.dialogs.push(dialogInternal);
 
     return promise;
@@ -95,12 +96,14 @@ export class CommonDialogService {
         status: DialogueStateResult.Resolved,
         result,
       });
+
       this.removeDialog(dialog);
     }
   }
 
   private removeDialog(dialog: DialogInternal<any>) {
     const index = this.dialogs.findIndex(i => i === dialog);
+
     if (index !== -1) {
       this.dialogs.splice(index, 1);
     }

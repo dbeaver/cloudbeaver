@@ -44,11 +44,13 @@ export class AIChatConversationProfileService {
       }
 
       const config = contexts.getContext(conversationConfigContext);
+
       if (config.settings?.profile) {
         return;
       }
 
       const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
+
       if (profile) {
         config.settings = { ...config.settings, profile: profile.id };
       }
@@ -60,6 +62,7 @@ export class AIChatConversationProfileService {
       }
 
       const profile = await this.aiDefaultProfileService.restoreDefaultProfile();
+
       if (profile && data.profile !== profile.id) {
         await this.aiChatConversationsResource.updateConversation(data.id, { settings: { profile: profile.id } });
       }
@@ -85,6 +88,7 @@ export class AIChatConversationProfileService {
   async updateConversationProfile(conversationId: string, profileId: string): Promise<AIChatConversationInfo> {
     const conversation = await this.aiChatConversationsResource.updateConversation(conversationId, { settings: { profile: profileId } });
     await this.aiDefaultProfileService.setDefaultProfile(profileId);
+
     return conversation;
   }
 }

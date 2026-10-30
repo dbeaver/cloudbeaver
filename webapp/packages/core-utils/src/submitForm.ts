@@ -33,9 +33,11 @@ export function submitForm(url: string, fields: Iterable<readonly [string, strin
  */
 export function objectToFormFields(obj: Record<string, unknown>): Array<[string, string]> {
   const fields: Array<[string, string]> = [];
+
   for (const [key, value] of Object.entries(obj)) {
     appendField(fields, key, value);
   }
+
   return fields;
 }
 
@@ -43,19 +45,24 @@ function appendField(fields: Array<[string, string]>, key: string, value: unknow
   if (value == null || value === '') {
     return;
   }
+
   if (Array.isArray(value)) {
     for (const item of value) {
       if (item != null && item !== '') {
         fields.push([key, String(item)]);
       }
     }
+
     return;
   }
+
   if (typeof value === 'object') {
     for (const [innerKey, innerValue] of Object.entries(value)) {
       appendField(fields, innerKey, innerValue);
     }
+
     return;
   }
+
   fields.push([key, String(value)]);
 }

@@ -27,6 +27,7 @@ declare module 'react-hotkeys-hook' {
     | 'option'
     | 'radio'
     | 'textbox';
+
   export type Scopes = string | readonly string[];
 
   export type EventListenerOptions =

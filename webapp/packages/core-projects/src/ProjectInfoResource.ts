@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
       () => {},
       () => CachedMapAllKey,
     );
+
     appAuthService.requireAuthentication(this);
     permissionsService.requirePublic(this);
     this.userInfoResource.onUserChange.addPostHandler(() => {
@@ -46,6 +47,7 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
 
       for (let ext of resourceType?.fileExtensions || []) {
         ext = `.${ext}`;
+
         if (fileName.toLowerCase().endsWith(ext)) {
           return fileName.slice(0, fileName.length - ext.length);
         }

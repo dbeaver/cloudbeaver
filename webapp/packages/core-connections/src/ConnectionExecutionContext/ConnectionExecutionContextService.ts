@@ -36,6 +36,7 @@ export class ConnectionExecutionContextService {
           this.graphQLService,
         ),
     );
+
     this.scheduler = new TaskScheduler((a, b) => a === b);
     this.connectionExecutionContextResource.onItemDelete.addHandler(key =>
       ResourceKeyUtils.forEach(key, contextId => this.contexts.delete(contextId)),
@@ -46,6 +47,7 @@ export class ConnectionExecutionContextService {
     if (!this.connectionExecutionContextResource.has(contextId)) {
       return undefined;
     }
+
     return this.contexts.get(contextId);
   }
 

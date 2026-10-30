@@ -47,6 +47,7 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
       }
 
       this.projectInfoOptionsPanelService.itemId = tabId ?? null;
+
       return true;
     }
 

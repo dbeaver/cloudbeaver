@@ -36,6 +36,7 @@ DEFAULT_KEY_MAP.push({
   key: 'Mod-s',
   run: () => true,
 });
+
 DEFAULT_KEY_MAP.push(...searchKeymap);
 DEFAULT_KEY_MAP.push(...foldKeymap);
 
@@ -140,5 +141,6 @@ function createExtensions(options?: IDefaultExtensions): [Compartment, Extension
       return extensionFunction?.();
     })
     .filter(Boolean);
+
   return [DEFAULT_EXTENSIONS_COMPARTMENT, extensions];
 }

@@ -46,6 +46,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       const message = this.localizationService.translate('plugin_connections_connection_cloud_auth_required', undefined, {
         providerLabel: provider.label,
       });
+
       stateContext.setInfo(message);
       stateContext.readonly = this.formState.mode === 'edit';
     }

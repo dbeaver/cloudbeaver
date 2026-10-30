@@ -24,6 +24,7 @@ export function useAutoLoad(
   const sessionExpireService = useService(SessionExpireService);
   const unmountedRef = useObjectRef({ unmounted: false });
   const [loadFunctionName] = useState(`${component.name}.useAutoLoad(...)` as const);
+
   if (!Array.isArray(state)) {
     state = [state] as ReadonlyArray<ILoadableState>;
   }

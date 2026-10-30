@@ -17,6 +17,7 @@ function createResource(authTokens: Array<{ authProvider: string; authConfigurat
   Object.defineProperty(resource, 'data', {
     value: authTokens === null ? null : ({ authTokens } as unknown as UserInfo),
   });
+
   return resource;
 }
 

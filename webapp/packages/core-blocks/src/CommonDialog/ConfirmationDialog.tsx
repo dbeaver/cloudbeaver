@@ -68,6 +68,7 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Conf
     cancelActionText,
     extraActionText,
   } = payload;
+
   const [skipConfirmations, setSkipConfirmations] = useState(false);
 
   function resolve() {

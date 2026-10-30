@@ -79,10 +79,12 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
     [navNodeInfoResource, projectsService, projectsNavNodeService],
   );
+
   const transformResourceNode = useMemo(
     () => transformResourceNodeInfo(projectInfoResource, projectsNavNodeService, navNodeInfoResource, resourceTypeId),
     [projectInfoResource, projectsNavNodeService, navNodeInfoResource, resourceTypeId],
   );
+
   const projectFilter = useMemo(
     () =>
       navigationTreeProjectFilter(
@@ -95,6 +97,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
       ),
     [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource, resourceManagerService, resourceTypeId],
   );
+
   const resourceTypeFilter = useMemo(
     () => navigationTreeResourceTypeFilter(navNodeInfoResource, projectsNavNodeService, projectInfoResource, resourceTypeId),
     [navNodeInfoResource, projectsNavNodeService, projectInfoResource, resourceTypeId],
@@ -104,6 +107,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
 
   async function loadChildren(nodeId: string, manual: boolean) {
     await userInfoResource.load();
+
     if (!resourceManagerService.enabled) {
       return false;
     }

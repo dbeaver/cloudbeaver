@@ -80,6 +80,7 @@ export const Button = observer<ButtonProps>(function Button({
   }
 
   const Tag = createElement(tag);
+
   return (
     <UIKitButton
       render={Tag}

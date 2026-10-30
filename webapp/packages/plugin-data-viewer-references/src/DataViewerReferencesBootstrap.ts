@@ -35,11 +35,13 @@ export class DataViewerReferencesBootstrap extends Bootstrap {
       dataFormat: ResultDataFormat.Resultset,
       hidden: (dataFormat, model, resultIndex) => {
         const source = model.source;
+
         if (!isResultSetDataSource(source) || !source.hasResult(resultIndex) || this.dataViewerReferencesSettingsService.disabled) {
           return true;
         }
 
         const data = source.tryGetAction(resultIndex, IDatabaseDataResultAction);
+
         return data?.empty ?? true;
       },
       getPresentationComponent: () => DataViewerReferencesPresentation,

@@ -47,21 +47,25 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     const firstProfile = this.values.length === 0;
     const { profile } = await this.graphQLService.sdk.createAiProfile({ config });
     this.set(profile.id, profile);
+
     if (firstProfile) {
       this.aiSettingsResource.markOutdated();
     }
+
     return profile;
   }
 
   async updateProfile(config: AiConfigurationProfileInput): Promise<AiAdminConfigurationProfileInfo> {
     const { profile } = await this.graphQLService.sdk.updateAiProfile({ config });
     this.set(profile.id, profile);
+
     return profile;
   }
 
   async copyProfile(profileId: string): Promise<AiAdminConfigurationProfileInfo> {
     const { profile } = await this.graphQLService.sdk.copyAiProfile({ profileId });
     this.set(profile.id, profile);
+
     return profile;
   }
 
@@ -95,6 +99,7 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
   protected async loader(): Promise<Map<string, AIProfile>> {
     const { profiles } = await this.graphQLService.sdk.getAiProfiles();
     this.replace(resourceKeyList(profiles.map(profile => profile.id)), profiles);
+
     return this.data;
   }
 

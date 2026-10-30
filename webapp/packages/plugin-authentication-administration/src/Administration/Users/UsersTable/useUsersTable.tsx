@@ -26,7 +26,14 @@ interface State {
 
 export function useUsersTable(filters: IUserFilters) {
   const searchFilter = filters.search.trim().toLowerCase();
-  const enabledStateFilter = filters.status === 'true' ? true : filters.status === 'false' ? false : undefined;
+  let enabledStateFilter: boolean | undefined;
+
+  if (filters.status === 'true') {
+    enabledStateFilter = true;
+  } else if (filters.status === 'false') {
+    enabledStateFilter = false;
+  }
+
   const pagination = useOffsetPagination(UsersResource, {
     key: UsersResourceFilterKey(searchFilter, enabledStateFilter),
   });

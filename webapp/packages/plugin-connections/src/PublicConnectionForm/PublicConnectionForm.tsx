@@ -26,6 +26,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
     if (isCreate) {
       await publicConnectionFormService.close(true);
     }
+
     await publicConnectionFormService.save();
   }, []);
 

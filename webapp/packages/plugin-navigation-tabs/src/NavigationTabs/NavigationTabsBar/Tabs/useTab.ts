@@ -13,6 +13,7 @@ export function useTab(tabId: string) {
   const navigationTabsService = useService(NavigationTabsService);
 
   const tab = navigationTabsService.getTab(tabId);
+
   if (!tab) {
     throw new Error(`Tab ${tabId} not found`);
   }

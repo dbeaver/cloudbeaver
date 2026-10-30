@@ -81,6 +81,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
     if (onKeyChange) {
       onKeyChange(property.key, key);
     }
+
     property.key = key;
   }, []);
 
@@ -94,6 +95,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
 
     if (propertiesState) {
       const defaultValue = isNotNullDefined(property.defaultValue) ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
+
       if (value === defaultValue && !propsRef.staticProperties) {
         delete propertiesState[property.key];
       } else {

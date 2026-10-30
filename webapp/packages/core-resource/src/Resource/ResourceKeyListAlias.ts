@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@ export class ResourceKeyListAlias<TKey, TOptions extends ResourceAliasOptions> e
 export function isResourceKeyListAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
 ): data is ResourceKeyListAlias<TKey, TOptions>;
+
 export function isResourceKeyListAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
   id: string,
 ): data is ResourceKeyListAlias<TKey, TOptions>;
+
 export function isResourceKeyListAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
   alias: ResourceKeyListAlias<TKey, TOptions>,
 ): data is ResourceKeyListAlias<TKey, TOptions>;
+
 export function isResourceKeyListAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
   factory: ResourceKeyListAliasFactory<TKey, any, TOptions>,
 ): data is ResourceKeyListAlias<TKey, TOptions>;
+
 export function isResourceKeyListAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
   id?: ResourceKeyListAlias<TKey, TOptions> | ResourceKeyListAliasFactory<TKey, any, TOptions> | string,
@@ -33,6 +37,7 @@ export function isResourceKeyListAlias<TKey = any, TOptions extends ResourceAlia
   if (!id || typeof id === 'string') {
     return data instanceof ResourceKeyListAlias && (!id || data.id === id);
   }
+
   return data instanceof ResourceKeyListAlias && data.id === id.id;
 }
 
@@ -55,7 +60,9 @@ export function resourceKeyListAliasFactory<TKey = any, TArgs extends any[] = an
   function factory(...args: TArgs) {
     return resourceKeyListAlias(id, optionsGetter(...args));
   }
+
   Object.defineProperty(factory, 'id', { value: id, writable: false });
   Object.defineProperty(factory, 'isKeyOfAlias', { value: (key: string) => key.startsWith(`${ResourceKeyListAlias.name}(${id})`), writable: false });
+
   return factory as ResourceKeyListAliasFactory<TKey, TArgs, TOptions>;
 }

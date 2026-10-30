@@ -177,6 +177,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       return false;
     }
   }
+
   const [loadingNodes] = useState(() => observable.map(new Map<string, Promise<void>>(), { deep: false }));
 
   const functionsRef = useObjectRef({
@@ -190,6 +191,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         } else {
           this.exitNodeFolder(preloadedRoot);
         }
+
         return;
       }
 
@@ -198,6 +200,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
     async loadNodes(...nodes: string[]) {
       const promises = [];
+
       for (const nodeId of nodes) {
         const promise = this.loadNode(nodeId).finally(() => loadingNodes.delete(nodeId));
         loadingNodes.set(nodeId, promise);
@@ -210,6 +213,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
     async loadNode(nodeId: string) {
       const expanded = elementsTree.isNodeExpanded(nodeId, true);
+
       if (!expanded && nodeId !== options.root) {
         if (navNodeInfoResource.isOutdated(nodeId)) {
           const node = navNodeInfoResource.get(nodeId);
@@ -218,6 +222,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
             await navNodeInfoResource.load(nodeId);
           }
         }
+
         return;
       }
 
@@ -227,6 +232,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         if (expanded) {
           elementsTree.collapse(nodeId);
         }
+
         return;
       }
 
@@ -238,6 +244,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       if (pageInfo) {
         const lastOffset = getNextPageOffset(pageInfo);
+
         for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
           await navTreeResource.load(
             CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
@@ -543,6 +550,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
           treeNodeState.expanded = false;
           treeNodeState.showInFilter = false;
+
           return;
         }
 
@@ -663,16 +671,19 @@ export function useElementsTree(options: IOptions): IElementsTree {
           await options.customSelectReset();
           return;
         }
+
         await functionsRef.resetSelection();
       },
       async loadPath(path: string[], lastNode?: string): Promise<string | undefined> {
         let lastLoadedNode: string | undefined;
+
         for (const nodeId of path) {
           const loaded = await handleLoadChildren(nodeId, false);
 
           if (!loaded) {
             return lastLoadedNode;
           }
+
           lastLoadedNode = nodeId;
         }
 
