@@ -28,6 +28,7 @@ export class BrowserLanguageBootstrap extends Bootstrap {
       navigator.languages.length ? navigator.languages : [navigator.language],
       this.localizationService.supportedLanguages,
     );
+
     // User settings at the same layer take precedence over application defaults.
     this.settingsResolverService.addResolver(SESSION_SETTINGS_LAYER, this.source);
   }

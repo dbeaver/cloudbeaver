@@ -27,6 +27,7 @@ export const LanguageSelector = observer(function LanguageSelector() {
     }
 
     setChanging(true);
+
     try {
       await localizationService.changeLocale(language);
       notificationService.logSuccess({ title: 'plugin_localization_language_changed' });

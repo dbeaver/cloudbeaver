@@ -51,6 +51,7 @@ export class WizardLanguageSelectorBootstrap extends Bootstrap {
         });
       }
     });
+
     this.userInfoResource.onDataUpdate.addHandler(this.synchronize);
     this.serverConfigResource.onDataUpdate.addHandler(this.synchronize);
   }
@@ -67,12 +68,15 @@ export class WizardLanguageSelectorBootstrap extends Bootstrap {
     }
 
     this.synchronizing = true;
+
     try {
       const anonymous = this.userInfoResource.isAnonymous();
+
       // A preference already saved in the profile takes precedence over a pending wizard choice.
       if (!this.userInfoResource.getConfigurationParameter('core.localization.language')) {
         await this.userInfoResource.updatePreferences({ 'core.localization.language': this.pending.language });
       }
+
       if (!anonymous) {
         runInAction(() => {
           this.pending.userId = '';

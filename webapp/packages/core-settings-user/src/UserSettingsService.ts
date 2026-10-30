@@ -115,6 +115,7 @@ export class UserSettingsService extends EditableSettingsSource {
       }
 
       const user = this.userInfoResource.data;
+
       if (user && user.configurationParameters !== this.lastConfig) {
         this.clear();
         this.localSettings.clear();
