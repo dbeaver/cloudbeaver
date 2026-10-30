@@ -788,6 +788,97 @@ public class WebServiceNavigatorTest {
     }
 
     @Test
+    void creatingPersonalFilterPreservesUnrelatedSavedFilterOverwrittenInRuntime() throws Exception {
+        assertPersonalWritePreservesSavedFilterOverwrittenInRuntime(false);
+    }
+
+    @Test
+    void updatingPersonalFilterPreservesUnrelatedSavedFilterOverwrittenInRuntime() throws Exception {
+        assertPersonalWritePreservesSavedFilterOverwrittenInRuntime(true);
+    }
+
+    private void assertPersonalWritePreservesSavedFilterOverwrittenInRuntime(boolean update) throws Exception {
+        Fixture f = new Fixture(true);
+        f.localShared();
+        DBNDatabaseNode second = f.node("second", "other_schema");
+        WebNavigatorNodeInfo secondInfo = new WebNavigatorNodeInfo(f.session, second);
+        f.seedOtherSettings();
+        service.setUserNavigatorNodeFilter(f.session, "node", List.of("saved_a_%"), List.of("saved_a_hidden%"));
+        if (update) {
+            service.setUserNavigatorNodeFilter(f.session, "second", List.of("old_b_%"), null);
+        }
+        // Saved A remains personal, but its live entry no longer has the personal flag.
+        f.dataSource.setObjectFilter(DBSTable.class, f.parent, f.shared);
+        assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
+        assertFilter(f.info().getUserFilter(), true, "saved_a_%", "saved_a_hidden%");
+        clearInvocations(f.security, f.registry, f.node, second);
+
+        assertTrue(service.setUserNavigatorNodeFilter(
+            f.session, "second", List.of("new_b_%"), List.of("new_b_hidden%")));
+
+        var saved = f.serializer.deserializeObjectFilterConfig(f.savedFilters());
+        assertEquals(3, saved.size());
+        assertTrue(saved.stream().anyMatch(c -> DBSTable.class.getName().equals(c.typeName()) && "schema".equals(c.objectID())));
+        assertTrue(saved.stream().anyMatch(c -> DBSTable.class.getName().equals(c.typeName()) && "other_schema".equals(c.objectID())));
+        assertTrue(saved.stream().anyMatch(c -> DBSSchema.class.getName().equals(c.typeName()) && c.objectID() == null));
+        assertFilter(f.info().getUserFilter(), true, "saved_a_%", "saved_a_hidden%");
+        assertFilter(secondInfo.getUserFilter(), true, "new_b_%", "new_b_hidden%");
+        // Existing settings callbacks reapply both saved personal filters to the runtime map.
+        assertFilter(f.node.getNodeFilter(f.meta, true), true, "saved_a_%", "saved_a_hidden%");
+        assertFilter(second.getNodeFilter(f.meta, true), true, "new_b_%", "new_b_hidden%");
+        assertFilter(f.dataSource.getObjectFilter(DBSSchema.class, null, true), true, "other_%", null);
+        assertFilter(f.info().getFilter(), false, "shared_%", "shared_hidden%");
+        assertEquals("keep", f.settings().get("unrelated"));
+        assertFalse(f.savedFilters().contains("old_b_%"));
+        assertFalse(f.savedFilters().contains("shared_%"));
+        verify(f.security).setObjectSettings("project", SMObjectType.datasource, "connection", Map.of(FILTER_KEY, f.savedFilters()));
+        verify(f.registry).refreshConfig(List.of("connection"));
+        verify(f.node, never()).setNodeFilter(any(), any(), anyBoolean());
+        verify(second, never()).setNodeFilter(any(), any(), anyBoolean());
+        f.assertNoSharedSave();
+    }
+
+    @Test
+    void failedPersonalWriteDoesNotMutateRuntimeOrLoseUnrelatedSavedFilters() throws Exception {
+        for (boolean update : List.of(false, true)) {
+            Fixture f = new Fixture(true);
+            f.localShared();
+            DBNDatabaseNode second = f.node("second", "other_schema");
+            WebNavigatorNodeInfo secondInfo = new WebNavigatorNodeInfo(f.session, second);
+            f.seedOtherSettings();
+            service.setUserNavigatorNodeFilter(f.session, "node", List.of("saved_a_%"), null);
+            if (update) {
+                service.setUserNavigatorNodeFilter(f.session, "second", List.of("old_b_%"), null);
+            }
+            f.dataSource.setObjectFilter(DBSTable.class, f.parent, f.shared);
+            Map<String, String> before = Map.copyOf(f.settings());
+            DBSObjectFilter previousB = second.getNodeFilter(f.meta, true);
+            clearInvocations(f.security, f.registry, f.node, second, f.dataSource);
+            DBException failure = new DBException("storage unavailable");
+            doThrow(failure).when(f.security).setObjectSettings(anyString(), any(), anyString(), anyMap());
+
+            DBWebException error = assertThrows(DBWebException.class,
+                () -> service.setUserNavigatorNodeFilter(f.session, "second", List.of("new_b_%"), null));
+
+            assertSame(failure, error.getCause());
+            assertEquals(before, f.settings());
+            assertSame(f.shared, f.node.getNodeFilter(f.meta, true));
+            assertSame(previousB, second.getNodeFilter(f.meta, true));
+            assertFilter(f.info().getUserFilter(), true, "saved_a_%", null);
+            if (update) {
+                assertFilter(secondInfo.getUserFilter(), true, "old_b_%", null);
+            } else {
+                assertNull(secondInfo.getUserFilter());
+            }
+            verify(f.registry, never()).refreshConfig(any());
+            verify(f.node, never()).setNodeFilter(any(), any(), anyBoolean());
+            verify(second, never()).setNodeFilter(any(), any(), anyBoolean());
+            verify(f.dataSource, never()).setObjectFilter(any(Class.class), any(), any());
+            f.assertNoSharedSave();
+        }
+    }
+
+    @Test
     void savedGlobalFiltersRemainEffectiveButDoNotLeakIntoLocalGetters() throws Exception {
         Fixture f = new Fixture(true);
         f.connectionFilters(List.of(filterConfig(null, "shared_global_%", null)));

@@ -115,23 +115,19 @@ public final class WebNavigatorFilterUtils {
             saveUserFilters(filters);
             return;
         }
-        DBSObjectFilter previousFilter = node.getNodeFilter(itemsMeta, true);
         DBPObjectSettingsProvider settings = DBUtils.getAdapter(DBPObjectSettingsProvider.class, dataSource.getProject());
         if (settings == null) {
             throw new DBWebException("Personal settings are not available for navigator node '" + node.getNodeUri() + "'");
         }
-        // Initialize the cache before writing, including anonymous users' session-only settings.
-        settings.getObjectSettings(SMObjectType.datasource, dataSource.getId());
+        // The runtime mapping can omit saved personal filters that were overwritten by shared filters.
+        // Update only the requested entry in the saved settings; callbacks reapply them after a successful save.
+        FilterLookupDataSource filters = readUserFilters(dataSource);
+        if (filters == null) {
+            filters = new FilterLookupDataSource(dataSource);
+        }
         filter.setUserFilter(true);
-        if (!node.setNodeFilter(itemsMeta, filter, false)) {
-            throw new DBWebException("Navigator node '" + node.getNodeUri() + "' does not support object filters");
-        }
-        try {
-            saveUserFilters(dataSource);
-        } catch (DBException e) {
-            node.setNodeFilter(itemsMeta, previousFilter, false);
-            throw new DBWebException("Error saving personal navigator filters", e);
-        }
+        filters.setObjectFilter(childClass, node.getFilterObject(), filter);
+        saveUserFilters(filters);
     }
 
     @Nullable
