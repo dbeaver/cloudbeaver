@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   async refreshAll(): Promise<AuthProvider[]> {
     this.resetIncludes();
     await this.refresh(CachedMapAllKey);
+
     return this.values;
   }
 
@@ -98,11 +99,13 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     const { providers } = await this.graphQLService.sdk.getAuthProviders();
 
     const key = resourceKeyList(providers.map(provider => provider.id));
+
     if (all) {
       this.replace(key, providers);
     } else {
       this.set(key, providers);
     }
+
     return this.data;
   }
 
@@ -120,6 +123,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
         if (provider.configurable && provider.configurations?.length) {
           ResourceKeyUtils.forEach(key, id => {
             const index = provider.configurations!.findIndex(configuration => configuration.id === id);
+
             if (index >= 0) {
               provider.configurations!.splice(index, 1);
             }

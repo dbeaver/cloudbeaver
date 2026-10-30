@@ -86,6 +86,7 @@ export class UsersAdministrationService extends Bootstrap {
       getContentComponent: () => UsersAdministration,
       getDrawerComponent: () => UsersDrawerItem,
     });
+
     this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
     this.actionButtonsPlaceholder.add(UsersTableFilterButton, 0);
   }

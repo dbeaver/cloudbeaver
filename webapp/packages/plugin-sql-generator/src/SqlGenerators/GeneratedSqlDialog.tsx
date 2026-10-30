@@ -72,6 +72,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
 
   const extensions = useCodemirrorExtensions();
+
   if (sqlDialect) {
     extensions.set(...sqlDialect);
   }
@@ -117,6 +118,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
         schemaId,
         query: state.query,
       });
+
       rejectDialog();
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_open_editor');

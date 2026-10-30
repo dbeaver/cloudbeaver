@@ -16,17 +16,24 @@
  */
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.DBWUserIdentity;
+import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.auth.ldap.LdapAuthProvider;
 import io.cloudbeaver.service.auth.ldap.LdapConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.model.security.SMStandardMeta;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.naming.Context;
@@ -188,6 +195,288 @@ public class LdapAuthenticationTest {
         Assertions.assertEquals("LDAP authentication failed: User bind failed", exception.getMessage());
     }
 
+    @Test
+    public void firstAndLastNamesAreReadFromTheDirectory() throws Exception {
+        Map<String, Object> userData = authenticateWithProfile(
+            Map.of(
+                "ldap-first-name-field", "givenName",
+                "ldap-last-name-field", "sn"
+            )
+        );
+
+        Assertions.assertEquals("Una", userData.get(SMStandardMeta.META_FIRST_NAME));
+        Assertions.assertEquals("One", userData.get(SMStandardMeta.META_LAST_NAME));
+        // the login stays what the other parts of the provider rely on
+        Assertions.assertEquals("test-user", userData.get(LdapConstants.CRED_DISPLAY_NAME));
+        Assertions.assertEquals(
+            Map.of(
+                SMStandardMeta.META_FIRST_NAME, "Una",
+                SMStandardMeta.META_LAST_NAME, "One"
+            ),
+            userData.get(SMStandardMeta.KEY_META_PARAMS)
+        );
+    }
+
+    @Test
+    public void attributeMappingCanBeChangedOrDisabled() throws Exception {
+        Map<String, Object> userData = authenticateWithProfile(
+            Map.of(
+                LdapConstants.PARAM_FIRST_NAME_FIELD, "cn",
+                LdapConstants.PARAM_LAST_NAME_FIELD, ""
+            )
+        );
+
+        Assertions.assertEquals("Una Maria", userData.get(SMStandardMeta.META_FIRST_NAME));
+        Assertions.assertNull(userData.get(SMStandardMeta.META_LAST_NAME));
+        Assertions.assertEquals(
+            Map.of(SMStandardMeta.META_FIRST_NAME, "Una Maria"),
+            userData.get(SMStandardMeta.KEY_META_PARAMS)
+        );
+    }
+
+    @Test
+    public void entryWithoutNamesReportsEmptyProfileValues() throws Exception {
+        DirContext userContext = Mockito.mock(DirContext.class);
+        NamingEnumeration<SearchResult> userSearchResult = mockUserSearchResult();
+        Mockito.when(userContext.search(
+            Mockito.eq(USER_DN),
+            Mockito.eq("objectClass=*"),
+            Mockito.any(SearchControls.class)
+        )).thenReturn(userSearchResult);
+
+        Map<String, Object> userData = authenticate(new TestLdapAuthProvider(userContext), "", Map.of(
+            LdapConstants.PARAM_FIRST_NAME_FIELD, "givenName",
+            LdapConstants.PARAM_LAST_NAME_FIELD, "sn"
+        ));
+
+        // Missing directory values supply nothing to fill; they must not clear the stored profile.
+        Assertions.assertEquals(
+            Map.of(SMStandardMeta.META_FIRST_NAME, "", SMStandardMeta.META_LAST_NAME, ""),
+            userData.get(SMStandardMeta.KEY_META_PARAMS)
+        );
+        Assertions.assertNull(userData.get(SMStandardMeta.META_FIRST_NAME));
+    }
+
+    @Test
+    public void attributeClearedInTheDirectoryIsReportedAsEmpty() throws Exception {
+        BasicAttributes attributes = profileAttributes();
+        attributes.remove("givenName");
+
+        Map<String, Object> userData = authenticateWithProfile(
+            attributes,
+            Map.of(
+                LdapConstants.PARAM_FIRST_NAME_FIELD, "givenName",
+                LdapConstants.PARAM_LAST_NAME_FIELD, "sn"
+            )
+        );
+
+        Assertions.assertEquals(
+            Map.of(SMStandardMeta.META_FIRST_NAME, "", SMStandardMeta.META_LAST_NAME, "One"),
+            userData.get(SMStandardMeta.KEY_META_PARAMS)
+        );
+        Assertions.assertNull(userData.get(SMStandardMeta.META_FIRST_NAME));
+        Assertions.assertEquals("One", userData.get(SMStandardMeta.META_LAST_NAME));
+    }
+
+    @Test
+    public void absentAndEmptyNameMappingsDoNotSupplyNamesForTheProfile() throws Exception {
+        for (Map<String, Object> parameters : List.<Map<String, Object>>of(
+            Map.of(),
+            Map.of(LdapConstants.PARAM_FIRST_NAME_FIELD, "", LdapConstants.PARAM_LAST_NAME_FIELD, "")
+        )) {
+            Map<String, Object> userData = authenticateWithProfile(parameters);
+            Assertions.assertFalse(userData.containsKey(SMStandardMeta.KEY_META_PARAMS));
+            Assertions.assertNull(userData.get(SMStandardMeta.META_FIRST_NAME));
+            Assertions.assertNull(userData.get(SMStandardMeta.META_LAST_NAME));
+        }
+    }
+
+    @Test
+    public void unconfiguredMappingsIgnoreTheDirectoryDisplayName() throws Exception {
+        Map<String, Object> userData = authenticateWithProfile(Map.of());
+
+        Assertions.assertFalse(userData.containsKey(SMStandardMeta.KEY_META_PARAMS));
+        DBWUserIdentity identity = new LdapAuthProvider().getUserIdentity(new VoidProgressMonitor(), null, userData);
+        Assertions.assertEquals("test-user", identity.getDisplayName());
+        Assertions.assertTrue(identity.getMetaParameters().isEmpty());
+    }
+
+    @Test
+    public void directoryProfileIsUsedForIdentityWithoutChangingLoginOrId() throws Exception {
+        Map<String, Object> userData = authenticateWithProfile(Map.of(
+            LdapConstants.PARAM_FIRST_NAME_FIELD, "givenName",
+            LdapConstants.PARAM_LAST_NAME_FIELD, "sn"
+        ));
+        DBWUserIdentity identity = new LdapAuthProvider().getUserIdentity(new VoidProgressMonitor(), null, userData);
+
+        Assertions.assertEquals("test-user-id", identity.getId());
+        Assertions.assertEquals("test-user", userData.get(LdapConstants.CRED_DISPLAY_NAME));
+        Assertions.assertEquals("Una One", identity.getDisplayName());
+        Assertions.assertTrue(identity.getMetaParameters().isEmpty());
+        Assertions.assertEquals(
+            Map.of(SMStandardMeta.META_FIRST_NAME, "Una", SMStandardMeta.META_LAST_NAME, "One"),
+            userData.get(SMStandardMeta.KEY_META_PARAMS)
+        );
+    }
+
+    @Test
+    public void firstAndLastNamesAreTrimmedAndLimitedToStorageLength() throws Exception {
+        BasicAttributes attributes = profileAttributes();
+        attributes.put("cn", " " + "a".repeat(1025) + " ");
+        attributes.put("sn", " " + "b".repeat(1025) + " ");
+        Map<String, Object> userData = authenticateWithProfile(attributes, Map.of(
+            LdapConstants.PARAM_FIRST_NAME_FIELD, "cn",
+            LdapConstants.PARAM_LAST_NAME_FIELD, "sn"
+        ));
+
+        Assertions.assertEquals(
+            Map.of(SMStandardMeta.META_FIRST_NAME, "a".repeat(1024), SMStandardMeta.META_LAST_NAME, "b".repeat(1024)),
+            userData.get(SMStandardMeta.KEY_META_PARAMS)
+        );
+        Assertions.assertEquals("a".repeat(1024), userData.get(SMStandardMeta.META_FIRST_NAME));
+        Assertions.assertEquals("b".repeat(1024), userData.get(SMStandardMeta.META_LAST_NAME));
+    }
+
+    @Test
+    public void userIdentityBuildsTheNameFromProfileFields() throws Exception {
+        DBWUserIdentity identity = new LdapAuthProvider().getUserIdentity(
+            new VoidProgressMonitor(),
+            null,
+            Map.of(
+                LdapConstants.CRED_USERNAME, "test-user",
+                LdapConstants.CRED_DISPLAY_NAME, "test-user",
+                SMStandardMeta.KEY_META_PARAMS, Map.of(
+                    SMStandardMeta.META_FIRST_NAME, "Una",
+                    SMStandardMeta.META_LAST_NAME, "One"
+                )
+            )
+        );
+
+        Assertions.assertEquals("test-user", identity.getId());
+        Assertions.assertEquals("Una One", identity.getDisplayName());
+        Assertions.assertTrue(identity.getMetaParameters().isEmpty());
+    }
+
+    @Test
+    public void userIdentityDoesNotExposeDirectoryProfileAsMetadataOverlay() throws Exception {
+        DBWUserIdentity identity = new LdapAuthProvider().getUserIdentity(
+            new VoidProgressMonitor(),
+            null,
+            Map.of(
+                LdapConstants.CRED_USERNAME, "test-user",
+                SMStandardMeta.KEY_META_PARAMS, Map.of(SMStandardMeta.META_FIRST_NAME, "")
+            )
+        );
+
+        Assertions.assertTrue(identity.getMetaParameters().isEmpty());
+    }
+
+    @Test
+    public void additionalLdapAuthenticationDoesNotOverrideTheLocalSessionProfile() throws Exception {
+        Map<String, String> localProfile = Map.of(
+            SMStandardMeta.META_FIRST_NAME, "Manual",
+            SMStandardMeta.META_LAST_NAME, "Name",
+            "email", "manual@example.com"
+        );
+        SMUser user = new SMUser("local-account", true, null);
+        user.setMetaParameters(new HashMap<>(localProfile));
+        Map<String, Object> ldapCredentials = Map.of(
+            LdapConstants.CRED_USERNAME, "ldap-account",
+            SMStandardMeta.KEY_META_PARAMS, Map.of(
+                SMStandardMeta.META_FIRST_NAME, "Directory",
+                SMStandardMeta.META_LAST_NAME, "User"
+            )
+        );
+
+        // Child authentication does not call validateLocalAuth before building the provider identity.
+        DBWUserIdentity identity = new LdapAuthProvider().getUserIdentity(new VoidProgressMonitor(), null, ldapCredentials);
+        WebAuthInfo authInfo = Mockito.mock(WebAuthInfo.class);
+        Mockito.when(authInfo.getUserIdentity()).thenReturn(identity);
+        WebSession session = Mockito.mock(WebSession.class, Mockito.CALLS_REAL_METHODS);
+        Mockito.doReturn(new WebUser(user)).when(session).getUser();
+        Mockito.doReturn(List.of(authInfo)).when(session).getAllAuthInfo();
+
+        Assertions.assertEquals(localProfile, session.getUserMetaParameters());
+        Assertions.assertEquals(localProfile, user.getMetaParameters());
+        Assertions.assertTrue(identity.getMetaParameters().isEmpty());
+        Assertions.assertEquals("ldap-account", identity.getId());
+    }
+
+    @Test
+    public void userIdentityUsesASingleAvailableNameWithoutExtraSpaces() throws Exception {
+        for (Map<String, String> names : List.of(
+            Map.of(SMStandardMeta.META_FIRST_NAME, "Una"),
+            Map.of(SMStandardMeta.META_LAST_NAME, "One")
+        )) {
+            DBWUserIdentity identity = new LdapAuthProvider().getUserIdentity(
+                new VoidProgressMonitor(),
+                null,
+                Map.of(LdapConstants.CRED_USERNAME, "test-user", SMStandardMeta.KEY_META_PARAMS, names)
+            );
+
+            Assertions.assertEquals(names.values().iterator().next(), identity.getDisplayName());
+            Assertions.assertTrue(identity.getMetaParameters().isEmpty());
+        }
+    }
+
+    @Test
+    public void userIdentityFallsBackToFirstAndLastNameThenToTheLogin() throws Exception {
+        LdapAuthProvider provider = new LdapAuthProvider();
+
+        DBWUserIdentity byParts = provider.getUserIdentity(
+            new VoidProgressMonitor(),
+            null,
+            Map.of(
+                LdapConstants.CRED_USERNAME, "test-user",
+                SMStandardMeta.META_FIRST_NAME, "Una",
+                SMStandardMeta.META_LAST_NAME, "One"
+            )
+        );
+        Assertions.assertEquals("Una One", byParts.getDisplayName());
+
+        DBWUserIdentity byLogin = provider.getUserIdentity(
+            new VoidProgressMonitor(),
+            null,
+            Map.of(LdapConstants.CRED_USERNAME, "test-user", LdapConstants.CRED_DISPLAY_NAME, "the-login")
+        );
+        Assertions.assertEquals("the-login", byLogin.getDisplayName());
+        Assertions.assertTrue(byLogin.getMetaParameters().isEmpty());
+    }
+
+    @NotNull
+    private static BasicAttributes profileAttributes() {
+        BasicAttributes attributes = new BasicAttributes(true);
+        attributes.put("entryUUID", "test-user-id");
+        attributes.put("cn", "Una Maria");
+        attributes.put("givenName", "Una");
+        attributes.put("sn", "One");
+        attributes.put("displayName", "Must not be used as the user's name");
+        return attributes;
+    }
+
+    @NotNull
+    private static Map<String, Object> authenticateWithProfile(
+        @NotNull Map<String, Object> additionalParameters
+    ) throws Exception {
+        return authenticateWithProfile(profileAttributes(), additionalParameters);
+    }
+
+    @NotNull
+    private static Map<String, Object> authenticateWithProfile(
+        @NotNull BasicAttributes attributes,
+        @NotNull Map<String, Object> additionalParameters
+    ) throws Exception {
+        DirContext userContext = Mockito.mock(DirContext.class);
+        NamingEnumeration<SearchResult> userSearchResult = mockUserSearchResult(attributes);
+        Mockito.when(userContext.search(
+            Mockito.eq(USER_DN),
+            Mockito.eq("objectClass=*"),
+            Mockito.any(SearchControls.class)
+        )).thenReturn(userSearchResult);
+
+        return authenticate(new TestLdapAuthProvider(userContext), "", additionalParameters);
+    }
+
     @NotNull
     private static Map<String, Object> authenticate(
         @NotNull LdapAuthProvider provider,
@@ -240,10 +529,17 @@ public class LdapAuthenticationTest {
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     private static NamingEnumeration<SearchResult> mockUserSearchResult() throws Exception {
         BasicAttributes attributes = new BasicAttributes();
         attributes.put("entryUUID", "test-user-id");
+        return mockUserSearchResult(attributes);
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    private static NamingEnumeration<SearchResult> mockUserSearchResult(
+        @NotNull BasicAttributes attributes
+    ) throws Exception {
         SearchResult user = new SearchResult("", null, attributes);
 
         NamingEnumeration<SearchResult> searchResult = Mockito.mock(NamingEnumeration.class);

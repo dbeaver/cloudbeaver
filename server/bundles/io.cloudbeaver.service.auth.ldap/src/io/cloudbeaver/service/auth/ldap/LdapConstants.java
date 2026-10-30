@@ -28,7 +28,10 @@ public interface LdapConstants {
     String PARAM_SSL_ENABLE = "ldap-enable-ssl";
     String PARAM_SSL_CERT = "ldap-ssl-cert";
     String PARAM_REFERRAL_HANDLING = "ldap-referral";
-
+    /** LDAP attribute with the user first name. Empty value disables the mapping. */
+    String PARAM_FIRST_NAME_FIELD = "ldap-first-name-field";
+    /** LDAP attribute with the user last name. Empty value disables the mapping. */
+    String PARAM_LAST_NAME_FIELD = "ldap-last-name-field";
     String CRED_USERNAME = "user";
     String CRED_DISPLAY_NAME = "displayName";
     String CRED_USER_DN = "user-dn";

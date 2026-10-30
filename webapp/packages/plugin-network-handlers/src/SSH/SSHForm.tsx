@@ -71,6 +71,7 @@ export const SSHForm = observer<ISSHFormProps>(function SSHForm({
 
   async function testTunnel() {
     setTestLoading(true);
+
     try {
       await networkHandlerResource.test(state, projectId, connectionId);
     } finally {

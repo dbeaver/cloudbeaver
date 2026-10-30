@@ -30,9 +30,11 @@ export const Database = observer<Props>(function Database({ database, onSelect }
         if (a === database.defaultDriver) {
           return 1;
         }
+
         if (b === database.defaultDriver) {
           return -1;
         }
+
         return a.localeCompare(b);
       }),
     [database],

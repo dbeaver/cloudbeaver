@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
       const pageKey =
         this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+
       let limit = this.navTreeResource.childrenLimit;
       let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
 
@@ -75,6 +76,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
         await this.navTreeResource.load(
           CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(parentKey.options.parentId)),
         );
+
         return;
       }
 
@@ -134,6 +136,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       await ResourceKeyUtils.forEachAsync(originalKey, async navNodeId => {
         values.push(await this.loadDBObjectInfo(navNodeId));
       });
+
       this.set(originalKey, values);
     }
 

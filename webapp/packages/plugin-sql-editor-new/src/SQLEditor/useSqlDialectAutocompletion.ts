@@ -44,6 +44,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
     if (!codemirror) {
       return undefined;
     }
+
     function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
       const wordLowerCase = word.toLocaleLowerCase();
       const hasSameName = proposals.some(
@@ -68,6 +69,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
           if (aIncludes && !bIncludes) {
             return -1;
           }
+
           if (!aIncludes && bIncludes) {
             return 1;
           }

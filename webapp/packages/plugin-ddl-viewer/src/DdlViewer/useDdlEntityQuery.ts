@@ -75,6 +75,7 @@ export function useDdlEntityQuery(nodeId: string): IState {
             ...getDefaultQueryGeneratorOptions(),
             showFullDdl: isFullDdl,
           });
+
           this.query = await this.promise;
           this.key = key;
         } catch (exception: any) {

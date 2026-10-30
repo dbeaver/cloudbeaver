@@ -44,6 +44,7 @@ export function useTab(
         if (tabId !== data.tabId) {
           return;
         }
+
         await onOpen?.(data);
       },
     ],
@@ -56,6 +57,7 @@ export function useTab(
         if (tabId !== data.tabId) {
           return;
         }
+
         await onClose?.(data);
       },
     ],
@@ -76,6 +78,7 @@ export function useTab(
         if (EventContext.has(e, EventStopPropagationFlag)) {
           return;
         }
+
         refObject.onClick?.(this.tabId);
       },
       handleClose(e: React.MouseEvent<HTMLElement>) {

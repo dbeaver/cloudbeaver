@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from './ConnectionInfoResource.js';
 
 export type ObjectContainer = NavNodeInfoFragment;
+
 export interface ICatalogData {
   catalog: ObjectContainer;
   schemaList: ObjectContainer[];
@@ -54,16 +55,19 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
       if (isResourceAlias(key)) {
         return '';
       }
+
       return ResourceKeyUtils.mapKey(
         key,
         key => this.connectionInfoResource.get(createConnectionParam(key.projectId, key.connectionId))?.nodePath || '',
       );
     });
+
     this.navTreeResource.onDataOutdated.addHandler(key => {
       ResourceKeyUtils.forEach(key, key => {
         if (isResourceAlias(key)) {
           return;
         }
+
         const connection = this.connectionInfoResource.getConnectionForNode(key);
 
         if (!connection) {
@@ -73,12 +77,14 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
         this.markOutdated(resourceKeyList(this.keys.filter(key => key.projectId === connection.projectId && key.connectionId === connection.id)));
       });
     });
+
     this.preloadResource(connectionInfoResource, () => ConnectionInfoActiveProjectKey);
     this.before(
       ExecutorInterrupter.interrupter(key => {
         if (isResourceAlias(key)) {
           return false;
         }
+
         return !connectionInfoResource.isConnected(ResourceKeyUtils.mapKey(key, key => createConnectionParam(key.projectId, key.connectionId)));
       }),
     );
@@ -86,6 +92,7 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
     this.connectionInfoResource.onItemDelete.addHandler(key =>
       ResourceKeyUtils.forEach(key, key => this.delete({ projectId: key.projectId, connectionId: key.connectionId })),
     );
+
     this.connectionInfoResource.onItemUpdate.addHandler(key =>
       ResourceKeyUtils.forEach(key, key => {
         if (!this.connectionInfoResource.isConnected(key)) {
@@ -113,6 +120,7 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
     if (isResourceAlias(originalKey)) {
       throw new Error('Aliases not supported by this resource');
     }
+
     const containers = new Map<ObjectContainerParams, IStructContainers>();
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {

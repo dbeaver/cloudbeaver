@@ -42,5 +42,6 @@ export const TreeToolbar = observer<React.PropsWithChildren<TreeToolbarProps>>(f
     context.set(DATA_CONTEXT_TREE_FILTER, filter, id);
     context.set(DATA_CONTEXT_TREE_REFRESH, onRefresh, id);
   });
+
   return <div className={clsx('tw:sticky tw:top-0 tw:z-1 tw:px-2 theme-background-surface', className)}>{children}</div>;
 });

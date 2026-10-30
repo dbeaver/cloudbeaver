@@ -53,13 +53,14 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat, dataFormat, model, resultIndex);
   const Tab = PresentationTab; // alias for styles matching
-  const handleClick = (tabId: string) => {
+
+  function handleClick(tabId: string) {
     if (tabId === presentationId) {
       onClose?.();
     } else {
       onPresentationChange(tabId);
     }
-  };
+  }
 
   const main = type === DataPresentationType.main;
 

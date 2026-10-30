@@ -13,6 +13,7 @@ export const Icon: React.FC<SVGAttributes<any>> = function Icon(props) {
   const { name = '', className, ...rest } = props;
   const cn = `icon ${className || ''}`;
   const url = name.startsWith('/') ? GlobalConstants.absoluteUrl(name) : `${GlobalConstants.iconSpriteUrl}#${name}`;
+
   return (
     <svg {...rest} className={cn} aria-hidden="true" focusable="false">
       <use href={url} />

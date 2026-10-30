@@ -38,6 +38,7 @@ export const baseHtmlPlugin = ({
         if (env.command === 'build') {
           rootUri = '{ROOT_URI}';
         }
+
         return config;
       },
       transformIndexHtml: {

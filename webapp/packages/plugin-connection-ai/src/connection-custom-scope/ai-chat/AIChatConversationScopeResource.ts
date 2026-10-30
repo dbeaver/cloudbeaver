@@ -40,6 +40,7 @@ export class AIChatConversationScopeResource extends CachedMapResource<string, I
     });
 
     this.set(conversation.id, { id: conversation.id, scope: conversation.settings?.scope ?? null });
+
     return this.get(conversation.id)!;
   }
 

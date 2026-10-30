@@ -54,6 +54,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
         metadata.outdated = true;
         metadata.outdatedIncludes = observable([...metadata.includes]);
       }
+
       metadata.withDetails = state;
     });
   }
@@ -109,11 +110,13 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     if (isResourceAlias(key)) {
       throw new Error('Aliases not supported by this resource');
     }
+
     const values: NavNode[] = [];
 
     await ResourceKeyUtils.forEachAsync(key, async nodePath => {
       values.push(await this.loadNodeInfo(nodePath));
     });
+
     this.set(ResourceKeyUtils.toList(key), values);
 
     return this.data;
@@ -189,6 +192,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
       const navParents = parents.map((parent, index) => this.navNodeInfoToNavNode(parent, parentUris[index + 1]));
 
       this.set(resourceKeyList([...parents.map(parent => parent.uri), navNode.uri]), [...navParents, navNode]);
+
       return navNode;
     });
   }

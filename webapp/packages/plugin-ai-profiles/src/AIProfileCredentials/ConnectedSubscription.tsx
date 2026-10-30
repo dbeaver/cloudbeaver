@@ -34,10 +34,13 @@ export const ConnectedSubscription = observer<Props>(function ConnectedSubscript
       message: 'plugin_ai_account_disconnect_confirmation',
       confirmActionText: 'plugin_ai_account_disconnect',
     });
+
     if (status !== DialogueStateResult.Resolved) {
       return;
     }
+
     setProcessing(true);
+
     try {
       await aiProfilesResource.disconnectAccount(profile.id);
       notificationService.logSuccess({ title: 'plugin_ai_account_disconnected', message: profile.name });

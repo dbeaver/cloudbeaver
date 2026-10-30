@@ -59,7 +59,10 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const isReadonly = Boolean(dataSource?.isReadonly());
   const hasUnsavedMark = !saved && !isReadonly;
 
-  const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
+  function handleSelect({ tabId }: ITabData<any>) {
+    return onSelect(tabId);
+  }
+
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
   const tooltip = useObjectInfoTooltip(connection?.name, executionContext?.defaultCatalog, executionContext?.defaultSchema, project?.name);

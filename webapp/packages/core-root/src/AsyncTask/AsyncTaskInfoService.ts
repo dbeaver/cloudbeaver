@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@ export class AsyncTaskInfoService extends Disposable {
       }
 
       this.pendingEvents.set(data.taskId, pendingEvents.concat(data));
+
       return;
     }
 
@@ -91,6 +92,7 @@ export class AsyncTaskInfoService extends Disposable {
     this.tasks.set(task.id, task);
     task.onStatusChange.addHandler(info => {
       this.onTaskUpdated.execute(task);
+
       if (this.taskIdAliases.get(info.id)) {
         return;
       }
@@ -98,6 +100,7 @@ export class AsyncTaskInfoService extends Disposable {
       this.taskIdAliases.set(info.id, task.id);
 
       const pendingEvents = this.pendingEvents.get(info.id);
+
       if (pendingEvents) {
         this.pendingEvents.delete(info.id);
 
@@ -157,11 +160,14 @@ export class AsyncTaskInfoService extends Disposable {
     if (task.pending) {
       throw new Error('Cant remove unfinished task');
     }
+
     this.tasks.delete(task.id);
+
     if (task.info) {
       this.taskIdAliases.delete(task.info.id);
       this.pendingEvents.delete(task.info.id);
     }
+
     if (this.tasks.size === 0) {
       this.connection?.unsubscribe();
       this.connection = null;

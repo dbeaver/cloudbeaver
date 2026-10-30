@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ export function renderLayout(app: App): IRender {
     initRoot(): Root {
       this.unmount();
       let container = document.body.querySelector<HTMLDivElement>('div#root');
+
       if (!container) {
         container = document.createElement('div');
         container.id = 'root';
@@ -75,6 +76,7 @@ export function renderLayout(app: App): IRender {
       if (exception) {
         console.error(exception);
       }
+
       this.initRoot().render(
         <AppContext value={app}>
           <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>

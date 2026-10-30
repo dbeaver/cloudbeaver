@@ -124,6 +124,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
       const plan = contexts.getContext(nodeDeletionPlanContext);
+
       for (const node of nodes.filter(node => this.isFolder(node))) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
         const target = {
@@ -132,11 +133,14 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           warning: 'plugin_connections_delete_folder_warning',
           keepChildren: true,
         };
+
         const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
+
         if ((key && !connection) || !this.canDelete(node)) {
           plan.exclude({ ...target, owner: 'connection-folders', reason: 'plugin_navigation_tree_delete_unavailable' });
           continue;
         }
+
         plan.addOperation({
           id: `delete-connection-folder:${node.uri}`,
           owner: 'connection-folders',
@@ -282,6 +286,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
             name: folderDuplicates.map(node => `"${node.name}"`).join(', '),
           }),
         });
+
         return;
       }
 

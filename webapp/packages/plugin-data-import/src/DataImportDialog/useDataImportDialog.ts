@@ -68,6 +68,7 @@ export function useDataImportDialog(initialState?: IDataImportDialogState): IDia
           }
 
           const defaultValue = getObjectPropertyDefaultValue(property);
+
           return [
             {
               id: property.id,
@@ -107,6 +108,7 @@ export function useDataImportDialog(initialState?: IDataImportDialogState): IDia
         if (configuration) {
           this.state.settings = { ...getDefaultSettings(configuration), ...this.state.settings };
         }
+
         this.state.step = EDataImportDialogStep.Settings;
       },
       selectProcessor(processor: DataTransferProcessorInfo) {

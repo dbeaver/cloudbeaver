@@ -29,10 +29,13 @@ export class DVResultTraceDetailsBootstrap extends Bootstrap {
       title: 'plugin_data_viewer_result_trace_details',
       hidden(dataFormat, model, resultIndex) {
         const source = model.source;
+
         if (!isResultSetDataSource(source)) {
           return true;
         }
+
         const result = (source as ResultSetDataSource).getResult(resultIndex);
+
         return !result?.data?.hasDynamicTrace;
       },
       getPresentationComponent: () => DVResultTraceDetailsPresentation,

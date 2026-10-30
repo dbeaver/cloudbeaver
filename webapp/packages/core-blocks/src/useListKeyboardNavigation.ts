@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ export function useListKeyboardNavigation<T extends HTMLElement>(elementsSelecto
           if (currentIndex === -1) {
             currentIndex = 0;
           }
+
           newIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length; // Move to previous element
 
           break;

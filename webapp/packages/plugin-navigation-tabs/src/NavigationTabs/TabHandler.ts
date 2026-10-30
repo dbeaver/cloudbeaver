@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@ export interface TabHandlerTabProps<T = any> {
   onSelect: (tabId: string) => void;
   onClose?: (tabId: string) => void;
 }
+
 export type TabHandlerTabComponent<T = any> = React.FunctionComponent<TabHandlerTabProps<T>>;
 
 export interface TabHandlerPanelProps<T = any> {
   tab: ITab<T>;
   handler: TabHandler<T>;
 }
+
 export type TabHandlerPanelComponent<T = any> = React.FunctionComponent<TabHandlerPanelProps<T>>;
 
 export type TabHandlerCloseEvent<T = any> = (tab: ITab<T>) => Promise<boolean> | boolean;

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,11 @@ const FinishPageDrawerItem = importLazyComponent(() => import('./Finish/FinishPa
 const ServerConfigurationDrawerItem = importLazyComponent(() =>
   import('./ServerConfiguration/ServerConfigurationDrawerItem.js').then(m => m.ServerConfigurationDrawerItem),
 );
+
 const ServerConfigurationPage = importLazyComponent(() =>
   import('./ServerConfiguration/ServerConfigurationPage.js').then(m => m.ServerConfigurationPage),
 );
+
 const WelcomeDrawerItem = importLazyComponent(() => import('./Welcome/WelcomeDrawerItem.js').then(m => m.WelcomeDrawerItem));
 const WelcomePage = importLazyComponent(() => import('./Welcome/WelcomePage.js').then(m => m.WelcomePage));
 
@@ -61,6 +63,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       getContentComponent: () => WelcomePage,
       getDrawerComponent: () => WelcomeDrawerItem,
     });
+
     this.administrationItemService.create({
       name: ADMINISTRATION_SERVER_CONFIGURATION_ITEM,
       type: AdministrationItemType.Default,
@@ -82,6 +85,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
         },
         onConfigurationFinish: async () => {
           const state = this.serverConfigurationFormStateManager.formState;
+
           if (state) {
             const saved = await this.serverConfigurationFormStateManager.save();
 
@@ -137,6 +141,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       getContentComponent: () => ServerConfigurationPage,
       getDrawerComponent: () => ServerConfigurationDrawerItem,
     });
+
     this.administrationItemService.create({
       name: 'finish',
       type: AdministrationItemType.ConfigurationWizard,

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ export class ConnectionInfoOriginDetailsResource extends CachedMapResource<IConn
 
     await ResourceKeyUtils.forEachAsync(key, async connectionKey => {
       let connectionId: string | undefined;
+
       if (!isResourceAlias(connectionKey)) {
         projectId = connectionKey.projectId;
         connectionId = connectionKey.connectionId;
@@ -91,9 +92,11 @@ export class ConnectionInfoOriginDetailsResource extends CachedMapResource<IConn
 
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+
     if (!parse.success) {
       this.logger.warn(`Invalid resource key ${(schemaValidationError(parse.error).toString(), { prefix: null })}`);
     }
+
     return parse.success;
   }
 }

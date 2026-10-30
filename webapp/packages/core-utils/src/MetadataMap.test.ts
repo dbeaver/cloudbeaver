@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,7 @@ describe('MetadataMap', () => {
       [2, 'two'],
       [3, 'three'],
     ];
+
     map.sync(data);
 
     for (const [key, value] of map) {
@@ -116,6 +117,7 @@ describe('MetadataMap', () => {
       [2, 'two'],
       [3, 'three'],
     ];
+
     const keys = data.map(([key]) => key);
 
     map.sync(data);
@@ -132,6 +134,7 @@ describe('MetadataMap', () => {
       [2, 'two'],
       [3, 'three'],
     ];
+
     const values = data.map(([, value]) => value);
     map.sync(data);
 
@@ -147,6 +150,7 @@ describe('MetadataMap', () => {
       [2, 'two'],
       [3, 'three'],
     ];
+
     map.sync(data);
 
     for (const [key, value] of map.entries()) {

@@ -23,9 +23,11 @@ export class AIProfileAuthorizationService {
   authorize(profileId: string, onAuthorization: (info: AiDeviceAuthorizationInfo) => void): ITask<boolean> {
     const task = this.asyncTaskInfoService.create(async () => {
       const info = await this.aiProfilesResource.startDeviceAuthorization(profileId);
+
       if (!task.cancelled) {
         onAuthorization(info);
       }
+
       return info.taskInfo;
     });
 
@@ -33,10 +35,13 @@ export class AIProfileAuthorizationService {
       async () => {
         try {
           const result = await this.asyncTaskInfoService.run(task);
+
           if (task.cancelled || result.taskResult !== true) {
             return false;
           }
+
           this.aiProfilesResource.markOutdated(profileId);
+
           return true;
         } finally {
           if (!task.pending) {
@@ -56,6 +61,7 @@ export class AIProfileAuthorizationService {
         }
       },
     );
+
     return operation;
   }
 }

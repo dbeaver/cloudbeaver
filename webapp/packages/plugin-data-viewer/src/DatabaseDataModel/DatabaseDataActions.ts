@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,23 +39,29 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
 
   registerAction<T>(service: SingleServiceType<any>, implementation: SingleServiceType<T>): this {
     let implementations = this.registeredActions.get(service);
+
     if (!implementations) {
       implementations = [];
       this.registeredActions.set(service, implementations);
     }
+
     if (!implementations.includes(implementation)) {
       implementations.push(implementation);
     }
+
     return this;
   }
   unregisterAction<T>(service: SingleServiceType<any>, implementation: SingleServiceType<T>): this {
     const implementations = this.registeredActions.get(service);
+
     if (implementations) {
       const index = implementations.indexOf(implementation);
+
       if (index !== -1) {
         implementations.splice(index, 1);
       }
     }
+
     return this;
   }
 
@@ -63,10 +69,13 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
     const possibleImplementations = this.registeredActions
       .get(service)
       ?.filter(action => isActionSupportsFormat(action as any, this.source.dataFormat));
+
     const impl = possibleImplementations?.[possibleImplementations.length - 1];
+
     if (!impl) {
       throw new Error(`Action ${service.name} not found for format ${this.source.dataFormat}`);
     }
+
     return impl as SingleServiceType<T>;
   }
 
@@ -84,9 +93,11 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
   get<T>(result: TResult, Action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T;
   get<T>(result: TResult, Action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T {
     const scope = this.resultScopes.get(result.uniqueResultId);
+
     if (!scope) {
       throw new Error(`Result ${result.uniqueResultId} not found in the source`);
     }
+
     const value = untracked(() =>
       scope.serviceProvider.getService(
         withExternal(Action)
@@ -115,6 +126,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
         this.resultScopes.set(result.uniqueResultId, this.serviceProvider.createScope());
       }
     }
+
     return this;
   }
 
@@ -122,6 +134,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
     for (const scope of this.resultScopes.values()) {
       scope[Symbol.dispose]?.();
     }
+
     this.resultScopes.clear();
   }
 }
@@ -133,6 +146,8 @@ function isActionSupportsFormat<TOptions, TResult extends IDatabaseDataResult>(
   if ('dataFormat' in action) {
     return !action.dataFormat || action.dataFormat.includes(format);
   }
+
   const constructor = action.constructor as IDatabaseDataActionClass<TOptions, TResult, IDatabaseDataAction<TOptions, TResult>>;
+
   return !constructor.dataFormat || constructor.dataFormat.includes(format);
 }

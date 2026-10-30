@@ -32,6 +32,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   const showCellMenu = getComputed(
     () => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || cellContext.isMenuVisible),
   );
+
   const styles = useS(style);
 
   function handleMouseUp(event: React.MouseEvent<HTMLButtonElement>) {

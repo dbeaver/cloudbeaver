@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ interface ITaskContainer<T, TValue> {
 }
 
 export type BlockedExecution<T> = (active: T, current: T) => boolean;
+
 export interface IScheduleOptions {
   cancel?: () => Promise<any> | any;
   before?: () => any;
@@ -54,6 +55,7 @@ export class TaskScheduler<TIdentifier = void> {
     if (!this.isBlocked) {
       return this.executing;
     }
+
     return this.queue.some(active => this.isBlocked!(active.id, id));
   }
 
@@ -121,6 +123,7 @@ export class TaskScheduler<TIdentifier = void> {
         if (container.task.cancelled) {
           throw new Error('Task was cancelled');
         }
+
         if (!_container.task.cancelled) {
           try {
             await _container.task;

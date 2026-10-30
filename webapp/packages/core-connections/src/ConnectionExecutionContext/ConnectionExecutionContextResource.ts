@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     userInfoResource.onUserChange.addHandler(() => {
       this.clear();
     });
+
     connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionContexts.bind(this));
     connectionInfoResource.onItemDelete.addHandler(this.deleteConnectionContexts.bind(this));
 
@@ -114,10 +115,12 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         defaultCatalog,
         defaultSchema,
       });
+
       this.onDataOutdated.execute(contextId);
     });
 
     this.markOutdated();
+
     return this.get(contextId)!;
   }
 
@@ -134,6 +137,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         connectionId: context.connectionId,
         projectId: context.projectId,
       });
+
       this.delete(contextId);
     });
 
@@ -174,6 +178,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
     runInAction(() => {
       const key = resourceKeyList(contextsList.map(context => context.id));
+
       if (all) {
         this.replace(key, contextsList.map(getBaseContext));
       } else {

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
  */
 package io.cloudbeaver.test;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -31,6 +30,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -41,6 +41,7 @@ public class WebGQLClient {
     private static final Gson gson = new GsonBuilder()
         .setPrettyPrinting()
         .create();
+    private static final Gson REQUEST_GSON = gson.newBuilder().serializeNulls().create();
     public static final String GQL_AUTHENTICATE = """
         query authLogin($provider: ID!, $configuration: ID, $credentials: Object, $linkUser: Boolean, $forceSessionsLogout: Boolean) {
           result: authLogin(
@@ -156,7 +157,29 @@ public class WebGQLClient {
             request.put("variables", variables);
         }
 
-        return gson.toJson(request, Map.class);
+        return REQUEST_GSON.toJson(toRequestJson(request));
+    }
+
+    @NotNull
+    private JsonElement toRequestJson(@Nullable Object value) {
+        // Preserve explicit nulls in JSON input maps, but keep omitting unset fields of Java DTOs.
+        if (value instanceof Map<?, ?> values) {
+            JsonObject object = new JsonObject();
+            values.forEach((key, item) -> object.add(String.valueOf(key), toRequestJson(item)));
+            return object;
+        }
+        if (value instanceof Object[] values) {
+            value = Arrays.asList(values);
+        }
+        if (value instanceof Iterable<?> values) {
+            JsonArray array = new JsonArray();
+            values.forEach(item -> array.add(toRequestJson(item)));
+            return array;
+        }
+        if (value instanceof JsonElement json) {
+            return json;
+        }
+        return gson.toJsonTree(value);
     }
 
     @NotNull

@@ -53,6 +53,7 @@ export class ResultSetFormatAction
     if (!this.edit) {
       return true;
     }
+
     let readonly = false;
 
     if (key.column) {
@@ -78,6 +79,7 @@ export class ResultSetFormatAction
     }
 
     const column = this.view.getColumn(holder.key.column);
+
     if (column?.dataKind?.toLocaleLowerCase() === 'binary') {
       return true;
     }
@@ -98,6 +100,7 @@ export class ResultSetFormatAction
   isGeometry(holder: IDatabaseValueHolder<Partial<IGridDataKey>, any>): boolean {
     if (holder.key.column) {
       const column = this.view.getColumn(holder.key.column);
+
       if (column?.dataKind?.toLocaleLowerCase() === 'geometry') {
         return true;
       }
@@ -207,8 +210,10 @@ export class ResultSetFormatAction
         if (typeof holder.value.value === 'object' && holder.value.value !== null) {
           return JSON.stringify(holder.value.value);
         }
+
         return String(holder.value.value);
       }
+
       return '';
     }
 
@@ -253,8 +258,10 @@ export class ResultSetFormatAction
         if (typeof holder.value.value === 'object' && holder.value.value !== null) {
           return NaN;
         }
+
         return parseFloat(holder.value.value);
       }
+
       return NaN;
     }
 

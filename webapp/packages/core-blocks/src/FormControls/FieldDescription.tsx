@@ -17,6 +17,7 @@ interface Props {
   className?: string;
   invalid?: boolean;
 }
+
 export const FieldDescription: React.FC<PropsWithChildren<Props>> = observer(function FieldDescription({ children, id, className, invalid }) {
   const styles = useS(fieldDescriptionStyles);
 

@@ -69,6 +69,7 @@ export class SQLParser {
     if (isArraysEqual(this.lastParsingArgs, parsingArgs)) {
       return undefined as any;
     }
+
     const result = parser(parsingScript, ...args);
 
     const applyResult = (queries: IQueryInfo[]) => {

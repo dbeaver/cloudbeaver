@@ -40,6 +40,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
           return nodes.length > 0 ? { nodeIds: nodes.map(node => node.uri) } : null;
         }),
     });
+
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],

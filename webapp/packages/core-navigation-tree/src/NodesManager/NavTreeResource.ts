@@ -117,6 +117,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       () => CachedMapAllKey,
       () => CachedMapAllKey,
     );
+
     this.projectInfoResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
     this.sessionDataResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
     this.userInfoResource.onUserChange.addHandler(
@@ -152,6 +153,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       } else {
         children = this.get(next) || [];
       }
+
       parent = next;
       isParentHasMoreData = hasMorePagesForResourceKey(this, next);
     }
@@ -172,6 +174,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       if (!silent) {
         this.markTreeOutdated(navNodeId);
       }
+
       await this.onNodeRefresh.execute(navNodeId);
     });
   }
@@ -185,6 +188,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       if (!silent) {
         this.markOutdated(navNodeId);
       }
+
       await this.onNodeRefresh.execute(navNodeId);
     });
   }
@@ -202,6 +206,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         metadata.outdated = true;
         metadata.outdatedIncludes = observable([...metadata.includes]);
       }
+
       metadata.withDetails = state;
     });
   }
@@ -217,6 +222,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
           await this.graphQLService.sdk.navDeleteNodes({ nodePaths: [path] });
           deletedPaths.push(path);
         }
+
         this.onDataOutdated.execute(key);
       } finally {
         runInAction(() => {
@@ -283,11 +289,14 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
   async changeName(node: NavNode, name: string): Promise<string> {
     const parentId = node.parentId;
+
     if (isUndefined(parentId)) {
       throw new Error("Root node can't be renamed");
     }
+
     const newNodeId = await this.performUpdate(parentId, [], async () => {
       this.markLoading(node.uri, true);
+
       try {
         const { nodePath } = await this.graphQLService.sdk.navRenameNode({
           nodePath: node.uri,
@@ -309,6 +318,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       nodeId: node.uri,
       newNodeId,
     });
+
     return newNodeId;
   }
 
@@ -319,6 +329,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     this.pushToNode(toParent, [to]);
 
     const node = this.navNodeInfoResource.get(from);
+
     if (node) {
       node.uri = to;
       node.name = getPathName(to);
@@ -463,7 +474,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     if (!this.navNodeInfoResource.has(nodeId) && nodeId !== ROOT_NODE_PATH) {
       await this.navNodeInfoResource.loadNodeParents(nodeId);
     }
+
     const parents = this.navNodeInfoResource.getParents(nodeId);
+
     return await this.preloadNodeParents(parents, nodeId);
   }
 

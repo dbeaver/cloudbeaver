@@ -80,17 +80,21 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
       }
 
       EventContext.set(event, EventTreeNodeSelectFlag);
+
       switch ((event as unknown as KeyboardEvent).code) {
         case KEY.ENTER:
           await context.select(event.ctrlKey || event.metaKey);
           break;
       }
+
       return true;
     }
+
     async function handleClick(event: React.MouseEvent<HTMLDivElement>) {
       if (EventContext.has(event, EventStopPropagationFlag)) {
         return;
       }
+
       if (onClick) {
         onClick(event);
       }
@@ -103,12 +107,15 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
 
       await context.click?.();
     }
+
     async function handleDbClick(event: React.MouseEvent<HTMLDivElement>) {
       if (EventContext.has(event, EventTreeNodeExpandFlag, EventTreeNodeSelectFlag, EventStopPropagationFlag)) {
         return;
       }
+
       await context.open();
     }
+
     function handleMouseDown(event: React.MouseEvent<HTMLDivElement>) {
       if (onMouseDown) {
         onMouseDown(event);

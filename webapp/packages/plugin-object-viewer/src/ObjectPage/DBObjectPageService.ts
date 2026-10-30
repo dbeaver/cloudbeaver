@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ export class DBObjectPageService {
   register<T>(options: ObjectPageOptions<T>): ObjectPage<T> {
     const objectPage = new ObjectPage(options);
     this.pages.set(options.key, objectPage);
+
     return objectPage;
   }
 
@@ -50,6 +51,7 @@ export class DBObjectPageService {
     if ((currentPage.priority || 0) < page.priority) {
       return true;
     }
+
     return false;
   }
 
@@ -62,6 +64,7 @@ export class DBObjectPageService {
       this.selectPage(tab, page, state);
       return true;
     }
+
     return false;
   }
 
@@ -81,6 +84,7 @@ export class DBObjectPageService {
         return false;
       }
     }
+
     return true;
   }
 
@@ -103,6 +107,7 @@ export class DBObjectPageService {
   private async callHandlerCallback<T>(tab: ITab<IObjectViewerTabState>, selector: (page: ObjectPage<T>) => ObjectPageCallback<T> | undefined) {
     for (const page of this.pages.values()) {
       const callback = selector(page);
+
       if (callback) {
         callback.call(page, tab, this.getPageState(tab, page));
       }
