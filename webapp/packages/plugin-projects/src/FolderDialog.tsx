@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
         state.message = undefined;
         state.validationInProgress = true;
         let valid: boolean | undefined;
+
         try {
           valid = await state.payload.validation?.({ folder, name: value, projectId }, (message: string) => {
             if (state.folder === folder && state.value === value && state.projectId === projectId) {
@@ -147,6 +148,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   async function resolveHandler() {
     try {
       await state.validate();
+
       if (state.valid) {
         resolveDialog({ folder: state.folder, name: state.value, projectId: state.projectId });
       }

@@ -319,6 +319,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
         for (const schema of schemaList) {
           const schemaName = schema.name?.trim() || '';
+
           if (!schemaName) {
             continue;
           }
@@ -362,6 +363,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         for (const catalogData of catalogList) {
           const catalog = catalogData.catalog;
           const catalogName = catalog.name?.trim() || '';
+
           if (!catalogName) {
             continue;
           }

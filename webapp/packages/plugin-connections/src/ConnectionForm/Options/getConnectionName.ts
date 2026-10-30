@@ -17,6 +17,7 @@ export function getConnectionName({ driverName, host, port, defaultPort }: IConn
 
   if (host) {
     name += '@' + host;
+
     if (port && port !== defaultPort) {
       name += ':' + port;
     }

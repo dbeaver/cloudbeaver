@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ export class ActionService {
     if (this.handlers.has(handler.id)) {
       throw new Error(`Action handler with same id (${handler.id}) already exists`);
     }
+
     this.handlers.set(handler.id, {
       ...handler,
       menus: new Set(handler.menus),
@@ -47,6 +48,7 @@ export class ActionService {
           continue;
         }
       }
+
       if (handler.contexts.size > 0) {
         for (const context of handler.contexts) {
           if (!contexts.has(context)) {
@@ -56,6 +58,7 @@ export class ActionService {
       }
 
       const menu = contexts.getOwn(DATA_CONTEXT_MENU);
+
       if (handler.menus.size > 0) {
         if (!isNotNullDefined(menu) || !handler.menus.has(menu)) {
           continue;

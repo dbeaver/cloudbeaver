@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useId } from 'react';
 
 import { clsx, Switch as SwitchBase } from '@dbeaver/ui-kit';
 
@@ -47,6 +48,7 @@ export const Switch: SwitchType = observer(function Switch({
   onChange,
   ...rest
 }: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>) & ILayoutSizeProps) {
+  const descriptionId = useId();
   const checkboxState = useCheckboxState({
     value,
     defaultValue,
@@ -57,6 +59,7 @@ export const Switch: SwitchType = observer(function Switch({
     inverse,
     onChange,
   });
+
   rest = filterLayoutFakeProps(rest);
 
   if (autoHide && !isControlPresented(name, state)) {
@@ -77,7 +80,7 @@ export const Switch: SwitchType = observer(function Switch({
         onChange={checkboxState.change}
       >
         <SwitchBase.Track />
-        <SwitchBase.Input />
+        <SwitchBase.Input aria-describedby={[rest['aria-describedby'], description && descriptionId].filter(Boolean).join(' ') || undefined} />
         <SwitchBase.Thumb />
         {children && (
           <SwitchBase.Label
@@ -92,7 +95,7 @@ export const Switch: SwitchType = observer(function Switch({
           </SwitchBase.Label>
         )}
       </SwitchBase.Provider>
-      {description && <FieldDescription>{description}</FieldDescription>}
+      {description && <FieldDescription id={descriptionId}>{description}</FieldDescription>}
     </Field>
   );
 });

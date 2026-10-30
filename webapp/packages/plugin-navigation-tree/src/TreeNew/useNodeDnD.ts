@@ -42,6 +42,7 @@ export function useNodeDnD(nodeId: string): INodeDnD {
       if (!treeDnD || !isOver) {
         return false;
       }
+
       return treeDnD.canDrop(nodeId, moveContext);
     },
     onDrop: moveContext => treeDnD?.onDrop(nodeId, moveContext),

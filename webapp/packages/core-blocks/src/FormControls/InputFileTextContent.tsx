@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { type ReactNode, useContext, useState } from 'react';
+import { type ReactNode, useContext, useId, useState } from 'react';
 
 import { blobToBase64, bytesToSize } from '@cloudbeaver/core-utils';
 import { IconButton } from '@dbeaver/ui-kit';
@@ -62,6 +62,10 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
 }: Props<Record<any, any>>) {
   const translate = useTranslate();
   const context = useContext(FormContext);
+  const inputId = useId();
+  const labelId = useId();
+  const buttonId = useId();
+  const labelledBy = children ? `${buttonId} ${labelId}` : undefined;
 
   const [selected, setSelected] = useState<File | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -136,11 +140,19 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
 
   return (
     <Field className={className}>
-      <FieldLabel title={labelTooltip} required={required} className={s(styles, { fieldLabel: true })}>
+      <FieldLabel id={labelId} htmlFor={inputId} title={labelTooltip} required={required} className={s(styles, { fieldLabel: true })}>
         {children}
       </FieldLabel>
-      <UploadArea title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
-        <Button className="tw:w-max" icon="/icons/import.svg" tag="div" variant="secondary" disabled={disabled}>
+      <UploadArea id={inputId} aria-labelledby={labelledBy} title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
+        <Button
+          id={buttonId}
+          aria-labelledby={labelledBy}
+          className="tw:w-max"
+          icon="/icons/import.svg"
+          tag="div"
+          variant="secondary"
+          disabled={disabled}
+        >
           {translate('ui_upload_file')}
         </Button>
       </UploadArea>

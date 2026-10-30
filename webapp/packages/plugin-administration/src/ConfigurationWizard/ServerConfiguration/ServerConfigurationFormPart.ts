@@ -48,6 +48,7 @@ function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
 }
 
 const SUPPORTED_HOSTS_SPLITTER = '\n';
+
 export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFormPartState> {
   constructor(
     formState: IFormState<null>,

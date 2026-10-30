@@ -18,7 +18,13 @@
     "eslintplugin",
     "eslint-plugin"
   ],
+  "scripts": {
+    "test": "node --test",
+    "lint": "eslint ."
+  },
   "devDependencies": {
-    "eslint": "^9"
+    "@typescript-eslint/parser": "^8",
+    "eslint": "^9",
+    "typescript": "^5.8.3"
   }
 }

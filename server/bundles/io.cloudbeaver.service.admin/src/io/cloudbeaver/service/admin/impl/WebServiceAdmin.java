@@ -49,6 +49,7 @@ import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
+import org.jkiss.dbeaver.model.security.user.SMUserTeam;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -88,11 +89,22 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public List<AdminUserInfo> listUsers(@NotNull WebSession webSession, @NotNull AdminUserInfoFilter adminFilter) throws DBWebException {
+    public List<AdminUserInfo> listUsers(
+        @NotNull WebSession webSession,
+        @NotNull AdminUserInfoFilter adminFilter
+    ) throws DBWebException {
         try {
+            var securityController = webSession.getAdminSecurityController();
+            SMUser[] foundUsers = securityController.findUsers(adminFilter.getFilter());
+            Set<String> userIds = Arrays.stream(foundUsers).map(SMUser::getUserId).collect(Collectors.toSet());
+            Map<String, SMUserTeam[]> userTeams = securityController.getUsersTeams(userIds);
             List<AdminUserInfo> users = new ArrayList<>();
-            for (SMUser smUser : webSession.getAdminSecurityController().findUsers(adminFilter.getFilter())) {
-                users.add(new AdminUserInfo(webSession, new WebUser(smUser)));
+            for (SMUser smUser : foundUsers) {
+                users.add(new AdminUserInfo(
+                    webSession,
+                    new WebUser(smUser),
+                    userTeams.getOrDefault(smUser.getUserId(), new SMUserTeam[0])
+                ));
             }
             return users;
         } catch (Exception e) {

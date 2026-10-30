@@ -21,6 +21,7 @@ interface Props {
 export const PendingSubscription = observer<Props>(function PendingSubscription({ profile, authorization }) {
   const translate = useTranslate();
   const copy = useClipboard();
+
   return (
     <>
       <div role="status">

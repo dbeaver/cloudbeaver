@@ -39,6 +39,7 @@ export const MenuActionElement = registry(
     const actionInfo = item.action.actionInfo;
     const loading = getComputed(() => item.action.isLoading());
     let binding: string | undefined;
+
     if (item.action.binding !== null) {
       binding = getBindingLabel(item.action.binding.binding);
     }

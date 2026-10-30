@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ const registry: StyleRegistry = [
     },
   ],
 ];
+
 export const SqlEditorToolsMenu = observer<Props>(function SqlEditorToolsMenu({ data, state, context, className }) {
   const menuBarStyles = useS(SqlEditorActionsMenuBarStyles, SqlEditorActionsMenuBarItemStyles, MenuBarStyles, MenuBarItemStyles, MenuBarGroupStyles);
   const menu = useMenu({ menu: SQL_EDITOR_TOOLS_MENU, context });
@@ -50,6 +51,7 @@ export const SqlEditorToolsMenu = observer<Props>(function SqlEditorToolsMenu({ 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_SQL_EDITOR_STATE, state, id);
   });
+
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_SQL_EDITOR_DATA, data, id);
   });

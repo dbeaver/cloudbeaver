@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ describe('useObservableRef', () => {
         return this.count * 2;
       },
     });
+
     const observed = { count: observable, doubleCount: computed };
 
     const { result } = renderHook(() => useObservableRef(init, observed, false));
@@ -72,6 +73,7 @@ describe('useObservableRef', () => {
     runInAction(() => {
       result.current.count = 5;
     });
+
     expect(result.current.doubleCount).toBe(10);
   });
 
@@ -96,6 +98,7 @@ describe('useObservableRef', () => {
         this.count++;
       },
     });
+
     const observed = { count: observable };
     const update = ['increment'];
 
@@ -110,6 +113,7 @@ describe('useObservableRef', () => {
       count: number;
       str?: string;
     }
+
     const init = () => ({ count: 0 }) as Update;
     const observed = { count: observable };
 

@@ -1,4 +1,16 @@
 export default [
+  ['plugin_authentication_administration_team_grant_manual', 'Administrateur'],
+  ['plugin_authentication_administration_team_grant_provider', 'Fournisseur d’authentification'],
+  ['plugin_authentication_administration_team_grant_default', 'Équipe par défaut'],
+  ['plugin_authentication_administration_team_grant_manual_tooltip', 'Ajouté manuellement par un administrateur.'],
+  [
+    'plugin_authentication_administration_team_grant_default_tooltip',
+    'L’utilisateur a été ajouté automatiquement car cette équipe est configurée comme équipe par défaut pour les utilisateurs.',
+  ],
+  [
+    'plugin_authentication_administration_team_grant_provider_tooltip',
+    'Attribuée par le fournisseur d’authentification et synchronisée à la connexion.',
+  ],
   ['authentication_administration_pages_label', 'Pages'],
   ['authentication_administration_user_connections_user_add', "Création d'utilisateur"],
   ['authentication_administration_user_connections_user_new', 'Nouvel utilisateur'],
@@ -127,7 +139,10 @@ export default [
     'administration_teams_delete_confirmation_users_note',
     "Notez que les utilisateurs perdront leur affiliation à l'équipe et toutes les permissions associées",
   ],
-  ['administration_teams_team_granted_users_only_admin_team', "Vous ne pouvez pas gérer vos propres permissions, car il s'agit de la seule équipe d'administration à laquelle vous participez"],
+  [
+    'administration_teams_team_granted_users_only_admin_team',
+    "Vous ne pouvez pas gérer vos propres permissions, car il s'agit de la seule équipe d'administration à laquelle vous participez",
+  ],
   ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
   ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
   ['plugin_authentication_administration_user_last_login', 'Dernière connexion'],

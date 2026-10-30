@@ -36,6 +36,8 @@ export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
     autoSelect?: boolean;
     tabList?: string[];
     enabledBaseActions?: boolean;
+    /** Open the tab menu on right-click. Disabled by default for each tab group. */
+    enabledContextMenu?: boolean;
     reorderStateKey?: string;
     sortFunction?: (tabs: string[]) => string[];
     canClose?: (tab: ITabData<T>) => boolean;
@@ -55,6 +57,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   autoSelect = true,
   tabList,
   enabledBaseActions,
+  enabledContextMenu = false,
   reorderStateKey,
   sortFunction,
   onChange: onOpen,
@@ -252,6 +255,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       async closeOthers(tabId: string) {
         if (dynamic.tabList) {
           const tabs = dynamic.tabList.filter(tab => tab !== tabId);
+
           for (const tab of tabs) {
             await this.close(tab);
           }
@@ -273,6 +277,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closable: observable.ref,
       tabList: observable.ref,
       enabledBaseActions: observable.ref,
+      enabledContextMenu: observable.ref,
       reorderStateKey: observable.ref,
       sortFunction: observable.ref,
       getTabInfo: action.bound,
@@ -295,6 +300,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closable,
       tabList,
       enabledBaseActions,
+      enabledContextMenu,
       reorderStateKey,
       sortFunction,
     },

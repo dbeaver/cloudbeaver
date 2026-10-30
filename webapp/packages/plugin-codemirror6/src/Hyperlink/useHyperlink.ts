@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ const modKeyState = StateField.define<boolean>({
         return effect.value;
       }
     }
+
     return value;
   },
 });
@@ -49,6 +50,7 @@ const hoverPositionState = StateField.define<number | null>({
         return effect.value;
       }
     }
+
     return value;
   },
 });
@@ -77,6 +79,7 @@ const linksState = StateField.define({
               hyperlink.state = HyperlinkState.Result;
               hyperlink.hyperlink = effect.value[1];
             }
+
             return true;
           },
         });
@@ -233,6 +236,7 @@ const hyperlinkPlugin = ViewPlugin.fromClass(
 );
 
 const EDITOR_AUTOCOMPLETION_COMPARTMENT = new Compartment();
+
 export function useHyperlink(config: HyperlinksConfig): [Compartment, Extension] {
   return [EDITOR_AUTOCOMPLETION_COMPARTMENT, [hyperlinkPlugin, modKeyState, hoverPositionState, linksState, hyperlinksConfig.of(config)]];
 }

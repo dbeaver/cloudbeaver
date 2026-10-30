@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
 
       return [];
     }, [readonly]);
+
     const eventHandlers = useMemo(
       () =>
         EditorView.domEventHandlers({
@@ -58,6 +59,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
         }),
       [copyEventHandler],
     );
+
     extensions = useCodemirrorExtensions(extensions, [readOnlyFacet, eventHandlers]);
     const [container, setContainer] = useState<HTMLDivElement | null>(null);
     const [view, setView] = useState<EditorView | null>(null);
@@ -89,6 +91,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
         let merge: MergeView | undefined;
 
         const effects: Extension[] = [];
+
         for (const [compartment, extension] of extensions) {
           effects.push(compartment.of(extension));
         }
@@ -136,6 +139,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
         if (incomingView) {
           setIncomingView(incomingView);
         }
+
         setView(editorView);
         currentExtensions.current = extensions;
 
@@ -167,6 +171,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       }
 
       const effects: StateEffect<any>[] = [];
+
       for (const [compartment, extension] of extensions) {
         if (currentExtensions.current.get(compartment) !== extension) {
           if (compartment.get(view.state) === undefined) {

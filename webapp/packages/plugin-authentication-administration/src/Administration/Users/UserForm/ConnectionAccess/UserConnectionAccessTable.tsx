@@ -93,6 +93,7 @@ export const UserConnectionAccessTable: TabContainerPanelComponent<UserFormProps
   function isEdited(connection: DatabaseConnection) {
     const initial = tabState.initialState.some(permission => permission.dataSourceId === connection.id);
     const current = tabState.state.some(permission => permission.dataSourceId === connection.id);
+
     return initial !== current;
   }
 
@@ -131,6 +132,7 @@ export const UserConnectionAccessTable: TabContainerPanelComponent<UserFormProps
   function isManageable(connection: DatabaseConnection) {
     const permission = tabState.initialState.find(permission => permission.dataSourceId === connection.id);
     const isTeamProvided = permission?.subjectType === AdminSubjectType.Team;
+
     return !isTeamProvided;
   }
 

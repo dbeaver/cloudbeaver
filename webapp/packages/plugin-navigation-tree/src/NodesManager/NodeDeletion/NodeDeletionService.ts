@@ -110,6 +110,7 @@ export class NodeDeletionService {
     }
 
     const selected = new Set(result);
+
     return items.filter(item => selected.has(item.node.uri));
   }
 

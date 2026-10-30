@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ export class ResultSetTableFooterMenuService {
         return [ACTION_COUNT_TOTAL_ELEMENTS, ...items];
       },
     });
+
     this.actionService.addHandler({
       id: 'result-set-data-base-handler',
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
@@ -68,6 +69,7 @@ export class ResultSetTableFooterMenuService {
         if (!result) {
           return false;
         }
+
         const constraint = model.source.tryGetAction(resultIndex, IDatabaseDataConstraintAction);
 
         switch (action) {
@@ -75,6 +77,7 @@ export class ResultSetTableFooterMenuService {
             return !!constraint?.supported && !model.isDisabled(resultIndex);
           }
         }
+
         return true;
       },
       isDisabled: (context, action) => {
@@ -114,6 +117,7 @@ export class ResultSetTableFooterMenuService {
         switch (action) {
           case ACTION_COUNT_TOTAL_ELEMENTS: {
             const result = model.source.getResult(resultIndex);
+
             if (!result) {
               return action.info;
             }
@@ -173,6 +177,7 @@ export class ResultSetTableFooterMenuService {
                 metadata.totalCount.loading = false;
               }
             }
+
             break;
           }
         }
@@ -184,6 +189,7 @@ export class ResultSetTableFooterMenuService {
     const model = context.get(DATA_CONTEXT_DV_DDM)!;
     const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
     const metadataAction = model.source.getAction(resultIndex, IDatabaseDataMetadataAction);
+
     return metadataAction.get<IResultSetActionsMetadata>('result-set-database-metadata', () => ({ totalCount: { loading: false } }));
   }
 }

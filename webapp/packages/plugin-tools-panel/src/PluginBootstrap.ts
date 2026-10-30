@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,12 @@ export class PluginBootstrap extends Bootstrap {
       undefined,
       () => this.toolsPanelService.disabled || this.toolsPanelService.tabsContainer.getDisplayed().length === 0,
     );
+
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [...items, MENU_TOOLS],
     });
+
     this.menuService.setHandler({
       id: 'tools-menu-base',
       menus: [MENU_TOOLS],

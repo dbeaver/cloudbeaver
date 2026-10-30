@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -82,15 +82,18 @@ export class AdministrationItemService {
         if (a.replace && b.replace) {
           return (b.replace.priority ?? Number.MIN_SAFE_INTEGER) - (a.replace.priority ?? Number.MIN_SAFE_INTEGER);
         }
+
         return 0;
       })
       .filter(item => !item.replace?.condition || item.replace.condition(configurationWizard));
 
     let lastItem: IAdministrationItem | null = null;
+
     for (const item of orderedByPriority) {
       if (lastItem?.name === item.name) {
         continue;
       }
+
       items.push(item);
       lastItem = item;
     }
@@ -140,6 +143,7 @@ export class AdministrationItemService {
 
   getItemSub(item: IAdministrationItem, subItem: string): IAdministrationItemSubItem | null {
     const sub = item.sub.find(sub => sub.name === subItem);
+
     if (!sub) {
       return null;
     }
@@ -165,6 +169,7 @@ export class AdministrationItemService {
       sub: options.sub ?? [],
       order: options.order ?? Number.MAX_SAFE_INTEGER,
     };
+
     const index = this.items.push(item);
 
     return this.items[index - 1]!;
@@ -186,6 +191,7 @@ export class AdministrationItemService {
   ): Promise<boolean> {
     const item = this.getItem(screen.item, configurationWizard);
     let nextItem = null;
+
     if (toScreen) {
       nextItem = this.getItem(toScreen.item, configurationWizard);
     }
@@ -200,6 +206,7 @@ export class AdministrationItemService {
 
     if (screen.sub) {
       const sub = this.getItemSub(item, screen.sub);
+
       if (sub?.canDeActivate && !(await sub.canDeActivate(screen.param, configurationWizard))) {
         return false;
       }
@@ -210,6 +217,7 @@ export class AdministrationItemService {
 
   async canActivate(screen: IAdministrationItemRoute, configurationWizard: boolean, outside: boolean): Promise<boolean> {
     const item = this.getItem(screen.item, configurationWizard);
+
     if (!item) {
       return false;
     }
@@ -220,6 +228,7 @@ export class AdministrationItemService {
 
     if (screen.sub) {
       const sub = this.getItemSub(item, screen.sub);
+
       if (sub?.canActivate && !(await sub.canActivate(screen.param, configurationWizard))) {
         return false;
       }
@@ -230,28 +239,35 @@ export class AdministrationItemService {
 
   private activateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside, outsideAdminPage }) => {
     let lastItem = 0;
+
     while (true) {
       const items = this.getActiveItems(configurationWizard);
+
       if (lastItem === items.length) {
         break;
       }
+
       await items[lastItem]?.onLoad?.(configurationWizard, outside, outsideAdminPage);
       lastItem++;
     }
 
     if (configurationWizard) {
       let item = 0;
+
       while (true) {
         const items = this.getActiveItems(configurationWizard);
+
         if (item === items.length) {
           break;
         }
+
         await items[item]?.configurationWizardOptions?.onLoad?.();
         item++;
       }
     }
 
     const item = this.getItem(screen.item, configurationWizard);
+
     if (!item) {
       return;
     }
@@ -265,6 +281,7 @@ export class AdministrationItemService {
 
   private deActivateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside, outsideAdminPage }) => {
     const item = this.getItem(screen.item, configurationWizard);
+
     if (!item) {
       return;
     }

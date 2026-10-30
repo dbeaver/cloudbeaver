@@ -65,6 +65,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           title: 'plugin_ai_credentials_saved',
           message: profile?.name,
         });
+
         resolveDialog();
       } else if (exception) {
         notificationService.logException(exception, 'plugin_ai_credentials_save_failed');
@@ -76,6 +77,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     if (isSaving) {
       return;
     }
+
     if (formState.isChanged) {
       const { status } = await commonDialogService.open(ConfirmationDialog, {
         title: 'ui_discard_changes',
@@ -83,10 +85,12 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
         confirmActionText: 'ui_discard',
         cancelActionText: 'ui_keep_editing',
       });
+
       if (status !== DialogueStateResult.Resolved) {
         return;
       }
     }
+
     if (await authorization.confirmLeave()) {
       rejectDialog();
     }

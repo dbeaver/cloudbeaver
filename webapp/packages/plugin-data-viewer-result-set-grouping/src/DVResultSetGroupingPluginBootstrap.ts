@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_D
 const DVGroupingColumnEditorDialog = importLazyComponent(() =>
   import('./DVGroupingColumnEditorDialog/DVGroupingColumnEditorDialog.js').then(module => module.DVGroupingColumnEditorDialog),
 );
+
 const DVResultSetGroupingPresentation = importLazyComponent(() =>
   import('./DVResultSetGroupingPresentation.js').then(module => module.DVResultSetGroupingPresentation),
 );
@@ -69,9 +70,11 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       isActionApplicable(context, action) {
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
+
         if ((presentation && presentation.type !== DataViewerPresentationType.Data) || !isResultSetDataSource(model.source)) {
           return false;
         }
+
         switch (action) {
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN:
             return context.has(DATA_CONTEXT_DV_DDM) && context.has(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
@@ -80,6 +83,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
           case ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES:
             return true;
         }
+
         return false;
       },
       getActionInfo(context, action) {
@@ -106,6 +110,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN: {
             const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
             const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
             if (!model.source.hasResult(resultIndex)) {
               return true;
             }
@@ -170,6 +175,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
         }
       },
     });
+
     this.menuService.addCreator({
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_DV_DDM_RS_GROUPING],
@@ -194,11 +200,13 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       dataFormat: ResultDataFormat.Resultset,
       hidden: (dataFormat, model, resultIndex) => {
         const source = model.source as any;
+
         if (!isResultSetDataSource(source) || !source.hasResult(resultIndex)) {
           return true;
         }
 
         const data = source.tryGetAction(resultIndex, IDatabaseDataResultAction);
+
         return data?.empty ?? true;
       },
       getPresentationComponent: () => DVResultSetGroupingPresentation,

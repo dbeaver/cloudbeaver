@@ -93,6 +93,7 @@ export class DataGridContextMenuFilterService {
         }
 
         const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
+
         return !model.source.hasFeature(DatabaseDataFeature.References) && constraints.supported && !model.isDisabled(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_FILTERS],
@@ -254,6 +255,7 @@ export class DataGridContextMenuFilterService {
         }
 
         const supportedOperations = data.getColumnOperations(key.column);
+
         return supportedOperations.length > 0;
       },
       getItems: (context, items) => {

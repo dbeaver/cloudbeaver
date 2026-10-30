@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions>
   setParent(parent: ResourceAlias<TKey, any> | undefined): this {
     parent = this.parent ? this.parent.setParent(parent) : parent;
     const copy = new (this.constructor as any)(this.id, this.options, parent) as this;
+
     return copy;
   }
 
@@ -78,8 +79,10 @@ export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions>
     return `${this.name}(${this.id})`;
   }
 }
+
 const key = Symbol('key');
 const options = Symbol('options');
+
 export interface ResourceAliasFactory<TKey, TOptions extends ResourceAliasOptions> {
   readonly id: string;
   readonly [key]: TKey;
@@ -93,14 +96,17 @@ export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOption
   data: any,
   id: string,
 ): data is ResourceAlias<TKey, TOptions>;
+
 export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
   alias: ResourceAlias<TKey, TOptions>,
 ): data is ResourceAlias<TKey, TOptions>;
+
 export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
   factory: ResourceAliasFactory<TKey, TOptions>,
 ): data is ResourceAlias<TKey, TOptions>;
+
 export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOptions = any>(
   data: any,
   id?: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions> | string,
@@ -108,5 +114,6 @@ export function isResourceAlias<TKey = any, TOptions extends ResourceAliasOption
   if (!id || typeof id === 'string') {
     return data instanceof ResourceAlias && (!id || data.id === id);
   }
+
   return data instanceof ResourceAlias && data.id === id.id;
 }

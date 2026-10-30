@@ -116,6 +116,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
         if (result.id === null) {
           continue;
         }
+
         const executionContextInfo = executionContext.context!;
         const projectId = executionContextInfo.projectId;
         const connectionId = executionContextInfo.connectionId;
@@ -128,6 +129,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
           contextId,
           resultsId,
         };
+
         let editor: ResultSetEditAction | DocumentEditAction | undefined;
 
         if (result.dataFormat === ResultDataFormat.Resultset) {
@@ -137,6 +139,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
         }
 
         let blobs: IResultSetBlobValue[] = [];
+
         if (editor instanceof ResultSetEditAction) {
           blobs = editor.getBlobsToUpload();
         }
@@ -227,6 +230,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     const task = this.asyncTaskInfoService.create(async () => {
       const config = this.getConfig(prevResults, context);
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
+
       return taskInfo;
     });
 

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ export interface AdministrationItemDrawerProps {
   onSelect: (id: string) => void;
   disabled?: boolean;
 }
+
 export type AdministrationItemDrawerComponent = React.FunctionComponent<AdministrationItemDrawerProps>;
 
 export interface AdministrationItemContentProps {
@@ -34,12 +35,14 @@ export interface AdministrationItemContentProps {
   sub?: IAdministrationItemSubItem;
   param?: string | null;
 }
+
 export type AdministrationItemContentComponent = React.FunctionComponent<AdministrationItemContentProps>;
 
 export type AdministrationItemSubContentProps = AdministrationItemContentProps & {
   sub: IAdministrationItemSubItem;
   param: string | null;
 };
+
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>;
 
 export type AdministrationItemEvent = (configurationWizard: boolean, outside: boolean, outsideAdminPage: boolean) => Promise<void> | void;
@@ -49,6 +52,7 @@ export type AdministrationItemCanDeActivateEvent = (
   administration: boolean,
   nextAdministrationItem: IAdministrationItem | null,
 ) => Promise<boolean> | boolean;
+
 export type AdministrationItemSubEvent = (param: string | null, configurationWizard: boolean, outside: boolean) => Promise<void> | void;
 export type AdministrationItemSubCanActivateEvent = (param: string | null, configurationWizard: boolean) => Promise<boolean> | boolean;
 

@@ -201,6 +201,7 @@ export class DataGridContextMenuCellEditingService {
         tooltip: translate(label) + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')',
       };
     }
+
     if (action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
       const label = isMultipleRows ? 'data_grid_table_editing_rows_add_copy' : 'data_grid_table_editing_row_add_copy';
       return {

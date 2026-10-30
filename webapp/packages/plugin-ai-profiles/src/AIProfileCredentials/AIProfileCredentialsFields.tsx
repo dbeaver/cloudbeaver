@@ -62,6 +62,7 @@ export const AIProfileCredentialsFields = observer<IAIProfileCredentialsFieldsPr
             if (!(await authorization.confirmLeave())) {
               return;
             }
+
             part.state.accountAuthentication = value === 'subscription';
           }}
         >

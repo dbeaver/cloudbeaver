@@ -38,12 +38,14 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
   const readOnly = false;
 
   let value = source.getEditedValue(setting.key);
+
   if (readOnly || !isNotNullDefined(value)) {
     value = resolver.getEditedValue(setting.key);
   }
 
   if (setting.key in settingsProviderService.schema.shape) {
     const schema = settingsProviderService.schema.shape[setting.key];
+
     if (!isNotNullDefined(value)) {
       const result = schema.safeParse(undefined);
       value = result.success ? result.data : '';
@@ -59,6 +61,7 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
     if (!(setting.key in settingsProviderService.schema.shape)) {
       return null;
     }
+
     const result = settingsProviderService.schema.shape[setting.key].safeParse(value);
 
     if (result.success) {

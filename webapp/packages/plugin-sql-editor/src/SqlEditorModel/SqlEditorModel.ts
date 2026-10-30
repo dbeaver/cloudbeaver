@@ -101,6 +101,7 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
       // TODO: we updating parser scripts
       //       script may be changed this will lead to temporary wrong segments offsets
       await this.updateParserScripts();
+
       if (currentScript !== this.parser.actualScript) {
         continue;
       }
@@ -139,6 +140,7 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
     if (!projectId || !connectionId || !script || !this.dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
       this.parser.parse(() => []);
       this.onUpdate.execute();
+
       return;
     }
 

@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.DBWebExceptionAccessDenied;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
@@ -399,6 +400,22 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             return new WebUserInfo(webSession, webSession.getUser());
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameters", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> updateUserConfiguration(
+        @NotNull WebSession webSession,
+        @NotNull Map<String, Object> configuration
+    ) throws DBWebException {
+        if (!webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+            throw new DBWebExceptionAccessDenied("Access denied: user not authenticated");
+        }
+        try {
+            return webSession.getSecurityController().updateCurrentUserUISettings(configuration);
+        } catch (DBException | IllegalArgumentException e) {
+            throw new DBWebException("Error updating user configuration", e);
         }
     }
 

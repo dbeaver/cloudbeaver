@@ -39,23 +39,31 @@ export function useScopeFilter(rootId: string, isAllowed: (id: string) => boolea
         if (!this.query.trim()) {
           return null;
         }
+
         const items: { uri: string; name: string }[] = [];
         const pending = [options.rootId];
         const visited = new Set<string>();
+
         while (pending.length) {
           const id = pending.pop()!;
+
           if (visited.has(id) || !options.isAllowed(id)) {
             continue;
           }
+
           visited.add(id);
           const node = navNodeInfoResource.get(id);
+
           if (!node) {
             continue;
           }
+
           const container = node.objectFeatures.some(feature => feature === EObjectFeature.catalog || feature === EObjectFeature.schema);
+
           if (id !== options.rootId && isScopeObject(node) && (container ? this.containers : this.objects)) {
             items.push({ uri: id, name: node.name || node.uri });
           }
+
           if (!isScopeLeaf(node)) {
             pending.push(...(navigationTreeService.getChildren(id) ?? []));
           }

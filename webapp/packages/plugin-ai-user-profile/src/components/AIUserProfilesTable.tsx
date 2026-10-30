@@ -57,11 +57,13 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
         if (profile.global) {
           return translate('plugin_ai_user_profile_status_managed');
         }
+
         if (profile.accountAuthentication) {
           return profile.account
             ? `${translate('plugin_ai_account_connected')}${profile.account.email ? `: ${profile.account.email}` : ''}`
             : translate('plugin_ai_account_not_connected');
         }
+
         return translate(profile.credentialsSaved ? 'plugin_ai_user_profile_status_configured' : 'plugin_ai_user_profile_status_not_configured');
       },
     },

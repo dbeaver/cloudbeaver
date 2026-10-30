@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,10 @@ function collectVisibleNodes(treeData: ITreeData, nodeId: string): string[] {
     result.push(current);
 
     const state = treeData.getState(current);
+
     if (state.expanded) {
       const children = treeData.getChildren(current);
+
       for (let i = children.length - 1; i >= 0; i--) {
         stack.push(children[i]!);
       }
@@ -76,6 +78,7 @@ export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSe
       async select(nodeId: string, multiple = false, range = false): Promise<void> {
         if (range && this.lastSelectedNode) {
           const nodesInRange = getNodesInRange(treeData, this.lastSelectedNode, nodeId);
+
           for (const id of nodesInRange) {
             selectionState.set(id, getSelectionState(true));
           }
@@ -96,9 +99,11 @@ export function useTreeClickSelection(treeData: ITreeData, options: ITreeClickSe
       },
       async selectAll(): Promise<void> {
         const allNodes = collectVisibleNodes(treeData, treeData.rootId);
+
         for (const id of allNodes) {
           selectionState.set(id, { selected: true, indeterminate: false });
         }
+
         await optionsRef.onSelectionChange?.(selectionState);
       },
     }),

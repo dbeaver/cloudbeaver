@@ -96,6 +96,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         .filter(k => isNewUser(k[1]))
         .sort((a, b) => compareUsersById(a[1], b[1]))
         .map(([key]) => key);
+
       return resourceKeyList(orderedKeys);
     });
   }
@@ -104,6 +105,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return {
       userId: '',
       grantedTeams: [],
+      grantedTeamsInfo: [],
       grantedConnections: [],
       configurationParameters: {},
       metaParameters: {},
@@ -157,6 +159,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     const userData = this.get(user.userId)!;
 
     await this.onUserCreate.execute(userData);
+
     return userData;
   }
 
@@ -238,6 +241,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       if (this.isActiveUser(key)) {
         throw new Error("You can't delete current logged user");
       }
+
       await this.graphQLService.sdk.deleteUser({ userId: key });
       this.delete(key);
     });
@@ -309,6 +313,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     const key = resourceKeyList(usersList.map(user => user.userId));
     runInAction(() => {
       this.set(key, usersList);
+
       for (const pageArgs of pages) {
         this.offsetPagination.setPage(...pageArgs);
       }

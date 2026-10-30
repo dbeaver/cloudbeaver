@@ -91,6 +91,7 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
 
       for (let i = 0; i < update.update.length; i++) {
         const value = update.update[i];
+
         if (isResultSetBlobValue(value) && value.fileId === null) {
           blobs.push(value);
         }
@@ -107,6 +108,7 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
           if (batch.updatedRows === undefined) {
             batch.updatedRows = [];
           }
+
           const updatedRows = batch.updatedRows as SqlResultRow[];
 
           if (update.source) {
@@ -120,11 +122,13 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
                 } else if (value !== update.source![index]) {
                   obj[index] = value;
                 }
+
                 return obj;
               }, {}),
               metaData: this.data.getRowMetadata(update.row),
             });
           }
+
           break;
         }
 
@@ -132,6 +136,7 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
           if (batch.addedRows === undefined) {
             batch.addedRows = [];
           }
+
           const addedRows = batch.addedRows as SqlResultRow[];
 
           addedRows.push({ data: replaceUploadBlobs(update.update) });
@@ -142,6 +147,7 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
           if (batch.deletedRows === undefined) {
             batch.deletedRows = [];
           }
+
           const deletedRows = batch.deletedRows as SqlResultRow[];
 
           deletedRows.push({ data: replaceBlobsWithNull(update.update), metaData: this.data.getRowMetadata(update.row) });
@@ -174,14 +180,17 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
 
   protected override applyResultToUpdate(update: IGridUpdate<IResultSetValue>, result?: IResultSetValue[]): void {
     super.applyResultToUpdate(update, result);
+
     if (result) {
       update.update = update.update.map((value, i) => {
         const source = update.source![i];
+
         if (isResultSetContentValue(source) && isResultSetFileValue(value)) {
           if (value.fileId && value.contentLength === source.contentLength) {
             return JSON.parse(JSON.stringify(source));
           }
         }
+
         return value;
       });
     }
@@ -201,6 +210,7 @@ function replaceBlobsWithNull(values: IResultSetValue[]) {
     if (isResultSetBlobValue(value)) {
       return null;
     }
+
     return value;
   });
 }
@@ -214,6 +224,7 @@ function replaceUploadBlobs(values: IResultSetValue[]) {
         return null;
       }
     }
+
     return value;
   });
 }

@@ -187,6 +187,7 @@ export const AuthDialog: DialogComponent<IAuthOptions> = observer(function AuthD
                       );
                     });
                   }
+
                   return (
                     <Tab
                       key={provider.id}

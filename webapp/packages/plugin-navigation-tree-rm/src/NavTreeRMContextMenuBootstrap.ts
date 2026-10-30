@@ -71,17 +71,21 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
 
     this.nodeDeletionService.prepareDeletion.addHandler((nodes, contexts) => {
       const plan = contexts.getContext(nodeDeletionPlanContext);
+
       for (const node of nodes.filter(node => this.isResource(node))) {
         const target = {
           node,
           type: node.folder ? 'ui_folder' : 'plugin_navigation_tree_rm_delete_resource',
           warning: node.folder ? 'plugin_navigation_tree_rm_delete_folder_warning' : undefined,
         };
+
         const key = getResourceKeyFromNodeId(node.uri);
+
         if (!key || !this.canDelete(node)) {
           plan.exclude({ ...target, owner: 'resource-manager', reason: 'plugin_navigation_tree_delete_unavailable' });
           continue;
         }
+
         plan.addOperation({
           id: `delete-resource:${node.uri}`,
           owner: 'resource-manager',
@@ -93,6 +97,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
         });
       }
     });
+
     this.actionService.addHandler({
       id: 'nav-node-rm-handler',
       contexts: [DATA_CONTEXT_NAV_NODE],
@@ -121,6 +126,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
         const project = this.projectInfoResource.get(key.projectId);
 
         let resourceType: ProjectInfoResourceType | undefined = undefined;
+
         if (project) {
           for (const type of project.resourceTypes) {
             if (isResourceOfType(type, node.uri)) {
@@ -148,6 +154,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
                   return false;
                 }
               }
+
               return true;
             };
 
@@ -166,6 +173,7 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
                 save(result);
               }
             }
+
             break;
           }
         }

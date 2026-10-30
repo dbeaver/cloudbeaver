@@ -84,6 +84,7 @@ export class ConnectionNavNodeService {
       undefined,
       this.navTreeResource,
     );
+
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderDeleted,
       data => {
@@ -97,6 +98,7 @@ export class ConnectionNavNodeService {
       undefined,
       this.navTreeResource,
     );
+
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderUpdated,
       data => {
@@ -118,6 +120,7 @@ export class ConnectionNavNodeService {
     if (isResourceAlias(key)) {
       return;
     }
+
     if (!ResourceKeyUtils.some(key, key => NodeManagerUtils.isDatabaseObject(key))) {
       return;
     }
@@ -143,6 +146,7 @@ export class ConnectionNavNodeService {
       const closedConnections: string[] = [];
 
       connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
+
       for (const connectionInfo of connectionInfos) {
         if (!connectionInfo?.nodePath) {
           return;
@@ -230,6 +234,7 @@ export class ConnectionNavNodeService {
 
         // allows to preload missing folders
         const loadingPath = [...parents, parentId];
+
         for (let i = 0; i < loadingPath.length - 1; i++) {
           const parent = loadingPath[i]!;
           const nextParent = loadingPath[i + 1]!;
@@ -273,6 +278,7 @@ export class ConnectionNavNodeService {
         if (!node?.folder && node?.name?.localeCompare(connectionNode.name!) === 1) {
           break;
         }
+
         insertIndex++;
       }
 

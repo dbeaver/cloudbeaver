@@ -7,6 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -27,8 +28,11 @@ import { QueryDataSource } from '../QueryDataSource.js';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SqlEditorPermissionService } from '../SqlEditorPermissionService.js';
+import type { SqlScriptErrorAction } from './SqlScriptErrorDialog.js';
+
+const SqlScriptErrorDialog = importLazyComponent(() => import('./SqlScriptErrorDialog.js').then(module => module.SqlScriptErrorDialog));
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -108,11 +112,13 @@ export class SqlQueryService {
     }
 
     let first = true;
+
     for (const model of databaseModels) {
       this.tableViewerStorageService.add(model);
       this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
 
       let tabGroup = this.sqlQueryResultService.getModelGroup(editorState, model.id);
+
       if (!tabGroup) {
         tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, model.source.options?.query ?? '');
 
@@ -128,6 +134,7 @@ export class SqlQueryService {
             }
           }
         });
+
         first = false;
       }
     }
@@ -169,6 +176,7 @@ export class SqlQueryService {
           this.graphQLService,
           this.asyncTaskInfoService,
         );
+
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerService.trackDataAccess(model);
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
@@ -209,16 +217,19 @@ export class SqlQueryService {
         this.sqlQueryResultService.removeGroup(editorState, tabGroup!.groupId);
         const message = 'Query execution has been canceled';
         this.notificationService.logException(exception, 'Query execution Error', message);
+
         return;
       } else if (!source) {
         this.notificationService.logException(exception, 'Query execution Error', exception.message);
       }
+
       throw exception;
     }
   }
 
   async executeQueries(editorState: ISqlEditorTabState, queries: string[], options?: IQueryExecutionOptions): Promise<void> {
     await this.onQueryExecution.execute(editorState);
+
     try {
       const dataSource = this.sqlDataSourceService.get(editorState.editorId);
 
@@ -257,6 +268,7 @@ export class SqlQueryService {
       let source: QueryDataSource | undefined;
       let model: IDatabaseDataModel<QueryDataSource> | undefined;
       let resultCount = 0;
+      let skipErrors = false;
 
       for (let i = 0; i < queries.length; i++) {
         const query = queries[i]!;
@@ -271,10 +283,12 @@ export class SqlQueryService {
             this.graphQLService,
             this.asyncTaskInfoService,
           );
+
           model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
           this.dataViewerService.trackDataAccess(model);
           this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
         }
+
         statistics.modelId = model.id;
 
         const isOutputLogsTabOpened = !!editorState.outputLogsTab;
@@ -322,14 +336,32 @@ export class SqlQueryService {
             break;
           }
         } catch (exception: any) {
+          options?.onQueryExecuted?.(query, i, false);
+
+          let action: SqlScriptErrorAction = source?.cancelled ? 'stop' : 'skip';
+
+          if (action !== 'stop' && !skipErrors) {
+            const { status, result } = await this.commonDialogService.open(SqlScriptErrorDialog, { query, error: exception });
+            action = status === DialogueStateResult.Resolved ? (result ?? 'stop') : 'stop';
+          }
+
+          if (action === 'retry') {
+            i--;
+            continue;
+          }
+
+          skipErrors ||= action === 'skip-all';
+
           if (model) {
             const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
             this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true, resultCount);
 
             model = source = undefined;
           }
-          options?.onQueryExecuted?.(query, i, false);
-          break;
+
+          if (action === 'stop') {
+            break;
+          }
         }
       }
 
@@ -354,6 +386,7 @@ export class SqlQueryService {
     model.onRequest.addPostHandler(({ stage }) => {
       if (stage === 'request') {
         const activeGroupId = this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId;
+
         for (const result of model.source.getResults()) {
           const editor = model.source.tryGetAction(result, IDatabaseDataEditAction);
 

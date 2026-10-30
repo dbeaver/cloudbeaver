@@ -48,6 +48,7 @@ export function useCellCopy<Cell = ICellPosition>({ getText }: Options<Cell> = {
       event.stopPropagation();
       event.preventGridDefault?.();
       props.copy(text);
+
       return true;
     },
     [props],

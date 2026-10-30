@@ -22,6 +22,7 @@ export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
   const networkHandlerResource = useResource(SSLTab, NetworkHandlerResource, CachedMapAllKey, {
     active: selected,
   });
+
   const optionsPart = getConnectionFormOptionsPart(props.formState);
   const dbDriverResource = useResource(SSLTab, DBDriverResource, optionsPart.state.driverId ?? null);
 

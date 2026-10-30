@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -133,6 +133,7 @@ export function useResource<
     if (resource instanceof CachedDataResource) {
       return resource.data;
     }
+
     if (resource instanceof CachedMapResource) {
       if (key === null) {
         if (isResourceKeyList(key) || isResourceKeyListAlias(key)) {
@@ -142,6 +143,7 @@ export function useResource<
         // TODO: this is incorrect return type (key == null)
         return undefined;
       }
+
       return resource.get(key);
     }
 
@@ -166,12 +168,15 @@ export function useResource<
             if (unmountedRef.unmounted) {
               return;
             }
+
             await this[loadFunctionName]!(key, includes, resource, refresh);
             setLoadingException(null);
           } catch (exception: any) {
             console.error(exception);
+
             if (actions?.silent !== true && this.errorContext) {
               const resourceException: Error | Error[] | null = resource.getException(key);
+
               if (isContainsException(resourceException)) {
                 const errors = Array.isArray(resourceException) ? resourceException : [resourceException];
 
@@ -189,6 +194,7 @@ export function useResource<
                   'Application is unable to load resource',
                   { cause: exception },
                 );
+
                 setLoadingException(loadingError);
                 this.errorContext.catch(loadingError);
               }
@@ -223,6 +229,7 @@ export function useResource<
         if (this.isError()) {
           throw this.exception;
         }
+
         // TODO: should we call it anyway even if resource loaded?
         //       not forcing loading may lead to problems related to outdated resources
         // if (this.canLoad) {
@@ -273,8 +280,10 @@ export function useResource<
     if (!result.isError()) {
       return;
     }
+
     if (actions?.silent !== true && errorContext) {
       const errors = Array.isArray(result.exception) ? result.exception : [result.exception];
+
       for (const error of errors) {
         if (error) {
           errorContext.catch(error);

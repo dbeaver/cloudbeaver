@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ export function useResourceTracker<TKey>(resource: Resource<any, TKey, any, any>
       sub: null as (() => void) | null,
       use(key: ResourceKey<TKey> | null, resub = false): void {
         key = toJS(key);
+
         if (!resub && key !== null && this.key !== null && this.resource.isEqual(key, this.key)) {
           return;
         }
@@ -41,6 +42,7 @@ export function useResourceTracker<TKey>(resource: Resource<any, TKey, any, any>
       },
       free() {
         this.sub?.();
+
         if (this.key !== null && this.id !== null && this.resource.useTracker.hasUseId(this.id)) {
           this.resource.useTracker.free(this.key, this.id);
           this.key = null;
