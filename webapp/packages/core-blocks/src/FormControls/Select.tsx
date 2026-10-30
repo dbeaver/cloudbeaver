@@ -111,7 +111,7 @@ export const Select: ISelectType = observer(function Select({
   const generatedId = useId();
   const inputId = id || generatedId;
 
-  const handleSelect = (id: any) => {
+  function handleSelect(id: any) {
     id = id ?? value ?? '';
     const changed = id !== value;
 
@@ -126,7 +126,7 @@ export const Select: ISelectType = observer(function Select({
     if (context && changed) {
       context.change(id, name);
     }
-  };
+  }
 
   useLayoutEffect(() => {
     onSwitch?.(isOpened);

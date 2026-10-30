@@ -20,7 +20,6 @@ import {
   type ICellPosition,
   type IDataGridRowRenderer,
   type IDataGridCellRenderer,
-  type DataGridProps,
   type ICellChange,
   type DataGridCellKeyboardEvent,
 } from '@cloudbeaver/plugin-data-grid';
@@ -339,7 +338,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     };
   }, [historyAction, tableData, handlers]);
 
-  const handleFocusChange = (position: ICellPosition) => {
+  function handleFocusChange(position: ICellPosition) {
     focusedCell.current = position;
     const columnIndex = position.colIdx;
     const rowIndex = position.rowIdx;
@@ -360,7 +359,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     } else {
       selectionAction.focus(null);
     }
-  };
+  }
 
   const handleScrollToBottom = useCallback(async () => {
     const result = model.source.getResult(resultIndex);
@@ -600,7 +599,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
   }
 
-  const handleCellKeyDown: DataGridProps['onCellKeyDown'] = (_, event) => {
+  function handleCellKeyDown(_: ICellPosition, event: DataGridCellKeyboardEvent): void {
     handleCopyPaste(event);
 
     const cell = selectionAction.getFocusedElement();
@@ -615,7 +614,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       case 'Delete':
         event.preventGridDefault();
     }
-  };
+  }
 
   function handleCopyPaste(event: DataGridCellKeyboardEvent) {
     const readonly = model.isReadonly(resultIndex);
