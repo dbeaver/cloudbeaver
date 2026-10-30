@@ -106,6 +106,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           reorderStateKey="navigation-tabs-bar"
           tabList={navigationTabsService.tabIdList}
           enabledBaseActions
+          enabledContextMenu
           autoSelect
           onChange={handleTabChange}
           onReorder={handleReorder}

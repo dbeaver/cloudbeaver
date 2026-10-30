@@ -13,12 +13,17 @@ import { useS } from '../useS.js';
 import fieldDescriptionStyles from './FieldDescription.module.css';
 
 interface Props {
+  id?: string;
   className?: string;
   invalid?: boolean;
 }
 
-export const FieldDescription: React.FC<PropsWithChildren<Props>> = observer(function FieldDescription({ children, className, invalid }) {
+export const FieldDescription: React.FC<PropsWithChildren<Props>> = observer(function FieldDescription({ children, id, className, invalid }) {
   const styles = useS(fieldDescriptionStyles);
 
-  return <div className={s(styles, { fieldDescription: true, invalid }, className)}>{children}</div>;
+  return (
+    <div id={id} className={s(styles, { fieldDescription: true, invalid }, className)}>
+      {children}
+    </div>
+  );
 });

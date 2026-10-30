@@ -96,7 +96,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
       throw new Error('Team not found');
     }
 
-    return team[0]!.grantedUsersInfo.map(user => ({ userId: user.userId, teamRole: user.teamRole ?? null }));
+    return team[0]!.grantedUsersInfo.map(user => ({ ...user, teamRole: user.teamRole ?? null }));
   }
 
   async getSubjectConnectionAccess(subjectId: string): Promise<AdminConnectionGrantInfo[]> {

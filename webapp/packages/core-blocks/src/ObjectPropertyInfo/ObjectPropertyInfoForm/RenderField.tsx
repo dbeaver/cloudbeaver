@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useId } from 'react';
 
 import {
   ConditionType,
@@ -71,6 +72,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   readOnly,
 }) {
   const translate = useTranslate();
+  const labelId = useId();
+  const uploadId = useId();
 
   let readonly = readOnly;
 
@@ -269,10 +272,17 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           readOnly={readonly}
           className={clsx('tw:flex-0!', className)}
         >
-          {property.displayName ?? ''}
+          <span id={labelId}>{property.displayName ?? ''}</span>
         </Textarea>
-        <UploadArea disabled={disabled || readonly} reset onChange={handleFileUpload}>
-          <Button className="tw:w-max" tag="div" disabled={disabled || readonly} variant="secondary">
+        <UploadArea aria-labelledby={`${uploadId} ${labelId}`} disabled={disabled || readonly} reset onChange={handleFileUpload}>
+          <Button
+            id={uploadId}
+            aria-labelledby={`${uploadId} ${labelId}`}
+            className="tw:w-max"
+            tag="div"
+            disabled={disabled || readonly}
+            variant="secondary"
+          >
             {translate('ui_file')}
           </Button>
         </UploadArea>

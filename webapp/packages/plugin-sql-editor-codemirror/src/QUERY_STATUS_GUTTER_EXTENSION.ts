@@ -55,7 +55,9 @@ const statusGutterState = StateField.define<RangeSet<GutterMarker>>({
 
           set = set.update({ add: markers });
         } else {
-          set = set.update({ filter: () => false });
+          set = set.update({
+            filter: (_from, _to, marker) => marker !== (effect.value.type === 'run' ? RUN_QUERY_MARKER : ERROR_QUERY_MARKER),
+          });
         }
       }
     }

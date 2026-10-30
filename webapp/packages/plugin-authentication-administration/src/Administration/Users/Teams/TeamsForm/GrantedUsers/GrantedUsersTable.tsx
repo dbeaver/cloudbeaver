@@ -7,6 +7,7 @@
  */
 
 import { useMemo } from 'react';
+import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { useTab, useTabState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
@@ -27,6 +28,7 @@ import {
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import type { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
+import { TeamGrantSource } from '../../../TeamGrantSource.js';
 
 const USER_ID_COLUMN: IGrantManagementTableColumn<AdminUser> = {
   key: 'userId',
@@ -41,8 +43,12 @@ const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser> = {
 };
 
 const TEAM_ROLE_COLUMN_KEY = 'teamRole';
+const GRANT_TYPE_COLUMN: IGrantManagementTableColumn<AdminUser> = {
+  key: 'grantType',
+  label: 'authentication_administration_user_connections_access_granted_by',
+};
 
-const COLUMNS: IGrantManagementTableColumn<AdminUser>[] = [USER_ID_COLUMN, LAST_LOGIN_COLUMN];
+const COLUMNS: IGrantManagementTableColumn<AdminUser>[] = [USER_ID_COLUMN, LAST_LOGIN_COLUMN, GRANT_TYPE_COLUMN];
 
 export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedUsersTable({ tabId, formState }) {
   const translate = useTranslate();
@@ -60,7 +66,7 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
     active,
   });
 
-  const grantedUsersIdsMap = useMemo(() => new Map(tabState.state.grantedUsers.map(user => [user.userId, user])), [tabState.state.grantedUsers]);
+  const grantedUsersIdsMap = useMemo(() => computed(() => new Map(tabState.state.grantedUsers.map(user => [user.userId, user]))), [tabState]).get();
 
   useAutoLoad(GrantedUsersTable, tabState, active);
 
@@ -149,6 +155,10 @@ export const GrantedUsersTable: TabContainerPanelComponent<TeamFormProps> = obse
           <span className="tw:truncate">{name}</span>
         </div>
       );
+    }
+
+    if (colKey === GRANT_TYPE_COLUMN.key) {
+      return <TeamGrantSource grant={grantedUsersIdsMap.get(user.userId)} />;
     }
 
     if (colKey === LAST_LOGIN_COLUMN.key) {
