@@ -31,7 +31,9 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   let supportedProperties: DriverPropertyInfo[] = [];
 
   if (configurationType !== undefined) {
-    supportedProperties = properties.filter(property => isProviderPropertySupported(property, configurationType));
+    supportedProperties = properties.filter(
+      property => !property.features.includes('main') && isProviderPropertySupported(property, configurationType),
+    );
   }
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(supportedProperties);

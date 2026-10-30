@@ -55,6 +55,7 @@ import { isConnectionFormReadOnly } from '../isConnectionFormReadOnly.js';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
 import { ParametersForm } from './ParametersForm.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
+import { isProviderPropertySupported } from '../AdvancedSettings/isProviderPropertySupported.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
 interface IDriverConfiguration {
@@ -104,6 +105,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   });
 
   const driver = driverMap.data;
+  const configurationType = optionsPart.state.configurationType;
+  const mainProviderProperties =
+    configurationType === undefined
+      ? EMPTY_ARRAY
+      : (driver?.providerProperties ?? EMPTY_ARRAY).filter(
+          property => property.features.includes('main') && isProviderPropertySupported(property, configurationType),
+        );
   const configurationTypes = driverConfiguration.filter(configuration => driver && configuration.isVisible(driver));
 
   const applicableAuthModels = driver?.applicableAuthModels ?? [];
@@ -223,6 +231,14 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 originLocal={originLocal}
               />
             ))}
+          {mainProviderProperties.length > 0 && (
+            <ObjectPropertyInfoForm
+              state={optionsPart.state.providerProperties}
+              properties={mainProviderProperties}
+              disabled={formState.isDisabled}
+              readOnly={readonly}
+            />
+          )}
         </section>
 
         <Placeholder container={connectionFormService.mainPropertiesContainer} formState={formState} />
