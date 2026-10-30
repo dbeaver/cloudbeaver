@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 
-import { Filter, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, Placeholder, s, ToolbarActions, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
@@ -52,10 +52,10 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
         />
         <UsersTableFiltersOpenContext.Provider value={openContext}>
           <UsersTableFilterButton filters={filters} />
-          <div className={s(style, { actions: true })}>
+          <ToolbarActions className="tw:ml-auto">
             {actionsSlot}
             <Placeholder container={usersAdministrationService.actionButtonsPlaceholder} filters={filters} />
-          </div>
+          </ToolbarActions>
         </UsersTableFiltersOpenContext.Provider>
       </div>
     </div>

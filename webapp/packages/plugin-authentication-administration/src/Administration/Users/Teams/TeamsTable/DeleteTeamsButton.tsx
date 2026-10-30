@@ -19,7 +19,6 @@ export const DeleteTeamsButton = observer(function DeleteTeamsButton() {
   return (
     <Button
       variant="secondary"
-      className="tw:normal-case! tw:tracking-normal! tw:font-semibold"
       title={translate('administration_teams_delete_tooltip')}
       icon="trash"
       iconPlacement="start"

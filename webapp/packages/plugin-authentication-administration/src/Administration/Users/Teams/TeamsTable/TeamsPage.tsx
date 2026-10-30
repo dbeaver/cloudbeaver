@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { compareTeams, TeamsResource } from '@cloudbeaver/core-authentication';
 import { AdministrationPageHeader, AdministrationPageContent, AdministrationPageTitle } from '@cloudbeaver/core-administration';
-import { Filter, IconOrImage, Placeholder, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, IconOrImage, Placeholder, s, ToolbarAction, ToolbarActions, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
@@ -19,7 +19,6 @@ import { isDefined } from '@dbeaver/js-helpers';
 
 import { TeamsTable } from './TeamsTable.js';
 import style from '../../shared/UsersAdministration.module.css';
-import { FiltersActionButton } from '../../UsersTable/Filters/FiltersActionButton.js';
 import { TeamsAdministrationService } from '../TeamsAdministrationService.js';
 import { useTeamsTableFilters } from './Filters/useTeamsTableFilters.js';
 import { TeamsTableContext } from './TeamsTableContext.js';
@@ -50,16 +49,16 @@ export const TeamsPage = observer(function TeamsPage() {
             value={filters.search}
             onChange={filters.setSearch}
           />
-          <div className="tw:ml-auto">
-            <FiltersActionButton
+          <ToolbarActions className="tw:ml-auto">
+            <ToolbarAction
               aria-label={translate('administration_teams_refresh_tooltip')}
               title={translate('administration_teams_refresh_tooltip')}
               disabled={table.processing}
               onClick={table.update}
             >
               <IconOrImage className="tw:w-full tw:h-full" icon="refresh" viewBox="0 0 24 24" />
-            </FiltersActionButton>
-          </div>
+            </ToolbarAction>
+          </ToolbarActions>
         </div>
 
         <div className={s(styles, { tableContainer: true })}>

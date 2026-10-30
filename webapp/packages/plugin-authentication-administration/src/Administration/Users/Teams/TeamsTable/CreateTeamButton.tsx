@@ -22,7 +22,6 @@ export const CreateTeamButton = observer(function CreateTeamButton() {
   return (
     <Button
       variant="primary"
-      className="tw:normal-case! tw:tracking-normal! tw:font-semibold"
       title={translate('administration_teams_add_tooltip')}
       disabled={!!createTeamService.formState || table.processing}
       onClick={createTeamService.create}

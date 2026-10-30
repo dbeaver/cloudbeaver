@@ -30,6 +30,8 @@ export const WEBSITE_LINKS = {
   DATABASE_NAVIGATOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Database-Navigator/',
   USERS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Users/',
   TEAMS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Teams/',
+  CONNECTION_TYPES_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Connection-Types/',
+  GLOBAL_PROFILES_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Network-profiles/#manage-global-profiles',
   AWS_DEPLOY_UPDATE_PAGE: 'https://github.com/dbeaver/cloudbeaver-deploy?tab=readme-ov-file#updating-the-cluster',
   PROXY_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Proxy-Configuration/',
   API_TOKEN_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Generate-API-access-token/',

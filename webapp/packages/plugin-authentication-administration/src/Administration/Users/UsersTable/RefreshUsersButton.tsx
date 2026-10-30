@@ -7,9 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
-
-import { FiltersActionButton } from './Filters/FiltersActionButton.js';
+import { Icon, ToolbarAction, useTranslate } from '@cloudbeaver/core-blocks';
 
 interface Props {
   onUpdate: () => void;
@@ -20,8 +18,8 @@ export const RefreshUsersButton = observer<Props>(function RefreshUsersButton({ 
   const label = translate('authentication_administration_tools_refresh_tooltip');
 
   return (
-    <FiltersActionButton aria-label={label} title={label} onClick={onUpdate}>
-      <IconOrImage className="tw:w-full tw:h-full" icon="refresh" viewBox="0 0 24 24" />
-    </FiltersActionButton>
+    <ToolbarAction aria-label={label} title={label} onClick={onUpdate}>
+      <Icon className="tw:size-full tw:fill-(--theme-primary)!" name="/icons/refresh_m.svg#root" viewBox="0 0 24 24" />
+    </ToolbarAction>
   );
 });

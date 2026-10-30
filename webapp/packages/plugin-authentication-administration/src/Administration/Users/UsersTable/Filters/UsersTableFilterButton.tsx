@@ -8,10 +8,9 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, ToolbarAction, ToolbarActions, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IUsersActionButtonProps } from '../../UsersAdministrationService.js';
-import { FiltersActionButton } from './FiltersActionButton.js';
 import { UsersTableFiltersOpenContext } from './UsersTableFiltersOpenContext.js';
 
 export const UsersTableFilterButton = observer<IUsersActionButtonProps>(function UsersTableFilterButton() {
@@ -25,8 +24,10 @@ export const UsersTableFilterButton = observer<IUsersActionButtonProps>(function
   const label = translate('authentication_administration_users_filters_filter_label');
 
   return (
-    <FiltersActionButton active={openContext.open} aria-label={label} title={label} onClick={openContext.onToggle}>
-      <IconOrImage className="tw:w-full tw:h-full" icon="filter" />
-    </FiltersActionButton>
+    <ToolbarActions>
+      <ToolbarAction active={openContext.open} aria-label={label} title={label} onClick={openContext.onToggle}>
+        <IconOrImage className="tw:w-full tw:h-full" icon="filter" />
+      </ToolbarAction>
+    </ToolbarActions>
   );
 });
