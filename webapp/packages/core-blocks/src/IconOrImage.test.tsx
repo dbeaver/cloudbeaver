@@ -6,22 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 import { fireEvent } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { IconOrImage, type IconOrImageProps } from './IconOrImage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
+import * as IconModule from './Icon.js';
+import * as StaticImageModule from './StaticImage.js';
 
-vi.mock('./Icon.js', () => ({
-  Icon: vi.fn(({ ...props }) => (
+beforeEach(() => {
+  vi.spyOn(IconModule, 'Icon').mockImplementation(props => (
     <svg {...props} role="svg">
       <use href={`/icons/preload/icons.svg#${props.name}`} />
     </svg>
-  )),
-}));
+  ));
 
-vi.mock('./StaticImage.js', () => ({
-  StaticImage: vi.fn(({ ...props }) => <img {...props} />),
-}));
+  vi.spyOn(StaticImageModule, 'StaticImage').mockImplementation(props => <img {...props} />);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('IconOrImage', () => {
   test('should render StaticImage for platform: prefixed icon', () => {

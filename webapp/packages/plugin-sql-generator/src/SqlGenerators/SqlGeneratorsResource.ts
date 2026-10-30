@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
@@ -15,6 +15,12 @@ import {
   type SqlQueryGenerator,
   type SqlQueryGeneratorOptions,
 } from '@cloudbeaver/core-sdk';
+import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
+
+export interface ISqlGeneratorsKey {
+  nodeIds: string[];
+}
 
 export const MAX_GENERATORS_LENGTH = 15;
 export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => ({
@@ -26,19 +32,24 @@ export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => (
 export const DDL_GENERATOR_ID = 'tableDDL';
 
 @injectable(() => [GraphQLService, AsyncTaskInfoService, NavNodeInfoResource])
-export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {
+export class SqlGeneratorsResource extends CachedMapResource<ISqlGeneratorsKey, SqlQueryGenerator[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
-    private readonly navNodeInfoResource: NavNodeInfoResource,
+    navNodeInfoResource: NavNodeInfoResource,
   ) {
     super();
 
-    this.navNodeInfoResource.outdateResource(this);
-    this.navNodeInfoResource.deleteInResource(this);
+    const mapKeys = (key: ResourceKey<string>) => {
+      const nodeIds = new Set(ResourceKeyUtils.toArray(navNodeInfoResource.aliases.transformToKey(key)));
+      return resourceKeyList(this.keys.filter(selection => selection.nodeIds.some(id => nodeIds.has(id))));
+    };
+
+    navNodeInfoResource.outdateResource(this, mapKeys);
+    navNodeInfoResource.deleteInResource(this, mapKeys);
   }
 
-  async generateEntityQuery(generatorId: string, nodePathList: string | string[], options?: SqlQueryGeneratorOptions): Promise<string> {
+  generateEntityQuery(generatorId: string, nodePathList: string | string[], options?: SqlQueryGeneratorOptions): ITask<string> {
     const task = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncSqlGenerateEntityQuery({
         generatorId,
@@ -49,10 +60,31 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
       return taskInfo;
     });
 
-    const info = await this.asyncTaskInfoService.run(task);
-    await this.asyncTaskInfoService.remove(task.id);
+    const operation = new AutoRunningTask<string>(
+      async () => {
+        try {
+          const info = await this.asyncTaskInfoService.run(task);
+          return info.taskResult;
+        } finally {
+          if (!task.pending) {
+            await this.asyncTaskInfoService.remove(task.id);
+          }
+        }
+      },
+      async () => {
+        try {
+          if (task.pending && !task.cancelled) {
+            await this.asyncTaskInfoService.cancel(task.id);
+          }
+        } catch (exception) {
+          // Task.cancel marks itself cancelled before calling the server; allow a retry on failure.
+          operation.cancelled = false;
+          throw exception;
+        }
+      },
+    );
 
-    return info.taskResult;
+    return operation;
   }
 
   async generateResultSetSql(params: SqlGenerateResultSetQueryQueryVariables): Promise<string | null> {
@@ -61,27 +93,23 @@ export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGen
     return response.sqlGenerateResultSetQuery;
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, SqlQueryGenerator[]>> {
-    if (isResourceAlias(key)) {
-      throw new Error('Aliases not supported by this resource.');
-    }
+  override isKeyEqual(first: ISqlGeneratorsKey, second: ISqlGeneratorsKey): boolean {
+    return isArraysEqual(first.nodeIds, second.nodeIds);
+  }
 
-    const values = new Map();
-
-    await ResourceKeyUtils.forEachAsync(key, async key => {
+  protected async loader(key: ResourceKey<ISqlGeneratorsKey>): Promise<Map<ISqlGeneratorsKey, SqlQueryGenerator[]>> {
+    await ResourceKeyUtils.forEachAsync(this.aliases.transformToKey(key), async selection => {
       const { generators } = await this.graphQLService.sdk.sqlEntityQueryGenerators({
-        nodePathList: key,
+        nodePathList: [...selection.nodeIds],
       });
 
-      values.set(key, generators);
+      this.set(selection, generators);
     });
-
-    this.set(resourceKeyList(Array.from(values.keys())), Array.from(values.values()));
 
     return this.data;
   }
 
-  protected validateKey(key: string): boolean {
-    return typeof key === 'string';
+  protected validateKey(key: ISqlGeneratorsKey): boolean {
+    return Array.isArray(key.nodeIds) && key.nodeIds.length > 0 && key.nodeIds.every(id => typeof id === 'string');
   }
 }

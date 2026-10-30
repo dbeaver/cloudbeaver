@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
       "path": "../../common-typescript/@dbeaver/cli"
     },
     {
@@ -23,6 +26,9 @@
       "path": "../core-connections"
     },
     {
+      "path": "../core-data-context"
+    },
+    {
       "path": "../core-di"
     },
     {
@@ -30,6 +36,9 @@
     },
     {
       "path": "../core-events"
+    },
+    {
+      "path": "../core-executor"
     },
     {
       "path": "../core-localization"
@@ -59,7 +68,7 @@
       "path": "../plugin-data-viewer"
     },
     {
-      "path": "../plugin-sql-editor"
+      "path": "../plugin-navigation-tree"
     },
     {
       "path": "../plugin-sql-editor-codemirror"

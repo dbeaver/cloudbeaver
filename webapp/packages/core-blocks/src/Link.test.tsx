@@ -1,19 +1,24 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
 
 import { Link } from './Link.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
+import * as IconOrImageModule from './IconOrImage.js';
 
-vi.mock('./IconOrImage', () => ({
-  IconOrImage: (props: any) => <svg {...props}>{props.children}</svg>,
-}));
+beforeEach(() => {
+  vi.spyOn(IconOrImageModule, 'IconOrImage').mockImplementation((props: any) => <svg {...props}>{props.children}</svg>);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('Link', () => {
   it('should render link and children correctly', async () => {
