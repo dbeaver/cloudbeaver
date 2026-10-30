@@ -80,6 +80,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
     const node = context.get(DATA_CONTEXT_NAV_NODE);
     // Node menus do not always expose DATA_CONTEXT_NAV_NODES.
     const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+
     return getSqlGenerationNodes(node, tree?.getSelected().map(id => this.navNodeInfoResource.get(id)) ?? []).filter(isSqlGenerationNode);
   }
 }

@@ -13,6 +13,7 @@ export function getSqlGenerationNodes<T extends Pick<NavNode, 'uri'>>(node: T | 
   }
 
   const nodes = selected.some(selectedNode => selectedNode?.uri === node.uri) ? selected.filter((node): node is T => !!node) : [node];
+
   return Array.from(new Map(nodes.map(node => [node.uri, node])).values());
 }
 

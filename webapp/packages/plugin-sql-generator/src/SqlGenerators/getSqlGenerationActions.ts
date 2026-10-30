@@ -26,9 +26,11 @@ export function getSqlGenerationActions<T extends Pick<NavNode, 'objectFeatures'
   return generators.flatMap(generator => {
     const isJoin = generator.id === 'tableJoin' || generator.id === 'tableInnerJoin';
     const selected = isJoin ? entities : supported;
+
     if (selected.length === 0 || ((isJoin || generator.multiObject) && selected.length < 2)) {
       return [];
     }
+
     return [{ generator, nodes: selected }];
   });
 }

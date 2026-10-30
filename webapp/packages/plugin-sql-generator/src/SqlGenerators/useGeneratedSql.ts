@@ -73,10 +73,12 @@ export function useGeneratedSql(source: IGeneratedSqlSource): IGeneratedSql {
         if (this.loading || this.cancelling || this.closed) {
           return;
         }
+
         const previousOptions = this.options;
         this.options = { ...this.options, ...options };
         this.error = false;
         this.loading = true;
+
         try {
           this.task = null;
           const operation = this.source.generate(this.options);
@@ -93,6 +95,7 @@ export function useGeneratedSql(source: IGeneratedSqlSource): IGeneratedSql {
             this.options = previousOptions;
             this.error = true;
           });
+
           if (!this.task?.cancelled && !this.closed) {
             notificationService.logException(error, 'app_shared_sql_generators_error_title');
           }
@@ -103,12 +106,16 @@ export function useGeneratedSql(source: IGeneratedSqlSource): IGeneratedSql {
         }
       },
       async cancel(): Promise<void> {
-        this.closed = true;
         this.cancelling = true;
+
         try {
           if (this.task?.executing && this.task.cancellable) {
             await this.task.cancel();
           }
+
+          runInAction(() => {
+            this.closed = true;
+          });
         } finally {
           runInAction(() => {
             this.cancelling = false;

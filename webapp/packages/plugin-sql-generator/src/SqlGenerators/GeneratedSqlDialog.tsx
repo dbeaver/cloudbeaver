@@ -52,6 +52,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
         ? payload.regenerateQuery
         : options => sqlGeneratorsResource.generateEntityQuery(payload.generatorId, [...payload.nodeIds], options),
   });
+
   const { loading } = state;
 
   const connectionInfoResource = useService(ConnectionInfoResource);
@@ -83,12 +84,16 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
     if (closing.current) {
       return;
     }
+
     // Capture this dialog before confirmation becomes the active dialog.
     const dialog = commonDialogService.dialogs.find(dialog => dialog.payload === payload);
+
     if (!dialog) {
       return;
     }
+
     closing.current = true;
+
     try {
       if (loading) {
         const { status } = await commonDialogService.open(ConfirmationDialog, {
@@ -97,12 +102,14 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
           confirmActionText: 'ui_yes',
           cancelActionText: 'ui_no',
         });
+
         if (status !== DialogueStateResult.Resolved) {
           return;
         }
       }
-      commonDialogService.rejectDialog(dialog.promise);
+
       await state.cancel();
+      commonDialogService.rejectDialog(dialog.promise);
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_title');
     } finally {

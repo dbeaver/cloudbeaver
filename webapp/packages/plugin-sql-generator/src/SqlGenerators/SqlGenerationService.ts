@@ -29,9 +29,11 @@ export class SqlGenerationService {
       const selected = nodes.filter(isSqlGenerationNode);
 
       const [first, ...rest] = selected;
+
       if (!first) {
         return;
       }
+
       await this.commonDialogService.open(
         GeneratedSqlDialog,
         {

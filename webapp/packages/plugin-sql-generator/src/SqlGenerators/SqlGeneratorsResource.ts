@@ -28,6 +28,7 @@ export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => (
   compactSql: false,
   showFullDdl: false,
 });
+
 export const DDL_GENERATOR_ID = 'tableDDL';
 
 @injectable(() => [GraphQLService, AsyncTaskInfoService, NavNodeInfoResource])
@@ -43,6 +44,7 @@ export class SqlGeneratorsResource extends CachedMapResource<ISqlGeneratorsKey, 
       const nodeIds = new Set(ResourceKeyUtils.toArray(navNodeInfoResource.aliases.transformToKey(key)));
       return resourceKeyList(this.keys.filter(selection => selection.nodeIds.some(id => nodeIds.has(id))));
     };
+
     navNodeInfoResource.outdateResource(this, mapKeys);
     navNodeInfoResource.deleteInResource(this, mapKeys);
   }
@@ -81,6 +83,7 @@ export class SqlGeneratorsResource extends CachedMapResource<ISqlGeneratorsKey, 
         }
       },
     );
+
     return operation;
   }
 
@@ -99,8 +102,10 @@ export class SqlGeneratorsResource extends CachedMapResource<ISqlGeneratorsKey, 
       const { generators } = await this.graphQLService.sdk.sqlEntityQueryGenerators({
         nodePathList: [...selection.nodeIds],
       });
+
       this.set(selection, generators);
     });
+
     return this.data;
   }
 

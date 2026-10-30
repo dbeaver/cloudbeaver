@@ -44,6 +44,7 @@ export function getGeneratedSqlContext(generatorId: string, nodes: readonly IGen
     connection && first && containers.every(info => info.catalogId === first.catalogId && info.schemaId === first.schemaId)
       ? first.schemaId
       : undefined;
+
   const hasFullDdl =
     generatorId.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()) &&
     nodes.some(node => node.objectFeatures.includes(EObjectFeature.supportsFullDdl));
