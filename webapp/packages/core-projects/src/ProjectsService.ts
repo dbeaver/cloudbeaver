@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -143,6 +143,7 @@ export class ProjectsService {
     this.projectInfoResource.onItemDelete.addHandler(async data => {
       const ids = ResourceKeyUtils.toArray(data);
       const wasActive = ids.some(id => this.activeProjectIds.includes(id));
+
       if (wasActive) {
         await this.setActiveProjects(this.activeProjects.filter(project => !ids.includes(project.id)));
       }
@@ -209,6 +210,7 @@ export class ProjectsService {
     if (ExecutorInterrupter.isInterrupted(context)) {
       return false;
     }
+
     this.userProjectsSettings.activeProjectIds = ids;
 
     this.projectInfoResource.markOutdated(resourceKeyList(ids));

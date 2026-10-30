@@ -59,6 +59,7 @@ export const Switch: SwitchType = observer(function Switch({
     inverse,
     onChange,
   });
+
   rest = filterLayoutFakeProps(rest);
 
   if (autoHide && !isControlPresented(name, state)) {

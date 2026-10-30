@@ -65,6 +65,7 @@ export class AuthConfigurationsResource extends CachedMapResource<string, AuthCo
       await this.graphQLService.sdk.deleteAuthProviderConfiguration({
         id: key,
       });
+
       this.delete(key);
     });
   }

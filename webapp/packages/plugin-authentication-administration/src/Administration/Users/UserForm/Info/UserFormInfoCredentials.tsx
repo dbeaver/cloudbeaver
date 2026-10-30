@@ -68,6 +68,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
     if (!isValuesEqual(value, tabState.state.password, null)) {
       return translate('authentication_user_passwords_not_match');
     }
+
     return null;
   });
 

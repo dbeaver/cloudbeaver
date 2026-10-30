@@ -31,6 +31,7 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
   const grantedTeams = useResource(UserFormInfoTeams, UsersGrantedTeamsResource, formState.state.userId, {
     active: tabSelected && !!formState.state.userId,
   });
+
   const teams = teamsLoader.data.filter(isDefined).sort(compareTeams);
   const defaultTeam = serverConfigResource.data?.defaultUserTeam;
 
@@ -63,11 +64,13 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
         {teams.map(team => {
           const isDefault = team.teamId === defaultTeam;
           const isGranted = isDefault || tabState.state.teams.includes(team.teamId);
-          const grant: ITeamGrantSource | undefined = isDefault
-            ? { grantType: 'DEFAULT' }
-            : isGranted
-              ? (grantedTeams.data?.find(grant => grant.teamId === team.teamId) ?? { grantType: 'MANUAL' })
-              : undefined;
+          let grant: ITeamGrantSource | undefined;
+
+          if (isDefault) {
+            grant = { grantType: 'DEFAULT' };
+          } else if (isGranted) {
+            grant = grantedTeams.data?.find(grant => grant.teamId === team.teamId) ?? { grantType: 'MANUAL' };
+          }
 
           return (
             <FieldCheckbox

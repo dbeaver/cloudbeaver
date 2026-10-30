@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ import { ServerEventId, SessionEventSource } from './SessionEventSource.js';
 import { type ISessionStateEvent, SessionInfoEventHandler } from './SessionInfoEventHandler.js';
 
 export type SessionState = SessionStateFragment;
+
 export interface ISessionAction {
   action: string;
   [key: string]: any;
@@ -81,6 +82,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
       if (this.data?.locale === locale) {
         return;
       }
+
       await this.graphQLService.sdk.changeSessionLanguage({ locale });
 
       if (this.data) {

@@ -46,6 +46,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   const contextRef = useObjectRef({
     context: useContext(ElementsTreeContext),
   });
+
   const { isLoading, isLoaded, isOutdated } = useNode(node.uri);
   const children = useChildren(node.uri);
 

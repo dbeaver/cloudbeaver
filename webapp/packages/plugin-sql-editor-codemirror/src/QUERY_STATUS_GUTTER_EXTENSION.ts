@@ -15,6 +15,7 @@ const RUN_QUERY_MARKER = new (class extends GutterMarker {
   override toDOM(): Node {
     const span = document.createElement('div');
     span.className = 'running-query-line';
+
     return span;
   }
 })();
@@ -23,6 +24,7 @@ const ERROR_QUERY_MARKER = new (class extends GutterMarker {
   override toDOM(): Node {
     const span = document.createElement('div');
     span.className = 'running-query-error-line';
+
     return span;
   }
 })();

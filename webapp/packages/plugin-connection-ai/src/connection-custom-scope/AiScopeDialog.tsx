@@ -70,11 +70,13 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
       showInFilter: false,
     }));
   });
+
   const selection = useAiScopeSelection({
     selectedIds: payload.selectedIds.filter(isAllowed),
     getParents: id => navNodeInfoResource.getParents(id),
     canSelect: id => isAllowed(id) && isScopeObject(navNodeInfoResource.get(id)),
   });
+
   const filter = useScopeFilter(payload.rootId, isAllowed);
   const renderers: INodeRenderer[] = useMemo(
     () => [
@@ -82,6 +84,7 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
         if (id.startsWith(MORE_PREFIX)) {
           return AiScopeMoreNode;
         }
+
         return AiScopeNode;
       },
     ],
@@ -95,16 +98,21 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
       if (id.startsWith(MORE_PREFIX)) {
         return { name: translate('ui_load_more'), leaf: true };
       }
+
       const node = navNodeInfoResource.get(id)!;
+
       return { name: node.name || node.uri, leaf: isScopeLeaf(node) };
     },
     getParent: id => (id.startsWith(MORE_PREFIX) ? id.slice(MORE_PREFIX.length) : (navNodeInfoResource.getParent(id) ?? null)),
     getChildren(id) {
       const node = navNodeInfoResource.get(id);
+
       if (!node || isScopeLeaf(node) || !isAllowed(id)) {
         return [];
       }
+
       const children = (navigationTreeService.getChildren(id) ?? []).filter(isAllowed);
+
       return hasMorePagesForResourceKey(navTreeResource, id) ? [...children, MORE_PREFIX + id] : children;
     },
     childrenTransformers: [
@@ -113,9 +121,11 @@ export const AiScopeDialog: DialogComponent<IAiScopeDialogPayload, string[]> = o
     stateTransformers: [(_, id, state) => (filter.result?.expanded.has(id) ? { ...state, expanded: true } : state)],
     async load(id) {
       const node = navNodeInfoResource.get(id);
+
       if (id.startsWith(MORE_PREFIX) || !isAllowed(id) || (node && isScopeLeaf(node))) {
         return;
       }
+
       try {
         if (!(await navigationTreeService.loadNestedNodes(id))) {
           notificationService.logException(new Error(translate('plugin_ai_scope_load_error')));

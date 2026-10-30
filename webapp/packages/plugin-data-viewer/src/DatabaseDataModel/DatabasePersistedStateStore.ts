@@ -28,6 +28,7 @@ export class DatabasePersistedStateStore implements IDatabasePersistedStateStore
 
   set(key: string, value: unknown): void {
     this.store.set(key, value);
+
     // Mirror into the external tab-state object so it persists on serialization.
     if (this.external) {
       this.external[key] = value;
@@ -36,6 +37,7 @@ export class DatabasePersistedStateStore implements IDatabasePersistedStateStore
 
   delete(key: string): void {
     this.store.delete(key);
+
     if (this.external) {
       delete this.external[key];
     }

@@ -190,7 +190,9 @@ export class AuthenticationService extends Bootstrap {
         if (status === DialogueStateResult.Rejected) {
           return status;
         }
+
         await this.onLogin.execute('after');
+
         return status;
       })
       .finally(() => {
@@ -204,6 +206,7 @@ export class AuthenticationService extends Bootstrap {
     await this.waitAuth();
 
     const authNeeded = await this.appAuthService.isAuthNeeded();
+
     if (!authNeeded) {
       return;
     }
@@ -220,18 +223,21 @@ export class AuthenticationService extends Bootstrap {
     this.sessionDataResource.onDataUpdate.addPostHandler(() => {
       this.requireAuthentication();
     });
+
     this.screenService.routeChange.addHandler(() => this.requireAuthentication());
 
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
       await this.waitAuth();
 
       await this.userInfoResource.load();
+
       if (this.userInfoResource.isAuthenticated()) {
         return;
       }
 
       await this.auth(false, { providerId: null, linkUser: false, accessRequest: true });
     });
+
     this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }
 
@@ -247,6 +253,7 @@ export class AuthenticationService extends Bootstrap {
         //loin form may be opened and we need to close it
         this.authDialogService.closeLoginForm();
       }
+
       action.process();
     }
   }
@@ -257,6 +264,7 @@ export class AuthenticationService extends Bootstrap {
     if (data.providerId === AUTH_PROVIDER_LOCAL_ID) {
       const provider = contexts.getContext(AuthProviderContext);
       provider.auth();
+
       return;
     }
 

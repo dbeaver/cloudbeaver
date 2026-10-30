@@ -139,8 +139,10 @@ export class AIChatConversationsService {
       generatorId,
       executionContext.getContext(conversationConfigContext),
     );
+
     this.selectConversation(conversation.id);
     await this.onCreateConversation.execute({ stage: 'after', data: conversation }, executionContext);
+
     return conversation;
   }
 

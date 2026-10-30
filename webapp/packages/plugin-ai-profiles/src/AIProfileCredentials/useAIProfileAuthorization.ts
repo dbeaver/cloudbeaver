@@ -51,11 +51,14 @@ export function useAIProfileAuthorization(
         if (!this.formState || this.task?.executing) {
           return;
         }
+
         const profileId = this.formState.state.profileId;
         const task = aiProfileAuthorizationService.authorize(profileId, info => {
           this.authorization = info;
         });
+
         this.task = task;
+
         try {
           if (await task) {
             notificationService.logSuccess({ title: 'plugin_ai_account_connected', message: aiProfilesResource.get(profileId)?.name });
@@ -81,15 +84,18 @@ export function useAIProfileAuthorization(
         if (!this.task?.executing || this.task.cancelled) {
           return true;
         }
+
         const { status } = await commonDialogService.open(ConfirmationDialog, {
           title: 'plugin_ai_device_cancel_title',
           message: 'plugin_ai_device_cancel_confirmation',
           confirmActionText: 'plugin_ai_device_cancel',
           cancelActionText: 'plugin_ai_device_continue',
         });
+
         if (status !== DialogueStateResult.Resolved) {
           return false;
         }
+
         try {
           await this.cancel();
           return true;

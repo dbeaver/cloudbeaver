@@ -37,6 +37,7 @@ export const NodeDeletionDialog: DialogComponent<{ items: INodeDeletionDialogIte
         .filter(Boolean),
     ),
   ];
+
   const messages = warnings.map(warning => ({ key: warning, content: <>{translate(warning)}</> }));
 
   if (count !== rows.length) {

@@ -43,6 +43,7 @@ export class SqlExecutionPlanMenuBootstrap extends Bootstrap {
         const extracted = menuExtractItems(items, [ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN]);
         const outputIndex = items.indexOf(ACTION_SQL_EDITOR_SHOW_OUTPUT);
         items.splice(outputIndex !== -1 ? outputIndex : items.length, 0, ...extracted);
+
         return items;
       },
     });

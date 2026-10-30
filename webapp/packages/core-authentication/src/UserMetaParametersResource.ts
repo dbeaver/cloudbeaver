@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ import { GraphQLService, type UserConnectionAuthPropertiesFragment } from '@clou
 import { UserInfoResource } from './UserInfoResource.js';
 
 export type UserMetaParameter = UserConnectionAuthPropertiesFragment;
+
 export interface IUserMetaParameterOptions {
   id: string;
   displayName: string;
@@ -35,6 +36,7 @@ export class UserMetaParametersResource extends CachedDataResource<UserMetaParam
       () => {},
       () => {},
     );
+
     this.preloadResource(userInfoResource, () => {}).before(ExecutorInterrupter.interrupter(() => userInfoResource.data === null));
   }
 
@@ -44,6 +46,7 @@ export class UserMetaParametersResource extends CachedDataResource<UserMetaParam
     this.data.push(parameter);
 
     this.dataUpdate();
+
     return parameter;
   }
 
@@ -55,6 +58,7 @@ export class UserMetaParametersResource extends CachedDataResource<UserMetaParam
     if (index > -1) {
       this.data.splice(index, 1);
     }
+
     this.dataUpdate();
   }
 

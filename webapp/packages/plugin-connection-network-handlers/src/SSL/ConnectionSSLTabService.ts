@@ -18,6 +18,7 @@ const SSLTab = React.lazy(async () => {
   const { SSLTab } = await import('./SSLTab.js');
   return { default: SSLTab };
 });
+
 const SSLPanel = React.lazy(async () => {
   const { SSLPanel } = await import('./SSLPanel.js');
   return { default: SSLPanel };
@@ -49,6 +50,7 @@ export class ConnectionSSLTabService extends Bootstrap {
         if (optionsPart?.state.driverId) {
           const driver = this.dbDriverResource.get(optionsPart.state.driverId);
           const handler = getSSLDriverHandler(this.networkHandlerResource.values, driver?.applicableNetworkHandlers ?? []);
+
           return !handler;
         }
 

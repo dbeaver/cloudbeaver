@@ -94,6 +94,7 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
         if (!this.selectedCell) {
           return null;
         }
+
         return this.contentAction.retrieveBlobFromCache(this.selectedCell);
       },
       get canSave() {
@@ -111,11 +112,13 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
         const executionContext = this.model.source.executionContext?.context;
         const connection =
           executionContext && this.connectionInfoResource.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
+
         const isDataEditable = !!connection && this.dataViewerService.isDataEditable(connection);
 
         if (!this.cellHolder || !connection || !isDataEditable) {
           return false;
         }
+
         return this.formatAction.isBinary(this.cellHolder);
       },
       get truncated() {

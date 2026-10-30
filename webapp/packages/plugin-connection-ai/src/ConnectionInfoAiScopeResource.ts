@@ -39,10 +39,12 @@ export class ConnectionInfoAiScopeResource extends CachedMapResource<IConnection
     if (isResourceAlias(key)) {
       throw new Error('Resource alias is not supported');
     }
+
     await ResourceKeyUtils.forEachAsync(key, async dataSourceId => {
       const { scope } = await this.graphQLService.sdk.getUserConnectionAiScope({ dataSourceId });
       this.set(dataSourceId, scope);
     });
+
     return this.data;
   }
 

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ export class CachedTreeMetadata<TValue, TMetadata extends ICachedResourceMetadat
     if (isResourceKeyList(key)) {
       return key.every(key => this.dataHasMetadata(key));
     }
+
     return this.dataHasMetadata(key);
   }
 
@@ -57,6 +58,7 @@ export class CachedTreeMetadata<TValue, TMetadata extends ICachedResourceMetadat
     if (isResourceAlias(key)) {
       return super.get(key);
     }
+
     if (isResourceKeyList(key)) {
       return key.map(key => this.dataGetMetadata(key));
     }
@@ -72,8 +74,10 @@ export class CachedTreeMetadata<TValue, TMetadata extends ICachedResourceMetadat
     if (isResourceAlias(key)) {
       return super.delete(key);
     }
+
     ResourceKeyUtils.forEach(key, path => {
       const data = getTreeValue(this.getTree(), path);
+
       if (data) {
         data.metadata = this.getDefaultMetadata(path, this.metadata) as TMetadata;
       }

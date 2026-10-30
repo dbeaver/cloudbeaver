@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ export class PluginBootstrap extends Bootstrap {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         const dataSource = this.sqlDataSourceService.get(state.editorId);
+
         return dataSource?.executionContext === undefined;
       },
       handler: this.openTab.bind(this),
@@ -90,6 +91,7 @@ export class PluginBootstrap extends Bootstrap {
         title: 'sql_editor_screen_no_context_title',
         message: 'sql_editor_screen_no_context_message',
       });
+
       return;
     }
 

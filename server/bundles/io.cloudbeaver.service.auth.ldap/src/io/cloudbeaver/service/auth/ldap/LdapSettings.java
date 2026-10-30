@@ -37,6 +37,10 @@ public class LdapSettings {
     private final String loginAttribute;
     private final LdapSslSetting ldapSslSetting;
     private final String referralHandlingMode;
+    @NotNull
+    private final String firstNameField;
+    @NotNull
+    private final String lastNameField;
 
 
     public LdapSettings(
@@ -58,6 +62,13 @@ public class LdapSettings {
             providerConfiguration.getParameter(LdapConstants.PARAM_SSL_CERT)
         );
         this.referralHandlingMode = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_REFERRAL_HANDLING,  "ignore");
+        this.firstNameField = readAttributeName(LdapConstants.PARAM_FIRST_NAME_FIELD);
+        this.lastNameField = readAttributeName(LdapConstants.PARAM_LAST_NAME_FIELD);
+    }
+
+    @NotNull
+    private String readAttributeName(@NotNull String parameter) {
+        return CommonUtils.toString(providerConfiguration.getParameters().get(parameter)).trim();
     }
 
 
@@ -115,4 +126,15 @@ public class LdapSettings {
     public String getReferralHandlingMode() {
         return referralHandlingMode;
     }
+
+    @NotNull
+    public String getFirstNameField() {
+        return firstNameField;
+    }
+
+    @NotNull
+    public String getLastNameField() {
+        return lastNameField;
+    }
+
 }

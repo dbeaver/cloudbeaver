@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,5 +16,6 @@ export function isMapsEqual(map1: Map<any, any>, map2: Map<any, any>): boolean {
       return false;
     }
   }
+
   return true;
 }

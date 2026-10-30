@@ -24,6 +24,7 @@ export function navigationTreeProjectsExpandStateGetter(
 
     let active = false;
     const project = projectsNavNodeService.getByNodeId(nodeId);
+
     if (project) {
       active = projectsService.activeProjects.some(({ id }) => id === project.id);
     }

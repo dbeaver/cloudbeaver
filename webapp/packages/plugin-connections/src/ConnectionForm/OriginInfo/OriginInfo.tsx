@@ -46,6 +46,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const connectionInfoAuthPropertiesResource = useResource(OriginInfo, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
     active: tab.selected,
   });
+
   const dbDriverResource = useResource(OriginInfo, DBDriverResource, optionsPart.state.driverId ?? null, {
     active: tab.selected,
   });
@@ -64,6 +65,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const providerLoader = useResource(OriginInfo, AuthProvidersResource, providerId, {
     active: tab.selected,
   });
+
   const userInfoResource = useResource(OriginInfo, UserInfoResource, undefined, {
     active: tab.selected,
   });
@@ -73,6 +75,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, optionsPart.connectionKey, {
     active: tab.selected && isAuthenticated,
   });
+
   const connection = useResource(OriginInfo, ConnectionInfoResource, optionsPart.connectionKey, {
     active: tab.selected && isAuthenticated,
   });

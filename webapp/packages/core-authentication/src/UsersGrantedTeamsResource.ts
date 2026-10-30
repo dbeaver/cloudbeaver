@@ -44,6 +44,7 @@ export class UsersGrantedTeamsResource extends CachedMapResource<string, UserGra
     });
 
     this.set(keys, grants);
+
     return this.data;
   }
 

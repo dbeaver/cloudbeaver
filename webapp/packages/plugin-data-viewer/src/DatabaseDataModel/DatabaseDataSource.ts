@@ -78,6 +78,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.actions = this.dataSourceScope.serviceProvider.getService(
       withExternal(IDatabaseDataActions).set(IDatabaseDataSource, this as unknown),
     ) as unknown as IDatabaseDataActions<TOptions, TResult>;
+
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
     this.activeOperationStack = [];
@@ -102,6 +103,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       requestFilter: '',
       source: null,
     };
+
     this.error = null;
     this.lastAction = this.requestData.bind(this);
 
@@ -137,6 +139,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       if (!this.hasResult(resultIndex)) {
         return undefined;
       }
+
       return this.actions.tryGet(this.results[resultIndex]!, action, implementation!) as T;
     }
 
@@ -152,6 +155,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       if (!this.hasResult(resultIndex)) {
         throw new Error('Result index out of range');
       }
+
       return this.actions.get(this.results[resultIndex]!, action, implementation!) as T;
     }
 
@@ -190,6 +194,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.actions.updateResults(results);
     this.onResultsUpdate.execute(results);
     this.results = results;
+
     return this;
   }
 
@@ -221,6 +226,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     if (resultIndex === undefined) {
       return !this.results.length && this.error === null;
     }
+
     return this.hasResult(resultIndex) && !this.getResult(resultIndex)?.data && this.error === null;
   }
 
@@ -232,6 +238,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   setSlice(offset: number, count: number): this {
     this.offset = offset;
     this.count = count;
+
     return this;
   }
 
@@ -243,6 +250,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   loadPersistedState(state: Record<string, unknown>): this {
     this.persistedState.setStore(state);
     this.onPersistedStateLoaded();
+
     return this;
   }
 
@@ -259,6 +267,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     if (!this.supportedDataFormats.includes(this.dataFormat)) {
       this.dataFormat = dataFormats[0]!; // set's default format based on supported list, but maybe should be moved to separate method
     }
+
     return this;
   }
 
@@ -294,6 +303,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       this.lastAction = this.requestData.bind(this);
 
       mutation?.();
+
       return this.requestDataAction();
     });
   }
@@ -304,8 +314,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
         this.lastAction = this.requestDataPortion.bind(this, offset, count);
 
         this.setSlice(offset, count);
+
         return this.requestDataAction();
       }
+
       return Promise.resolve();
     });
   }
@@ -350,6 +362,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.clearError();
     this.setResults([]);
     this.setOutdated();
+
     return this;
   }
 
@@ -371,6 +384,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
         if (data !== null) {
           this.setResults(data);
         }
+
         return data;
       });
   }
@@ -381,11 +395,13 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     }
 
     const operationTask = this.executeOperation(type, operation);
+
     try {
       this.activeOperationStack.push(operationTask);
       return await operationTask;
     } finally {
       const index = this.activeOperationStack.indexOf(operationTask);
+
       if (index !== -1) {
         this.activeOperationStack.splice(index, 1);
       }

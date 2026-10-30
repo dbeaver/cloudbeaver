@@ -111,20 +111,22 @@ export const Select: ISelectType = observer(function Select({
   const generatedId = useId();
   const inputId = id || generatedId;
 
-  const handleSelect = (id: any) => {
+  function handleSelect(id: any) {
     id = id ?? value ?? '';
     const changed = id !== value;
 
     if (state && changed) {
       state[name] = id;
     }
+
     if (onSelect && changed) {
       onSelect(id, name, value);
     }
+
     if (context && changed) {
       context.change(id, name);
     }
-  };
+  }
 
   useLayoutEffect(() => {
     onSwitch?.(isOpened);

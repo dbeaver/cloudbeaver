@@ -64,6 +64,7 @@ export const Table = observer<ITableProps>(function Table({ objects, hasNextPage
     onValueChange => reaction(() => columns.length + 1, onValueChange),
     [columns],
   );
+
   const rowCount = useCreateGridReactiveValue(
     () => objects.length,
     onValueChange => reaction(() => objects.length, onValueChange),
@@ -100,6 +101,7 @@ export const Table = observer<ITableProps>(function Table({ objects, hasNextPage
 
     return '';
   }
+
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
     objects,
     tableState,
@@ -108,6 +110,7 @@ export const Table = observer<ITableProps>(function Table({ objects, hasNextPage
   function getCellTooltip(rowIdx: number, colIdx: number) {
     colIdx--;
     const property = objects[rowIdx]?.object?.properties?.[colIdx];
+
     return property ? getObjectPropertyDisplayValue(property) : '';
   }
 
@@ -121,14 +124,17 @@ export const Table = observer<ITableProps>(function Table({ objects, hasNextPage
     if (colIdx === 0) {
       return 40;
     }
+
     return null;
   }
 
   function getHeaderText(colIdx: number) {
     colIdx--;
+
     if (colIdx < 0) {
       return '';
     }
+
     return columns[colIdx]?.displayName ?? '';
   }
 

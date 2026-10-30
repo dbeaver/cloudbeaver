@@ -39,9 +39,11 @@ export const ExtendedDDLViewerTabPanel: NavNodeTransformViewComponent = observer
   const connectionDialectResource = useResource(ExtendedDDLViewerTabPanel, ConnectionDialectResource, connectionParam);
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
+
   if (sqlDialect) {
     extensions.set(...sqlDialect);
   }
+
   const extendedDDlData = extendedDDLResource.data;
 
   useDataContextLink(menu.context, (context, id) => {

@@ -83,6 +83,7 @@ export class UserSettingsService extends EditableSettingsSource {
         this.changes.forEach((value, key) => {
           this.localSettings.set(key, value);
         });
+
         this.changes.clear();
       });
     }
@@ -94,6 +95,7 @@ export class UserSettingsService extends EditableSettingsSource {
 
   restoreDefaults() {
     this.resetChanges();
+
     for (const key of this.getSource().keys()) {
       this.resetValue(key);
     }
@@ -108,6 +110,7 @@ export class UserSettingsService extends EditableSettingsSource {
       if (!this.useProfileSettings) {
         this.clear();
         this.lastConfig = null;
+
         return;
       }
 

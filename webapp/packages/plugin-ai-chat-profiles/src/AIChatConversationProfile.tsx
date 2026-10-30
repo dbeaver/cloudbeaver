@@ -40,10 +40,12 @@ export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(
       if (aiProfileCredentialsService.isRequired(profile)) {
         menu?.hide();
         const result = await aiProfileCredentialsService.open(profile.id, () => updateProfile(profile.id));
+
         if (result?.status !== DialogueStateResult.Resolved) {
           return;
         }
       }
+
       await updateProfile(profile.id);
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_profile_change_fail');
@@ -52,6 +54,7 @@ export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(
 
   async function updateProfile(profileId: string): Promise<void> {
     setSaving(true);
+
     try {
       await aiChatConversationProfileService.updateConversationProfile(conversation.id, profileId);
     } catch (exception: any) {

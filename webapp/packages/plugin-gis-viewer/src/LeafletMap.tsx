@@ -115,6 +115,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
   const onEachFeature = useCallback(
     (feature: IGeoJSONFeature, layer: leaflet.Layer) => {
       const associatedValues = getAssociatedValues(feature.properties.associatedCell);
+
       if (associatedValues.length > 0) {
         const table = document.createElement('table');
 
@@ -138,6 +139,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
           tr.appendChild(tdValue);
           table.appendChild(tr);
         }
+
         layer.bindPopup(table.outerHTML, popupOption);
       }
     },
@@ -161,6 +163,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
       if (crs === leaflet.CRS.Simple) {
         const maxDimension = Math.max(bounds.getNorth() - bounds.getSouth(), bounds.getEast() - bounds.getWest());
         mapRef.setMinZoom(-5);
+
         if (maxDimension > 0) {
           mapRef.fitBounds(bounds);
         } else {

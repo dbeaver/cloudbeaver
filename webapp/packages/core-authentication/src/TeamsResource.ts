@@ -82,6 +82,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
         teamId: key,
         force: options?.force ?? false,
       });
+
       this.delete(key);
     });
 
@@ -94,6 +95,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     if (!team.length) {
       throw new Error('Team not found');
     }
+
     return team[0]!.grantedUsersInfo.map(user => ({ ...user, teamRole: user.teamRole ?? null }));
   }
 
@@ -139,6 +141,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     });
 
     const key = resourceKeyList(teamsList.map(team => team.teamId));
+
     if (all) {
       this.replace(key, teamsList);
     } else {

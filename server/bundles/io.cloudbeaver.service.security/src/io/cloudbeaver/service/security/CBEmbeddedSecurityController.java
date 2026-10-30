@@ -3401,7 +3401,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         String userId = findUserByCredentials(authProvider, userCredentials, true);
         String userIdFromCredentials;
         try {
-            userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, providerConfig, userCredentials, null);
+            userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, providerConfig, userCredentials, userId);
         } catch (DBException e) {
             log.debug("Local auth validation error", e);
             return null;

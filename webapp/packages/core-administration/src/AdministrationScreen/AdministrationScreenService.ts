@@ -117,6 +117,7 @@ export class AdministrationScreenService {
         this.itemState.sync(this.itemsStateSync);
       },
     );
+
     this.sessionPermissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });
@@ -171,10 +172,13 @@ export class AdministrationScreenService {
           if (param) {
             return AdministrationScreenService.setupItemSubParamRouteName;
           }
+
           return AdministrationScreenService.setupItemSubRouteName;
         }
+
         return AdministrationScreenService.setupItemRouteName;
       }
+
       return AdministrationScreenService.setupName;
     } else {
       if (item) {
@@ -182,10 +186,13 @@ export class AdministrationScreenService {
           if (param) {
             return AdministrationScreenService.itemSubParamRouteName;
           }
+
           return AdministrationScreenService.itemSubRouteName;
         }
+
         return AdministrationScreenService.itemRouteName;
       }
+
       return AdministrationScreenService.screenName;
     }
   }
@@ -285,6 +292,7 @@ export class AdministrationScreenService {
 
     const fromScreen = this.getScreen(fromState);
     const screen = this.getScreen(toState);
+
     if (!screen) {
       return false;
     }
@@ -301,6 +309,7 @@ export class AdministrationScreenService {
 
     const screen = this.getScreen(state);
     const fromScreen = this.getScreen(prevState);
+
     if (screen) {
       await this.administrationItemService.activate(screen, this.isConfigurationMode, screen.item !== fromScreen?.item, fromScreen === null);
     }
@@ -317,8 +326,10 @@ export class AdministrationScreenService {
       this.screenService.navigateToRoot();
 
       this.notificationService.logInfo({ title: 'root_permission_no_permission', uuid: 'no_permission' });
+
       return false;
     }
+
     return true;
   }
 

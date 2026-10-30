@@ -51,6 +51,7 @@ function getSearchMatchesCount(state: EditorState, config?: SearchQuery) {
   const { from, to } = state.selection.main;
 
   let item = cursor.next();
+
   while (!item.done) {
     if (item.value.from === from && item.value.to === to) {
       counter.current = counter.count + 1;
@@ -174,6 +175,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
         dom.classList.remove(...classes);
       };
     }
+
     return undefined;
   }, [className, dom.classList]);
 
