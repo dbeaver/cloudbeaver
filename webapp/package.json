@@ -17,6 +17,7 @@
     "inflight": ">1.0.6",
     "node-domexception": ">1.0.0",
     "happy-dom": ">=21.0.4",
+    "decode-uri-component": ">=0.5.1",
     "shell-quote": ">=1.11.0",
     "source-map-js": ">=1.2.2",
     "@graphql-tools/utils": ">=12.0.1",
