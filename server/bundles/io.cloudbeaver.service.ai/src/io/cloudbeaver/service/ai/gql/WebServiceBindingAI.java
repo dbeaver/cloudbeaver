@@ -23,6 +23,7 @@ import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.ai.WebAIFeatureProvider;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
+import io.cloudbeaver.service.ai.model.inputs.WebAIChatAttachmentInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIDataSourceSettingsInput;
@@ -164,7 +165,8 @@ public class WebServiceBindingAI extends WebServiceBindingBase<DBWServiceAI> imp
                 env -> getService(env).asyncSendChatMessage(
                     getWebSession(env),
                     getArgumentVal(env, "conversationId"),
-                    getArgumentVal(env, "prompt")
+                    getArgumentVal(env, "prompt"),
+                    JSONUtils.GSON.fromJson(JSONUtils.GSON.toJsonTree(env.getArgument("attachments")), WebAIChatAttachmentInput[].class)
                 )
             ).dataFetcher(
                 "aiClearLastChatMessages",

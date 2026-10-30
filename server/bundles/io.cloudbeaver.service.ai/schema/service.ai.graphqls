@@ -84,6 +84,8 @@ type AIMessage {
     content: String!
     displayMessage: String!
     time: DateTime!
+    "Attachments associated with this message. Empty when the message has no attachments."
+    attachments: [AIChatAttachment!]! @since(version: "26.2.4")
     "Present only with CONFIRMATION role"
     functionConfirmation: AIFunctionConfirmation
     "Present only with FUNCTION role"
@@ -97,6 +99,28 @@ type AISendChatMessageInfo @since(version: "25.1.1") {
     userMessage: AIMessage!
     "Message that would be received via websockets."
     assistantMessage: AIMessage!
+}
+
+type AIImageAttachment @since(version: "26.2.4") {
+    name: String!
+    mediaType: String!
+    "Base64-encoded image content, without a data URL prefix."
+    data: String!
+}
+
+type AIChatAttachment @since(version: "26.2.4") {
+    "Image payload. Each attachment contains one payload matching its kind."
+    image: AIImageAttachment
+}
+
+input AIImageAttachmentInput @since(version: "26.2.4") {
+    name: String!
+    mediaType: String!
+    data: String!
+}
+
+input AIChatAttachmentInput @since(version: "26.2.4") {
+    image: AIImageAttachmentInput
 }
 
 type AIDataSourceSettingsInfo @since(version: "25.3.3") {
@@ -345,7 +369,7 @@ extend type Mutation @since(version: "23.2.2") {
     aiDeleteChatConversation(conversationId: ID!): Boolean! @since(version: "25.1.1")
 
     "Sends a chat message to the AI chat conversation and returns a message ID from response. The response will be received partially via websockets."
-    aiSendChatMessage(conversationId: ID!, prompt: String!): AISendChatMessageInfo! @since(version: "25.1.1")
+    aiSendChatMessage(conversationId: ID!, prompt: String!, attachments: [AIChatAttachmentInput!] @since(version: "26.2.4")): AISendChatMessageInfo! @since(version: "25.1.1")
 
     "Clears the chat messages in the AI chat conversation. The messages will be removed from the conversation."
     aiClearLastChatMessages(conversationId: ID!, messageId: ID!): Boolean! @since(version: "25.1.1")

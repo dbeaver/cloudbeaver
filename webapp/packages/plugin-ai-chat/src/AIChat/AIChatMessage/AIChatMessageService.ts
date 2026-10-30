@@ -12,12 +12,13 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { ExecutionContext, Executor, ExecutorInterrupter, type IExecutionContext, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { AIChatMessagesResource, isFunctionConfirmationMessage, isFunctionMessage, type IMessageParam } from './AIChatMessagesResource.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
+import { aiChatMessageRequestContext } from './aiChatMessageRequestContext.js';
 
 type IAiSendChatMessageInfo = AiSendChatMessageInfoFragment;
 
@@ -44,13 +45,7 @@ interface IMessageSendExecutorAfterData {
 
 export type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExecutorAfterData;
 
-@injectable(() => [
-  AIChatMessagesResource,
-  AIChatConversationsResource,
-  CommonDialogService,
-  LocalizationService,
-  ConnectionsManagerService,
-])
+@injectable(() => [AIChatMessagesResource, AIChatConversationsResource, CommonDialogService, LocalizationService, ConnectionsManagerService])
 export class AIChatMessageService {
   onMessageSend: Executor<MessageSendExecutorData>;
 
@@ -66,8 +61,16 @@ export class AIChatMessageService {
     this.onMessageSend.addHandler(this.updateConversation.bind(this));
   }
 
-  async sendMessage(conversationId: string, prompt: string) {
-    return await this.processSendMessageAction(conversationId, async () => await this.aiChatMessagesResource.sendMessage(conversationId, prompt));
+  async sendMessage<TContextData>(
+    conversationId: string,
+    prompt: string,
+    context?: IExecutionContext<TContextData>,
+  ): Promise<IAiSendChatMessageInfo | undefined> {
+    return await this.processSendMessageAction(
+      conversationId,
+      async contexts => await this.aiChatMessagesResource.sendMessage(conversationId, prompt, contexts.getContext(aiChatMessageRequestContext)),
+      context,
+    );
   }
 
   async deleteMessage(conversationId: string, messageId: string): Promise<void> {
@@ -103,9 +106,15 @@ export class AIChatMessageService {
     return this.aiChatMessagesResource.isExternalFunction(param) && status === EAiFunctionStatus.PENDING;
   }
 
-  async processSendMessageAction(conversationId: string, action: () => Promise<IAiSendChatMessageInfo>) {
+  async processSendMessageAction<TContextData>(
+    conversationId: string,
+    action: (contexts: IExecutionContextProvider<MessageSendExecutorData>) => Promise<IAiSendChatMessageInfo>,
+    context?: IExecutionContext<TContextData>,
+  ): Promise<IAiSendChatMessageInfo | undefined> {
     const conversation = await this.aiChatConversationsResource.load(conversationId);
-    const contexts = await this.onMessageSend.execute({ stage: 'before', data: { conversationId, connectionKey: conversation.dataSourceId } });
+    const data: MessageSendExecutorData = { stage: 'before', data: { conversationId, connectionKey: conversation.dataSourceId } };
+    const executionContext = new ExecutionContext<MessageSendExecutorData>(data, context);
+    const contexts = await this.onMessageSend.execute(data, executionContext);
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;
@@ -142,9 +151,9 @@ export class AIChatMessageService {
       }
     }
 
-    const message = await action();
+    const message = await action(contexts);
 
-    await this.onMessageSend.execute({ stage: 'after', data: message });
+    await this.onMessageSend.execute({ stage: 'after', data: message }, executionContext);
 
     return message;
   }

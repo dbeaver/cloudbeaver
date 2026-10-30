@@ -59,6 +59,11 @@ public class WebAIMessage {
         return message.message().getDisplayMessage();
     }
 
+    @NotNull
+    public List<WebAIChatAttachment> getAttachments() {
+        return message.message().getImages().stream().map(WebAIChatAttachment::new).toList();
+    }
+
     @Nullable
     public AIFunctionCall getFunctionCall() {
         return message.message().getFunctionCall();
