@@ -24,6 +24,7 @@ import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebObjectFeatureProviderDescriptor;
 import io.cloudbeaver.registry.WebObjectFeatureRegistry;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
@@ -215,13 +216,34 @@ public class WebNavigatorNodeInfo {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
         try {
-            DBSObjectFilter filter = dbNode.getNodeFilter(
-                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
-                true);
-            return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+            return getApplicableFilter(WebNavigatorFilterUtils.getConnectionFilter(
+                dbNode,
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)
+            ));
         } catch (DBException e) {
             throw new DBWebException(e);
         }
+    }
+
+    @Property
+    @Nullable
+    public DBSObjectFilter getUserFilter() throws DBWebException {
+        if (!(node instanceof DBNDatabaseNode dbNode)) {
+            return null;
+        }
+        try {
+            return getApplicableFilter(WebNavigatorFilterUtils.getUserFilter(
+                dbNode,
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode)
+            ));
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
+    }
+
+    @Nullable
+    private static DBSObjectFilter getApplicableFilter(@Nullable DBSObjectFilter filter) {
+        return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
     }
 
     @Override
