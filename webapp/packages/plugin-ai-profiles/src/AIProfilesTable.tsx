@@ -10,14 +10,14 @@ import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import type { ReactNode } from 'react';
 
-import { IconOrImage, Link, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { AdministrationTableStyles } from '@cloudbeaver/core-administration';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { DataGrid, TableRowSelect, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
-import { Command } from '@dbeaver/ui-kit';
 
 import { AI_PROFILES_TABLE_ROW_HEIGHT } from './AI_PROFILES_TABLE_ROW_HEIGHT.js';
 import type { AIProfile } from './AIProfilesResource.js';
+import { AIProfileNameCell } from './AIProfileNameCell.js';
 
 export interface IAIProfilesTableColumn {
   key: string;
@@ -39,7 +39,12 @@ export interface IAIProfilesTableProps {
   isProfileSelectable?: (profile: AIProfile) => boolean;
   getSelectionTitle?: (profile: AIProfile) => string | undefined;
   isProfileClickable?: (profile: AIProfile) => boolean;
+  isProfileDeletable?: (profile: AIProfile) => boolean;
   getProfileBadge?: (profile: AIProfile) => ReactNode;
+  processing?: boolean;
+  onClone?: (profileId: string) => void;
+  onDelete?: (profileId: string) => void;
+  onSetDefault?: (profileId: string) => void;
   onProfileClick?: (profile: AIProfile) => void;
 }
 
@@ -58,7 +63,12 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   isProfileSelectable,
   getSelectionTitle,
   isProfileClickable,
+  isProfileDeletable,
   getProfileBadge,
+  processing,
+  onClone,
+  onDelete,
+  onSetDefault,
   onProfileClick,
 }) {
   const translate = useTranslate();
@@ -75,8 +85,8 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
       label: 'plugin_ai_profiles_scope',
       render: profile => (
         <div className="tw:flex tw:items-center tw:gap-2">
-          <span>{translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user')}</span>
           {profile.global && <IconOrImage icon="document-global" width={16} />}
+          <span>{translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user')}</span>
         </div>
       ),
     },
@@ -103,31 +113,17 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
 
     if (column.key === NAME_COLUMN.key) {
       const clickable = !!onProfileClick && (isProfileClickable?.(profile) ?? true);
-      const content = (
-        <>
-          {clickable ? <Link truncate>{profile.name}</Link> : <span className="tw:truncate">{profile.name}</span>}
-          {getProfileBadge?.(profile)}
-        </>
-      );
-
-      if (clickable) {
-        return (
-          <Command
-            render={<div />}
-            tabIndex={0}
-            title={profile.name}
-            className="tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:outline-none"
-            onClick={() => onProfileClick(profile)}
-          >
-            {content}
-          </Command>
-        );
-      }
-
       return (
-        <div title={profile.name} className="tw:flex tw:items-center tw:gap-2">
-          {content}
-        </div>
+        <AIProfileNameCell
+          profile={profile}
+          badge={getProfileBadge?.(profile)}
+          disabled={processing}
+          deletionDisabled={!(isProfileDeletable?.(profile) ?? true)}
+          onOpen={clickable ? onProfileClick : undefined}
+          onClone={onClone}
+          onDelete={onDelete}
+          onSetDefault={onSetDefault}
+        />
       );
     }
 
@@ -136,8 +132,8 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
       const title = engine?.name ?? profile.engineId;
       return (
         <div title={title} className="tw:flex tw:items-center tw:gap-2">
-          <span className="tw:truncate">{title}</span>
           {engine?.icon && <IconOrImage icon={engine.icon} width={16} />}
+          <span className="tw:truncate">{title}</span>
         </div>
       );
     }
@@ -154,7 +150,12 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     isProfileSelectable,
     getSelectionTitle,
     isProfileClickable,
+    isProfileDeletable,
     getProfileBadge,
+    processing,
+    onClone,
+    onDelete,
+    onSetDefault,
     onProfileClick,
   ]);
 

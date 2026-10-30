@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed } from '@cloudbeaver/core-blocks';
+import { getComputed, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
 import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useMenu } from '@cloudbeaver/core-view';
 
@@ -21,9 +21,10 @@ interface TabMenuProps extends React.PropsWithChildren {
   tabId: string;
   state: ITabsContext<any>;
   menuContext?: IDataContext;
+  contextMenuPosition?: IContextMenuPosition;
 }
 
-export const TabMenu = observer<TabMenuProps>(function TabMenu({ children, tabId, state, menuContext }) {
+export const TabMenu = observer<TabMenuProps>(function TabMenu({ children, tabId, state, menuContext, contextMenuPosition }) {
   const menu = useMenu({
     menu: MENU_TAB,
     context: menuContext,
@@ -41,8 +42,8 @@ export const TabMenu = observer<TabMenuProps>(function TabMenu({ children, tabId
   }
 
   return (
-      <ContextMenu menu={menu} placement="bottom-start">
-        {children}
-      </ContextMenu>
+    <ContextMenu menu={menu} placement="bottom-start" contextMenuPosition={contextMenuPosition}>
+      {children}
+    </ContextMenu>
   );
 });

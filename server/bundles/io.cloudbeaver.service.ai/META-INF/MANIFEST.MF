@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Cloudbeaver AI Integration
 Bundle-SymbolicName: io.cloudbeaver.service.ai;singleton:=true
-Bundle-Version: 1.0.5.qualifier
-Bundle-Release-Date: 20261019
+Bundle-Version: 1.0.7.qualifier
+Bundle-Release-Date: 20261116
 Bundle-Vendor: DBeaver Corp
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: io.cloudbeaver.service.ai
@@ -11,4 +11,5 @@ Require-Bundle: org.jkiss.dbeaver.model.ai;visibility:=reexport,
  io.cloudbeaver.server.ce;visibility:=reexport
 Export-Package: io.cloudbeaver.service.ai,
  io.cloudbeaver.service.ai.model,
+ io.cloudbeaver.service.ai.model.events,
  io.cloudbeaver.service.ai.model.inputs

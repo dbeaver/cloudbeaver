@@ -33,8 +33,7 @@ import {
   type IConnectionFolderEvent,
 } from '@cloudbeaver/core-connections';
 import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
-import { isDefined } from '@dbeaver/js-helpers';
-import { getPathParts } from '@cloudbeaver/core-utils';
+import { getPathParent, getPathParts } from '@cloudbeaver/core-utils';
 
 @injectable(() => [
   ConnectionInfoResource,
@@ -78,7 +77,7 @@ export class ConnectionNavNodeService {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderCreated,
       data => {
-        const parents = data.nodePaths.map(nodeId => this.resolveParent(nodeId)).filter(isDefined);
+        const parents = data.nodePaths.map(nodeId => this.resolveParent(nodeId));
 
         this.navTreeResource.markOutdated(resourceKeyList(parents));
       },
@@ -88,7 +87,7 @@ export class ConnectionNavNodeService {
     this.connectionFolderEventHandler.onEvent<IConnectionFolderEvent>(
       ServerEventId.CbDatasourceFolderDeleted,
       data => {
-        const parents = data.nodePaths.map(nodeId => this.resolveParent(nodeId)).filter(isDefined);
+        const parents = data.nodePaths.map(nodeId => this.resolveParent(nodeId));
 
         this.navTreeResource.deleteInNode(
           resourceKeyList(parents),
@@ -312,18 +311,12 @@ export class ConnectionNavNodeService {
     this.containerResource.markOutdated(resourceKeyList(outdateKeys));
   }
 
-  private resolveParent(nodeId: string): string | undefined {
-    const parents = this.navNodeInfoResource.getParents(nodeId);
-    const parent = parents[parents.length - 1];
-
-    if (parent === undefined) {
-      return undefined;
-    }
-
+  private resolveParent(nodeId: string): string {
+    const parent = getPathParent(nodeId);
     const path = getPathParts(NodeManagerUtils.getPlainPath(parent));
 
-    if (path[path.length - 1] === NODE_DATASOURCES_SEGMENT) {
-      return parents[parents.length - 2];
+    if (path.length === 2 && path[1] === NODE_DATASOURCES_SEGMENT) {
+      return getPathParent(parent);
     }
 
     return parent;

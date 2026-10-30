@@ -7,6 +7,15 @@
  */
 
 export default [
+  ['plugin_ai_profiles_profile_menu', 'Profilaktionen'],
+  ['plugin_ai_profiles_profile_clone', 'Klonen'],
+  ['plugin_ai_profiles_default_badge', '(Standard)'],
+  [
+    'plugin_ai_profiles_default_description',
+    'Standardprofil für Ihre KI-Anfragen. Wählen Sie ein Profil im Chat oder verwenden Sie „Als Standard festlegen“, um es zu ändern.',
+  ],
+  ['plugin_ai_profiles_set_default', 'Als Standard festlegen'],
+  ['plugin_ai_profiles_default_save_failed', 'Ihr KI-Standardprofil konnte nicht gespeichert werden'],
   ['plugin_ai_profiles_scope', 'Geltungsbereich'],
   ['plugin_ai_profiles_scope_global', 'Global'],
   ['plugin_ai_profiles_scope_user', 'Benutzer'],

@@ -19,9 +19,9 @@ import { AIChatMessageService } from './AIChat/AIChatMessage/AIChatMessageServic
 import { AIChatConversationsService } from './AIChat/AIChatConversation/AIChatConversationsService.js';
 import { AIChatConversationsResource } from './AIChat/AIChatConversation/AIChatConversationsResource.js';
 import { AIChatContextService } from './AIChat/AIChatContext/AIChatContextService.js';
-import { AIChatConversationScopeResource } from './AIChat/AIChatConversation/AIChatConversationScopeResource.js';
 import { AIChatConversationMetricsResource } from './AIChat/AIChatConversation/AIChatConversationMetricsResource.js';
 import { AIChatFunctionsService } from './AIChatFunctionsService.js';
+import { AIChatFunctionRegistryService } from './AIChatFunctionRegistryService.js';
 import { AIFunctionsResource } from './AIFunctionsResource.js';
 
 export default ModuleRegistry.add({
@@ -45,9 +45,9 @@ export default ModuleRegistry.add({
       .addSingleton(AIChatMessageService)
       .addSingleton(AIChatConversationsService)
       .addSingleton(AIChatConversationsResource)
-      .addSingleton(AIChatConversationScopeResource)
       .addSingleton(AIChatConversationMetricsResource)
       .addSingleton(AIChatFunctionsService)
+      .addSingleton(AIChatFunctionRegistryService)
       .addSingleton(AIFunctionsResource);
   },
 });

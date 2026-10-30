@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTranslate } from '@cloudbeaver/core-blocks';
-import { AIProfilesTable, type AIProfile, type IAIProfilesTableColumn } from '@cloudbeaver/plugin-ai-profiles';
+import { AIDefaultProfileService, AIProfilesTable, type AIProfile, type IAIProfilesTableColumn } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
 
@@ -23,6 +23,15 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
   const translate = useTranslate();
   const aiProfileCredentialsPanelService = useService(AIProfileCredentialsPanelService);
   const notificationService = useService(NotificationService);
+  const aiDefaultProfileService = useService(AIDefaultProfileService);
+
+  async function setDefaultProfile(profileId: string): Promise<void> {
+    try {
+      await aiDefaultProfileService.setDefaultProfile(profileId);
+    } catch (exception: any) {
+      notificationService.logException(exception, 'plugin_ai_profiles_default_save_failed');
+    }
+  }
 
   async function editCredentials(profileId: string): Promise<void> {
     try {
@@ -34,12 +43,24 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
 
   const columns: IAIProfilesTableColumn[] = [
     {
+      key: 'authentication',
+      label: 'plugin_ai_credentials_method',
+      width: 180,
+      render: profile =>
+        translate(!profile.global && profile.accountAuthentication ? 'plugin_ai_credentials_subscription' : 'plugin_ai_credentials_token'),
+    },
+    {
       key: 'status',
       label: 'plugin_ai_user_profile_column_status',
       width: 280,
       render: profile => {
         if (profile.global) {
           return translate('plugin_ai_user_profile_status_managed');
+        }
+        if (profile.accountAuthentication) {
+          return profile.account
+            ? `${translate('plugin_ai_account_connected')}${profile.account.email ? `: ${profile.account.email}` : ''}`
+            : translate('plugin_ai_account_not_connected');
         }
         return translate(profile.credentialsSaved ? 'plugin_ai_user_profile_status_configured' : 'plugin_ai_user_profile_status_not_configured');
       },
@@ -53,7 +74,16 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
       engineLabel="plugin_ai_user_profile_column_engine"
       emptyPlaceholder="plugin_ai_user_profile_empty"
       additionalColumns={columns}
+      processing={aiDefaultProfileService.saving}
+      getProfileBadge={profile =>
+        aiDefaultProfileService.defaultProfile?.id === profile.id ? (
+          <span className="tw:shrink-0 tw:text-xs tw:opacity-60 tw:whitespace-nowrap" title={translate('plugin_ai_profiles_default_description')}>
+            {translate('plugin_ai_profiles_default_badge')}
+          </span>
+        ) : null
+      }
       isProfileClickable={profile => !profile.global}
+      onSetDefault={setDefaultProfile}
       onProfileClick={profile => editCredentials(profile.id)}
     />
   );

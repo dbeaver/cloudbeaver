@@ -1,4 +1,6 @@
 export default [
+  ['plugin_ai_administration_profile_clone_success', 'Profile cloned'],
+  ['plugin_ai_administration_profile_clone_error', 'Failed to clone profile'],
   ['ai_administration_language_model_settings', 'Model settings'],
   ['ai_administration_select_language_model_selector_title', 'Model'],
   ['ai_administration_models_refresh', 'Refresh models'],
@@ -29,6 +31,9 @@ export default [
   ['plugin_ai_administration_profile_scope', 'Scope'],
   ['plugin_ai_administration_profile_scope_global', 'Global'],
   ['plugin_ai_administration_profile_scope_user', 'User'],
+  ['plugin_ai_administration_profile_scope_global_description', 'A global profile is available to all users with shared credentials.'],
+  ['plugin_ai_administration_profile_scope_user_description', 'Each user can configure this profile with their own API token or subscription.'],
+  ['plugin_ai_administration_profile_select_engine_first', 'Select an engine first'],
   ['plugin_ai_administration_profile_user_credentials_unsupported', 'This engine does not support user-provided API tokens'],
   ['plugin_ai_administration_profile_form_tab_options', 'Profile'],
   ['plugin_ai_administration_profile_name_max_length', 'Profile name must not exceed {arg:length} characters'],

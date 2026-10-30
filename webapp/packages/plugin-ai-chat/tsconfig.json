@@ -71,12 +71,6 @@
       "path": "../core-view"
     },
     {
-      "path": "../plugin-ai"
-    },
-    {
-      "path": "../plugin-ai-profiles"
-    },
-    {
       "path": "../plugin-codemirror6"
     },
     {
@@ -84,9 +78,6 @@
     },
     {
       "path": "../plugin-navigation-tabs"
-    },
-    {
-      "path": "../plugin-navigation-tree"
     },
     {
       "path": "../plugin-sql-editor"

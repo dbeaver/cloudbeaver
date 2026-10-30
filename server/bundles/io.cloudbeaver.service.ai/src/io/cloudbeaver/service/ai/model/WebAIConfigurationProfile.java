@@ -21,8 +21,11 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.ai.AIConfigurationProfile;
+import org.jkiss.dbeaver.model.ai.engine.AIAccountProperties;
+import org.jkiss.dbeaver.model.ai.registry.AISettingsManager;
 
 public class WebAIConfigurationProfile {
 
@@ -55,12 +58,57 @@ public class WebAIConfigurationProfile {
         return profile.isGlobal();
     }
 
+    public boolean getIsDefault() {
+        AIConfigurationProfile defaultProfile = AISettingsManager.getInstance().getSettings().getDefaultConfigurationOrNull();
+        return defaultProfile != null && profile.getProfileId().equals(defaultProfile.getProfileId());
+    }
+
     public boolean isCredentialsSaved() throws DBException {
         return WebAIProfileUtils.areCredentialsSaved(webSession, profile);
+    }
+
+    public boolean isAccountAuthentication() throws DBException {
+        return WebAIProfileUtils.isAccountAuthentication(webSession, profile);
+    }
+
+    public boolean isDeviceAuthorizationAvailable() throws DBException {
+        return getDeviceAuthorizationProperties() != null;
+    }
+
+    @Nullable
+    public String getAccountProvider() throws DBException {
+        AIAccountProperties properties = getDeviceAuthorizationProperties();
+        return properties == null ? null : properties.getAccountAuthenticationProviderName();
+    }
+
+    public boolean isTokenSaved() throws DBException {
+        return WebAIProfileUtils.isTokenSaved(webSession, profile);
+    }
+
+    @Nullable
+    public WebAIAccountInfo getAccount() throws DBException {
+        if (profile.isGlobal()
+            || !(profile.getConfiguration() instanceof AIAccountProperties)
+            || !WebAIProfileUtils.isAccountSaved(webSession, profile)
+        ) {
+            return null;
+        }
+        return new WebAIAccountInfo(WebAIProfileUtils.getAccountEmail(webSession, profile));
     }
 
     @NotNull
     public WebPropertyInfo[] getConfiguration() throws DBException {
         return WebServiceUtils.getObjectFilteredProperties(webSession, profile.getConfiguration(), null);
+    }
+
+    @Nullable
+    private AIAccountProperties getDeviceAuthorizationProperties() throws DBException {
+        if (profile.isGlobal()
+            || !(profile.getConfiguration() instanceof AIAccountProperties properties)
+            || !properties.supportsDeviceAuthorization()
+        ) {
+            return null;
+        }
+        return properties;
     }
 }

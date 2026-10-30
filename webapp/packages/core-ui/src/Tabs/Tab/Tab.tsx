@@ -9,7 +9,7 @@ import { Tab as BaseTab } from '@dbeaver/ui-kit';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useRef } from 'react';
 
-import { getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, s, useContextMenuPosition, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from '../TabContext.js';
 import { useTabDragAndDrop } from '../useTabDragAndDrop.js';
@@ -27,6 +27,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
   const info = tab.getInfo();
   const styles = useS(componentStyles);
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
+  const contextMenuPosition = useContextMenuPosition();
 
   const {
     ref: dragRef,
@@ -58,18 +59,11 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
           dropAfter: dropAllowed && dropPosition === 'after',
         })}
         onMouseUp={onMouseUpHandler}
+        onContextMenu={tab.state.enabledContextMenu && !disabled ? contextMenuPosition.open : undefined}
         {...dragProps}
         {...dropProps}
       >
         <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
-          <TabActions
-            className={s(styles, { actions: true })}
-            state={tab.state}
-            menuContext={props.menuContext}
-            canClose={canClose}
-            tabId={tabId}
-            handleClose={tab.handleClose}
-          />
           <BaseTab
             ref={ref}
             type="button"
@@ -83,6 +77,15 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
           >
             <div className={s(styles, { tabContainer: true })}>{children}</div>
           </BaseTab>
+          <TabActions
+            className={s(styles, { actions: true })}
+            state={tab.state}
+            menuContext={props.menuContext}
+            contextMenuPosition={tab.state.enabledContextMenu ? contextMenuPosition : undefined}
+            canClose={canClose}
+            tabId={tabId}
+            handleClose={tab.handleClose}
+          />
           {after}
         </div>
       </div>

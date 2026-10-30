@@ -1,0 +1,18 @@
+fragment AIAdminConfigurationProfileInfo on AIAdminConfigurationProfileInfo {
+  id
+  isDefault
+  name
+  engineId
+  global
+  credentialsSaved
+  accountAuthentication
+  deviceAuthorizationAvailable
+  accountProvider
+  tokenSaved
+  account {
+    email
+  }
+  configuration {
+    ...ObjectPropertyInfo
+  }
+}

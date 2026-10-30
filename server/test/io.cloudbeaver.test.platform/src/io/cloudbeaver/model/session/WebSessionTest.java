@@ -19,8 +19,13 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebSessionProjectImpl;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.app.ServletAuthApplication;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.utils.function.ThrowableConsumer;
 import org.jkiss.utils.function.ThrowableFunction;
@@ -84,6 +89,17 @@ public class WebSessionTest extends CloudbeaverMockTest {
     }
 
     @Test
+    public void asyncTaskCancellationNotifiesProcessor() throws Exception {
+        WebAsyncTaskProcessor<?> processor = Mockito.mock(WebAsyncTaskProcessor.class);
+        WebAsyncTaskInfo taskInfo = session.createAsyncTask("Test task");
+        session.runAsyncTask(taskInfo, processor);
+
+        session.asyncTaskCancel(taskInfo.getId());
+
+        Mockito.verify(processor).cancel();
+    }
+
+    @Test
     public void authInfoIsIdentifiedByProviderAndConfiguration() throws Exception {
         WebAuthInfo firstConfig = mockAuthInfo("ldap", "ldap-1");
         WebAuthInfo secondConfig = mockAuthInfo("ldap", "ldap-2");
@@ -118,6 +134,36 @@ public class WebSessionTest extends CloudbeaverMockTest {
         Assertions.assertEquals(List.of(firstConfig), session.removeAuthInfo("ldap"));
         Assertions.assertNull(session.getAuthInfo("ldap", "ldap-1"));
         Assertions.assertSame(secondConfig, session.getAuthInfo("ldap", "ldap-2"));
+    }
+
+    @Test
+    public void inputOnlyAuthRemainsRestrictedDuringCredentialProviderCallback() throws Exception {
+        SMSession authSession = Mockito.mock(
+            SMSession.class,
+            Mockito.withSettings().extraInterfaces(DBACredentialsProvider.class)
+        );
+        DBACredentialsProvider contextCredentialsProvider = (DBACredentialsProvider) authSession;
+        WebAuthInfo authInfo = mockAuthInfo("entra", "entra-1");
+        Mockito.when(authInfo.getAuthSession()).thenReturn(authSession);
+        session.addAuthInfo(authInfo);
+
+        DBPDataSourceContainer dataSource = Mockito.mock(DBPDataSourceContainer.class);
+        DBPDriver driver = Mockito.mock(DBPDriver.class);
+        Mockito.when(dataSource.getDriver()).thenReturn(driver);
+        DBPConnectionConfiguration configuration = new DBPConnectionConfiguration();
+
+        session.provideInputAuthParameters(session.getProgressMonitor(), dataSource, configuration);
+        session.provideAuthParameters(session.getProgressMonitor(), dataSource, configuration);
+
+        Assertions.assertEquals(
+            true,
+            configuration.getRuntimeAttribute(WebSession.RUNTIME_PARAM_INPUT_AUTH_ONLY)
+        );
+        Mockito.verify(contextCredentialsProvider, Mockito.never()).provideAuthParameters(
+            Mockito.any(),
+            Mockito.any(),
+            Mockito.any()
+        );
     }
 
     @Test

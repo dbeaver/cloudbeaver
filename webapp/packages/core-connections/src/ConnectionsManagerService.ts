@@ -7,9 +7,8 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { ConfirmationDialogDelete, ProcessSnackbar } from '@cloudbeaver/core-blocks';
+import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
 import { type ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
@@ -29,7 +28,7 @@ export interface IConnectionExecutorData {
   state: 'before' | 'after';
 }
 
-@injectable(() => [ConnectionInfoResource, ContainerResource, NotificationService, CommonDialogService, ProjectsService])
+@injectable(() => [ConnectionInfoResource, ContainerResource, NotificationService, ProjectsService])
 export class ConnectionsManagerService {
   get projectConnections(): Connection[] {
     return this.connectionInfoResource.values.filter(connection =>
@@ -49,7 +48,6 @@ export class ConnectionsManagerService {
     readonly connectionInfoResource: ConnectionInfoResource,
     readonly containerResource: ContainerResource,
     private readonly notificationService: NotificationService,
-    private readonly commonDialogService: CommonDialogService,
     private readonly projectsService: ProjectsService,
   ) {
     this.disconnecting = false;
@@ -104,20 +102,11 @@ export class ConnectionsManagerService {
     return undefined;
   }
 
-  async deleteConnection(key: IConnectionInfoParams): Promise<void> {
+  async deleteConnection(key: IConnectionInfoParams): Promise<boolean> {
     const connection = await this.connectionInfoResource.load(key);
 
     if (!connection.canDelete) {
-      return;
-    }
-
-    const { status } = await this.commonDialogService.open(ConfirmationDialogDelete, {
-      title: 'ui_data_delete_confirmation',
-      message: `You're going to delete "${connection.name}" connection. Are you sure?`,
-      confirmActionText: 'ui_delete',
-    });
-    if (status === DialogueStateResult.Rejected) {
-      return;
+      return false;
     }
 
     const contexts = await this.onDelete.execute({
@@ -126,7 +115,7 @@ export class ConnectionsManagerService {
     });
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
+      return false;
     }
 
     await this.connectionInfoResource.deleteConnection(key);
@@ -135,6 +124,7 @@ export class ConnectionsManagerService {
       connections: [key],
       state: 'after',
     });
+    return true;
   }
 
   hasAnyConnection(connected?: boolean): boolean {

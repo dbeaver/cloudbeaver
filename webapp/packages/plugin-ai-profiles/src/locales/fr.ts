@@ -7,6 +7,15 @@
  */
 
 export default [
+  ['plugin_ai_profiles_profile_menu', 'Actions du profil'],
+  ['plugin_ai_profiles_profile_clone', 'Cloner'],
+  ['plugin_ai_profiles_default_badge', '(Par défaut)'],
+  [
+    'plugin_ai_profiles_default_description',
+    'Profil par défaut pour vos requêtes IA. Sélectionnez un profil dans le chat ou utilisez « Définir par défaut » pour le modifier.',
+  ],
+  ['plugin_ai_profiles_set_default', 'Définir par défaut'],
+  ['plugin_ai_profiles_default_save_failed', 'Échec de l’enregistrement de votre profil IA par défaut'],
   ['plugin_ai_profiles_scope', 'Portée'],
   ['plugin_ai_profiles_scope_global', 'Globale'],
   ['plugin_ai_profiles_scope_user', 'Utilisateur'],

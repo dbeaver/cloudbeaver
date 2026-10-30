@@ -1,4 +1,12 @@
 export default [
+  ['sql_editor_settings_blank_line_delimiter_name', 'Blank line is statement delimiter'],
+  [
+    'sql_editor_settings_blank_line_delimiter_desc',
+    'Controls whether blank lines separate SQL statements. Select Never to allow blank lines within a statement.',
+  ],
+  ['sql_editor_settings_blank_line_delimiter_always', 'Always'],
+  ['sql_editor_settings_blank_line_delimiter_never', 'Never'],
+  ['sql_editor_settings_blank_line_delimiter_smart', 'Smart'],
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Editor'],
   ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
   ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],
@@ -26,6 +34,9 @@ export default [
   ['sql_editor_sql_statistics_unavailable', 'Statistics is not available'],
   ['sql_editor_sql_execution_executed_queries', 'Executed queries:'],
   ['sql_editor_sql_execution_executing', 'Executing...'],
+  ['sql_editor_script_error_title', 'Script execution error'],
+  ['sql_editor_script_error_message', 'An error occurred while executing this statement. Choose how to continue the script.'],
+  ['sql_editor_script_error_skip_all', 'Skip all'],
   ['sql_editor_upload_script_tooltip', 'Upload sql script'],
   ['sql_editor_download_script_tooltip', 'Download sql script'],
   [

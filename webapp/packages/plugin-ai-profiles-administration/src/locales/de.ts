@@ -1,4 +1,6 @@
 export default [
+  ['plugin_ai_administration_profile_clone_success', 'Profil geklont'],
+  ['plugin_ai_administration_profile_clone_error', 'Profil konnte nicht geklont werden'],
   ['ai_administration_language_model_settings', 'Modelleinstellungen'],
   ['ai_administration_select_language_model_selector_title', 'Modell'],
   ['ai_administration_models_refresh', 'Modelle aktualisieren'],
@@ -17,7 +19,10 @@ export default [
   ['plugin_ai_administration_profiles_refresh_success', 'Profilliste aktualisiert'],
   ['plugin_ai_administration_profiles_refresh_error', 'Profilliste konnte nicht aktualisiert werden'],
   ['plugin_ai_administration_profile_delete_confirmation', 'Sie sind dabei, folgende Profile zu löschen: '],
-  ['plugin_ai_administration_profile_delete_user_credentials_warning', 'Gespeicherte Anmeldedaten für alle Benutzer dieser Profile werden ebenfalls gelöscht.'],
+  [
+    'plugin_ai_administration_profile_delete_user_credentials_warning',
+    'Gespeicherte Anmeldedaten für alle Benutzer dieser Profile werden ebenfalls gelöscht.',
+  ],
   ['plugin_ai_administration_profile_delete_success', 'Ausgewählte Profile gelöscht'],
   ['plugin_ai_administration_profile_delete_error', 'Profile konnten nicht gelöscht werden'],
   ['plugin_ai_administration_profile_created', 'Profil erstellt'],
@@ -29,6 +34,12 @@ export default [
   ['plugin_ai_administration_profile_scope', 'Geltungsbereich'],
   ['plugin_ai_administration_profile_scope_global', 'Global'],
   ['plugin_ai_administration_profile_scope_user', 'Benutzer'],
+  ['plugin_ai_administration_profile_scope_global_description', 'Ein globales Profil ist für alle Benutzer mit gemeinsamen Anmeldedaten verfügbar.'],
+  [
+    'plugin_ai_administration_profile_scope_user_description',
+    'Jeder Benutzer kann dieses Profil mit seinem eigenen API-Token oder Abonnement konfigurieren.',
+  ],
+  ['plugin_ai_administration_profile_select_engine_first', 'Wählen Sie zuerst eine Engine aus'],
   ['plugin_ai_administration_profile_user_credentials_unsupported', 'Diese Engine unterstützt keine vom Benutzer bereitgestellten API-Token'],
   ['plugin_ai_administration_profile_form_tab_options', 'Profil'],
   ['plugin_ai_administration_profile_name_max_length', 'Der Profilname darf {arg:length} Zeichen nicht überschreiten'],

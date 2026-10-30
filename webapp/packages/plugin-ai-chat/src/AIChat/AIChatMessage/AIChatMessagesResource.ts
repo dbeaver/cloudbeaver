@@ -30,8 +30,7 @@ import {
 
 import { AIChatMessageEventHandler, type IAiChatMessageChunkEvent, type IAiChatMessageEvent } from './AIChatMessageEventHandler.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
-import { AIFunctionsResource } from '../../AIFunctionsResource.js';
-import { getCanonicalAIFunctionId } from '../../AIChatFunctionsService.js';
+import { AIChatFunctionRegistryService } from '../../AIChatFunctionRegistryService.js';
 
 export interface IAIFunctionMessage extends AiMessage {
   role: AiMessageType.Function;
@@ -62,7 +61,7 @@ const BLOCKING_ROLES = [AiMessageType.Assistant, AiMessageType.Confirmation];
   GraphQLService,
   LocalizationService,
   AIChatMessageEventHandler,
-  AIFunctionsResource,
+  AIChatFunctionRegistryService,
   AIChatConversationsResource,
   UserInfoResource,
 ])
@@ -73,7 +72,7 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     private readonly graphQLService: GraphQLService,
     private readonly localizationService: LocalizationService,
     private readonly aiChatMessageEventHandler: AIChatMessageEventHandler,
-    private readonly aiFunctionsResource: AIFunctionsResource,
+    private readonly aiChatFunctionRegistryService: AIChatFunctionRegistryService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
     userInfoResource: UserInfoResource,
   ) {
@@ -229,8 +228,7 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     }
 
     return message.functionConfirmation.functionCalls.some(call => {
-      const functionId = getCanonicalAIFunctionId(call.functionName);
-      const func = this.aiFunctionsResource.data.find(f => f.id === functionId);
+      const func = this.aiChatFunctionRegistryService.getFunction(call.functionName);
       return func?.system === false;
     });
   }

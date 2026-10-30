@@ -18,6 +18,8 @@ package io.cloudbeaver.service.security;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import com.google.gson.ToNumberPolicy;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.*;
@@ -65,6 +67,7 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -90,6 +93,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
+    private static final Gson UI_SETTINGS_GSON = new GsonBuilder()
+        .serializeNulls()
+        .setObjectToNumberStrategy(ToNumberPolicy.BIG_DECIMAL)
+        .create();
+    private static final int MAX_UI_SETTINGS_BYTES = 64_000;
 
     protected final T application;
     protected final CBDatabase database;
@@ -395,7 +403,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         saveSubjectMetas(dbCon, userId, metaParameters);
         String defaultTeamName = getDefaultUserTeam();
         if (!CommonUtils.isEmpty(defaultTeamName)) {
-            setUserTeams(dbCon, userId, new String[]{defaultTeamName}, userId);
+            setUserTeamsInternal(dbCon, userId, new String[]{defaultTeamName}, userId, SMTeamGrantType.DEFAULT);
         }
     }
 
@@ -558,40 +566,70 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         log.info(String.format("User deleted: [userId=%s]", userId));
     }
 
-    public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
+    @Override
+    public void setUserTeams(
+        @NotNull String userId,
+        @NotNull String[] teamIds,
+        @NotNull String grantorId
+    ) throws DBCException {
+        setUserTeams(userId, teamIds, grantorId, SMTeamGrantType.MANUAL);
+    }
+
+    @Override
+    public void setUserTeams(
+        @NotNull String userId,
+        @NotNull String[] teamIds,
+        @NotNull String grantorId,
+        @NotNull SMTeamGrantType grantType
+    ) throws DBCException {
+        if (grantType == SMTeamGrantType.AUTH_PROVIDER) {
+            syncAuthProviderTeams(userId, grantorId, teamIds);
+            return;
+        }
+        boolean changed;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                setUserTeams(dbCon, userId, teamIds, grantorId);
+                changed = setUserTeamsInternal(dbCon, userId, teamIds, grantorId, grantType);
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
-        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+        if (changed) {
+            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+        }
     }
 
+    @Override
     public void addUserTeams(@NotNull String userId, @NotNull String[] teamIds, @NotNull String grantorId) throws DBCException {
+        boolean changed;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                addUserTeams(dbCon, userId, teamIds, grantorId);
+                changed = addUserTeamsInternal(dbCon, userId, teamIds, grantorId);
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
-        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+        if (changed) {
+            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+        }
     }
 
+    @Override
     public void deleteUserTeams(@NotNull String userId, @NotNull String[] teamIds) throws DBCException {
+        boolean changed;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                deleteUserTeams(dbCon, userId, teamIds);
+                changed = deleteUserTeamsInternal(dbCon, userId, teamIds);
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error delete user teams in database", e);
         }
-        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+        if (changed) {
+            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+        }
     }
 
     @Override
@@ -628,116 +666,96 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         ));
     }
 
-    //TODO implement add/delete user teams api
-    protected void setUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds, String grantorId)
-        throws SQLException {
-
-        String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?";
-
-        if (!ArrayUtils.isEmpty(teamIds)) {
-            deleteUserTeamsSql =
-                deleteUserTeamsSql + " AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
+    private boolean setUserTeamsInternal(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String[] teamIds,
+        @NotNull String grantorId,
+        @NotNull SMTeamGrantType grantType
+    ) throws SQLException {
+        lockUserTeamGrants(dbCon, userId);
+        Set<String> targetTeamIds = new LinkedHashSet<>(Arrays.asList(teamIds));
+        String defaultUserTeam = getDefaultUserTeam();
+        if (CommonUtils.isNotEmpty(defaultUserTeam)) {
+            targetTeamIds.add(defaultUserTeam);
         }
-        try (PreparedStatement dbStat = dbCon.prepareStatement(deleteUserTeamsSql)) {
+
+        String deleteSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? AND GRANT_TYPE<>?";
+        if (!targetTeamIds.isEmpty()) {
+            deleteSql += " AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(targetTeamIds.size()) + ")";
+        }
+        boolean changed;
+        try (PreparedStatement dbStat = dbCon.prepareStatement(deleteSql)) {
             int index = 1;
             dbStat.setString(index++, userId);
-            for (String teamId : teamIds) {
+            dbStat.setString(index++, SMTeamGrantType.AUTH_PROVIDER.name());
+            for (String teamId : targetTeamIds) {
                 dbStat.setString(index++, teamId);
             }
-            dbStat.execute();
+            changed = dbStat.executeUpdate() > 0;
         }
 
-        String defaultUserTeam = getDefaultUserTeam();
-        if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
-            teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
-        }
-        if (!ArrayUtils.isEmpty(teamIds)) {
-            Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
-
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "INSERT INTO {table_prefix}CB_USER_TEAM" +
-                    "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")
-            ) {
-                for (String teamId : teamIds) {
-                    if (currentUserTeams.contains(teamId)) {
-                        continue;
-                    }
-                    dbStat.setString(1, userId);
-                    dbStat.setString(2, teamId);
-                    dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                    dbStat.setString(4, grantorId);
-                    dbStat.execute();
-                }
+        Map<String, UserTeamGrant> currentGrants = getCurrentUserTeamGrants(dbCon, userId);
+        for (String teamId : targetTeamIds) {
+            SMTeamGrantType effectiveGrantType = teamId.equals(defaultUserTeam) ? SMTeamGrantType.DEFAULT : grantType;
+            UserTeamGrant currentGrant = currentGrants.get(teamId);
+            if (currentGrant == null) {
+                insertUserTeamGrant(dbCon, userId, teamId, grantorId, effectiveGrantType);
+                changed = true;
+            } else if (effectiveGrantType == SMTeamGrantType.DEFAULT
+                && currentGrant.grantType() != SMTeamGrantType.DEFAULT) {
+                updateUserTeamGrant(dbCon, userId, teamId, grantorId, effectiveGrantType);
+                changed = true;
             }
         }
+        return changed;
     }
 
-    @NotNull
-    private Set<String> getCurrentUserTeams(@NotNull Connection dbCon, String userId) throws SQLException {
-        return new HashSet<>(JDBCUtils.queryStrings(
-            dbCon,
-            "SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?",
-            userId
-        ));
-    }
-
-    protected void addUserTeams(
+    private boolean addUserTeamsInternal(
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds,
         @NotNull String grantorId
     ) throws SQLException {
-        if (ArrayUtils.isEmpty(teamIds)) {
-            return;
-        }
-
-        String defaultUserTeam = getDefaultUserTeam();
-        if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
-            teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
-        }
-
-        Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
-
+        lockUserTeamGrants(dbCon, userId);
+        Map<String, UserTeamGrant> currentGrants = getCurrentUserTeamGrants(dbCon, userId);
         List<String> resultTeamIds = new ArrayList<>();
-        try (PreparedStatement dbStat = dbCon.prepareStatement(
-            "INSERT INTO {table_prefix}CB_USER_TEAM" +
-                "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")
-        ) {
-            for (String teamId : teamIds) {
-                if (currentUserTeams.contains(teamId)) {
-                    continue;
-                }
+        boolean changed = false;
+        for (String teamId : teamIds) {
+            UserTeamGrant currentGrant = currentGrants.get(teamId);
+            if (currentGrant == null) {
+                insertUserTeamGrant(dbCon, userId, teamId, grantorId, SMTeamGrantType.MANUAL);
                 resultTeamIds.add(teamId);
-                dbStat.setString(1, userId);
-                dbStat.setString(2, teamId);
-                dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                dbStat.setString(4, grantorId);
-                dbStat.execute();
+                changed = true;
             }
         }
+        changed |= ensureDefaultUserTeam(dbCon, userId);
         log.info(String.format(
             "User added to team: [userId=%s,team=%s, grantorUserId=%s]",
             userId,
             String.join(",", resultTeamIds),
             grantorId
         ));
+        return changed;
     }
 
-    protected void deleteUserTeams(
+    private boolean deleteUserTeamsInternal(
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds
     ) throws SQLException, DBCException {
+        lockUserTeamGrants(dbCon, userId);
         String defaultTeam = getDefaultUserTeam();
         if (ArrayUtils.contains(teamIds, defaultTeam)) {
             throw new SMException("Cannot delete default user team: " + defaultTeam);
         }
         if (ArrayUtils.isEmpty(teamIds)) {
-            return;
+            return false;
         }
         String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
                 "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
+        boolean changed;
         try (PreparedStatement dbStat = dbCon.prepareStatement(deleteUserTeamsSql)) {
             int index = 1;
             dbStat.setString(index, userId);
@@ -745,41 +763,199 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 index++;
                 dbStat.setString(index, teamId);
             }
-            dbStat.execute();
+            changed = dbStat.executeUpdate() > 0;
         }
         log.info(String.format("User deleted from team: [userId=%s,teamIds=%s]", userId, String.join(",", teamIds)));
+        return changed;
+    }
+
+    private void lockUserTeamGrants(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        // Serialize team grant updates for a user across application nodes without relying on database-specific lock syntax.
+        JDBCUtils.executeUpdate(
+            dbCon,
+            "UPDATE {table_prefix}CB_USER SET USER_ID=USER_ID WHERE USER_ID=?",
+            userId
+        );
+    }
+
+    private boolean ensureDefaultUserTeam(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        String defaultUserTeam = getDefaultUserTeam();
+        if (CommonUtils.isEmpty(defaultUserTeam)) {
+            return false;
+        }
+        UserTeamGrant currentGrant = getCurrentUserTeamGrants(dbCon, userId).get(defaultUserTeam);
+        if (currentGrant != null) {
+            if (currentGrant.grantType() == SMTeamGrantType.DEFAULT) {
+                return false;
+            }
+            updateUserTeamGrant(dbCon, userId, defaultUserTeam, userId, SMTeamGrantType.DEFAULT);
+            return true;
+        }
+        insertUserTeamGrant(dbCon, userId, defaultUserTeam, userId, SMTeamGrantType.DEFAULT);
+        return true;
+    }
+
+    private void insertUserTeamGrant(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String teamId,
+        @NotNull String grantedBy,
+        @NotNull SMTeamGrantType grantType
+    ) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "INSERT INTO {table_prefix}CB_USER_TEAM" +
+                "(USER_ID,TEAM_ID,GRANT_TYPE,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?,?)")
+        ) {
+            dbStat.setString(1, userId);
+            dbStat.setString(2, teamId);
+            dbStat.setString(3, grantType.name());
+            dbStat.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+            dbStat.setString(5, grantedBy);
+            dbStat.executeUpdate();
+        }
+    }
+
+    private void updateUserTeamGrant(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String teamId,
+        @NotNull String grantedBy,
+        @NotNull SMTeamGrantType grantType
+    ) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "UPDATE {table_prefix}CB_USER_TEAM SET GRANT_TYPE=?,GRANT_TIME=?,GRANTED_BY=? " +
+                "WHERE USER_ID=? AND TEAM_ID=?")
+        ) {
+            dbStat.setString(1, grantType.name());
+            dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            dbStat.setString(3, grantedBy);
+            dbStat.setString(4, userId);
+            dbStat.setString(5, teamId);
+            dbStat.executeUpdate();
+        }
+    }
+
+    @NotNull
+    private Map<String, UserTeamGrant> getCurrentUserTeamGrants(
+        @NotNull Connection dbCon,
+        @NotNull String userId
+    ) throws SQLException {
+        Map<String, UserTeamGrant> result = new LinkedHashMap<>();
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT TEAM_ID,GRANT_TYPE,GRANTED_BY FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?")
+        ) {
+            dbStat.setString(1, userId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    result.put(
+                        dbResult.getString("TEAM_ID"),
+                        new UserTeamGrant(
+                            SMTeamGrantType.valueOf(dbResult.getString("GRANT_TYPE")),
+                            dbResult.getString("GRANTED_BY")
+                        )
+                    );
+                }
+            }
+        }
+        return result;
+    }
+
+    private record UserTeamGrant(@NotNull SMTeamGrantType grantType, @NotNull String grantedBy) {
     }
 
     @NotNull
     @Override
-    public SMUserTeam[] getUserTeams(String userId) throws DBException {
-        Map<String, SMUserTeam> teams = new LinkedHashMap<>();
+    public SMUserTeam[] getUserTeams(@NotNull String userId) throws DBException {
+        return getUsersTeams(Set.of(userId)).getOrDefault(userId, new SMUserTeam[0]);
+    }
+
+    @NotNull
+    @Override
+    public Map<String, SMUserTeam[]> getUsersTeams(@NotNull Set<String> userIds) throws DBException {
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, SMTeam> teamsById = new LinkedHashMap<>();
+        for (SMTeam team : readAllTeams()) {
+            teamsById.put(team.getTeamId(), team);
+        }
+
+        List<String> requestedUserIds = new ArrayList<>(userIds);
+        Map<String, Map<String, SMUserTeam>> usersTeams = new LinkedHashMap<>();
+        String userParameters = SQLUtils.generateParamList(requestedUserIds.size());
+        String defaultUserTeam = getDefaultUserTeam();
         try (Connection dbCon = database.openConnection()) {
-            String defaultUserTeam = getDefaultUserTeam();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT R.*,S.IS_SECRET_STORAGE,UR.TEAM_ROLE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
-                    "{table_prefix}CB_AUTH_SUBJECT S " +
-                        "WHERE UR.USER_ID=? AND UR.TEAM_ID = R.TEAM_ID " +
-                        "AND S.SUBJECT_ID IN (R.TEAM_ID,?)")
+                "SELECT USER_ID FROM {table_prefix}CB_USER WHERE USER_ID IN (" + userParameters + ")")
             ) {
-                dbStat.setString(1, userId);
-                dbStat.setString(2, defaultUserTeam);
+                int index = 1;
+                for (String userId : requestedUserIds) {
+                    dbStat.setString(index++, userId);
+                }
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        var team = fetchTeam(dbResult);
-                        String teamRole = dbResult.getString("TEAM_ROLE");
-                        teams.put(team.getTeamId(), new SMUserTeam(team, teamRole));
+                        usersTeams.put(dbResult.getString("USER_ID"), new LinkedHashMap<>());
                     }
                 }
             }
-            readSubjectsMetas(dbCon, SMSubjectType.team, null, teams);
-            return teams.values().toArray(new SMUserTeam[0]);
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT USER_ID,TEAM_ID,TEAM_ROLE,GRANT_TYPE,GRANTED_BY " +
+                    "FROM {table_prefix}CB_USER_TEAM WHERE USER_ID IN (" + userParameters + ")")
+            ) {
+                int index = 1;
+                for (String userId : requestedUserIds) {
+                    dbStat.setString(index++, userId);
+                }
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String userId = dbResult.getString("USER_ID");
+                        Map<String, SMUserTeam> userTeams = usersTeams.get(userId);
+                        SMTeam team = teamsById.get(dbResult.getString("TEAM_ID"));
+                        if (userTeams == null || team == null) {
+                            continue;
+                        }
+                        String teamRole = dbResult.getString("TEAM_ROLE");
+                        boolean isDefaultTeam = team.getTeamId().equals(defaultUserTeam);
+                        userTeams.put(team.getTeamId(), new SMUserTeam(
+                            team,
+                            teamRole,
+                            isDefaultTeam
+                                ? SMTeamGrantType.DEFAULT
+                                : SMTeamGrantType.valueOf(dbResult.getString("GRANT_TYPE")),
+                            isDefaultTeam ? userId : dbResult.getString("GRANTED_BY")
+                        ));
+                    }
+                }
+            }
+
+            SMTeam defaultTeam = teamsById.get(defaultUserTeam);
+            Map<String, SMUserTeam[]> result = new LinkedHashMap<>();
+            for (String userId : requestedUserIds) {
+                Map<String, SMUserTeam> userTeams = usersTeams.get(userId);
+                if (userTeams == null) {
+                    result.put(userId, new SMUserTeam[0]);
+                    continue;
+                }
+                if (defaultTeam != null) {
+                    userTeams.putIfAbsent(
+                        defaultUserTeam,
+                        new SMUserTeam(defaultTeam, null, SMTeamGrantType.DEFAULT, userId)
+                    );
+                }
+                result.put(userId, userTeams.values().toArray(new SMUserTeam[0]));
+            }
+            return result;
         } catch (SQLException e) {
-            throw new DBCException("Error while reading user teams", e);
+            throw new DBCException("Error while reading users teams", e);
         }
     }
 
-    private Set<String> getAllLinkedSubjects(Connection dbCon, String subjectId) throws SQLException {
+    @NotNull
+    private Set<String> getAllLinkedSubjects(
+        @NotNull Connection dbCon,
+        @NotNull String subjectId
+    ) throws SQLException {
         Set<String> allSubjects = new HashSet<>();
         allSubjects.add(subjectId);
         try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1147,6 +1323,94 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
         }
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> getCurrentUserUISettings() throws DBException {
+        String userId = getUserIdOrThrow();
+        try (Connection dbCon = database.openConnection()) {
+            return readUserUISettings(dbCon, userId);
+        } catch (SQLException | JsonParseException e) {
+            throw new DBCException("Error while loading user UI settings", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> updateCurrentUserUISettings(@NotNull Map<String, Object> settings) throws DBException {
+        String userId = getUserIdOrThrow();
+        String configuration;
+        try {
+            configuration = UI_SETTINGS_GSON.toJson(settings);
+        } catch (IllegalArgumentException e) {
+            throw new DBException("Invalid user UI settings", e);
+        }
+        if (configuration.getBytes(StandardCharsets.UTF_8).length > MAX_UI_SETTINGS_BYTES) {
+            throw new DBException("User UI settings exceed the maximum size of " + MAX_UI_SETTINGS_BYTES + " UTF-8 bytes");
+        }
+        Map<String, Object> savedSettings = UI_SETTINGS_GSON.fromJson(configuration, MAP_STRING_OBJECT_TYPE);
+
+        try (Connection dbCon = database.openConnection();
+             JDBCTransaction txn = new JDBCTransaction(dbCon)
+        ) {
+            try {
+                lockUserUISettings(dbCon, userId);
+                try (PreparedStatement deleteStatement = dbCon.prepareStatement(
+                    "DELETE FROM {table_prefix}CB_USER_STATE WHERE USER_ID=?");
+                     PreparedStatement insertStatement = dbCon.prepareStatement(
+                         "INSERT INTO {table_prefix}CB_USER_STATE " +
+                             "(USER_ID,USER_CONFIGURATION,UPDATE_TIME) VALUES(?,?,CURRENT_TIMESTAMP)")) {
+                    deleteStatement.setString(1, userId);
+                    deleteStatement.executeUpdate();
+                    insertStatement.setString(1, userId);
+                    insertStatement.setString(2, configuration);
+                    insertStatement.executeUpdate();
+                }
+                txn.commit();
+                return savedSettings;
+            } catch (SQLException | RuntimeException e) {
+                try {
+                    txn.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+                throw e;
+            }
+        } catch (SQLException | RuntimeException e) {
+            throw new DBCException("Error while updating user UI settings", e);
+        }
+    }
+
+    private void lockUserUISettings(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        // Lock the parent row even before the first save to serialize replacements across server nodes.
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=IS_ACTIVE WHERE USER_ID=?")) {
+            dbStat.setString(1, userId);
+            dbStat.executeUpdate();
+        }
+    }
+
+    @NotNull
+    private Map<String, Object> readUserUISettings(@NotNull Connection dbCon, @NotNull String userId)
+        throws SQLException, DBException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT USER_CONFIGURATION FROM {table_prefix}CB_USER_STATE WHERE USER_ID=?")) {
+            dbStat.setString(1, userId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                if (dbResult.next()) {
+                    String configuration = dbResult.getString(1);
+                    if (configuration != null) {
+                        Map<String, Object> settings = UI_SETTINGS_GSON.fromJson(configuration, MAP_STRING_OBJECT_TYPE);
+                        if (settings == null) {
+                            throw new DBException("Stored user UI settings must be a JSON object");
+                        }
+                        return settings;
+                    }
+                }
+            }
+        }
+        return Map.of();
     }
 
     public void enableUser(
@@ -1599,32 +1863,38 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public List<SMTeamMemberInfo> getTeamMembersInfo(@NotNull String teamId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            Map<String, String> usersRoles = new LinkedHashMap<>();
+            Map<String, SMTeamMemberInfo> members = new LinkedHashMap<>();
             if (getDefaultUserTeam().equals(teamId)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID FROM {table_prefix}CB_USER")) {
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         while (dbResult.next()) {
-                            usersRoles.put(dbResult.getString(1), null);
+                            String userId = dbResult.getString(1);
+                            members.put(userId, new SMTeamMemberInfo(userId, null, SMTeamGrantType.DEFAULT, userId));
                         }
                     }
                 }
             }
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                "SELECT USER_ID,TEAM_ROLE FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?")
+                "SELECT USER_ID,TEAM_ROLE,GRANT_TYPE,GRANTED_BY FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?")
             ) {
                 dbStat.setString(1, teamId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
                         String teamRole = dbResult.getString(2);
-                        usersRoles.put(userId, teamRole);
+                        boolean isDefaultTeam = getDefaultUserTeam().equals(teamId);
+                        members.put(userId, new SMTeamMemberInfo(
+                            userId,
+                            teamRole,
+                            isDefaultTeam
+                                ? SMTeamGrantType.DEFAULT
+                                : SMTeamGrantType.valueOf(dbResult.getString("GRANT_TYPE")),
+                            isDefaultTeam ? userId : dbResult.getString("GRANTED_BY")
+                        ));
                     }
                 }
             }
-            return usersRoles.entrySet()
-                .stream()
-                .map(entry -> new SMTeamMemberInfo(entry.getKey(), entry.getValue()))
-                .toList();
+            return new ArrayList<>(members.values());
         } catch (SQLException e) {
             throw new DBCException("Error while reading team members", e);
         }
@@ -2744,7 +3014,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     return SMAuthInfo.error(authId, error, isMainAuthSession, null, authInfo.getAppSessionId());
                 }
 
-                if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
+                if (autoAssign != null && (autoAssign.isTeamAssignmentsAuthoritative()
+                    || !CommonUtils.isEmpty(autoAssign.getExternalTeamIds()))) {
                     if (allTeams == null) {
                         allTeams = readAllTeams();
                     }
@@ -2870,21 +3141,125 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 ).stream())
                 .map(SMTeam::getTeamId)
                 .toArray(String[]::new);
-            SMUserTeam[] oldUserTeams = getUserTeams(userId);
-            Set<String> oldUserTeamIdSet = Arrays.stream(oldUserTeams).map(SMTeam::getTeamId).collect(Collectors.toSet());
-            oldUserTeamIdSet.remove(getDefaultUserTeam());
-            Set<String> newUserTeamIdSet = Arrays.stream(newTeamIds).collect(Collectors.toSet());
-            if (oldUserTeamIdSet.equals(newUserTeamIdSet)) {
-                //do not need to update teams and send events
-                return;
+            String[] providerManagedTeamIds = Arrays.stream(allTeams)
+                .filter(team -> CommonUtils.isNotEmpty(team.getMetaParameters().get(externalTeamIdMetadataFieldName)))
+                .map(SMTeam::getTeamId)
+                .toArray(String[]::new);
+            syncAuthProviderTeams(
+                userId,
+                authProvider.getId(),
+                newTeamIds,
+                providerManagedTeamIds,
+                autoAssign.isTeamAssignmentsAuthoritative()
+            );
+        }
+    }
+
+    private void syncAuthProviderTeams(
+        @NotNull String userId,
+        @NotNull String authProviderId,
+        @NotNull String[] teamIds
+    ) throws DBCException {
+        String[] providerManagedTeamIds = teamIds;
+        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
+        if (authProvider != null && authProvider.getInstance() instanceof SMAuthProviderAssigner assigner) {
+            String metadataFieldName = assigner.getExternalTeamIdMetadataFieldName();
+            if (CommonUtils.isNotEmpty(metadataFieldName)) {
+                providerManagedTeamIds = Arrays.stream(readAllTeams())
+                    .filter(team -> CommonUtils.isNotEmpty(team.getMetaParameters().get(metadataFieldName)))
+                    .map(SMTeam::getTeamId)
+                    .toArray(String[]::new);
             }
-            if (!ArrayUtils.isEmpty(newTeamIds)) {
-                setUserTeams(
-                    userId,
-                    newTeamIds,
-                    userId
-                );
+        }
+        syncAuthProviderTeams(userId, authProviderId, teamIds, providerManagedTeamIds, true);
+    }
+
+    private void syncAuthProviderTeams(
+        @NotNull String userId,
+        @NotNull String authProviderId,
+        @NotNull String[] teamIds,
+        @NotNull String[] providerManagedTeamIds,
+        boolean authoritative
+    ) throws DBCException {
+        boolean changed = false;
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                lockUserTeamGrants(dbCon, userId);
+                Set<String> mappedTeamIds = new LinkedHashSet<>(Arrays.asList(teamIds));
+                Set<String> managedTeamIds = new LinkedHashSet<>(Arrays.asList(providerManagedTeamIds));
+                managedTeamIds.addAll(mappedTeamIds);
+                Map<String, UserTeamGrant> currentGrants = getCurrentUserTeamGrants(dbCon, userId);
+
+                if (authoritative) {
+                    String deleteSql = "DELETE FROM {table_prefix}CB_USER_TEAM " +
+                        "WHERE USER_ID=? AND GRANT_TYPE=? AND GRANTED_BY=?";
+                    if (!mappedTeamIds.isEmpty()) {
+                        deleteSql += " AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(mappedTeamIds.size()) + ")";
+                    }
+                    try (PreparedStatement dbStat = dbCon.prepareStatement(deleteSql)) {
+                        int index = 1;
+                        dbStat.setString(index++, userId);
+                        dbStat.setString(index++, SMTeamGrantType.AUTH_PROVIDER.name());
+                        dbStat.setString(index++, authProviderId);
+                        for (String teamId : mappedTeamIds) {
+                            dbStat.setString(index++, teamId);
+                        }
+                        changed = dbStat.executeUpdate() > 0;
+                    }
+                }
+
+                String defaultUserTeam = getDefaultUserTeam();
+                // A configured provider mapping owns membership in that team, even if the existing grant was manual.
+                if (authoritative) {
+                    for (String teamId : managedTeamIds) {
+                        UserTeamGrant currentGrant = currentGrants.get(teamId);
+                        if (currentGrant == null
+                            || currentGrant.grantType() == SMTeamGrantType.AUTH_PROVIDER
+                            || teamId.equals(defaultUserTeam)
+                            || mappedTeamIds.contains(teamId)) {
+                            continue;
+                        }
+                        try (PreparedStatement dbStat = dbCon.prepareStatement(
+                            "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? AND TEAM_ID=?")
+                        ) {
+                            dbStat.setString(1, userId);
+                            dbStat.setString(2, teamId);
+                            changed |= dbStat.executeUpdate() > 0;
+                        }
+                    }
+                }
+
+                for (String teamId : mappedTeamIds) {
+                    UserTeamGrant currentGrant = currentGrants.get(teamId);
+                    if (currentGrant == null) {
+                        insertUserTeamGrant(
+                            dbCon,
+                            userId,
+                            teamId,
+                            authProviderId,
+                            SMTeamGrantType.AUTH_PROVIDER
+                        );
+                        changed = true;
+                    } else if (!teamId.equals(defaultUserTeam)
+                        && (currentGrant.grantType() != SMTeamGrantType.AUTH_PROVIDER
+                            || !authProviderId.equals(currentGrant.grantedBy()))) {
+                        updateUserTeamGrant(
+                            dbCon,
+                            userId,
+                            teamId,
+                            authProviderId,
+                            SMTeamGrantType.AUTH_PROVIDER
+                        );
+                        changed = true;
+                    }
+                }
+                txn.commit();
             }
+        } catch (SQLException e) {
+            throw new DBCException("Error synchronizing auth provider user teams", e);
+        }
+        if (changed) {
+            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
         }
     }
 
@@ -3078,7 +3453,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
-                setUserTeams(userId, ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new), userId);
+                setUserTeams(
+                    userId,
+                    ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new),
+                    authProvider.getId(),
+                    SMTeamGrantType.AUTH_PROVIDER
+                );
             }
         }
         return userId;

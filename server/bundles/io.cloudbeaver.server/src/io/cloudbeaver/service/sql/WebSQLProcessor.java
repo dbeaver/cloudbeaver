@@ -34,6 +34,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences.SQLScriptStatementDelimiterMode;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -118,6 +119,8 @@ public class WebSQLProcessor implements WebSessionProvider {
     }
 
     public SQLSyntaxManager getSyntaxManager() {
+        syntaxManager.setStatementDelimiterMode(SQLScriptStatementDelimiterMode.fromPreferences(
+            connection.getDataSourceContainer().getPreferenceStore()));
         return syntaxManager;
     }
 
@@ -186,6 +189,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         WebSQLParametersProvider parametersProvider = new WebSQLParametersProvider(webSession, asyncTask);
 
+        SQLSyntaxManager syntaxManager = getSyntaxManager();
         var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql, parametersProvider);
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
@@ -226,6 +230,9 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
             if (element instanceof SQLQuery mainQuery) {
+                if (isGenerated) {
+                    dataContainer.setQuery(mainQuery);
+                }
 
                 if (useEvents) {
                     // fill query with parameters

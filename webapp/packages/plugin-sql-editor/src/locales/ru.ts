@@ -1,4 +1,12 @@
 export default [
+  ['sql_editor_settings_blank_line_delimiter_name', 'Пустая строка — разделитель SQL-выражений'],
+  [
+    'sql_editor_settings_blank_line_delimiter_desc',
+    'Определяет, разделяют ли пустые строки SQL-выражения. Выберите «Никогда», чтобы разрешить пустые строки внутри выражения.',
+  ],
+  ['sql_editor_settings_blank_line_delimiter_always', 'Всегда'],
+  ['sql_editor_settings_blank_line_delimiter_never', 'Никогда'],
+  ['sql_editor_settings_blank_line_delimiter_smart', 'Умный режим'],
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Редактор'],
   ['sql_editor_settings_content_assistant_experimental_mode_name', 'Режим автодополнения'],
   ['sql_editor_settings_content_assistant_experimental_mode_desc', 'Режим автодополнения SQL редактора'],
@@ -26,6 +34,9 @@ export default [
   ['sql_editor_sql_statistics_unavailable', 'Статистика не доступна'],
   ['sql_editor_sql_execution_executed_queries', 'Выполненные запросы:'],
   ['sql_editor_sql_execution_executing', 'Выполняется...'],
+  ['sql_editor_script_error_title', 'Ошибка выполнения скрипта'],
+  ['sql_editor_script_error_message', 'При выполнении запроса произошла ошибка. Выберите, как продолжить выполнение скрипта.'],
+  ['sql_editor_script_error_skip_all', 'Пропустить все'],
   ['sql_editor_upload_script_tooltip', 'Загрузить sql скрипт'],
   ['sql_editor_download_script_tooltip', 'Скачать sql скрипт'],
   ['sql_editor_upload_script_unsaved_changes_dialog_message', 'Текущий скрипт будет перезаписан загруженным. Сохранить текущий?'],

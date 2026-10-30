@@ -1,0 +1,5 @@
+mutation copyAiProfile($profileId: ID!) {
+  profile: aiCopyProfile(profileId: $profileId) {
+    ...AIAdminConfigurationProfileInfo
+  }
+}
