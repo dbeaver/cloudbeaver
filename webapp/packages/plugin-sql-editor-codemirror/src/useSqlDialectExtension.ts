@@ -21,6 +21,7 @@ export function useSqlDialectExtension(dialectInfo?: SqlDialectInfo): [Compartme
     if (!codemirror) {
       return null;
     }
+
     return new codemirror.Compartment();
   }, [codemirror]);
 
@@ -28,6 +29,7 @@ export function useSqlDialectExtension(dialectInfo?: SqlDialectInfo): [Compartme
     if (!dialect || !codemirror || !SQL_EDITOR_COMPARTMENT) {
       return null;
     }
+
     let dialectInner = dialect;
 
     if (dialectInfo) {

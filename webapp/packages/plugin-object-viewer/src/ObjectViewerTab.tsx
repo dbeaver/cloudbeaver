@@ -28,7 +28,11 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
   const { node } = useNode(tab.handlerState.objectId);
-  const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
+
+  function handleSelect({ tabId }: ITabData<any>) {
+    return onSelect(tabId);
+  }
+
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
   const title = node?.name || tab.handlerState.tabTitle;
   const connection = tab.handlerState.connectionKey ? connectionInfoResource.get(tab.handlerState.connectionKey) : undefined;

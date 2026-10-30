@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,7 @@ export class CustomGraphQLClient extends GraphQLClient {
     ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
   ): Promise<T> {
     this.blockRequestsReasonHandler();
+
     try {
       // TODO: seems here can be undefined
       return await super.request<T, V>(documentOrOptions as any, ...variablesAndRequestHeaders);
@@ -127,6 +128,7 @@ export class CustomGraphQLClient extends GraphQLClient {
     signal?: AbortSignal,
   ): Promise<T> {
     this.blockRequestsReasonHandler();
+
     try {
       const { operationName } = analyzeDocument(query ?? '');
       // TODO: we don't support GQL response right now

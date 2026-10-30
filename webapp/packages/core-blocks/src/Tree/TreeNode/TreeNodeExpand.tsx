@@ -45,6 +45,7 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
     getComputed(() => context.loading || context.processing),
     300,
   );
+
   const expandable = getComputed(() => !loading && (!leaf || context.externalExpanded));
 
   async function handleExpand(event: React.MouseEvent<HTMLDivElement>) {

@@ -36,6 +36,7 @@ export function useAuthenticationAction(options: Options): IAuthenticationAction
       },
       async auth() {
         this.authenticating = true;
+
         try {
           const result = await authProviderService.requireProvider(this.providerId);
 

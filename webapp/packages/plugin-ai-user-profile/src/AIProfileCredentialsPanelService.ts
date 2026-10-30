@@ -24,6 +24,7 @@ import { AI_PROFILES_TAB_ID } from './AI_PROFILES_TAB_ID.js';
 const AIProfileCredentialsPanel = importLazyComponent(() =>
   import('./components/AIProfileCredentialsPanel.js').then(module => module.AIProfileCredentialsPanel),
 );
+
 const panelGetter = () => AIProfileCredentialsPanel;
 
 @injectable(() => [LocalizationService, NotificationService, OptionsPanelService, UserProfileTabsService, IServiceProvider, CommonDialogService])
@@ -76,6 +77,7 @@ export class AIProfileCredentialsPanelService extends FormBaseService<IAIProfile
     if (data === 'after') {
       await this.formState?.dispose();
       this.formState = null;
+
       return;
     }
 

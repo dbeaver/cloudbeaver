@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
       if (!context) {
         context = new ExecutionContext(data);
       }
+
       return this.executeHandlersCollection<T>(this, data, context, [scope || []].flat());
     });
   }
@@ -64,6 +65,7 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
       if (!context) {
         context = new ExecutionContext(data);
       }
+
       return this.executeHandlersCollection<T>(this, data, context, [scope || []].flat());
     });
   }
@@ -113,6 +115,7 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     for (const scope of scoped) {
       await this.executeChain(scope, data, context, 'next');
     }
+
     return context;
   }
 
@@ -150,6 +153,7 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
       if (interrupter?.interrupted) {
         return;
       }
+
       await handler(data, context);
     }
   }
@@ -158,6 +162,7 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     if (data === null && this.defaultData !== null) {
       return this.defaultData;
     }
+
     return data;
   }
 

@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMTeamGrantType;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.db.InternalDB;
@@ -76,7 +77,7 @@ import javax.sql.DataSource;
 public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final Log log = Log.getLog(CBDatabase.class);
 
-    private static final int CURRENT_SCHEMA_VERSION = 29;
+    private static final int CURRENT_SCHEMA_VERSION = 30;
     private static final String SCHEMA_ID = "CB_CE";
 
     private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
@@ -418,6 +419,17 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
                     log.warn("Default users team not found, create :" + defaultTeamId);
                     adminSecurityController.createTeam(defaultTeamId, defaultTeamId, null,
                         ApplicationRegistry.getInstance().getApplication().getName());
+                }
+                int updatedRows = JDBCUtils.executeUpdate(
+                    connection,
+                    "UPDATE {table_prefix}CB_USER_TEAM " +
+                        "SET GRANT_TYPE=? WHERE TEAM_ID=? AND GRANT_TYPE<>?",
+                    SMTeamGrantType.DEFAULT.name(),
+                    defaultTeamId,
+                    SMTeamGrantType.DEFAULT.name()
+                );
+                if (updatedRows > 0) {
+                    log.info("Normalized " + updatedRows + " default team grant(s)");
                 }
             }
             txn.commit();

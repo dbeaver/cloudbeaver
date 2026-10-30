@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,12 @@ let isValidationSuccess = true;
 for (let currentPackageDir of sourceFilesIterator) {
   currentPackageDir = resolve(currentPackageDir);
   const status = validateDependencies(currentPackageDir);
+
   if (!status) {
     isValidationSuccess = false;
   }
 }
+
 if (isValidationSuccess) {
   printMessage('All dependencies are valid', false);
 } else {

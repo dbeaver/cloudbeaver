@@ -25,6 +25,7 @@ export interface IIconSpriteAsset {
 export function getIconSpriteAsset(): IIconSpriteAsset {
   const assets = getAssets(path.join(process.cwd(), 'package.json'));
   const iconSpritePath = assets.map(asset => path.join(asset, ICON_SPRITE_PATH)).find(asset => fs.existsSync(asset));
+
   if (!iconSpritePath) {
     throw new Error(`Icon sprite not found: ${ICON_SPRITE_PATH}`);
   }
@@ -46,6 +47,7 @@ export function copyAssetsPlugin(iconSprite = getIconSpriteAsset()): PluginOptio
       // the DynamicPublicDirectory plugin expects paths to be in posix format (to include images and fonts for windows)
       .replace(/\\/g, '/'),
   );
+
   const normalizedIconSpritePath = path.normalize(iconSprite.filePath).replace(/\\/g, '/');
   const iconSpritePlugin: Plugin = {
     name: 'icon-sprite',
@@ -56,6 +58,7 @@ export function copyAssetsPlugin(iconSprite = getIconSpriteAsset()): PluginOptio
           void server.restart();
         }
       });
+
       server.middlewares.use((request, response, next) => {
         if (new URL(request.url ?? '/', 'http://localhost').pathname !== `/${iconSprite.uri}`) {
           next();

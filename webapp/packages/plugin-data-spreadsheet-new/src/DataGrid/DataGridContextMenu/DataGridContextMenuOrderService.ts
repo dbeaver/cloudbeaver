@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,11 @@ export class DataGridContextMenuOrderService {
 
   private async changeOrder(unknownModel: IDatabaseDataModel, resultIndex: number, column: IGridColumnKey, order: Order) {
     const model = unknownModel as any;
+
     if (!isResultSetDataModel<IDatabaseDataOptions>(model)) {
       throw new Error('Unsupported data model');
     }
+
     const data = model.source.getAction(resultIndex, IDatabaseDataResultAction, GridDataResultAction);
     const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
     // TODO: fix column abstraction
@@ -66,6 +68,7 @@ export class DataGridContextMenuOrderService {
         }
 
         const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
+
         return constraints.supported && !model.isDisabled(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_ORDERING],
@@ -138,6 +141,7 @@ export class DataGridContextMenuOrderService {
             await model.request(() => {
               constraints.deleteOrders();
             });
+
             break;
           }
         }

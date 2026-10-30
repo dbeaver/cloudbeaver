@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,10 @@ export class ExportFromResultsProcess extends Deferred<string> {
         resultsId,
         parameters,
       });
+
       await this.applyResult(taskInfo);
       this.taskId = taskInfo.id;
+
       if (this.getState() === EDeferredState.CANCELLING) {
         await this.cancelAsync(this.taskId);
       }
@@ -58,7 +60,9 @@ export class ExportFromResultsProcess extends Deferred<string> {
     if (this.getState() !== EDeferredState.PENDING) {
       return;
     }
+
     this.toCancelling();
+
     if (this.timeout) {
       this.timeout.cancel();
     }
@@ -68,18 +72,22 @@ export class ExportFromResultsProcess extends Deferred<string> {
     if (this.isFinished || !this.taskId) {
       return;
     }
+
     // check async task status until execution finished
     while (this.isInProgress) {
       if (this.getState() === EDeferredState.CANCELLING) {
         await this.cancelAsync(this.taskId);
       }
+
       // run the first check immediately because usually the query execution is fast
       try {
         const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({
           taskId: this.taskId,
           removeOnFinish: false,
         });
+
         await this.applyResult(taskInfo);
+
         if (this.isFinished) {
           return;
         }
@@ -98,6 +106,7 @@ export class ExportFromResultsProcess extends Deferred<string> {
     if (this.isCancelConfirmed) {
       return;
     }
+
     try {
       await this.graphQLService.sdk.asyncTaskCancel({ taskId });
       this.isCancelConfirmed = true;
@@ -114,16 +123,20 @@ export class ExportFromResultsProcess extends Deferred<string> {
     if (taskInfo.running) {
       return;
     }
+
     // task failed to execute
     if (taskInfo.error) {
       const serverError = new ServerInternalError(taskInfo.error);
       this.onError(serverError, taskInfo.status);
+
       return;
     }
+
     if (!taskInfo.taskResult) {
       this.onError(new Error('Tasks execution returns no taskResult'), taskInfo.status);
       return;
     }
+
     // task execution successful
     this.toResolved(taskInfo.taskResult);
     await this.graphQLService.sdk.getAsyncTaskInfo({ taskId: taskInfo.id, removeOnFinish: true });

@@ -3,6 +3,8 @@ query getTeamGrantedUsers($teamId: ID!) {
     grantedUsersInfo {
       userId
       teamRole
+      grantType
+      grantedBy
     }
   }
 }

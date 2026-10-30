@@ -105,9 +105,11 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
 
     const entry = this.getCurrentEntry();
     this.currentIndex--;
+
     if (entry) {
       this.onUndo.execute(entry);
     }
+
     return true;
   }
 
@@ -118,9 +120,11 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
 
     this.currentIndex++;
     const entry = this.getCurrentEntry();
+
     if (entry) {
       this.onRedo.execute(entry);
     }
+
     return true;
   }
 
@@ -136,6 +140,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
     if (this.currentIndex < 0 || this.currentIndex >= this.history.length) {
       return undefined;
     }
+
     return this.history[this.currentIndex];
   }
 
@@ -180,6 +185,7 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
       if (prevIndex !== null && currentIndex - prevIndex === 1) {
         return true;
       }
+
       if (nextIndex !== null && nextIndex - currentIndex === 1) {
         return true;
       }

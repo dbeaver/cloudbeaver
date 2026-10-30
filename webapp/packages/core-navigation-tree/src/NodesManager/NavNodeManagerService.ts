@@ -126,6 +126,7 @@ export class NavNodeManagerService extends Bootstrap {
       nodeId: ROOT_NODE_PATH,
       parentId: ROOT_NODE_PATH,
     });
+
     this.navigator = new Executor<INodeNavigationData>(
       {
         nodeId: ROOT_NODE_PATH,
@@ -261,6 +262,7 @@ export class NavNodeManagerService extends Bootstrap {
     if (node.parentId === undefined) {
       return undefined;
     }
+
     return this.navNodeInfoResource.get(node.parentId);
   }
 
@@ -295,19 +297,25 @@ export class NavNodeManagerService extends Bootstrap {
       if (!nodeId) {
         return res;
       }
+
       const object = this.getNode(nodeId);
+
       if (!object) {
         return res;
       }
+
       if (object.projectId && res.projectId !== object.projectId) {
         res.projectId = object.projectId;
       }
+
       if (object.objectFeatures.includes(EObjectFeature.dataSource)) {
         res.connectionNodeId = object.uri;
       }
+
       if (object.objectFeatures.includes(EObjectFeature.catalog)) {
         res.catalogId = object.name; // note that catalogId is node name
       }
+
       if (object.objectFeatures.includes(EObjectFeature.schema)) {
         res.schemaId = object.name; // note that schemaId is node name
       }
@@ -315,6 +323,7 @@ export class NavNodeManagerService extends Bootstrap {
       if (object.parentId === nodeId) {
         return res;
       }
+
       return scanParents(res, object.parentId);
     };
 
@@ -332,6 +341,7 @@ export class NavNodeManagerService extends Bootstrap {
     let features: string[] | undefined;
 
     const node = this.getNode(nodeId);
+
     if (node) {
       name = node.name;
       icon = node.icon;
@@ -342,6 +352,7 @@ export class NavNodeManagerService extends Bootstrap {
         if (node.folder) {
           const parent = this.getParent(node);
           folderId = nodeId;
+
           if (parent && !parent.folder) {
             nodeId = parent.uri;
             parentId = parent.parentId;

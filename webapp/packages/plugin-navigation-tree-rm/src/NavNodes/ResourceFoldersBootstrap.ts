@@ -176,8 +176,10 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         if (targetRmFolderId) {
           for (const nodeId of nodeIdList) {
             const rmNodeId = getResourceKeyFromNodeId(nodeId);
+
             if (rmNodeId) {
               const key = getRmResourceKey(rmNodeId);
+
               if (key.name) {
                 await this.navResourceNodeService.move(rmNodeId, createPath(targetRmFolderId, key.name));
               }
@@ -215,6 +217,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
           if (resourceKey !== undefined) {
             const key = getRmResourceKey(resourceKey);
+
             if (key.path) {
               path = key.path;
             }
@@ -273,6 +276,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     if (!resourceTypeId) {
       return undefined;
     }
+
     const project = this.projectInfoResource.get(projectId);
 
     if (!project) {
@@ -280,6 +284,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     }
 
     const resourceFolder = this.resourceManagerService.getRootFolder(project, resourceTypeId);
+
     return resourceFolder;
   }
 
@@ -288,6 +293,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
     this.resourceManagerResource.onItemUpdate.addHandler(key => {
       const updated = resourceKeyList([...new Set(ResourceKeyUtils.mapArray(key, getResourceNodeId).map(getPathParent))]);
+
       if (!this.navTreeResource.isOutdated(updated)) {
         this.navTreeResource.markTreeOutdated(updated);
       }

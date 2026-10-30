@@ -41,6 +41,7 @@ class TestFormState {
         ExecutorInterrupter.interrupt(contexts);
       }
     });
+
     this.submitTask = new Executor(state, () => true);
     this.submitTask.before(this.validationTask);
   }
@@ -107,6 +108,7 @@ describe('FormPart', () => {
     const loading = new Promise<void>(resolve => {
       finishLoading = resolve;
     });
+
     const calls: string[] = [];
     const part = new TestFormPart(new TestFormState(), calls, { loader: () => loading });
 
@@ -185,6 +187,7 @@ describe('FormPart', () => {
     const part = new TestFormPart(formState, calls, {
       schema: schema.object({ value: schema.string().min(1) }),
     });
+
     await part.load();
     calls.length = 0;
 

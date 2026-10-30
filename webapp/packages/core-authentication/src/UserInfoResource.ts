@@ -162,6 +162,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
               authId,
               linkUser,
             });
+
             return authInfo as AuthInfo;
           },
           1000,
@@ -269,6 +270,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
 
       this.onDataOutdated.execute();
     });
+
     return this.data;
   }
 
@@ -291,7 +293,9 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
       if (this.onException.isEmpty) {
         throw exception;
       }
+
       this.onException.execute(exception);
+
       return null;
     }
   }

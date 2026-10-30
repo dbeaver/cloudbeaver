@@ -165,6 +165,7 @@ export class SqlEditorSettingsService {
         },
       }),
     );
+
     this.registerSettings();
   }
 
@@ -178,6 +179,7 @@ export class SqlEditorSettingsService {
       description: 'sql_editor_settings_blank_line_delimiter_desc',
       options: BLANK_LINE_DELIMITER_OPTIONS_LOCALIZED,
     }));
+
     this.settingsTransformationService.setSettingTransformer(
       'sql.proposals.insert.table.alias',
       setting =>
@@ -189,6 +191,7 @@ export class SqlEditorSettingsService {
           options: [...(setting.options?.filter(option => !TABLE_ALIAS_OPTIONS.includes(option.value as any)) || []), ...TABLE_ALIAS_SETTING_OPTIONS],
         }) as ISettingDescription<SqlEditorSettings>,
     );
+
     this.settingsTransformationService.setSettingTransformer(
       'SQLEditor.ContentAssistant.experimental.mode',
       setting =>
@@ -260,6 +263,7 @@ export class SqlEditorSettingsService {
           options: BLANK_LINE_DELIMITER_OPTIONS_LOCALIZED,
         });
       }
+
       if (!this.serverSettingsManagerService.providedSettings.has('sql.proposals.insert.table.alias')) {
         settings.push({
           key: 'sql.proposals.insert.table.alias',
@@ -273,6 +277,7 @@ export class SqlEditorSettingsService {
           options: TABLE_ALIAS_SETTING_OPTIONS,
         });
       }
+
       if (!this.serverSettingsManagerService.providedSettings.has('SQLEditor.ContentAssistant.experimental.mode')) {
         settings.push({
           key: 'SQLEditor.ContentAssistant.experimental.mode',
@@ -285,6 +290,7 @@ export class SqlEditorSettingsService {
           options: ASSISTANT_MODE_OPTIONS_LOCALIZED,
         });
       }
+
       return settings;
     });
   }

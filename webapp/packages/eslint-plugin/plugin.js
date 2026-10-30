@@ -9,6 +9,9 @@
 import noSyncComponentImport from './noSyncComponentImport.js';
 import formPartContract from './formPartContract.js';
 import serviceVariableName from './serviceVariableName.js';
+import statementSpacing from './statementSpacing.js';
+import requireFunctionDeclarationsInComponents from './requireFunctionDeclarationsInComponents.js';
+import noConditionalEmptyObjectSpread from './noConditionalEmptyObjectSpread.js';
 
 const plugin = {
   meta: {
@@ -20,6 +23,9 @@ const plugin = {
     'no-sync-component-import': noSyncComponentImport,
     'form-part-contract': formPartContract,
     'service-variable-name': serviceVariableName,
+    'statement-spacing': statementSpacing,
+    'require-function-declarations-in-components': requireFunctionDeclarationsInComponents,
+    'no-conditional-empty-object-spread': noConditionalEmptyObjectSpread,
   },
 };
 
@@ -30,6 +36,9 @@ Object.assign(plugin.configs, {
       '@cloudbeaver/no-sync-component-import': 'error',
       '@cloudbeaver/form-part-contract': 'error',
       '@cloudbeaver/service-variable-name': 'error',
+      '@cloudbeaver/statement-spacing': 'error',
+      '@cloudbeaver/require-function-declarations-in-components': 'error',
+      '@cloudbeaver/no-conditional-empty-object-spread': 'error',
     },
   },
 });

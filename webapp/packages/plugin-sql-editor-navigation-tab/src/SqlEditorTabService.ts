@@ -265,6 +265,7 @@ export class SqlEditorTabService extends Bootstrap {
 
       if (!executionContext) {
         const executionContext = dataSource.executionContext;
+
         if (executionContext) {
           const contextConnection = createConnectionParam(executionContext.projectId, executionContext.connectionId);
 
@@ -311,6 +312,7 @@ export class SqlEditorTabService extends Bootstrap {
     if (!SQL_EDITOR_TAB_STATE_SCHEMA.safeParse(tab.handlerState).success) {
       await this.sqlEditorModelService.destroy(tab.handlerState.editorId);
       await this.sqlDataSourceService.destroy(tab.handlerState.editorId);
+
       return false;
     }
 
@@ -381,12 +383,14 @@ export class SqlEditorTabService extends Bootstrap {
   private getObjectCatalogId(tab: ITab<ISqlEditorTabState>) {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
     const context = this.connectionExecutionContextResource.get(dataSource?.executionContext?.id ?? '');
+
     return context?.defaultCatalog;
   }
 
   private getObjectSchemaId(tab: ITab<ISqlEditorTabState>) {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
     const context = this.connectionExecutionContextResource.get(dataSource?.executionContext?.id ?? '');
+
     return context?.defaultSchema;
   }
 
@@ -431,6 +435,7 @@ export class SqlEditorTabService extends Bootstrap {
       const context = await executionContext.update(containerId, dataSource.executionContext.defaultSchema);
 
       dataSource.setExecutionContext({ ...context });
+
       return true;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor catalog');
@@ -455,6 +460,7 @@ export class SqlEditorTabService extends Bootstrap {
       const context = await executionContext.update(dataSource.executionContext.defaultCatalog, containerId);
 
       dataSource.setExecutionContext({ ...context });
+
       return true;
     } catch (exception: any) {
       this.notificationService.logException(exception, 'Failed to change SQL-editor schema');
@@ -472,6 +478,7 @@ export class SqlEditorTabService extends Bootstrap {
 
   private async disconnectHandler(data: IConnectionExecutorData, contexts: IExecutionContextProvider<IConnectionExecutorData>) {
     const connectionsKey = resourceKeyList(data.connections);
+
     if (data.state === 'before') {
       for (const tab of this.sqlEditorTabs) {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
@@ -505,6 +512,7 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     const contexts = await this.onCanClose.execute(editorTab);
+
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return false;
     }
@@ -563,6 +571,7 @@ export class SqlEditorTabService extends Bootstrap {
     if (dataSource?.executionContext) {
       await this.sqlEditorService.destroyContext(dataSource.executionContext);
     }
+
     await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
   }
 }

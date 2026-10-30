@@ -22,6 +22,7 @@ export enum DatabaseDataSourceOperation {
   /** May lead to data lost */
   Request = 'request',
 }
+
 export interface IDatabaseDataSourceOperationEvent {
   stage: 'request' | 'before' | 'after';
   operation: DatabaseDataSourceOperation;

@@ -51,14 +51,17 @@ function formatKeyToDisplayKey(code: string): string {
       if (OS === OperatingSystem.windowsOS || OS === OperatingSystem.linuxOS) {
         return 'CTRL';
       }
+
       if (OS === OperatingSystem.macOS) {
         return 'CMD';
       }
+
       return code;
     case 'alt':
       if (OS === OperatingSystem.macOS) {
         return 'OPTION';
       }
+
       return 'ALT';
     default:
       return FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode] ?? code;

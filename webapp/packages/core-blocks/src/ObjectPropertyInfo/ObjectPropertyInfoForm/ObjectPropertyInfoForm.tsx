@@ -107,6 +107,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
         if (category !== undefined && property.category !== category) {
           return null;
         }
+
         return (
           <RenderField
             key={property.id}

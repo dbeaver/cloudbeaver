@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,11 @@ export class DataExportProcessService {
 
   cancel(exportId: string): void {
     const process = this.exportProcesses.get(exportId);
+
     if (!process) {
       return;
     }
+
     process.process.cancel();
   }
 
@@ -56,25 +58,33 @@ export class DataExportProcessService {
 
   download(exportId: string): void {
     const process = this.exportProcesses.get(exportId);
+
     if (!process) {
       return;
     }
+
     const dataFileId = process.process.getPayload();
+
     if (!dataFileId) {
       return;
     }
+
     this.exportProcesses.remove(exportId);
   }
 
   downloadUrl(exportId: string): string | undefined {
     const process = this.exportProcesses.get(exportId);
+
     if (!process) {
       return;
     }
+
     const dataFileId = process.process.getPayload();
+
     if (!dataFileId) {
       return;
     }
+
     return GlobalConstants.absoluteServiceUrl('/data/', dataFileId);
   }
 
@@ -107,6 +117,7 @@ export class DataExportProcessService {
   ): Promise<Process> {
     const process = new ExportFromContainerProcess(this.graphQLService, this.notificationService);
     const taskId = await process.start(connectionKey, containerNodePath, parameters);
+
     return { taskId, process };
   }
 
