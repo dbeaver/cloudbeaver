@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package io.cloudbeaver.service.rm;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.rm.impl.WebServiceRM;
-import io.cloudbeaver.service.rm.model.RMProjectPermissions;
-import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import org.jkiss.utils.CommonUtils;
 
 /**
@@ -39,10 +37,6 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
         model.getQueryType()
             .dataFetcher("rmListProjects",
                 env -> getService(env).listProjects(getWebSession(env)))
-            .dataFetcher("rmListSharedProjects",
-                env -> getService(env).listSharedProjects(getWebSession(env)))
-            .dataFetcher("rmProject",
-                env -> getService(env).getProject(getWebSession(env), getArgumentVal(env, "projectId")))
             .dataFetcher("rmListResources",
                 env -> getService(env).listResources(getWebSession(env),
                     getArgumentVal(env, "projectId"),
@@ -54,15 +48,6 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                 env -> getService(env).readResourceAsString(getWebSession(env),
                     getArgumentVal(env, "projectId"),
                     getArgumentVal(env, "resourcePath")))
-            .dataFetcher("rmListProjectPermissions", env -> getService(env).listProjectPermissions())
-            .dataFetcher("rmListProjectGrantedPermissions", env -> getService(env).listProjectGrantedPermissions(
-                getWebSession(env),
-                getArgumentVal(env, "projectId")
-            ))
-            .dataFetcher("rmListSubjectProjectsPermissionGrants", env -> getService(env).listSubjectProjectsPermissionGrants(
-                getWebSession(env),
-                getArgumentVal(env, "subjectId")
-            ))
         ;
         model.getMutationType()
             .dataFetcher("rmCreateResource",
@@ -85,51 +70,12 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                     getArgumentVal(env, "resourcePath"),
                     getArgumentVal(env, "data"),
                     getArgumentVal(env, "forceOverwrite")))
-            .dataFetcher("rmCreateProject", env -> getService(env).createProject(
-                getWebSession(env),
-                getArgumentVal(env, "projectName"),
-                getArgument(env, "description")
-            ))
-            .dataFetcher(
-                "rmUpdateProject", env -> getService(env).updateProject(
-                    getWebSession(env),
-                    getProjectReference(env),
-                    getArgument(env, "projectName"),
-                    getArgument(env, "description")
-                )
-            )
-            .dataFetcher("rmDeleteProject", env -> getService(env).deleteProject(
-                getWebSession(env),
-                getProjectReference(env)
-            ))
-            .dataFetcher("rmSetProjectPermissions", env -> getService(env).setProjectPermissions(
-                getWebSession(env),
-                getArgumentVal(env, "projectId"),
-                new RMSubjectProjectPermissions(getArgumentVal(env, "permissions"))
-            ))
             .dataFetcher("rmSetResourceProperty", env -> getService(env).setResourceProperty(
                 getWebSession(env),
                 getArgumentVal(env, "projectId"),
                 getArgumentVal(env, "resourcePath"),
                 getArgumentVal(env, "name"),
                 getArgument(env, "value")
-            ))
-            .dataFetcher("rmSetSubjectProjectPermissions", env -> getService(env).setSubjectProjectPermissions(
-                getWebSession(env),
-                getArgumentVal(env, "subjectId"),
-                new RMProjectPermissions(getArgumentVal(env, "permissions"))
-            ))
-            .dataFetcher("rmAddProjectsPermissions", env -> getService(env).addProjectsPermissions(
-                getWebSession(env),
-                getArgumentVal(env, "projectIds"),
-                getArgumentVal(env, "subjectIds"),
-                getArgumentVal(env, "permissions")
-            ))
-            .dataFetcher("rmDeleteProjectsPermissions", env -> getService(env).deleteProjectsPermissions(
-                getWebSession(env),
-                getArgumentVal(env, "projectIds"),
-                getArgumentVal(env, "subjectIds"),
-                getArgumentVal(env, "permissions")
             ))
         ;
     }

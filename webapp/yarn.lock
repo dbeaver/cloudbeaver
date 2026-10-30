@@ -1949,7 +1949,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-resource-manager@workspace:packages/core-resource-manager"
   dependencies:
-    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
@@ -1961,7 +1960,6 @@ __metadata:
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    mobx: "npm:^6"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -4300,7 +4298,6 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-projects": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
-    "@cloudbeaver/core-resource-manager": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"

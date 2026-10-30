@@ -18,44 +18,23 @@ package io.cloudbeaver.service.rm.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.admin.AdminPermissionInfo;
 import io.cloudbeaver.service.rm.DBWServiceRM;
-import io.cloudbeaver.service.rm.model.RMProjectPermissions;
-import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
-import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.SMObjectType;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMProjectInfo;
 import org.jkiss.dbeaver.model.rm.RMResource;
-import org.jkiss.dbeaver.model.secret.DBSSecretController;
-import org.jkiss.dbeaver.model.security.SMAdminController;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjectPermissionsGrant;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
-import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
-import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Web service implementation
  */
 public class WebServiceRM implements DBWServiceRM {
-
-    private static final Log log = Log.getLog(WebServiceRM.class);
 
     @Override
     public RMProject[] listProjects(@NotNull WebSession webSession) throws DBWebException {
@@ -63,28 +42,6 @@ public class WebServiceRM implements DBWServiceRM {
             return getResourceController(webSession).listAccessibleProjects();
         } catch (DBException e) {
             throw new DBWebException("Error reading list of accessible projects", e);
-        }
-    }
-
-    @Override
-    public RMProject[] listSharedProjects(@NotNull WebSession webSession) throws DBWebException {
-        try {
-            return getResourceController(webSession).listAllSharedProjects();
-        } catch (DBException e) {
-            throw new DBWebException("Error reading list of accessible projects", e);
-        }
-    }
-
-    @Override
-    public RMProject getProject(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
-        try {
-            var project = getResourceController(webSession).getProject(projectId, false, false);
-            if (project == null) {
-                throw new DBWebException("Project not found " + projectId);
-            }
-            return project;
-        } catch (DBException e) {
-            throw new DBWebException("Error reading project", e);
         }
     }
 
@@ -252,224 +209,6 @@ public class WebServiceRM implements DBWServiceRM {
             return content;
         } catch (Exception e) {
             throw new DBWebException("Error writing resource data", e);
-        }
-    }
-
-    @Override
-    public RMProject createProject(
-        @NotNull WebSession session, @NotNull String name, @Nullable String description
-    ) throws DBWebException {
-        try {
-            RMProject rmProject = getResourceController(session).createProject(name, description);
-            session.addSessionProject(rmProject.getId());
-            ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSProjectUpdateEvent.create(WebEventUtils.getSmSessionId(session), session.getUserId(), rmProject.getId())
-            );
-            return rmProject;
-        } catch (DBException e) {
-            throw new DBWebException("Error creating project", e);
-        }
-    }
-
-    @Override
-    public RMProject updateProject(
-        @NotNull WebSession session,
-        @NotNull String projectId,
-        @Nullable String name,
-        @Nullable String description
-    ) throws DBWebException {
-        try {
-            var project = session.getProjectById(projectId);
-            if (project == null) {
-                throw new DBException("Project not found: " + projectId);
-            }
-            RMProjectInfo projectInfo = new RMProjectInfo(name, description);
-            RMProject rmProject = getResourceController(session).updateProject(projectId, projectInfo);
-            project.updateProject(rmProject.getName(), rmProject.getDescription());
-
-            ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSProjectUpdateEvent.update(WebEventUtils.getSmSessionId(session), session.getUserId(), rmProject.getId(), projectInfo)
-            );
-            return project.getRMProject();
-        } catch (DBException e) {
-            throw new DBWebException("Error updating project", e);
-        }
-    }
-
-    @Override
-    public boolean deleteProject(@NotNull WebSession session, @NotNull String projectId) throws DBWebException {
-        try {
-            var project = session.getProjectById(projectId);
-            if (project == null) {
-                throw new DBException("Project not found: " + projectId);
-            }
-            if (project.isUseSecretStorage()) {
-                var secretController = DBSSecretController.getProjectSecretController(project);
-                secretController.deleteProjectSecrets(project.getId());
-            }
-            getResourceController(session).deleteProject(projectId);
-            session.removeSessionProject(projectId);
-            ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSProjectUpdateEvent.delete(WebEventUtils.getSmSessionId(session), session.getUserId(), projectId)
-            );
-            return true;
-        } catch (DBException e) {
-            throw new DBWebException("Error deleting project", e);
-        }
-    }
-
-    @Override
-    public List<AdminPermissionInfo> listProjectPermissions() throws DBWebException {
-        try {
-            return SMUtils.findPermissions(SMConstants.PROJECT_PERMISSION_SCOPE);
-        } catch (Exception e) {
-            throw new DBWebException("Error reading project permissions", e);
-        }
-    }
-
-    @Override
-    public boolean setProjectPermissions(@NotNull WebSession webSession,
-                                         @NotNull String projectId,
-                                         @NotNull RMSubjectProjectPermissions projectPermissions
-    ) throws DBWebException {
-        try {
-            SMController sm = webSession.getSecurityController();
-            sm.deleteAllObjectPermissions(projectId, SMObjectType.project);
-            for (Map.Entry<String, Set<String>> entry : projectPermissions.getSubjectPermissions().entrySet()) {
-                String subjectId = entry.getKey();
-                Set<String> permissions = entry.getValue();
-                sm.setObjectPermissions(
-                    Set.of(projectId),
-                    SMObjectType.project,
-                    Set.of(subjectId),
-                    permissions,
-                    webSession.getUserId()
-                );
-            }
-            addProjectPermissionsUpdatedEvent(webSession, projectId);
-            return true;
-        } catch (Exception e) {
-            throw new DBWebException("Error granting project permissions", e);
-        }
-    }
-
-    private void addProjectPermissionsUpdatedEvent(
-        @NotNull WebSession webSession,
-        @NotNull String projectId
-    ) {
-        var event = WSObjectPermissionEvent.update(
-            WebEventUtils.getSmSessionId(webSession),
-            webSession.getUserId(),
-            SMObjectType.project,
-            projectId
-        );
-        webSession.getApplication().getEventController().addEvent(event);
-    }
-
-    @Override
-    public boolean setSubjectProjectPermissions(
-        @NotNull WebSession webSession,
-        @NotNull String subjectId,
-        @NotNull RMProjectPermissions projectPermissions
-    ) throws DBWebException {
-        try {
-            SMController sm = webSession.getSecurityController();
-            for (Map.Entry<String, Set<String>> entry : projectPermissions.getProjectPermissions().entrySet()) {
-                String projectId = entry.getKey();
-                Set<String> permissions = entry.getValue();
-                sm.setObjectPermissions(
-                    Set.of(projectId),
-                    SMObjectType.project,
-                    Set.of(subjectId),
-                    permissions,
-                    webSession.getUserId()
-                );
-                addProjectPermissionsUpdatedEvent(webSession, projectId);
-            }
-            return true;
-        } catch (Exception e) {
-            throw new DBWebException("Error granting project permissions", e);
-        }
-    }
-
-    @Override
-    public boolean deleteProjectsPermissions(
-        @NotNull WebSession webSession,
-        @NotNull List<String> projectIds,
-        @NotNull List<String> subjectIds,
-        @NotNull List<String> permissions
-    ) throws DBWebException {
-        try {
-            SMAdminController smAdminController = webSession.getAdminSecurityController();
-            smAdminController.deleteObjectPermissions(
-                new HashSet<>(projectIds),
-                SMObjectType.project,
-                new HashSet<>(subjectIds),
-                new HashSet<>(permissions)
-            );
-            log.info("Project permissions deleted: [projectIds=%s, subjectIds=%s, permissions=%s, madeBy=%s]"
-                .formatted(
-                    String.join(",", projectIds),
-                    String.join(",", subjectIds),
-                    String.join(",", permissions),
-                    webSession.getUserId()
-                ));
-            return true;
-        } catch (Exception e) {
-            throw new DBWebException("Error deleting project permissions", e);
-        }
-    }
-
-    @Override
-    public boolean addProjectsPermissions(
-        @NotNull WebSession webSession,
-        @NotNull List<String> projectIds,
-        @NotNull List<String> subjectIds,
-        @NotNull List<String> permissions
-    ) throws DBWebException {
-        try {
-            SMAdminController smAdminController = webSession.getAdminSecurityController();
-            smAdminController.addObjectPermissions(
-                new HashSet<>(projectIds),
-                SMObjectType.project,
-                new HashSet<>(subjectIds),
-                new HashSet<>(permissions),
-                webSession.getUserId()
-            );
-            log.info("Project permissions added: [projectIds=%s, subjectIds=%s, permissions=%s, madeBy=%s]"
-                .formatted(
-                    String.join(",", projectIds),
-                    String.join(",", subjectIds),
-                    String.join(",", permissions),
-                    webSession.getUserId()
-                ));
-            return true;
-        } catch (Exception e) {
-            throw new DBWebException("Error adding project permissions", e);
-        }
-    }
-
-    @Override
-    public List<SMObjectPermissionsGrant> listProjectGrantedPermissions(@NotNull WebSession webSession,
-                                                                        @NotNull String projectId
-    ) throws DBWebException {
-        SMController sm = webSession.getSecurityController();
-        try {
-            return sm.getObjectPermissionGrants(projectId, SMObjectType.project);
-        } catch (DBException e) {
-            throw new DBWebException("Error reading project permission grants", e);
-        }
-    }
-
-    @Override
-    public List<SMObjectPermissionsGrant> listSubjectProjectsPermissionGrants(@NotNull WebSession webSession,
-                                                                              @NotNull String subjectId
-    ) throws DBWebException {
-        try {
-            SMAdminController sm = webSession.getAdminSecurityController();
-            return sm.getSubjectObjectPermissionGrants(subjectId, SMObjectType.project);
-        } catch (DBException e) {
-            throw new DBWebException("Error reading project permission grants", e);
         }
     }
 
