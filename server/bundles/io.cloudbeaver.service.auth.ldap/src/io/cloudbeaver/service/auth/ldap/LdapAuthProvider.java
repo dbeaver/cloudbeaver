@@ -34,9 +34,11 @@ import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMStandardMeta;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayInputStream;
@@ -412,35 +414,21 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         if (CommonUtils.isEmpty(userName)) {
             throw new DBException("LDAP user name is empty");
         }
-        Map<String, String> userMeta = new LinkedHashMap<>();
-        if (authParameters.get(SMStandardMeta.KEY_META_PARAMS) instanceof Map<?, ?> storedMeta) {
-            storedMeta.forEach((key, value) -> {
-                if (key != null && value != null && !value.toString().isEmpty()) {
-                    userMeta.put(key.toString(), value.toString());
-                }
-            });
-        }
-        String firstName = JSONUtils.getString(authParameters, SMStandardMeta.META_FIRST_NAME);
-        String lastName = JSONUtils.getString(authParameters, SMStandardMeta.META_LAST_NAME);
-        if (CommonUtils.isNotEmpty(firstName)) {
-            userMeta.putIfAbsent(SMStandardMeta.META_FIRST_NAME, firstName);
-        }
-        if (CommonUtils.isNotEmpty(lastName)) {
-            userMeta.putIfAbsent(SMStandardMeta.META_LAST_NAME, lastName);
-        }
-
-        // Name from the directory first, then "first last", the login is the last resort
-        String displayName = JSONUtils.getString(authParameters, LdapConstants.CRED_FULL_NAME);
-        if (CommonUtils.isEmpty(displayName)) {
-            displayName = Stream.of(firstName, lastName).filter(CommonUtils::isNotEmpty).collect(Collectors.joining(" "));
-        }
+        Map<?, ?> profile = authParameters.get(SMStandardMeta.KEY_META_PARAMS) instanceof Map<?, ?> meta ? meta : Map.of();
+        String firstName = profile.get(SMStandardMeta.META_FIRST_NAME) instanceof String first
+            ? first : JSONUtils.getString(authParameters, SMStandardMeta.META_FIRST_NAME);
+        String lastName = profile.get(SMStandardMeta.META_LAST_NAME) instanceof String last
+            ? last : JSONUtils.getString(authParameters, SMStandardMeta.META_LAST_NAME);
+        String displayName = Stream.of(firstName, lastName).filter(CommonUtils::isNotEmpty).collect(Collectors.joining(" "));
         if (CommonUtils.isEmpty(displayName)) {
             displayName = JSONUtils.getString(authParameters, LocalAuthProviderConstants.CRED_DISPLAY_NAME);
         }
         if (CommonUtils.isEmpty(displayName)) {
             displayName = userName;
         }
-        return new DBWUserIdentity(userName, displayName, userMeta);
+        // Main LDAP login has already filled the stored user profile. Do not expose directory metadata as an
+        // identity overlay: child authentication skips local validation and must not override that profile.
+        return new DBWUserIdentity(userName, displayName);
     }
 
     @Nullable
@@ -477,7 +465,51 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         if (CommonUtils.isEmpty(userId)) {
             throw new DBException("LDAP user id not found");
         }
+        // LDAP user IDs are case-insensitive. For linked accounts use the local ID resolved by the controller,
+        // which may differ from the LDAP login. Fill missing values before loading the user into the web session.
+        String localUserId = activeUserId == null ? userId.toLowerCase() : activeUserId;
+        fillMissingUserProfile(securityController, localUserId, userCredentials);
         return activeUserId == null ? userId : activeUserId;
+    }
+
+    private void fillMissingUserProfile(
+        @NotNull SMController securityController,
+        @NotNull String userId,
+        @NotNull Map<String, Object> userCredentials
+    ) {
+        if (!(userCredentials.get(SMStandardMeta.KEY_META_PARAMS) instanceof Map<?, ?> provided)) {
+            return;
+        }
+        Map<String, String> profile = new LinkedHashMap<>();
+        for (String name : List.of(SMStandardMeta.META_FIRST_NAME, SMStandardMeta.META_LAST_NAME)) {
+            if (provided.get(name) instanceof String value && CommonUtils.isNotEmpty(value)) {
+                profile.put(name, value);
+            }
+        }
+        // The security controller provisions new users after this hook using these nonempty LDAP values.
+        userCredentials.put(SMStandardMeta.KEY_META_PARAMS, profile);
+        if (provided.isEmpty() || !(securityController instanceof SMAdminController adminController)) {
+            return;
+        }
+        try {
+            SMUser user = adminController.getUserById(userId);
+            if (user == null) {
+                return;
+            }
+            Map<String, String> completedProfile = new LinkedHashMap<>(user.getMetaParameters());
+            for (Map.Entry<String, String> entry : profile.entrySet()) {
+                if (CommonUtils.isEmpty(completedProfile.get(entry.getKey()))) {
+                    completedProfile.put(entry.getKey(), entry.getValue());
+                }
+            }
+            // Use the same effective values for this session's identity, including manually entered names.
+            userCredentials.put(SMStandardMeta.KEY_META_PARAMS, completedProfile);
+            if (!completedProfile.equals(user.getMetaParameters())) {
+                adminController.setSubjectMetas(userId, completedProfile);
+            }
+        } catch (DBException e) {
+            log.warn("Cannot fill missing LDAP profile values of user '" + userId + "'", e);
+        }
     }
 
     @Override
@@ -588,38 +620,27 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     }
 
     /**
-     * Copies the user name and the other configured attributes of the directory entry into the authentication data.
-     * They are shown in the UI and stored in the profile of a new user.
+     * Reads the configured first and last names for the user profile and session identity.
      */
     private void collectUserProfile(
         @NotNull LdapSettings ldapSettings,
         @NotNull Attributes attributes,
         @NotNull Map<String, Object> userData
     ) {
-        // Every configured parameter is reported. An empty value means the attribute is empty or missing in the
-        // directory, so the value stored in the profile is removed instead of staying forever.
         Map<String, String> profile = new LinkedHashMap<>();
-
-        String firstName = readProfileAttribute(attributes, ldapSettings.getFirstNameAttr());
-        if (CommonUtils.isNotEmpty(ldapSettings.getFirstNameAttr())) {
-            profile.put(SMStandardMeta.META_FIRST_NAME, firstName);
+        if (CommonUtils.isNotEmpty(ldapSettings.getFirstNameField())) {
+            profile.put(SMStandardMeta.META_FIRST_NAME, readProfileAttribute(attributes, ldapSettings.getFirstNameField()));
         }
+        if (CommonUtils.isNotEmpty(ldapSettings.getLastNameField())) {
+            profile.put(SMStandardMeta.META_LAST_NAME, readProfileAttribute(attributes, ldapSettings.getLastNameField()));
+        }
+        String firstName = profile.get(SMStandardMeta.META_FIRST_NAME);
         if (CommonUtils.isNotEmpty(firstName)) {
             userData.put(SMStandardMeta.META_FIRST_NAME, firstName);
         }
-        String lastName = readProfileAttribute(attributes, ldapSettings.getLastNameAttr());
-        if (CommonUtils.isNotEmpty(ldapSettings.getLastNameAttr())) {
-            profile.put(SMStandardMeta.META_LAST_NAME, lastName);
-        }
+        String lastName = profile.get(SMStandardMeta.META_LAST_NAME);
         if (CommonUtils.isNotEmpty(lastName)) {
             userData.put(SMStandardMeta.META_LAST_NAME, lastName);
-        }
-        String displayName = readProfileAttribute(attributes, ldapSettings.getDisplayNameAttr());
-        if (CommonUtils.isNotEmpty(displayName)) {
-            userData.put(LdapConstants.CRED_FULL_NAME, displayName);
-        }
-        for (Map.Entry<String, String> metaAttr : ldapSettings.getUserMetaAttrs().entrySet()) {
-            profile.put(metaAttr.getKey(), readProfileAttribute(attributes, metaAttr.getValue()));
         }
         if (!profile.isEmpty()) {
             userData.put(SMStandardMeta.KEY_META_PARAMS, profile);
