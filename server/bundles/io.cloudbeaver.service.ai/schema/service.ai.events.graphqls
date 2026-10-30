@@ -42,6 +42,7 @@ type WSAIChatMessageEvent implements CBServerEvent @since(version: "25.3.5") {
     content: String!
     displayMessage: String!
     time: String!
+    attachments: [AIChatAttachment!]! @since(version: "26.2.4")
     "Present only with CONFIRMATION role"
     functionConfirmation: AIFunctionConfirmation
     "Present only with FUNCTION role"

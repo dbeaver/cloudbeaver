@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.ai.model.events;
 
+import io.cloudbeaver.service.ai.model.WebAIChatAttachment;
 import io.cloudbeaver.service.ai.model.WebAIMessage;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -27,6 +28,7 @@ import org.jkiss.dbeaver.model.websocket.event.session.WSAbstractSessionEvent;
 import org.jkiss.utils.CommonUtils;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class WSAiChatMessageEvent extends WSAbstractSessionEvent {
     private static final String ID = "cb_ai_chat_message";
@@ -42,6 +44,8 @@ public class WSAiChatMessageEvent extends WSAbstractSessionEvent {
     private final String role;
 
     private final String time;
+    @NotNull
+    private final List<WebAIChatAttachment> attachments;
 
     @Nullable
     private AIFunctionCallConfirmation functionConfirmation;
@@ -58,6 +62,7 @@ public class WSAiChatMessageEvent extends WSAbstractSessionEvent {
         this.content = message.getContent();
         this.role = message.getRole().name();
         this.time = message.getTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        this.attachments = message.getAttachments();
         this.functionCall = message.getFunctionCall();
         this.functionResult = message.getFunctionResult();
 
@@ -94,6 +99,11 @@ public class WSAiChatMessageEvent extends WSAbstractSessionEvent {
     @NotNull
     public String getTime() {
         return time;
+    }
+
+    @NotNull
+    public List<WebAIChatAttachment> getAttachments() {
+        return attachments;
     }
 
     @Nullable

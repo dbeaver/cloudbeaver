@@ -7,17 +7,18 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useRef, useState, type PropsWithChildren } from 'react';
+import { Suspense, useContext, useRef, useState, type PropsWithChildren } from 'react';
 
-import { ActionIconButton, AutoResizeTextarea, Form, s, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, AutoResizeTextarea, Form, Placeholder, s, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Command } from '@dbeaver/ui-kit';
 
-import { AIChatMessageService } from './AIChatMessageService.js';
 import { AIChatConversationsService } from '../AIChatConversation/AIChatConversationsService.js';
 import { AIChatContext } from '../AIChatContext.js';
+import { AIChatInputService } from '../AIChatInput/AIChatInputService.js';
+import { useAIChatInput } from '../AIChatInput/useAIChatInput.js';
 import classes from './AIChatMessageForm.module.css';
 
 interface Props {
@@ -29,11 +30,13 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const translate = useTranslate();
   const context = useContext(AIChatContext);
   const notificationService = useService(NotificationService);
-  const aiChatMessageService = useService(AIChatMessageService);
   const aiChatConversationsService = useService(AIChatConversationsService);
+  const aiChatInputService = useService(AIChatInputService);
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { input, dragHandlers } = useAIChatInput({ conversationId: currentConversationId, connectionKey: context.connectionKey, textareaRef });
+  const submitting = aiChatInputService.isSubmitting(input);
 
   useExecutor({
     executor: aiChatConversationsService.onNewConversation,
@@ -47,20 +50,12 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   });
 
   async function sendMessage() {
-    let conversationId = currentConversationId;
-
+    const submittedValue = value;
     try {
-      if (!conversationId) {
-        const conversation = await aiChatConversationsService.createConversation(context.connectionKey ?? null);
-        conversationId = conversation.id;
-      }
-
-      const v = value.trim();
-
-      const message = await aiChatMessageService.sendMessage(conversationId, v);
+      const message = await aiChatInputService.submit(input, submittedValue);
 
       if (message) {
-        setValue('');
+        setValue(current => (current === submittedValue ? '' : current));
       }
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_send_message_error');
@@ -84,26 +79,33 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
     return translate('plugin_ai_chat_submit_message_placeholder', undefined, { symbol });
   }
 
-  const disabled = !value.trim() || context.disabled;
+  const disabled = context.disabled || !aiChatInputService.canSubmit(input, value);
 
   return (
     <div className={s(styles, { container: true })}>
+      <Suspense fallback={null}>
+        <Placeholder container={aiChatInputService.beforeInput} input={input} />
+      </Suspense>
       <Form
         className="tw:flex tw:items-end tw:gap-2"
         disableEnterSubmit={disabled}
         contents
         onSubmit={aiChatConversationsService.processing ? cancel : sendMessage}
       >
-        <div className={s(styles, { textareaContainer: true })}>
+        <div className={s(styles, { textareaContainer: true }, 'tw:relative')}>
           <AutoResizeTextarea
+            {...dragHandlers}
             ref={textareaRef}
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
             value={value}
-            readOnly={aiChatConversationsService.processing}
+            readOnly={aiChatConversationsService.processing || submitting}
             autoFocus
             onChange={v => setValue(v)}
           />
+          <Suspense fallback={null}>
+            <Placeholder container={aiChatInputService.dragPreview} input={input} />
+          </Suspense>
           {!aiChatConversationsService.processing ? (
             <ActionIconButton name="/icons/send.svg" disabled={disabled} img onClick={sendMessage} />
           ) : (

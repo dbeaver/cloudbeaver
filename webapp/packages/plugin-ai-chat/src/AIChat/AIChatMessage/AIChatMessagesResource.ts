@@ -31,6 +31,7 @@ import {
 import { AIChatMessageEventHandler, type IAiChatMessageChunkEvent, type IAiChatMessageEvent } from './AIChatMessageEventHandler.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 import { AIChatFunctionRegistryService } from '../../AIChatFunctionRegistryService.js';
+import type { AIChatMessageRequestConfig } from './aiChatMessageRequestContext.js';
 
 export interface IAIFunctionMessage extends AiMessage {
   role: AiMessageType.Function;
@@ -102,6 +103,7 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
             role: data.role as AiMessageType,
             content: data.content,
             time: data.time,
+            attachments: data.attachments ?? [],
             functionCall: data.functionCall,
             functionResult: data.functionResult,
             functionConfirmation: data.functionConfirmation,
@@ -233,9 +235,9 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     });
   }
 
-  async sendMessage(conversationId: string, prompt: string): Promise<AiSendChatMessageInfoFragment> {
+  async sendMessage(conversationId: string, prompt: string, config: AIChatMessageRequestConfig = {}): Promise<AiSendChatMessageInfoFragment> {
     return await this.processSendMessage(conversationId, async () => {
-      const { message } = await this.graphQLService.sdk.sendConversationMessage({ conversationId, prompt });
+      const { message } = await this.graphQLService.sdk.sendConversationMessage({ ...config, conversationId, prompt });
       return message;
     });
   }
