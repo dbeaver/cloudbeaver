@@ -8,10 +8,16 @@
   },
   "references": [
     {
+      "path": "../core-blocks"
+    },
+    {
       "path": "../core-cli"
     },
     {
       "path": "../core-di"
+    },
+    {
+      "path": "../core-events"
     },
     {
       "path": "../core-localization"

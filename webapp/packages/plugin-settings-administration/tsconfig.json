@@ -14,6 +14,9 @@
       "path": "../core-administration"
     },
     {
+      "path": "../core-authentication"
+    },
+    {
       "path": "../core-blocks"
     },
     {
@@ -32,10 +35,22 @@
       "path": "../core-localization"
     },
     {
+      "path": "../core-root"
+    },
+    {
       "path": "../core-settings"
     },
     {
+      "path": "../core-storage"
+    },
+    {
       "path": "../core-ui"
+    },
+    {
+      "path": "../plugin-administration"
+    },
+    {
+      "path": "../plugin-localization"
     },
     {
       "path": "../plugin-settings-panel"
