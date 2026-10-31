@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@ export * from './Administration/Users/UserForm/Info/getUserFormInfoPart.js';
 export * from './Administration/Users/UserForm/Info/UserFormInfoPart.js';
 export * from './Administration/Users/UserForm/Info/UserFormInfoPartService.js';
 export * from './Administration/Users/Teams/TeamsForm/TeamsAdministrationFormService.js';
-export * from './Menus/MENU_USERS_ADMINISTRATION.js';
 export * from './AdministrationUsersManagementService.js';
 export * from './externalUserProviderStatusContext.js';
 export * from './Administration/Users/Teams/TeamsForm/Options/getTeamOptionsFormPart.js';
 export * from './Administration/Users/UsersTable/UsersTableOptionsPanelService.js';
 export * from './Administration/Users/UsersTable/Filters/useUsersTableFilters.js';
-export * from './Administration/Users/UsersTable/Filters/FiltersActionButton.js';

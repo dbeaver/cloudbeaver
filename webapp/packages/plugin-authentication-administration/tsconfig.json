@@ -44,6 +44,9 @@
       "path": "../core-executor"
     },
     {
+      "path": "../core-links"
+    },
+    {
       "path": "../core-localization"
     },
     {
@@ -63,9 +66,6 @@
     },
     {
       "path": "../core-utils"
-    },
-    {
-      "path": "../core-view"
     },
     {
       "path": "../plugin-administration"

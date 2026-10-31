@@ -27,6 +27,7 @@ export default [
   ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
   ['authentication_administration_user_auth_method_no_details', 'No details available'],
   ['authentication_administration_item', 'Users and Teams'],
+  ['authentication_administration_create_user', 'Create user'],
   ['authentication_administration_item_users', 'Users'],
   ['authentication_administration_item_metaParameters', 'Meta Parameters'],
   ['authentication_administration_tools_add_tooltip', 'Create new user'],
@@ -112,6 +113,8 @@ export default [
 
   ['administration_teams_tab_title', 'Teams'],
   ['administration_teams_tab_description', 'Team management'],
+  ['administration_teams_search_placeholder', 'Search teams...'],
+  ['administration_teams_create', 'Create team'],
   ['administration_teams_team_creation', 'Team Creation'],
   ['administration_teams_team_id', 'Team ID'],
   ['administration_teams_team_name', 'Team Name'],

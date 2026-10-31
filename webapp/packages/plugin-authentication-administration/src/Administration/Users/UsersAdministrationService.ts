@@ -31,11 +31,6 @@ const UsersAdministration = React.lazy(async () => {
   return { default: UsersAdministration };
 });
 
-const UsersTableFilterButton = React.lazy(async () => {
-  const { UsersTableFilterButton } = await import('./UsersTable/Filters/UsersTableFilterButton.js');
-  return { default: UsersTableFilterButton };
-});
-
 export interface IUserDetailsInfoProps {
   user: AdminUser;
 }
@@ -49,7 +44,7 @@ export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
   readonly informationPlaceholder: PlaceholderContainer;
-  readonly statisticsPlaceholder = new PlaceholderContainer();
+  readonly actions = new PlaceholderContainer();
   readonly actionButtonsPlaceholder: PlaceholderContainer<IUsersActionButtonProps>;
   administrationItem!: IAdministrationItem;
 
@@ -88,7 +83,6 @@ export class UsersAdministrationService extends Bootstrap {
     });
 
     this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
-    this.actionButtonsPlaceholder.add(UsersTableFilterButton, 0);
   }
 
   private handleUsersDeactivate(param: string | null, configurationWizard: boolean, outside: boolean) {

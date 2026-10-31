@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-/* TODO: same styles cloudbeaver/webapp/packages/plugin-product-information-administration/src/shared/ProductInfoPageTabPanel.module.css */
-.tabPanel {
-  overflow: auto;
-}
+import { importLazyComponent } from '../importLazyComponent.js';
+
+export const ToolbarAction = importLazyComponent(() => import('./ToolbarAction.js').then(m => m.ToolbarAction));

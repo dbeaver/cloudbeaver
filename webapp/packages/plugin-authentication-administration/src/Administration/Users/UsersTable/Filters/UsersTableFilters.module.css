@@ -1,14 +1,22 @@
+.filters {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 16px;
+  min-width: 0;
+  width: 100%;
+}
+
 .filterContainer {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .filter {
-  flex: 1;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  flex: 1 1 240px;
+  min-width: 0;
+  max-width: 400px;
 }

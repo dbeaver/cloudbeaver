@@ -1,22 +1,53 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
+.tableContainer {
+  --administration-table-border-radius: 10px;
+
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--theme-background);
+  border-radius: var(--administration-table-border-radius);
+  background: var(--theme-surface);
+  color: var(--theme-on-surface);
+  box-shadow: none;
+}
+
 .table {
   font-size: 14px;
+  box-shadow: none;
+
   & [role='columnheader'] {
-    text-transform: uppercase;
+    background: var(--theme-sub-secondary);
+    color: var(--theme-on-secondary);
+    font-weight: 600;
+    text-transform: none;
+
+    &:first-child {
+      border-start-start-radius: calc(var(--administration-table-border-radius) - 1px);
+    }
+
+    &:last-child {
+      border-start-end-radius: calc(var(--administration-table-border-radius) - 1px);
+    }
   }
 
-  :global(.rdg-cell) {
+  & :global(.rdg-cell) {
     padding-inline: 12px;
+    border-inline-end: none;
   }
 
-  :global(.rdg-cell):not([role='columnheader']):not(:last-child) {
-    border-inline-end: 1px solid transparent;
+  & [role='row']:nth-last-child(1 of [role='row']) > [role='gridcell'] {
+    border-block-end: none;
   }
 }

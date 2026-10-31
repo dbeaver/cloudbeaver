@@ -10,12 +10,17 @@ import { useCallback, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { reaction } from 'mobx';
 
-import { Checkbox, Link, Placeholder, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Checkbox, Link, Placeholder, s, Tag, Tags, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
+import {
+  ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT,
+  AdministrationTable,
+  AdministrationTableStyles,
+} from '@cloudbeaver/core-administration';
 import { DataGrid, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
 import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.js';
@@ -36,7 +41,7 @@ const ENABLED_COLUMN = { key: 'enabled', label: 'authentication_user_enabled' };
 const AUTH_COLUMN = { key: 'auth', label: 'authentication_administration_user_auth_methods' };
 const LAST_LOGIN_COLUMN = { key: 'lastLogin', label: 'plugin_authentication_administration_user_last_login' };
 
-const COLUMNS = [ID_COLUMN, TEAM_COLUMN, ENABLED_COLUMN, AUTH_COLUMN, LAST_LOGIN_COLUMN];
+const COLUMNS = [ID_COLUMN, TEAM_COLUMN, AUTH_COLUMN, LAST_LOGIN_COLUMN, ENABLED_COLUMN];
 
 export const UsersTable = observer<Props>(function UsersTable({ users, isManageable, displayAuthRole, onLoadMore }) {
   const translate = useTranslate();
@@ -106,8 +111,20 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
     }
 
     if (column.key === TEAM_COLUMN.key) {
-      const teams = row.grantedTeams.join(', ');
-      return <span title={teams}>{teams}</span>;
+      return (
+        <div title={row.grantedTeams.join(', ')} className="tw:min-w-0 tw:w-full">
+          <Tags className="tw:flex-nowrap! tw:gap-1.5! tw:overflow-hidden tw:m-0">
+            {row.grantedTeams.map(team => (
+              <Tag
+                key={team}
+                id={team}
+                label={team}
+                className="tw:shrink-0 tw:max-w-44! tw:m-0 tw:px-2! tw:py-1! tw:rounded-(--theme-form-element-radius)! tw:bg-(--theme-secondary) tw:text-(--theme-on-surface)! tw:text-sm tw:leading-5"
+              />
+            ))}
+          </Tags>
+        </div>
+      );
     }
 
     if (column.key === ENABLED_COLUMN.key) {
@@ -159,25 +176,42 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
     return translate(columns[colIdx]?.label) ?? '';
   }
 
+  function getHeaderElement(colIdx: number) {
+    if (columns[colIdx]?.key === ENABLED_COLUMN.key) {
+      return <div className="tw:text-center">{getHeaderText(colIdx)}</div>;
+    }
+
+    return getHeaderText(colIdx);
+  }
+
+  const headerElement = useCreateGridReactiveValue(
+    getHeaderElement,
+    (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
+    [columns, translate],
+  );
+
   const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), [
     columns,
     translate,
   ]);
 
   return (
-    <div className="tw:h-full tw:max-w-full theme-text-on-surface">
+    <AdministrationTable>
       <DataGrid
         columnCount={columnsCount}
         rowCount={rowsCount}
         getHeaderResizable={colIdx => colIdx > 0}
+        getHeaderHeight={() => ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT}
         getRowHeight={() => ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT}
+        getHeaderWidth={() => 'auto'}
         getHeaderPinned={colIdx => colIdx <= 0}
         headerText={headerText}
+        headerElement={headerElement}
         cell={cell}
         className={s(styles, { table: true })}
         onScrollToBottom={onLoadMore}
         onCellKeyDown={cellCopy.handleKeyDown}
       />
-    </div>
+    </AdministrationTable>
   );
 });

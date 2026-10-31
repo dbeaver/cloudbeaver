@@ -11,11 +11,16 @@ import { observer } from 'mobx-react-lite';
 import type { ReactNode } from 'react';
 
 import { IconOrImage, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { AdministrationTableStyles } from '@cloudbeaver/core-administration';
+import {
+  ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH,
+  AdministrationTable,
+  AdministrationTableStyles,
+} from '@cloudbeaver/core-administration';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { DataGrid, TableRowSelect, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
-import { AI_PROFILES_TABLE_ROW_HEIGHT } from './AI_PROFILES_TABLE_ROW_HEIGHT.js';
 import type { AIProfile } from './AIProfilesResource.js';
 import { AIProfileNameCell } from './AIProfileNameCell.js';
 
@@ -48,7 +53,7 @@ export interface IAIProfilesTableProps {
   onProfileClick?: (profile: AIProfile) => void;
 }
 
-const SELECT_COLUMN = { key: 'select', label: '' };
+const SELECT_COLUMN = { key: 'select', label: '', width: ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH };
 const NAME_COLUMN = { key: 'name', minWidth: 160 };
 const ENGINE_COLUMN = { key: 'engine', width: 160 };
 const SCOPE_COLUMN = { key: 'scope', width: 120 };
@@ -189,7 +194,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   }
 
   function getHeaderWidth(colIdx: number) {
-    return columns[colIdx]?.width ?? null;
+    return columns[colIdx]?.width ?? 'auto';
   }
 
   function getHeaderMinWidth(colIdx: number) {
@@ -197,12 +202,13 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   }
 
   return (
-    <div className="tw:overflow-auto tw:h-full tw:max-w-full theme-text-on-surface">
+    <AdministrationTable>
       <DataGrid
         columnCount={columnCount}
         rowCount={rowCount}
         getHeaderResizable={colIdx => columns[colIdx]?.key !== SELECT_COLUMN.key}
-        getRowHeight={() => AI_PROFILES_TABLE_ROW_HEIGHT}
+        getHeaderHeight={() => ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT}
+        getRowHeight={() => ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT}
         getHeaderPinned={colIdx => columns[colIdx]?.key === SELECT_COLUMN.key}
         headerText={headerText}
         headerElement={headerElement}
@@ -212,6 +218,6 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
         className={s(styles, { table: true })}
         onCellKeyDown={cellCopy.handleKeyDown}
       />
-    </div>
+    </AdministrationTable>
   );
 });

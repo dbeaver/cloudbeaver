@@ -1430,6 +1430,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-administration@workspace:packages/core-administration"
   dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-data-context": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
@@ -1446,10 +1447,17 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
     mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -2790,6 +2798,7 @@ __metadata:
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-projects": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
@@ -2797,7 +2806,6 @@ __metadata:
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
-    "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-authentication": "workspace:*"
     "@cloudbeaver/plugin-data-grid": "workspace:*"
@@ -2805,6 +2813,7 @@ __metadata:
     "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
@@ -3297,6 +3306,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-grid@workspace:packages/plugin-data-grid"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
