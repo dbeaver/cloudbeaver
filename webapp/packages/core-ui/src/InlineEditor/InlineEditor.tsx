@@ -19,7 +19,7 @@ import { EditorAction } from './EditorAction.js';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
-export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onKeyDown' | 'autoFocus' | 'style'> {
+export interface IInlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onKeyDown' | 'autoFocus' | 'style'> {
   value: string;
   controlsPosition?: InlineEditorControls;
   simple?: boolean;
@@ -39,7 +39,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   className?: string;
 }
 
-export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
+export const InlineEditor = observer<IInlineEditorProps, HTMLInputElement>(
   forwardRef(function InlineEditor(
     {
       value,
