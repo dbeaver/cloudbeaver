@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ export class TabsBootstrap extends Bootstrap {
       isApplicable: context => {
         const tab = context.get(DATA_CONTEXT_TAB_ID);
         const state = context.get(DATA_CONTEXT_TABS_CONTEXT);
+
         return !!tab && !!state?.enabledBaseActions && state.canClose(tab);
       },
       getItems: (context, items) => [
@@ -113,6 +114,7 @@ export class TabsBootstrap extends Bootstrap {
           if (items.length > 0) {
             items.push(new MenuSeparatorItem());
           }
+
           items.push(...actions);
         }
 

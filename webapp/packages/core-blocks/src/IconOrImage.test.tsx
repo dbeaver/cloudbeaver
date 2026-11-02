@@ -69,6 +69,7 @@ describe('IconOrImage', () => {
       width: 24,
       onClick: handleClick,
     };
+
     const { getByRole } = renderInApp(<IconOrImage {...props} />);
     const element = getByRole('img');
 
@@ -90,6 +91,7 @@ describe('IconOrImage', () => {
       width: 24,
       onClick: handleClick,
     };
+
     const { getByRole } = renderInApp(<IconOrImage {...props} />);
     const element = getByRole('svg');
 

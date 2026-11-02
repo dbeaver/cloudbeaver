@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,9 @@ export class ScreenService {
       name = routeName;
       routeName = this.routerService.route;
     }
+
     const screen = this.getScreenByRoute(routeName);
+
     return screen?.name === name;
   }
 
@@ -88,6 +90,7 @@ export class ScreenService {
 
   getScreenByRoute(route: string): IScreen<any> | undefined {
     const screen = this.routeScreenMap.get(route);
+
     if (!screen) {
       return undefined;
     }

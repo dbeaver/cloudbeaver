@@ -49,11 +49,13 @@ export const ChangePassword = observer(function ChangePassword() {
       }
     },
   });
+
   const passwordValidationRef = usePasswordValidation(form);
   const passwordRepeatValidation = useFormCustomInputValidation<string>(value => {
     if (!isValuesEqual(value, state.password, null)) {
       return translate('authentication_user_passwords_not_match');
     }
+
     return null;
   }, form);
 

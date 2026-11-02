@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
       clearTimeout(this.flushTask);
       this.flushTask = null;
     }
+
     this.deleted.clear();
     this.temp.clear();
     this.keysTemp.invalidate();
@@ -70,6 +71,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
     this.temp.delete(key);
     this.deleted.set(key, true);
     this.scheduleFlush();
+
     return this.has(key);
   }
 
@@ -78,6 +80,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
       if (this.isDeleted(key)) {
         continue;
       }
+
       callbackfn.call(thisArg, value, key, this);
     }
   }
@@ -92,6 +95,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
     if (this.temp.has(key)) {
       return this.temp.get(key);
     }
+
     return getTargetMobxSub;
   }
 
@@ -111,6 +115,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
     this.deleted.delete(key);
 
     this.scheduleFlush();
+
     return this;
   }
 
@@ -142,11 +147,13 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
         for (const [deleted] of this.deleted) {
           this.target.delete(deleted);
         }
+
         this.deleted.clear();
 
         for (const [key, value] of this.temp) {
           this.target.set(key, value);
         }
+
         this.onSync?.();
         this.temp.clear();
         this.keysTemp.invalidate();

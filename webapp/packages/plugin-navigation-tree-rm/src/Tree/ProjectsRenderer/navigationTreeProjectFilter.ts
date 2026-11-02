@@ -45,6 +45,7 @@ export function navigationTreeProjectFilter(
           if (node.uri === folderNodeId) {
             return navTreeResource.get(node.uri)?.length;
           }
+
           return false;
         })
         .map(node => node.uri);
@@ -71,11 +72,13 @@ export function navigationTreeProjectFilter(
             const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
 
             const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+
             return (navTreeResource.get(folderNodeId)?.length || 0) > 0;
           }
 
           return (navTreeResource.get(node.uri)?.length || 0) > 0;
         }
+
         return true;
       })
       .map(node => node.uri);

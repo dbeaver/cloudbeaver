@@ -52,12 +52,14 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
         ) {
           return;
         }
+
         if (!(await authorization.confirmLeave())) {
           ExecutorInterrupter.interrupt(contexts);
         }
       },
     ],
   });
+
   const form = useForm({
     onSubmit: async function onSubmit() {
       if (!formState) {
@@ -72,6 +74,7 @@ export const AIProfileCredentialsPanel = observer(function AIProfileCredentialsP
           title: 'plugin_ai_user_profile_credentials_saved',
           message: aiProfilesResource.get(formState.state.profileId)?.name,
         });
+
         await aiProfileCredentialsPanelService.back();
       } else if (exception) {
         notificationService.logException(exception, 'plugin_ai_credentials_save_failed');

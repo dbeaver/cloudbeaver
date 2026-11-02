@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -115,6 +115,7 @@ export class Task<T> implements ITask<T> {
     if (this.cancelling) {
       throw new Error('Task is already cancelling');
     }
+
     this.cancelling = true;
 
     if (this.parentTask && this.parentTask.status === 'pending') {
@@ -144,9 +145,11 @@ export class Task<T> implements ITask<T> {
   protected internalReject(reason?: any, cancelled?: boolean) {
     if (this.status === 'pending') {
       cancelled ||= reason instanceof CancelError;
+
       if (cancelled && !(reason instanceof CancelError)) {
         reason = new CancelError(reason, { cause: reason });
       }
+
       this.status = 'rejected';
       this.value = reason;
 
@@ -166,6 +169,7 @@ export class Task<T> implements ITask<T> {
 
   private registerCancel(cancel: TaskCancelFn): void {
     let copy = this.cancelCallback;
+
     if (copy === this.internalCancel) {
       copy = NOOP;
     }
@@ -179,6 +183,7 @@ export class Task<T> implements ITask<T> {
         {
           this.fulfillCallbacks.push(resolve);
         }
+
         break;
       case 'fulfilled':
         resolve(this.value);
@@ -192,6 +197,7 @@ export class Task<T> implements ITask<T> {
         {
           this.rejectCallbacks.push(reject);
         }
+
         break;
       case 'rejected':
         reject(this.value, this.value instanceof CancelError);
@@ -245,6 +251,7 @@ export class Task<T> implements ITask<T> {
           res => {
             result[i] = res;
             counter += 1;
+
             if (counter === values.length) {
               resolve(result);
             }
@@ -276,6 +283,7 @@ export class Task<T> implements ITask<T> {
           res => {
             result[i] = { status: 'fulfilled', value: res };
             counter += 1;
+
             if (counter === values.length) {
               resolve(result);
             }
@@ -283,6 +291,7 @@ export class Task<T> implements ITask<T> {
           (reason, cancelled) => {
             result[i] = { status: cancelled ? 'cancelled' : 'rejected', reason };
             counter += 1;
+
             if (counter === values.length) {
               resolve(result);
             }
@@ -304,7 +313,9 @@ export class Task<T> implements ITask<T> {
           if (value instanceof Task) {
             promise.registerCancel(reason => value.cancel(reason));
           }
+
           value.then(promise.internalResolve, promise.internalReject);
+
           return;
         }
 
@@ -319,6 +330,7 @@ export class Task<T> implements ITask<T> {
               },
               promise.internalReject,
             );
+
             return;
           }
         }
@@ -347,7 +359,9 @@ export class Task<T> implements ITask<T> {
           if (value instanceof Task) {
             registerCancel(reason => value.cancel(reason));
           }
+
           value.then(resolve, reject);
+
           return;
         }
 
@@ -362,6 +376,7 @@ export class Task<T> implements ITask<T> {
               },
               reject,
             );
+
             return;
           }
         }

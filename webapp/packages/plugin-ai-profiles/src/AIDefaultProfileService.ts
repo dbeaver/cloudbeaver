@@ -38,6 +38,7 @@ export class AIDefaultProfileService {
       defaultProfileId: computed,
       defaultProfile: computed,
     });
+
     this.aiProfilesResource.beforeLoad.addHandler(async () => {
       await this.userInfoResource.load();
     });
@@ -55,6 +56,7 @@ export class AIDefaultProfileService {
     if (this.savingPromise) {
       return this.savingPromise;
     }
+
     try {
       this.savingPromise = this.saveProfile(profileId);
       await this.savingPromise;
@@ -79,11 +81,13 @@ export class AIDefaultProfileService {
 
   private async saveProfile(profileId: string | null): Promise<void> {
     const previous = this.defaultProfileId;
+
     if (profileId === null) {
       this.settings.resetValue(DEFAULT_PROFILE_KEY);
     } else {
       this.settings.setValue(DEFAULT_PROFILE_KEY, profileId);
     }
+
     try {
       await this.settings.save();
     } catch (exception) {

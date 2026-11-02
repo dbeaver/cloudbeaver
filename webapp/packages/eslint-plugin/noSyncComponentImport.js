@@ -25,6 +25,7 @@ export default {
         }
 
         const source = node.source;
+
         // bail if the declaration doesn't have a source, e.g. "export { foo };", or if it's only partially typed like in an editor
         if (!source || !source.value) {
           return;
@@ -46,6 +47,7 @@ export default {
             return;
           }
         } // else {
+
         //   resolvedPath = pnpapi.resolveRequest(importPath, context.filename);
 
         //   if (resolvedPath === null) {

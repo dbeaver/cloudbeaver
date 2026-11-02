@@ -126,9 +126,11 @@ export class SqlExecutionPlanService {
 
   private removeTab(state: ISqlEditorTabState, tabId: string) {
     const tab = state.tabs.find(tab => tab.id === tabId);
+
     if (tab) {
       state.tabs.splice(state.tabs.indexOf(tab), 1);
     }
+
     this.removeExecutionPlanTab(state, tabId);
 
     if (state.tabs.length > 0) {
@@ -140,6 +142,7 @@ export class SqlExecutionPlanService {
 
   private createExecutionPlanTab(state: ISqlEditorTabState, query: string, task: ITask<SqlExecutionPlan>): string {
     const dataSource = this.sqlDataSourceService.get(state.editorId);
+
     if (!dataSource) {
       throw new Error('SQL Data Source is not provided');
     }

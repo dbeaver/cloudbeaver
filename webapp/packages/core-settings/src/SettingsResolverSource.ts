@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -50,9 +50,11 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   add(...resolvers: SettingsResolverSource[]): this {
     this.resolvers.push(...resolvers);
+
     for (const resolver of resolvers) {
       resolver.onChange.next(this.onChange, data => ({ ...data, value: this.getValue(data.key) }));
     }
+
     return this;
   }
 
@@ -99,9 +101,11 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   isEdited(key?: any): boolean {
     const source = this.sources.find(r => r.has(key));
+
     if (!source || !isEditableSettingsSource(source)) {
       return false;
     }
+
     return source.isEdited(key);
   }
 
@@ -119,6 +123,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
         return true;
       }
     }
+
     return false;
   }
 
@@ -137,9 +142,11 @@ export class SettingsResolverSource implements ISettingsResolverSource {
       if (!r.has(key)) {
         return false;
       }
+
       if (isEditableSettingsSource(r)) {
         return isNotNullDefined(r.getEditedValue(key));
       }
+
       return isNotNullDefined(r.getValue(key));
     });
 
@@ -168,6 +175,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   resetValue(key: any): void {
     for (const source of this.sources) {
       const readonly = !isEditableSettingsSource(source) || source.isReadOnly(key);
+
       if (source.has(key) && readonly) {
         throw new Error(`Can't set value for key ${key}`);
       }
@@ -230,6 +238,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     }
 
     this.updating = true;
+
     try {
       const snapshot = this.getSnapshot();
       action();

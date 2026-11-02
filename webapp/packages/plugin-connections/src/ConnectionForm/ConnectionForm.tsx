@@ -44,9 +44,11 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
 
       const submitInfo = context.getContext(formSubmitContext);
       submitInfo.setType(submitType);
+
       if (submitType === 'test') {
         submitInfo.setSubmitOnNoChanges(true);
       }
+
       const isCreate = formState.mode === FormMode.Create || optionsPart.state.hidden === true;
       const saved = await formState.save(context);
 
@@ -84,7 +86,7 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>
             <Container className={s(styles, { connectionTopBarStatus: true })} overflow>
-              <Container className={s(styles, { connectionStatusMessage: true })} overflow>
+              <Container className={s(styles, { connectionStatusMessage: true })} role="status" aria-live="polite" aria-atomic="true" overflow>
                 <StatusMessage
                   type={exception ? ENotificationType.Error : ENotificationType.Info}
                   message={formState.statusMessage}

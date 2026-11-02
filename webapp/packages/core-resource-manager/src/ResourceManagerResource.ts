@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -205,6 +205,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const childrenKey = this.aliases.isAlias(key, CachedTreeChildrenKey);
+
       if (childrenKey) {
         const resourceKey = getRmResourceKey(childrenKey.options.path);
 
@@ -220,6 +221,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
         }
 
         const parent = getPathParent(childrenKey.options.path);
+
         if (parent) {
           key = parent;
         }

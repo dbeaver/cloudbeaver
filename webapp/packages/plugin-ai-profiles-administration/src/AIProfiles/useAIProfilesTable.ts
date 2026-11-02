@@ -82,6 +82,7 @@ export function useAIProfilesTable(selection: ITableSelection): Readonly<State> 
         const credentialsWarning = shouldDeleteUserCredentials
           ? `\n\n${translate('plugin_ai_administration_profile_delete_user_credentials_warning')}`
           : '';
+
         const message = `${translate('plugin_ai_administration_profile_delete_confirmation')}${names}.${credentialsWarning}\n\n${translate('ui_are_you_sure')}`;
 
         const { status } = await this.dialogService.open(ConfirmationDialogDelete, {

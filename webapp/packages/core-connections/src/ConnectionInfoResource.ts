@@ -136,12 +136,14 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     userInfoResource.onUserChange.addHandler(() => {
       this.clear();
     });
+
     appAuthService.requireAuthentication(this);
     this.sync(
       this.projectInfoResource,
       () => CachedMapAllKey,
       () => CachedMapAllKey,
     );
+
     this.projectsService.onActiveProjectChange.addHandler(data => {
       if (data.type === 'after') {
         this.markOutdated(ConnectionInfoActiveProjectKey);
@@ -468,6 +470,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.onDataOutdated.execute(connectionKey);
+
       return subjects;
     });
 
@@ -496,10 +499,12 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     await this.performUpdate(key, [], async () => {
       const metadata = this.metadata.get(key);
       metadata.connecting = true;
+
       try {
         const { connection } = await this.graphQLService.sdk.initConnection({
           ...config,
         });
+
         this.set(createConnectionParam(connection), connection);
         this.onDataOutdated.execute(key);
       } finally {
@@ -569,8 +574,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       await this.performUpdate(key, [], async () => {
         await this.graphQLService.sdk.deleteConnection({ projectId: key.projectId, connectionId: key.connectionId });
       });
+
       this.delete(key);
     });
+
     this.onDataOutdated.execute(key);
   }
 
@@ -605,6 +612,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     await ResourceKeyUtils.forEachAsync(key, async connectionKey => {
       let connectionId: string | undefined;
+
       if (!isResourceAlias(connectionKey)) {
         projectId = connectionKey.projectId;
         connectionId = connectionKey.connectionId;
@@ -634,6 +642,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       const keys = resourceKeyList(connectionsList.map(createConnectionParam));
       this.set(keys, connectionsList);
     });
+
     this.sessionUpdate = false;
 
     return this.data;
@@ -666,9 +675,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
   protected override dataSet(key: IConnectionInfoParams, value: Connection): void {
     const oldConnection = this.dataGet(key);
+
     if (value.nodePath) {
       this.nodeIdMap.set(value.nodePath, key);
     }
+
     super.dataSet(key, {
       ...oldConnection,
       ...value,
@@ -681,9 +692,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
   protected override dataDelete(key: IConnectionInfoParams): void {
     const connection = this.dataGet(key);
+
     if (connection?.nodePath) {
       this.nodeIdMap.delete(connection.nodePath);
     }
+
     super.dataDelete(key);
   }
 
@@ -694,9 +707,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+
     if (!parse.success) {
       this.logger.warn(`Invalid resource key ${(schemaValidationError(parse.error).toString(), { prefix: null })}`);
     }
+
     return parse.success;
   }
 }
@@ -736,6 +751,7 @@ export function compareNewConnectionsInfo(a: DatabaseConnection, b: DatabaseConn
 export function createConnectionParam(connection: Pick<Connection, 'id' | 'projectId'>): IConnectionInfoParams;
 export function createConnectionParam(connection: Connection): IConnectionInfoParams;
 export function createConnectionParam(projectId: string, connectionId: string): IConnectionInfoParams;
+
 export function createConnectionParam(
   projectIdOrConnection: string | Connection | Pick<Connection, 'id' | 'projectId'>,
   connectionId?: string,

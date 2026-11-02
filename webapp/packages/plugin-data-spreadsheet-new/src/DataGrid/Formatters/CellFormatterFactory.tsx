@@ -42,6 +42,7 @@ const formatterSelectors: FormatterSelector[] = [
     if (!context.hasFormatters) {
       return null;
     }
+
     return context.resultColumn?.dataKind?.toUpperCase() === 'DATETIME' ? DateTimeFormatter : null;
   },
 
@@ -50,6 +51,7 @@ const formatterSelectors: FormatterSelector[] = [
     if (!context.hasFormatters) {
       return null;
     }
+
     return context.resultColumn?.dataKind?.toUpperCase() === 'NUMERIC' ? NumberFormatter : null;
   },
 ];
@@ -75,6 +77,7 @@ export const CellFormatterFactory = observer<ICellFormatterProps>(function CellF
 
       for (const selector of formatterSelectors) {
         const formatter = selector(context, cellContext.cell);
+
         if (formatter) {
           formatterRef.current = formatter;
           break;

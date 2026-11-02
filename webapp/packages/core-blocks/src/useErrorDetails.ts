@@ -44,6 +44,7 @@ export function useErrorDetails(error: IErrorDetailsHook['error']): HookType {
     if (!error) {
       return;
     }
+
     try {
       setIsOpen(true);
       await commonDialogService.open(ErrorDetailsDialog, error);
@@ -51,6 +52,7 @@ export function useErrorDetails(error: IErrorDetailsHook['error']): HookType {
       setIsOpen(false);
     }
   };
+
   const name = typeof error === 'string' ? translate('core_blocks_exception_message_error_message') : error?.name;
   const message = typeof error === 'string' ? error : error?.message;
 

@@ -15,5 +15,6 @@ export function getDropSide(columnInfo: IColumnInfo | undefined, columnDnDContex
   if (columnInfo?.key !== null && columnDnDContext?.dropTargetColumnIndex === columnInfo?.key.index && columnDnDContext?.isDragging) {
     return columnDnDContext.dropSide;
   }
+
   return null;
 }

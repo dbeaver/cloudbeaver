@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,11 @@ interface Props {
 
 export const FormattingStyle = observer<Props>(function FormattingStyle({ rule, state }) {
   const t = useTranslate();
-  const findFormat = (key: string) => rule.formatting?.[key];
+
+  function findFormat(key: string) {
+    return rule.formatting?.[key];
+  }
+
   const colorParameter = findFormat(TEXT_COLOR_PARAMETER.key);
   const backgroundColorParameter = findFormat(BACKGROUND_COLOR_PARAMETER.key);
   const fontWeightParameter = findFormat(FONT_WEIGHT_PARAMETER.key);

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,11 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
   resultIndex,
 }) {
   const model = unknownModel as any;
+
   if (!isResultSetDataModel(model)) {
     throw new Error('BooleanValuePresentation can be used only with ResultSetDataSource');
   }
+
   const translate = useTranslate();
 
   const selectAction = model.source.getAction(resultIndex, IDatabaseDataSelectAction, GridSelectAction);
@@ -60,6 +62,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
     model.isReadonly(resultIndex) ||
     model.isDisabled(resultIndex) ||
     (formatAction.isReadOnly(firstSelectedCell) && editAction.getElementState(firstSelectedCell) !== DatabaseEditChangeType.add);
+
   return (
     <div className={classes['container']}>
       <Radio id="true_value" checked={value === true} disabled={readonly} onClick={() => editAction.set(firstSelectedCell, true)}>

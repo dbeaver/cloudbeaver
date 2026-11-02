@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ export class NavigationTabsService extends View<ITab> {
     if (this.currentTabId) {
       return this.getTab(this.currentTabId);
     }
+
     return undefined;
   }
 
@@ -156,6 +157,7 @@ export class NavigationTabsService extends View<ITab> {
       unloadTabs: action,
       closeTabSilent: action,
     });
+
     this.tempHistoryState = new TempMap(this.historyState);
 
     this.storageService.registerSettings(
@@ -173,6 +175,7 @@ export class NavigationTabsService extends View<ITab> {
             map.delete(key);
           }
         }
+
         return map;
       },
     );
@@ -187,6 +190,7 @@ export class NavigationTabsService extends View<ITab> {
             map.delete(key);
           }
         }
+
         return map;
       },
     );
@@ -201,6 +205,7 @@ export class NavigationTabsService extends View<ITab> {
             map.delete(key);
           }
         }
+
         return map;
       },
     );
@@ -258,6 +263,7 @@ export class NavigationTabsService extends View<ITab> {
     }
 
     const tab = this.tabsMap.get(tabId);
+
     if (tab && !skipHandlers) {
       const handler = this.handlers.get(tab.handlerId);
 
@@ -319,11 +325,13 @@ export class NavigationTabsService extends View<ITab> {
   registerTabHandler<TState>(options: TabHandlerOptions<TState>): TabHandler<TState> {
     const tabHandler = new TabHandler(options);
     this.handlers.set(options.key, tabHandler);
+
     return tabHandler;
   }
 
   updateHandlerState<T>(tabId: string, state: T): void {
     const tab = this.tabsMap.get(tabId);
+
     if (tab) {
       tab.handlerState = state;
     }
@@ -378,6 +386,7 @@ export class NavigationTabsService extends View<ITab> {
         return tab;
       }
     }
+
     return null;
   }
 
@@ -400,6 +409,7 @@ export class NavigationTabsService extends View<ITab> {
       for (const tab of this.tabsMap.values()) {
         if (tab.userId !== this.userInfoResource.getId()) {
           const metadata = this.getTabMetadata(tab.id);
+
           if (metadata.restored) {
             metadata.restored = false;
             unloadHandlers.push(this.callHandlerCallback(tab, handler => handler.onUnload));
@@ -425,6 +435,7 @@ export class NavigationTabsService extends View<ITab> {
 
     for (const tabId of this.userTabsState.tabs) {
       const tab = this.tabsMap.get(tabId);
+
       if (!tab) {
         removedTabs.push(tabId);
         continue;
@@ -483,11 +494,13 @@ export class NavigationTabsService extends View<ITab> {
 
   private async restoreTab(tab: ITab, removedTabs: string[]): Promise<void> {
     const metadata = this.getTabMetadata(tab.id);
+
     if (metadata.restored) {
       return;
     }
 
     let restoreFail = false;
+
     try {
       const handler = this.handlers.get(tab.handlerId);
 

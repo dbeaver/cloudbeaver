@@ -109,6 +109,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
   const context = useContext(FormContext);
 
   let selectedKey: unknown = controlledValue ?? defaultValue ?? undefined;
+
   if (state && name !== undefined && name in state) {
     selectedKey = state[name];
   }
@@ -141,7 +142,9 @@ export const Combobox: IComboboxType = observer(function Combobox({
         !internalInputValue.trim() ||
         itemValue.toLowerCase().includes(internalInputValue.trim().toLowerCase()),
     );
+
   const itemGroups: { key: string; items: typeof filteredItems }[] = [{ key: 'first', items: [] }];
+
   for (const item of filteredItems) {
     if (item.itemSeparator) {
       itemGroups.push({ key: `separator:${item.itemKey}`, items: [] });
@@ -149,12 +152,14 @@ export const Combobox: IComboboxType = observer(function Combobox({
       itemGroups[itemGroups.length - 1]!.items.push(item);
     }
   }
+
   const visibleGroups = itemGroups.filter(group => group.items.length > 0);
 
   const handleSelect = useCallback(
     (selectedValue: string | string[] | null) => {
       const allItems = footerItems ? [...items, ...footerItems] : items;
       const item = allItems.find((item, idx) => keySelector(item, idx) === selectedValue);
+
       if ((!item || selectedValue === selectedKey) && !allowClear) {
         return;
       }
@@ -162,9 +167,11 @@ export const Combobox: IComboboxType = observer(function Combobox({
       if (name !== undefined && state) {
         state[name] = selectedValue;
       }
+
       if (onSelect) {
         onSelect(selectedValue, name as undefined, selectedKey);
       }
+
       if (context) {
         context.change(typeof selectedValue === 'string' ? selectedValue : '', name);
       }
@@ -187,9 +194,11 @@ export const Combobox: IComboboxType = observer(function Combobox({
 
   function setInputValue(value: string | null) {
     setInternalInputValue(value);
+
     if (allowCustomValue && state && name !== undefined) {
       state[name] = value;
     }
+
     onChange?.(value);
   }
 
@@ -226,7 +235,9 @@ export const Combobox: IComboboxType = observer(function Combobox({
     if (allowCustomValue) {
       return true;
     }
+
     setInputValue(null);
+
     return false;
   }
 

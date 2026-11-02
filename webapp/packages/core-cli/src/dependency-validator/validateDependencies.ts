@@ -87,6 +87,7 @@ export function validateDependencies(currentPackageRoot: string) {
     if (isCSSModuleFileRegex) {
       devDependencies.add('typescript-plugin-css-modules');
     }
+
     if (isTestFile) {
       devDependencies.add('@dbeaver/react-tests');
     }
@@ -97,12 +98,14 @@ export function validateDependencies(currentPackageRoot: string) {
       } else {
         dependencies.add('react');
       }
+
       devDependencies.add('@types/react');
     }
 
     const filePath = path.join(currentPackageSrcPath, file);
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const matches = fileContent.matchAll(importRegex);
+
     for (const match of matches) {
       const dep = match[6]!;
       validateDependency(dep);
@@ -131,12 +134,14 @@ export function validateDependencies(currentPackageRoot: string) {
       }
 
       const peerDeps = KNOWN_PEER_DEPS_MAP[dep] || [];
+
       if (isStyleFileRegex || isTestFile || forceDev) {
         devDependencies.add(dep);
 
         for (const peerDep of peerDeps) {
           devDependencies.add(peerDep);
         }
+
         return;
       }
 
@@ -144,6 +149,7 @@ export function validateDependencies(currentPackageRoot: string) {
         selfImports.add(filePath);
         return;
       }
+
       dependencies.add(dep);
 
       for (const peerDep of peerDeps) {
@@ -202,6 +208,7 @@ export function validateDependencies(currentPackageRoot: string) {
   if (Object.keys(currentPackage.devDependencies).length === 0) {
     delete currentPackage.devDependencies;
   }
+
   if (Object.keys(currentPackage.dependencies).length === 0) {
     delete currentPackage.dependencies;
   }

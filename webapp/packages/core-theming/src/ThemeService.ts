@@ -92,6 +92,7 @@ export class ThemeService extends Bootstrap {
     if (this.themeMap.has(theme.id)) {
       throw new UIError(`Theme with id "${theme.id}" already exists.`);
     }
+
     this.themeMap.set(theme.id, theme);
   }
 
@@ -151,7 +152,9 @@ export class ThemeService extends Bootstrap {
     if (themeId === this.themeId) {
       return;
     }
+
     await this.setTheme(themeId);
+
     if (this.currentTheme) {
       this.onChange.execute(this.currentTheme);
     }
@@ -172,6 +175,7 @@ export class ThemeService extends Bootstrap {
       if (themeId !== FALLBACK_THEME_ID) {
         return this.loadTheme(FALLBACK_THEME_ID); // try to fallback to default theme
       }
+
       throw e;
     }
   }
@@ -184,6 +188,7 @@ export class ThemeService extends Bootstrap {
 
   private async loadThemeStylesAsync(id: string): Promise<void> {
     const theme = this.themeMap.get(id);
+
     if (!theme) {
       throw new UIError(`Theme ${id} not found.`);
     }

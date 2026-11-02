@@ -22,6 +22,7 @@ export function useTeamsAdministrationFormState(id: string | null, configure?: (
     ref.current = new TeamsAdministrationFormState(serviceProvider, teamsAdministrationFormService, {
       teamId: id,
     });
+
     configure?.(ref.current);
   }
 

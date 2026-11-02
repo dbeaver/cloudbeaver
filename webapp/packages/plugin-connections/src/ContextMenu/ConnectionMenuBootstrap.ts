@@ -108,6 +108,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
       const plan = contexts.getContext(nodeDeletionPlanContext);
+
       for (const node of nodes.filter(isConnectionNode)) {
         const key = node.projectId && node.objectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
         const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
@@ -117,11 +118,13 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           readOnly: connection?.features.includes(EConnectionFeature.readOnly),
           keepChildren: true,
         };
+
         // Readonly restricts database edits, not removal of the saved connection configuration.
         if (!key || !connection?.canDelete) {
           plan.exclude({ ...target, owner: 'connections', reason: 'plugin_navigation_tree_delete_unavailable' });
           continue;
         }
+
         plan.addOperation({
           id: `delete-connection:${node.uri}`,
           owner: 'connections',
@@ -132,19 +135,23 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           },
         });
       }
+
       for (const node of nodes.filter(node => this.isDatabaseNode(node))) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
         const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
         const readOnly = connection?.features.includes(EConnectionFeature.readOnly);
         const target = { node, type: 'plugin_connections_delete_database_object', readOnly };
+
         if ((key && !connection) || !this.canDeleteObject(node)) {
           plan.exclude({
             ...target,
             owner: 'database-objects',
             reason: readOnly ? 'plugin_connections_delete_read_only' : 'plugin_navigation_tree_delete_unavailable',
           });
+
           continue;
         }
+
         plan.addOperation({
           id: `delete-database-object:${node.uri}`,
           owner: 'database-objects',
@@ -156,6 +163,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         });
       }
     });
+
     this.addConnectionsMenuToTopAppBar();
 
     this.menuService.addCreator({
@@ -234,6 +242,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             } catch (exception: any) {
               this.notificationService.logException(exception, 'plugin_connections_connection_clone_error');
             }
+
             break;
           }
         }
@@ -273,6 +282,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           const auth = this.connectionInfoAuthPropertiesResource.get(connectionKey);
           const driver = this.dbDriverResource.get(connection.driverId);
+
           return !!driver?.anonymousAccess || !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
         }
 
@@ -323,6 +333,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
               projectId: connection.projectId,
               connectionId: connection.id,
             });
+
             break;
           }
         }
@@ -356,6 +367,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [...items, MENU_CONNECTIONS],
     });
+
     this.menuService.setHandler({
       id: 'connections-menu-base',
       menus: [MENU_CONNECTIONS],

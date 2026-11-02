@@ -45,6 +45,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
         return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.uri);
       },
     });
+
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],

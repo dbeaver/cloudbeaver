@@ -143,6 +143,7 @@ export class FormState<TState> implements IFormState<TState> {
 
       const part = init(this.dataContext, this.id);
       this.dataContext.set(getter, part, this.id);
+
       return part;
     }) as T;
   }

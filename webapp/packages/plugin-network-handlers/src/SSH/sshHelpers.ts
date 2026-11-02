@@ -76,6 +76,7 @@ export function trimSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerC
     ...toJS(input),
     properties: input.properties ? { ...toJS(input.properties) } : input.properties,
   };
+
   const attributesToTrim = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
 
   for (const key of attributesToTrim) {
