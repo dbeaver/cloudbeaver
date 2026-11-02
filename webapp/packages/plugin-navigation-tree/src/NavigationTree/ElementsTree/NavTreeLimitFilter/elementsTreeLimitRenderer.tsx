@@ -14,21 +14,13 @@ import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey, getNextPageOffset } from '@cloudbeaver/core-resource';
 
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent.js';
+import type { IElementsTreeCustomRenderer } from '../useElementsTree.js';
 import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter.js';
-
-export function elementsTreeLimitRenderer(nodeId: string): NavigationNodeRendererComponent | undefined {
-  if (nodeId === NAVIGATION_TREE_LIMIT.limit) {
-    return NavTreeLimitMessage;
-  }
-
-  return;
-}
 
 const NavTreeLimitMessage: NavigationNodeRendererComponent = observer(function NavTreeLimitMessage({ path }) {
   const translate = useTranslate();
   const navTreeResource = useService(NavTreeResource);
   const limit = navTreeResource.childrenLimit;
-
 
   async function loadMore() {
     const parentNodeId = path[path.length - 1];
@@ -44,16 +36,15 @@ const NavTreeLimitMessage: NavigationNodeRendererComponent = observer(function N
   }
 
   return (
-    <div className='tw:px-6 tw:py-1'>
-      <Button
-        title={translate('app_navigationTree_limited', undefined, { limit: limit })}
-        size='small'
-        variant='ghost'
-        loader
-        onClick={loadMore}
-      >
+    <div className="tw:px-6 tw:py-1">
+      <Button title={translate('app_navigationTree_limited', undefined, { limit: limit })} size="small" variant="ghost" loader onClick={loadMore}>
         {translate('ui_load_more')}
       </Button>
     </div>
   );
 });
+
+export const elementsTreeLimitRenderer: IElementsTreeCustomRenderer = {
+  matches: nodeId => nodeId === NAVIGATION_TREE_LIMIT.limit,
+  Component: NavTreeLimitMessage,
+};
