@@ -8,8 +8,9 @@
 .textareaContainer {
   composes: theme-border-color-background from global;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
   flex: 1;
+  min-width: 0;
   border: 2px solid;
   border-radius: 8px;
   background: var(--theme-surface);
@@ -18,17 +19,23 @@
     background: var(--theme-input-background-readonly);
   }
 
-  &:focus-within {
+  &:has(textarea:focus) {
     outline: 2px solid var(--theme-primary);
     outline-offset: -2px;
   }
 }
 
-.textareaContainer button {
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px 8px;
+}
+
+.actions button {
   width: 28px !important;
   height: 28px !important;
-  margin-right: 8px !important;
-  margin-bottom: 12px !important;
   flex-shrink: 0;
 }
 

@@ -1,5 +1,5 @@
-mutation sendConversationMessage($conversationId: ID!, $prompt: String!) {
-  message: aiSendChatMessage(conversationId: $conversationId, prompt: $prompt) {
+mutation sendConversationMessage($conversationId: ID!, $prompt: String!, $attachments: [AIChatAttachmentInput!]) {
+  message: aiSendChatMessage(conversationId: $conversationId, prompt: $prompt, attachments: $attachments) {
     ...AiSendChatMessageInfo
   }
 }
