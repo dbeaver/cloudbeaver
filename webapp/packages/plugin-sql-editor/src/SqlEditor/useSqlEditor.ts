@@ -291,6 +291,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
             });
           }
 
+          const failedQueries = new Set<number>();
+
           await this.sqlQueryService.executeQueries(
             this.state,
             queries.map(query => query.query),
@@ -303,7 +305,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
                 const segment = queries[index]!;
                 this.onSegmentExecute.execute({ segment, type: 'end' });
 
-                if (!success) {
+                if (!success && !failedQueries.has(index)) {
+                  failedQueries.add(index);
                   this.onSegmentExecute.execute({ segment, type: 'error' });
                 }
               },
