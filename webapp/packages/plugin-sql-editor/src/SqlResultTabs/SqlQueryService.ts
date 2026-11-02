@@ -306,51 +306,17 @@ export class SqlQueryService {
           })
           .resetQueryParameters();
 
+        let errorAction: Exclude<SqlScriptErrorAction, 'retry'> | undefined;
+
         try {
           await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
-
-          const cancelled = model.source.cancelled;
-
-          statistics.executedQueries++;
-          statistics.executeTime += source.requestInfo.requestDuration;
-
-          for (const result of source.results) {
-            statistics.updatedRows += result.updateRowCount;
-          }
-
-          if (source.results.some(result => result.data)) {
-            resultCount = resultCount + 1;
-
-            const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query, groupNameOrder);
-            model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.source.getResults().length, resultCount));
-            this.switchTabToActiveRequest(editorState, tabGroup, model);
-
-            this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, false, resultCount);
-
-            model = source = undefined;
-          }
-
-          options?.onQueryExecuted?.(query, i, true);
-
-          if (cancelled) {
-            break;
-          }
         } catch (exception: any) {
           options?.onQueryExecuted?.(query, i, false);
+          errorAction = await this.retryScriptQuery(model, query, exception, skipErrors);
+        }
 
-          let action: SqlScriptErrorAction = source?.cancelled ? 'stop' : 'skip';
-
-          if (action !== 'stop' && !skipErrors) {
-            const { status, result } = await this.commonDialogService.open(SqlScriptErrorDialog, { query, error: exception });
-            action = status === DialogueStateResult.Resolved ? (result ?? 'stop') : 'stop';
-          }
-
-          if (action === 'retry') {
-            i--;
-            continue;
-          }
-
-          skipErrors ||= action === 'skip-all';
+        if (errorAction) {
+          skipErrors ||= errorAction === 'skip-all';
 
           if (model) {
             const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -359,9 +325,38 @@ export class SqlQueryService {
             model = source = undefined;
           }
 
-          if (action === 'stop') {
+          if (errorAction === 'stop') {
             break;
           }
+
+          continue;
+        }
+
+        const cancelled = model.source.cancelled;
+
+        statistics.executedQueries++;
+        statistics.executeTime += source.requestInfo.requestDuration;
+
+        for (const result of source.results) {
+          statistics.updatedRows += result.updateRowCount;
+        }
+
+        if (source.results.some(result => result.data)) {
+          resultCount = resultCount + 1;
+
+          const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query, groupNameOrder);
+          model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.source.getResults().length, resultCount));
+          this.switchTabToActiveRequest(editorState, tabGroup, model);
+
+          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, false, resultCount);
+
+          model = source = undefined;
+        }
+
+        options?.onQueryExecuted?.(query, i, true);
+
+        if (cancelled) {
+          break;
         }
       }
 
@@ -380,6 +375,39 @@ export class SqlQueryService {
   removeStatisticsTab(state: ISqlEditorTabState, tabId: string): void {
     this.sqlQueryResultService.removeStatisticsTab(state, tabId);
     this.statisticsMap.delete(tabId);
+  }
+
+  private async retryScriptQuery(
+    model: IDatabaseDataModel<QueryDataSource>,
+    query: string,
+    error: Error,
+    skipErrors: boolean,
+  ): Promise<Exclude<SqlScriptErrorAction, 'retry'> | undefined> {
+    let currentError = error;
+
+    while (true) {
+      if (model.source.cancelled) {
+        return 'stop';
+      }
+
+      if (skipErrors) {
+        return 'skip';
+      }
+
+      const { status, result } = await this.commonDialogService.open(SqlScriptErrorDialog, { query, error: currentError });
+      const action = status === DialogueStateResult.Resolved ? (result ?? 'stop') : 'stop';
+
+      if (action !== 'retry') {
+        return action;
+      }
+
+      try {
+        await model.retry();
+        return;
+      } catch (exception: any) {
+        currentError = exception;
+      }
+    }
   }
 
   private switchTabToActiveRequest(editorState: ISqlEditorTabState, tabGroup: IResultGroup, model: IDatabaseDataModel<QueryDataSource>) {
