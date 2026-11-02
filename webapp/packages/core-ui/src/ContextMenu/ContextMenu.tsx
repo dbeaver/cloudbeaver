@@ -96,6 +96,13 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
     }
   }, [showAtPosition, menu]);
 
+  useLayoutEffect(() => {
+    if (showAtPosition && isMenuOpen && presentable) {
+      menu.setInitialFocus('container');
+      menu.setAutoFocusOnShow(true);
+    }
+  }, [showAtPosition, isMenuOpen, presentable, menu]);
+
   const menuContext = useMemo<IMenuContext>(() => ({ menu: menuData, rtl: isRtl }), [menuData, isRtl]);
 
   useLayoutEffect(() => {
@@ -128,7 +135,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
           gutter={gutter}
           dir={isRtl ? 'rtl' : 'ltr'}
           hidden={presentable ? undefined : true}
-          autoFocusOnShow={presentable && isAutoFocus}
+          autoFocusOnShow={presentable}
         >
           {isMenuOpen && presentable && (
             <Loader state={menuData} small>
