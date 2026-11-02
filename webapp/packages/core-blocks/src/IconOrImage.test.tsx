@@ -20,6 +20,7 @@ describe('IconOrImage', () => {
         <use href={`/icons/preload/icons.svg#${props.name}`} />
       </svg>
     ));
+
     vi.spyOn(staticImageModule, 'StaticImage').mockImplementation(props => <img {...props} />);
   });
 
