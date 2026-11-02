@@ -61,6 +61,101 @@ function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> 
 }
 
 describe('MenuModel', () => {
+  it('waits for child availability before presenting an open menu', async () => {
+    const preparation = resource();
+    const item = new MenuSubMenuItem({ menu: childMenu });
+    const model = new MenuModel(
+      service({
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [item] : []),
+        getPreparationLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [preparation.loader] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    expect(model.isLoaded()).toBe(true);
+    model.setOpen(true);
+    expect(model.visibleItems).toEqual([item]);
+    expect(model.isLoaded()).toBe(false);
+    await model.load();
+    expect(model.isLoaded()).toBe(true);
+    expect(model.empty).toBe(true);
+    stop();
+  });
+
+  it('waits for child non-lazy content without waiting for its unopened descendants', async () => {
+    const content = resource();
+    const descendant = resource();
+    const grandchildMenu: IMenu = { id: 'grandchild', info: { label: 'grandchild' } };
+    const child = new MenuSubMenuItem({ menu: childMenu });
+    const grandchild = new MenuSubMenuItem({ menu: grandchildMenu });
+    const model = new MenuModel(
+      service({
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [child] : [grandchild]),
+        getMenuItemLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [content.loader] : []),
+        getPreparationLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === grandchildMenu ? [descendant.loader] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    model.setOpen(true);
+    expect(model.isLoaded()).toBe(false);
+    await model.load();
+    expect(model.isLoaded()).toBe(true);
+    expect(descendant.loader.load).not.toHaveBeenCalled();
+    model.getSubMenu(child)!.setOpen(true);
+    expect(model.getSubMenu(child)!.isLoaded()).toBe(false);
+    expect(model.isLoaded()).toBe(true);
+    await model.load();
+    expect(model.getSubMenu(child)!.isLoaded()).toBe(true);
+    stop();
+  });
+
+  it('keeps the parent presentable while a child loads its lazy content', async () => {
+    const content = resource(true);
+    const item = new MenuSubMenuItem({ menu: childMenu });
+    const model = new MenuModel(
+      service({
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [item] : []),
+        getMenuItemLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [content.loader] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    model.setOpen(true);
+    const child = model.getSubMenu(item)!;
+    expect(model.isLoaded()).toBe(true);
+    child.setOpen(true);
+    expect(child.isLoaded()).toBe(false);
+    expect(model.isLoaded()).toBe(true);
+    const loading = model.load();
+    expect(child.isLoading()).toBe(true);
+    expect(model.isLoaded()).toBe(true);
+    await loading;
+    expect(child.isLoaded()).toBe(true);
+    stop();
+  });
+
+  it('does not wait for content of a hidden child', async () => {
+    const content = resource();
+    const item = new MenuSubMenuItem({ menu: childMenu });
+    const model = new MenuModel(
+      service({
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [item] : []),
+        getHandler: context =>
+          context.getOwn(DATA_CONTEXT_MENU) === childMenu ? { id: 'hidden', menus: new Set(), contexts: new Set(), isHidden: () => true } : null,
+        getMenuItemLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [content.loader] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    model.setOpen(true);
+    await model.load();
+    expect(model.isLoaded()).toBe(true);
+    expect(model.empty).toBe(true);
+    expect(content.loader.load).not.toHaveBeenCalled();
+    stop();
+  });
+
   it('removes a failure after its dynamic submenu leaves the active menu', async () => {
     const { loader } = resource();
     loader.load = () => Promise.reject(new Error('removed child failed'));

@@ -202,7 +202,17 @@ export class MenuModel implements ILoadableState {
     return null;
   }
 
-  isLoaded = (): boolean => this.prepared && this.loaders.filter(loader => !loader.lazy || this.loadLazy).every(loader => !pending(loader));
+  isLoaded = (): boolean => {
+    if (!this.isContentLoaded(this.loadLazy)) {
+      return false;
+    }
+    // Resolve the next level before displaying its entries. Opening a child must
+    // not make its parent wait for the child's lazy content or deeper menus.
+    return (
+      !this.open ||
+      this.items.every(item => item.hidden || !(item instanceof MenuSubMenuItem) || this.getSubMenu(item)?.isContentLoaded(false) !== false)
+    );
+  };
   isLoading = (): boolean => this.state === 'loading';
   isError = (): boolean => this.state === 'error';
   load = (): Promise<void> => this.root.loadPending();
@@ -248,6 +258,13 @@ export class MenuModel implements ILoadableState {
 
   private activeLoaders(): ILoadableState[] {
     return this.activeRequests().map(request => request.loader);
+  }
+
+  private isContentLoaded(loadLazy: boolean): boolean {
+    return (
+      this.prepared &&
+      (this.handler?.isHidden?.(this.context) === true || this.loaders.filter(loader => !loader.lazy || loadLazy).every(loader => !pending(loader)))
+    );
   }
 
   private activeRequests(): IMenuLoadRequest[] {
