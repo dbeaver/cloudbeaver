@@ -31,6 +31,7 @@ export * from './SessionResource.js';
 export * from './Settings/SettingsTransformationService.js';
 export * from './Settings/ServerSettingsManagerService.js';
 export * from './Settings/ServerSettingsService.js';
+export * from './Settings/ServerDefaultSettingsService.js';
 export * from './Settings/SESSION_SETTINGS_LAYER.js';
 export * from './Settings/ROLE_SETTINGS_LAYER.js';
 export * from './Settings/TEAM_SETTINGS_LAYER.js';

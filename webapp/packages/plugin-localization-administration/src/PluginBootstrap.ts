@@ -1,0 +1,44 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { WizardTopAppBarService } from '@cloudbeaver/plugin-administration';
+
+import { ConfigurationLocaleService } from './ConfigurationLocaleService.js';
+
+const LanguageSelector = importLazyComponent(() => import('./LanguageSelector.js').then(m => m.LanguageSelector));
+
+@injectable(() => [WizardTopAppBarService, ServerConfigResource, ConfigurationLocaleService])
+export class PluginBootstrap extends Bootstrap {
+  constructor(
+    private readonly wizardTopAppBarService: WizardTopAppBarService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly configurationLocaleService: ConfigurationLocaleService,
+  ) {
+    super();
+  }
+
+  override register(): void {
+    this.wizardTopAppBarService.placeholder.add(LanguageSelector, 4);
+
+    this.serverConfigResource.onDataUpdate.addHandler(() => {
+      if (!this.serverConfigResource.configurationMode) {
+        this.configurationLocaleService.clear();
+      }
+    });
+  }
+
+  override async load(): Promise<void> {
+    await this.serverConfigResource.load();
+
+    if (this.serverConfigResource.configurationMode) {
+      this.configurationLocaleService.initialize();
+    }
+  }
+}

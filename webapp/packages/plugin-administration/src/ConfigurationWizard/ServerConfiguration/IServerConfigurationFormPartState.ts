@@ -27,6 +27,7 @@ const ServerConfigurationFormPartStateConfigSchema = schema.looseObject({
   forceHttps: schema.boolean().optional(),
   supportedHosts: schema.string(),
   bindSessionToIp: schema.string().optional(),
+  productSettings: schema.record(schema.string(), schema.unknown()).optional(),
 });
 
 const ServerConfigurationFormPartStateNavigatorSchema = schema.object({

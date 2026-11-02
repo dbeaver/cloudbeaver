@@ -246,6 +246,8 @@ input ServerConfigInput {
     supportedHosts: [String!] @since(version: "25.1.3")
     "Bind session to client IP address"
     bindSessionToIp: String @since(version: "25.1.4")
+    "Global product preference changes; null values reset individual preferences"
+    productSettings: Object @since(version: "26.2.5")
 }
 
 "Filter input for searching users in the admin interface"

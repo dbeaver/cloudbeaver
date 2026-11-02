@@ -549,7 +549,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
             CBConstants.PARAM_PRODUCT_SETTINGS);
-        Map<String, Object> productSettings = getServerConfiguration().getProductSettings();
+        Map<String, Object> productSettings = serverConfig.getProductSettings();
         if (!CommonUtils.isEmpty(productSettings)) {
             for (Map.Entry<String, Object> mp : productSettings.entrySet()) {
                 copyConfigValue(oldProductRuntimeConfig, productConfigProperties, mp.getKey(), mp.getValue());

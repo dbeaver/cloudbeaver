@@ -21,6 +21,8 @@ import graphql.schema.DataFetchingEnvironment;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.DBWebExceptionAccessDenied;
 import io.cloudbeaver.DBWebExceptionServerNotInitialized;
+import io.cloudbeaver.model.cli.CloudbeaverCliConstants;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -55,6 +57,12 @@ public class ConfigurationModeAccessTest {
     }
 
     @Test
+    public void productSettingsAreAvailableInConfigurationMode() {
+        DBWServiceCore service = createService(false);
+        Assertions.assertDoesNotThrow(() -> service.getProductSettings(null));
+    }
+
+    @Test
     public void objectMethodsAreAvailableInConfigurationMode() {
         DBWServiceCore service = createService(false);
         Assertions.assertAll(
@@ -76,7 +84,9 @@ public class ConfigurationModeAccessTest {
     @NotNull
     private static DBWServiceCore createService(boolean initializationMode) {
         DataFetchingEnvironment environment = Mockito.mock(DataFetchingEnvironment.class);
-        Mockito.when(environment.getGraphQlContext()).thenReturn(GraphQLContext.newContext().build());
+        Mockito.when(environment.getGraphQlContext()).thenReturn(GraphQLContext.newContext()
+            .of(CloudbeaverCliConstants.CLI_MODE, true, WebSession.class.getName(), Mockito.mock(WebSession.class))
+            .build());
 
         WebApplication application = Mockito.mock(WebApplication.class);
         Mockito.when(application.isConfigurationMode()).thenReturn(true);

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,8 +57,11 @@ public class AdminServerConfig {
     private long sessionExpireTime;
     @Nullable
     private String bindSessionToIp;
+    @NotNull
+    private final Map<String, Object> productSettings;
 
     public AdminServerConfig(@NotNull Map<String, Object> params) {
+        this.productSettings = JSONUtils.getObject(params, CBConstants.PARAM_PRODUCT_SETTINGS);
         this.serverName = JSONUtils.getString(params, "serverName");
         this.adminName = JSONUtils.getString(params, "adminName");
         this.adminPassword = JSONUtils.getString(params, "adminPassword");
@@ -218,5 +221,10 @@ public class AdminServerConfig {
     @Nullable
     public String getBindSessionToIp() {
         return bindSessionToIp;
+    }
+
+    @NotNull
+    public Map<String, Object> getProductSettings() {
+        return productSettings;
     }
 }

@@ -37,6 +37,7 @@ public class CBServerConfigurationMapper<C extends CBServerConfig, I extends Adm
     public CBServerConfigurations loadServerConfigurationsFromParams(@NotNull Map<String, Object> params) {
         CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
         C serverConfig = createServerConfiguration();
+        serverConfig.getProductSettings().putAll(CBApplication.getInstance().getProductConfiguration());
         serverConfig.setServerName(CBApplication.getInstance().getServerName());
         serverConfig.setMaxSessionIdleTime(CBApplication.getInstance().getMaxSessionIdleTime());
         String adminName = null;
@@ -91,6 +92,12 @@ public class CBServerConfigurationMapper<C extends CBServerConfig, I extends Adm
         if (input.getBindSessionToIp() != null) {
             serverConfig.setBindSessionToIp(input.getBindSessionToIp());
         }
+        Map<String, Object> productSettings = ServletAppUtils.flattenMap(ServletAppUtils.mergeConfigurations(
+            serverConfig.getProductSettings(),
+            input.getProductSettings()
+        ));
+        serverConfig.getProductSettings().clear();
+        serverConfig.getProductSettings().putAll(productSettings);
     }
 
     private void updateDisabledFeaturesConfig(@NotNull CBAppConfig appConfig, @NotNull List<String> enabledFeatures) {
