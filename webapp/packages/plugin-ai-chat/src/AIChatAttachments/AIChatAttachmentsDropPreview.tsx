@@ -12,13 +12,11 @@ import { useContext, useEffect } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AIChatContext } from '../AIChat/AIChatContext.js';
-import { AIChatInputService, type IAIChatInputProps } from '../AIChat/AIChatInput/AIChatInputService.js';
+import type { IAIChatInputProps } from '../AIChat/AIChatInput/AIChatInputService.js';
 import { AIChatAttachmentsService } from './AIChatAttachmentsService.js';
 
 export const AIChatAttachmentsDropPreview = observer<IAIChatInputProps>(function AIChatAttachmentsDropPreview({ input }) {
-  const context = useContext(AIChatContext);
-  const aiChatInputService = useService(AIChatInputService);
-  const disabled = context.disabled || aiChatInputService.isSubmitting(input);
+  const { disabled } = useContext(AIChatContext);
   const aiChatAttachmentsService = useService(AIChatAttachmentsService);
   const state = aiChatAttachmentsService.getState(input);
 

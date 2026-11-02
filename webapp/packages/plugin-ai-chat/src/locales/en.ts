@@ -10,6 +10,8 @@ export default [
   ['plugin_ai_chat_generate_response_error', 'Failed to generate response'],
   ['plugin_ai_chat_send_message_error', 'Failed to send message'],
   ['plugin_ai_chat_attachment_load_error', 'Failed to attach file'],
+  ['plugin_ai_chat_attachment_add', 'Add files'],
+  ['plugin_ai_chat_attachment_drop_hint', 'or drag files here'],
   ['plugin_ai_chat_attachment_remove', 'Remove {arg:name}'],
   ['plugin_ai_chat_attachment_image_format', 'Use a PNG, JPEG, GIF or WebP image.'],
   ['plugin_ai_chat_attachment_image_limit', 'Attach no more than 10 images with a total size of 20 MiB or less.'],

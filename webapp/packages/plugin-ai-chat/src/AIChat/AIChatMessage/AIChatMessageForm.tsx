@@ -19,6 +19,7 @@ import { AIChatConversationsService } from '../AIChatConversation/AIChatConversa
 import { AIChatContext } from '../AIChatContext.js';
 import { AIChatInputService } from '../AIChatInput/AIChatInputService.js';
 import { useAIChatInput } from '../AIChatInput/useAIChatInput.js';
+import { AIChatAttachmentsButton } from '../../AIChatAttachments/AIChatAttachmentsButton.js';
 import classes from './AIChatMessageForm.module.css';
 
 interface Props {
@@ -36,7 +37,6 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { input, dragHandlers } = useAIChatInput({ conversationId: currentConversationId, connectionKey: context.connectionKey, textareaRef });
-  const submitting = aiChatInputService.isSubmitting(input);
 
   useExecutor({
     executor: aiChatConversationsService.onNewConversation,
@@ -50,12 +50,12 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   });
 
   async function sendMessage() {
-    const submittedValue = value;
     try {
-      const message = await aiChatInputService.submit(input, submittedValue);
+      const v = value.trim();
+      const message = await aiChatInputService.submit(input, v);
 
       if (message) {
-        setValue(current => (current === submittedValue ? '' : current));
+        setValue('');
       }
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_send_message_error');
@@ -83,40 +83,42 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
 
   return (
     <div className={s(styles, { container: true })}>
-      <Suspense fallback={null}>
-        <Placeholder container={aiChatInputService.beforeInput} input={input} />
-      </Suspense>
       <Form
         className="tw:flex tw:items-end tw:gap-2"
         disableEnterSubmit={disabled}
         contents
         onSubmit={aiChatConversationsService.processing ? cancel : sendMessage}
       >
-        <div className={s(styles, { textareaContainer: true }, 'tw:relative')}>
+        <div {...dragHandlers} className={s(styles, { textareaContainer: true }, 'tw:relative')}>
+          <Suspense fallback={null}>
+            <Placeholder container={aiChatInputService.beforeInput} input={input} />
+          </Suspense>
           <AutoResizeTextarea
-            {...dragHandlers}
             ref={textareaRef}
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
             value={value}
-            readOnly={aiChatConversationsService.processing || submitting}
+            readOnly={aiChatConversationsService.processing}
             autoFocus
             onChange={v => setValue(v)}
           />
           <Suspense fallback={null}>
             <Placeholder container={aiChatInputService.dragPreview} input={input} />
           </Suspense>
-          {!aiChatConversationsService.processing ? (
-            <ActionIconButton name="/icons/send.svg" disabled={disabled} img onClick={sendMessage} />
-          ) : (
-            <Command
-              className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
-              aria-label={translate('ui_processing_cancel')}
-              onClick={cancel}
-            >
-              <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />
-            </Command>
-          )}
+          <div className={s(styles, { actions: true })}>
+            <AIChatAttachmentsButton input={input} />
+            {!aiChatConversationsService.processing ? (
+              <ActionIconButton name="/icons/send.svg" disabled={disabled} img onClick={sendMessage} />
+            ) : (
+              <Command
+                className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
+                aria-label={translate('ui_processing_cancel')}
+                onClick={cancel}
+              >
+                <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />
+              </Command>
+            )}
+          </div>
         </div>
       </Form>
       {children}

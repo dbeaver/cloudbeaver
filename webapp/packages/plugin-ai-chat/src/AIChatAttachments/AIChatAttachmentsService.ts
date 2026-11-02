@@ -9,7 +9,7 @@
 import { PlaceholderContainer, type PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
+import type { AiChatAttachment, AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { observable, runInAction, type ObservableMap } from 'mobx';
 
@@ -33,9 +33,15 @@ export interface IAIChatAttachmentProps {
   attachment: IAIChatAttachment;
 }
 
+export interface IAIChatMessageAttachmentProps {
+  attachment: AiChatAttachment;
+}
+
 export interface IAIChatAttachmentHandler {
   readonly id: string;
+  readonly accept?: string;
   readonly preview: PlaceholderComponent<IAIChatAttachmentProps>;
+  readonly messagePreview?: PlaceholderComponent<IAIChatMessageAttachmentProps>;
   canHandle(file: File): boolean;
   create(file: File): IAIChatAttachment | Promise<IAIChatAttachment>;
   validate?(attachments: readonly IAIChatAttachment[]): void;
@@ -55,6 +61,14 @@ function aiChatAttachmentsSubmissionContext(): { submission: IAIChatAttachmentsS
 @injectable(() => [NotificationService])
 export class AIChatAttachmentsService {
   readonly previews = new PlaceholderContainer<IAIChatAttachmentProps>();
+  readonly messagePreviews = new PlaceholderContainer<IAIChatMessageAttachmentProps>();
+
+  get accept(): string {
+    return Array.from(this.handlers.values())
+      .map(handler => handler.accept)
+      .filter(Boolean)
+      .join(',');
+  }
 
   private readonly handlers = new Map<string, IAIChatAttachmentHandler>();
   private readonly states = new WeakMap<IAIChatInputContext['textareaRef'], ObservableMap<string, AIChatAttachmentsState>>();
@@ -82,6 +96,10 @@ export class AIChatAttachmentsService {
 
     this.handlers.set(handler.id, handler);
     this.previews.add(handler.preview, undefined, ({ attachment }) => attachment.type !== handler.id);
+
+    if (handler.messagePreview) {
+      this.messagePreviews.add(handler.messagePreview);
+    }
   }
 
   getHandler(file: File): IAIChatAttachmentHandler | undefined {
@@ -123,6 +141,7 @@ export class AIChatAttachmentsService {
       for (const attachment of submission.attachments) {
         submission.state.remove(attachment);
       }
+
       return;
     }
 
@@ -150,19 +169,24 @@ export class AIChatAttachmentsService {
     const state = this.getState(input);
 
     if (event.type === 'dragleave') {
+      if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
+        return;
+      }
+
       state.setDragOver(false);
+
       return;
     }
 
-    if (!event.dataTransfer?.types.includes('Files') || event.defaultPrevented) {
+    if (!event.dataTransfer?.types.includes('Files')) {
       return;
     }
 
     event.preventDefault();
     event.stopPropagation();
 
-    const textarea = event.currentTarget;
-    const disabled = textarea.disabled || textarea.readOnly;
+    const textarea = input.textareaRef.current;
+    const disabled = !textarea || textarea.disabled || textarea.readOnly;
 
     if (event.type === 'drop') {
       state.setDragOver(false);
@@ -179,7 +203,7 @@ export class AIChatAttachmentsService {
     state.setDragOver(!disabled);
   }
 
-  private async attachFiles(input: IAIChatInputContext, files: File[]): Promise<void> {
+  async attachFiles(input: IAIChatInputContext, files: File[]): Promise<void> {
     const state = this.getState(input);
     state.startLoading();
 

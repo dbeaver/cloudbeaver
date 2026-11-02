@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 
 import type { IAIChatAttachmentProps } from '../../AIChatAttachments/AIChatAttachmentsService.js';
+import { AIChatAttachmentImage } from './AIChatAttachmentImage.js';
 
 export const AIChatImageAttachmentImagePreview = observer<IAIChatAttachmentProps>(function AIChatImageAttachmentImagePreview({ attachment }) {
   const [source, setSource] = useState<string>();
@@ -26,5 +27,5 @@ export const AIChatImageAttachmentImagePreview = observer<IAIChatAttachmentProps
     return null;
   }
 
-  return <img className="tw:size-16 tw:rounded-md tw:object-contain" src={source} alt={file.name} title={file.name} decoding="async" />;
+  return <AIChatAttachmentImage source={source} name={file.name} className="tw:size-16 tw:object-cover" />;
 });

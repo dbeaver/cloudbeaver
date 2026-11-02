@@ -9,6 +9,8 @@ export default [
   ['plugin_ai_chat_execute_query_error', 'Не удалось выполнить запрос'],
   ['plugin_ai_chat_generate_response_error', 'Не удалось сгенерировать ответ'],
   ['plugin_ai_chat_send_message_error', 'Не удалось отправить сообщение'],
+  ['plugin_ai_chat_attachment_add', 'Добавить файлы'],
+  ['plugin_ai_chat_attachment_drop_hint', 'или перетащите файлы сюда'],
   ['plugin_ai_chat_no_context', 'Без соединения'],
   ['plugin_ai_chat_metadata_transfer_confirmation_title', 'Передача информации поставщику AI'],
   [

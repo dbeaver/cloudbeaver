@@ -18,6 +18,10 @@ const AIChatImageAttachmentImagePreview = importLazyComponent(() =>
   import('./AIChatImageAttachmentImagePreview.js').then(m => m.AIChatImageAttachmentImagePreview),
 );
 
+const AIChatImageAttachmentMessagePreview = importLazyComponent(() =>
+  import('./AIChatImageAttachmentMessagePreview.js').then(m => m.AIChatImageAttachmentMessagePreview),
+);
+
 const IMAGE_ATTACHMENT_TYPE = 'image';
 const IMAGE_MEDIA_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
 const MAX_IMAGES = 10;
@@ -35,11 +39,13 @@ export class AIChatAttachmentsImageHandlerService extends Bootstrap {
   override register(): void {
     this.aiChatAttachmentsService.register({
       id: IMAGE_ATTACHMENT_TYPE,
+      accept: [...IMAGE_MEDIA_TYPES].join(','),
       canHandle: file => IMAGE_MEDIA_TYPES.has(file.type),
       create: file => ({ id: uuid(), type: IMAGE_ATTACHMENT_TYPE, file }),
       validate: attachments => this.validate(attachments),
       serialize: attachment => this.serialize(attachment),
       preview: AIChatImageAttachmentImagePreview,
+      messagePreview: AIChatImageAttachmentMessagePreview,
     });
   }
 

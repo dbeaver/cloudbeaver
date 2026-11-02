@@ -30,7 +30,12 @@ export * from './AIChat/AIChatMessage/AIChatMessagesResource.js';
 export * from './AIChatTabService.js';
 export * from './EAIConversationPromptGeneratorId.js';
 export { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
-export type { IAIChatAttachment, IAIChatAttachmentProps, IAIChatAttachmentHandler } from './AIChatAttachments/AIChatAttachmentsService.js';
+export type {
+  IAIChatAttachment,
+  IAIChatAttachmentProps,
+  IAIChatMessageAttachmentProps,
+  IAIChatAttachmentHandler,
+} from './AIChatAttachments/AIChatAttachmentsService.js';
 export { AIChatAttachmentsState } from './AIChatAttachments/AIChatAttachmentsState.js';
 export { AIChatInputService } from './AIChat/AIChatInput/AIChatInputService.js';
 export type {
