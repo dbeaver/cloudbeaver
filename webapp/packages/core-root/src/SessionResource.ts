@@ -78,7 +78,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   async changeLanguage(locale: string): Promise<void> {
     await this.load();
 
-    this.performUpdate(undefined, [], async () => {
+    await this.performUpdate(undefined, [], async () => {
       if (this.data?.locale === locale) {
         return;
       }

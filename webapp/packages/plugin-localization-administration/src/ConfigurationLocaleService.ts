@@ -7,12 +7,17 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { ServerSettingsResource, SessionResource } from '@cloudbeaver/core-root';
 
 const STORAGE_KEY = 'easy_config_language';
 
-@injectable(() => [LocalizationService])
+@injectable(() => [LocalizationService, SessionResource, ServerSettingsResource])
 export class ConfigurationLocaleService {
-  constructor(private readonly localizationService: LocalizationService) {}
+  constructor(
+    private readonly localizationService: LocalizationService,
+    private readonly sessionResource: SessionResource,
+    private readonly serverSettingsResource: ServerSettingsResource,
+  ) {}
 
   initialize(): void {
     let savedLanguage: string | null = null;
@@ -71,5 +76,20 @@ export class ConfigurationLocaleService {
   private applyLanguage(language: string): void {
     this.localizationService.setLanguage(language);
     document.documentElement.lang = language;
+
+    // New sessions receive the current language when they are opened.
+    if (this.sessionResource.isLoaded()) {
+      this.syncSessionLanguage(language).catch(exception => {
+        console.error('Unable to update Easy Config session language', exception);
+      });
+    }
+  }
+
+  private async syncSessionLanguage(language: string): Promise<void> {
+    await this.sessionResource.changeLanguage(language);
+
+    if (this.serverSettingsResource.isLoaded()) {
+      await this.serverSettingsResource.refresh();
+    }
   }
 }
