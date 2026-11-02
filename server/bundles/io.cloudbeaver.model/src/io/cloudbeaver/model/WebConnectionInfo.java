@@ -497,6 +497,13 @@ public class WebConnectionInfo {
         mainProperties.put(DBConstants.PROP_PORT, getPort());
         mainProperties.put(DBConstants.PROP_DATABASE, getDatabaseName());
         mainProperties.put(DBConstants.PROP_SERVER, getServerName());
+        var configuration = dataSourceContainer.getConnectionConfiguration();
+        for (DBPPropertyDescriptor property : dataSourceContainer.getDriver().getMainPropertyDescriptors()) {
+            String id = CommonUtils.toString(property.getId());
+            if (!mainProperties.containsKey(id)) {
+                mainProperties.put(id, configuration.getProviderProperty(id));
+            }
+        }
         return mainProperties;
     }
 

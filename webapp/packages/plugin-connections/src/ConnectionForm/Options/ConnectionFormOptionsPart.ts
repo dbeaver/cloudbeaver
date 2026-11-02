@@ -284,7 +284,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.driverId = driverId;
 
     if (driverId) {
-      driver = await this.dbDriverResource.load(driverId, ['includeProviderProperties']);
+      driver = await this.dbDriverResource.load(driverId, ['includeProviderProperties', 'includeMainProperties']);
     }
 
     if (!driver) {
@@ -300,6 +300,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (driver?.id !== prevDriver?.id) {
       this.state.credentials = {};
       this.state.providerProperties = {};
+      this.state.mainPropertyValues = getMainPropertyDefaults(driver.mainProperties ?? []);
       this.state.expertSettingsValues = {};
 
       await this.setAuthModelId(driver?.defaultAuthModel);
@@ -334,14 +335,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       config.authModelId = authModelId ?? driver.defaultAuthModel;
 
       if (config.mainPropertyValues) {
-        for (const property of driver.mainProperties) {
-          // We don't use getObjectPropertyDefaults because, in this case, the backend returns default values in the value field.
-          const value = getObjectPropertyDefaultValue(property) || getObjectPropertyValue(property);
-
-          if (property.id) {
-            config.mainPropertyValues[property.id] = value;
-          }
-        }
+        config.mainPropertyValues = getMainPropertyDefaults(driver.mainProperties);
       }
     }
 
@@ -519,25 +513,23 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     if (this.state.driverId && this.state.configurationType) {
-      const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties']);
+      const driver = await this.dbDriverResource.load(this.state.driverId, ['includeMainProperties']);
 
       if (!driver.configurationTypes.includes(this.state.configurationType)) {
         validation.error('plugin_connections_connection_form_host_configuration_invalid');
       }
 
-      for (const property of driver.providerProperties) {
-        if (
-          !property.id ||
-          !property.required ||
-          !property.features.includes('main') ||
-          !isProviderPropertySupported(property, this.state.configurationType)
-        ) {
-          continue;
-        }
+      if (this.state.configurationType === DriverConfigurationType.Manual) {
+        for (const property of driver.mainProperties) {
+          if (!property.id || !property.required || !isProviderPropertySupported(property, this.state.configurationType)) {
+            continue;
+          }
 
-        const value = this.state.providerProperties?.[property.id];
-        if (value === undefined || value === null || (typeof value === 'string' && value.trim().length === 0)) {
-          validation.error(`${property.displayName || property.id}: ${this.localizationService.translate('ui_field_is_required')}`);
+          const value = this.state.mainPropertyValues?.[property.id];
+
+          if (value === undefined || value === null || (typeof value === 'string' && value.trim().length === 0)) {
+            validation.error(`${property.displayName || property.id}: ${this.localizationService.translate('ui_field_is_required')}`);
+          }
         }
       }
     }
@@ -602,6 +594,19 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   override dispose(): void {
     this.disposeReaction();
   }
+}
+
+function getMainPropertyDefaults(properties: readonly IObjectPropertyInfo[]): Record<string, any> {
+  const defaults: Record<string, any> = {};
+
+  for (const property of properties) {
+    if (property.id) {
+      // Main-property defaults can be returned in the value field.
+      defaults[property.id] = getObjectPropertyDefaultValue(property) || getObjectPropertyValue(property);
+    }
+  }
+
+  return defaults;
 }
 
 function prepareDynamicProperties(

@@ -17,11 +17,17 @@
 package io.cloudbeaver.utils;
 
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,6 +38,112 @@ import java.util.Map;
 public class WebDataSourceUtilsTest {
     private static final String HOST = "database.example.com";
     private static final String URL = "jdbc:postgresql://database.example.com:5432/database";
+
+    @Test
+    public void storesAdditionalMainFieldsAsProviderProperties() {
+        DBPConnectionConfiguration configuration = createConnectionConfiguration();
+
+        WebDataSourceUtils.setMainProperties(driverWithMainFields("tenant"), configuration, new WebConnectionConfig(Map.of(
+            "mainPropertyValues", Map.of(DBConstants.PROP_HOST, "new-host", "tenant", "acme")
+        )));
+
+        Assertions.assertEquals("new-host", configuration.getHostName());
+        Assertions.assertEquals("acme", configuration.getProviderProperty("tenant"));
+    }
+
+    @Test
+    public void additionalMainFieldsOverrideStaleProviderValues() throws Exception {
+        DBPConnectionConfiguration configuration = createConnectionConfiguration();
+        DBPDriver driver = driverWithMainFields("tenant");
+        Mockito.when(driver.getConnectionURL(configuration)).thenReturn(URL);
+
+        WebDataSourceUtils.setConnectionConfiguration(driver, configuration, new WebConnectionConfig(Map.of(
+            "providerProperties", Map.of("tenant", "old", "timeout", "1000"),
+            "mainPropertyValues", Map.of("tenant", "new")
+        )));
+
+        Assertions.assertEquals("new", configuration.getProviderProperty("tenant"));
+        Assertions.assertEquals("1000", configuration.getProviderProperty("timeout"));
+    }
+
+    @Test
+    public void loadsAdditionalMainFieldsFromExistingProviderValues() {
+        DBPConnectionConfiguration configuration = createConnectionConfiguration();
+        configuration.setProviderProperty("tenant", "existing");
+        configuration.setProviderProperty("timeout", "1000");
+        configuration.setProviderProperty(DBConstants.PROP_HOST, "unrelated-provider-host");
+        DBPPropertyDescriptor tenant = Mockito.mock(DBPPropertyDescriptor.class);
+        Mockito.when(tenant.getId()).thenReturn("tenant");
+        DBPPropertyDescriptor host = Mockito.mock(DBPPropertyDescriptor.class);
+        Mockito.when(host.getId()).thenReturn(DBConstants.PROP_HOST);
+        DBPDriver driver = Mockito.mock(DBPDriver.class);
+        Mockito.when(driver.getMainPropertyDescriptors()).thenReturn(new DBPPropertyDescriptor[]{host, tenant});
+        DBPDataSourceContainer container = Mockito.mock(DBPDataSourceContainer.class);
+        Mockito.when(container.getDriver()).thenReturn(driver);
+        Mockito.when(container.getConnectionConfiguration()).thenReturn(configuration);
+        WebConnectionInfo info = Mockito.spy(new WebConnectionInfo(Mockito.mock(WebSession.class), container));
+        Mockito.doReturn(true).when(info).isCanEdit();
+
+        Map<String, String> values = info.getMainPropertyValues();
+
+        Assertions.assertEquals("existing", values.get("tenant"));
+        Assertions.assertEquals(HOST, values.get(DBConstants.PROP_HOST));
+        Assertions.assertFalse(values.containsKey("timeout"));
+    }
+
+    @Test
+    public void customUrlStillTakesPrecedenceOverManualFields() {
+        DBPConnectionConfiguration configuration = createConnectionConfiguration();
+
+        WebDataSourceUtils.setMainProperties(driverWithMainFields(), configuration, new WebConnectionConfig(Map.of(
+            "url", URL,
+            "mainPropertyValues", Map.of(DBConstants.PROP_HOST, "ignored-host")
+        )));
+
+        Assertions.assertEquals(URL, configuration.getUrl());
+        Assertions.assertEquals(HOST, configuration.getHostName());
+    }
+
+    @Test
+    public void rejectsMainFieldsNotDeclaredByTheDriver() {
+        DBPConnectionConfiguration configuration = createConnectionConfiguration();
+
+        Assertions.assertThrows(IllegalStateException.class, () -> WebDataSourceUtils.setMainProperties(
+            driverWithMainFields("tenant"), configuration,
+            new WebConnectionConfig(Map.of("mainPropertyValues", Map.of("timeout", "1000")))
+        ));
+        Assertions.assertNull(configuration.getProviderProperty("timeout"));
+    }
+
+    @Test
+    public void preservesStandardFieldMappingWithoutCustomMainFields() {
+        DBPConnectionConfiguration configuration = createConnectionConfiguration();
+
+        WebDataSourceUtils.setMainProperties(driverWithMainFields(), configuration, new WebConnectionConfig(Map.of(
+            "mainPropertyValues", Map.of(
+                DBConstants.PROP_HOST, "new-host", DBConstants.PROP_PORT, "1234",
+                DBConstants.PROP_DATABASE, "new-database", DBConstants.PROP_SERVER, "new-server"
+            )
+        )));
+
+        Assertions.assertEquals("new-host", configuration.getHostName());
+        Assertions.assertEquals("1234", configuration.getHostPort());
+        Assertions.assertEquals("new-database", configuration.getDatabaseName());
+        Assertions.assertEquals("new-server", configuration.getServerName());
+        Assertions.assertTrue(configuration.getProviderProperties().isEmpty());
+    }
+
+    @NotNull
+    private static DBPDriver driverWithMainFields(@NotNull String... ids) {
+        DBPDriver driver = Mockito.mock(DBPDriver.class);
+        DBPPropertyDescriptor[] properties = new DBPPropertyDescriptor[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            properties[i] = Mockito.mock(DBPPropertyDescriptor.class);
+            Mockito.when(properties[i].getId()).thenReturn(ids[i]);
+        }
+        Mockito.when(driver.getMainPropertyDescriptors()).thenReturn(properties);
+        return driver;
+    }
 
     @Test
     public void detectsChangedHost() {

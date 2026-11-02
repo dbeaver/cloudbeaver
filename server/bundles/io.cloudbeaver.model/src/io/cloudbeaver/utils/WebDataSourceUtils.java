@@ -287,7 +287,6 @@ public class WebDataSourceUtils {
         @NotNull DBPConnectionConfiguration dsConfig,
         @NotNull WebConnectionConfig config
     ) {
-        setMainProperties(dsConfig, config);
         if (config.getProperties() != null) {
             Map<String, String> newProps = new LinkedHashMap<>();
             for (Map.Entry<String, Object> pe : config.getProperties().entrySet()) {
@@ -317,6 +316,8 @@ public class WebDataSourceUtils {
                 dsConfig.setProviderProperty(e.getKey(), CommonUtils.toString(e.getValue()));
             }
         }
+        // Main fields may also contain provider properties, so apply them after the provider map is replaced.
+        setMainProperties(driver, dsConfig, config);
         if (config.getConfigurationType() != null) {
             dsConfig.setConfigurationType(config.getConfigurationType());
         }
@@ -355,7 +356,11 @@ public class WebDataSourceUtils {
         }
     }
 
-    public static void setMainProperties(@NotNull DBPConnectionConfiguration dsConfig, @NotNull WebConnectionConfig config) {
+    public static void setMainProperties(
+        @NotNull DBPDriver driver,
+        @NotNull DBPConnectionConfiguration dsConfig,
+        @NotNull WebConnectionConfig config
+    ) {
         if (CommonUtils.isNotEmpty(config.getUrl())) {
             dsConfig.setUrl(config.getUrl());
             return;
@@ -370,7 +375,14 @@ public class WebDataSourceUtils {
                     case DBConstants.PROP_PORT -> dsConfig.setHostPort(CommonUtils.toString(e.getValue()));
                     case DBConstants.PROP_DATABASE -> dsConfig.setDatabaseName(CommonUtils.toString(e.getValue()));
                     case DBConstants.PROP_SERVER -> dsConfig.setServerName(CommonUtils.toString(e.getValue()));
-                    default -> throw new IllegalStateException("Unexpected value: " + e.getKey());
+                    default -> {
+                        boolean declared = Arrays.stream(driver.getMainPropertyDescriptors())
+                            .anyMatch(property -> Objects.equals(property.getId(), e.getKey()));
+                        if (!declared) {
+                            throw new IllegalStateException("Unexpected value: " + e.getKey());
+                        }
+                        dsConfig.setProviderProperty(e.getKey(), CommonUtils.toString(e.getValue()));
+                    }
                 }
             }
             return;

@@ -60,9 +60,7 @@ export class AdvancedSettingsTabService extends Bootstrap {
           return true;
         }
 
-        return !driver?.providerProperties?.some(
-          property => !property.features.includes('main') && isProviderPropertySupported(property, configurationType),
-        );
+        return !driver?.providerProperties?.some(property => isProviderPropertySupported(property, configurationType));
       },
     });
   }
