@@ -55,6 +55,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
 
   const empty = menuData.empty;
   const contentReady = menuData.isLoaded() && menuData.visibleItems.length > 0;
+  const presentable = contentReady || menuData.isError();
 
   useLayoutEffect(() => {
     if (isMenuOpen && empty) {
@@ -119,28 +120,28 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
             {children}
           </MenuButton>
         )}
-        {(contentReady || menuData.isError()) && (
-          <Menu
-            modal={modal}
-            aria-label={translate(menuData.menu.info.label)}
-            getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
-            shift={shift}
-            gutter={gutter}
-            dir={isRtl ? 'rtl' : 'ltr'}
-          >
-            {isMenuOpen && (
-              <Loader state={menuData} small>
-                <RenderMenuItems
-                  menu={menuData}
-                  menuComponent={ContextMenu}
-                  itemComponent={MenuItemElement}
-                  groupComponent={GroupComponent}
-                  groupArrowComponent={GroupArrowComponent}
-                />
-              </Loader>
-            )}
-          </Menu>
-        )}
+        <Menu
+          modal={modal}
+          aria-label={translate(menuData.menu.info.label)}
+          getAnchorRect={contextMenuPosition ? handlers.getAnchorRect : undefined}
+          shift={shift}
+          gutter={gutter}
+          dir={isRtl ? 'rtl' : 'ltr'}
+          hidden={presentable ? undefined : true}
+          autoFocusOnShow={presentable && isAutoFocus}
+        >
+          {isMenuOpen && presentable && (
+            <Loader state={menuData} small>
+              <RenderMenuItems
+                menu={menuData}
+                menuComponent={ContextMenu}
+                itemComponent={MenuItemElement}
+                groupComponent={GroupComponent}
+                groupArrowComponent={GroupArrowComponent}
+              />
+            </Loader>
+          )}
+        </Menu>
       </MenuProvider>
     </MenuContext>
   );

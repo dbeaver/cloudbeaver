@@ -57,7 +57,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   const hidden = getComputed(() => subMenuData.hidden);
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
-  const loading = handler?.isLoading?.(subMenuData.context) || subMenuData.isLoading();
+  const loading = handler?.isLoading?.(subMenuData.context) ?? false;
   /** @deprecated must be refactored (#1)*/
   const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);

@@ -61,6 +61,39 @@ function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> 
 }
 
 describe('MenuModel', () => {
+  it('exposes a cached child failure to its parent and retries it', async () => {
+    const content = resource();
+    const failure = new Error('cached child failure');
+    content.state.error = failure;
+    content.loader.reload = async () => {
+      runInAction(() => {
+        content.state.error = null;
+      });
+      await content.loader.load();
+    };
+    const child = new MenuSubMenuItem({ menu: childMenu });
+    const available = new MenuBaseItem({ id: 'available', label: 'available' });
+    const model = new MenuModel(
+      service({
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [available, child] : []),
+        getMenuItemLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [content.loader] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    model.setOpen(true);
+    await model.load();
+    expect(model.isLoaded()).toBe(false);
+    expect(model.isError()).toBe(true);
+    expect(model.exception).toBe(failure);
+    expect(content.loader.load).not.toHaveBeenCalled();
+    await model.reload();
+    expect(model.isError()).toBe(false);
+    expect(model.isLoaded()).toBe(true);
+    expect(model.visibleItems).toEqual([available]);
+    stop();
+  });
+
   it('waits for child availability before presenting an open menu', async () => {
     const preparation = resource();
     const item = new MenuSubMenuItem({ menu: childMenu });

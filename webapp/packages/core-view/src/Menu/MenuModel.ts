@@ -160,7 +160,7 @@ export class MenuModel implements ILoadableState {
   }
   get state(): MenuResolutionState {
     const loaders = [...this.preparationLoaders, ...this.loaders];
-    if (this.exception || loaders.some(loader => loader.isError())) {
+    if (this.exception || [...loaders, ...this.activeLoaders()].some(loader => loader.isError())) {
       return 'error';
     }
     if (loaders.some(loader => loader.isLoading())) {
@@ -192,7 +192,7 @@ export class MenuModel implements ILoadableState {
     ) {
       return failure.error;
     }
-    for (const loader of [...this.preparationLoaders, ...this.loaders]) {
+    for (const loader of [...this.preparationLoaders, ...this.loaders, ...this.activeLoaders()]) {
       const errors = [loader.exception ?? []].flat();
       const error = errors.find((error): error is Error => !!error);
       if (error) {
