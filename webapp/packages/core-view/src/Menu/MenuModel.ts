@@ -59,7 +59,7 @@ export class MenuModel implements ILoadableState {
   private initialized = false;
   private open = false;
   private loadLazy = false;
-  private failure: { error: Error; context: IDataContext; revision: string | undefined } | null = null;
+  private failure: { error: Error; loader: ILoadableState; context: IDataContext; revision: string | undefined } | null = null;
   private dispose: IReactionDisposer | undefined;
   private task: Promise<void> | undefined;
   private scheduled = false;
@@ -141,10 +141,22 @@ export class MenuModel implements ILoadableState {
 
   get visibleItems(): IMenuItem[] {
     const visible = this.items.filter(item => !item.hidden && (!(item instanceof MenuSubMenuItem) || this.getSubMenu(item)?.hidden === false));
-    return visible.filter(
-      (item, index) =>
-        !(item instanceof MenuSeparatorItem) || (index > 0 && index < visible.length - 1 && !(visible[index - 1] instanceof MenuSeparatorItem)),
-    );
+    const result: IMenuItem[] = [];
+    let separator: IMenuItem | undefined;
+    for (const item of visible) {
+      if (item instanceof MenuSeparatorItem) {
+        if (result.length > 0) {
+          separator = item;
+        }
+        continue;
+      }
+      if (separator) {
+        result.push(separator);
+        separator = undefined;
+      }
+      result.push(item);
+    }
+    return result;
   }
   get state(): MenuResolutionState {
     const loaders = [...this.preparationLoaders, ...this.loaders];
@@ -172,8 +184,13 @@ export class MenuModel implements ILoadableState {
     return this.empty && (!primaryAction || primaryAction.hidden === true);
   }
   get exception(): Error | null {
-    if (this.root.failure && this.root.failure.context.revision === this.root.failure.revision) {
-      return this.root.failure.error;
+    const failure = this.root.failure;
+    if (
+      failure &&
+      failure.context.revision === failure.revision &&
+      this.root.activeRequests().some(request => request.context === failure.context && request.loader === failure.loader)
+    ) {
+      return failure.error;
     }
     for (const loader of [...this.preparationLoaders, ...this.loaders]) {
       const errors = [loader.exception ?? []].flat();
@@ -283,7 +300,9 @@ export class MenuModel implements ILoadableState {
         if (context.revision !== revision) {
           continue;
         }
-        if (!this.activeLoaders().includes(loader)) { continue; }
+        if (!this.activeLoaders().includes(loader)) {
+          continue;
+        }
         if (!pending(loader) || loader.isError() || loader.isLoadable?.() === false) {
           continue;
         }
@@ -292,7 +311,7 @@ export class MenuModel implements ILoadableState {
         } catch (error) {
           if (generation === this.generation && context.revision === revision) {
             runInAction(() => {
-              this.failure = { error: error instanceof Error ? error : new Error(String(error)), context, revision };
+              this.failure = { error: error instanceof Error ? error : new Error(String(error)), loader, context, revision };
             });
           }
           return;

@@ -57,9 +57,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   const hidden = getComputed(() => subMenuData.hidden);
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
-  // TODO: fix, this triggers `Cannot update a component (`SubMenuElement`) while rendering a different component`
-  //       and if getComputed used update will be skipped
-  const loading = handler?.isLoading?.(subMenuData.context) || subMenuData.loaders.some(loader => loader.isLoading()) || false;
+  const loading = handler?.isLoading?.(subMenuData.context) || subMenuData.isLoading();
   /** @deprecated must be refactored (#1)*/
   const displayLabel = getComputed(() => handler?.isLabelVisible?.(subMenuData.context, subMenuData.menu) ?? true);
   const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
@@ -67,7 +65,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   const label = info?.label ?? subMenu.label ?? subMenu.menu.info.label;
   const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.info.icon;
   const group = info ? info.group : subMenu.menu.info.group;
-  const disabled = getComputed(() => !subMenuData.prepared || handler?.isDisabled?.(subMenuData.context));
+  const disabled = getComputed(() => (!subMenuData.prepared && !subMenuData.isError()) || handler?.isDisabled?.(subMenuData.context));
 
   const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.info.tooltip;
   const MenuComponent = menuComponent;

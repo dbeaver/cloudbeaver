@@ -175,6 +175,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_ELEMENTS_TREE_TOOLS],
+      getPreparationLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       getItems: (context, items) => {
         if (!items.includes(ACTION_NEW_FOLDER)) {
           return [...items, ACTION_NEW_FOLDER];
@@ -187,6 +188,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_CREATE],
       contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
+      getPreparationLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;

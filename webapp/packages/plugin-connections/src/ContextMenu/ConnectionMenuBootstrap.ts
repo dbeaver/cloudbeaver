@@ -160,6 +160,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_MANAGE],
+      getPreparationLoader: context => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION);
+        return connectionKey ? getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey) : [];
+      },
       getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
     });
 

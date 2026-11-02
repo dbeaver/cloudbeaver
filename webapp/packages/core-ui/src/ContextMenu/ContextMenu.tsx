@@ -104,7 +104,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
         {hasTrigger && (
           <MenuButton
             {...rest}
-            disabled={!menuData.prepared || rest.disabled}
+            disabled={(!menuData.prepared && !menuData.isError()) || rest.disabled}
             title={rest.title ?? translate(menuData.menu.info.tooltip || menuData.menu.info.label)}
           >
             {children}

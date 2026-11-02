@@ -22,7 +22,6 @@ import { useLayoutEffect, useMemo } from 'react';
 
 export const MenuBar = observer<IMenuBarProps>(function MenuBar({ menu, compact = true, rtl, className, ref, ...props }) {
   const styles = useS(style);
-  const items = menu.visibleItems;
   useLayoutEffect(() => {
     menu.setOpen(true, false);
     return () => menu.setOpen(false);
@@ -30,7 +29,7 @@ export const MenuBar = observer<IMenuBarProps>(function MenuBar({ menu, compact 
   const menubarStore = useMenubarStore({ rtl });
   const menuContext = useMemo<IMenuContext>(() => ({ menu, rtl }), [menu, rtl]);
 
-  if (!items.length) {
+  if (menu.hidden) {
     return null;
   }
 

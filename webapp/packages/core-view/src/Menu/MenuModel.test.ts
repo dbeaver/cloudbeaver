@@ -61,6 +61,43 @@ function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> 
 }
 
 describe('MenuModel', () => {
+  it('removes a failure after its dynamic submenu leaves the active menu', async () => {
+    const { loader } = resource();
+    loader.load = () => Promise.reject(new Error('removed child failed'));
+    const showChild = observable.box(true);
+    const item = new MenuSubMenuItem({ menu: childMenu });
+    const action = new MenuBaseItem({ id: 'available', label: 'available' });
+    const model = new MenuModel(
+      service({
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [action, ...(showChild.get() ? [item] : [])] : []),
+        getPreparationLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [loader] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    model.setOpen(true);
+    await model.load();
+    expect(model.isError()).toBe(true);
+    runInAction(() => showChild.set(false));
+    expect(model.exception).toBeNull();
+    expect(model.visibleItems).toEqual([action]);
+    expect(model.state).toBe('ready');
+    stop();
+  });
+
+  it('removes consecutive separators at both ends while keeping one between content', () => {
+    const first = new MenuBaseItem({ id: 'first', label: 'first' });
+    const second = new MenuBaseItem({ id: 'second', label: 'second' });
+    const separator = () => new MenuSeparatorItem();
+    const model = new MenuModel(
+      service({ getMenu: () => [separator(), separator(), first, separator(), separator(), second, separator(), separator()] }),
+      rootMenu,
+    );
+    const stop = model.start();
+    expect(model.visibleItems).toEqual([first, expect.any(MenuSeparatorItem), second]);
+    stop();
+  });
+
   it('keeps blocked loaders pending without retrying them in a loop', async () => {
     const { loader } = resource();
     loader.isLoadable = () => false;

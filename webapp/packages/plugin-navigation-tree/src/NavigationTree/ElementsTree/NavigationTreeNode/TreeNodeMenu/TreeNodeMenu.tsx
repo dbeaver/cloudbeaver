@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { getComputed, Icon, type IContextMenuPosition, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
-import { useDataContextLink } from '@cloudbeaver/core-data-context';
+import { useDataContextValues } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type INodeActions, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
@@ -34,14 +34,11 @@ export const TreeNodeMenu = observer<TreeNodeMenuProps>(function TreeNodeMenu({ 
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const connectionKey = getComputed(() => connectionInfoResource.getConnectionIdForNodeId(node.projectId!, node.uri));
 
-  useDataContextLink(menu.context, (context, id) => {
-    context.set(DATA_CONTEXT_NAV_NODE, node, id);
-    context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions, id);
-
-    if (connectionKey) {
-      context.set(DATA_CONTEXT_CONNECTION, connectionKey, id);
-    }
-  });
+  useDataContextValues(menu.context, () => [
+    [DATA_CONTEXT_NAV_NODE, node],
+    [DATA_CONTEXT_NAV_NODE_ACTIONS, actions],
+    ...(connectionKey ? [[DATA_CONTEXT_CONNECTION, connectionKey] as const] : []),
+  ]);
 
   function handleVisibleSwitch(visible: boolean) {
     if (!visible) {
