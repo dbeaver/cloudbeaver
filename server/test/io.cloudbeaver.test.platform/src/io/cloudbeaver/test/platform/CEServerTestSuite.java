@@ -52,6 +52,7 @@ import org.junit.platform.suite.api.Suite;
         SQLQueryTranslatorTest.class,
         AuthenticationTest.class,
         WebAuthUtilsTest.class,
+        TrustedTeamsUtilsTest.class,
         LdapAuthenticationTest.class,
         LdapProfileFillTest.class,
         ResourceManagerTest.class,
