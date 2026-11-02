@@ -17,6 +17,7 @@ import type { AiMessage } from '@cloudbeaver/core-sdk';
 
 import { AIChatMessageService } from '../AIChatMessageService.js';
 import { AIChatMessageActions } from '../AIChatMessageActions.js';
+import { AIChatMessageAttachments } from '../../../AIChatAttachments/AIChatMessageAttachments.js';
 
 interface Props {
   message: AiMessage;
@@ -47,14 +48,17 @@ export const AIChatUserMessage = observer<PropsWithChildren<Props>>(function AIC
 
   return (
     <div
-      className="tw:group tw:flex tw:flex-col tw:gap-1 tw:items-end tw:relative tw:break-all"
+      className="tw:group tw:flex tw:flex-col tw:gap-2 tw:items-end tw:relative tw:break-all"
       role="article"
       aria-label={translate('plugin_ai_chat_message_user_description')}
     >
       <span className="tw:sr-only">{translate('plugin_ai_chat_message_sr_user_description')}</span>
-      <div className="tw:flex tw:bg-[var(--theme-primary)] tw:flex-col tw:gap-2 tw:max-w-[80%] tw:px-3 tw:py-2 tw:rounded-lg tw:text-[var(--theme-on-primary)] tw:rounded-br-none">
-        {children}
-      </div>
+      <AIChatMessageAttachments message={message} />
+      {message.displayMessage.trim().length > 0 && (
+        <div className="tw:flex tw:bg-[var(--theme-primary)] tw:flex-col tw:gap-2 tw:max-w-[80%] tw:px-3 tw:py-2 tw:rounded-lg tw:text-[var(--theme-on-primary)] tw:rounded-br-none">
+          {children}
+        </div>
+      )}
 
       <AIChatMessageActions>
         <ActionIconButton title={translate('ui_copy_to_clipboard')} name="copy" onClick={() => copy(message.displayMessage, true)} />
