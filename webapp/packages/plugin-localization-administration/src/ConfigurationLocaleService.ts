@@ -79,8 +79,6 @@ export class ConfigurationLocaleService {
         return;
       }
     }
-
-    document.documentElement.lang = this.localizationService.currentLanguage;
   }
 
   changeLanguage(language: string): void {
@@ -101,7 +99,6 @@ export class ConfigurationLocaleService {
 
   private applyLanguage(language: string): void {
     this.localizationService.setLanguage(language);
-    document.documentElement.lang = language;
 
     // New sessions receive the current language when they are opened.
     if (this.sessionResource.isLoaded()) {

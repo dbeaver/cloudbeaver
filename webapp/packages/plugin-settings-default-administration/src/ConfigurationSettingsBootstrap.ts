@@ -84,7 +84,6 @@ export class ConfigurationSettingsBootstrap extends Bootstrap {
         onConfigurationFinish: () => {
           const language = this.settingsLocalizationService.language;
           this.localizationService.setLanguage(language);
-          document.documentElement.lang = this.localizationService.currentLanguage;
           this.configurationSettingsService.clear();
         },
       },
