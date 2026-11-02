@@ -5,28 +5,61 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action, makeObservable, observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ServerSettingsResource, SessionResource } from '@cloudbeaver/core-root';
+import { StorageService } from '@cloudbeaver/core-storage';
 
-const STORAGE_KEY = 'easy_config_language';
+const STORAGE_KEY = 'easy_config_language_state';
 
-@injectable(() => [LocalizationService, SessionResource, ServerSettingsResource])
+@injectable(() => [LocalizationService, SessionResource, ServerSettingsResource, StorageService])
 export class ConfigurationLocaleService {
+  private readonly state = observable<{ language: string | null }>({ language: null });
+  private initialized = false;
+  private storageRegistered = false;
+
   constructor(
     private readonly localizationService: LocalizationService,
     private readonly sessionResource: SessionResource,
     private readonly serverSettingsResource: ServerSettingsResource,
-  ) {}
+    private readonly storageService: StorageService,
+  ) {
+    makeObservable(this, {
+      changeLanguage: action,
+      clear: action,
+    });
+  }
 
   initialize(): void {
-    let savedLanguage: string | null = null;
+    this.initialized = true;
+    this.registerStorage();
+    this.applyInitialLanguage();
+  }
 
-    try {
-      savedLanguage = localStorage.getItem(STORAGE_KEY);
-    } catch (exception) {
-      console.warn('Unable to read Easy Config language', exception);
+  private registerStorage(): void {
+    if (!this.storageRegistered) {
+      this.storageRegistered = true;
+      this.storageService.registerSettings(
+        STORAGE_KEY,
+        this.state,
+        () => ({ language: this.initialized ? this.state.language : null }),
+        saved => ({
+          // A selection made while storage is loading takes precedence over restored state.
+          language: this.initialized ? (this.state.language ?? (typeof saved?.language === 'string' ? saved.language : null)) : null,
+        }),
+        () => {
+          if (this.initialized) {
+            this.applyInitialLanguage();
+          }
+        },
+      );
     }
+  }
+
+  private applyInitialLanguage(): void {
+    const savedLanguage = this.state.language;
 
     if (savedLanguage && this.localizationService.isLanguageSupported(savedLanguage)) {
       this.applyLanguage(savedLanguage);
@@ -57,20 +90,13 @@ export class ConfigurationLocaleService {
 
     this.applyLanguage(language);
 
-    // Save synchronously so an immediate reload preserves the explicit choice.
-    try {
-      localStorage.setItem(STORAGE_KEY, language);
-    } catch (exception) {
-      console.warn('Unable to save Easy Config language', exception);
-    }
+    this.state.language = language;
   }
 
   clear(): void {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch (exception) {
-      console.warn('Unable to clear Easy Config language', exception);
-    }
+    this.initialized = false;
+    this.state.language = null;
+    this.registerStorage();
   }
 
   private applyLanguage(language: string): void {

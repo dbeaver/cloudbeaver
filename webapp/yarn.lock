@@ -3854,6 +3854,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"

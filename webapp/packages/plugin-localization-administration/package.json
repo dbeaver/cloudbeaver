@@ -25,6 +25,7 @@
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-storage": "workspace:*",
     "@cloudbeaver/plugin-administration": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
