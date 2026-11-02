@@ -35,7 +35,7 @@ export class AIChatAttachmentsImageHandlerService {
   ) {}
 
   register(): void {
-    this.aiChatAttachmentsService.register({
+    this.aiChatAttachmentsService.addHandler({
       id: IMAGE_ATTACHMENT_TYPE,
       accept: [...IMAGE_MEDIA_TYPES].join(','),
       canHandle: file => IMAGE_MEDIA_TYPES.has(file.type),

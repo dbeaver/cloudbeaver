@@ -26,7 +26,6 @@ import { AIFunctionsResource } from './AIFunctionsResource.js';
 import { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
 import { AIChatAttachmentsImageHandlerService } from './AIChatAttachmentsHandlers/AIChatAttachmentsImageHandler/AIChatAttachmentsImageHandlerService.js';
 import { AIChatInputService } from './AIChat/AIChatInput/AIChatInputService.js';
-import { AIChatAttachmentsBootstrap } from './AIChatAttachments/AIChatAttachmentsBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-chat',
@@ -35,7 +34,6 @@ export default ModuleRegistry.add({
     serviceCollection
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, AIChatServiceBootstrap)
-      .addSingleton(Bootstrap, AIChatAttachmentsBootstrap)
       .addSingleton(Bootstrap, proxy(AIChatContextService))
       .addSingleton(Dependency, proxy(AIChatSettingsService))
       .addSingleton(Dependency, proxy(AIChatMessagesResource))

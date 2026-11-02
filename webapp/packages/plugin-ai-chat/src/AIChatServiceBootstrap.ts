@@ -19,6 +19,7 @@ import { AIChatService } from './AIChat/AIChatService.js';
 import { ACTION_TOGGLE_AI_CHAT } from './actions/ACTION_TOGGLE_AI_CHAT.js';
 import { AIChatTabService } from './AIChatTabService.js';
 import { AIChatFunctionsService } from './AIChatFunctionsService.js';
+import { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
 import { AIChatAttachmentsImageHandlerService } from './AIChatAttachmentsHandlers/AIChatAttachmentsImageHandler/AIChatAttachmentsImageHandlerService.js';
 
 const WelcomeAIChat = importLazyComponent(() => import('./WelcomeAIChat.js').then(m => m.WelcomeAIChat));
@@ -32,6 +33,7 @@ const WelcomeAIChat = importLazyComponent(() => import('./WelcomeAIChat.js').the
   NavigationTabsService,
   AIChatTabService,
   AIChatFunctionsService,
+  AIChatAttachmentsService,
   AIChatAttachmentsImageHandlerService,
 ])
 export class AIChatServiceBootstrap extends Bootstrap {
@@ -44,6 +46,7 @@ export class AIChatServiceBootstrap extends Bootstrap {
     private readonly navigationTabsService: NavigationTabsService,
     private readonly aiChatTabService: AIChatTabService,
     private readonly aiChatFunctionsService: AIChatFunctionsService,
+    private readonly aiChatAttachmentsService: AIChatAttachmentsService,
     private readonly aiChatAttachmentsImageHandlerService: AIChatAttachmentsImageHandlerService,
   ) {
     super();
@@ -51,6 +54,7 @@ export class AIChatServiceBootstrap extends Bootstrap {
 
   override register(): void {
     this.aiChatFunctionsService.register();
+    this.aiChatAttachmentsService.register();
     this.aiChatAttachmentsImageHandlerService.register();
 
     this.menuService.addCreator({

@@ -6,22 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { PlaceholderContainer, type PlaceholderComponent } from '@cloudbeaver/core-blocks';
+import { importLazyComponent, PlaceholderContainer, type PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { AiChatAttachment, AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { observable, runInAction, type ObservableMap } from 'mobx';
 
-import type {
-  IAIChatInputContext,
-  IAIChatInputDragEvent,
-  IAIChatInputSubmission,
-  IAIChatInputValidation,
+import {
+  AIChatInputService,
+  type IAIChatInputContext,
+  type IAIChatInputDragEvent,
+  type IAIChatInputSubmission,
+  type IAIChatInputValidation,
 } from '../AIChat/AIChatInput/AIChatInputService.js';
-import type { MessageSendExecutorData } from '../AIChat/AIChatMessage/AIChatMessageService.js';
+import { AIChatMessageService, type MessageSendExecutorData } from '../AIChat/AIChatMessage/AIChatMessageService.js';
 import { aiChatMessageRequestContext } from '../AIChat/AIChatMessage/aiChatMessageRequestContext.js';
 import { AIChatAttachmentsState } from './AIChatAttachmentsState.js';
+
+const AIChatAttachmentsDropPreview = importLazyComponent(() => import('./AIChatAttachmentsDropPreview.js').then(m => m.AIChatAttachmentsDropPreview));
+const AIChatAttachmentsInputContent = importLazyComponent(() =>
+  import('./AIChatAttachmentsInputContent.js').then(m => m.AIChatAttachmentsInputContent),
+);
 
 export interface IAIChatAttachment {
   readonly id: string;
@@ -58,7 +64,7 @@ function aiChatAttachmentsSubmissionContext(): { submission: IAIChatAttachmentsS
   return { submission: null };
 }
 
-@injectable(() => [NotificationService])
+@injectable(() => [NotificationService, AIChatInputService, AIChatMessageService])
 export class AIChatAttachmentsService {
   readonly previews = new PlaceholderContainer<IAIChatAttachmentProps>();
   readonly messagePreviews = new PlaceholderContainer<IAIChatMessageAttachmentProps>();
@@ -73,7 +79,22 @@ export class AIChatAttachmentsService {
   private readonly handlers = new Map<string, IAIChatAttachmentHandler>();
   private readonly states = new WeakMap<IAIChatInputContext['textareaRef'], ObservableMap<string, AIChatAttachmentsState>>();
 
-  constructor(private readonly notificationService: NotificationService) {}
+  constructor(
+    private readonly notificationService: NotificationService,
+    private readonly aiChatInputService: AIChatInputService,
+    private readonly aiChatMessageService: AIChatMessageService,
+  ) {}
+
+  register(): void {
+    this.aiChatInputService.onDrag.addHandler(data => this.handleInputDrag(data));
+    this.aiChatInputService.onValidate.addHandler(data => this.validateInput(data));
+    this.aiChatInputService.onPrepareSubmit.addHandler((data, contexts) => this.prepareSubmission(data, contexts));
+
+    this.aiChatMessageService.onMessageSend.addHandler((data, contexts) => this.handleMessageSend(data, contexts));
+
+    this.aiChatInputService.dragPreview.add(AIChatAttachmentsDropPreview);
+    this.aiChatInputService.beforeInput.add(AIChatAttachmentsInputContent);
+  }
 
   getState(input: IAIChatInputContext): AIChatAttachmentsState {
     const states = this.getStates(input);
@@ -89,7 +110,7 @@ export class AIChatAttachmentsService {
     return state;
   }
 
-  register(handler: IAIChatAttachmentHandler): void {
+  addHandler(handler: IAIChatAttachmentHandler): void {
     if (this.handlers.has(handler.id)) {
       throw new Error(`AI chat attachment handler is already registered: ${handler.id}`);
     }
