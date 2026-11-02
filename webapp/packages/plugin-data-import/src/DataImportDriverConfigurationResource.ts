@@ -71,9 +71,11 @@ export class DataImportDriverConfigurationResource extends CachedMapResource<ICo
 
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+
     if (!parse.success) {
       this.logger.warn(`Invalid resource key ${schemaValidationError(parse.error).toString()}`);
     }
+
     return parse.success;
   }
 }

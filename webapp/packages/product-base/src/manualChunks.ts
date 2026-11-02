@@ -67,6 +67,7 @@ export const manualChunks = (): PluginOption => [
 
                     // Check if any importer imports this module statically
                     let hasStaticImporter = false;
+
                     for (const importer of info.importers) {
                       if (!dynamicImports.includes(importer)) {
                         hasStaticImporter = true;
@@ -83,6 +84,7 @@ export const manualChunks = (): PluginOption => [
                 }
 
                 const langMatch = /[\\/]locales[\\/](\w+)\.js/.exec(normalizedId);
+
                 if (langMatch) {
                   const language = langMatch[1]; // e.g. "en"
                   return `locales/${language}`;
@@ -92,6 +94,7 @@ export const manualChunks = (): PluginOption => [
                   if (!isModuleSync(id)) {
                     return 'core-async';
                   }
+
                   return 'core';
                 }
 
@@ -99,6 +102,7 @@ export const manualChunks = (): PluginOption => [
                   if (!isModuleSync(id)) {
                     return 'plugins-async';
                   }
+
                   return 'plugins';
                 }
 
@@ -106,6 +110,7 @@ export const manualChunks = (): PluginOption => [
                   if (!isModuleSync(id)) {
                     return 'products-async';
                   }
+
                   return 'products';
                 }
 
@@ -113,6 +118,7 @@ export const manualChunks = (): PluginOption => [
                   if (!isModuleSync(id)) {
                     return 'dbeaver-async';
                   }
+
                   return 'dbeaver';
                 }
 
@@ -120,6 +126,7 @@ export const manualChunks = (): PluginOption => [
                   if (!isModuleSync(id)) {
                     return 'vendor-async';
                   }
+
                   return 'vendor';
                 }
 

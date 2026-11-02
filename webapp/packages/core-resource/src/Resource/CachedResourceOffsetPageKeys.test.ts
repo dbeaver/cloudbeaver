@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -115,39 +115,52 @@ describe('CachedResourceOffsetPageKeys', () => {
       const pageInfo: ICachedResourceOffsetPage = {
         pages: [randomPage],
       };
+
       expect(getNextPageOffset(pageInfo)).toBe(100);
     });
+
     test('should return next page offset with multiple pages', () => {
       const pages = [];
+
       for (let i = 0; i < 10; i++) {
         pages.push(getRandomPage(i * 100, 100, false));
       }
+
       const pageInfo: ICachedResourceOffsetPage = {
         pages,
       };
+
       expect(getNextPageOffset(pageInfo)).toBe(1000);
     });
+
     test('should return next page offset with multiple pages with gaps', () => {
       const pages = [];
+
       for (let i = 0; i < 10; i++) {
         pages.push(getRandomPage(i * 100, 100, false));
       }
+
       pages.push(getRandomPage(11 * 100, 100, false));
       const pageInfo: ICachedResourceOffsetPage = {
         pages,
       };
+
       expect(getNextPageOffset(pageInfo)).toBe(1000);
     });
+
     test('should return next page offset with end', () => {
       const pages = [];
+
       for (let i = 0; i < 10; i++) {
         pages.push(getRandomPage(i * 100, 100, false));
       }
+
       pages.push(getRandomPage(10 * 100, 20, false));
       const pageInfo: ICachedResourceOffsetPage = {
         end: 1020,
         pages,
       };
+
       expect(getNextPageOffset(pageInfo)).toBe(1020);
     });
   });

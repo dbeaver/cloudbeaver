@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ export class SystemThemeService extends Bootstrap {
       loaded: false,
       async loader() {
         await systemThemeService.updateSystemTheme();
+
         if (systemThemeService.dynamicTheme) {
           await systemThemeService.themeService.loadTheme(systemThemeService.dynamicTheme.id);
         }
@@ -65,12 +66,14 @@ export class SystemThemeService extends Bootstrap {
         if (key === 'core.theming.theme') {
           return 'system';
         }
+
         return undefined;
       },
       getEditedValue(key) {
         if (key === 'core.theming.theme') {
           return 'system';
         }
+
         return undefined;
       },
       isEdited() {
@@ -93,6 +96,7 @@ export class SystemThemeService extends Bootstrap {
 
   private async updateSystemTheme(): Promise<void> {
     this.dynamicTheme = this.getDynamicTheme();
+
     if (this.dynamicTheme && this.themeService.themeId === 'system') {
       await this.themeService.loadTheme(this.dynamicTheme.id);
     }

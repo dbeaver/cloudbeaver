@@ -17,20 +17,26 @@ export function getScopeFilterResult(
   const matches = new Set<string>();
   const expanded = new Set<string>();
   const search = query.toLowerCase();
+
   for (const item of items) {
     if (!item.name.toLowerCase().includes(search)) {
       continue;
     }
+
     matches.add(item.uri);
+
     for (const parent of getParents(item.uri)) {
       expanded.add(parent);
     }
   }
+
   const visible = new Set([...matches, ...expanded]);
+
   for (const id of loadedIds) {
     if (getParents(id).some(parent => matches.has(parent))) {
       visible.add(id);
     }
   }
+
   return { visible, expanded };
 }

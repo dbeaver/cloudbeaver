@@ -58,6 +58,7 @@ export class ConnectionViewResource extends CachedMapResource<IConnectionInfoPar
     });
 
     this.set(key, connection);
+
     return this.get(key)!;
   }
 
@@ -93,6 +94,7 @@ export class ConnectionViewResource extends CachedMapResource<IConnectionInfoPar
 
     await ResourceKeyUtils.forEachAsync(key, async connectionKey => {
       let connectionId: string | undefined;
+
       if (!isResourceAlias(connectionKey)) {
         projectId = connectionKey.projectId;
         connectionId = connectionKey.connectionId;
@@ -132,9 +134,11 @@ export class ConnectionViewResource extends CachedMapResource<IConnectionInfoPar
 
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+
     if (!parse.success) {
       this.logger.warn(`Invalid resource key ${(schemaValidationError(parse.error).toString(), { prefix: null })}`);
     }
+
     return parse.success;
   }
 }

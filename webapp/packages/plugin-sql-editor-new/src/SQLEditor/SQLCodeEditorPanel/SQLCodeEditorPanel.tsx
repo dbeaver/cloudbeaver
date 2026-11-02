@@ -46,6 +46,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
     Prec.lowest(QUERY_STATUS_GUTTER_EXTENSION),
     EditorView.contentAttributes.of({ 'aria-label': translate('sql_editor_script_editor') }),
   ]);
+
   const autocompletion = useSqlDialectAutocompletion(data);
   const sqlDialect = useSqlDialectExtension(data.dialect);
   const highlightExtensions = useHighlightExtensions(sqlEditorSettingsService.highlightWhitespace);
@@ -81,6 +82,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
           }
 
           const replacement = alias.join(', ');
+
           if (replacement) {
             view.dispatch({
               changes: { from: pos, to: pos, insert: replacement },

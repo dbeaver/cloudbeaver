@@ -47,6 +47,7 @@ addEventListener('fetch', event => {
       (async () => {
         const preCachedResponsePromise = matchPrecache('/index.html');
         const networkResponsePromise = fetch(request, { cache: 'no-cache', method: 'HEAD' });
+
         try {
           // Try to fetch the request from the network.
           // If it's redirect then return it.
@@ -106,6 +107,7 @@ function createUpdateProgressPlugin(): WorkboxPlugin {
       if (state) {
         state['originalRequest'] = request;
       }
+
       if (hasPreviousCache === null) {
         hasPreviousCache = await caches.has(cacheNames.precache);
 

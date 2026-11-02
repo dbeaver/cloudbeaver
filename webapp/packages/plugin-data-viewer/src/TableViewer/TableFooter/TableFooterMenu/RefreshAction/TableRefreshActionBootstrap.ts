@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
         return [...extracted, ...items];
       },
     });
+
     this.menuService.addCreator({
       menus: [MENU_DATA_VIEWER_AUTO_REFRESH],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
@@ -73,6 +74,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
       getItems: (context, items) => {
         const state = getRefreshState(context);
         items = [...items];
+
         for (const interval of AUTO_REFRESH_INTERVALS) {
           const label = this.getLabel(interval);
           const tooltip = this.localizationService.translate('data_viewer_action_auto_refresh_interval_tooltip', undefined, { interval: label });
@@ -127,6 +129,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
         return items;
       },
     });
+
     this.actionService.addHandler({
       id: 'data-base-handler',
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
@@ -165,6 +168,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
 
   private async configureAutoRefresh(context: IDataContextProvider) {
     const state = getRefreshState(context);
+
     if (!state) {
       return;
     }

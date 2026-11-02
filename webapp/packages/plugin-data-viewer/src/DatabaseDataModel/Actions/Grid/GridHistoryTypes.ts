@@ -83,25 +83,34 @@ export function getKeyFromHistoryEntry(entry: IHistoryEntry<unknown>): IGridData
     const lastUpdate = entry.data.updates[entry.data.updates.length - 1];
     return lastUpdate?.key ?? null;
   }
+
   if (isGridHistoryAddRowData(entry)) {
     const firstRow = entry.data.rowEntries[0];
     return firstRow?.key ?? null;
   }
+
   if (isGridHistoryDeleteRowData(entry)) {
     const firstRow = entry.data.rowEntries[0];
     return firstRow?.key ?? null;
   }
+
   if (isGridHistoryRevertData(entry)) {
     const firstUpdate = entry.data.updates[0];
+
     if (firstUpdate) {
       return firstUpdate.key;
     }
+
     const firstDeletion = entry.data.deletions[0];
+
     if (firstDeletion) {
       return firstDeletion.key;
     }
+
     const firstAddition = entry.data.additions[0];
+
     return firstAddition?.key ?? null;
   }
+
   return null;
 }

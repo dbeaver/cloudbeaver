@@ -117,6 +117,7 @@ export abstract class FormPart<TPartState extends object, TFormState = any> impl
       this.isSaving = true;
 
       await this.saveChanges(data, contexts);
+
       if (ExecutorInterrupter.isInterrupted(contexts)) {
         return;
       }

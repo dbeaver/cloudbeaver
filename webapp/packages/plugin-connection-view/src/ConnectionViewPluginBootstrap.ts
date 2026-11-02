@@ -66,6 +66,7 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
         }
 
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
         return node.objectFeatures.includes(EObjectFeature.dataSource);
       },
       getItems: (context, items) => [...items, MENU_CONNECTION_VIEW],
@@ -146,6 +147,7 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
               ...currentSettings,
               showSystemObjects: !currentSettings.showSystemObjects,
             });
+
             break;
           }
           case ACTION_CONNECTION_VIEW_RESET: {

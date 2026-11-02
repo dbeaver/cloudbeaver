@@ -152,6 +152,7 @@ export class MenuBootstrap extends Bootstrap {
         return [...items, ...extracted];
       },
     });
+
     this.menuService.addCreator({
       menus: [SQL_EDITOR_TOOLS_MENU],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
@@ -166,6 +167,7 @@ export class MenuBootstrap extends Bootstrap {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         const dataSource = this.sqlDataSourceService.get(state.editorId);
+
         switch (action) {
           case ACTION_DOWNLOAD:
             return !dataSource?.script;
@@ -193,10 +195,12 @@ export class MenuBootstrap extends Bootstrap {
               tooltip: 'sql_editor_upload_script_tooltip',
             };
         }
+
         return action.info;
       },
       handler: this.sqlEditorActionHandler.bind(this),
     });
+
     this.menuService.addCreator({
       menus: [SQL_EDITOR_TOOLS_MENU],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
@@ -287,6 +291,7 @@ export class MenuBootstrap extends Bootstrap {
             label: '',
           };
         }
+
         return action.info;
       },
       handler: this.sqlEditorActionHandler.bind(this),
@@ -371,12 +376,14 @@ export class MenuBootstrap extends Bootstrap {
           const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
           this.downloadSql(state);
         }
+
         break;
       case ACTION_UPLOAD:
         {
           const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
           this.uploadSql(state);
         }
+
         break;
       case ACTION_SQL_EDITOR_EXECUTE:
         data.executeQuery();
@@ -432,6 +439,7 @@ export class MenuBootstrap extends Bootstrap {
       const fileName = withTimestamp(name);
 
       downloadSql(fileName, script);
+
       return;
     }
 
@@ -450,6 +458,7 @@ export class MenuBootstrap extends Bootstrap {
     if (!dataSource) {
       return;
     }
+
     const files = await promptForFiles({ accept: '.sql,.txt' });
     const file = files[0];
 
@@ -473,6 +482,7 @@ export class MenuBootstrap extends Bootstrap {
     }
 
     const prevScript = dataSource.script.trim();
+
     if (prevScript) {
       const payload = {
         title: 'ui_changes_might_be_lost',

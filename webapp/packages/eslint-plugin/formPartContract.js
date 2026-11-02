@@ -42,14 +42,17 @@ function unwrap(node) {
   while (node && ['ChainExpression', 'TSAsExpression', 'TSTypeAssertion', 'TSNonNullExpression', 'TSSatisfiesExpression'].includes(node.type)) {
     node = node.expression;
   }
+
   return node;
 }
 
 function isRootedInThis(node) {
   node = unwrap(node);
+
   while (node?.type === 'MemberExpression') {
     node = unwrap(node.object);
   }
+
   return node?.type === 'ThisExpression';
 }
 
@@ -95,18 +98,22 @@ export default {
 
       if (node?.type === 'Identifier') {
         specifier = getImport(node);
+
         if (specifier?.type !== 'ImportSpecifier') {
           return false;
         }
+
         name = specifier.imported.name ?? specifier.imported.value;
       } else if (
         (node?.type === 'MemberExpression' && node.object.type === 'Identifier') ||
         (node?.type === 'TSQualifiedName' && node.left.type === 'Identifier')
       ) {
         specifier = getImport(node.object ?? node.left);
+
         if (specifier?.type !== 'ImportNamespaceSpecifier') {
           return false;
         }
+
         name = getMemberName({ key: node.property ?? node.right, computed: node.computed });
       } else {
         return false;
@@ -121,23 +128,29 @@ export default {
 
     function isObservableAnnotation(node) {
       node = unwrap(node);
+
       if (node?.type === 'Literal' && node.value === true) {
         return true;
       }
+
       if (node?.type === 'CallExpression') {
         node = unwrap(node.callee);
       }
+
       while (node) {
         if (isFrameworkImport(node, 'mobx', ['observable', 'computed'])) {
           return true;
         }
+
         node = node.type === 'MemberExpression' ? unwrap(node.object) : null;
       }
+
       return false;
     }
 
     function getObservableFields(members) {
       const fields = [];
+
       for (const member of members) {
         if (member.kind === 'constructor') {
           fields.push(...member.value.params.filter(parameter => parameter.type === 'TSParameterProperty'));
@@ -147,20 +160,24 @@ export default {
       }
 
       const observableFields = new Set();
+
       function mark(name) {
         if (name === null || name === undefined) {
           return;
         }
+
         for (const field of fields) {
           if (!field.static && getMemberName(field) === name) {
             observableFields.add(field);
           }
         }
       }
+
       function isObservableValue(value) {
         value = unwrap(value);
         return value?.type === 'CallExpression' && isObservableAnnotation(value.callee);
       }
+
       function properties(node) {
         node = unwrap(node);
         return node?.type === 'ObjectExpression' ? node.properties.filter(property => property.type === 'Property') : [];
@@ -168,6 +185,7 @@ export default {
 
       for (const field of fields) {
         const initialValue = field.type === 'TSParameterProperty' ? field.parameter.right : field.value;
+
         if (
           (!field.static && inheritedObservableFields.has(getMemberName(field))) ||
           isObservableValue(initialValue) ||
@@ -181,11 +199,13 @@ export default {
         if (!node || (node !== root && ['ClassDeclaration', 'ClassExpression', 'FunctionDeclaration', 'FunctionExpression'].includes(node.type))) {
           return;
         }
+
         if (node.type === 'AssignmentExpression' && node.left.type === 'MemberExpression' && isObservableValue(node.right)) {
           if (unwrap(node.left.object)?.type === 'ThisExpression') {
             mark(getMemberName({ key: node.left.property, computed: node.left.computed }));
           }
         }
+
         if (node.type === 'CallExpression' && unwrap(node.arguments[0])?.type === 'ThisExpression') {
           if (isFrameworkImport(node.callee, 'mobx', ['makeObservable'])) {
             for (const property of properties(node.arguments[1])) {
@@ -197,20 +217,24 @@ export default {
             const auto = isFrameworkImport(node.callee, 'mobx', ['makeAutoObservable']);
             const annotations = properties(node.arguments[auto ? 1 : 2]);
             const candidates = auto ? fields.filter(field => !field.static) : properties(node.arguments[1]);
+
             for (const candidate of candidates) {
               const name = getMemberName(candidate);
               const annotation = annotations.find(property => getMemberName(property) === name);
               const observable = annotation
                 ? isObservableAnnotation(annotation.value)
                 : !['FunctionExpression', 'ArrowFunctionExpression'].includes(candidate.value?.type);
+
               if (observable) {
                 mark(name);
               }
             }
           }
         }
+
         for (const key of sourceCode.visitorKeys[node.type] ?? []) {
           const child = node[key];
+
           if (Array.isArray(child)) {
             child.forEach(child => visit(child, root));
           } else {
@@ -218,11 +242,13 @@ export default {
           }
         }
       }
+
       for (const member of members) {
         if (!member.static) {
           visit(member.value, member.value);
         }
       }
+
       return observableFields;
     }
 
@@ -234,30 +260,39 @@ export default {
         if (member.static || member.kind === 'set' || member.kind === 'constructor') {
           continue;
         }
+
         const root = member.value;
+
         if (!root || !['FunctionExpression', 'ArrowFunctionExpression', 'TSEmptyBodyFunctionExpression'].includes(root.type)) {
           continue;
         }
 
         const relation = { state: false, references: new Set() };
+
         function visit(node) {
           if (!node) {
             return;
           }
+
           if (node !== root && ['ClassDeclaration', 'ClassExpression', 'FunctionDeclaration', 'FunctionExpression'].includes(node.type)) {
             return;
           }
+
           if (node.type === 'MemberExpression') {
             const name = getMemberName({ key: node.property, computed: node.computed });
+
             if (stateMembers.has(name) && isRootedInThis(node.object)) {
               relation.state = true;
             }
+
             if (unwrap(node.object)?.type === 'ThisExpression' && name !== null) {
               relation.references.add(name);
             }
           }
+
           if (node.type === 'CallExpression') {
             const callee = unwrap(node.callee);
+
             if (
               callee?.type === 'MemberExpression' &&
               unwrap(callee.object)?.type === 'ThisExpression' &&
@@ -266,8 +301,10 @@ export default {
               relation.state = true;
             }
           }
+
           for (const key of sourceCode.visitorKeys[node.type] ?? []) {
             const child = node[key];
+
             if (Array.isArray(child)) {
               child.forEach(visit);
             } else {
@@ -275,10 +312,12 @@ export default {
             }
           }
         }
+
         visit(root);
         relations.set(member, relation);
 
         const name = getMemberName(member);
+
         if (name !== null) {
           const definitions = helpers.get(name) ?? [];
           definitions.push(member);
@@ -290,13 +329,16 @@ export default {
         if (seen.has(member)) {
           return false;
         }
+
         seen.add(member);
         const relation = relations.get(member);
+
         return (
           !!relation &&
           (relation.state || [...relation.references].some(name => (helpers.get(name) ?? []).some(helper => accessesState(helper, seen))))
         );
       }
+
       return accessesState;
     }
 
@@ -319,6 +361,7 @@ export default {
 
       if (visibility) {
         const kind = publicGetters.has(name) ? 'get' : 'method';
+
         if (!isMethod || member.static || member.kind !== kind) {
           context.report({ node: member, messageId: 'lifecycleKind', data: { ...data, kind: kind === 'get' ? 'getter' : 'method' } });
         } else if ((member.accessibility ?? 'public') !== visibility) {
@@ -326,6 +369,7 @@ export default {
         } else if (!member.override) {
           context.report({ node: member, messageId: 'missingOverride', data });
         }
+
         return;
       }
 
@@ -351,6 +395,7 @@ export default {
 
       const accessesState = getStateRelations(node.body.body);
       const observableFields = getObservableFields(node.body.body);
+
       for (const member of node.body.body) {
         if (member.type === 'StaticBlock') {
           continue;
@@ -362,6 +407,7 @@ export default {
               checkMember(parameter, accessesState, observableFields);
             }
           }
+
           continue;
         }
 

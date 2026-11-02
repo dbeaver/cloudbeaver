@@ -51,6 +51,7 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
               {state.columns.map(property => {
                 const name = property.displayName;
                 const columnTooltip = `${name} ${property.description ? '(' + property.description + ')' : ''}`;
+
                 return (
                   <TableColumnHeader key={property.id || property.order} title={columnTooltip}>
                     {name}

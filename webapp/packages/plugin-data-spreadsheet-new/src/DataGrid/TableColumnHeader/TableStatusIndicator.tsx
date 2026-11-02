@@ -49,6 +49,7 @@ export const TableStatusIndicator = observer(function TableStatusIndicator() {
   const firstColumnData = isNotNullDefined(firstColumn?.key)
     ? (tableDataContext.data.getColumn(firstColumn.key) as SqlResultColumn | undefined)
     : undefined;
+
   const readOnlyStatus = firstColumnData?.readOnlyStatus;
 
   const isVirtualKey = rowIdentifierInfo?.state === SqlRowIdentifierState.VirtualKey;

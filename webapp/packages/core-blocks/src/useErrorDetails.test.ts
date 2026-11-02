@@ -120,6 +120,7 @@ describe.skip('useErrorDetails', () => {
       if (errorType === DetailsError) {
         return detailsError;
       }
+
       return undefined;
     });
 
@@ -143,6 +144,7 @@ describe.skip('useErrorDetails', () => {
       if (errorType === LoadingError) {
         return loadingError;
       }
+
       return undefined;
     });
 
@@ -231,9 +233,11 @@ describe.skip('useErrorDetails', () => {
       if (errorType === DetailsError) {
         return detailsError;
       }
+
       if (errorType === LoadingError) {
         return loadingError;
       }
+
       return undefined;
     });
 

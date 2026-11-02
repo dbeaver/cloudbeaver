@@ -44,9 +44,11 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
 
       const submitInfo = context.getContext(formSubmitContext);
       submitInfo.setType(submitType);
+
       if (submitType === 'test') {
         submitInfo.setSubmitOnNoChanges(true);
       }
+
       const isCreate = formState.mode === FormMode.Create || optionsPart.state.hidden === true;
       const saved = await formState.save(context);
 

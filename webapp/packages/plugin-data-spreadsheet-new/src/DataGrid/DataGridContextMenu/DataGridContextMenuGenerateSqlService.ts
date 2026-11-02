@@ -149,6 +149,7 @@ export class DataGridContextMenuGenerateSqlService {
         title: 'data_grid_table_generate_sql_error_title',
         message: 'data_grid_table_generate_sql_error_no_rows',
       });
+
       return;
     }
 
@@ -157,6 +158,7 @@ export class DataGridContextMenuGenerateSqlService {
         title: 'data_grid_table_generate_sql_error_title',
         message: 'data_grid_table_generate_sql_error_no_connection',
       });
+
       return;
     }
 
@@ -214,6 +216,7 @@ export class DataGridContextMenuGenerateSqlService {
         title: 'data_grid_table_generate_sql_error_title',
         message: 'data_grid_table_generate_sql_error_no_connection',
       });
+
       return;
     }
 
@@ -226,6 +229,7 @@ export class DataGridContextMenuGenerateSqlService {
           title: 'data_grid_table_generate_sql_error_title',
           message: 'data_grid_table_generate_sql_ddl_no_support',
         });
+
         return;
       }
 

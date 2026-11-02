@@ -97,6 +97,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
 
     if (!saved) {
       const error = getFirstException(part.exception);
+
       if (error) {
         notificationService.logException(error, 'administration_configuration_wizard_configuration_save_error');
         return;

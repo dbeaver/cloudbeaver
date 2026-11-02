@@ -40,6 +40,7 @@ export const NodeDeletionTable = observer<Props>(function NodeDeletionTable({ it
     ],
     [hasReason],
   );
+
   const columnCount = useCreateGridReactiveValue(() => columns.length, null, [columns]);
   const rowCount = useCreateGridReactiveValue(() => items.length, null, [items]);
   const headerText = useCreateGridReactiveValue(colIdx => translate(columns[colIdx]?.label) ?? '', null, [columns, translate]);
@@ -48,6 +49,7 @@ export const NodeDeletionTable = observer<Props>(function NodeDeletionTable({ it
     null,
     [columns, translate],
   );
+
   const cell = useCreateGridReactiveValue(getCell, null, [items, translate, selection.selected]);
 
   function getCell(rowIdx: number, colIdx: number) {

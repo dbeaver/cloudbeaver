@@ -56,6 +56,7 @@ export class NetworkStateService extends Bootstrap {
     } else {
       this.graphQLService.blockRequests(new NetworkError('Network connection was lost'));
     }
+
     this.networkState = state;
     this.networkStateExecutor.execute(this.networkState);
   }

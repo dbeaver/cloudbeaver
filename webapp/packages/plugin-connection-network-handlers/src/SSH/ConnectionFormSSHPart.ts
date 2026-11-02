@@ -52,6 +52,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     if (this.networkHandlerResource.isOutdated(SSH_TUNNEL_ID)) {
       return true;
     }
+
     if (!this.optionsPart.connectionKey) {
       return false;
     }
@@ -61,10 +62,12 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
 
   protected override async loader(): Promise<void> {
     const handler = await this.networkHandlerResource.load(SSH_TUNNEL_ID);
+
     if (!this.optionsPart.connectionKey) {
       const state = getDefaultState();
       this.copyInitialHandlerProperties(handler, state);
       this.setInitialState(state);
+
       return;
     }
 

@@ -39,6 +39,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
         new: key === undefined,
         custom: true,
       });
+
       return id;
     }
 

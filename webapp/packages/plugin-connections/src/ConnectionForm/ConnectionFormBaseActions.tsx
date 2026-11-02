@@ -36,6 +36,7 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
     DatabaseAuthModelsResource,
     getComputed(() => optionsPart.state.authModelId || connectionInfoResource.data?.authModel || driver?.defaultAuthModel || null),
   );
+
   const authentication = useAuthenticationAction({
     providerId: authModel?.requiredAuth ?? connectionInfoResource.data?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
