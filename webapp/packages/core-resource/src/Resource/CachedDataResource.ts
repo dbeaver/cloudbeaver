@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,9 @@ export abstract class CachedDataResource<
     if (param === undefined) {
       param = CachedResourceParamKey as TKey;
     }
+
     await this.loadData(param, true, context);
+
     return this.data as CachedResourceValueIncludes<TData, T>;
   }
 
@@ -53,7 +55,9 @@ export abstract class CachedDataResource<
     if (param === undefined) {
       param = CachedResourceParamKey as TKey;
     }
+
     await this.loadData(param, false, context);
+
     return this.data as CachedResourceValueIncludes<TData, T>;
   }
 

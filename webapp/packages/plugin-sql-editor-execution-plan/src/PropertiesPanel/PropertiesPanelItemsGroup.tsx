@@ -54,6 +54,7 @@ export const PropertiesPanelItemsGroup: React.FC<Props> = function PropertiesPan
           const name = property.displayName;
           const tooltip = `${name} ${property.description ? '(' + property.description + ')' : ''}`;
           const value = getPropertyValue(property);
+
           return (
             <CompositeItem
               key={property.id}

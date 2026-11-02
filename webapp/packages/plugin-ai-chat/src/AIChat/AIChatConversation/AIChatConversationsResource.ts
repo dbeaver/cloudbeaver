@@ -73,6 +73,7 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
     });
 
     this.set(conversation.id, conversation);
+
     return this.get(conversation.id)!;
   }
 

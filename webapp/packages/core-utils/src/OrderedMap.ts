@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ export class OrderedMap<K, V> {
     if (this.map.has(key)) {
       return; // no overwrite
     }
+
     this.indexes.push(key);
     this.map.set(key, value);
   }
@@ -54,6 +55,7 @@ export class OrderedMap<K, V> {
     if (!this.toKey) {
       throw Error('no toKey method');
     }
+
     this.add(this.toKey(value), value);
   }
 
@@ -61,6 +63,7 @@ export class OrderedMap<K, V> {
     if (!this.map.has(key)) {
       return;
     }
+
     this.map.delete(key);
     this.indexes.remove(key);
   }
@@ -74,6 +77,7 @@ export class OrderedMap<K, V> {
     if (!this.toKey) {
       throw Error('no toKey method');
     }
+
     values.forEach(v => this.add(this.toKey!(v), v));
   }
 

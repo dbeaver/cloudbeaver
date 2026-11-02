@@ -64,6 +64,7 @@ export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabase
     });
 
     this.associations = associations.map(a => ({ ...a, id: `${a.associationName}_${a.reference}` }));
+
     return this.associations;
   }
 }

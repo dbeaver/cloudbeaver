@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ export abstract class CachedTreeResource<
       this.getKeyRef.bind(this),
       () => this.data,
     );
+
     this.useTracker = new CachedTreeUseTracker(this.logger, this.aliases, this.metadata);
 
     this.onMove = new SyncExecutor();
@@ -115,6 +116,7 @@ export abstract class CachedTreeResource<
     }
 
     key = this.aliases.transformToKey(key);
+
     return ResourceKeyUtils.every(key, key => this.dataHas(this.getKeyRef(key)));
   }
 
@@ -137,6 +139,7 @@ export abstract class CachedTreeResource<
     if (this.aliases.isAlias(originalKey, CachedTreeChildrenKey) || this.aliases.isAlias(originalKey, CachedTreeRootChildrenKey)) {
       throw new Error("Children can't be set with alias");
     }
+
     const key = this.aliases.transformToKey(originalKey);
 
     if (isResourceKeyList(key)) {
@@ -150,6 +153,7 @@ export abstract class CachedTreeResource<
     } else {
       this.dataSet(this.getKeyRef(key), value as TValue);
     }
+
     this.markUpdated(key);
     this.markLoaded(key);
     this.cleanError(key);
@@ -181,6 +185,7 @@ export abstract class CachedTreeResource<
     ResourceKeyUtils.forEach(key, key => {
       this.dataDelete(this.getKeyRef(key));
     });
+
     this.metadata.delete(originalKey);
     // rewrites pending outdate
     // this.markUpdated(key);
@@ -205,7 +210,9 @@ export abstract class CachedTreeResource<
     if (key === undefined) {
       key = CachedTreeRootChildrenKey;
     }
+
     await this.loadData(key, true, includes);
+
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
@@ -228,7 +235,9 @@ export abstract class CachedTreeResource<
     if (key === undefined) {
       key = CachedTreeRootChildrenKey;
     }
+
     await this.loadData(key, false, includes);
+
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 

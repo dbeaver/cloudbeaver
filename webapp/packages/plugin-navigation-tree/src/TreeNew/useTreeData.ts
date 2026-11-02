@@ -59,6 +59,7 @@ export function useTreeData(options: IOptions): ITreeData {
       stateTransformers: observable.ref,
     },
   );
+
   const state = useTreeState(options.externalState);
   const [nodeCache] = useState(
     () =>
@@ -68,18 +69,21 @@ export function useTreeData(options: IOptions): ITreeData {
         ),
       ),
   );
+
   const [childrenCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<string[]>>(id =>
         computed(() => applyTransforms(treeData, id, options.getChildren(id), options.childrenTransformers)),
       ),
   );
+
   const [parentCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<string | null>>(id =>
         computed(() => applyTransforms(treeData, id, options.getParent?.(id) ?? null, options.parentTransformers)),
       ),
   );
+
   const [stateCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<INodeState>>(id =>

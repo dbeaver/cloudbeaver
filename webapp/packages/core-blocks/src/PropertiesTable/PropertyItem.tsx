@@ -50,6 +50,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({
   const handleKeyChange = useCallback((key: string) => onNameChange(property.id, key), [property]);
   const handleValueChange = useCallback((value: string | null) => onValueChange(property.id, value), [property]);
   const handleRemove = useCallback(() => onRemove(property.id), [property]);
+
   function handleRevert() {
     onValueChange(property.id, defaultValue ?? null);
   }

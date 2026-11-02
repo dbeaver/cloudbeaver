@@ -18,6 +18,8 @@ package io.cloudbeaver.service.security;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import com.google.gson.ToNumberPolicy;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.*;
@@ -65,6 +67,7 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -87,6 +90,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
+    private static final Gson UI_SETTINGS_GSON = new GsonBuilder()
+        .serializeNulls()
+        .setObjectToNumberStrategy(ToNumberPolicy.BIG_DECIMAL)
+        .create();
+    private static final int MAX_UI_SETTINGS_BYTES = 64_000;
 
     protected final T application;
     protected final CBDatabase database;
@@ -1312,6 +1320,94 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
         }
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> getCurrentUserUISettings() throws DBException {
+        String userId = getUserIdOrThrow();
+        try (Connection dbCon = database.openConnection()) {
+            return readUserUISettings(dbCon, userId);
+        } catch (SQLException | JsonParseException e) {
+            throw new DBCException("Error while loading user UI settings", e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> updateCurrentUserUISettings(@NotNull Map<String, Object> settings) throws DBException {
+        String userId = getUserIdOrThrow();
+        String configuration;
+        try {
+            configuration = UI_SETTINGS_GSON.toJson(settings);
+        } catch (IllegalArgumentException e) {
+            throw new DBException("Invalid user UI settings", e);
+        }
+        if (configuration.getBytes(StandardCharsets.UTF_8).length > MAX_UI_SETTINGS_BYTES) {
+            throw new DBException("User UI settings exceed the maximum size of " + MAX_UI_SETTINGS_BYTES + " UTF-8 bytes");
+        }
+        Map<String, Object> savedSettings = UI_SETTINGS_GSON.fromJson(configuration, MAP_STRING_OBJECT_TYPE);
+
+        try (Connection dbCon = database.openConnection();
+             JDBCTransaction txn = new JDBCTransaction(dbCon)
+        ) {
+            try {
+                lockUserUISettings(dbCon, userId);
+                try (PreparedStatement deleteStatement = dbCon.prepareStatement(
+                    "DELETE FROM {table_prefix}CB_USER_STATE WHERE USER_ID=?");
+                     PreparedStatement insertStatement = dbCon.prepareStatement(
+                         "INSERT INTO {table_prefix}CB_USER_STATE " +
+                             "(USER_ID,USER_CONFIGURATION,UPDATE_TIME) VALUES(?,?,CURRENT_TIMESTAMP)")) {
+                    deleteStatement.setString(1, userId);
+                    deleteStatement.executeUpdate();
+                    insertStatement.setString(1, userId);
+                    insertStatement.setString(2, configuration);
+                    insertStatement.executeUpdate();
+                }
+                txn.commit();
+                return savedSettings;
+            } catch (SQLException | RuntimeException e) {
+                try {
+                    txn.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+                throw e;
+            }
+        } catch (SQLException | RuntimeException e) {
+            throw new DBCException("Error while updating user UI settings", e);
+        }
+    }
+
+    private void lockUserUISettings(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        // Lock the parent row even before the first save to serialize replacements across server nodes.
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=IS_ACTIVE WHERE USER_ID=?")) {
+            dbStat.setString(1, userId);
+            dbStat.executeUpdate();
+        }
+    }
+
+    @NotNull
+    private Map<String, Object> readUserUISettings(@NotNull Connection dbCon, @NotNull String userId)
+        throws SQLException, DBException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT USER_CONFIGURATION FROM {table_prefix}CB_USER_STATE WHERE USER_ID=?")) {
+            dbStat.setString(1, userId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                if (dbResult.next()) {
+                    String configuration = dbResult.getString(1);
+                    if (configuration != null) {
+                        Map<String, Object> settings = UI_SETTINGS_GSON.fromJson(configuration, MAP_STRING_OBJECT_TYPE);
+                        if (settings == null) {
+                            throw new DBException("Stored user UI settings must be a JSON object");
+                        }
+                        return settings;
+                    }
+                }
+            }
+        }
+        return Map.of();
     }
 
     public void enableUser(
@@ -3305,7 +3401,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         String userId = findUserByCredentials(authProvider, userCredentials, true);
         String userIdFromCredentials;
         try {
-            userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, providerConfig, userCredentials, null);
+            userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, providerConfig, userCredentials, userId);
         } catch (DBException e) {
             log.debug("Local auth validation error", e);
             return null;

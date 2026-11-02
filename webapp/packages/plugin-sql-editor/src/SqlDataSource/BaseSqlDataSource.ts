@@ -113,6 +113,7 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
         if (source === SOURCE_HISTORY) {
           return;
         }
+
         this.history.add(script, source, cursor);
       }),
     );
@@ -161,6 +162,7 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
     if (cursor) {
       this.setInnerCursorState(cursor);
     }
+
     this.onSetScript.execute({ script, source, cursor });
   }
 
@@ -251,6 +253,7 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
       anchor,
       head,
     });
+
     this.onUpdate.execute();
   }
 
@@ -267,6 +270,7 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
       this.setBaseScript(this.incomingScript);
       this.incomingScript = undefined;
     }
+
     if (this.incomingExecutionContext !== null) {
       this.setBaseExecutionContext(this.incomingExecutionContext);
       this.incomingExecutionContext = null;
@@ -277,9 +281,11 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
     if (this.incomingScript !== undefined) {
       this.setBaseScript(this.incomingScript);
     }
+
     if (this.incomingExecutionContext !== null) {
       this.setBaseExecutionContext(this.incomingExecutionContext);
     }
+
     this.reset();
   }
 

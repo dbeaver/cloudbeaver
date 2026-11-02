@@ -57,6 +57,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
   const connectionInfoNetworkHandlersService = useResource(SSL, ConnectionInfoNetworkHandlersResource, optionsPart.connectionKey, {
     active: selected,
   });
+
   const handlersInfo = connectionInfoNetworkHandlersService.data;
   const initialHandler = handlersInfo?.networkHandlersConfig?.find(h => h.id === handler.id);
   const projectInfoResource = useService(ProjectInfoResource);

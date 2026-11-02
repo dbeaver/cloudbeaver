@@ -124,9 +124,11 @@ export class NotificationService {
 
     if (filteredNotificationList.length > notificationsPool) {
       let i = 0;
+
       while (this.notificationList.get(this.notificationList.keys[i]!)?.persistent) {
         i++;
       }
+
       this.notificationList.remove(this.notificationList.keys[i]!);
     }
 
@@ -167,6 +169,7 @@ export class NotificationService {
     );
 
     processController.init(notification.title, notification.message);
+
     return { controller: processController, notification };
   }
 
@@ -213,6 +216,7 @@ export class NotificationService {
       details: exception,
       isSilent: true,
     });
+
     throw exception;
   }
 
@@ -229,8 +233,10 @@ export class NotificationService {
           this.closeTask.execute(id);
         }, DELAY_DELETING);
       }
+
       return;
     }
+
     this.notificationList.remove(id);
     this.closeTask.execute(id);
   }

@@ -87,6 +87,7 @@ export function useGridSelectionContext(
       }
 
       let i = 0;
+
       for (let rowIdx = firstRowIndex; rowIdx <= lastRowIndex; rowIdx++) {
         const row = props.tableData.getRow(rowIdx)!;
         const newElements = rowSelection
@@ -99,11 +100,14 @@ export function useGridSelectionContext(
             if (selected) {
               return !rowSelection.some(key => GridDataKeysUtils.isEqual(key, column.column));
             }
+
             return true;
           }),
         );
+
         i++;
       }
+
       return;
     }
 
@@ -196,6 +200,7 @@ export function useGridSelectionContext(
       if (column === undefined) {
         return (temporaryRowSelection || []).length === props.tableData.columnKeys.length;
       }
+
       return temporaryRowSelection.some(key => GridDataKeysUtils.isEqual(key.column, column));
     }
 

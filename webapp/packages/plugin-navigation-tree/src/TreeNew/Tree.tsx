@@ -60,8 +60,10 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
     onNodeDoubleClick,
     getNodeHeight,
   });
+
   const mountOptimization = useTreeVirtualization();
   const elementsSizeCache = useNodeSizeCache(tree, data);
+
   return (
     <NodeSizeCacheContext.Provider value={elementsSizeCache}>
       <TreeDataContext.Provider value={data}>

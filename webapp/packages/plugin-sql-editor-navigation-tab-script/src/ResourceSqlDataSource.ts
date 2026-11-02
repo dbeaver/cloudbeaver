@@ -69,15 +69,19 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     if (this.resourceKey === undefined) {
       return super.projectId;
     }
+
     const key = getRmResourceKey(this.resourceKey);
+
     return key.projectId;
   }
 
   get executionContext(): IConnectionExecutionContextInfo | undefined {
     const executionContext = this.state?.executionContext;
+
     if (!executionContext || !this.connectionInfoResource.has(createConnectionParam(executionContext.projectId, executionContext.connectionId))) {
       return undefined;
     }
+
     return this.state.executionContext;
   }
 
@@ -113,6 +117,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     if (this.isProjectDifferent) {
       return true;
     }
+
     return super.isExecutionContextSaved;
   }
 
@@ -234,6 +239,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   override setName(name: string | null): void {
     name = name?.trim() ?? null;
+
     if (!name || name === this.name) {
       return;
     }
@@ -252,6 +258,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   override setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {
     const previous = this.state.script;
+
     if (previous === script) {
       return;
     }
@@ -321,6 +328,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   override dispose(): void {
     super.dispose();
     this.resourceManagerResource.onItemUpdate.removeHandler(this.syncResource);
+
     if (this.state.resourceKey && this.resourceUseKeyId) {
       this.resourceManagerResource.useTracker.free(this.state.resourceKey, this.resourceUseKeyId);
       this.resourceUseKeyId = null;
@@ -339,6 +347,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     }
 
     const resourceKey = this.resourceKey;
+
     if (resourceKey && ResourceKeyUtils.some(key, key => resourceKey.startsWith(key))) {
       this.markOutdated();
     }
@@ -358,6 +367,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         if (!this.isSaved) {
           throw new Error('Please save changes before renaming');
         }
+
         this.exception = null;
 
         this.loadingMessage = 'plugin_sql_editor_navigation_tab_script_state_renaming';
@@ -443,9 +453,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       if (!this.actions || !this.resourceKey) {
         return;
       }
+
       this.loadingMessage = 'plugin_sql_editor_navigation_tab_script_state_reading';
       const script = await this.actions.read(this, this.resourceKey);
       const executionContext = await this.actions.getProperties(this, this.resourceKey);
+
       if (executionContext) {
         await this.connectionInfoResource.load(createConnectionParam(executionContext.projectId, executionContext.connectionId));
       }
@@ -455,6 +467,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
           if (this.baseScript !== script) {
             this.setScript(script);
           }
+
           if (!isObjectsEqual(toJS(this.baseExecutionContext), executionContext)) {
             this.setExecutionContext(executionContext);
           }

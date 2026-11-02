@@ -54,6 +54,7 @@ export class DataExportMenuService {
         return [...items, ...extracted];
       },
     });
+
     this.actionService.addHandler({
       id: 'data-export-base-handler',
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],

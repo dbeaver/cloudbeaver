@@ -75,5 +75,6 @@ export function useAiScopeSelection(options: Options): Readonly<IAiScopeSelectio
     false,
     ['getSelection', 'isSelected', 'isInherited'],
   );
+
   return selection;
 }

@@ -1,18 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 const top = 0;
+
 function parent(i: number): number {
   return ((i + 1) >>> 1) - 1;
 }
+
 function left(i: number): number {
   return (i << 1) + 1;
 }
+
 function right(i: number): number {
   return (i + 1) << 1;
 }
@@ -45,6 +48,7 @@ export class PriorityQueue<T = number> {
       this._heap.push(value);
       this.siftUp();
     });
+
     return this.size();
   }
 
@@ -58,6 +62,7 @@ export class PriorityQueue<T = number> {
 
     this._heap.pop();
     this.siftDown();
+
     return poppedValue;
   }
 
@@ -65,6 +70,7 @@ export class PriorityQueue<T = number> {
     const replacedValue = this.peek();
     this._heap[top] = value;
     this.siftDown();
+
     return replacedValue;
   }
 
@@ -78,6 +84,7 @@ export class PriorityQueue<T = number> {
 
   private siftUp() {
     let node = this.size() - 1;
+
     while (node > top && this.greater(node, parent(node))) {
       this.swap(node, parent(node));
       node = parent(node);
@@ -86,6 +93,7 @@ export class PriorityQueue<T = number> {
 
   private siftDown() {
     let node = top;
+
     while ((left(node) < this.size() && this.greater(left(node), node)) || (right(node) < this.size() && this.greater(right(node), node))) {
       const maxChild = right(node) < this.size() && this.greater(right(node), left(node)) ? right(node) : left(node);
       this.swap(node, maxChild);

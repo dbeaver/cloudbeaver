@@ -56,6 +56,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
 
     function handlePortalClick(event: React.MouseEvent<HTMLDivElement>) {
       EventContext.set(event, EventStopPropagationFlag);
+
       if (!treeNodeContext.selected) {
         treeNodeContext.select();
       }
@@ -63,6 +64,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
 
     function handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {
       contextMenuPosition.open(event);
+
       if (!treeNodeContext.selected) {
         treeNodeContext.select();
       }
@@ -75,6 +77,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     if (node.projectId && resourceType !== undefined) {
       if (isRMProjectNode(node)) {
         const project = projectInfoResource.get(node.projectId);
+
         if (project) {
           const resourceFolder = resourceManagerService.getRootFolder(project, resourceType);
 

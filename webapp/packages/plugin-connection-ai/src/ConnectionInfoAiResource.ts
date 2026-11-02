@@ -47,6 +47,7 @@ export class ConnectionInfoAiResource extends CachedMapResource<IConnectionInfoP
           dataSourceId,
           settings,
         });
+
         this.set(dataSourceId, result.settings);
       });
     });
@@ -84,9 +85,11 @@ export class ConnectionInfoAiResource extends CachedMapResource<IConnectionInfoP
 
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+
     if (!parse.success) {
       this.logger.warn(`Invalid resource key ${(schemaValidationError(parse.error).toString(), { prefix: null })}`);
     }
+
     return parse.success;
   }
 }

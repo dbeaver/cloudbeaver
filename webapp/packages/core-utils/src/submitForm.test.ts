@@ -18,8 +18,10 @@ describe('submitForm', () => {
     if (!capturedForm) {
       throw new Error('submit() was not called');
     }
+
     return capturedForm;
   };
+
   const getInputs = (): HTMLInputElement[] => Array.from(getForm().querySelectorAll('input'));
 
   beforeEach(() => {

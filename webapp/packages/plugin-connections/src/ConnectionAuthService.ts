@@ -63,6 +63,7 @@ export class ConnectionAuthService {
       }),
       state => state === 'before' && userInfoResource.isAnonymous(),
     );
+
     this.authenticationService.onLogout.before(
       connectionsManagerService.onDisconnect,
       state => ({
@@ -81,6 +82,7 @@ export class ConnectionAuthService {
     if (!newConnection?.connected) {
       return;
     }
+
     connection.connection = newConnection;
   }
 

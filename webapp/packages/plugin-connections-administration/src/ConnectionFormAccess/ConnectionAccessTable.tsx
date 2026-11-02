@@ -31,6 +31,7 @@ const NAME_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = {
   label: 'connections_connection_access_user_or_team_name',
   compare: compareGrantSubjectsByName,
 };
+
 const DESCRIPTION_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = { key: 'description', label: 'connections_connection_description' };
 const LAST_LOGIN_COLUMN: IGrantManagementTableColumn<AdminUser | TeamInfo> = {
   key: 'lastLogin',
@@ -56,9 +57,11 @@ export const ConnectionAccessTable: TabContainerPanelComponent<IConnectionFormPr
   const optionsPart = getConnectionFormOptionsPart(formState);
   const connectionParam =
     optionsPart.state.connectionId !== undefined ? createConnectionParam(formState.state.projectId, optionsPart.state.connectionId) : null;
+
   const connectionInfoResource = useResource(ConnectionAccessTable, ConnectionInfoResource, connectionParam, {
     active: selected,
   });
+
   const originInfoResource = useResource(ConnectionAccessTable, ConnectionInfoOriginResource, connectionParam, {
     active: selected,
   });

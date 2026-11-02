@@ -103,6 +103,7 @@ export class DataViewerSettingsService {
     if (typeof count === 'number' && Number.isNaN(count)) {
       count = 0;
     }
+
     return count !== undefined ? Math.max(this.minFetchSize, Math.min(count, this.maxFetchSize)) : this.defaultFetchSize;
   }
 

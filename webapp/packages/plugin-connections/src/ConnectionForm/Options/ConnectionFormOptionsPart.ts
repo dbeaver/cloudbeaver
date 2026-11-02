@@ -90,6 +90,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         if (this.formState.mode === 'edit') {
           return;
         }
+
         if (!this.state.name || prev === this.state.name) {
           this.state.name = value;
         }
@@ -453,6 +454,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       if (!properties) {
         continue;
       }
+
       for (const key of Object.keys(properties)) {
         if (typeof properties[key] === 'string') {
           properties[key] = properties[key].trim();
@@ -505,6 +507,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     if (this.state.configurationType === DriverConfigurationType.Manual && this.state.host?.length === 0 && this.state.driverId) {
       const driver = await this.dbDriverResource.load(this.state.driverId);
+
       if (!driver.embedded) {
         validation.error('plugin_connections_connection_form_host_invalid');
       }
@@ -540,6 +543,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     const submitType = contexts.getContext(formSubmitContext);
+
     if (submitType.type === 'submit') {
       if (this.formState.mode === 'edit') {
         await this.connectionInfoResource.update(this.connectionKey!, this.state);
@@ -645,5 +649,6 @@ function isCredentialsChanged(authProperties: IObjectPropertyInfo[], credentials
       return true;
     }
   }
+
   return false;
 }

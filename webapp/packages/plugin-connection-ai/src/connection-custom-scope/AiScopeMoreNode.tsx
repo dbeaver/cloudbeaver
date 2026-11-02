@@ -23,6 +23,7 @@ export const AiScopeMoreNode: NodeComponent = function AiScopeMoreNode({ nodeId 
   async function loadMore() {
     const parent = CachedResourceOffsetPageTargetKey(nodeId.slice(MORE_PREFIX.length));
     const page = navTreeResource.offsetPagination.getPageInfo(CachedResourceOffsetPageKey(0, 0).setParent(parent));
+
     if (page) {
       try {
         await navTreeResource.load(CachedResourceOffsetPageKey(getNextPageOffset(page), navTreeResource.childrenLimit).setParent(parent));

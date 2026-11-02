@@ -41,6 +41,7 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
     if (disabled || !tableDataContext || !cell) {
       return;
     }
+
     const resultColumn = tableDataContext.getColumnInfo(cell.column);
 
     if (!resultColumn) {

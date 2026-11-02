@@ -62,6 +62,7 @@ export class PluginBootstrap extends Bootstrap {
       if (this.errorNotification) {
         return;
       }
+
       if (this.screenService.isActive(AppScreenService.screenName) && this.localStorageSaveService.storage === 'session') {
         this.errorNotification = this.notificationService.customNotification(
           () => ActionSnackbar,
@@ -83,6 +84,7 @@ export class PluginBootstrap extends Bootstrap {
         );
       }
     };
+
     this.localStorageSaveService.onStorageChange.addHandler(displayErrorMessage);
 
     this.screenService.routeChange.addPostHandler(displayErrorMessage);

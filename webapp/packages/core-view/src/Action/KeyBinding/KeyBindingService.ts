@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ export class KeyBindingService {
     if (this.handlers.has(handler.id)) {
       throw new Error(`Key binding handler with same id (${handler.id}) already exists`);
     }
+
     this.handlers.set(handler.id, {
       ...handler,
       actions: new Set(handler.actions),
@@ -35,6 +36,7 @@ export class KeyBindingService {
       if (handler.actions.size > 0 && !handler.actions.has(action)) {
         continue;
       }
+
       if (handler.contexts.size > 0) {
         for (const context of handler.contexts) {
           if (!contexts.has(context)) {
@@ -42,6 +44,7 @@ export class KeyBindingService {
           }
         }
       }
+
       if (handler.isBindingApplicable?.(contexts, action) !== false) {
         return handler;
       }

@@ -71,6 +71,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       this.dbDriverResource.load(this.optionsPart.state.driverId),
       this.networkHandlerResource.load(CachedMapAllKey),
     ]);
+
     const handler = getSSLDriverHandler(handlers, driver?.applicableNetworkHandlers ?? []);
 
     if (!handler) {
@@ -89,6 +90,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       }
 
       this.setInitialState(config);
+
       return;
     }
 
@@ -139,6 +141,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       }
 
       const submitInfo = contexts.getContext(formSubmitContext);
+
       if (submitInfo.type === 'submit') {
         if (Object.keys(handlerConfig.secureProperties).length === 0) {
           delete handlerConfig.secureProperties;
@@ -163,6 +166,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
 
   protected override async format(): Promise<void> {
     const properties = this.state.properties;
+
     if (!properties) {
       return;
     }

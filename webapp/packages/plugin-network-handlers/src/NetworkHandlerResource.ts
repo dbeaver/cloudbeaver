@@ -44,6 +44,7 @@ export class NetworkHandlerResource extends CachedMapResource<string, NetworkHan
     const { handlers } = await this.graphQLService.sdk.getNetworkHandlers();
 
     this.replace(resourceKeyList(handlers.map(handler => handler.id)), handlers);
+
     return this.data;
   }
 

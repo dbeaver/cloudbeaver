@@ -16,11 +16,14 @@
  */
 package io.cloudbeaver.service.auth;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.auth.impl.WebServiceAuthImpl;
 import org.jkiss.utils.CommonUtils;
+
+import java.util.Map;
 
 /**
  * Web service implementation
@@ -86,6 +89,13 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             .dataFetcher("setUserPreferences",
                 env -> getService(env).setUserConfigurationParameters(getWebSession(env),
                     getArgumentVal(env, "preferences")))
+            .dataFetcher("authSetUserConfiguration", env -> {
+                Object configuration = getArgumentVal(env, "configuration");
+                if (!(configuration instanceof Map<?, ?>)) {
+                    throw new DBWebException("User configuration must be a JSON object");
+                }
+                return getService(env).updateUserConfiguration(getWebSession(env), getArgumentVal(env, "configuration"));
+            })
             .dataFetcher("federatedLogin", env -> getService(env).federatedLogin(
                 GraphQLEndpoint.getServletRequestOrThrow(env),
                 getWebSession(env, false),
