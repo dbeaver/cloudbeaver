@@ -82,7 +82,7 @@ export class AIChatAttachmentsService {
 
     if (!state) {
       const newState = new AIChatAttachmentsState();
-      runInAction(() => states.set(key, newState));
+      states.set(key, newState);
       state = newState;
     }
 

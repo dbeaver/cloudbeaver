@@ -7,7 +7,7 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { blobToBase64, uuid } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import type { AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
@@ -28,15 +28,13 @@ const MAX_IMAGES = 10;
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
 
 @injectable(() => [AIChatAttachmentsService, LocalizationService])
-export class AIChatAttachmentsImageHandlerService extends Bootstrap {
+export class AIChatAttachmentsImageHandlerService {
   constructor(
     private readonly aiChatAttachmentsService: AIChatAttachmentsService,
     private readonly localizationService: LocalizationService,
-  ) {
-    super();
-  }
+  ) {}
 
-  override register(): void {
+  register(): void {
     this.aiChatAttachmentsService.register({
       id: IMAGE_ATTACHMENT_TYPE,
       accept: [...IMAGE_MEDIA_TYPES].join(','),

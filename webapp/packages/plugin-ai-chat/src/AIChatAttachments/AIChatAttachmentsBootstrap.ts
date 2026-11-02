@@ -32,7 +32,9 @@ export class AIChatAttachmentsBootstrap extends Bootstrap {
     this.aiChatInputService.onDrag.addHandler(data => this.aiChatAttachmentsService.handleInputDrag(data));
     this.aiChatInputService.onValidate.addHandler(data => this.aiChatAttachmentsService.validateInput(data));
     this.aiChatInputService.onPrepareSubmit.addHandler((data, contexts) => this.aiChatAttachmentsService.prepareSubmission(data, contexts));
+
     this.aiChatMessageService.onMessageSend.addHandler((data, contexts) => this.aiChatAttachmentsService.handleMessageSend(data, contexts));
+
     this.aiChatInputService.dragPreview.add(AIChatAttachmentsDropPreview);
     this.aiChatInputService.beforeInput.add(AIChatAttachmentsInputContent);
   }

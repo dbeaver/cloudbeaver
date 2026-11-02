@@ -37,7 +37,6 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, AIChatServiceBootstrap)
       .addSingleton(Bootstrap, AIChatAttachmentsBootstrap)
       .addSingleton(Bootstrap, proxy(AIChatContextService))
-      .addSingleton(Bootstrap, proxy(AIChatAttachmentsImageHandlerService))
       .addSingleton(Dependency, proxy(AIChatSettingsService))
       .addSingleton(Dependency, proxy(AIChatMessagesResource))
       .addSingleton(Dependency, proxy(AIChatConversationsResource))

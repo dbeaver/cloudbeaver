@@ -11,8 +11,10 @@ import { action, computed, makeObservable, observable } from 'mobx';
 import type { IAIChatAttachment } from './AIChatAttachmentsService.js';
 
 export class AIChatAttachmentsState {
-  readonly attachments: IAIChatAttachment[] = [];
   dragOver = false;
+
+  readonly attachments: IAIChatAttachment[] = [];
+
   private loadingCount = 0;
 
   get loading(): boolean {
