@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,6 +8,8 @@
 import type { DataContextGetter } from './DataContextGetter.js';
 
 export interface IDataContextProvider {
+  /** Changes when this scope or its ancestors receive a different contribution. */
+  readonly revision?: string;
   has: (context: DataContextGetter<any>) => boolean;
   hasOwn: (context: DataContextGetter<any>) => boolean;
   get: <T>(context: DataContextGetter<T>) => T | undefined;

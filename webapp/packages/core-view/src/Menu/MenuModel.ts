@@ -30,6 +30,12 @@ type MenuModelService = Pick<
 >;
 export type MenuResolutionState = 'pending' | 'loading' | 'ready' | 'error';
 
+interface IMenuLoadRequest {
+  loader: ILoadableState;
+  context: IDataContext;
+  revision: string | undefined;
+}
+
 export function createMenuContext(menu: IMenu, parent?: IDataContext, subMenu?: IMenuSubMenuItem): IDataContext {
   const context = new DataContext(parent);
   context.set(DATA_CONTEXT_MENU, menu, 'menu');
@@ -53,7 +59,7 @@ export class MenuModel implements ILoadableState {
   private initialized = false;
   private open = false;
   private loadLazy = false;
-  private failure: Error | null = null;
+  private failure: { error: Error; context: IDataContext; revision: string | undefined } | null = null;
   private dispose: IReactionDisposer | undefined;
   private task: Promise<void> | undefined;
   private scheduled = false;
@@ -91,7 +97,7 @@ export class MenuModel implements ILoadableState {
   }
 
   get handler(): IMenuHandler | null {
-    return this.menuModelService.getHandler(this.context);
+    return this.prepared ? this.menuModelService.getHandler(this.context) : null;
   }
   get preparationLoaders(): ILoadableState[] {
     return this.menuModelService.getPreparationLoaders(this.context);
@@ -166,8 +172,8 @@ export class MenuModel implements ILoadableState {
     return this.empty && (!primaryAction || primaryAction.hidden === true);
   }
   get exception(): Error | null {
-    if (this.root.failure) {
-      return this.root.failure;
+    if (this.root.failure && this.root.failure.context.revision === this.root.failure.revision) {
+      return this.root.failure.error;
     }
     for (const loader of [...this.preparationLoaders, ...this.loaders]) {
       const errors = [loader.exception ?? []].flat();
@@ -212,7 +218,7 @@ export class MenuModel implements ILoadableState {
     });
     this.dispose = autorun(() => {
       const loaders = this.activeLoaders();
-      if (!this.failure && loaders.some(loader => pending(loader) && !loader.isError() && loader.isLoadable?.() !== false)) {
+      if (!this.exception && loaders.some(loader => pending(loader) && !loader.isError() && loader.isLoadable?.() !== false)) {
         this.schedule();
       }
     });
@@ -224,19 +230,27 @@ export class MenuModel implements ILoadableState {
   }
 
   private activeLoaders(): ILoadableState[] {
-    const loaders = [...this.preparationLoaders];
+    return this.activeRequests().map(request => request.loader);
+  }
+
+  private activeRequests(): IMenuLoadRequest[] {
+    const requests = this.preparationLoaders.map(loader => ({ loader, context: this.context, revision: this.context.revision }));
     if (!this.prepared || this.handler?.isHidden?.(this.context)) {
-      return loaders;
+      return requests;
     }
-    loaders.push(...this.loaders.filter(loader => !loader.lazy || this.loadLazy));
+    requests.push(
+      ...this.loaders
+        .filter(loader => !loader.lazy || this.loadLazy)
+        .map(loader => ({ loader, context: this.context, revision: this.context.revision })),
+    );
     if (this.open) {
       for (const item of this.items) {
         if (!item.hidden && item instanceof MenuSubMenuItem) {
-          loaders.push(...(this.getSubMenu(item)?.activeLoaders() ?? []));
+          requests.push(...(this.getSubMenu(item)?.activeRequests() ?? []));
         }
       }
     }
-    return loaders;
+    return requests;
   }
 
   private schedule(): void {
@@ -262,19 +276,23 @@ export class MenuModel implements ILoadableState {
     }
     const generation = this.generation;
     this.task = (async () => {
-      for (const loader of this.activeLoaders()) {
+      for (const { loader, context, revision } of this.activeRequests()) {
         if (generation !== this.generation || !this.dispose) {
           return;
         }
+        if (context.revision !== revision) {
+          continue;
+        }
+        if (!this.activeLoaders().includes(loader)) { continue; }
         if (!pending(loader) || loader.isError() || loader.isLoadable?.() === false) {
           continue;
         }
         try {
           await loader.load();
         } catch (error) {
-          if (generation === this.generation) {
+          if (generation === this.generation && context.revision === revision) {
             runInAction(() => {
-              this.failure = error instanceof Error ? error : new Error(String(error));
+              this.failure = { error: error instanceof Error ? error : new Error(String(error)), context, revision };
             });
           }
           return;

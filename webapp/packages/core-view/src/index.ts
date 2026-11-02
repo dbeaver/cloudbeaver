@@ -78,6 +78,7 @@ export * from './Menu/menuExtractItems.js';
 export * from './Menu/menuItemsPlaceAfter.js';
 export * from './Menu/getMenuLabelClipped.js';
 export * from './Menu/MenuService.js';
+export * from './Menu/MenuModel.js';
 export * from './Menu/useMenu.js';
 export * from './Menu/useMenuContext.js';
 export * from './View/AppView.js';

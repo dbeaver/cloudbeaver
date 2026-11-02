@@ -19,6 +19,18 @@ import { createMenuContext, MenuModel } from './MenuModel.js';
 import { MenuService } from './MenuService.js';
 
 describe('MenuService preparation', () => {
+  it('preserves the primary action when its submenu has no items', () => {
+    const actionService = new ActionService(new KeyBindingService());
+    const menuService = new MenuService(actionService);
+    const action = createAction('primary', { label: 'primary' });
+    const menu = createMenu('split', { label: 'split', action });
+    actionService.addHandler({ id: 'primary', actions: [action], handler: () => {} });
+    const model = new MenuModel(menuService, menu);
+    const stop = model.start();
+    expect(model.empty).toBe(true);
+    expect(model.hidden).toBe(false);
+    stop();
+  });
   it('discovers preparation before resource-dependent applicability', async () => {
     const menuService = new MenuService(new ActionService(new KeyBindingService()));
     const menu = createMenu('manage', { label: 'manage' });

@@ -9,6 +9,7 @@ import { observable, runInAction } from 'mobx';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ILoadableState } from '@cloudbeaver/core-utils';
+import { createDataContext } from '@cloudbeaver/core-data-context';
 
 import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU.js';
 import { DATA_CONTEXT_MENU_NESTED } from './DATA_CONTEXT_MENU_NESTED.js';
@@ -60,6 +61,37 @@ function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> 
 }
 
 describe('MenuModel', () => {
+  it('keeps blocked loaders pending without retrying them in a loop', async () => {
+    const { loader } = resource();
+    loader.isLoadable = () => false;
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
+    const stop = model.start();
+    await model.load();
+    expect(loader.load).not.toHaveBeenCalled();
+    expect(model.state).toBe('pending');
+    expect(model.hidden).toBe(false);
+    stop();
+  });
+
+  it('ignores an old request failure after the context switches to a different object', async () => {
+    const key = createDataContext<string>('connection');
+    let reject!: (error: Error) => void;
+    const loader = resource().loader;
+    loader.load = () =>
+      new Promise<void>((_, rejectLoad) => {
+        reject = rejectLoad;
+      });
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
+    model.context.set(key, 'first', 'node');
+    const stop = model.start();
+    const loading = model.load();
+    model.context.set(key, 'second', 'node');
+    reject(new Error('first connection failed'));
+    await loading;
+    stop();
+    expect(model.exception).toBeNull();
+  });
+
   it('provides menu identity before effects and distinguishes uninitialized from empty', () => {
     const model = new MenuModel(service(), rootMenu);
     expect(model.context.getOwn(DATA_CONTEXT_MENU)).toBe(rootMenu);

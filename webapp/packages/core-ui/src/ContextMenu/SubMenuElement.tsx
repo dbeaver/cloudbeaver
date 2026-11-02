@@ -14,17 +14,7 @@ import {
   type IMenuItemGroupArrowElementProps,
   type IMenuItemGroupElementProps,
 } from '@cloudbeaver/core-blocks';
-import { useDataContextLink } from '@cloudbeaver/core-data-context';
-import {
-  DATA_CONTEXT_MENU_NESTED,
-  DATA_CONTEXT_SUBMENU_ITEM,
-  type IMenuActionItem,
-  type IMenuData,
-  type IMenuSubMenuItem,
-  MenuActionItem,
-  MenuService,
-  useMenu,
-} from '@cloudbeaver/core-view';
+import { type IMenuActionItem, type IMenuData, type IMenuSubMenuItem, MenuActionItem, MenuService } from '@cloudbeaver/core-view';
 
 import type { IContextMenuNewProps } from './ContextMenu.js';
 import { type HovercardStoreState, MenuItem } from '@dbeaver/ui-kit';
@@ -32,7 +22,6 @@ import { useService } from '@cloudbeaver/core-di';
 import { MenuActionElement } from './MenuActionElement.js';
 import { MenuContext, type IMenuContext } from './MenuContext.js';
 import { use, useCallback, useMemo } from 'react';
-import { isMenuEmpty } from './isMenuEmpty.js';
 
 interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   menuData: IMenuData;
@@ -60,16 +49,12 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   const parent = use(MenuContext);
   const translate = useTranslate();
   const menuService = useService(MenuService);
-  const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
-
-  useDataContextLink(subMenuData.context, (context, id) => {
-    context.set(DATA_CONTEXT_MENU_NESTED, true, id);
-    context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu, id);
-  });
+  // The parent model creates and prepares this scope independently of the submenu UI.
+  const subMenuData = menuData.getSubMenu(subMenu)!;
 
   const handler = subMenuData.handler;
 
-  const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context) || isMenuEmpty(subMenuData));
+  const hidden = getComputed(() => subMenuData.hidden);
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
   // TODO: fix, this triggers `Cannot update a component (`SubMenuElement`) while rendering a different component`
@@ -82,14 +67,14 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   const label = info?.label ?? subMenu.label ?? subMenu.menu.info.label;
   const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.info.icon;
   const group = info ? info.group : subMenu.menu.info.group;
-  const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
+  const disabled = getComputed(() => !subMenuData.prepared || handler?.isDisabled?.(subMenuData.context));
 
   const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.info.tooltip;
   const MenuComponent = menuComponent;
 
   let actionItem: IMenuActionItem | null = null;
 
-  if (action) {
+  if (action && subMenuData.prepared) {
     actionItem = menuService.createActionItem(subMenuData.context, action);
   }
   const menuContext = useMemo<IMenuContext>(() => ({ menu: subMenuData, rtl: parent?.rtl }), [subMenuData, parent]);
@@ -101,8 +86,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
     [menuData, subMenu],
   );
 
-  // TODO: need to be fixed, in case when menu depend on data from loaders this may be always true
-  if (hidden && !action) {
+  if (hidden) {
     return null;
   }
 
@@ -118,23 +102,25 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
             itemComponent={MenuItemElement}
           />
         </MenuContext>
-        <MenuComponent
-          menu={subMenuData}
-          placement={placement}
-          title={translate(tooltip || label)}
-          render={<MenuItemGroupArrowElement style={{ pointerEvents: 'auto' }} />}
-          id={subMenu.id}
-          aria-label={translate(label || tooltip)}
-          showOnHover={showSubmenuOnHover}
-          disabled={disabled}
-          onClick={handleClick}
-        />
+        {!subMenuData.empty && (
+          <MenuComponent
+            menu={subMenuData}
+            placement={placement}
+            title={translate(tooltip || label)}
+            render={<MenuItemGroupArrowElement style={{ pointerEvents: 'auto' }} />}
+            id={subMenu.id}
+            aria-label={translate(label || tooltip)}
+            showOnHover={showSubmenuOnHover}
+            disabled={disabled}
+            onClick={handleClick}
+          />
+        )}
       </MenuItemGroupElement>
     );
   }
 
   if (group) {
-    const firstActionItem = subMenuData.items.find(item => item instanceof MenuActionItem);
+    const firstActionItem = subMenuData.visibleItems.find(item => item instanceof MenuActionItem);
     if (firstActionItem) {
       // TODO: don't want to show submenu right now
       // if (subMenuData.items.length === 1) {

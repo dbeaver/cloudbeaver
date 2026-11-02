@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { use, useLayoutEffect, useMemo } from 'react';
 
-import { MenuItemElement, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, MenuItemElement, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IContextMenuProps } from './IContextMenuProps.js';
 import { MenuButton, MenuProvider, Menu, type HovercardStoreState, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
 import { RenderMenuItems } from './RenderMenuItems.js';
@@ -48,7 +48,10 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
 
   const handler = menuData.handler;
 
-  useAutoLoad({ name: `${ContextMenuInner.name}(${menuData.menu.id})` }, menuData.loaders, true, isMenuOpen, true);
+  useLayoutEffect(() => {
+    menuData.setOpen(isMenuOpen);
+    return () => menuData.setOpen(false);
+  }, [menuData, isMenuOpen]);
 
   const handlers = useObjectRef(
     () => ({
@@ -99,7 +102,11 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
     <MenuContext value={menuContext}>
       <MenuProvider store={menu} setOpen={handlers.handleVisibleSwitch}>
         {hasTrigger && (
-          <MenuButton {...rest} title={rest.title ?? translate(menuData.menu.info.tooltip || menuData.menu.info.label)}>
+          <MenuButton
+            {...rest}
+            disabled={!menuData.prepared || rest.disabled}
+            title={rest.title ?? translate(menuData.menu.info.tooltip || menuData.menu.info.label)}
+          >
             {children}
           </MenuButton>
         )}
@@ -112,13 +119,15 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
           dir={isRtl ? 'rtl' : 'ltr'}
         >
           {isMenuOpen && (
-            <RenderMenuItems
-              menu={menuData}
-              menuComponent={ContextMenu}
-              itemComponent={MenuItemElement}
-              groupComponent={GroupComponent}
-              groupArrowComponent={GroupArrowComponent}
-            />
+            <Loader state={menuData} small>
+              <RenderMenuItems
+                menu={menuData}
+                menuComponent={ContextMenu}
+                itemComponent={MenuItemElement}
+                groupComponent={GroupComponent}
+                groupArrowComponent={GroupArrowComponent}
+              />
+            </Loader>
           )}
         </Menu>
       </MenuProvider>

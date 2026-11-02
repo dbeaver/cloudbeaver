@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, s, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
+import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 
 import { ContextMenu } from '../ContextMenu.js';
 import type { IMenuBarProps } from './IMenuBarProps.js';
@@ -18,12 +18,15 @@ import { RenderMenuItems } from '../RenderMenuItems.js';
 import { MenuBarGroup } from './MenuBarGroup.js';
 import { MenuBarGroupArrow } from './MenuBarGroupArrow.js';
 import { MenuContext, type IMenuContext } from '../MenuContext.js';
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo } from 'react';
 
 export const MenuBar = observer<IMenuBarProps>(function MenuBar({ menu, compact = true, rtl, className, ref, ...props }) {
   const styles = useS(style);
-  const items = menu.items.filter(item => !item.hidden);
-  useAutoLoad(MenuBar, menu.loaders, true, false, true);
+  const items = menu.visibleItems;
+  useLayoutEffect(() => {
+    menu.setOpen(true, false);
+    return () => menu.setOpen(false);
+  }, [menu]);
   const menubarStore = useMenubarStore({ rtl });
   const menuContext = useMemo<IMenuContext>(() => ({ menu, rtl }), [menu, rtl]);
 
@@ -35,7 +38,7 @@ export const MenuBar = observer<IMenuBarProps>(function MenuBar({ menu, compact 
     <MenuContext value={menuContext}>
       <Menubar ref={ref} store={menubarStore} className={s(styles, { menuBar: true }, className)} focusable {...props}>
         <MenuProvider>
-          <Loader suspense small inline>
+          <Loader state={menu} small inline>
             <RenderMenuItems
               menu={menu}
               onlyIcons={compact}

@@ -15,6 +15,18 @@ const key = { id: 'value', name: 'value' } as DataContextGetter<string | undefin
 const otherKey = { id: 'other', name: 'other' } as DataContextGetter<string>;
 
 describe('DataContext layers', () => {
+  it('revises descendants when contributions change but keeps equivalent snapshots stable', () => {
+    const root = new DataContext();
+    const child = new DataContext(root);
+    const initial = child.revision;
+    root.set(key, 'value', 'owner');
+    const changed = child.revision;
+    expect(changed).not.toBe(initial);
+    root.replaceForId('owner', [[key, 'value']]);
+    expect(child.revision).toBe(changed);
+    root.deleteForId('owner');
+    expect(child.revision).not.toBe(changed);
+  });
   it('resolves values through arbitrarily nested layers', () => {
     const root = new DataContext().set(key, 'root', 'root');
     const child = new DataContext(new DataContext(new DataContext(root)));
