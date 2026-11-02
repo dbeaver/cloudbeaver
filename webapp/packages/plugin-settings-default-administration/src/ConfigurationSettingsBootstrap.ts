@@ -92,12 +92,4 @@ export class ConfigurationSettingsBootstrap extends Bootstrap {
       getDrawerComponent: () => ConfigurationSettingsDrawerItem,
     });
   }
-
-  override async load(): Promise<void> {
-    await this.serverConfigResource.load();
-
-    if (this.serverConfigResource.configurationMode && !this.configurationSettingsService.has('core.localization.language')) {
-      this.configurationSettingsService.setValue('core.localization.language', this.localizationService.currentLanguage);
-    }
-  }
 }
