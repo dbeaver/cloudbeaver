@@ -32,6 +32,7 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^19",
     "rimraf": "^6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4"
   }
 }

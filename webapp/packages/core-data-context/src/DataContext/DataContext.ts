@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ export class DataContext implements IDataContext {
       delete: action,
       clear: action,
       deleteForId: action,
+      replaceForId: action,
+      setFallBack: action,
       store: observable.shallow,
       fallback: observable.ref,
     });
@@ -44,11 +46,11 @@ export class DataContext implements IDataContext {
   }
 
   hasOwnValue<T>(context: DataContextGetter<T>, value: T): boolean {
-    return this.getOwn(context) === value;
+    return this.hasOwn(context) && this.getOwn(context) === value;
   }
 
   hasValue<T>(context: DataContextGetter<T>, value: T): boolean {
-    return this.hasOwnValue(context, value) || this.fallback?.hasOwnValue(context, value) || false;
+    return this.hasOwnValue(context, value) || this.fallback?.hasValue(context, value) || false;
   }
 
   find<T>(context: DataContextGetter<T>, predicate: (value: T) => boolean): T | undefined {
@@ -98,6 +100,23 @@ export class DataContext implements IDataContext {
       if (data.size === 0) {
         this.store.delete(context);
       }
+    }
+
+    return this;
+  }
+
+  /** Replace one owner's contribution without exposing a partially updated context. */
+  replaceForId(id: string, values: ReadonlyArray<readonly [DataContextGetter<any>, unknown]>): this {
+    const keys = new Set(values.map(([key]) => key));
+
+    for (const key of this.store.keys()) {
+      if (!keys.has(key)) {
+        this.delete(key, id);
+      }
+    }
+
+    for (const [key, value] of values) {
+      this.set(key, value, id);
     }
 
     return this;
