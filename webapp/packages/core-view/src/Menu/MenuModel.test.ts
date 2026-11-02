@@ -1,0 +1,236 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { observable, runInAction } from 'mobx';
+import { describe, expect, it, vi } from 'vitest';
+
+import type { ILoadableState } from '@cloudbeaver/core-utils';
+
+import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU.js';
+import { DATA_CONTEXT_MENU_NESTED } from './DATA_CONTEXT_MENU_NESTED.js';
+import { MenuModel } from './MenuModel.js';
+import type { IMenu } from './IMenu.js';
+import { MenuSubMenuItem } from './MenuItem/MenuSubMenuItem.js';
+import { MenuSeparatorItem } from './MenuItem/MenuSeparatorItem.js';
+import { MenuBaseItem } from './MenuItem/MenuBaseItem.js';
+
+const rootMenu: IMenu = { id: 'root', info: { label: 'root' } };
+const childMenu: IMenu = { id: 'child', info: { label: 'child' } };
+
+function resource(lazy = false) {
+  const state = observable({ loaded: false, loading: false, outdated: false, error: null as Error | null });
+  const loader: ILoadableState = {
+    lazy,
+    get exception() {
+      return state.error;
+    },
+    isLoaded: () => state.loaded,
+    isLoading: () => state.loading,
+    isOutdated: () => state.outdated,
+    isError: () => !!state.error,
+    load: vi.fn(async () => {
+      runInAction(() => {
+        state.loading = true;
+      });
+      await Promise.resolve();
+      runInAction(() => {
+        state.loaded = true;
+        state.loading = false;
+        state.outdated = false;
+      });
+    }),
+  };
+  return { state, loader };
+}
+
+function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> = {}): ConstructorParameters<typeof MenuModel>[0] {
+  return {
+    getHandler: () => null,
+    getPreparationLoaders: () => [],
+    getMenuItemCreators: () => [],
+    getMenuItemLoaders: () => [],
+    getMenu: () => [],
+    createActionItem: () => null,
+    ...overrides,
+  };
+}
+
+describe('MenuModel', () => {
+  it('provides menu identity before effects and distinguishes uninitialized from empty', () => {
+    const model = new MenuModel(service(), rootMenu);
+    expect(model.context.getOwn(DATA_CONTEXT_MENU)).toBe(rootMenu);
+    expect(model.state).toBe('pending');
+    expect(model.hidden).toBe(false);
+    const stop = model.start();
+    expect(model.state).toBe('ready');
+    expect(model.hidden).toBe(true);
+    stop();
+  });
+
+  it('loads prerequisites before evaluating availability', async () => {
+    const { state, loader } = resource();
+    const getItems = vi.fn(() => {
+      expect(state.loaded).toBe(true);
+      return [];
+    });
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader], getMenu: getItems }), rootMenu);
+    const stop = model.start();
+    expect(model.prepared).toBe(false);
+    expect(model.hidden).toBe(false);
+    expect(getItems).not.toHaveBeenCalled();
+    await model.load();
+    expect(model.hidden).toBe(true);
+    stop();
+  });
+
+  it('keeps lazy content reachable and loads it only after opening', async () => {
+    const { loader } = resource(true);
+    const model = new MenuModel(service({ getMenuItemLoaders: () => [loader] }), rootMenu);
+    const stop = model.start();
+    await model.load();
+    expect(loader.load).not.toHaveBeenCalled();
+    expect(model.hidden).toBe(false);
+    model.setOpen(true);
+    await model.load();
+    expect(loader.load).toHaveBeenCalledOnce();
+    expect(model.hidden).toBe(true);
+    stop();
+  });
+
+  it('prepares a child without mounting its UI and preserves its lazy content', async () => {
+    const preparation = resource();
+    const content = resource(true);
+    const item = new MenuSubMenuItem({ menu: childMenu });
+    const model = new MenuModel(
+      service({
+        getPreparationLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [preparation.loader] : []),
+        getMenuItemLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [content.loader] : []),
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [item] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    model.setOpen(true);
+    await model.load();
+    expect(preparation.loader.load).toHaveBeenCalledOnce();
+    expect(content.loader.load).not.toHaveBeenCalled();
+    const child = model.getSubMenu(item)!;
+    expect(child.context.hasOwn(DATA_CONTEXT_MENU_NESTED)).toBe(true);
+    expect(child.hidden).toBe(false);
+    child.setOpen(true);
+    await model.load();
+    expect(content.loader.load).toHaveBeenCalledOnce();
+    expect(model.visibleItems).toEqual([]);
+    stop();
+  });
+
+  it('does not fetch descendants of closed menus', async () => {
+    const preparation = resource();
+    const model = new MenuModel(
+      service({
+        getPreparationLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [preparation.loader] : []),
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [new MenuSubMenuItem({ menu: childMenu })] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    await model.load();
+    expect(preparation.loader.load).not.toHaveBeenCalled();
+    stop();
+  });
+
+  it('resolves dependencies discovered after the first preparation request', async () => {
+    const first = resource();
+    const second = resource();
+    const model = new MenuModel(service({ getPreparationLoaders: () => (first.state.loaded ? [second.loader] : [first.loader]) }), rootMenu);
+    const stop = model.start();
+    await model.load();
+    await model.load();
+    expect(second.loader.load).toHaveBeenCalledOnce();
+    expect(model.hidden).toBe(true);
+    stop();
+  });
+
+  it('reopens availability when cached permissions become outdated', async () => {
+    const { state, loader } = resource();
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
+    const stop = model.start();
+    await model.load();
+    expect(model.hidden).toBe(true);
+    runInAction(() => {
+      state.outdated = true;
+    });
+    expect(model.prepared).toBe(false);
+    expect(model.hidden).toBe(false);
+    await model.load();
+    expect(model.hidden).toBe(true);
+    stop();
+  });
+
+  it('preserves disabled items and custom content, and removes empty separators', () => {
+    const disabled = new MenuBaseItem({ id: 'disabled', label: 'disabled', disabled: true });
+    const custom = { id: 'custom' };
+    const model = new MenuModel(
+      service({ getMenu: () => [new MenuSeparatorItem(), disabled, new MenuSeparatorItem(), custom, new MenuSeparatorItem()] }),
+      rootMenu,
+    );
+    const stop = model.start();
+    expect(model.visibleItems).toEqual([disabled, expect.any(MenuSeparatorItem), custom]);
+    expect(model.empty).toBe(false);
+    stop();
+  });
+
+  it('prevents recursive menu contributions from causing infinite resolution', () => {
+    const model = new MenuModel(service({ getMenu: () => [new MenuSubMenuItem({ menu: rootMenu })] }), rootMenu);
+    const stop = model.start();
+    expect(model.hidden).toBe(true);
+    stop();
+  });
+
+  it('keeps failed menus distinct from empty and supports retry', async () => {
+    const { state, loader } = resource();
+    const failure = new Error('request failed');
+    const originalLoad = loader.load;
+    loader.load = vi.fn(async () => {
+      await Promise.resolve();
+      runInAction(() => {
+        state.error = failure;
+      });
+      throw failure;
+    });
+    loader.reload = async () => {
+      runInAction(() => {
+        state.error = null;
+      });
+      await originalLoad();
+    };
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
+    const stop = model.start();
+    await model.load();
+    expect(model.state).toBe('error');
+    expect(model.hidden).toBe(false);
+    await model.reload();
+    expect(model.state).toBe('ready');
+    stop();
+  });
+
+  it('does not publish failures from a disposed scope', async () => {
+    let reject!: (error: Error) => void;
+    const loader = resource().loader;
+    loader.load = () =>
+      new Promise<void>((_, rejectLoad) => {
+        reject = rejectLoad;
+      });
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
+    const stop = model.start();
+    const loading = model.load();
+    stop();
+    reject(new Error('stale request'));
+    await loading;
+    expect(model.exception).toBeNull();
+  });
+});

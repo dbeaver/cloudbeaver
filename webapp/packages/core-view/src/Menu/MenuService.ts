@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,10 @@ export class MenuService {
     ).filter<ILoadableState>((item => item !== null) as (obj: any) => obj is ILoadableState);
   }
 
+  getPreparationLoaders(context: IDataContextProvider): ILoadableState[] {
+    return this.creators.filter(filterApplicable(context, false)).flatMap(creator => creator.getPreparationLoader?.(context) ?? []);
+  }
+
   getMenuItemCreators(context: IDataContextProvider): MenuCreatorItem[] {
     const creators = this.creators.filter(filterApplicable(context));
 
@@ -142,7 +146,7 @@ export class MenuService {
   }
 }
 
-function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsCreator) => boolean {
+function filterApplicable(contexts: IDataContextProvider, checkAvailability = true): (creator: IMenuItemsCreator) => boolean {
   const menu = contexts.getOwn(DATA_CONTEXT_MENU);
 
   return (creator: IMenuItemsCreator) => {
@@ -163,7 +167,7 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
       }
     }
 
-    if (creator.isApplicable?.(contexts) === false) {
+    if (checkAvailability && creator.isApplicable?.(contexts) === false) {
       return false;
     }
 
