@@ -36,6 +36,14 @@ interface IMenuLoadRequest {
   revision: string | undefined;
 }
 
+interface IMenuLoadFailure extends IMenuLoadRequest {
+  error: Error;
+}
+
+function sameRequest(first: IMenuLoadRequest, second: IMenuLoadRequest): boolean {
+  return first.loader === second.loader && first.context === second.context && first.revision === second.revision;
+}
+
 export function createMenuContext(menu: IMenu, parent?: IDataContext, subMenu?: IMenuSubMenuItem): IDataContext {
   const context = new DataContext(parent);
   context.set(DATA_CONTEXT_MENU, menu, 'menu');
@@ -59,7 +67,7 @@ export class MenuModel implements ILoadableState {
   private initialized = false;
   private open = false;
   private loadLazy = false;
-  private failure: { error: Error; loader: ILoadableState; context: IDataContext; revision: string | undefined } | null = null;
+  private failures: IMenuLoadFailure[] = [];
   private dispose: IReactionDisposer | undefined;
   private task: Promise<void> | undefined;
   private scheduled = false;
@@ -76,11 +84,11 @@ export class MenuModel implements ILoadableState {
   ) {
     this.context = context ?? createMenuContext(menu);
     this.root = parent?.root ?? this;
-    makeObservable<this, 'initialized' | 'open' | 'loadLazy' | 'failure'>(this, {
+    makeObservable<this, 'initialized' | 'open' | 'loadLazy' | 'failures'>(this, {
       initialized: observable,
       open: observable,
       loadLazy: observable,
-      failure: observable.ref,
+      failures: observable.ref,
       handler: computed,
       preparationLoaders: computed,
       prepared: computed,
@@ -159,8 +167,8 @@ export class MenuModel implements ILoadableState {
     return result;
   }
   get state(): MenuResolutionState {
-    const loaders = [...this.preparationLoaders, ...this.loaders];
-    if (this.exception || [...loaders, ...this.activeLoaders()].some(loader => loader.isError())) {
+    const loaders = this.resolutionRequests().map(request => request.loader);
+    if (this.exception || loaders.some(loader => loader.isError())) {
       return 'error';
     }
     if (loaders.some(loader => loader.isLoading())) {
@@ -184,15 +192,12 @@ export class MenuModel implements ILoadableState {
     return this.empty && (!primaryAction || primaryAction.hidden === true);
   }
   get exception(): Error | null {
-    const failure = this.root.failure;
-    if (
-      failure &&
-      failure.context.revision === failure.revision &&
-      this.root.activeRequests().some(request => request.context === failure.context && request.loader === failure.loader)
-    ) {
+    const requests = this.resolutionRequests();
+    const failure = this.root.failures.find(failure => requests.some(request => sameRequest(request, failure)));
+    if (failure) {
       return failure.error;
     }
-    for (const loader of [...this.preparationLoaders, ...this.loaders, ...this.activeLoaders()]) {
+    for (const { loader } of requests) {
       const errors = [loader.exception ?? []].flat();
       const error = errors.find((error): error is Error => !!error);
       if (error) {
@@ -220,13 +225,14 @@ export class MenuModel implements ILoadableState {
     this.root.retrying = true;
     try {
       await this.root.task;
-      for (const loader of this.activeLoaders()) {
+      const requests = this.activeRequests();
+      for (const { loader } of requests) {
         if (loader.isError() && loader.reload) {
           await loader.reload();
         }
       }
       runInAction(() => {
-        this.root.failure = null;
+        this.root.failures = this.root.failures.filter(failure => !requests.some(request => sameRequest(request, failure)));
       });
     } finally {
       this.root.retrying = false;
@@ -244,8 +250,12 @@ export class MenuModel implements ILoadableState {
       this.initialized = true;
     });
     this.dispose = autorun(() => {
-      const loaders = this.activeLoaders();
-      if (!this.exception && loaders.some(loader => pending(loader) && !loader.isError() && loader.isLoadable?.() !== false)) {
+      const requests = this.activeRequests();
+      if (
+        requests.some(
+          request => !this.requestFailed(request) && pending(request.loader) && !request.loader.isError() && request.loader.isLoadable?.() !== false,
+        )
+      ) {
         this.schedule();
       }
     });
@@ -267,16 +277,38 @@ export class MenuModel implements ILoadableState {
     );
   }
 
-  private activeRequests(): IMenuLoadRequest[] {
+  private requestFailed(request: IMenuLoadRequest): boolean {
+    return this.root.failures.some(failure => sameRequest(request, failure));
+  }
+
+  private ownRequests(loadLazy: boolean): IMenuLoadRequest[] {
     const requests = this.preparationLoaders.map(loader => ({ loader, context: this.context, revision: this.context.revision }));
     if (!this.prepared || this.handler?.isHidden?.(this.context)) {
       return requests;
     }
     requests.push(
-      ...this.loaders
-        .filter(loader => !loader.lazy || this.loadLazy)
-        .map(loader => ({ loader, context: this.context, revision: this.context.revision })),
+      ...this.loaders.filter(loader => !loader.lazy || loadLazy).map(loader => ({ loader, context: this.context, revision: this.context.revision })),
     );
+    return requests;
+  }
+
+  private resolutionRequests(): IMenuLoadRequest[] {
+    const requests = this.ownRequests(true);
+    if (this.open) {
+      for (const item of this.items) {
+        if (!item.hidden && item instanceof MenuSubMenuItem) {
+          requests.push(...(this.getSubMenu(item)?.ownRequests(false) ?? []));
+        }
+      }
+    }
+    return requests;
+  }
+
+  private activeRequests(): IMenuLoadRequest[] {
+    const requests = this.ownRequests(this.loadLazy);
+    if (!this.prepared || this.handler?.isHidden?.(this.context)) {
+      return requests;
+    }
     if (this.open) {
       for (const item of this.items) {
         if (!item.hidden && item instanceof MenuSubMenuItem) {
@@ -310,7 +342,8 @@ export class MenuModel implements ILoadableState {
     }
     const generation = this.generation;
     this.task = (async () => {
-      for (const { loader, context, revision } of this.activeRequests()) {
+      for (const request of this.activeRequests()) {
+        const { loader, context, revision } = request;
         if (generation !== this.generation || !this.dispose) {
           return;
         }
@@ -320,7 +353,7 @@ export class MenuModel implements ILoadableState {
         if (!this.activeLoaders().includes(loader)) {
           continue;
         }
-        if (!pending(loader) || loader.isError() || loader.isLoadable?.() === false) {
+        if (!pending(loader) || this.requestFailed(request) || loader.isError() || loader.isLoadable?.() === false) {
           continue;
         }
         try {
@@ -328,7 +361,11 @@ export class MenuModel implements ILoadableState {
         } catch (error) {
           if (generation === this.generation && context.revision === revision) {
             runInAction(() => {
-              this.failure = { error: error instanceof Error ? error : new Error(String(error)), loader, context, revision };
+              const active = this.activeRequests();
+              this.failures = [
+                ...this.failures.filter(failure => active.some(request => sameRequest(request, failure)) && !sameRequest(request, failure)),
+                { error: error instanceof Error ? error : new Error(String(error)), loader, context, revision },
+              ];
             });
           }
           return;

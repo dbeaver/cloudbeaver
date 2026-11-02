@@ -61,6 +61,67 @@ function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> 
 }
 
 describe('MenuModel', () => {
+  it('keeps a cached lazy child error inside the child menu', () => {
+    const content = resource(true);
+    const failure = new Error('lazy child failed');
+    content.state.error = failure;
+    const item = new MenuSubMenuItem({ menu: childMenu });
+    const model = new MenuModel(
+      service({
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [item] : []),
+        getMenuItemLoaders: context => (context.getOwn(DATA_CONTEXT_MENU) === childMenu ? [content.loader] : []),
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    model.setOpen(true);
+    const child = model.getSubMenu(item)!;
+    child.setOpen(true);
+    expect(child.exception).toBe(failure);
+    expect(child.isError()).toBe(true);
+    expect(model.exception).toBeNull();
+    expect(model.isError()).toBe(false);
+    expect(model.isLoaded()).toBe(true);
+    expect(model.visibleItems).toEqual([item]);
+    stop();
+  });
+
+  it('isolates rejected lazy child requests without blocking another child or retrying automatically', async () => {
+    const content = resource(true);
+    content.loader.load = vi.fn(() => Promise.reject(new Error('lazy request rejected')));
+    const otherContent = resource(true);
+    const otherMenu: IMenu = { id: 'other', info: { label: 'other' } };
+    const item = new MenuSubMenuItem({ menu: childMenu });
+    const other = new MenuSubMenuItem({ menu: otherMenu });
+    const model = new MenuModel(
+      service({
+        getMenu: context => (context.getOwn(DATA_CONTEXT_MENU) === rootMenu ? [item, other] : []),
+        getMenuItemLoaders: context => {
+          const menu = context.getOwn(DATA_CONTEXT_MENU);
+          if (menu === childMenu) {
+            return [content.loader];
+          }
+          return menu === otherMenu ? [otherContent.loader] : [];
+        },
+      }),
+      rootMenu,
+    );
+    const stop = model.start();
+    model.setOpen(true);
+    const child = model.getSubMenu(item)!;
+    child.setOpen(true);
+    await model.load();
+    expect(child.isError()).toBe(true);
+    expect(model.isError()).toBe(false);
+    expect(model.isLoaded()).toBe(true);
+    model.getSubMenu(other)!.setOpen(true);
+    await model.load();
+    expect(content.loader.load).toHaveBeenCalledOnce();
+    expect(otherContent.loader.load).toHaveBeenCalledOnce();
+    expect(child.isError()).toBe(true);
+    stop();
+  });
+
   it('exposes a cached child failure to its parent and retries it', async () => {
     const content = resource();
     const failure = new Error('cached child failure');
