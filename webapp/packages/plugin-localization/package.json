@@ -18,14 +18,20 @@
     "build": "tsc -b",
     "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
+    "@cloudbeaver/core-authentication": "workspace:*",
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
+    "@cloudbeaver/core-executor": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-storage": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@cloudbeaver/plugin-authentication": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
@@ -35,9 +41,13 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:*",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "rimraf": "^6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5",
+    "vitest": "^4"
   }
 }

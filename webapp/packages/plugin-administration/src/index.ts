@@ -19,7 +19,6 @@ export * from './ConfigurationWizard/ServerConfiguration/IServerConfigurationPag
 export * from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService.js';
 export * from './ConfigurationWizard/ServerConfiguration/getServerConfigurationFormPart.js';
 export * from './ConfigurationWizard/ServerConfiguration/ServerConfigurationFormStateManager.js';
-export * from './ConfigurationWizard/ServerConfiguration/ServerConfigurationFormService.js';
 export * from './ConfigurationWizard/ServerConfigurationAdministrationNavService.js';
 export * from './ConfigurationWizard/ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM.js';
 export * from './ConfigurationWizard/ServerConfiguration/IServerConfigurationFormPartState.js';

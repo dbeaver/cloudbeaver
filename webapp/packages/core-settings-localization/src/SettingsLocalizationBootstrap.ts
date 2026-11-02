@@ -6,37 +6,37 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { reaction, type IReactionDisposer } from 'mobx';
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
-import { SettingsLocalizationService } from './SettingsLocalizationService.js';
+import { SettingsLocalizationService, type ILocalizationSettings } from './SettingsLocalizationService.js';
+import type { ISettingChangeData } from '@cloudbeaver/core-settings';
 
 @injectable(() => [SettingsLocalizationService, LocalizationService])
 export class SettingsLocalizationBootstrap extends Bootstrap {
-  private languageReaction: IReactionDisposer | undefined;
-
   constructor(
     private readonly settingsLocalizationService: SettingsLocalizationService,
     private readonly localizationService: LocalizationService,
   ) {
     super();
     this.changeLanguage = this.changeLanguage.bind(this);
+    this.syncLanguage = this.syncLanguage.bind(this);
   }
 
   override register(): void {
     this.localizationService.onChange.addHandler(this.changeLanguage);
-    this.languageReaction = reaction(
-      () => this.settingsLocalizationService.language,
-      language => this.localizationService.setLanguage(language),
-      { fireImmediately: true },
-    );
+    this.settingsLocalizationService.settingsProvider.onChange.addHandler(this.syncLanguage);
   }
 
   override dispose(): void {
     this.localizationService.onChange.removeHandler(this.changeLanguage);
-    this.languageReaction?.();
+    this.settingsLocalizationService.settingsProvider.onChange.removeHandler(this.syncLanguage);
+  }
+
+  private syncLanguage(data: ISettingChangeData<keyof ILocalizationSettings>) {
+    if (data.key === 'core.localization.language') {
+      this.localizationService.setLanguage(data.value);
+    }
   }
 
   private async changeLanguage(language: string) {

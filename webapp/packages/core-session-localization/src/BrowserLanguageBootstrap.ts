@@ -9,16 +9,18 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { SESSION_SETTINGS_LAYER } from '@cloudbeaver/core-root';
 import { SettingsResolverService } from '@cloudbeaver/core-settings';
+import { SettingsLocalizationService } from '@cloudbeaver/core-settings-localization';
 
 import { BrowserLanguageSettingsSource } from './BrowserLanguageSettingsSource.js';
 
-@injectable(() => [LocalizationService, SettingsResolverService])
+@injectable(() => [LocalizationService, SettingsResolverService, SettingsLocalizationService])
 export class BrowserLanguageBootstrap extends Bootstrap {
   private source: BrowserLanguageSettingsSource | undefined;
 
   constructor(
     private readonly localizationService: LocalizationService,
     private readonly settingsResolverService: SettingsResolverService,
+    private readonly settingsLocalizationService: SettingsLocalizationService,
   ) {
     super();
   }
@@ -37,5 +39,9 @@ export class BrowserLanguageBootstrap extends Bootstrap {
     if (this.source) {
       this.settingsResolverService.removeResolver(SESSION_SETTINGS_LAYER, this.source);
     }
+  }
+
+  override load(): void {
+    this.localizationService.setLanguage(this.settingsLocalizationService.language);
   }
 }

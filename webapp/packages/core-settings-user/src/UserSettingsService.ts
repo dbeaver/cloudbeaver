@@ -9,17 +9,12 @@ import { makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { EditableSettingsSource } from '@cloudbeaver/core-settings';
 import { StorageService } from '@cloudbeaver/core-storage';
 import { isNull } from '@cloudbeaver/core-utils';
 
-@injectable(() => [UserInfoResource, StorageService, ServerConfigResource])
+@injectable(() => [UserInfoResource, StorageService])
 export class UserSettingsService extends EditableSettingsSource {
-  private get useProfileSettings(): boolean {
-    return !this.serverConfigResource.configurationMode && this.userInfoResource.hasAccess();
-  }
-
   private readonly settings: Map<string, any>;
   private lastConfig: any;
   private localSettings: Map<string, any>;
@@ -27,7 +22,6 @@ export class UserSettingsService extends EditableSettingsSource {
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly storageService: StorageService,
-    private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
     this.lastConfig = null;
@@ -36,7 +30,6 @@ export class UserSettingsService extends EditableSettingsSource {
 
     this.userInfoResource.onDataUpdate.addHandler(this.refreshConfig.bind(this));
     this.userInfoResource.onUserChange.addHandler(this.refreshConfig.bind(this));
-    this.serverConfigResource.onDataUpdate.addHandler(this.refreshConfig.bind(this));
 
     makeObservable<this, 'settings' | 'localSettings'>(this, {
       settings: observable.shallow,
@@ -76,7 +69,7 @@ export class UserSettingsService extends EditableSettingsSource {
   }
 
   async save() {
-    if (this.useProfileSettings) {
+    if (this.userInfoResource.hasAccess()) {
       await this.userInfoResource.updatePreferences(Object.fromEntries(this.changes));
     } else {
       this.update(() => {
@@ -107,19 +100,17 @@ export class UserSettingsService extends EditableSettingsSource {
 
   private refreshConfig() {
     this.update(() => {
-      if (!this.useProfileSettings) {
+      if (!this.userInfoResource.hasAccess()) {
         this.clear();
         this.lastConfig = null;
 
         return;
       }
 
-      const user = this.userInfoResource.data;
-
-      if (user && user.configurationParameters !== this.lastConfig) {
+      if (this.userInfoResource.data.configurationParameters !== this.lastConfig) {
         this.clear();
         this.localSettings.clear();
-        this.lastConfig = user.configurationParameters;
+        this.lastConfig = this.userInfoResource.data.configurationParameters;
 
         if (this.lastConfig && typeof this.lastConfig === 'object') {
           for (const [key, value] of Object.entries(this.lastConfig)) {
@@ -137,7 +128,7 @@ export class UserSettingsService extends EditableSettingsSource {
   }
 
   private getSource() {
-    if (this.useProfileSettings) {
+    if (this.userInfoResource.hasAccess()) {
       return this.settings;
     }
 

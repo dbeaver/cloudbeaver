@@ -2133,9 +2133,11 @@ __metadata:
     "@cloudbeaver/core-settings-localization": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 
@@ -3849,13 +3851,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-localization@workspace:packages/plugin-localization"
   dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-authentication": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     mobx: "npm:^6"
@@ -3865,6 +3874,8 @@ __metadata:
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 
@@ -4536,16 +4547,13 @@ __metadata:
   resolution: "@cloudbeaver/plugin-settings-administration@workspace:packages/plugin-settings-administration"
   dependencies:
     "@cloudbeaver/core-administration": "workspace:*"
-    "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
-    "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
-    "@cloudbeaver/core-storage": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-localization": "workspace:*"

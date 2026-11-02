@@ -8,6 +8,15 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/react-tests"
+    },
+    {
+      "path": "../../common-typescript/@dbeaver/cli"
+    },
+    {
+      "path": "../core-authentication"
+    },
+    {
       "path": "../core-blocks"
     },
     {
@@ -20,10 +29,22 @@
       "path": "../core-events"
     },
     {
+      "path": "../core-executor"
+    },
+    {
       "path": "../core-localization"
     },
     {
+      "path": "../core-root"
+    },
+    {
+      "path": "../core-storage"
+    },
+    {
       "path": "../core-utils"
+    },
+    {
+      "path": "../plugin-authentication"
     }
   ],
   "include": [

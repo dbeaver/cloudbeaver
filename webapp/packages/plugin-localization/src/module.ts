@@ -9,11 +9,15 @@
 import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
 import { PluginBootstrap } from './PluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
+import { PendingLanguageBootstrap } from './PendingLanguageBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-localization',
 
   configure: serviceCollection => {
-    serviceCollection.addSingleton(Bootstrap, PluginBootstrap).addSingleton(Bootstrap, LocaleService);
+    serviceCollection
+      .addSingleton(Bootstrap, PluginBootstrap)
+      .addSingleton(Bootstrap, LocaleService)
+      .addSingleton(Bootstrap, PendingLanguageBootstrap);
   },
 });
