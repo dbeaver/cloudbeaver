@@ -35,6 +35,7 @@ export default [
     'Vous allez supprimer "{arg:name}". Les connexions ne seront pas supprimées. Êtes-vous sûr ?',
   ],
   ['plugin_connections_menu_connections_label', 'Connexion'],
+  ['plugin_connections_menu_security_label', 'Sécurité'],
   ['plugin_connections_action_disconnect_all_label', 'Déconnecter tout'],
   ['plugin_connections_settings', 'Connexions'],
   ['plugin_connections_settings_hide_connections_view_name', 'Hide connection view management'],
@@ -49,4 +50,6 @@ export default [
   ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
+
+  ['plugin_connections_change_db_password_menu_title', 'Modifier le mot de passe actuel de la base de données'],
 ];
