@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { ImageLightboxDialog } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { clsx } from '@dbeaver/ui-kit';
+import { clsx, UnstyledButton } from '@dbeaver/ui-kit';
 
 interface Props {
   source: string;
@@ -27,13 +27,13 @@ export const AIChatAttachmentImage = observer<Props>(function AIChatAttachmentIm
   }
 
   return (
-    <button
+    <UnstyledButton
       className="tw:block tw:max-w-full tw:cursor-zoom-in tw:rounded-lg tw:border-0 tw:bg-transparent tw:p-0 tw:focus-visible:outline-2 tw:focus-visible:outline-solid tw:focus-visible:outline-(--theme-primary)"
       type="button"
       aria-haspopup="dialog"
       onClick={openImage}
     >
       <img className={clsx('tw:rounded-lg', className)} src={source} alt={name} title={name} decoding="async" loading="lazy" />
-    </button>
+    </UnstyledButton>
   );
 });
