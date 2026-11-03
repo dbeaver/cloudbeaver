@@ -7,20 +7,18 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
 import {
-  ColoredContainer,
-  Form,
-  Group,
-  ToolsAction,
-  ToolsPanel,
-  useForm,
-  useTranslate,
-  getComputed,
-  TextPlaceholder,
-} from '@cloudbeaver/core-blocks';
+  AdministrationPageContent,
+  AdministrationPageHeader,
+  AdministrationPageLayout,
+  AdministrationPageNavigation,
+  AdministrationPageTitle,
+  type AdministrationItemContentProps,
+} from '@cloudbeaver/core-administration';
+import { Button, Form, useForm, useTranslate, getComputed, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
 import { TabList, TabsState, type ITabData } from '@cloudbeaver/core-ui';
 import { SettingsAdministrationService } from './SettingsAdministrationService.js';
@@ -72,42 +70,49 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
   const hideSingleTab = settingsAdministrationService.tabsContainer.getDisplayed().length === 1;
 
   return (
-    <TabsState container={settingsAdministrationService.tabsContainer} currentTabId={tabId} onChange={handleTabChange}>
-      <Form context={form} contents>
-        <ColoredContainer overflow parent vertical noWrap gap>
-          <Group box keepSize>
-            <ToolsPanel rounded>
-              {!configurationWizard && (
-                <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
-                  {translate('ui_processing_save')}
-                </ToolsAction>
-              )}
-              <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" disabled={!changed} onClick={handleReset}>
-                {translate('ui_processing_cancel')}
-              </ToolsAction>
-              {settingsSource?.restoreDefaults && (
-                <ToolsAction
-                  icon="/icons/settings_restore_defaults2_m.svg#root"
-                  viewBox="0 0 24 24"
-                  disabled={settingsSource.isOverrideDefaults?.() === false}
-                  svg
-                  onClick={handleRestoreDefaults}
-                >
-                  {translate('plugin_user_profile_settings_restore_defaults')}
-                </ToolsAction>
-              )}
-            </ToolsPanel>
-          </Group>
-          <Group hidden={hideSingleTab} box keepSize hideOverflow>
-            <TabList underline />
-          </Group>
-          {settingsSource ? (
-            <Settings resolver={settingsResolverService} source={settingsSource} accessor={accessor} />
-          ) : (
-            <TextPlaceholder>{translate('plugin_settings_administration_no_settings')}</TextPlaceholder>
-          )}
-        </ColoredContainer>
-      </Form>
-    </TabsState>
+    <AdministrationPageLayout>
+      <TabsState container={settingsAdministrationService.tabsContainer} currentTabId={tabId} onChange={handleTabChange}>
+        <Form context={form} contents>
+          <AdministrationPageHeader
+            actionsSlot={
+              <>
+                {settingsSource?.restoreDefaults && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={settingsSource.isOverrideDefaults?.() === false}
+                    onClick={handleRestoreDefaults}
+                  >
+                    {translate('plugin_user_profile_settings_restore_defaults')}
+                  </Button>
+                )}
+                <Button type="button" variant="secondary" disabled={!changed} onClick={handleReset}>
+                  {translate('ui_processing_cancel')}
+                </Button>
+                {!configurationWizard && (
+                  <Button type="button" variant="primary" disabled={!changed} onClick={() => form.submit()}>
+                    {translate('ui_processing_save')}
+                  </Button>
+                )}
+              </>
+            }
+          >
+            <AdministrationPageTitle docLink={WEBSITE_LINKS.SETTINGS_DOCUMENTATION_PAGE}>
+              {translate('plugin_settings_administration_drawer_item_title')}
+            </AdministrationPageTitle>
+          </AdministrationPageHeader>
+          <AdministrationPageNavigation hidden={hideSingleTab}>
+            <TabList aria-label={translate('plugin_settings_administration_drawer_item_title')} underline />
+          </AdministrationPageNavigation>
+          <AdministrationPageContent>
+            {settingsSource ? (
+              <Settings resolver={settingsResolverService} source={settingsSource} accessor={accessor} />
+            ) : (
+              <TextPlaceholder>{translate('plugin_settings_administration_no_settings')}</TextPlaceholder>
+            )}
+          </AdministrationPageContent>
+        </Form>
+      </TabsState>
+    </AdministrationPageLayout>
   );
 });

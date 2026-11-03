@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,12 +8,14 @@
 
 import { observer } from 'mobx-react-lite';
 
-import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
+import {
+  AdministrationPageContent,
+  AdministrationPageHeader,
+  AdministrationPageTitle,
+  type AdministrationItemContentProps,
+} from '@cloudbeaver/core-administration';
 import {
   Button,
-  ColoredContainer,
-  Flex,
-  Fill,
   Group,
   ObjectPropertyInfoForm,
   useClipboard,
@@ -45,25 +47,33 @@ export const SystemInformation: TabContainerPanelComponent<AdministrationItemCon
   }
 
   return (
-    <ColoredContainer overflow parent>
-      <Group gap medium wrap>
-        {isUncategorizedExists && (
-          <Container gap>
-            <ObjectPropertyInfoForm category={null} properties={properties} small fill readOnly />
-          </Container>
-        )}
-        {categories.map(category => (
-          <Container key={category} gap>
-            <GroupTitle>{category}</GroupTitle>
-            <ObjectPropertyInfoForm category={category} properties={properties} small fill readOnly />
-          </Container>
-        ))}
-
-        <Flex>
-          <Fill />
-          <Button onClick={copyToClipboard}>{translate('ui_copy_to_clipboard')}</Button>
-        </Flex>
-      </Group>
-    </ColoredContainer>
+    <>
+      <AdministrationPageHeader
+        actionsSlot={
+          <Button variant="secondary" onClick={copyToClipboard}>
+            {translate('ui_copy_to_clipboard')}
+          </Button>
+        }
+      >
+        <AdministrationPageTitle>{translate('plugin_system_information_administration_tab_title')}</AdministrationPageTitle>
+      </AdministrationPageHeader>
+      <AdministrationPageContent>
+        <div className="tw:shrink-0">
+          <Group gap medium wrap>
+            {isUncategorizedExists && (
+              <Container gap>
+                <ObjectPropertyInfoForm category={null} properties={properties} small fill readOnly />
+              </Container>
+            )}
+            {categories.map(category => (
+              <Container key={category} gap>
+                <GroupTitle>{category}</GroupTitle>
+                <ObjectPropertyInfoForm category={category} properties={properties} small fill readOnly />
+              </Container>
+            ))}
+          </Group>
+        </div>
+      </AdministrationPageContent>
+    </>
   );
 });

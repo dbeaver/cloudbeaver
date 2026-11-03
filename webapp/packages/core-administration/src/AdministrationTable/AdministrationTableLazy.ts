@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.toolsPanel {
-  height: 44px !important;
-}
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-.buttonLabel {
-  font-size: 14px !important;
-}
+export const AdministrationTable = importLazyComponent(() => import('./AdministrationTable.js').then(module => module.AdministrationTable));
