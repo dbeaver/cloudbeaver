@@ -77,11 +77,11 @@ export class LocalizationService extends Bootstrap {
     const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
 
     for (const language of languages) {
-      const parts = language.toLowerCase().split('-');
+      const parts = language.toLowerCase().replaceAll('_', '-').split('-');
 
       while (parts.length > 0) {
         const code = parts.join('-');
-        const supported = this.supportedLanguages.find(locale => locale.isoCode.toLowerCase() === code);
+        const supported = this.supportedLanguages.find(locale => locale.isoCode.toLowerCase().replaceAll('_', '-') === code);
 
         if (supported) {
           return supported.isoCode;

@@ -24,14 +24,13 @@ export const LanguageSelector = observer(function LanguageSelector() {
 
   return (
     <Select
-      className="tw:mx-2"
       items={localizationService.supportedLanguages}
       value={localizationService.currentLanguage}
       keySelector={language => language.isoCode}
       valueSelector={language => language.nativeName ?? language.name}
       title={translate('plugin_localization_administration_language')}
       tiny
-      inline
+      noGrow
       portal
       onSelect={language => localizationService.setLanguage(language)}
     />
