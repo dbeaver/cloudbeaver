@@ -29,6 +29,7 @@ import { useTreeVirtualization } from './useTreeVirtualization.js';
 import { TreeMenuContextProvider } from './contexts/TreeMenuContext/TreeMenuContextProvider.js';
 import type { ITreeMenu } from './useTreeMenu.js';
 import { TreeViewService } from './TreeViewService.js';
+import { TreeViewContextProvider } from './contexts/TreeViewContextProvider.js';
 
 export interface NavigationTreeNewProps {
   data: ITreeData;
@@ -75,14 +76,16 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
           <TreeContext.Provider value={tree}>
             <TreeDnDContext.Provider value={dnd ?? null}>
               <CaptureView view={treeViewService} className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0">
-                <TreeMenuContextProvider menu={menu ?? null}>
-                  {children}
-                  <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
-                    <TreeVirtualizationContext.Provider value={mountOptimization}>
-                      <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
-                    </TreeVirtualizationContext.Provider>
-                  </div>
-                </TreeMenuContextProvider>
+                <TreeViewContextProvider>
+                  <TreeMenuContextProvider menu={menu ?? null}>
+                    {children}
+                    <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
+                      <TreeVirtualizationContext.Provider value={mountOptimization}>
+                        <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
+                      </TreeVirtualizationContext.Provider>
+                    </div>
+                  </TreeMenuContextProvider>
+                </TreeViewContextProvider>
               </CaptureView>
             </TreeDnDContext.Provider>
           </TreeContext.Provider>
