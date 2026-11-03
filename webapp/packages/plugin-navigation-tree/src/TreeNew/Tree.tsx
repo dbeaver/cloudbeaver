@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 
 import { clsx } from '@dbeaver/ui-kit';
-import { ACTION_COLLAPSE_ALL, AppView, CaptureView } from '@cloudbeaver/core-view';
+import { useService } from '@cloudbeaver/core-di';
+import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
 import { TreeContext } from './contexts/TreeContext.js';
@@ -28,6 +28,7 @@ import type { ITreeDnD } from './useTreeDnD.js';
 import { useTreeVirtualization } from './useTreeVirtualization.js';
 import { TreeMenuContextProvider } from './contexts/TreeMenuContext/TreeMenuContextProvider.js';
 import type { ITreeMenu } from './useTreeMenu.js';
+import { TreeViewService } from './TreeViewService.js';
 
 export interface NavigationTreeNewProps {
   data: ITreeData;
@@ -55,7 +56,7 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
   onNodeDoubleClick,
   getNodeHeight,
 }) {
-  const [view] = useState(() => new AppView().registerAction(ACTION_COLLAPSE_ALL));
+  const treeViewService = useService(TreeViewService);
   const tree = useTree({
     data,
     nodeRenderers,
@@ -73,7 +74,7 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
         <TreeSelectionContext.Provider value={selection}>
           <TreeContext.Provider value={tree}>
             <TreeDnDContext.Provider value={dnd ?? null}>
-              <CaptureView view={view} className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0">
+              <CaptureView view={treeViewService} className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0">
                 <TreeMenuContextProvider menu={menu ?? null}>
                   {children}
                   <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
