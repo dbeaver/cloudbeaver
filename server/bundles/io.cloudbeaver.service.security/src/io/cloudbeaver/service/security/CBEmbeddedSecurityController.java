@@ -2782,25 +2782,73 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @NotNull
     @Override
     public SMTokens refreshSession(@NotNull String refreshToken) throws DBException {
-        var currentUserCreds = getCurrentUserCreds();
-        var currentUserAccessToken = currentUserCreds.getSmAccessToken();
-
-        SMTokenInfo smTokenInfo = readAccessTokenInfo(currentUserAccessToken);
-
-        if (!smTokenInfo.getRefreshToken().equals(refreshToken)) {
-            throw new SMException("Invalid refresh token");
-        }
-
-        try (var dbCon = database.openConnection()) {
-            invalidateUserTokens(currentUserAccessToken);
-            return generateNewSessionToken(
-                smTokenInfo.getSessionId(),
-                smTokenInfo.getUserId(),
-                updateUserAuthRoleIfNeeded(smTokenInfo.getUserId(), null), dbCon, smTokenInfo.isServiceToken()
-            );
+        String accessToken = getCurrentUserCreds().getSmAccessToken();
+        try (Connection dbCon = database.openConnection(); JDBCTransaction transaction = new JDBCTransaction(dbCon)) {
+            try {
+                SMTokens tokens = rotateSessionToken(dbCon, accessToken, refreshToken, false);
+                transaction.commit();
+                return tokens;
+            } catch (SQLException | DBException | RuntimeException e) {
+                try {
+                    transaction.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+                throw e;
+            }
         } catch (SQLException e) {
             throw new DBException("Error refreshing sm session", e);
         }
+    }
+
+    @NotNull
+    protected SMTokens rotateSessionToken(
+        @NotNull Connection dbCon,
+        @NotNull String accessToken,
+        @NotNull String refreshToken,
+        boolean preserveAuthRole
+    ) throws SQLException, DBException {
+        String sessionId;
+        String userId;
+        String authRole;
+        boolean isServiceToken;
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "SELECT REFRESH_TOKEN_ID, SESSION_ID, USER_ID, AUTH_ROLE, REFRESH_TOKEN_EXPIRATION_TIME, IS_SERVICE " +
+                "FROM {table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?"
+        )) {
+            dbStat.setString(1, accessToken);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                if (!dbResult.next()) {
+                    throw new SMException("Refresh token not found");
+                }
+                if (!refreshToken.equals(dbResult.getString(1))) {
+                    throw new SMException("Invalid refresh token");
+                }
+                if (isTokenExpired(dbResult.getTimestamp(5))) {
+                    throw new SMRefreshTokenExpiredException("Refresh token expired");
+                }
+                sessionId = dbResult.getString(2);
+                userId = dbResult.getString(3);
+                authRole = dbResult.getString(4);
+                isServiceToken = stringToBoolean(dbResult.getString(6));
+            }
+        }
+
+        // Only the request that consumes the old token pair may create its replacement.
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "DELETE FROM {table_prefix}CB_AUTH_TOKEN " +
+                "WHERE TOKEN_ID=? AND REFRESH_TOKEN_ID=? AND REFRESH_TOKEN_EXPIRATION_TIME>CURRENT_TIMESTAMP"
+        )) {
+            dbStat.setString(1, accessToken);
+            dbStat.setString(2, refreshToken);
+            if (dbStat.executeUpdate() != 1) {
+                throw new SMException("Invalid or expired refresh token");
+            }
+        }
+        return generateNewSessionToken(
+            sessionId, userId,
+            updateUserAuthRoleIfNeeded(userId, preserveAuthRole ? authRole : null), dbCon, isServiceToken
+        );
     }
 
     private void invalidateUserTokens(String smToken) throws DBCException {
