@@ -73,6 +73,8 @@ export class SqlGeneratorsResource extends CachedMapResource<ISqlGeneratorsKey, 
       },
       async () => {
         try {
+          await task.run();
+
           if (task.pending && !task.cancelled) {
             await this.asyncTaskInfoService.cancel(task.id);
           }
