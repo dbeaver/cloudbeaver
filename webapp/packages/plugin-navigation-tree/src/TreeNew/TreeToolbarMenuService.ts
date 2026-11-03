@@ -26,28 +26,27 @@ export class TreeToolbarMenuService {
   register(): void {
     this.actionService.addHandler({
       id: 'tree-toolbar-menu-base-handler',
-      actions: [ACTION_TREE_REFRESH, ACTION_COLLAPSE_ALL],
+      menus: [MENU_TREE_TOOLBAR],
+      actions: [ACTION_TREE_REFRESH],
       contexts: [DATA_CONTEXT_TREE_DATA],
-      isActionApplicable(context, action): boolean {
+      isActionApplicable: context => !!context.get(DATA_CONTEXT_TREE_DATA),
+      handler: this.treeToolbarActionHandler.bind(this),
+    });
+
+    this.actionService.addHandler({
+      id: 'tree-collapse-handler',
+      actions: [ACTION_COLLAPSE_ALL],
+      contexts: [DATA_CONTEXT_TREE_DATA],
+      isActionApplicable(context): boolean {
         const treeData = context.get(DATA_CONTEXT_TREE_DATA);
 
         if (!treeData) {
           return false;
         }
 
-        if (action === ACTION_COLLAPSE_ALL) {
-          const { getState, getChildren, rootId } = treeData;
+        const { getState, getChildren, rootId } = treeData;
 
-          const hasExpanded = getChildren(rootId).some(node => getState(node).expanded);
-
-          return hasExpanded;
-        }
-
-        if (action === ACTION_TREE_REFRESH) {
-          return true;
-        }
-
-        return false;
+        return getChildren(rootId).some(node => getState(node).expanded);
       },
       handler: this.treeToolbarActionHandler.bind(this),
     });
