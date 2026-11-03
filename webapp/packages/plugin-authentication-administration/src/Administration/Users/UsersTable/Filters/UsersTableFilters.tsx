@@ -45,7 +45,7 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
     <div className={s(style, { filters: true })}>
       <div className={s(style, { filterContainer: true })}>
         <Filter
-          className={s(style, { filter: true })}
+          className="tw:w-full tw:max-w-sm"
           placeholder={translate('authentication_administration_users_filters_search_placeholder')}
           value={filters.search}
           onChange={filters.setSearch}

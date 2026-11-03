@@ -14,9 +14,3 @@
   gap: 12px;
   min-width: 0;
 }
-
-.filter {
-  flex: 1 1 240px;
-  min-width: 0;
-  max-width: 400px;
-}
