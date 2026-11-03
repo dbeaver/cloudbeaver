@@ -55,6 +55,7 @@ export class ConnectionAiPart extends FormPart<ConnectionAiPartState, IConnectio
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const submitInfo = contexts.getContext(formSubmitContext);
+
     if (submitInfo.type === 'test' || !this.optionsPart.connectionKey) {
       return;
     }

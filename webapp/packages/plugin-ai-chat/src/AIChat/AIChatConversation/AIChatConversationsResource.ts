@@ -64,16 +64,21 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
     generatorId?: EAIConversationPromptGeneratorId,
     config: AIChatConversationConfig = {},
   ): Promise<AIChatConversationInfo> {
-    const { conversation } = await this.graphQLService.sdk.createChatConversation({
-      config: {
-        ...config,
-        dataSourceId: connectionKey ?? undefined,
-        promptGeneratorId: generatorId,
-      },
-    });
+    const dataSourceId = connectionKey ?? undefined;
 
-    this.set(conversation.id, conversation);
-    return this.get(conversation.id)!;
+    return await this.performUpdate(ChatConversationConnectionKey(dataSourceId), undefined, async () => {
+      const { conversation } = await this.graphQLService.sdk.createChatConversation({
+        config: {
+          ...config,
+          dataSourceId,
+          promptGeneratorId: generatorId,
+        },
+      });
+
+      this.set(conversation.id, conversation);
+
+      return this.get(conversation.id)!;
+    });
   }
 
   async deleteConversation(conversationId: string): Promise<void> {

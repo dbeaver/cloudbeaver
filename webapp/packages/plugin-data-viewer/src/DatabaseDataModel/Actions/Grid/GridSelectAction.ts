@@ -100,6 +100,7 @@ export class GridSelectAction<
                 return;
               }
             }
+
             for (let index = focusIndex; index <= previous.length; index++) {
               const nextElement = previous[index]!;
               const row = current.find(key => GridDataKeysUtils.isEqual(key, nextElement));
@@ -128,6 +129,7 @@ export class GridSelectAction<
     if (!this.focusedElement) {
       return false;
     }
+
     return GridDataKeysUtils.isEqual(key.column, this.focusedElement.column) && GridDataKeysUtils.isEqual(key.row, this.focusedElement.row);
   }
 
@@ -221,6 +223,7 @@ export class GridSelectAction<
           selected,
         });
       }
+
       return;
     }
 
@@ -228,6 +231,7 @@ export class GridSelectAction<
       for (const column of this.view.columnKeys) {
         this.set({ row: key.row, column } as Partial<TKey>, selected, true);
       }
+
       if (!silent) {
         this.actions.execute({
           type: 'select',
@@ -236,6 +240,7 @@ export class GridSelectAction<
           selected,
         });
       }
+
       return;
     }
 
@@ -244,6 +249,7 @@ export class GridSelectAction<
         if (!selected) {
           return;
         }
+
         this.selectedElements.set(GridDataKeysUtils.serialize(key.row), []);
       }
 
@@ -346,12 +352,14 @@ export class GridSelectAction<
           if (nextFocus === null || GridDataKeysUtils.isEqual(update.row, nextFocus.row)) {
             nextFocus = { ...nextFocus, row: update.newRow };
           }
+
           break;
 
         case DatabaseEditChangeType.delete:
           if (nextFocus === null || GridDataKeysUtils.isEqual(update.row, nextFocus.row)) {
             nextFocus = { ...nextFocus, row: update.newRow };
           }
+
           this.set({ row: update.row } as Partial<TKey>, false, true);
           break;
       }
@@ -369,8 +377,10 @@ export class GridSelectAction<
           } else if (data.value.length > 0) {
             this.focus(data.value[data.value.length - 1]!.key);
           }
+
           this.clear();
         }
+
         break;
 
       case DatabaseEditChangeType.delete:
@@ -378,11 +388,13 @@ export class GridSelectAction<
           this.focus(data.value[0]!.key);
           this.clear();
         }
+
         break;
       case DatabaseEditChangeType.update:
         if (data.value && data.value.length > 0) {
           this.focus(data.value[data.value.length - 1]!.key);
         }
+
         break;
     }
   }

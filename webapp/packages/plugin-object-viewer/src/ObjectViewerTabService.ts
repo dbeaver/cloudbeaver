@@ -140,6 +140,7 @@ export class ObjectViewerTabService {
         tab.handlerState.tabIcon = nodeInfo.icon;
         tab.handlerState.tabTitle = nodeInfo.name;
       });
+
       tabInfo.registerTab(tab);
     }
 
@@ -185,10 +186,13 @@ export class ObjectViewerTabService {
       if (!tabInfo.tab) {
         return;
       }
+
       const pageId = (tabInfo.tab.handlerState as IObjectViewerTabState | undefined)?.pageId;
+
       if (!pageId) {
         return;
       }
+
       return this.dbObjectPageService.getPage(pageId);
     };
 
@@ -207,6 +211,7 @@ export class ObjectViewerTabService {
           page,
           state,
         };
+
         return true;
       }
 
@@ -323,6 +328,7 @@ export class ObjectViewerTabService {
     if (!nodeInfo.catalogId) {
       return;
     }
+
     return nodeInfo.catalogId;
   }
 
@@ -332,6 +338,7 @@ export class ObjectViewerTabService {
     if (!nodeInfo.schemaId) {
       return;
     }
+
     return nodeInfo.schemaId;
   }
 
@@ -382,6 +389,7 @@ export class ObjectViewerTabService {
     ) {
       if (tab.handlerState.connectionKey) {
         await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
+
         if (!this.connectionInfoResource.has(tab.handlerState.connectionKey)) {
           return false;
         }
@@ -398,6 +406,7 @@ export class ObjectViewerTabService {
 
       return this.dbObjectPageService.restorePages(tab);
     }
+
     return false;
   }
 
@@ -429,6 +438,7 @@ export class ObjectViewerTabService {
             tab.handlerState.childrenError = false;
             tab.handlerState.folderId = data.folderId || nodeInfo.folderId;
           }
+
           this.navigationTabsService.selectTab(tab.id);
         });
       }
@@ -441,6 +451,7 @@ export class ObjectViewerTabService {
     if (!contexts.hasContext(this.objectViewerTabContext)) {
       return;
     }
+
     try {
       const { switchPage } = contexts.getContext(this.objectViewerTabContext);
 
@@ -453,6 +464,7 @@ export class ObjectViewerTabService {
 
 export function isObjectViewerTab(tab: ITab): tab is ITab<IObjectViewerTabState>;
 export function isObjectViewerTab(predicate: (tab: ITab<IObjectViewerTabState>) => boolean): (tab: ITab) => tab is ITab<IObjectViewerTabState>;
+
 export function isObjectViewerTab(
   tab: ITab | ((tab: ITab<IObjectViewerTabState>) => boolean),
 ): boolean | ((tab: ITab) => tab is ITab<IObjectViewerTabState>) {
@@ -460,11 +472,14 @@ export function isObjectViewerTab(
     const predicate = tab;
     return (tab: ITab): tab is ITab<IObjectViewerTabState> => {
       const objectViewerTab = tab.handlerId === objectViewerTabHandlerKey;
+
       if (!predicate || !objectViewerTab) {
         return objectViewerTab;
       }
+
       return predicate(tab);
     };
   }
+
   return tab.handlerId === objectViewerTabHandlerKey;
 }

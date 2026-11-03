@@ -42,6 +42,7 @@ export class ConnectionViewPart extends FormPart<ConnectionViewPartState, IConne
     if (!this.optionsPart.connectionKey) {
       const defaults = await this.defaultNavigatorSettingsResource.load();
       this.setInitialState(defaults ? { ...defaults } : defaultStateGetter());
+
       return;
     }
 

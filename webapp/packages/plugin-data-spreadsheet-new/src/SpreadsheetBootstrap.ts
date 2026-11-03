@@ -176,6 +176,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
           }
 
           const constraints = model.source.getAction(resultIndex, IDatabaseDataConstraintAction);
+
           return constraints.orderConstraints.length > 0 || constraints.filterConstraints.length > 0;
         }
 

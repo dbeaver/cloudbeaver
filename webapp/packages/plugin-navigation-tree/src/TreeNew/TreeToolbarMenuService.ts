@@ -38,6 +38,7 @@ export class TreeToolbarMenuService {
           const { getState, getChildren, rootId } = treeData;
 
           const hasExpanded = getChildren(rootId).some(node => getState(node).expanded);
+
           return hasExpanded;
         }
 
@@ -69,11 +70,13 @@ export class TreeToolbarMenuService {
         break;
       case ACTION_TREE_REFRESH: {
         const refresh = contexts.get(DATA_CONTEXT_TREE_REFRESH);
+
         if (refresh) {
           await refresh();
         } else {
           await treeData.load(treeData.rootId, true);
         }
+
         break;
       }
     }

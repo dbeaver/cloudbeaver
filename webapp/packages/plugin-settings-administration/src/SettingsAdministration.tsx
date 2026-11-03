@@ -40,6 +40,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
     if (!changed) {
       return;
     }
+
     try {
       await settingsSource?.save();
       notificationService.logSuccess({ title: translate('plugin_settings_administration_settings_save_success') });

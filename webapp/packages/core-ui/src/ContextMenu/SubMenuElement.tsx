@@ -80,6 +80,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
 
     return !hasVisibleItems && !canLazyLoadItems;
   });
+
   const IconComponent = handler?.iconComponent?.() ?? subMenu.iconComponent?.();
   const extraProps = handler?.getExtraProps?.() ?? (subMenu.getExtraProps?.() as any);
   // TODO: fix, this triggers `Cannot update a component (`SubMenuElement`) while rendering a different component`
@@ -102,6 +103,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
   if (action) {
     actionItem = menuService.createActionItem(subMenuData.context, action);
   }
+
   const menuContext = useMemo<IMenuContext>(() => ({ menu: subMenuData, rtl: parent?.rtl }), [subMenuData, parent]);
 
   const handleClick = useCallback(
@@ -145,6 +147,7 @@ export const SubMenuElement = observer<ISubMenuElementProps>(function SubMenuEle
 
   if (group) {
     const firstActionItem = subMenuData.items.find(item => item instanceof MenuActionItem);
+
     if (firstActionItem) {
       // TODO: don't want to show submenu right now
       // if (subMenuData.items.length === 1) {

@@ -5,6 +5,13 @@ fragment AiChatMessage on AIMessage {
   content
   displayMessage
   time
+  attachments {
+    image {
+      name
+      mediaType
+      data
+    }
+  }
   functionCall {
     id
     functionName

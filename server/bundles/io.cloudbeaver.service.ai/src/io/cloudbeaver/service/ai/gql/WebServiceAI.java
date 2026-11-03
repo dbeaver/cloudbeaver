@@ -409,7 +409,8 @@ public class WebServiceAI implements DBWServiceAI {
     public WebAISendChatMessageInfo asyncSendChatMessage(
         @NotNull WebSession webSession,
         @NotNull String conversationId,
-        @NotNull String prompt
+        @NotNull String prompt,
+        @Nullable WebAIChatAttachmentInput[] attachments
     ) throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
         try {
@@ -418,12 +419,13 @@ public class WebServiceAI implements DBWServiceAI {
             if (conversation == null) {
                 throw new DBWebException("Invalid chat conversation ID " + conversationId);
             }
-            if (prompt.trim().isEmpty()) {
+            List<AIImageAttachment> images = WebAIChatAttachmentInput.toImages(attachments);
+            if (prompt.trim().isEmpty() && images.isEmpty()) {
                 throw new DBWebException("Invalid prompt");
             }
-            AIMessage message = AIMessage.userMessage(prompt.trim());
+            AIMessage message = AIMessage.userMessage(prompt.trim()).withImages(images);
             return WebAIUtils.submitPrompt(webSession, aiChatSession, conversation, message);
-        } catch (DBException e) {
+        } catch (DBException | IllegalArgumentException e) {
             throw new DBWebException(e.getMessage(), e);
         }
     }

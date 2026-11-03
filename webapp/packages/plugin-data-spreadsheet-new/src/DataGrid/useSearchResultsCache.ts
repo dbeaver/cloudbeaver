@@ -23,6 +23,7 @@ export function useSearchResultsCache(cacheAction: ResultSetCacheAction): IGridS
       },
       update(partial: Partial<IGridSearchStorageState>): void {
         const current = cacheAction.getShared<IGridSearchStorageState>(SEARCH_STORAGE_KEY);
+
         if (current) {
           cacheAction.setShared(SEARCH_STORAGE_KEY, { ...current, ...partial });
         }

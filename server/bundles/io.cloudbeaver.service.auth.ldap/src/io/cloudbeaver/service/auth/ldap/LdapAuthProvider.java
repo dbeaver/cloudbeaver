@@ -34,8 +34,11 @@ import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.SMStandardMeta;
+import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.ByteArrayInputStream;
@@ -45,6 +48,8 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -59,6 +64,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     private static final Log log = Log.getLog(LdapAuthProvider.class);
     public static final String LDAP_AUTH_PROVIDER_ID = "ldap";
     private static final int DEFAULT_TIME_LIMIT = 30_000;
+    // Size of the user meta parameter value column
+    private static final int MAX_PROFILE_VALUE_LENGTH = 1024;
 
     public LdapAuthProvider() {
     }
@@ -118,9 +125,13 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull SMAuthProviderCustomConfiguration providerConfig,
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
-        List<String> autoAssignmentTeamIds = detectAutoAssignmentTeam(new LdapSettings(providerConfig), authParameters);
+        LdapTeamAssignments teamAssignments = detectAutoAssignmentTeamResult(
+            new LdapSettings(providerConfig),
+            authParameters
+        );
         SMAutoAssign smAutoAssign = new SMAutoAssign();
-        autoAssignmentTeamIds.forEach(smAutoAssign::addExternalTeamId);
+        smAutoAssign.setTeamAssignmentsAuthoritative(teamAssignments.authoritative());
+        teamAssignments.teamIds().forEach(smAutoAssign::addExternalTeamId);
         return smAutoAssign;
     }
 
@@ -403,10 +414,20 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         if (CommonUtils.isEmpty(userName)) {
             throw new DBException("LDAP user name is empty");
         }
-        String displayName = JSONUtils.getString(authParameters, LocalAuthProviderConstants.CRED_DISPLAY_NAME);
+        Map<?, ?> profile = authParameters.get(SMStandardMeta.KEY_META_PARAMS) instanceof Map<?, ?> meta ? meta : Map.of();
+        String firstName = profile.get(SMStandardMeta.META_FIRST_NAME) instanceof String first
+            ? first : JSONUtils.getString(authParameters, SMStandardMeta.META_FIRST_NAME);
+        String lastName = profile.get(SMStandardMeta.META_LAST_NAME) instanceof String last
+            ? last : JSONUtils.getString(authParameters, SMStandardMeta.META_LAST_NAME);
+        String displayName = Stream.of(firstName, lastName).filter(CommonUtils::isNotEmpty).collect(Collectors.joining(" "));
+        if (CommonUtils.isEmpty(displayName)) {
+            displayName = JSONUtils.getString(authParameters, LocalAuthProviderConstants.CRED_DISPLAY_NAME);
+        }
         if (CommonUtils.isEmpty(displayName)) {
             displayName = userName;
         }
+        // Main LDAP login has already filled the stored user profile. Do not expose directory metadata as an
+        // identity overlay: child authentication skips local validation and must not override that profile.
         return new DBWUserIdentity(userName, displayName);
     }
 
@@ -444,7 +465,51 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         if (CommonUtils.isEmpty(userId)) {
             throw new DBException("LDAP user id not found");
         }
+        // LDAP user IDs are case-insensitive. For linked accounts use the local ID resolved by the controller,
+        // which may differ from the LDAP login. Fill missing values before loading the user into the web session.
+        String localUserId = activeUserId == null ? userId.toLowerCase() : activeUserId;
+        fillMissingUserProfile(securityController, localUserId, userCredentials);
         return activeUserId == null ? userId : activeUserId;
+    }
+
+    private void fillMissingUserProfile(
+        @NotNull SMController securityController,
+        @NotNull String userId,
+        @NotNull Map<String, Object> userCredentials
+    ) {
+        if (!(userCredentials.get(SMStandardMeta.KEY_META_PARAMS) instanceof Map<?, ?> provided)) {
+            return;
+        }
+        Map<String, String> profile = new LinkedHashMap<>();
+        for (String name : List.of(SMStandardMeta.META_FIRST_NAME, SMStandardMeta.META_LAST_NAME)) {
+            if (provided.get(name) instanceof String value && CommonUtils.isNotEmpty(value)) {
+                profile.put(name, value);
+            }
+        }
+        // The security controller provisions new users after this hook using these nonempty LDAP values.
+        userCredentials.put(SMStandardMeta.KEY_META_PARAMS, profile);
+        if (provided.isEmpty() || !(securityController instanceof SMAdminController adminController)) {
+            return;
+        }
+        try {
+            SMUser user = adminController.getUserById(userId);
+            if (user == null) {
+                return;
+            }
+            Map<String, String> completedProfile = new LinkedHashMap<>(user.getMetaParameters());
+            for (Map.Entry<String, String> entry : profile.entrySet()) {
+                if (CommonUtils.isEmpty(completedProfile.get(entry.getKey()))) {
+                    completedProfile.put(entry.getKey(), entry.getValue());
+                }
+            }
+            // Use the same effective values for this session's identity, including manually entered names.
+            userCredentials.put(SMStandardMeta.KEY_META_PARAMS, completedProfile);
+            if (!completedProfile.equals(user.getMetaParameters())) {
+                adminController.setSubjectMetas(userId, completedProfile);
+            }
+        } catch (DBException e) {
+            log.warn("Cannot fill missing LDAP profile values of user '" + userId + "'", e);
+        }
     }
 
     @Override
@@ -531,6 +596,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                         ldapSettings.getProviderConfiguration().getParameter(LdapConstants.LDAP_META_GROUP_NAME)
                     )
                 );
+                collectUserProfile(ldapSettings, attributes, userData);
                 doCustomModifyUserDataAfterAuthentication(ldapSettings, attributes, userData);
             }
             userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(login) ? login : userId);
@@ -553,11 +619,60 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
-    protected void doCustomModifyUserDataAfterAuthentication(LdapSettings ldapSettings, Attributes attributes, Map<String, Object> userData) {
+    /**
+     * Reads the configured first and last names for the user profile and session identity.
+     */
+    private void collectUserProfile(
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Attributes attributes,
+        @NotNull Map<String, Object> userData
+    ) {
+        Map<String, String> profile = new LinkedHashMap<>();
+        if (CommonUtils.isNotEmpty(ldapSettings.getFirstNameField())) {
+            profile.put(SMStandardMeta.META_FIRST_NAME, readProfileAttribute(attributes, ldapSettings.getFirstNameField()));
+        }
+        if (CommonUtils.isNotEmpty(ldapSettings.getLastNameField())) {
+            profile.put(SMStandardMeta.META_LAST_NAME, readProfileAttribute(attributes, ldapSettings.getLastNameField()));
+        }
+        String firstName = profile.get(SMStandardMeta.META_FIRST_NAME);
+        if (CommonUtils.isNotEmpty(firstName)) {
+            userData.put(SMStandardMeta.META_FIRST_NAME, firstName);
+        }
+        String lastName = profile.get(SMStandardMeta.META_LAST_NAME);
+        if (CommonUtils.isNotEmpty(lastName)) {
+            userData.put(SMStandardMeta.META_LAST_NAME, lastName);
+        }
+        if (!profile.isEmpty()) {
+            userData.put(SMStandardMeta.KEY_META_PARAMS, profile);
+        }
+    }
+
+    @NotNull
+    private String readProfileAttribute(@NotNull Attributes attributes, @NotNull String attributeName) {
+        if (CommonUtils.isEmpty(attributeName)) {
+            return "";
+        }
+        String value = getAttributeValueSafe(attributes, attributeName).trim();
+        return value.length() > MAX_PROFILE_VALUE_LENGTH ? value.substring(0, MAX_PROFILE_VALUE_LENGTH) : value;
+    }
+
+    protected void doCustomModifyUserDataAfterAuthentication(
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Attributes attributes,
+        @NotNull Map<String, Object> userData
+    ) {
     }
 
     @NotNull
     protected List<String> detectAutoAssignmentTeam(
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Map<String, Object> authParameters
+    ) throws DBException {
+        return detectAutoAssignmentTeamResult(ldapSettings, authParameters).teamIds();
+    }
+
+    @NotNull
+    protected LdapTeamAssignments detectAutoAssignmentTeamResult(
         @NotNull LdapSettings ldapSettings,
         @NotNull Map<String, Object> authParameters
     ) throws DBException {
@@ -574,16 +689,18 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             userDN = getUserDN(ldapSettings, JSONUtils.getString(authParameters, LdapConstants.CRED_DISPLAY_NAME));
         }
         if (userDN == null) {
-            return Collections.emptyList();
+            return new LdapTeamAssignments(Collections.emptyList(), false);
         }
 
         List<String> result = new ArrayList<>();
         result.add(userDN);
-        result.addAll(getGroupForMember(userDN, ldapSettings, authParameters));
-        return result;
+        LdapTeamAssignments groupAssignments = resolveGroupsForMember(userDN, ldapSettings, authParameters);
+        result.addAll(groupAssignments.teamIds());
+        return new LdapTeamAssignments(result, groupAssignments.authoritative());
     }
 
-    private String getUserDN(LdapSettings ldapSettings, String displayName) {
+    @Nullable
+    private String getUserDN(@NotNull LdapSettings ldapSettings, @Nullable String displayName) {
         DirContext context;
         try {
             context = initConnection(creteAuthEnvironment(ldapSettings));
@@ -595,9 +712,23 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     }
 
     @NotNull
-    protected List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
+    protected List<String> getGroupForMember(
+        @NotNull String fullDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Map<String, Object> authParameters
+    ) {
+        return resolveGroupsForMember(fullDN, ldapSettings, authParameters).teamIds();
+    }
+
+    @NotNull
+    protected LdapTeamAssignments resolveGroupsForMember(
+        @NotNull String fullDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Map<String, Object> authParameters
+    ) {
         DirContext context = null;
         Set<String> result = new LinkedHashSet<>();
+        boolean authoritative = true;
         try {
             Map<String, String> environment = creteAuthEnvironment(ldapSettings);
             if (CommonUtils.isEmpty(ldapSettings.getBindUserDN())) {
@@ -620,21 +751,30 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             // Run both lookups independently: a failure in one must not discard the groups
             // already collected by the other.
             try {
-                List<String> groupsByMemberOfAttribute = findGroupsByMemberOfAttribute(fullDN, context);
-                log.debug("Found " + groupsByMemberOfAttribute.size() + " groups by memberOf attribute");
-                result.addAll(groupsByMemberOfAttribute);
+                LdapTeamAssignments groupsByMemberOfAttribute = findGroupsByMemberOfAttributeResult(fullDN, context);
+                log.debug("Found " + groupsByMemberOfAttribute.teamIds().size() + " groups by memberOf attribute");
+                result.addAll(groupsByMemberOfAttribute.teamIds());
+                authoritative &= groupsByMemberOfAttribute.authoritative();
             } catch (Exception e) {
                 log.error("Failed to fetch groups by memberOf attribute. " + e.getMessage());
+                authoritative = false;
             }
             try {
-                List<String> groupsByMemberAttribute = findGroupsByMemberAttribute(fullDN, ldapSettings, context);
-                log.debug("Found " + groupsByMemberAttribute.size() + " groups by member attribute");
-                result.addAll(groupsByMemberAttribute);
+                LdapTeamAssignments groupsByMemberAttribute = findGroupsByMemberAttributeResult(
+                    fullDN,
+                    ldapSettings,
+                    context
+                );
+                log.debug("Found " + groupsByMemberAttribute.teamIds().size() + " groups by member attribute");
+                result.addAll(groupsByMemberAttribute.teamIds());
+                authoritative &= groupsByMemberAttribute.authoritative();
             } catch (Exception e) {
                 log.error("Failed to fetch groups by member attribute. " + e.getMessage());
+                authoritative = false;
             }
         } catch (Exception e) {
             log.error("Group not found. " + e.getMessage());
+            authoritative = false;
         } finally {
             try {
                 if (context != null) {
@@ -645,11 +785,35 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
         }
         log.debug("Resolved " + result.size() + " external group id(s) for member '" + fullDN + "': " + result);
-        return new ArrayList<>(result);
+        return new LdapTeamAssignments(new ArrayList<>(result), authoritative);
     }
 
-    protected List<String> findGroupsByMemberOfAttribute(String fullDN, DirContext context) throws NamingException {
+    protected record LdapTeamAssignments(@NotNull List<String> teamIds, boolean authoritative) {
+    }
+
+    @NotNull
+    protected LdapTeamAssignments createTeamAssignments(
+        @NotNull List<String> teamIds,
+        boolean authoritative
+    ) {
+        return new LdapTeamAssignments(teamIds, authoritative);
+    }
+
+    @NotNull
+    protected List<String> findGroupsByMemberOfAttribute(
+        @NotNull String fullDN,
+        @NotNull DirContext context
+    ) throws NamingException {
+        return findGroupsByMemberOfAttributeResult(fullDN, context).teamIds();
+    }
+
+    @NotNull
+    private LdapTeamAssignments findGroupsByMemberOfAttributeResult(
+        @NotNull String fullDN,
+        @NotNull DirContext context
+    ) throws NamingException {
         List<String> result = new ArrayList<>();
+        boolean authoritative = true;
         SearchControls memberOfSearch = new SearchControls();
         memberOfSearch.setSearchScope(SearchControls.OBJECT_SCOPE);
         memberOfSearch.setTimeLimit(DEFAULT_TIME_LIMIT);
@@ -669,18 +833,34 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 }
             }
         } catch (PartialResultException e) {
-          log.debug("Ignoring LDAP continuation references while reading memberOf for '" + fullDN + "'");
+            log.debug("Ignoring LDAP continuation references while reading memberOf for '" + fullDN + "'");
+            authoritative = false;
         } finally {
             if (userRecord != null) {
                 userRecord.close();
             }
         }
 
-        return result;
+        return new LdapTeamAssignments(result, authoritative);
     }
 
-    protected List<String> findGroupsByMemberAttribute(String fullDN, LdapSettings ldapSettings, DirContext context) throws NamingException {
+    @NotNull
+    protected List<String> findGroupsByMemberAttribute(
+        @NotNull String fullDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull DirContext context
+    ) throws NamingException {
+        return findGroupsByMemberAttributeResult(fullDN, ldapSettings, context).teamIds();
+    }
+
+    @NotNull
+    private LdapTeamAssignments findGroupsByMemberAttributeResult(
+        @NotNull String fullDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull DirContext context
+    ) throws NamingException {
         List<String> result = new ArrayList<>();
+        boolean authoritative = true;
         String searchFilter = "(member={0})";
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -700,19 +880,22 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                     result.add(next.getName());
                 } catch (Exception e) {
                     log.error("Failed fetch user group. " + e.getMessage());
+                    authoritative = false;
                 }
             }
         } catch (PartialResultException e) {
             log.debug("Ignoring LDAP continuation references during member group search for '" + fullDN + "'");
+            authoritative = false;
         } finally {
             if (searchResults != null) {
                 searchResults.close();
             }
         }
-        return result;
+        return new LdapTeamAssignments(result, authoritative);
     }
 
-    public DirContext initConnection(Map<String, String> environment) throws DBException {
+    @NotNull
+    public DirContext initConnection(@NotNull Map<String, String> environment) throws DBException {
         //this hack is needed for correct LDAPS working. JNDI uses ContextClassLoader instead of OSGI loader
         ClassLoader previous = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());

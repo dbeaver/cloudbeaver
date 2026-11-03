@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ export class ConnectionPublicSecretsResource extends CachedMapResource<IConnecti
 
       return key;
     });
+
     this.connectionInfoResource.onItemDelete.addHandler(this.delete.bind(this));
   }
 
@@ -72,6 +73,7 @@ export class ConnectionPublicSecretsResource extends CachedMapResource<IConnecti
       if (connections.length === 0) {
         throw new Error('Connection not found');
       }
+
       const connection = connections[0]!;
 
       this.set(key, connection.sharedSecrets);
@@ -86,9 +88,11 @@ export class ConnectionPublicSecretsResource extends CachedMapResource<IConnecti
 
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+
     if (!parse.success) {
       this.logger.warn(`Invalid resource key ${schemaValidationError(parse.error, { prefix: null }).toString()}`);
     }
+
     return parse.success;
   }
 }

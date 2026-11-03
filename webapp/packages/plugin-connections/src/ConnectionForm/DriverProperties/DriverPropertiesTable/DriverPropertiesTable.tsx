@@ -81,6 +81,7 @@ export const DriverPropertiesTable = observer<Props>(function DriverPropertiesTa
       }),
     [properties, deferredFilterValue],
   );
+
   const keyCounts = useMemo(
     () =>
       computed(() => {
@@ -125,6 +126,7 @@ export const DriverPropertiesTable = observer<Props>(function DriverPropertiesTa
     }
 
     const defaultValue = isNotNullDefined(property.defaultValue) ? String(getObjectPropertyOptionValue(property.defaultValue)) : undefined;
+
     if (value === defaultValue) {
       delete propertiesState[property.key];
     } else {
@@ -204,6 +206,7 @@ export const DriverPropertiesTable = observer<Props>(function DriverPropertiesTa
     (onValueChange, rowIdx, colIdx, tabIndex) => reaction(() => getCell(rowIdx, colIdx, tabIndex), onValueChange),
     [visibleProperties, keyCounts, propertiesState, readOnly, propertyIdToFocus, onRemove],
   );
+
   const columnsCount = useCreateGridReactiveValue(() => COLUMNS.length, null, []);
   const rowsCount = useCreateGridReactiveValue(
     () => visibleProperties.get().length,

@@ -23,6 +23,9 @@ import { AIChatConversationMetricsResource } from './AIChat/AIChatConversation/A
 import { AIChatFunctionsService } from './AIChatFunctionsService.js';
 import { AIChatFunctionRegistryService } from './AIChatFunctionRegistryService.js';
 import { AIFunctionsResource } from './AIFunctionsResource.js';
+import { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
+import { AIChatAttachmentsImageHandlerService } from './AIChatAttachmentsHandlers/AIChatAttachmentsImageHandler/AIChatAttachmentsImageHandlerService.js';
+import { AIChatInputService } from './AIChat/AIChatInput/AIChatInputService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-chat',
@@ -48,6 +51,9 @@ export default ModuleRegistry.add({
       .addSingleton(AIChatConversationMetricsResource)
       .addSingleton(AIChatFunctionsService)
       .addSingleton(AIChatFunctionRegistryService)
+      .addSingleton(AIChatAttachmentsService)
+      .addSingleton(AIChatInputService)
+      .addSingleton(AIChatAttachmentsImageHandlerService)
       .addSingleton(AIFunctionsResource);
   },
 });

@@ -24,6 +24,8 @@ export function evaluate(expression: string, object: Record<string, any>): boole
   const context: IContext = {
     object,
   };
+
   const result = fn(context);
+
   return !!result;
 }

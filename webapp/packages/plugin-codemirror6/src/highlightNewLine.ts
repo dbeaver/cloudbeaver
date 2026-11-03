@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@ class NewlineWidget extends WidgetType {
     const span = document.createElement('span');
     span.className = 'cm-newline';
     span.textContent = '↵';
+
     return span;
   }
 }
@@ -28,6 +29,7 @@ export function highlightNewLine() {
       getDecorations(view: EditorView) {
         const widgets = [];
         const lastLineNumber = view.state.doc.lines;
+
         for (const { from, to } of view.visibleRanges) {
           for (let pos = from; pos <= to; ) {
             const line = view.state.doc.lineAt(pos);
@@ -39,6 +41,7 @@ export function highlightNewLine() {
             pos = line.to + 1;
           }
         }
+
         return Decoration.set(widgets, true);
       }
 

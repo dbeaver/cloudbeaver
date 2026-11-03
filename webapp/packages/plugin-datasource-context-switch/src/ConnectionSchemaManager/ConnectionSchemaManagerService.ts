@@ -136,6 +136,7 @@ export class ConnectionSchemaManagerService {
     if (this.pendingCatalogId !== null) {
       return this.pendingCatalogId;
     }
+
     return this.activeObjectCatalogId;
   }
 
@@ -314,11 +315,13 @@ export class ConnectionSchemaManagerService {
     if (!this.activeItem?.changeProjectId) {
       return;
     }
+
     try {
       runInAction(() => {
         this.changingProjectId = true;
         this.pendingProjectId = projectId;
       });
+
       await this.activeItem.changeProjectId(projectId, this.activeItem.context);
     } finally {
       runInAction(() => {
@@ -335,6 +338,7 @@ export class ConnectionSchemaManagerService {
     if (!this.activeItem?.changeConnectionId) {
       return;
     }
+
     try {
       runInAction(() => {
         this.changingProjectId = true;
@@ -346,6 +350,7 @@ export class ConnectionSchemaManagerService {
         this.pendingSchemaId = undefined;
         this.pendingCatalogId = undefined;
       });
+
       await this.activeItem.changeConnectionId(connectionKey, this.activeItem.context);
       await this.updateContainer(connectionKey);
     } finally {
@@ -389,6 +394,7 @@ export class ConnectionSchemaManagerService {
         if (resetSchemaId) {
           this.pendingSchemaId = null;
         }
+
         this.pendingCatalogId = null;
         this.changingConnectionContainer = false;
       });

@@ -35,6 +35,7 @@ export function useTreeGridKeyboardNavigation({ expanded, parentItemId, setExpan
         } else {
           setExpanded?.(true);
         }
+
         break;
       case 'ArrowLeft':
         if (expanded) {
@@ -44,6 +45,7 @@ export function useTreeGridKeyboardNavigation({ expanded, parentItemId, setExpan
           event.preventDefault();
           compositeStore?.move(parentItemId);
         }
+
         break;
     }
   };

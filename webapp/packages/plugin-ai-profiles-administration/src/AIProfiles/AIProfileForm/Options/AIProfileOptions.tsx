@@ -61,12 +61,15 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
       if (id === 'global' || id === 'authentication') {
         return false;
       }
+
       if (id === 'token') {
         return !usesUserCredentials;
       }
+
       return true;
     })
     .map(property => (property.id === 'token' ? { ...property, required: true } : property));
+
   const isEditMode = formState.mode === FormMode.Edit;
   const [isLoading, setIsLoading] = useState(false);
   const [models, setModels] = useState<AiModelInfo[] | null>(null);
@@ -131,6 +134,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
 
   async function loadModels(notifyOnError: boolean): Promise<AiModelInfo[] | null> {
     const engineId = part.state.engineId;
+
     if (!engineId) {
       return null;
     }
@@ -141,12 +145,15 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
       const loadedModels = (await aiEnginePropertiesResource.loadModels(engineId, profileId, part.getCurrentEngineSettings())).toSorted((a, b) =>
         a.id.localeCompare(b.id),
       );
+
       setModels(loadedModels);
+
       return loadedModels;
     } catch (error: any) {
       if (notifyOnError) {
         notificationService.logException(error, 'ai_administration_models_refresh_fail');
       }
+
       return null;
     } finally {
       setIsLoading(false);
@@ -192,6 +199,7 @@ export const AIProfileOptions: TabContainerPanelComponent<IAIProfileFormProps> =
     const global = value === 'global';
     part.state.global = global;
     part.state.properties['global'] = global;
+
     if (!global) {
       part.state.properties['token'] = null;
     }

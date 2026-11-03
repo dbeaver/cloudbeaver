@@ -20,6 +20,7 @@ export const QueryDetailsDialog: DialogComponent<IPayload> = observer(function Q
   const translate = useTranslate();
   const sqlDialect = useSqlDialectExtension();
   const extensions = useCodemirrorExtensions();
+
   if (sqlDialect) {
     extensions.set(...sqlDialect);
   }

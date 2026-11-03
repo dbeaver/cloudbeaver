@@ -54,9 +54,11 @@ export class SessionExpireService extends Bootstrap {
       return await request;
     } catch (exception: any) {
       const gqlError = errorOf(exception, GQLError);
+
       if (gqlError?.errorCode === EServerErrorCode.sessionExpired) {
         this.sessionExpired();
       }
+
       throw exception;
     }
   }

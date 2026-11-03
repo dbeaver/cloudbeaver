@@ -12,6 +12,7 @@ import type { AdminUser } from './UsersResource.js';
 export function compareGrantSubjectsByName(a: AdminUser | TeamInfo, b: AdminUser | TeamInfo): number {
   const aName = isUser(a) ? a.userId : a.teamName;
   const bName = isUser(b) ? b.userId : b.teamName;
+
   return (aName ?? '').localeCompare(bName ?? '');
 }
 

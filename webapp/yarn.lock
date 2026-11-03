@@ -2444,7 +2444,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/eslint-plugin@workspace:packages/eslint-plugin"
   dependencies:
+    "@typescript-eslint/parser": "npm:^8"
     eslint: "npm:^9"
+    typescript: "npm:^5.8.3"
   languageName: unknown
   linkType: soft
 
@@ -2557,6 +2559,7 @@ __metadata:
   dependencies:
     "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-connections": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"

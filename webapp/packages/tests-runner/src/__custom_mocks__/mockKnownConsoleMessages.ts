@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,38 +27,49 @@ export function initKnownConsoleMessages(addKnownPatterns?: () => void) {
       if (filterPatterns(knownLogPatterns, args)) {
         return;
       }
+
       expect(logSpy).not.toHaveBeenCalledWith(...args);
     });
+
     warnSpy = vitest.spyOn(console, 'warn').mockImplementation((...args) => {
       if (filterPatterns(knownWarnPatterns, args)) {
         return;
       }
+
       expect(warnSpy).not.toHaveBeenCalledWith(...args);
     });
+
     errorSpy = vitest.spyOn(console, 'error').mockImplementation((...args) => {
       if (args[0] && String(args[0]).includes('Expected:')) {
         // skip exceptions from vitest expect
         return;
       }
+
       if (args[0] && String(args[0]).includes('Error: Uncaught')) {
         // skip uncaught exceptions
         return;
       }
+
       if (filterPatterns(knownErrorPatterns, args)) {
         return;
       }
+
       expect(errorSpy).not.toHaveBeenCalledWith(...args);
     });
+
     infoSpy = vitest.spyOn(console, 'info').mockImplementation((...args) => {
       if (filterPatterns(knownInfoPatterns, args)) {
         return;
       }
+
       expect(infoSpy).not.toHaveBeenCalledWith(...args);
     });
+
     debugSpy = vitest.spyOn(console, 'debug').mockImplementation((...args) => {
       if (filterPatterns(knownDebugPatterns, args)) {
         return;
       }
+
       expect(debugSpy).not.toHaveBeenCalledWith(...args);
     });
   });
@@ -92,9 +103,11 @@ function filterPatterns(patterns: any[][], args: any[]) {
       if (value instanceof RegExp) {
         return value.test(args[index]);
       }
+
       if (typeof value === 'function') {
         return value(args[index]);
       }
+
       return value === args[index];
     }),
   );

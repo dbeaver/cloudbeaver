@@ -61,6 +61,7 @@ export class ResultSetDataAction extends GridDataResultAction<
 
       return { index: index - 1, subIndex: 0 };
     }
+
     return undefined;
   }
 

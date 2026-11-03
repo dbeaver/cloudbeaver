@@ -96,9 +96,11 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       actions: [ACTION_TREE_CREATE_CONNECTION],
       getActionInfo: (context, action) => {
         const menu = context.get(DATA_CONTEXT_MENU);
+
         if (menu === MENU_ELEMENTS_TREE_TOOLS) {
           return { ...action.info, icon: '/icons/plugin_connection_new_sm.svg' };
         }
+
         return action.info;
       },
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),

@@ -23,6 +23,7 @@ export function useAdministrationUserFormState(id: string | null, configure?: (s
     ref.current = new AdministrationUserFormState(serviceProvider, administrationUserFormService, {
       userId: id,
     });
+
     configure?.(ref.current);
   }
 

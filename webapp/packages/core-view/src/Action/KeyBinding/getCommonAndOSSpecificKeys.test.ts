@@ -39,6 +39,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         id: 'test',
         keys: 'Ctrl+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
     });
@@ -48,6 +49,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         id: 'test',
         keysMac: 'Cmd+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Cmd+A']);
     });
@@ -58,6 +60,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: 'Ctrl+A',
         keysMac: 'Cmd+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Cmd+A', 'Ctrl+A']);
     });
@@ -68,6 +71,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: ['Ctrl+A', 'Ctrl+B'],
         keysMac: ['Cmd+A', 'Cmd+B'],
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Cmd+A', 'Cmd+B', 'Ctrl+A', 'Ctrl+B']);
     });
@@ -78,6 +82,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: 'Ctrl+A',
         keysMac: ['Cmd+A', 'Cmd+B'],
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Cmd+A', 'Cmd+B', 'Ctrl+A']);
     });
@@ -89,6 +94,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keysMac: 'Cmd+A',
         keysWin: 'Ctrl+Shift+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Cmd+A', 'Ctrl+A']);
     });
@@ -99,6 +105,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: 'Ctrl+A',
         keysMac: 'Ctrl+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
     });
@@ -109,6 +116,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: '',
         keysMac: '',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual([]);
     });
@@ -119,6 +127,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: ['Ctrl+A', ''],
         keysMac: ['Cmd+A', ''],
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Cmd+A', 'Ctrl+A']);
     });
@@ -135,6 +144,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: 'Ctrl+A',
         keysMac: 'Cmd+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
     });
@@ -145,6 +155,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keysWin: 'Ctrl+Shift+A',
         keysMac: 'Mod+Shift+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+Shift+A']);
     });
@@ -155,6 +166,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: 'Ctrl+A',
         keysWin: 'Ctrl+Shift+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+Shift+A', 'Ctrl+A']);
     });
@@ -165,6 +177,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: ['Ctrl+A', 'Ctrl+B'],
         keysWin: ['Ctrl+Shift+A', 'Ctrl+Shift+B'],
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+Shift+A', 'Ctrl+Shift+B', 'Ctrl+A', 'Ctrl+B']);
     });
@@ -175,6 +188,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: 'Ctrl+A',
         keysWin: ['Ctrl+Shift+A', 'Ctrl+Shift+B'],
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+Shift+A', 'Ctrl+Shift+B', 'Ctrl+A']);
     });
@@ -184,6 +198,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         id: 'test',
         keysMac: 'Cmd+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual([]);
     });
@@ -194,6 +209,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: 'Ctrl+A',
         keysWin: 'Ctrl+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
     });
@@ -204,6 +220,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: '',
         keysWin: '',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual([]);
     });
@@ -214,6 +231,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keys: ['Ctrl+A', ''],
         keysWin: ['Ctrl+Shift+A', ''],
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+Shift+A', 'Ctrl+A']);
     });
@@ -231,6 +249,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keysMac: 'Cmd+A',
         keysWin: 'Ctrl+Shift+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
     });
@@ -240,6 +259,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         id: 'test',
         keysMac: 'Cmd+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual([]);
     });
@@ -249,6 +269,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         id: 'test',
         keysWin: 'Ctrl+Shift+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual([]);
     });
@@ -260,6 +281,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         keysMac: ['Cmd+A', 'Cmd+B'],
         keysWin: ['Ctrl+Shift+A', 'Ctrl+Shift+B'],
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A', 'Ctrl+B']);
     });
@@ -269,6 +291,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         id: 'test',
         keys: 'Ctrl+A',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
     });
@@ -278,6 +301,7 @@ describe('getCommonAndOSSpecificKeys', () => {
         id: 'test',
         keys: ['Ctrl+A', ''],
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual(['Ctrl+A']);
     });
@@ -288,6 +312,7 @@ describe('getCommonAndOSSpecificKeys', () => {
       const keyBinding: IKeyBinding = {
         id: 'test',
       };
+
       const result = getCommonAndOSSpecificKeys(keyBinding);
       expect(result).toEqual([]);
     });

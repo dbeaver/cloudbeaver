@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,6 +8,7 @@
 
 import { Bootstrap, ModuleRegistry, proxy, Dependency } from '@cloudbeaver/core-di';
 import { UsersResource } from './UsersResource.js';
+import { UsersGrantedTeamsResource } from './UsersGrantedTeamsResource.js';
 import { UsersOriginDetailsResource } from './UsersOriginDetailsResource.js';
 import { UsersMetaParametersResource } from './UsersMetaParametersResource.js';
 import { UserInfoResource } from './UserInfoResource.js';
@@ -40,6 +41,7 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, UserConfigurationBootstrap)
       .addSingleton(Dependency, proxy(AppAuthService))
       .addSingleton(Dependency, proxy(UsersResource))
+      .addSingleton(Dependency, proxy(UsersGrantedTeamsResource))
       .addSingleton(Dependency, proxy(UsersOriginDetailsResource))
       .addSingleton(Dependency, proxy(UsersMetaParametersResource))
       .addSingleton(Dependency, proxy(UserInfoResource))
@@ -55,6 +57,7 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(AuthConfigurationParametersResource))
       .addSingleton(AppAuthService)
       .addSingleton(UsersResource)
+      .addSingleton(UsersGrantedTeamsResource)
       .addSingleton(UsersOriginDetailsResource)
       .addSingleton(UsersMetaParametersResource)
       .addSingleton(UserInfoResource)

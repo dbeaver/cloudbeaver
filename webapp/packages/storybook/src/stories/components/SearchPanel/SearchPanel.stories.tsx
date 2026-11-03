@@ -25,6 +25,7 @@ function useMockSearch(initial: SearchPanelQuery) {
   function updateQuery(next: Partial<SearchPanelQuery>) {
     const value = { ...query, ...next };
     setQuery(value);
+
     if (!value.search) {
       setMatches({ count: 0, current: 0 });
     } else {
@@ -67,6 +68,7 @@ export const SearchWithReplace = () => {
     wholeWord: false,
     regexp: false,
   });
+
   const ref = useRef<SearchPanelRef>(null);
 
   return (

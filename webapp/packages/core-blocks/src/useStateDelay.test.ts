@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,12 @@ describe('useStateDelay', () => {
     act(() => {
       vitest.advanceTimersByTime(50);
     });
+
     expect(result.current).toBe(true);
     act(() => {
       vitest.advanceTimersByTime(60);
     });
+
     expect(result.current).toBe(true);
     unmount();
   });
@@ -48,18 +50,22 @@ describe('useStateDelay', () => {
         delay: 100,
       },
     });
+
     expect(result.current).toBe(false);
     rerender({
       value: true,
       delay: 100,
     });
+
     act(() => {
       vitest.advanceTimersByTime(50);
     });
+
     expect(result.current).toBe(false);
     act(() => {
       vitest.advanceTimersByTime(60);
     });
+
     expect(result.current).toBe(true);
     unmount();
   });
@@ -73,19 +79,23 @@ describe('useStateDelay', () => {
         callback,
       },
     });
+
     expect(callback).toHaveBeenCalledTimes(0);
     act(() => {
       vitest.advanceTimersByTime(50);
     });
+
     expect(callback).toHaveBeenCalledTimes(0);
     rerender({
       value: true,
       delay: 100,
       callback,
     });
+
     act(() => {
       vitest.advanceTimersByTime(500);
     });
+
     expect(callback).toHaveBeenCalledTimes(1);
     unmount();
   });
@@ -99,20 +109,24 @@ describe('useStateDelay', () => {
         callback,
       },
     });
+
     expect(result.current).toBe(false);
     expect(callback).toHaveBeenCalledTimes(0);
     act(() => {
       vitest.advanceTimersByTime(50);
     });
+
     expect(callback).toHaveBeenCalledTimes(0);
     rerender({
       value: false,
       delay: 100,
       callback,
     });
+
     act(() => {
       vitest.advanceTimersByTime(60);
     });
+
     expect(callback).toHaveBeenCalledTimes(0);
     unmount();
   });
@@ -124,21 +138,26 @@ describe('useStateDelay', () => {
         delay: 100,
       },
     });
+
     expect(result.current).toBe(false);
     act(() => {
       vitest.advanceTimersByTime(50);
     });
+
     rerender({
       value: true,
       delay: 200,
     });
+
     act(() => {
       vitest.advanceTimersByTime(60);
     });
+
     expect(result.current).toBe(false);
     act(() => {
       vitest.advanceTimersByTime(500);
     });
+
     expect(result.current).toBe(true);
     unmount();
   });

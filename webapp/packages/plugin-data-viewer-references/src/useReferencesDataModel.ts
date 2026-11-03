@@ -77,6 +77,7 @@ export function useReferencesDataModel(
           },
         };
       }
+
       const source = new DataViewerReferencesDataSource(serviceProvider, connectionExecutionContextService, graphQLService, asyncTaskInfoService);
 
       source.setKeepExecutionContextOnDispose(true);

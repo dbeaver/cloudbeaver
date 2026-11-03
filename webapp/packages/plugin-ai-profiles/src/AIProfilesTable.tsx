@@ -108,6 +108,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   function getCell(rowIdx: number, colIdx: number) {
     const profile = profiles[rowIdx];
     const column = columns[colIdx];
+
     if (!profile || !column) {
       return null;
     }
@@ -135,6 +136,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     if (column.key === ENGINE_COLUMN.key) {
       const engine = enginesLoader.data.find(engine => engine.id === profile.engineId);
       const title = engine?.name ?? profile.engineId;
+
       return (
         <div title={title} className="tw:flex tw:items-center tw:gap-2">
           {engine?.icon && <IconOrImage icon={engine.icon} width={16} />}
@@ -172,6 +174,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     if (columns[colIdx]?.key === SELECT_COLUMN.key) {
       return <TableRowSelect isRoot />;
     }
+
     return getHeaderText(colIdx);
   }
 
@@ -180,6 +183,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
     [columns, translate],
   );
+
   const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), [
     columns,
     translate,

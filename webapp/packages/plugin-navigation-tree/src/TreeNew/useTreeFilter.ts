@@ -50,6 +50,7 @@ export function useTreeFilter(options: ITreeFilterOptions = {}, settings?: ITree
     matchFn: (treeData: ITreeData, nodeId: string) => boolean,
   ): boolean {
     const cacheKey = `${nodeId}:${filter}`;
+
     if (matchCache.has(cacheKey)) {
       return matchCache.get(cacheKey)!;
     }
@@ -60,6 +61,7 @@ export function useTreeFilter(options: ITreeFilterOptions = {}, settings?: ITree
     }
 
     const children = treeData.getUnfilteredChildren(nodeId);
+
     for (const childId of children) {
       if (matchesOrHasMatchingDescendant(treeData, childId, filter, matchFn)) {
         matchCache.set(cacheKey, true);
@@ -68,6 +70,7 @@ export function useTreeFilter(options: ITreeFilterOptions = {}, settings?: ITree
     }
 
     matchCache.set(cacheKey, false);
+
     return false;
   }
 
@@ -80,6 +83,7 @@ export function useTreeFilter(options: ITreeFilterOptions = {}, settings?: ITree
       },
       isNodeMatched(treeData: ITreeData, nodeId: string): boolean {
         const filter = this.filter.trim();
+
         if (!filter) {
           return true;
         }
@@ -98,6 +102,7 @@ export function useTreeFilter(options: ITreeFilterOptions = {}, settings?: ITree
         }
 
         const filter = this.filter.trim();
+
         if (!filter) {
           return children;
         }
@@ -120,6 +125,7 @@ export function useTreeFilter(options: ITreeFilterOptions = {}, settings?: ITree
         }
 
         const filter = this.filter.trim();
+
         if (!filter) {
           return state;
         }

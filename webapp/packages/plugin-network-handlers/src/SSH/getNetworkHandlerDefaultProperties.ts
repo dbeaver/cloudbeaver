@@ -9,10 +9,12 @@ import type { NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 
 export function getNetworkHandlerDefaultProperties(handler: NetworkHandlerDescriptor): Record<string, any> {
   const properties: Record<string, any> = {};
+
   for (const property of handler.properties) {
     if (!property.features.includes('password')) {
       properties[property.id!] = property.value;
     }
   }
+
   return properties;
 }

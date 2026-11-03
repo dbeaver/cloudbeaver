@@ -86,6 +86,7 @@ export class SqlResultTabsService {
       if (excludedTabIds?.includes(tab.id)) {
         continue;
       }
+
       this.removeTab(state, tab);
     }
   }

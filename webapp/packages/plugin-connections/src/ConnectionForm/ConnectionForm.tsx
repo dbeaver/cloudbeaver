@@ -44,9 +44,11 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
 
       const submitInfo = context.getContext(formSubmitContext);
       submitInfo.setType(submitType);
+
       if (submitType === 'test') {
         submitInfo.setSubmitOnNoChanges(true);
       }
+
       const isCreate = formState.mode === FormMode.Create || optionsPart.state.hidden === true;
       const saved = await formState.save(context);
 
@@ -79,12 +81,22 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
   }));
 
   return (
-    <Form context={form} contents>
+    <Form
+      context={form}
+      contents
+      onInvalidCapture={event => {
+        const target = event.target;
+
+        if (target instanceof HTMLElement && target.getClientRects().length === 0) {
+          event.preventDefault();
+        }
+      }}
+    >
       <TabsState container={connectionFormService.parts} localState={formState.parts} orientation="vertical" formState={formState}>
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>
             <Container className={s(styles, { connectionTopBarStatus: true })} overflow>
-              <Container className={s(styles, { connectionStatusMessage: true })} overflow>
+              <Container className={s(styles, { connectionStatusMessage: true })} role="status" aria-live="polite" aria-atomic="true" overflow>
                 <StatusMessage
                   type={exception ? ENotificationType.Error : ENotificationType.Info}
                   message={formState.statusMessage}

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
             map.delete(key);
           }
         }
+
         return map;
       },
       this.bindState.bind(this),
@@ -162,6 +163,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
             return false;
           }
         }
+
         return true;
       },
     });
@@ -223,6 +225,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           if (tab) {
             tabs.push(tab.id);
           }
+
           dataSource.setResourceKey(undefined); // prevent deleted resource refresh
         }
       }
@@ -235,6 +238,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     if (!dataSource.projectId) {
       throw new Error('Project ID is not defined');
     }
+
     if (!this.resourceManagerService.enabled) {
       throw new Error('Resource Manager disabled');
     }
@@ -244,6 +248,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       const newResourceKey = createPath(getPathParent(resourceKey), name);
 
       await this.navResourceNodeService.move(resourceKey, newResourceKey);
+
       return newResourceKey;
     } catch (exception) {
       this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_update_script_error');

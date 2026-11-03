@@ -35,6 +35,7 @@ export const AIAdministrationPanel = observer<AdministrationItemContentProps>(fu
     if (subName === tabId) {
       return;
     }
+
     aiAdministrationNavigationService.navToSub(tabId);
   }
 

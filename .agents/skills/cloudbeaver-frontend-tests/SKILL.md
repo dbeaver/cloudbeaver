@@ -5,7 +5,15 @@ description: Add tests, write tests, or test a file in the CloudBeaver frontend.
 
 # CloudBeaver Frontend Tests
 
-Set up the smallest environment required by the test, implement the test, and leave the package passing its focused checks.
+Assess the target and existing environment first, implement eligible tests, and leave the package passing its focused checks.
+
+## Automatic test generation limits
+
+- Before generating tests, inspect the target's runtime dependency chain and confirm the package's existing scripts, dependencies, compilation, and test discovery support the required environment. Use active tests as references and run the available package build and test baseline; skipped tests or an undiscovered test file do not prove readiness.
+- Eligible targets are isolated helpers, simple components driven by props/local state, isolated hooks, and small autonomous classes constructed directly. A `Service` suffix or type-only SDK imports alone do not make a target heavyweight. Local fixtures, callback spies, fake timers, and focused browser API stubs are acceptable.
+- Skip targets requiring application startup, DI/module registration, service/resource/permission substitutes, GraphQL/MSW/WebSocket setup, chains of module mocks, or replacement of whole workspace packages or UI libraries; briefly explain the concrete dependency that blocks generation. Do not refactor production code solely to make it testable under these limits.
+- Missing or failing wiring is a blocker: briefly explain the concrete reason and stop before generating tests. Do not automatically add scripts, dependencies, references, configs, providers, or shared mocks. The wiring and application guidance below is for separately requested infrastructure work or maintenance of existing tests, not permission to expand automatic generation or revive disabled suites.
+- Write a small set of meaningful behavioral and regression checks, not exhaustive prop/getter coverage, private-field assertions, or tests mirroring implementation. If a blocker emerges during implementation, stop rather than expanding setup; leave no placeholder, disabled, or knowingly unrunnable test from the attempt.
 
 ## Workflow
 
@@ -16,10 +24,10 @@ Set up the smallest environment required by the test, implement the test, and le
 3. Classify the narrowest required environment:
 
    - **Pure**: Vitest only; instantiate functions or services directly.
-   - **DOM**: shared React test environment and Testing Library; use `renderInApp` only when a service provider is required.
-   - **Application**: CloudBeaver DI lifecycle, module registration, GraphQL/MSW mocks, or application services through `@cloudbeaver/tests-runner`.
+   - **DOM**: shared React test environment and Testing Library. `renderInApp` without an application argument delegates to ordinary rendering; assess its actual dependencies rather than its name.
+   - **Application**: CloudBeaver DI lifecycle, module registration, GraphQL/MSW mocks, or application services through `@cloudbeaver/tests-runner`. Outside automatic generation limits.
 
-4. Wire the package by comparing it with the chosen peer:
+4. Only for explicitly requested wiring work, wire the package by comparing it with the chosen peer:
 
    - Add `"test": "dbeaver-test"` when absent.
    - Add only test tools and libraries actually required by scripts or test imports. The normal baseline is `@dbeaver/cli`, `@dbeaver/react-tests`, `typescript`, and `vitest`; application helpers require `@cloudbeaver/tests-runner`.
@@ -31,7 +39,7 @@ Set up the smallest environment required by the test, implement the test, and le
 
    **Mocking with `isolate: false`:** Prefer injected doubles or typed `vi.spyOn` on module namespaces, installed in `beforeEach` and restored in `afterEach`. Hoisted `vi.mock` may miss cached consumers, and `restoreAllMocks` does not unregister module factories. Avoid blanket `vi.resetModules()`: re-importing DI modules can fail with “module already added”.
 
-6. For application tests, read the current implementations of `@cloudbeaver/tests-runner` and `core-di` before writing setup. Register current modules through `module.ts`, then create the application with the current `createApp()` API. Replace legacy manifest imports and `createApp(...manifests)` calls rather than recreating the removed manifest layer. Import every required module registration before application startup, and install focused GraphQL/MSW and known-console-message expectations for observable side effects.
+6. When explicitly asked to maintain existing application tests, read the current implementations of `@cloudbeaver/tests-runner` and `core-di` before writing setup. Register current modules through `module.ts`, then create the application with the current `createApp()` API. Replace legacy manifest imports and `createApp(...manifests)` calls rather than recreating the removed manifest layer. Import every required module registration before application startup, and install focused GraphQL/MSW and known-console-message expectations for observable side effects.
 
    The shared Vitest configuration currently uses `isolate: false` in order to increase tests run speed. Test files in the same worker share the module cache and global environment, so module registration, mocks, globals, timers, environment variables, console handlers, DOM state, and open resources can affect later files. Make setup idempotent, restore mutable state in `afterEach` or `afterAll`, reset mocks and handlers to their declared baseline, unload applications, and close servers, sockets, and timers. Check that every test declares and initializes its own required dependencies and mocks instead of relying on another file having run first.
 
@@ -61,7 +69,7 @@ Set up the smallest environment required by the test, implement the test, and le
 ## Boundaries
 
 - There is no plugin-level "tests unsupported" switch. Test support is the combination of scripts, dependencies, compilation, active tests, and a passing build.
-- Prefer pure tests over booting the application. Use the DI environment only when direct construction would bypass behavior under test.
+- Prefer pure tests over booting the application. For explicitly requested maintenance of application tests, use the DI environment only when direct construction would bypass behavior under test.
 - Preserve package boundaries: import another workspace through public exports or documented mock exports, never through its `src` directory.
 - Keep production dependencies out of `devDependencies`; test-only imports belong in `devDependencies` unless the package also imports them from production code.
 - A package build failure blocks meaningful test execution because Vitest runs emitted JavaScript. Report unrelated pre-existing build failures explicitly rather than claiming the environment works.

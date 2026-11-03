@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -218,6 +218,7 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
       const newKeys = keys(parsed);
 
       this.unsubscribe();
+
       try {
         runInAction(() => {
           for (const oldKey of oldKeys) {
@@ -244,8 +245,10 @@ class DataStorage<T extends Record<any, any> | Map<any, any>> implements ILocalS
     if (firstRun) {
       await this.readState(false);
       this.firstRun = false;
+
       return;
     }
+
     try {
       if (this.storage instanceof LocalStorageIndexedDB) {
         await this.storage.setItem(this.storeId, this.serializeData(store));

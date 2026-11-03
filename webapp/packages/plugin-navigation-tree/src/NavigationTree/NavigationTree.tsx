@@ -18,7 +18,7 @@ import { useConnectionTypeLoader } from '@cloudbeaver/core-connections';
 import { ElementsTreeToolsStyles } from '../index.js';
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService.js';
 import { navigationTreeConnectionGroupFilter } from './ConnectionGroup/navigationTreeConnectionGroupFilter.js';
-import { navigationTreeConnectionGroupRenderer } from './ConnectionGroup/navigationTreeConnectionGroupRenderer.js';
+import { navigationTreeConnectionGroupRenderers } from './ConnectionGroup/navigationTreeConnectionGroupRenderer.js';
 import { navTreeConnectionRenderer } from './ConnectionsRenderer/navTreeConnectionRenderer.js';
 import { ElementsTree } from './ElementsTree/ElementsTree.js';
 import {
@@ -83,6 +83,7 @@ export const NavigationTree = observer(function NavigationTree() {
     () => navigationTreeProjectsExpandStateGetter(navNodeInfoResource, projectsService, projectsNavNodeService),
     [navNodeInfoResource, projectsService, projectsNavNodeService],
   );
+
   const transformFilteredNode = useMemo(() => transformFilteredNodeInfo(navNodeInfoResource), [navNodeInfoResource]);
   const transformDescriptionNode = useMemo(() => transformDescriptionNodeInfo(navNodeInfoResource), [navNodeInfoResource]);
   const projectFilter = useMemo(
@@ -114,7 +115,7 @@ export const NavigationTree = observer(function NavigationTree() {
           root={root}
           localState={navigationTreeService.treeState}
           filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
-          renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer]}
+          renderers={[projectsRendererRenderer, ...navigationTreeConnectionGroupRenderers, connectionRenderer]}
           navNodeFilterCompare={navigationTreeProjectSearchCompare}
           nodeInfoTransformers={[transformFilteredNode, transformDescriptionNode]}
           expandStateGetters={[projectsExpandStateGetter]}

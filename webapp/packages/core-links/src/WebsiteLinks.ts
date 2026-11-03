@@ -9,9 +9,11 @@ function extractDocsVersion(version: string | undefined): string | null {
   if (!version) {
     return null;
   }
+
   const parts = version.split('.');
   const major = parts[0];
   const minor = parts[1];
+
   if (!major || !minor) {
     return null;
   }
@@ -71,6 +73,7 @@ export const WEBSITE_LINKS = {
     let url = distributed ? WEBSITE_LINKS.TEAM_EDITION_DOCS_PAGE : WEBSITE_LINKS.DOCS_PAGE;
 
     const majorMinor = extractDocsVersion(version);
+
     if (majorMinor) {
       url += `${majorMinor}/`;
     }
