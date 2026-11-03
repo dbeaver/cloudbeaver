@@ -8,8 +8,6 @@
 import type { DataContextGetter } from './DataContextGetter.js';
 
 export interface IDataContextProvider {
-  /** Changes when this scope or its ancestors receive a different contribution. */
-  readonly revision?: string;
   has: (context: DataContextGetter<any>) => boolean;
   hasOwn: (context: DataContextGetter<any>) => boolean;
   get: <T>(context: DataContextGetter<T>) => T | undefined;

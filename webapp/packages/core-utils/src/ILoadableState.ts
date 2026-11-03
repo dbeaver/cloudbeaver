@@ -16,10 +16,24 @@ export interface ILoadableState {
   load: () => void | Promise<void>;
   reload?: () => void | Promise<void>;
 
+  /**
+   * Bind a request to its current inputs. Input keys are immutable values: changing
+   * a target replaces its key. The returned state must keep the captured inputs
+   * for load/reload and state reads, even if this loader later targets other data.
+   * Without this method the loader instance must represent one immutable target.
+   */
+  captureRequest?: () => ILoadableStateRequest;
+
   isOutdated?: () => boolean;
   isCancelled?: () => boolean;
   isLoadable?: () => boolean;
   cancel?: () => void;
+}
+
+export interface ILoadableStateRequest {
+  readonly state: ILoadableState;
+  /** True while the captured inputs still identify this loader's current target. */
+  isCurrent: () => boolean;
 }
 
 export function isLoadableStateHasException(state: ILoadableState): boolean {

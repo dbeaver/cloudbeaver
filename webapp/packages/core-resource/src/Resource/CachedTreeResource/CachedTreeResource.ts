@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { action, makeObservable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { getPathParent, type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
+import { getPathParent, type ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
 
 import { CachedResource } from '../CachedResource.js';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from '../CachedResourceIncludes.js';
@@ -323,6 +323,13 @@ export function getCachedTreeResourceLoaderState<TValue, TContext extends Record
   includes?: CachedResourceIncludeArgs<TValue, TContext> | undefined,
 ): ILoadableState {
   return {
+    captureRequest() {
+      const capturedIncludes = includes?.slice() as CachedResourceIncludeArgs<TValue, TContext> | undefined;
+      return {
+        state: getCachedTreeResourceLoaderState(resource, key, capturedIncludes),
+        isCurrent: () => isArraysEqual(capturedIncludes ?? [], includes ?? []),
+      };
+    },
     get exception() {
       return resource.getException(key);
     },

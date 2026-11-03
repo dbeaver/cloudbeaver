@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -278,6 +278,25 @@ export function getCachedMapResourceLoaderState<TKey, TValue, TContext extends R
 ): ILoadableState {
   return {
     lazy,
+    captureRequest() {
+      const key = getKey();
+      const includes = (key === null ? undefined : getIncludes?.()?.slice()) as CachedResourceIncludeArgs<TValue, TContext> | undefined;
+      return {
+        state: getCachedMapResourceLoaderState(
+          resource,
+          () => key,
+          () => includes,
+          lazy,
+        ),
+        isCurrent() {
+          const currentKey = getKey();
+          if (key === null || currentKey === null) {
+            return key === currentKey;
+          }
+          return resource.isEqual(key, currentKey) && isArraysEqual(includes ?? [], getIncludes?.() ?? []);
+        },
+      };
+    },
     get exception() {
       const key = getKey();
 

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import type { DataContextGetter } from './DataContextGetter.js';
 import type { IDataContext } from './IDataContext.js';
@@ -16,13 +16,12 @@ const NOT_FOUND = Symbol('not found');
 export class DataContext implements IDataContext {
   private readonly store: Map<DataContextGetter<unknown>, Map<string, unknown>>;
   private fallback?: IDataContextProvider;
-  private version = 0;
 
   constructor(fallback?: IDataContextProvider) {
     this.store = new Map();
     this.fallback = fallback;
 
-    makeObservable<this, 'store' | 'fallback' | 'version'>(this, {
+    makeObservable<this, 'store' | 'fallback'>(this, {
       set: action,
       delete: action,
       clear: action,
@@ -31,20 +30,11 @@ export class DataContext implements IDataContext {
       setFallBack: action,
       store: observable.shallow,
       fallback: observable.ref,
-      version: observable,
-      revision: computed,
     });
   }
 
   setFallBack(fallback?: IDataContextProvider): void {
-    if (this.fallback !== fallback) {
-      this.fallback = fallback;
-      this.version++;
-    }
-  }
-
-  get revision(): string {
-    return `${this.version}/${this.fallback?.revision ?? ''}`;
+    this.fallback = fallback;
   }
 
   hasOwn(context: DataContextGetter<any>): boolean {
@@ -79,10 +69,6 @@ export class DataContext implements IDataContext {
 
   set<T>(context: DataContextGetter<T>, value: T, id: string): this {
     let data = this.store.get(context);
-    if (!data?.has(id) || data.get(id) !== value) {
-      this.version++;
-    }
-
     if (!data) {
       data = observable(new Map(), { deep: false });
       this.store.set(context, data);
@@ -93,9 +79,6 @@ export class DataContext implements IDataContext {
   }
 
   delete(context: DataContextGetter<any>, id?: string): this {
-    if (id ? this.store.get(context)?.has(id) : this.store.has(context)) {
-      this.version++;
-    }
     if (id) {
       const data = this.store.get(context);
       data?.delete(id);
@@ -111,9 +94,7 @@ export class DataContext implements IDataContext {
 
   deleteForId(id: string): this {
     for (const [context, data] of this.store) {
-      if (data.delete(id)) {
-        this.version++;
-      }
+      data.delete(id);
 
       if (data.size === 0) {
         this.store.delete(context);
@@ -165,9 +146,6 @@ export class DataContext implements IDataContext {
   }
 
   clear(): void {
-    if (this.store.size > 0) {
-      this.version++;
-    }
     this.store.clear();
   }
 

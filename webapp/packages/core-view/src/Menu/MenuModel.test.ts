@@ -9,7 +9,7 @@ import { observable, runInAction } from 'mobx';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { ILoadableState } from '@cloudbeaver/core-utils';
-import { createDataContext } from '@cloudbeaver/core-data-context';
+import { createDataContext, DataContext } from '@cloudbeaver/core-data-context';
 
 import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU.js';
 import { DATA_CONTEXT_MENU_NESTED } from './DATA_CONTEXT_MENU_NESTED.js';
@@ -61,6 +61,78 @@ function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> 
 }
 
 describe('MenuModel', () => {
+  it('skips a queued target after its inputs change and loads the new target', async () => {
+    const gate = resource();
+    let release!: () => void;
+    gate.loader.load = async () => {
+      await new Promise<void>(resolve => {
+        release = resolve;
+      });
+      runInAction(() => {
+        gate.state.loaded = true;
+      });
+    };
+    const key = observable.box('first');
+    const loaded = observable.set<string>();
+    const loadKey = vi.fn((target: string) => {
+      runInAction(() => {
+        loaded.add(target);
+      });
+    });
+    const loader: ILoadableState = {
+      isLoaded: () => loaded.has(key.get()),
+      isLoading: () => false,
+      isError: () => false,
+      load: () => loadKey(key.get()),
+      captureRequest() {
+        const target = key.get();
+        return {
+          state: { ...loader, load: () => loadKey(target), isLoaded: () => loaded.has(target) },
+          isCurrent: () => key.get() === target,
+        };
+      },
+    };
+    const model = new MenuModel(service({ getPreparationLoaders: () => [gate.loader, loader] }), rootMenu);
+    const stop = model.start();
+    const loading = model.load();
+    runInAction(() => key.set('second'));
+    release();
+    await loading;
+    await model.load();
+    expect(loadKey).toHaveBeenCalledExactlyOnceWith('second');
+    expect(model.isLoaded()).toBe(true);
+    stop();
+  });
+
+  it('keeps a current failure when unrelated local or parent context values change', async () => {
+    const unrelated = createDataContext<string>('unrelated');
+    const parent = new DataContext();
+    const context = new DataContext(parent);
+    const failure = new Error('current request failed');
+    let reject!: (error: Error) => void;
+    const loader = resource().loader;
+    loader.load = vi.fn(
+      () =>
+        new Promise<void>((_, rejectLoad) => {
+          reject = rejectLoad;
+        }),
+    );
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu, context);
+    const stop = model.start();
+    const loading = model.load();
+    context.set(unrelated, 'local change', 'owner');
+    parent.set(unrelated, 'parent change', 'owner');
+    reject(failure);
+    await loading;
+    expect(model.exception).toBe(failure);
+    context.set(unrelated, 'another local change', 'owner');
+    parent.set(unrelated, 'another parent change', 'owner');
+    await model.load();
+    expect(model.exception).toBe(failure);
+    expect(loader.load).toHaveBeenCalledOnce();
+    stop();
+  });
+
   it('keeps a cached lazy child error inside the child menu', () => {
     const content = resource(true);
     const failure = new Error('lazy child failed');
@@ -308,6 +380,10 @@ describe('MenuModel', () => {
         reject = rejectLoad;
       });
     const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
+    loader.captureRequest = () => {
+      const connection = model.context.get(key);
+      return { state: loader, isCurrent: () => model.context.get(key) === connection };
+    };
     model.context.set(key, 'first', 'node');
     const stop = model.start();
     const loading = model.load();

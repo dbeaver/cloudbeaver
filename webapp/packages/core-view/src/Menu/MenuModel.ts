@@ -8,7 +8,7 @@
 import { action, autorun, computed, makeObservable, observable, runInAction, type IReactionDisposer } from 'mobx';
 
 import { DataContext, type IDataContext } from '@cloudbeaver/core-data-context';
-import type { ILoadableState } from '@cloudbeaver/core-utils';
+import type { ILoadableState, ILoadableStateRequest } from '@cloudbeaver/core-utils';
 
 import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU.js';
 import { DATA_CONTEXT_MENU_NESTED } from './DATA_CONTEXT_MENU_NESTED.js';
@@ -33,7 +33,7 @@ export type MenuResolutionState = 'pending' | 'loading' | 'ready' | 'error';
 interface IMenuLoadRequest {
   loader: ILoadableState;
   context: IDataContext;
-  revision: string | undefined;
+  target: ILoadableStateRequest;
 }
 
 interface IMenuLoadFailure extends IMenuLoadRequest {
@@ -41,7 +41,7 @@ interface IMenuLoadFailure extends IMenuLoadRequest {
 }
 
 function sameRequest(first: IMenuLoadRequest, second: IMenuLoadRequest): boolean {
-  return first.loader === second.loader && first.context === second.context && first.revision === second.revision;
+  return first.loader === second.loader && first.context === second.context && first.target.isCurrent() && second.target.isCurrent();
 }
 
 export function createMenuContext(menu: IMenu, parent?: IDataContext, subMenu?: IMenuSubMenuItem): IDataContext {
@@ -167,7 +167,7 @@ export class MenuModel implements ILoadableState {
     return result;
   }
   get state(): MenuResolutionState {
-    const loaders = this.resolutionRequests().map(request => request.loader);
+    const loaders = this.resolutionRequests().map(request => request.target.state);
     if (this.exception || loaders.some(loader => loader.isError())) {
       return 'error';
     }
@@ -197,7 +197,9 @@ export class MenuModel implements ILoadableState {
     if (failure) {
       return failure.error;
     }
-    for (const { loader } of requests) {
+    for (const {
+      target: { state: loader },
+    } of requests) {
       const errors = [loader.exception ?? []].flat();
       const error = errors.find((error): error is Error => !!error);
       if (error) {
@@ -226,9 +228,9 @@ export class MenuModel implements ILoadableState {
     try {
       await this.root.task;
       const requests = this.activeRequests();
-      for (const { loader } of requests) {
-        if (loader.isError() && loader.reload) {
-          await loader.reload();
+      for (const { target } of requests) {
+        if (target.isCurrent() && target.state.isError() && target.state.reload) {
+          await target.state.reload();
         }
       }
       runInAction(() => {
@@ -253,7 +255,12 @@ export class MenuModel implements ILoadableState {
       const requests = this.activeRequests();
       if (
         requests.some(
-          request => !this.requestFailed(request) && pending(request.loader) && !request.loader.isError() && request.loader.isLoadable?.() !== false,
+          request =>
+            request.target.isCurrent() &&
+            !this.requestFailed(request) &&
+            pending(request.target.state) &&
+            !request.target.state.isError() &&
+            request.target.state.isLoadable?.() !== false,
         )
       ) {
         this.schedule();
@@ -264,10 +271,6 @@ export class MenuModel implements ILoadableState {
       this.dispose?.();
       this.dispose = undefined;
     };
-  }
-
-  private activeLoaders(): ILoadableState[] {
-    return this.activeRequests().map(request => request.loader);
   }
 
   private isContentLoaded(loadLazy: boolean): boolean {
@@ -282,13 +285,16 @@ export class MenuModel implements ILoadableState {
   }
 
   private ownRequests(loadLazy: boolean): IMenuLoadRequest[] {
-    const requests = this.preparationLoaders.map(loader => ({ loader, context: this.context, revision: this.context.revision }));
+    const capture = (loader: ILoadableState): IMenuLoadRequest => ({
+      loader,
+      context: this.context,
+      target: loader.captureRequest?.() ?? { state: loader, isCurrent: () => true },
+    });
+    const requests = this.preparationLoaders.map(capture);
     if (!this.prepared || this.handler?.isHidden?.(this.context)) {
       return requests;
     }
-    requests.push(
-      ...this.loaders.filter(loader => !loader.lazy || loadLazy).map(loader => ({ loader, context: this.context, revision: this.context.revision })),
-    );
+    requests.push(...this.loaders.filter(loader => !loader.lazy || loadLazy).map(capture));
     return requests;
   }
 
@@ -343,28 +349,26 @@ export class MenuModel implements ILoadableState {
     const generation = this.generation;
     this.task = (async () => {
       for (const request of this.activeRequests()) {
-        const { loader, context, revision } = request;
+        const { target } = request;
         if (generation !== this.generation || !this.dispose) {
           return;
         }
-        if (context.revision !== revision) {
+        if (!target.isCurrent() || !this.activeRequests().some(active => sameRequest(active, request))) {
           continue;
         }
-        if (!this.activeLoaders().includes(loader)) {
-          continue;
-        }
+        const loader = target.state;
         if (!pending(loader) || this.requestFailed(request) || loader.isError() || loader.isLoadable?.() === false) {
           continue;
         }
         try {
           await loader.load();
         } catch (error) {
-          if (generation === this.generation && context.revision === revision) {
+          if (generation === this.generation && target.isCurrent() && this.activeRequests().some(active => sameRequest(active, request))) {
             runInAction(() => {
               const active = this.activeRequests();
               this.failures = [
                 ...this.failures.filter(failure => active.some(request => sameRequest(request, failure)) && !sameRequest(request, failure)),
-                { error: error instanceof Error ? error : new Error(String(error)), loader, context, revision },
+                { ...request, error: error instanceof Error ? error : new Error(String(error)) },
               ];
             });
           }
