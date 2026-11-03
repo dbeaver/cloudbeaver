@@ -43,10 +43,5 @@ export const AIChatAttachmentsButton = observer<IAIChatInputProps>(function AICh
     }
   }
 
-  return (
-    <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-2">
-      <ActionIconButton name="/icons/attach.svg" title={label} aria-label={label} disabled={disabled} type="button" img onClick={selectFiles} />
-      <span className="tw:truncate tw:text-xs tw:text-(--theme-text-hint-on-light)">{translate('plugin_ai_chat_attachment_drop_hint')}</span>
-    </div>
-  );
+  return <ActionIconButton name="/icons/attach.svg" title={label} aria-label={label} disabled={disabled} type="button" img onClick={selectFiles} />;
 });

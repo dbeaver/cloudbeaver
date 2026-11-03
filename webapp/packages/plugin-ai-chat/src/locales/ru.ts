@@ -11,7 +11,6 @@ export default [
   ['plugin_ai_chat_send_message_error', 'Не удалось отправить сообщение'],
   ['plugin_ai_chat_attachment_load_error', 'Не удалось прикрепить файл'],
   ['plugin_ai_chat_attachment_add', 'Добавить файлы'],
-  ['plugin_ai_chat_attachment_drop_hint', 'или перетащите файлы сюда'],
   ['plugin_ai_chat_attachment_remove', 'Удалить {arg:name}'],
   ['plugin_ai_chat_attachment_image_format', 'Используйте изображение в формате PNG, JPEG, GIF или WebP.'],
   ['plugin_ai_chat_attachment_image_limit', 'Прикрепите не более 10 изображений общим размером не более 20 МиБ.'],
