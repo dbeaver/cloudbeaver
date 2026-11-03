@@ -45,6 +45,7 @@ import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DI
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
+import { MENU_CONNECTION_SECURITY } from './MENU_CONNECTION_SECURITY.js';
 import { MENU_NAVIGATION_TREE_MANAGE, nodeDeletionPlanContext, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
 @injectable(() => [
@@ -168,7 +169,35 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
+    });
+
+    this.menuService.addCreator({
+      root: true,
+      contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
+      isApplicable: context => context.get(DATA_CONTEXT_NAV_NODE)!.objectFeatures.includes(EObjectFeature.dataSource),
+      getItems: (context, items) => [...items, MENU_CONNECTION_SECURITY],
+    });
+
+    this.menuService.addCreator({
+      menus: [MENU_CONNECTION_SECURITY],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
+    });
+
+    this.menuService.setHandler({
+      id: 'connection-security',
+      menus: [MENU_CONNECTION_SECURITY],
+      isHidden: context => {
+        const items = this.menuService.getMenuItemCreators(context);
+        const loaders = this.menuService.getMenuItemLoaders(context, items);
+
+        // Keep the submenu available until its actions have loaded their permissions.
+        if (loaders.some(loader => !loader.isLoaded())) {
+          return false;
+        }
+
+        return this.menuService.getMenu(context, items).every(item => item.hidden);
+      },
     });
 
     this.menuService.addCreator({
