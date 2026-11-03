@@ -2847,7 +2847,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
         return generateNewSessionToken(
             sessionId, userId,
-            updateUserAuthRoleIfNeeded(userId, preserveAuthRole ? authRole : null), dbCon, isServiceToken
+            preserveAuthRole ? authRole : updateUserAuthRoleIfNeeded(userId, null), dbCon, isServiceToken
         );
     }
 
