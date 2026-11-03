@@ -97,6 +97,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
 
   const extensions = useCodemirrorExtensions();
+
   if (sqlDialect) {
     extensions.set(...sqlDialect);
   }
@@ -117,6 +118,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
         schemaId: container.schemaId,
         query: state.query,
       });
+
       rejectDialog();
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_open_editor');

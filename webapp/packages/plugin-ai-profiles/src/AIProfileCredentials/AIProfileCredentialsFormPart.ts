@@ -28,18 +28,22 @@ export class AIProfileCredentialsFormPart extends FormPart<ReturnType<typeof get
     if (this.aiProfilesResource.isOutdated(this.formState.state.profileId)) {
       return true;
     }
+
     if (!this.aiProfilesResource.get(this.formState.state.profileId)) {
       return false;
     }
+
     return this.aiEnginesResource.isOutdated();
   }
 
   protected override async loader(): Promise<void> {
     const profile = await this.aiProfilesResource.load(this.formState.state.profileId);
+
     if (!profile) {
       this.setInitialState(getDefaultState());
       return;
     }
+
     await this.aiEnginesResource.load();
     this.setInitialState({ token: '', accountAuthentication: profile.deviceAuthorizationAvailable && profile.accountAuthentication });
   }
@@ -58,6 +62,7 @@ export class AIProfileCredentialsFormPart extends FormPart<ReturnType<typeof get
     contexts: IExecutionContextProvider<IFormState<IAIProfileCredentialsFormState>>,
   ): void {
     const profile = this.aiProfilesResource.get(this.formState.state.profileId);
+
     if (profile?.deviceAuthorizationAvailable && this.state.accountAuthentication) {
       if (!profile.account) {
         contexts.getContext(formValidationContext).error('plugin_ai_account_not_connected');

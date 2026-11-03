@@ -28,6 +28,7 @@ export class ResourceError extends LoadingError {
       message,
       options,
     );
+
     this.name = 'Resource Error';
   }
 }

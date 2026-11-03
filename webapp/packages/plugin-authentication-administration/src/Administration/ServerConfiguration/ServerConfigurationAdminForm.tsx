@@ -24,6 +24,7 @@ export const ServerConfigurationAdminForm = observer<Props>(function ServerConfi
     if (!isValuesEqual(value, serverConfig.adminPassword, null)) {
       return translate('authentication_user_passwords_not_match');
     }
+
     return null;
   });
 

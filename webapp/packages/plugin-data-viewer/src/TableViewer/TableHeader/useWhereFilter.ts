@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): 
       },
       get filter() {
         const source = this.model.source;
+
         if (!isResultSetDataSource<IDatabaseDataOptions>(source)) {
           return '';
         }
@@ -48,6 +49,7 @@ export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): 
       },
       get constraints() {
         const model = this.model as any;
+
         if (!model.source.hasResult(this.resultIndex) || !isResultSetDataModel(model)) {
           return null;
         }
@@ -60,9 +62,11 @@ export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): 
       },
       get applicableFilter() {
         const source = this.model.source;
+
         if (!isResultSetDataSource<IDatabaseDataOptions>(source)) {
           return false;
         }
+
         return source.prevOptions?.whereFilter !== source.options?.whereFilter || source.options?.whereFilter !== source.requestInfo.requestFilter;
       },
       set(value: string) {

@@ -131,6 +131,7 @@ export const ElementsTree = observer(
       onOpen,
       onClick,
     });
+
     const keyboardNavigationRef = useElementsTreeKeyboardNavigation(tree);
     const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, keyboardNavigationRef);
 

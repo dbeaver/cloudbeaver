@@ -113,6 +113,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     if (autoHide && !isControlPresented(property.id, state)) {
       return null;
     }
+
     return (
       <FormFieldDescription title={property.description} label={property.displayName} className={className}>
         {state?.[property.id!] ?? value}
@@ -138,6 +139,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         </FieldCheckbox>
       );
     }
+
     return (
       <FieldCheckbox
         id={property.id}
@@ -161,6 +163,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     if (passwordSaved && isPassword) {
       return SAVED_VALUE_INDICATOR;
     }
+
     return passwordSavedMessage || property.description;
   }
 

@@ -9,6 +9,13 @@ export default [
   ['plugin_ai_chat_execute_query_error', 'Не удалось выполнить запрос'],
   ['plugin_ai_chat_generate_response_error', 'Не удалось сгенерировать ответ'],
   ['plugin_ai_chat_send_message_error', 'Не удалось отправить сообщение'],
+  ['plugin_ai_chat_attachment_load_error', 'Не удалось прикрепить файл'],
+  ['plugin_ai_chat_attachment_add', 'Добавить файлы'],
+  ['plugin_ai_chat_attachment_drop_hint', 'или перетащите файлы сюда'],
+  ['plugin_ai_chat_attachment_remove', 'Удалить {arg:name}'],
+  ['plugin_ai_chat_attachment_image_format', 'Используйте изображение в формате PNG, JPEG, GIF или WebP.'],
+  ['plugin_ai_chat_attachment_image_limit', 'Прикрепите не более 10 изображений общим размером не более 20 МиБ.'],
+  ['plugin_ai_chat_attachment_read_error', 'Не удалось прочитать изображение'],
   ['plugin_ai_chat_no_context', 'Без соединения'],
   ['plugin_ai_chat_metadata_transfer_confirmation_title', 'Передача информации поставщику AI'],
   [

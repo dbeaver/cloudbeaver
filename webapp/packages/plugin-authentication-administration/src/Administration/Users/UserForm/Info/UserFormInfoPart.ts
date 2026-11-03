@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
         authRole: getTransformedAuthRole(this.state.authRole),
         enabled: this.state.enabled,
       });
+
       // userId is modified by backend and may not match value we sent, so we need to update the state
       this.state.userId = user.userId;
       this.initialState.userId = user.userId;
@@ -104,9 +105,11 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     await this.updateCredentials();
     await this.updateTeams();
     await this.updateAuthRole(); // we must update role before enabling user to prevent situation when user current role will reach the limit
+
     if (this.formState.mode === FormMode.Edit) {
       await this.updateStatus();
     }
+
     await this.updateMetaParameters();
 
     this.usersResource.markOutdated(this.state.userId);
@@ -131,6 +134,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
     if (this.authRolesResource.data.length > 0) {
       const authRole = getTransformedAuthRole(this.state.authRole);
+
       if (!authRole || !this.authRolesResource.data.includes(authRole)) {
         validation.error('authentication_user_role_not_set');
       }

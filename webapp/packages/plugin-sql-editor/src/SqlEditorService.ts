@@ -221,6 +221,7 @@ export class SqlEditorService {
       state.editorId,
       async dataSource => {
         const executionContext = dataSource?.executionContext;
+
         if (!executionContext) {
           console.error('executeEditorQuery executionContext is not provided');
           return;

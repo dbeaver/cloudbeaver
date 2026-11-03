@@ -102,6 +102,7 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
 
   override async saveData(): Promise<void> {
     await super.saveData();
+
     // TODO: Remove this when we have virtual keys. We need to refresh the data in tables without a primary key to avoid UI glitch #5140.
     if (!this.hasElementIdentifier(0)) {
       this.setOutdated();
@@ -167,6 +168,7 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
   override async dispose(): Promise<void> {
     this.persistConstraintsDisposer();
     await super.dispose();
+
     if (this.keepExecutionContextOnDispose) {
       await this.closeResults(this.results);
     } else {
@@ -182,6 +184,7 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
   setExecutionContext(context: IConnectionExecutionContext | null): this {
     this.executionContext = context;
     this.setOutdated();
+
     return this;
   }
 
@@ -218,6 +221,7 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
     if (result) {
       result.totalCount = count;
     }
+
     return this;
   }
 

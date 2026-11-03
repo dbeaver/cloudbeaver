@@ -30,6 +30,7 @@ export class GridEditHistoryManager<TKey extends IGridDataKey, TCell> {
     this.history.onUndo.addHandler((entry: IHistoryEntry<unknown>) => {
       handleGridEditHistoryUndo(entry, operations);
     });
+
     this.history.onRedo.addHandler((entry: IHistoryEntry<unknown>) => {
       handleGridEditHistoryRedo(entry, operations);
     });

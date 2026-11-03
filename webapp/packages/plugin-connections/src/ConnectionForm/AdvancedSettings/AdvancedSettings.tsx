@@ -30,6 +30,7 @@ export const AdvancedSettings: TabContainerPanelComponent<IConnectionFormProps> 
     key: optionsPart.state.driverId || null,
     includes: ['includeProviderProperties'] as const,
   });
+
   const readonly = isConnectionFormReadOnly(formState, connectionInfoAuthResource.data?.authModel);
 
   useFormValidator(formState.validationTask, formRef.current);

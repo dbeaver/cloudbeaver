@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,7 @@ export class LocalizationService extends Bootstrap {
 
   setSupportedLanguages(locales: ILocale[]): void {
     this.supportedLanguages = locales;
+
     if (this.supportedLanguages.length === 0) {
       this.supportedLanguages = [DEFAULT_LOCALE];
     }
@@ -100,6 +101,7 @@ export class LocalizationService extends Bootstrap {
       ) as string;
 
       translation = translation.replace(/({alias:(\w*?)})/g, (substr, group1, group2) => this.translate(group2));
+
       return translation as T;
     }
 
@@ -143,6 +145,7 @@ export class LocalizationService extends Bootstrap {
         nativeName: 'Tiếng Việt',
       },
     ]);
+
     this.addProvider(this.coreProvider.bind(this));
   }
 
@@ -153,6 +156,7 @@ export class LocalizationService extends Bootstrap {
         this.loadLocale(lang);
       },
     );
+
     await this.loadLocale(DEFAULT_LOCALE.isoCode);
     await this.loadLocale(this.currentLanguage);
   }
@@ -165,14 +169,17 @@ export class LocalizationService extends Bootstrap {
 
   async changeLocale(key: string): Promise<void> {
     const prevLocale = this.currentLanguage;
+
     if (key === this.currentLanguage) {
       return;
     }
+
     if (!this.isLanguageSupported(key)) {
       throw new Error(`Language '${key}' is not supported`);
     }
 
     await this.loadLocale(key);
+
     try {
       this.setLanguage(key);
       await this.onChange.execute(key);
@@ -203,6 +210,7 @@ export class LocalizationService extends Bootstrap {
     if (this.localeMap.has(localeKey)) {
       return;
     }
+
     const locale = new Map<string, string>();
 
     for (const provider of this.localeProviders) {
@@ -210,6 +218,7 @@ export class LocalizationService extends Bootstrap {
         locale.set(key!, value!);
       }
     }
+
     this.localeMap.set(localeKey, locale);
   }
 }

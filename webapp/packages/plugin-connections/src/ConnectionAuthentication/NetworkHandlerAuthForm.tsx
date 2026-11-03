@@ -56,6 +56,7 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
   const passwordLabel = keyAuth
     ? 'Passphrase'
     : translate(`connections_network_handler_${id}_password`, 'connections_network_handler_default_password');
+
   const properties = handler.data?.properties.filter(p => p.features.includes(PROPERTY_FEATURE_SECURED));
 
   return (

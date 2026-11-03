@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -138,6 +138,7 @@ export class SqlEditorBootstrap extends Bootstrap {
           case ACTION_SQL_EDITOR_OPEN:
             return context.has(DATA_CONTEXT_CONNECTION);
         }
+
         return false;
       },
       handler: async (context, action) => {
@@ -173,6 +174,7 @@ export class SqlEditorBootstrap extends Bootstrap {
             if (status === DialogueStateResult.Resolved && result !== undefined) {
               dataSource.setName((result ?? '').trim());
             }
+
             break;
           }
           case ACTION_SQL_EDITOR_OPEN: {
@@ -182,6 +184,7 @@ export class SqlEditorBootstrap extends Bootstrap {
               dataSourceKey: LocalStorageSqlDataSource.key,
               connectionKey,
             });
+
             break;
           }
         }

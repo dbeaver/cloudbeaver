@@ -60,6 +60,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     if (!this.optionsPart.connectionKey) {
       const defaults = await this.getDefaultConfig();
       this.setInitialState(defaults);
+
       return;
     }
 
@@ -101,6 +102,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<ConnectionPrope
     // Keep only explicitly changed properties in the outgoing config.
     for (const [key, value] of Object.entries(config)) {
       const property = properties?.find(property => property.id === key);
+
       if (property && value === getObjectPropertyOptionValue(property.defaultValue)) {
         delete config[key];
       }

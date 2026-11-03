@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ function fetchMock(key: ResourceKey<string> | undefined): Promise<IEntityData[]>
       }
 
       const item = data.find(d => d.id === key);
+
       if (item) {
         resolve([item]);
       }
@@ -64,6 +65,7 @@ class TestMapResource extends CachedMapResource<string, IEntityData> {
   protected async loader(key: ResourceKey<string>) {
     const data = await fetchMock(key);
     this.replace(resourceKeyList(data.map(d => d.id)), data);
+
     return this.data;
   }
 

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,9 +9,11 @@ function extractDocsVersion(version: string | undefined): string | null {
   if (!version) {
     return null;
   }
+
   const parts = version.split('.');
   const major = parts[0];
   const minor = parts[1];
+
   if (!major || !minor) {
     return null;
   }
@@ -54,6 +56,7 @@ export const WEBSITE_LINKS = {
     let url = distributed ? WEBSITE_LINKS.TEAM_EDITION_DOCS_PAGE : WEBSITE_LINKS.DOCS_PAGE;
 
     const majorMinor = extractDocsVersion(version);
+
     if (majorMinor) {
       url += `${majorMinor}/`;
     }

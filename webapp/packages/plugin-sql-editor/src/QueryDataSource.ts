@@ -88,6 +88,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       source: null,
       query: '',
     };
+
     this.currentQueryAsyncTask = null;
     this.setFeature(DatabaseDataFeature.QueryResult);
 
@@ -96,6 +97,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       event => event.id === ServerEventId.CbSessionTaskQueryParamsConfirmationRequest && event.taskId === this.currentQueryAsyncTask?.info?.id,
       this.handleQueryParamsEvent,
     );
+
     asyncTaskInfoService.onExecuteEvent.addHandler(this.queryParamsEventHandler);
 
     makeObservable(this, {
@@ -142,6 +144,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           contextId,
           resultsId,
         };
+
         let editor: ResultSetEditAction | DocumentEditAction | undefined;
 
         if (result.dataFormat === ResultDataFormat.Resultset) {
@@ -151,6 +154,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         }
 
         let blobs: IResultSetBlobValue[] = [];
+
         if (editor instanceof ResultSetEditAction) {
           blobs = editor.getBlobsToUpload();
         }
@@ -198,11 +202,13 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           source: this.options.query,
         };
       }
+
       this.clearError();
     } catch (exception: any) {
       this.error = exception;
       throw exception;
     }
+
     return prevResults;
   }
 
@@ -210,6 +216,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     if (this.options?.query !== options.query) {
       this.resetQueryParameters();
     }
+
     return super.setOptions(options);
   }
 
@@ -221,6 +228,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     if (!options || !executionContext || !executionContextInfo) {
       return prevResults;
     }
+
     const limit = this.count;
 
     let firstResultId: string | undefined;
@@ -319,6 +327,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       const parametersState = observable(
         Object.fromEntries(paramNames.map(name => [name, this.previousQueryParameters?.[name] ?? parameterValues.get(name) ?? ''])),
       );
+
       const connectionKey = this.executionContext?.context
         ? createConnectionParam(this.executionContext.context.projectId, this.executionContext.context.connectionId)
         : null;
@@ -334,6 +343,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       });
 
       const { status } = await dialogPromise;
+
       if (status === DialogueStateResult.Resolved) {
         this.currentQueryParameters = { ...parametersState };
       }

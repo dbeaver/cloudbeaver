@@ -33,7 +33,9 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
       element.setCustomValidity(result || translate('core_blocks_custom_input_validation_error'));
       return false;
     }
+
     element.setCustomValidity('');
+
     return true;
   }
 
@@ -56,12 +58,14 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
 
   useEffect(() => {
     const element = inputRef.current;
+
     if (!element) {
       return;
     }
 
     function handleInput(event: Event) {
       const target = event.target as TType;
+
       if (target.validity.valid === false) {
         revalidateAndReport(target);
       }
@@ -69,6 +73,7 @@ export function useCustomInputValidation<T = void, TType extends HTMLInputElemen
 
     function handleBlur(event: Event) {
       const target = event.target as TType;
+
       if (target.validity.valid === true) {
         revalidateAndReport(target);
       }

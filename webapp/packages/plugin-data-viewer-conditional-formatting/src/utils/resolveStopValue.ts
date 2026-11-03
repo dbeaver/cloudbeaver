@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,14 @@ export function resolveStopValue(
   }
 
   const value = parseFloat(getValueForRuleParameter<string>(state.parameters, rule.parameters, `${kind}-value`, '0'));
+
   if (type === 'number') {
     return value;
   }
+
   if (type === 'percent') {
     return dataMin + (value / 100) * (dataMax - dataMin);
   }
+
   return getPercentile(sorted, value / 100);
 }

@@ -52,6 +52,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   const selection = useTableSelection(
     profiles.filter(profile => settingsLoaded && profile.id !== defaultProfileId).map(profile => profile.id),
   );
+
   const table = useAIProfilesTable(selection);
 
   return (
