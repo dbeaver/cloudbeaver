@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useMemo, type DragEvent, type HTMLAttributes } from 'react';
+import { useMemo, type ClipboardEvent, type DragEvent, type HTMLAttributes } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 
@@ -15,12 +15,17 @@ import { AIChatInputService, type IAIChatInputContext } from './AIChatInputServi
 export function useAIChatInput({ conversationId, connectionKey, textareaRef }: IAIChatInputContext): {
   input: IAIChatInputContext;
   dragHandlers: Pick<HTMLAttributes<HTMLDivElement>, 'onDragEnter' | 'onDragOver' | 'onDragLeave' | 'onDrop'>;
+  onPaste: (event: ClipboardEvent<HTMLTextAreaElement>) => void;
 } {
   const aiChatInputService = useService(AIChatInputService);
   const input = useMemo<IAIChatInputContext>(() => ({ conversationId, connectionKey, textareaRef }), [conversationId, connectionKey, textareaRef]);
 
   function handleDrag(event: DragEvent<HTMLDivElement>): void {
     aiChatInputService.onDrag.execute({ input, event });
+  }
+
+  function handlePaste(event: ClipboardEvent<HTMLTextAreaElement>): void {
+    aiChatInputService.onPaste.execute({ input, event });
   }
 
   return {
@@ -31,5 +36,6 @@ export function useAIChatInput({ conversationId, connectionKey, textareaRef }: I
       onDragLeave: handleDrag,
       onDrop: handleDrag,
     },
+    onPaste: handlePaste,
   };
 }

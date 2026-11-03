@@ -1,0 +1,17 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.toolbarActions {
+  composes: theme-form-element-radius theme-background-surface theme-text-on-surface theme theme-border-color-background from global;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: calc(var(--tw-spacing) * 8);
+  border: 2px solid;
+}

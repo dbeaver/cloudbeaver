@@ -7,30 +7,33 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { type AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import {
-  ColoredContainer,
+  AdministrationPageContent,
+  AdministrationPageHeader,
+  AdministrationPageLayout,
+  AdministrationPageTitle,
+  type AdministrationItemContentComponent,
+  ConfigurationWizardService,
+} from '@cloudbeaver/core-administration';
+import {
+  Button,
   ConfirmationDialog,
   Container,
   Form,
   Group,
-  GroupItem,
   GroupTitle,
   Loader,
   Placeholder,
-  s,
-  ToolsAction,
-  ToolsPanel,
   useAutoLoad,
   useFocus,
   useForm,
   useFormValidator,
-  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm.js';
@@ -41,12 +44,10 @@ import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecur
 import { getServerConfigurationFormPart } from './getServerConfigurationFormPart.js';
 import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm.js';
 import { ServerConfigurationFormStateManager } from './ServerConfigurationFormStateManager.js';
-import style from './ServerConfigurationPage.module.css';
 import { ServerConfigurationService } from './ServerConfigurationService.js';
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();
-  const styles = useS(style);
   const [focusedRef, ref] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const serverConfigurationService = useService(ServerConfigurationService);
   const commonDialogService = useService(CommonDialogService);
@@ -116,45 +117,48 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   }
 
   return (
-    <ColoredContainer vertical wrap gap parent>
-      {!configurationWizard && (
-        <Group box keepSize>
-          <ToolsPanel rounded>
-            <ToolsAction
-              title={translate('administration_configuration_tools_save_tooltip')}
-              icon="admin-save"
-              viewBox="0 0 24 24"
-              disabled={!changed}
-              onClick={() => form.submit()}
-            >
-              {translate('ui_processing_save')}
-            </ToolsAction>
-            <ToolsAction
-              title={translate('administration_configuration_tools_cancel_tooltip')}
-              icon="admin-cancel"
-              viewBox="0 0 24 24"
-              disabled={!changed}
-              onClick={() => formState.reset()}
-            >
-              {translate('ui_processing_cancel')}
-            </ToolsAction>
-          </ToolsPanel>
-        </Group>
-      )}
-
-      <Container overflow gap wrap>
+    <AdministrationPageLayout>
+      <AdministrationPageHeader
+        actionsSlot={
+          !configurationWizard && (
+            <>
+              <Button
+                type="button"
+                variant="secondary"
+                title={translate('administration_configuration_tools_cancel_tooltip')}
+                disabled={!changed}
+                onClick={() => formState.reset()}
+              >
+                {translate('ui_processing_cancel')}
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                title={translate('administration_configuration_tools_save_tooltip')}
+                disabled={!changed}
+                onClick={() => form.submit()}
+              >
+                {translate('ui_processing_save')}
+              </Button>
+            </>
+          )
+        }
+      >
+        <AdministrationPageTitle docLink={WEBSITE_LINKS.SERVER_CONFIGURATION_DOCUMENTATION_PAGE}>
+          {translate('administration_configuration_wizard_configuration')}
+        </AdministrationPageTitle>
+      </AdministrationPageHeader>
+      <AdministrationPageContent>
         {configurationWizard && (
-          <Group form>
-            <GroupItem>
-              <h3 className="tw:text-xl tw:font-semibold">{translate('administration_configuration_wizard_configuration_title')}</h3>
-            </GroupItem>
-            <GroupItem>
-              <p className={s(styles, { message: true })}>{translate('administration_configuration_wizard_configuration_message')}</p>
-            </GroupItem>
-          </Group>
+          <div className="tw:shrink-0 tw:max-w-prose">
+            <h3 className="tw:text-xl tw:font-semibold">{translate('administration_configuration_wizard_configuration_title')}</h3>
+            <p className="tw:my-4 tw:whitespace-pre-wrap tw:leading-loose">
+              {translate('administration_configuration_wizard_configuration_message')}
+            </p>
+          </div>
         )}
         <Form ref={focusedRef} context={form} name="server_config" contents onChange={handleChange}>
-          <Container wrap gap grid medium>
+          <Container wrap gap grid medium keepSize>
             <ServerConfigurationInfoForm state={part.state} formState={formState} configurationWizard={configurationWizard} />
             <Group form gap>
               <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
@@ -168,7 +172,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             <ServerConfigurationDriversForm initialServerConfig={part.initialState.serverConfig} serverConfig={part.state.serverConfig} />
           </Container>
         </Form>
-      </Container>
-    </ColoredContainer>
+      </AdministrationPageContent>
+    </AdministrationPageLayout>
   );
 });

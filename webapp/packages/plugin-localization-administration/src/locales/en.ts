@@ -6,10 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-.toolsPanel {
-  height: 44px !important;
-}
-
-.buttonLabel {
-  font-size: 14px !important;
-}
+export default [['plugin_localization_administration_language', 'Language']];

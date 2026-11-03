@@ -12,7 +12,13 @@ import { reaction } from 'mobx';
 import { Link, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
+import {
+  ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH,
+  AdministrationTable,
+  AdministrationTableStyles,
+} from '@cloudbeaver/core-administration';
 import { DataGrid, useCellCopy, useCreateGridReactiveValue, TableRowSelect } from '@cloudbeaver/plugin-data-grid';
 
 import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
@@ -110,12 +116,14 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
   ]);
 
   return (
-    <div className="tw:overflow-auto tw:h-full tw:max-w-full theme-text-on-surface">
+    <AdministrationTable>
       <DataGrid
         columnCount={columnsCount}
         rowCount={rowsCount}
         getHeaderResizable={colIdx => colIdx > 0}
+        getHeaderHeight={() => ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT}
         getRowHeight={() => ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT}
+        getHeaderWidth={colIdx => (colIdx === 0 ? ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH : 'auto')}
         getHeaderPinned={colIdx => colIdx <= 0}
         headerText={headerText}
         headerElement={headerElement}
@@ -123,6 +131,6 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
         className={s(styles, { table: true })}
         onCellKeyDown={cellCopy.handleKeyDown}
       />
-    </div>
+    </AdministrationTable>
   );
 });
