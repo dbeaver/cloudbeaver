@@ -8,19 +8,21 @@
 
 import { observer } from 'mobx-react-lite';
 
-import type { AdministrationItemContentComponent, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
-import { s, SContext, type StyleRegistry, ToolsPanel, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  AdministrationPageLayout,
+  AdministrationPageNavigation,
+  type AdministrationItemContentComponent,
+  type AdministrationItemContentProps,
+} from '@cloudbeaver/core-administration';
+import { s, SContext, type StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabTitleStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabList, TabPanelList, TabsState, TabStyles, TabTitleStyles } from '@cloudbeaver/core-ui';
 
 import style from './shared/ConnectionsAdministration.module.css';
 import tabStyle from './shared/ConnectionsAdministrationTab.module.css';
-import tabPanelStyle from './shared/ConnectionsAdministrationTabPanel.module.css';
 import TabTitleModuleStyles from './shared/ConnectionsAdministrationTabTitle.module.css';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 import { ConnectionsAdministrationTabService } from './ConnectionsAdministrationTabService.js';
-
-const tabPanelRegistry: StyleRegistry = [[TabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 
 const mainTabsRegistry: StyleRegistry = [
   [TabStyles, { mode: 'append', styles: [tabStyle] }],
@@ -47,29 +49,29 @@ export const ConnectionsAdministration: AdministrationItemContentComponent = obs
   }
 
   return (
-    <TabsState
-      selectedId={sub?.name}
-      container={connectionsAdministrationTabService.tabsContainer}
-      item={item}
-      configurationWizard={configurationWizard}
-      sub={sub}
-      param={param ?? null}
-      lazy
-      onChange={openSub}
-    >
-      <ToolsPanel bottomBorder>
-        <SContext registry={mainTabsRegistry}>
-          <TabList
-            className={s(styles, { tabList: true, administrationTabs: true })}
-            aria-label={translate('plugin_connection_administration_label')}
-            childrenFirst
-            underline
-          />
-        </SContext>
-      </ToolsPanel>
-      <SContext registry={tabPanelRegistry}>
-        <TabPanelList />
-      </SContext>
-    </TabsState>
+    <AdministrationPageLayout>
+      <TabsState
+        selectedId={sub?.name}
+        container={connectionsAdministrationTabService.tabsContainer}
+        item={item}
+        configurationWizard={configurationWizard}
+        sub={sub}
+        param={param ?? null}
+        lazy
+        onChange={openSub}
+      >
+        <AdministrationPageNavigation>
+          <SContext registry={mainTabsRegistry}>
+            <TabList
+              className={s(styles, { tabList: true, administrationTabs: true })}
+              aria-label={translate('plugin_connection_administration_label')}
+              childrenFirst
+              underline
+            />
+          </SContext>
+        </AdministrationPageNavigation>
+        <TabPanelList contents />
+      </TabsState>
+    </AdministrationPageLayout>
   );
 });

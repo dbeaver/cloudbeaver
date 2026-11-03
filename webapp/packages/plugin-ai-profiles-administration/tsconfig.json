@@ -11,6 +11,9 @@
       "path": "../../common-typescript/@dbeaver/js-helpers"
     },
     {
+      "path": "../core-administration"
+    },
+    {
       "path": "../core-blocks"
     },
     {
@@ -30,6 +33,9 @@
     },
     {
       "path": "../core-executor"
+    },
+    {
+      "path": "../core-links"
     },
     {
       "path": "../core-localization"
