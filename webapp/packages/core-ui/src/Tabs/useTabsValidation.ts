@@ -27,12 +27,17 @@ export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement
   const selectedId = useTabsState('selectedId');
   const selected = selectedId === tabId;
 
-  const tabPropsRef = useObjectRef({ tabId, tabsValidationContext });
+  const tabPropsRef = useObjectRef({ tabId, tabsValidationContext, selected });
   const validationState = useObjectRef(
     () => ({
       beforeValidationCollection: new ExecutorHandlersCollection(),
       invalidElement: null as HTMLInputElement | null,
       invalidate(event: Event) {
+        if (!tabPropsRef.selected) {
+          // Report validity after the tab is visible so the browser can focus the invalid control.
+          event.preventDefault();
+        }
+
         tabPropsRef.tabsValidationContext?.invalidate(tabPropsRef.tabId);
 
         // we want to store only first element in order in the form
