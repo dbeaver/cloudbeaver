@@ -36,7 +36,11 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { input, dragHandlers } = useAIChatInput({ conversationId: currentConversationId, connectionKey: context.connectionKey, textareaRef });
+  const { input, dragHandlers, onPaste } = useAIChatInput({
+    conversationId: currentConversationId,
+    connectionKey: context.connectionKey,
+    textareaRef,
+  });
 
   useExecutor({
     executor: aiChatConversationsService.onNewConversation,
@@ -101,6 +105,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
             readOnly={aiChatConversationsService.processing}
             autoFocus
             onChange={v => setValue(v)}
+            onPaste={context.disabled ? undefined : onPaste}
           />
           <Suspense fallback={null}>
             <Placeholder container={aiChatInputService.dragPreview} input={input} />

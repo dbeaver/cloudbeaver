@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { DragEvent, RefObject } from 'react';
+import type { ClipboardEvent, DragEvent, RefObject } from 'react';
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
@@ -32,6 +32,10 @@ export interface IAIChatInputDragEvent extends IAIChatInputProps {
   event: DragEvent<HTMLElement>;
 }
 
+export interface IAIChatInputPasteEvent extends IAIChatInputProps {
+  event: ClipboardEvent<HTMLTextAreaElement>;
+}
+
 export interface IAIChatInputValidation extends IAIChatInputProps {
   prompt: string;
   hasContent: boolean;
@@ -45,6 +49,7 @@ export interface IAIChatInputSubmission extends IAIChatInputProps {
 @injectable(() => [AIChatConversationsService, AIChatMessageService])
 export class AIChatInputService {
   readonly onDrag = new SyncExecutor<IAIChatInputDragEvent>();
+  readonly onPaste = new SyncExecutor<IAIChatInputPasteEvent>();
   readonly onValidate = new SyncExecutor<IAIChatInputValidation>();
   readonly onPrepareSubmit = new SyncExecutor<IAIChatInputSubmission>();
 

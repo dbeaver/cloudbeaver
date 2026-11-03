@@ -11,7 +11,6 @@ export default [
   ['plugin_ai_chat_send_message_error', 'Failed to send message'],
   ['plugin_ai_chat_attachment_load_error', '无法附加文件'],
   ['plugin_ai_chat_attachment_add', '添加文件'],
-  ['plugin_ai_chat_attachment_drop_hint', '或将文件拖放到此处'],
   ['plugin_ai_chat_attachment_remove', '移除 {arg:name}'],
   ['plugin_ai_chat_attachment_image_format', '请使用 PNG、JPEG、GIF 或 WebP 格式的图像。'],
   ['plugin_ai_chat_attachment_image_limit', '最多可附加 10 张图像，总大小不得超过 20 MiB。'],
