@@ -1,4 +1,8 @@
 export default [
+  [
+    'plugin_settings_administration_configuration_description',
+    'Настройте значения по умолчанию для всех пользователей. Пользователи смогут переопределить их в личных настройках.',
+  ],
   ['plugin_settings_administration_settings_save_success', 'Настройки сохранены успешно'],
   ['plugin_settings_administration_settings_save_fail', 'Ошибка сохранения настроек'],
   ['plugin_settings_administration_drawer_item_title', 'Настройки'],

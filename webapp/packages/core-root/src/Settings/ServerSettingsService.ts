@@ -9,7 +9,8 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { PRODUCT_SETTINGS_LAYER } from '@cloudbeaver/core-product';
-import { createSettingsLayer, EditableSettingsSource } from '@cloudbeaver/core-settings';
+import { createSettingsLayer, EditableSettingsSource, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { EAdminPermission } from '../EAdminPermission.js';
 import { ServerConfigResource } from '../ServerConfigResource.js';
@@ -17,7 +18,7 @@ import { SessionPermissionsResource } from '../SessionPermissionsResource.js';
 
 export const SERVER_SETTINGS_LAYER = createSettingsLayer(PRODUCT_SETTINGS_LAYER, 'server');
 
-@injectable(() => [ServerConfigResource, SessionPermissionsResource])
+@injectable(() => [ServerConfigResource, SessionPermissionsResource, SettingsProviderService])
 export class ServerSettingsService extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
   private lastConfig: any;
@@ -25,6 +26,7 @@ export class ServerSettingsService extends EditableSettingsSource {
   constructor(
     readonly serverConfigResource: ServerConfigResource,
     private readonly sessionPermissionsResource: SessionPermissionsResource,
+    private readonly settingsProviderService: SettingsProviderService,
   ) {
     super();
     this.lastConfig = null;
@@ -46,7 +48,7 @@ export class ServerSettingsService extends EditableSettingsSource {
   }
 
   isReadOnly(key: any): boolean {
-    return !this.sessionPermissionsResource.has(EAdminPermission.admin);
+    return !this.serverConfigResource.configurationMode && !this.sessionPermissionsResource.has(EAdminPermission.admin);
   }
 
   getValue(key: any): any {
@@ -54,7 +56,35 @@ export class ServerSettingsService extends EditableSettingsSource {
   }
 
   async save() {
-    await this.serverConfigResource.updateProductConfiguration(Object.fromEntries(this.changes));
+    const error = this.validate();
+
+    if (error) {
+      throw new Error(error);
+    }
+
+    await this.serverConfigResource.updateProductConfiguration(this.getChanges());
+  }
+
+  getChanges(): Record<string, unknown> {
+    return Object.fromEntries(this.changes);
+  }
+
+  validate(): string | null {
+    for (const [key, value] of this.changes) {
+      const settingSchema = this.settingsProviderService.schema.shape[key];
+
+      if (value === null || !settingSchema) {
+        continue;
+      }
+
+      const result = settingSchema.safeParse(value);
+
+      if (!result.success) {
+        return schemaValidationError(result.error, { prefix: key }).toString();
+      }
+    }
+
+    return null;
   }
 
   protected getSnapshot() {
@@ -73,15 +103,19 @@ export class ServerSettingsService extends EditableSettingsSource {
 
   private refreshConfig() {
     this.update(() => {
-      this.clear();
-      this.settings.clear();
+      if (!this.serverConfigResource.configurationMode) {
+        this.clear();
+      }
 
       if (!this.serverConfigResource.data) {
+        this.settings.clear();
         this.lastConfig = null;
+
         return;
       }
 
       if (this.serverConfigResource.data.productConfiguration !== this.lastConfig) {
+        this.settings.clear();
         this.lastConfig = this.serverConfigResource.data.productConfiguration;
 
         if (this.lastConfig && typeof this.lastConfig === 'object') {

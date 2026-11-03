@@ -12,12 +12,6 @@
   ],
   "references": [
     {
-      "path": "../core-administration"
-    },
-    {
-      "path": "../core-blocks"
-    },
-    {
       "path": "../core-cli"
     },
     {
@@ -27,31 +21,10 @@
       "path": "../core-localization"
     },
     {
-      "path": "../core-product"
-    },
-    {
       "path": "../core-root"
     },
     {
-      "path": "../core-settings"
-    },
-    {
-      "path": "../core-settings-localization"
-    },
-    {
-      "path": "../core-ui"
-    },
-    {
-      "path": "../core-utils"
-    },
-    {
-      "path": "../plugin-administration"
-    },
-    {
       "path": "../plugin-settings-administration"
-    },
-    {
-      "path": "../plugin-settings-panel"
     }
   ],
   "include": [

@@ -32,10 +32,19 @@
       "path": "../core-localization"
     },
     {
+      "path": "../core-root"
+    },
+    {
       "path": "../core-settings"
     },
     {
+      "path": "../core-settings-localization"
+    },
+    {
       "path": "../core-ui"
+    },
+    {
+      "path": "../plugin-administration"
     },
     {
       "path": "../plugin-settings-panel"

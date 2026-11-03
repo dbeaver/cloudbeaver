@@ -11,28 +11,91 @@ import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-block
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IEditableSettingsSource } from '@cloudbeaver/core-settings';
+import { LocalizationService } from '@cloudbeaver/core-localization';
+import { ServerConfigResource, ServerSettingsService } from '@cloudbeaver/core-root';
+import { SettingsLocalizationService } from '@cloudbeaver/core-settings-localization';
+import { formValidationContext } from '@cloudbeaver/core-ui';
+import {
+  getServerConfigurationFormPart,
+  ServerConfigurationFormService,
+  ServerConfigurationFormStateManager,
+} from '@cloudbeaver/plugin-administration';
 
 import { SettingsAdministrationService } from './SettingsAdministrationService.js';
 
 const SettingsAdministration = importLazyComponent(() => import('./SettingsAdministration.js').then(module => module.SettingsAdministration));
 const SettingsDrawerItem = importLazyComponent(() => import('./SettingsDrawerItem.js').then(module => module.SettingsDrawerItem));
 
-@injectable(() => [AdministrationItemService, SettingsAdministrationService, CommonDialogService])
+@injectable(() => [
+  AdministrationItemService,
+  SettingsAdministrationService,
+  CommonDialogService,
+  ServerConfigurationFormService,
+  ServerConfigurationFormStateManager,
+  ServerSettingsService,
+  ServerConfigResource,
+  LocalizationService,
+  SettingsLocalizationService,
+])
 export class SettingsAdministrationPluginBootstrap extends Bootstrap {
   constructor(
     private readonly administrationItemService: AdministrationItemService,
     private readonly settingsAdministrationService: SettingsAdministrationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly serverConfigurationFormService: ServerConfigurationFormService,
+    private readonly serverConfigurationFormStateManager: ServerConfigurationFormStateManager,
+    private readonly serverSettingsService: ServerSettingsService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly localizationService: LocalizationService,
+    private readonly settingsLocalizationService: SettingsLocalizationService,
   ) {
     super();
   }
 
   override register(): void | Promise<void> {
+    this.serverConfigurationFormService.onPrepare.addHandler(form => {
+      if (this.serverConfigResource.configurationMode) {
+        getServerConfigurationFormPart(form).state.serverConfig.productSettings = this.serverSettingsService.getChanges();
+      }
+    });
+
+    this.serverConfigurationFormService.onValidate.addHandler((_, contexts) => {
+      if (this.serverConfigResource.configurationMode) {
+        const error = this.serverSettingsService.validate();
+
+        if (error) {
+          contexts.getContext(formValidationContext).error(error);
+        }
+      }
+    });
+
     this.administrationItemService.create({
       name: 'settings',
-      type: AdministrationItemType.Administration,
+      type: AdministrationItemType.Default,
       order: 3,
-      canDeActivate: async () => {
+      configurationWizardOptions: {
+        order: 2,
+        description: 'plugin_settings_administration_configuration_description',
+        onFinish: async () => {
+          const form = this.serverConfigurationFormStateManager.formState;
+
+          if (!form) {
+            return false;
+          }
+
+          const contexts = await form.validationTask.execute(form);
+
+          return contexts.getContext(formValidationContext).valid;
+        },
+        onConfigurationFinish: () => {
+          this.localizationService.setLanguage(this.settingsLocalizationService.language);
+        },
+      },
+      canDeActivate: async configurationWizard => {
+        if (configurationWizard) {
+          return true;
+        }
+
         const displayed = this.settingsAdministrationService.tabsContainer.getDisplayed();
         const edited = displayed.some(tab => (tab.options?.source as IEditableSettingsSource).isEdited());
 
@@ -51,7 +114,11 @@ export class SettingsAdministrationPluginBootstrap extends Bootstrap {
 
         return true;
       },
-      onDeActivate: () => {
+      onDeActivate: configurationWizard => {
+        if (configurationWizard) {
+          return;
+        }
+
         this.settingsAdministrationService.tabsContainer.getDisplayed().forEach(tab => {
           if (tab.options?.source.isEdited()) {
             tab.options?.source.clear();

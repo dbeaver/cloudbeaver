@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
+import { ConfigurationWizardService, type AdministrationItemContentProps } from '@cloudbeaver/core-administration';
 import {
   ColoredContainer,
   Form,
@@ -25,16 +25,17 @@ import { Settings } from '@cloudbeaver/plugin-settings-panel';
 import { TabList, TabsState, type ITabData } from '@cloudbeaver/core-ui';
 import { SettingsAdministrationService } from './SettingsAdministrationService.js';
 import { useState } from 'react';
-import { SettingsResolverService } from '@cloudbeaver/core-settings';
+import { SettingsResolverService, type IEditableSettingsSource } from '@cloudbeaver/core-settings';
 
-export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration() {
+export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration({ configurationWizard }) {
   const settingsResolverService = useService(SettingsResolverService);
   const settingsAdministrationService = useService(SettingsAdministrationService);
   const notificationService = useService(NotificationService);
+  const configurationWizardService = useService(ConfigurationWizardService);
   const [tabId, setTabId] = useState<string | null>(null);
   const translate = useTranslate();
   const tabInfo = getComputed(() => (tabId ? settingsAdministrationService.tabsContainer.getTabInfo(tabId) : null));
-  const settingsSource = tabInfo?.options?.source;
+  const settingsSource: IEditableSettingsSource | undefined = tabInfo?.options?.source;
   const accessor = tabInfo?.options?.accessor;
   const changed = settingsSource?.isEdited() || false;
 
@@ -53,7 +54,11 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
 
   const form = useForm({
     async onSubmit() {
-      await handleSave();
+      if (configurationWizard) {
+        await configurationWizardService.next();
+      } else {
+        await handleSave();
+      }
     },
   });
 
@@ -75,7 +80,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
     <TabsState container={settingsAdministrationService.tabsContainer} currentTabId={tabId} onChange={handleTabChange}>
       <Form context={form} contents>
         <ColoredContainer overflow parent vertical noWrap gap>
-          <Group box keepSize>
+          <Group hidden={configurationWizard} box keepSize>
             <ToolsPanel rounded>
               <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
                 {translate('ui_processing_save')}
@@ -96,7 +101,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
               )}
             </ToolsPanel>
           </Group>
-          <Group hidden={hideSingleTab} box keepSize hideOverflow>
+          <Group hidden={configurationWizard || hideSingleTab} box keepSize hideOverflow>
             <TabList underline />
           </Group>
           {settingsSource ? (
