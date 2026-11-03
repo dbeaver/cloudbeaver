@@ -26,6 +26,7 @@ export default [
   ['plugin_connections_connection_folder_move_failed', 'Failed to move to folder'],
   ['plugin_connections_connection_folder_move_duplication', 'Target folder or selected folders contains folder with the same name ({arg:name})'],
   ['plugin_connections_connection_cloud_auth_required', 'You need to sign in with "{arg:providerLabel}" credentials to work with this connection.'],
+  ['plugin_connections_connection_cloud_provider', 'Cloud'],
   ['plugin_connections_connection_form_project_invalid', 'You have no access to create connections in selected project'],
   ['plugin_connections_connection_form_host_configuration_invalid', 'Host configuration is not supported'],
   ['plugin_connections_connection_form_name_invalid', "Field 'Connection name' can't be empty"],

@@ -11,6 +11,7 @@ import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from 
 import {
   ColoredContainer,
   ExceptionMessage,
+  InputField,
   Loader,
   ObjectPropertyInfoForm,
   s,
@@ -110,7 +111,11 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     );
   }
 
-  if (!connectionOriginDetailsResource.data?.origin.details || connectionOriginDetailsResource.data?.origin.details.length === 0) {
+  const origin = connectionOriginDetailsResource.data?.origin;
+  const cloudProviderName = origin?.type === 'cloud' ? origin.providerName : undefined;
+  const properties = origin?.details ?? [];
+
+  if (!cloudProviderName && properties.length === 0) {
     return (
       <ColoredContainer className={s(style, { coloredContainer: true })} parent surface>
         <TextPlaceholder>{translate('core_connections_connection_no_information')}</TextPlaceholder>
@@ -121,7 +126,12 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} surface>
       <ConnectionSectionWrapper className="tw:block! tw:space-y-4">
-        <ObjectPropertyInfoForm properties={connectionOriginDetailsResource.data.origin.details} readOnly small autoHide />
+        {cloudProviderName && (
+          <InputField value={cloudProviderName} size="small" readOnly fill>
+            {translate('plugin_connections_connection_cloud_provider')}
+          </InputField>
+        )}
+        <ObjectPropertyInfoForm properties={properties} readOnly small autoHide />
       </ConnectionSectionWrapper>
       <Loader key="overlay" className={s(style, { loader: true })} loading={connection.isLoading()} overlay />
     </ColoredContainer>
