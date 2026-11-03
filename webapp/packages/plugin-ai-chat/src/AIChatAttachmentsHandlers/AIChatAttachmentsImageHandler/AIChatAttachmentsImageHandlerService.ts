@@ -10,7 +10,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { blobToBase64, uuid } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import type { AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
+import { DetailsError, type AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
 
 import { AIChatAttachmentsService, type IAIChatAttachment } from '../../AIChatAttachments/AIChatAttachmentsService.js';
 
@@ -49,11 +49,11 @@ export class AIChatAttachmentsImageHandlerService {
 
   private validate(attachments: readonly IAIChatAttachment[]): void {
     if (attachments.some(attachment => !IMAGE_MEDIA_TYPES.has(attachment.file.type))) {
-      throw new Error(this.localizationService.translate('plugin_ai_chat_attachment_image_format'));
+      throw new DetailsError(this.localizationService.translate('plugin_ai_chat_attachment_image_format'));
     }
 
     if (attachments.length > MAX_IMAGES || attachments.reduce((size, attachment) => size + attachment.file.size, 0) > MAX_IMAGE_BYTES) {
-      throw new Error(this.localizationService.translate('plugin_ai_chat_attachment_image_limit'));
+      throw new DetailsError(this.localizationService.translate('plugin_ai_chat_attachment_image_limit'));
     }
   }
 

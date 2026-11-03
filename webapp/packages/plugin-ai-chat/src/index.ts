@@ -42,6 +42,7 @@ export type {
   IAIChatInputContext,
   IAIChatInputProps,
   IAIChatInputDragEvent,
+  IAIChatInputPasteEvent,
   IAIChatInputValidation,
   IAIChatInputSubmission,
 } from './AIChat/AIChatInput/AIChatInputService.js';
