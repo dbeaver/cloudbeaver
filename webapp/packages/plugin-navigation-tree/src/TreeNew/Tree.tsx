@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
 import { clsx } from '@dbeaver/ui-kit';
+import { ACTION_COLLAPSE_ALL, AppView, CaptureView } from '@cloudbeaver/core-view';
 
 import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
 import { TreeContext } from './contexts/TreeContext.js';
@@ -53,6 +55,7 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
   onNodeDoubleClick,
   getNodeHeight,
 }) {
+  const [view] = useState(() => new AppView().registerAction(ACTION_COLLAPSE_ALL));
   const tree = useTree({
     data,
     nodeRenderers,
@@ -70,14 +73,16 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
         <TreeSelectionContext.Provider value={selection}>
           <TreeContext.Provider value={tree}>
             <TreeDnDContext.Provider value={dnd ?? null}>
-              <TreeMenuContextProvider menu={menu ?? null}>
-                {children}
-                <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
-                  <TreeVirtualizationContext.Provider value={mountOptimization}>
-                    <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
-                  </TreeVirtualizationContext.Provider>
-                </div>
-              </TreeMenuContextProvider>
+              <CaptureView view={view} className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0">
+                <TreeMenuContextProvider menu={menu ?? null}>
+                  {children}
+                  <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
+                    <TreeVirtualizationContext.Provider value={mountOptimization}>
+                      <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
+                    </TreeVirtualizationContext.Provider>
+                  </div>
+                </TreeMenuContextProvider>
+              </CaptureView>
             </TreeDnDContext.Provider>
           </TreeContext.Provider>
         </TreeSelectionContext.Provider>
