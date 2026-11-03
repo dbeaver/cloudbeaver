@@ -56,7 +56,6 @@ export interface IAIProfilesTableProps {
 const SELECT_COLUMN = { key: 'select', label: '', width: ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH };
 const NAME_COLUMN = { key: 'name', minWidth: 160 };
 const ENGINE_COLUMN = { key: 'engine', width: 160 };
-const SCOPE_COLUMN = { key: 'scope', width: 120 };
 
 export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfilesTable({
   profiles,
@@ -85,16 +84,6 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     ...(selectable ? [SELECT_COLUMN] : []),
     { ...NAME_COLUMN, label: nameLabel },
     { ...ENGINE_COLUMN, label: engineLabel },
-    {
-      ...SCOPE_COLUMN,
-      label: 'plugin_ai_profiles_scope',
-      render: profile => (
-        <div className="tw:flex tw:items-center tw:gap-2">
-          {profile.global && <IconOrImage icon="document-global" width={16} />}
-          <span>{translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user')}</span>
-        </div>
-      ),
-    },
     ...additionalColumns,
   ];
 
