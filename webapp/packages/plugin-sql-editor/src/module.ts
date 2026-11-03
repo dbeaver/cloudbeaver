@@ -8,6 +8,7 @@
 
 import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
 import { SqlQueryService } from './SqlResultTabs/SqlQueryService.js';
+import { SqlScriptErrorService } from './SqlResultTabs/SqlScriptErrorService.js';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService.js';
 import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService.js';
 import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootstrap.js';
@@ -42,6 +43,7 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(SqlEditorSettingsService))
       .addSingleton(Dependency, proxy(OutputLogsResource))
       .addSingleton(SqlQueryService)
+      .addSingleton(SqlScriptErrorService)
       .addSingleton(SqlResultTabsService)
       .addSingleton(SqlQueryResultService)
       .addSingleton(OutputMenuBootstrap)

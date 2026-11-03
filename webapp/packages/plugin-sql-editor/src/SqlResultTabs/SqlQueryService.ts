@@ -7,7 +7,6 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -28,11 +27,8 @@ import { QueryDataSource } from '../QueryDataSource.js';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { SqlEditorPermissionService } from '../SqlEditorPermissionService.js';
-import type { SqlScriptErrorAction } from './SqlScriptErrorDialog.js';
-
-const SqlScriptErrorDialog = importLazyComponent(() => import('./SqlScriptErrorDialog.js').then(module => module.SqlScriptErrorDialog));
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -45,6 +41,29 @@ export interface IQueryExecutionStatistics {
   updatedRows: number;
   executeTime: number;
   modelId: string | null;
+}
+
+export interface ISqlScriptQueryError {
+  editorState: ISqlEditorTabState;
+  model: IDatabaseDataModel<QueryDataSource>;
+  query: string;
+  error: Error;
+}
+
+export type SqlScriptErrorResolution = 'recovered' | 'skip' | 'skip-all' | 'stop';
+
+interface ISqlScriptErrorContext {
+  resolution: SqlScriptErrorResolution | undefined;
+  setResolution: (resolution: SqlScriptErrorResolution) => void;
+}
+
+export function SqlScriptErrorContext(): ISqlScriptErrorContext {
+  return {
+    resolution: undefined,
+    setResolution(resolution: SqlScriptErrorResolution) {
+      this.resolution = resolution;
+    },
+  };
 }
 
 @injectable(() => [
@@ -67,6 +86,7 @@ export interface IQueryExecutionStatistics {
 export class SqlQueryService {
   private readonly statisticsMap: Map<string, IQueryExecutionStatistics>;
   readonly onQueryExecution: IExecutor<ISqlEditorTabState>;
+  readonly onScriptQueryError: IExecutor<ISqlScriptQueryError>;
 
   constructor(
     private readonly serviceProvider: IServiceProvider,
@@ -87,6 +107,7 @@ export class SqlQueryService {
   ) {
     this.statisticsMap = new Map();
     this.onQueryExecution = new Executor();
+    this.onScriptQueryError = new Executor();
 
     makeObservable<this, 'statisticsMap'>(this, {
       statisticsMap: observable,
@@ -306,30 +327,32 @@ export class SqlQueryService {
           })
           .resetQueryParameters();
 
-        let errorAction: Exclude<SqlScriptErrorAction, 'retry'> | undefined;
-
         try {
           await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
         } catch (exception: any) {
           options?.onQueryExecuted?.(query, i, false);
-          errorAction = await this.retryScriptQuery(model, query, exception, skipErrors);
-        }
 
-        if (errorAction) {
-          skipErrors ||= errorAction === 'skip-all';
+          let resolution: SqlScriptErrorResolution = source.cancelled ? 'stop' : 'skip';
 
-          if (model) {
+          if (resolution !== 'stop' && !skipErrors) {
+            const contexts = await this.onScriptQueryError.execute({ editorState, model, query, error: exception });
+            resolution = contexts.getContext(SqlScriptErrorContext).resolution ?? 'stop';
+          }
+
+          if (resolution !== 'recovered') {
+            skipErrors ||= resolution === 'skip-all';
+
             const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
             this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true, resultCount);
 
             model = source = undefined;
-          }
 
-          if (errorAction === 'stop') {
-            break;
-          }
+            if (resolution === 'stop') {
+              break;
+            }
 
-          continue;
+            continue;
+          }
         }
 
         const cancelled = model.source.cancelled;
@@ -375,39 +398,6 @@ export class SqlQueryService {
   removeStatisticsTab(state: ISqlEditorTabState, tabId: string): void {
     this.sqlQueryResultService.removeStatisticsTab(state, tabId);
     this.statisticsMap.delete(tabId);
-  }
-
-  private async retryScriptQuery(
-    model: IDatabaseDataModel<QueryDataSource>,
-    query: string,
-    error: Error,
-    skipErrors: boolean,
-  ): Promise<Exclude<SqlScriptErrorAction, 'retry'> | undefined> {
-    let currentError = error;
-
-    while (true) {
-      if (model.source.cancelled) {
-        return 'stop';
-      }
-
-      if (skipErrors) {
-        return 'skip';
-      }
-
-      const { status, result } = await this.commonDialogService.open(SqlScriptErrorDialog, { query, error: currentError });
-      const action = status === DialogueStateResult.Resolved ? (result ?? 'stop') : 'stop';
-
-      if (action !== 'retry') {
-        return action;
-      }
-
-      try {
-        await model.retry();
-        return;
-      } catch (exception: any) {
-        currentError = exception;
-      }
-    }
   }
 
   private switchTabToActiveRequest(editorState: ISqlEditorTabState, tabGroup: IResultGroup, model: IDatabaseDataModel<QueryDataSource>) {
