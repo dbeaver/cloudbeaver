@@ -69,10 +69,10 @@ export class ConfigurationLocaleService {
     const preferences = navigator.languages.length ? navigator.languages : [navigator.language];
 
     for (const preference of preferences) {
-      const normalized = preference.toLowerCase();
+      const normalized = normalizeLocale(preference);
       const language =
-        this.localizationService.supportedLanguages.find(locale => locale.isoCode.toLowerCase() === normalized) ??
-        this.localizationService.supportedLanguages.find(locale => locale.isoCode.toLowerCase() === normalized.split('-')[0]);
+        this.localizationService.supportedLanguages.find(locale => normalizeLocale(locale.isoCode) === normalized) ??
+        this.localizationService.supportedLanguages.find(locale => normalizeLocale(locale.isoCode) === normalized.split('-')[0]);
 
       if (language) {
         this.applyLanguage(language.isoCode);
@@ -115,4 +115,15 @@ export class ConfigurationLocaleService {
       await this.serverSettingsResource.refresh();
     }
   }
+}
+
+function normalizeLocale(locale: string): string {
+  const normalized = locale.toLowerCase().replaceAll('_', '-');
+
+  // The server uses "tw" for Traditional Chinese rather than a BCP 47 language tag.
+  if (normalized === 'tw' || /^zh-(?:tw|hant)(?:-|$)/.test(normalized)) {
+    return 'zh-hant';
+  }
+
+  return normalized;
 }

@@ -556,6 +556,8 @@ public abstract class CBApplication<T extends CBServerConfig>
         if (appConfig.isGrantConnectionsAccessToAnonymousTeam()) {
             grantAnonymousAccessToConnections(appConfig, adminName);
         }
+        // Reload merges over the live settings, so remove preferences reset in the submitted configuration first.
+        getServerConfiguration().getProductSettings().keySet().retainAll(serverConfig.getProductSettings().keySet());
         reloadConfiguration(credentialsProvider);
     }
 
