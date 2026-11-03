@@ -33,6 +33,7 @@ export const WEBSITE_LINKS = {
   DRIVERS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Drivers-Management/',
   AUTHENTICATION_METHODS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Authentication-methods/',
   CLOUD_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Cloud-Explorer/#cloud-configuration',
+  SECRET_MANAGEMENT_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Configure-Secret-Providers/',
   AI_SETTINGS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/AI-Assistance-settings/',
   AI_PROFILES_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/AI-Assistance-settings/#ai-profiles',
   AI_TOOLS_AND_MCP_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/AI-Tools-and-MCP/',
