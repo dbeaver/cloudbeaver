@@ -41,7 +41,7 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQ
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { getDefaultQueryGeneratorOptions, GeneratedSqlDialog, SqlGeneratorsResource, DDL_GENERATOR_ID } from '@cloudbeaver/plugin-sql-generator';
+import { getDefaultQueryGeneratorOptions, openGeneratedSqlDialog, SqlGeneratorsResource, DDL_GENERATOR_ID } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 @injectable(() => [
@@ -177,28 +177,24 @@ export class DataGridContextMenuGenerateSqlService {
         return;
       }
 
-      await this.commonDialogService.open(
-        GeneratedSqlDialog,
-        {
-          query,
-          nodeId: nodePath ?? connectionId,
-          nodeName: this.getEntityNameFromNodePath(containerNodePath, model.name),
-          generatorId,
-          generatorName: this.localizationService.translate(generatorLabel),
-          options: getDefaultQueryGeneratorOptions(),
-          regenerateQuery: options =>
-            this.generateQuery({
-              projectId,
-              connectionId,
-              contextId,
-              resultId,
-              generatorId,
-              rows,
-              options,
-            }),
-        },
-        { persistent: true },
-      );
+      await openGeneratedSqlDialog(this.commonDialogService, {
+        query,
+        nodeId: nodePath ?? connectionId,
+        nodeName: this.getEntityNameFromNodePath(containerNodePath, model.name),
+        generatorId,
+        generatorName: this.localizationService.translate(generatorLabel),
+        options: getDefaultQueryGeneratorOptions(),
+        regenerateQuery: options =>
+          this.generateQuery({
+            projectId,
+            connectionId,
+            contextId,
+            resultId,
+            generatorId,
+            rows,
+            options,
+          }),
+      });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
     }
@@ -239,19 +235,15 @@ export class DataGridContextMenuGenerateSqlService {
 
       const query = await this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, getDefaultQueryGeneratorOptions());
 
-      await this.commonDialogService.open(
-        GeneratedSqlDialog,
-        {
-          query,
-          nodeId: nodePathList,
-          nodeName: this.getEntityNameFromNodePath(nodePathList, model.name),
-          generatorId: createGenerator.id,
-          generatorName: createGenerator.label,
-          options: getDefaultQueryGeneratorOptions(),
-          regenerateQuery: genOptions => this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
-        },
-        { persistent: true },
-      );
+      await openGeneratedSqlDialog(this.commonDialogService, {
+        query,
+        nodeId: nodePathList,
+        nodeName: this.getEntityNameFromNodePath(nodePathList, model.name),
+        generatorId: createGenerator.id,
+        generatorName: createGenerator.label,
+        options: getDefaultQueryGeneratorOptions(),
+        regenerateQuery: genOptions => this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, genOptions),
+      });
     } catch (e: any) {
       this.notificationService.logException(e, 'data_grid_table_generate_sql_error_title');
     }

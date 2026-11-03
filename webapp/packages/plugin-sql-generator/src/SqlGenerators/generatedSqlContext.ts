@@ -6,20 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { EObjectFeature, type INodeContainerInfo, type NavNode } from '@cloudbeaver/core-navigation-tree';
-import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
 import type { Connection } from '@cloudbeaver/core-connections';
 
 import { DDL_GENERATOR_ID } from './SqlGeneratorsResource.js';
 import { haveSameSqlGenerationConnection } from './sqlGenerationSelection.js';
-
-export type GeneratedSqlPayload = {
-  nodeName?: string;
-  generatorId: string;
-  generatorName?: string;
-  options?: SqlQueryGeneratorOptions;
-} & (
-  { nodeIds: readonly [string, ...string[]] } | { nodeId: string; query: string; regenerateQuery(options: SqlQueryGeneratorOptions): Promise<string> }
-);
 
 interface IGeneratedSqlNode {
   connection: Pick<Connection, 'id' | 'projectId' | 'name'> | undefined;

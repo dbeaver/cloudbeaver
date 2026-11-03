@@ -1,23 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2026 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { TimerIcon } from './TimerIcon.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
-import * as IconModule from './Icon.js';
 
-beforeEach(() => {
-  vi.spyOn(IconModule, 'Icon').mockImplementation((props: any) => <svg {...props}>Icon</svg>);
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
+vi.mock('./Icon', () => ({
+  Icon: (props: any) => <svg {...props}>Icon</svg>,
+}));
 
 describe('TimerIcon', () => {
   it('renders correctly with state "play" and interval 30', async () => {

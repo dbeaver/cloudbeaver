@@ -15,7 +15,6 @@ interface ISqlGenerationAction<T> {
   nodes: T[];
 }
 
-/** JOIN generators operate on the entire list and do not filter individual objects. */
 export function getSqlGenerationActions<T extends Pick<NavNode, 'objectFeatures'>>(
   nodes: readonly T[],
   generators: readonly SqlQueryGenerator[],
@@ -24,9 +23,11 @@ export function getSqlGenerationActions<T extends Pick<NavNode, 'objectFeatures'
   const entities = supported.filter(node => node.objectFeatures.includes(EObjectFeature.entity));
 
   return generators.flatMap(generator => {
+    // The server may offer JOIN for mixed selections, but JOIN generators expect only entities.
     const isJoin = generator.id === 'tableJoin' || generator.id === 'tableInnerJoin';
     const selected = isJoin ? entities : supported;
 
+    // Count eligible entities, not all selected objects (e.g. a table and a procedure).
     if (selected.length === 0 || ((isJoin || generator.multiObject) && selected.length < 2)) {
       return [];
     }

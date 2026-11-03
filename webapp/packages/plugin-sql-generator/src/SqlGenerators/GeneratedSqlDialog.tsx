@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
+import { useState } from 'react';
 
 import {
   Button,
@@ -35,30 +35,25 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 
 import { useGeneratedSql } from './useGeneratedSql.js';
-import { getGeneratedSqlContext, type GeneratedSqlPayload } from './generatedSqlContext.js';
+import { getGeneratedSqlContext } from './generatedSqlContext.js';
+import { getGeneratedSqlSource, type GeneratedSqlPayload } from './generatedSqlPayload.js';
 
-export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayload>>(function GeneratedSqlDialog({ rejectDialog, payload }) {
+export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayload & { onClose(): void }>>(function GeneratedSqlDialog({ payload }) {
   const translate = useTranslate();
   const copy = useClipboard();
   const notificationService = useService(NotificationService);
   const commonDialogService = useService(CommonDialogService);
-  const closing = useRef(false);
+  const [closing, setClosing] = useState(false);
   const sqlGeneratorsResource = useService(SqlGeneratorsResource);
-  const state = useGeneratedSql({
-    query: 'query' in payload ? payload.query : undefined,
-    options: payload.options,
-    generate:
-      'regenerateQuery' in payload
-        ? payload.regenerateQuery
-        : options => sqlGeneratorsResource.generateEntityQuery(payload.generatorId, [...payload.nodeIds], options),
-  });
+  const source = getGeneratedSqlSource(payload, sqlGeneratorsResource);
+  const state = useGeneratedSql(source);
 
   const { loading } = state;
 
   const connectionInfoResource = useService(ConnectionInfoResource);
   const sqlEditorNavigatorService = useService(SqlEditorNavigatorService);
   const navNodeManagerService = useService(NavNodeManagerService);
-  const nodeIds = 'nodeIds' in payload ? payload.nodeIds : [payload.nodeId];
+  const { nodeIds } = source;
   const { connection, catalogId, schemaId, hasFullDdl } = getGeneratedSqlContext(
     payload.generatorId,
     nodeIds.map(id => ({
@@ -81,18 +76,11 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
   const title = `${translate('app_shared_sql_generators_dialog_title')}${connection ? ` (${connection.name})` : ''}`;
 
   async function handleClose() {
-    if (closing.current) {
+    if (closing) {
       return;
     }
 
-    // Capture this dialog before confirmation becomes the active dialog.
-    const dialog = commonDialogService.dialogs.find(dialog => dialog.payload === payload);
-
-    if (!dialog) {
-      return;
-    }
-
-    closing.current = true;
+    setClosing(true);
 
     try {
       if (loading) {
@@ -109,11 +97,11 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
       }
 
       await state.cancel();
-      commonDialogService.rejectDialog(dialog.promise);
+      payload.onClose();
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_title');
     } finally {
-      closing.current = false;
+      setClosing(false);
     }
   }
 
@@ -126,7 +114,7 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
         query: state.query,
       });
 
-      rejectDialog();
+      payload.onClose();
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_open_editor');
     }
@@ -212,7 +200,9 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
               <Button variant="secondary" disabled={!state.query || loading} onClick={handleOpenInEditor}>
                 {translate('app_shared_sql_generators_open_in_editor')}
               </Button>
-              <Button onClick={handleClose}>{translate('ui_close')}</Button>
+              <Button disabled={closing} onClick={handleClose}>
+                {translate('ui_close')}
+              </Button>
             </div>
           </div>
         </div>
