@@ -6,18 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, type DialogInternal } from '@cloudbeaver/core-dialogs';
 
-import { ErrorBoundary } from '../ErrorBoundary.js';
 import { Loader } from '../Loader/Loader.js';
 import { s } from '../s.js';
 import { useObjectRef } from '../useObjectRef.js';
 import { useS } from '../useS.js';
-import { DialogContext, type IDialogContext } from './DialogContext.js';
 import style from './DialogsPortal.module.css';
+import { NestedDialog } from './NestedDialog.js';
 
 export const DialogsPortal = observer(function DialogsPortal() {
   const styles = useS(style);
@@ -64,38 +62,3 @@ export const DialogsPortal = observer(function DialogsPortal() {
     </div>
   );
 });
-
-interface NestedDialogType {
-  dialog: DialogInternal<any>;
-  resolveDialog: (result: any) => void;
-  rejectDialog: (result?: any) => void;
-  visible: boolean;
-}
-
-const NestedDialog: React.FC<NestedDialogType> = function NestedDialog({ dialog, resolveDialog, rejectDialog, visible }) {
-  const styles = useS(style);
-  const DialogComponent = dialog.component;
-
-  const context = useMemo<IDialogContext>(
-    () => ({
-      dialog,
-      visible,
-      reject: rejectDialog,
-    }),
-    [dialog, visible, rejectDialog],
-  );
-
-  return (
-    <DialogContext.Provider value={context}>
-      <ErrorBoundary className={s(styles, { error: true }, 'tw:shadow-xlarge')} remount onClose={rejectDialog}>
-        <DialogComponent
-          visible={visible}
-          payload={dialog.payload}
-          options={dialog.options}
-          resolveDialog={resolveDialog}
-          rejectDialog={rejectDialog}
-        />
-      </ErrorBoundary>
-    </DialogContext.Provider>
-  );
-};

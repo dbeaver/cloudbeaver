@@ -48,7 +48,7 @@ public interface DBWServiceCore extends DBWService {
     @WebAction
     WebPropertyInfo[] getSystemInformationProperties(@NotNull WebSession webSession);
 
-    @WebAction
+    @WebAction(configurationModeAllowed = true)
     WebGroupPropertiesInfo<ProductSettingDescriptor> getProductSettings(@NotNull WebSession webSession);
 
     @NotNull

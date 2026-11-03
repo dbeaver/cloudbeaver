@@ -13,6 +13,8 @@ import type { IContextMenuProps } from './IContextMenuProps.js';
 import { MenuButton, MenuProvider, Menu, type HovercardStoreState, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
 import { RenderMenuItems } from './RenderMenuItems.js';
 import { type IMenuContext, MenuContext } from './MenuContext.js';
+import { GroupComponent } from './GroupComponent.js';
+import { GroupArrowComponent } from './GroupArrowComponent.js';
 
 export interface IContextMenuNewProps extends IContextMenuProps {
   render?: React.ReactElement;
@@ -25,7 +27,7 @@ export interface IContextMenuNewProps extends IContextMenuProps {
   modal?: boolean;
 }
 
-export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuInner({
+function ContextMenuRender({
   contextMenuPosition,
   menu: menuData,
   children,
@@ -38,7 +40,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
   autoFocusOnShow,
   modal,
   ...rest
-}) {
+}: IContextMenuNewProps) {
   const translate = useTranslate();
   const parent = use(MenuContext);
   const menu = useMenuStore({ placement, rtl: rtl || parent?.rtl, open: visible });
@@ -48,7 +50,7 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
 
   const handler = menuData.handler;
 
-  useAutoLoad({ name: `${ContextMenuInner.name}(${menuData.menu.id})` }, menuData.loaders, true, isMenuOpen, true);
+  useAutoLoad({ name: `${ContextMenuRender.name}(${menuData.menu.id})` }, menuData.loaders, true, isMenuOpen, true);
 
   const handlers = useObjectRef(
     () => ({
@@ -124,12 +126,6 @@ export const ContextMenu = observer<IContextMenuNewProps>(function ContextMenuIn
       </MenuProvider>
     </MenuContext>
   );
-});
-
-function GroupComponent(props: React.HTMLAttributes<HTMLDivElement>) {
-  return <div {...props} />;
 }
 
-function GroupArrowComponent(props: React.HTMLAttributes<HTMLButtonElement>) {
-  return <button {...props} />;
-}
+export const ContextMenu = observer<IContextMenuNewProps>(ContextMenuRender);

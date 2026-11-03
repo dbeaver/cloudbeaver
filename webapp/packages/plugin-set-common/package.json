@@ -98,6 +98,7 @@
     "@cloudbeaver/plugin-holidays": "workspace:*",
     "@cloudbeaver/plugin-holidays-administration": "workspace:*",
     "@cloudbeaver/plugin-localization": "workspace:*",
+    "@cloudbeaver/plugin-localization-administration": "workspace:*",
     "@cloudbeaver/plugin-log-viewer": "workspace:*",
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
     "@cloudbeaver/plugin-navigation-tree": "workspace:*",

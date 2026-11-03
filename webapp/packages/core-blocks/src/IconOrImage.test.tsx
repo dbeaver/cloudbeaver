@@ -10,24 +10,24 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { IconOrImage, type IconOrImageProps } from './IconOrImage.js';
 import { renderInApp } from '@cloudbeaver/tests-runner';
-import * as IconModule from './Icon.js';
-import * as StaticImageModule from './StaticImage.js';
-
-beforeEach(() => {
-  vi.spyOn(IconModule, 'Icon').mockImplementation(props => (
-    <svg {...props} role="svg">
-      <use href={`/icons/preload/icons.svg#${props.name}`} />
-    </svg>
-  ));
-
-  vi.spyOn(StaticImageModule, 'StaticImage').mockImplementation(props => <img {...props} />);
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
+import * as iconModule from './Icon.js';
+import * as staticImageModule from './StaticImage.js';
 
 describe('IconOrImage', () => {
+  beforeEach(() => {
+    vi.spyOn(iconModule, 'Icon').mockImplementation(props => (
+      <svg {...props} role="svg">
+        <use href={`/icons/preload/icons.svg#${props.name}`} />
+      </svg>
+    ));
+
+    vi.spyOn(staticImageModule, 'StaticImage').mockImplementation(props => <img {...props} />);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   test('should render StaticImage for platform: prefixed icon', () => {
     const { getByRole } = renderInApp(<IconOrImage icon="platform:/image.png" />);
     expect(getByRole('img')).toHaveAttribute('icon', 'platform:/image.png');

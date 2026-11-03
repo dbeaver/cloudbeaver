@@ -15,10 +15,11 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { EditorDialog } from './EditorDialog.js';
 import styles from './InlineEditor.module.css';
 import { Input } from '@dbeaver/ui-kit';
+import { EditorAction } from './EditorAction.js';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
-export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onKeyDown' | 'autoFocus' | 'style'> {
+export interface IInlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onKeyDown' | 'autoFocus' | 'style'> {
   value: string;
   controlsPosition?: InlineEditorControls;
   simple?: boolean;
@@ -38,7 +39,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   className?: string;
 }
 
-export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
+export const InlineEditor = observer<IInlineEditorProps, HTMLInputElement>(
   forwardRef(function InlineEditor(
     {
       value,
@@ -167,13 +168,3 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     );
   }),
 );
-
-const EditorAction = observer<React.ButtonHTMLAttributes<HTMLButtonElement>>(function EditorAction({ children, ...props }) {
-  const style = useS(styles);
-
-  return (
-    <button className={s(style, { editorAction: true })} {...props}>
-      {children}
-    </button>
-  );
-});

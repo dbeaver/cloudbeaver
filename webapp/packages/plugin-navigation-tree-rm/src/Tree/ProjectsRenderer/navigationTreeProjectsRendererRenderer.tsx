@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -50,35 +50,34 @@ export function navigationTreeProjectsRendererRenderer(
   projectsNavNodeService: ProjectsNavNodeService,
   resourceTypeId?: string,
 ): IElementsTreeCustomRenderer {
-  return nodeId => {
-    const node = navNodeInfoResource.get(nodeId);
+  return {
+    matches: nodeId => {
+      const node = navNodeInfoResource.get(nodeId);
 
-    if (isRMProjectNode(node)) {
-      return ProjectRenderer;
-    }
+      if (isRMProjectNode(node)) {
+        return true;
+      }
 
-    if (!node?.folder || resourceTypeId === undefined) {
-      return undefined;
-    }
+      if (!node?.folder || resourceTypeId === undefined) {
+        return false;
+      }
 
-    const project = projectsNavNodeService.getProject(nodeId);
+      const project = projectsNavNodeService.getProject(nodeId);
 
-    if (!project) {
-      return undefined;
-    }
+      if (!project) {
+        return false;
+      }
 
-    const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
-    const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
+      const resourceFolder = resourceManagerService.getRootFolder(project, resourceTypeId);
+      const folderNodeId = createPath(RESOURCES_NODE_PATH, project.id, resourceFolder);
 
-    if (nodeId === folderNodeId) {
-      return ProjectRenderer;
-    }
-
-    return undefined;
+      return nodeId === folderNodeId;
+    },
+    Component: ProjectRenderer,
   };
 }
 
-const ProjectRenderer: NavigationNodeRendererComponent = observer(function ManageableGroup({
+const ProjectRenderer: NavigationNodeRendererComponent = observer(function ProjectRenderer({
   nodeId,
   path,
   dragging,
