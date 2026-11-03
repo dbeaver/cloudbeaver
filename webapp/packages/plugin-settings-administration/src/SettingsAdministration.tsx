@@ -27,7 +27,7 @@ import { SettingsAdministrationService } from './SettingsAdministrationService.j
 import { useState } from 'react';
 import { SettingsResolverService } from '@cloudbeaver/core-settings';
 
-export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration() {
+export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration({ configurationWizard }) {
   const settingsResolverService = useService(SettingsResolverService);
   const settingsAdministrationService = useService(SettingsAdministrationService);
   const notificationService = useService(NotificationService);
@@ -39,7 +39,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
   const changed = settingsSource?.isEdited() || false;
 
   async function handleSave() {
-    if (!changed) {
+    if (configurationWizard || !changed) {
       return;
     }
 
@@ -77,9 +77,11 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
         <ColoredContainer overflow parent vertical noWrap gap>
           <Group box keepSize>
             <ToolsPanel rounded>
-              <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
-                {translate('ui_processing_save')}
-              </ToolsAction>
+              {!configurationWizard && (
+                <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
+                  {translate('ui_processing_save')}
+                </ToolsAction>
+              )}
               <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" disabled={!changed} onClick={handleReset}>
                 {translate('ui_processing_cancel')}
               </ToolsAction>
