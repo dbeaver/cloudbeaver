@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
 import org.jkiss.dbeaver.model.auth.SMObjectType;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -695,6 +696,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             }
 
             boolean configurationMode = CBApplication.getInstance().isConfigurationMode();
+
+            Map<String, Object> productConfiguration = JSONUtils.getObject(params, CBConstants.PARAM_PRODUCT_CONFIGURATION);
+            if (!productConfiguration.isEmpty()) {
+                CBApplication.getInstance().getServerConfigurationController().saveProductConfiguration(productConfiguration);
+            }
 
             CBApplication.getInstance().finishConfiguration(
                 adminName,

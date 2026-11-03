@@ -30,9 +30,16 @@ export class SettingsAdministrationPluginBootstrap extends Bootstrap {
   override register(): void | Promise<void> {
     this.administrationItemService.create({
       name: 'settings',
-      type: AdministrationItemType.Administration,
+      type: AdministrationItemType.Default,
       order: 3,
-      canDeActivate: async () => {
+      configurationWizardOptions: {
+        description: 'plugin_settings_administration_drawer_item_title',
+      },
+      canDeActivate: async configurationWizard => {
+        if (configurationWizard) {
+          return true;
+        }
+
         const displayed = this.settingsAdministrationService.tabsContainer.getDisplayed();
         const edited = displayed.some(tab => (tab.options?.source as IEditableSettingsSource).isEdited());
 
@@ -51,7 +58,11 @@ export class SettingsAdministrationPluginBootstrap extends Bootstrap {
 
         return true;
       },
-      onDeActivate: () => {
+      onDeActivate: configurationWizard => {
+        if (configurationWizard) {
+          return;
+        }
+
         this.settingsAdministrationService.tabsContainer.getDisplayed().forEach(tab => {
           if (tab.options?.source.isEdited()) {
             tab.options?.source.clear();

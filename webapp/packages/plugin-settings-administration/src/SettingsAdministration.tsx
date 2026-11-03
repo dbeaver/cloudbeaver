@@ -25,7 +25,7 @@ import { SettingsAdministrationService } from './SettingsAdministrationService.j
 import { useState } from 'react';
 import { SettingsResolverService } from '@cloudbeaver/core-settings';
 
-export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration() {
+export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration({ configurationWizard }) {
   const settingsResolverService = useService(SettingsResolverService);
   const settingsAdministrationService = useService(SettingsAdministrationService);
   const notificationService = useService(NotificationService);
@@ -37,7 +37,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
   const changed = settingsSource?.isEdited() || false;
 
   async function handleSave() {
-    if (!changed) {
+    if (configurationWizard || !changed) {
       return;
     }
 
@@ -89,9 +89,11 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
                 <Button type="button" variant="secondary" disabled={!changed} onClick={handleReset}>
                   {translate('ui_processing_cancel')}
                 </Button>
-                <Button type="button" variant="primary" disabled={!changed} onClick={() => form.submit()}>
-                  {translate('ui_processing_save')}
-                </Button>
+                {!configurationWizard && (
+                  <Button type="button" variant="primary" disabled={!changed} onClick={() => form.submit()}>
+                    {translate('ui_processing_save')}
+                  </Button>
+                )}
               </>
             }
           >

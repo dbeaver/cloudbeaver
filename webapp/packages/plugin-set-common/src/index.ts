@@ -72,6 +72,7 @@ import pluginHelp from '@cloudbeaver/plugin-help/module';
 import pluginHolidays from '@cloudbeaver/plugin-holidays/module';
 import pluginHolidaysAdministration from '@cloudbeaver/plugin-holidays-administration/module';
 import pluginLocalization from '@cloudbeaver/plugin-localization/module';
+import pluginLocalizationAdministration from '@cloudbeaver/plugin-localization-administration/module';
 import pluginLogViewer from '@cloudbeaver/plugin-log-viewer/module';
 import pluginNavigationTabs from '@cloudbeaver/plugin-navigation-tabs/module';
 import pluginNavigationTree from '@cloudbeaver/plugin-navigation-tree/module';
@@ -175,6 +176,7 @@ export const commonSet = [
   pluginAuthenticationAdministration,
   pluginTheme,
   pluginLocalization,
+  pluginLocalizationAdministration,
   pluginConnectionAdministration,
   pluginConnectionCustom,
   pluginConnectionSearch,
