@@ -228,7 +228,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
         <Placeholder container={connectionFormService.mainPropertiesContainer} formState={formState} />
 
         {showAuth && (
-          <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-2 tw:border-t tw:py-6">
+          <section className="theme-border-color-background tw:flex tw:min-w-0 tw:flex-col tw:gap-2 tw:border-t tw:py-6 tw:has-[>div>div:only-child:empty]:hidden">
             <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
             <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-4">
               {showAuthDetails && serverConfigResource.resource.distributed && isSharedProject && (

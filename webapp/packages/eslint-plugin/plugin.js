@@ -12,6 +12,9 @@ import serviceVariableName from './serviceVariableName.js';
 import statementSpacing from './statementSpacing.js';
 import requireFunctionDeclarationsInComponents from './requireFunctionDeclarationsInComponents.js';
 import noConditionalEmptyObjectSpread from './noConditionalEmptyObjectSpread.js';
+import packageBoundaries from './packageBoundaries.js';
+import oneComponentPerFile from './oneComponentPerFile.js';
+import functionNameMatchesVariable from './functionNameMatchesVariable.js';
 
 const plugin = {
   meta: {
@@ -26,6 +29,9 @@ const plugin = {
     'statement-spacing': statementSpacing,
     'require-function-declarations-in-components': requireFunctionDeclarationsInComponents,
     'no-conditional-empty-object-spread': noConditionalEmptyObjectSpread,
+    'package-boundaries': packageBoundaries,
+    'one-component-per-file': oneComponentPerFile,
+    'function-name-matches-variable': functionNameMatchesVariable,
   },
 };
 
@@ -39,6 +45,9 @@ Object.assign(plugin.configs, {
       '@cloudbeaver/statement-spacing': 'error',
       '@cloudbeaver/require-function-declarations-in-components': 'error',
       '@cloudbeaver/no-conditional-empty-object-spread': 'error',
+      '@cloudbeaver/package-boundaries': 'error',
+      '@cloudbeaver/one-component-per-file': 'error',
+      '@cloudbeaver/function-name-matches-variable': 'error',
     },
   },
 });

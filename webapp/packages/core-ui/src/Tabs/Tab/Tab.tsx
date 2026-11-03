@@ -69,6 +69,7 @@ export const Tab = observer<TabProps>(function Tab({ after, ...props }) {
             type="button"
             title={translate(title ?? info?.title)}
             id={tabId}
+            data-id={tabId}
             className={s(styles, { tab: true }, className)}
             style={style}
             disabled={disabled}
