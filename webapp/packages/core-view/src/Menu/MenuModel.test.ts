@@ -61,6 +61,48 @@ function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> 
 }
 
 describe('MenuModel', () => {
+  it('loads a new target after retrying the previous target fails', async () => {
+    const first = resource();
+    const second = resource();
+    first.state.error = new Error('first failed');
+    let rejectRetry!: (error: Error) => void;
+    first.loader.reload = vi.fn(
+      () =>
+        new Promise<void>((_, reject) => {
+          rejectRetry = reject;
+        }),
+    );
+    const key = observable.box('first');
+    const current = () => (key.get() === 'first' ? first.loader : second.loader);
+    const loader: ILoadableState = {
+      get exception() {
+        return current().exception;
+      },
+      isLoaded: () => current().isLoaded(),
+      isLoading: () => current().isLoading(),
+      isError: () => current().isError(),
+      load: () => current().load(),
+      captureRequest() {
+        const state = current();
+        return { state, isCurrent: () => current() === state };
+      },
+    };
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
+    const stop = model.start();
+    const failure = new Error('first retry failed');
+    const retry = model.reload();
+    const rejected = expect(retry).rejects.toBe(failure);
+    await vi.waitFor(() => expect(first.loader.reload).toHaveBeenCalledOnce());
+    runInAction(() => key.set('second'));
+    await Promise.resolve();
+    rejectRetry(failure);
+    await rejected;
+    await vi.waitFor(() => expect(second.loader.load).toHaveBeenCalledOnce());
+    expect(model.exception).toBeNull();
+    expect(model.isLoaded()).toBe(true);
+    stop();
+  });
+
   it('skips a queued target after its inputs change and loads the new target', async () => {
     const gate = resource();
     let release!: () => void;

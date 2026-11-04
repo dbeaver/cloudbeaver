@@ -238,6 +238,7 @@ export class MenuModel implements ILoadableState {
       });
     } finally {
       this.root.retrying = false;
+      this.root.schedule();
     }
     await this.root.loadPending();
   };
