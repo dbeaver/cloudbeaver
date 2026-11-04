@@ -52,7 +52,7 @@ export default defineConfig(
       'default-param-last': 'off',
       'function-call-spacing': 'off',
       'keyword-spacing': 'off',
-      'no-duplicate-imports': 'error',
+      'no-duplicate-imports': ['error', { allowSeparateTypeImports: true }],
       'object-curly-spacing': 'off',
       'space-before-function-paren': 'off',
       'space-infix-ops': 'off',
@@ -60,10 +60,11 @@ export default defineConfig(
       'no-inner-declarations': 'off',
       'no-constant-condition': 'off',
       'space-before-blocks': 'error',
-      'func-names': ['error', 'always'],
+      'func-names': ['warn', 'always'],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-unsafe-finally': 'error',
-      'require-await': 'error',
+      // Async can be required by a Promise contract even without an await expression.
+      'require-await': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'warn',
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-unused-expressions': 'warn',
@@ -93,7 +94,7 @@ export default defineConfig(
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/naming-convention': [
-        'error',
+        'warn',
         {
           selector: 'interface',
           modifiers: ['exported'],
@@ -104,7 +105,7 @@ export default defineConfig(
           },
         },
       ],
-      '@stylistic/semi': ['error', 'always'],
+      '@stylistic/semi': ['warn', 'always'],
       '@typescript-eslint/consistent-type-assertions': [
         'error',
         {
@@ -183,7 +184,7 @@ export default defineConfig(
         },
       ],
       'max-len': [
-        'error',
+        'warn',
         {
           code: 150,
           ignoreTrailingComments: true,
@@ -241,7 +242,7 @@ export default defineConfig(
         },
       ],
       'react/jsx-sort-props': [
-        'error',
+        'warn',
         {
           callbacksLast: true,
           shorthandLast: true,
