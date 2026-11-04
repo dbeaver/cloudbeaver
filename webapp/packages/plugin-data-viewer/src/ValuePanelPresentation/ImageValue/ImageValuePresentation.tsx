@@ -22,6 +22,7 @@ import { useValuePanelImageValue } from './useValuePanelImageValue.js';
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 import type { IDatabaseValueHolder } from '../../DatabaseDataModel/Actions/IDatabaseValueHolder.js';
+import { ImageRenderer } from './ImageRenderer.js';
 
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps> = observer(function ImageValuePresentation({
   model: unknownModel,
@@ -122,20 +123,4 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       </Container>
     </Container>
   );
-});
-
-interface ImageRendererProps {
-  className?: string;
-  srcGetter: () => string | null;
-  onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
-}
-
-export const ImageRenderer = observer<ImageRendererProps>(function ImageRenderer({ srcGetter, className, onContextMenu }) {
-  const src = srcGetter();
-
-  if (!src) {
-    return null;
-  }
-
-  return <img src={src} className={className} onContextMenu={onContextMenu} />;
 });
