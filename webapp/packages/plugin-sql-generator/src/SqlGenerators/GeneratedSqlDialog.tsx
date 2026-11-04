@@ -31,12 +31,56 @@ import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-naviga
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 
 import { NotificationService } from '@cloudbeaver/core-events';
+import type { SqlQueryGeneratorOptions } from '@cloudbeaver/core-sdk';
 
 import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 
-import { useGeneratedSql } from './useGeneratedSql.js';
+import { useGeneratedSql, type IGeneratedSqlSource } from './useGeneratedSql.js';
 import { getGeneratedSqlContext } from './generatedSqlContext.js';
-import { getGeneratedSqlSource, type GeneratedSqlPayload } from './generatedSqlPayload.js';
+
+interface IGeneratedSqlPayload {
+  nodeName?: string;
+  generatorId: string;
+  generatorName?: string;
+  options?: SqlQueryGeneratorOptions;
+}
+
+export interface IGeneratedSqlSelectionPayload extends IGeneratedSqlPayload {
+  nodeIds: readonly [string, ...string[]];
+}
+
+export interface IGeneratedSqlQueryPayload extends IGeneratedSqlPayload {
+  nodeId: string;
+  query: string;
+  regenerateQuery(options: SqlQueryGeneratorOptions): Promise<string>;
+}
+
+export type GeneratedSqlPayload = IGeneratedSqlSelectionPayload | IGeneratedSqlQueryPayload;
+
+interface IGeneratedSqlDialogSource extends IGeneratedSqlSource {
+  nodeIds: readonly [string, ...string[]];
+}
+
+export function isGeneratedSqlQueryPayload(payload: GeneratedSqlPayload): payload is IGeneratedSqlQueryPayload {
+  return 'regenerateQuery' in payload;
+}
+
+export function getGeneratedSqlSource(payload: GeneratedSqlPayload, resource: SqlGeneratorsResource): IGeneratedSqlDialogSource {
+  if (isGeneratedSqlQueryPayload(payload)) {
+    return {
+      nodeIds: [payload.nodeId],
+      query: payload.query,
+      options: payload.options,
+      generate: payload.regenerateQuery,
+    };
+  }
+
+  return {
+    nodeIds: payload.nodeIds,
+    options: payload.options,
+    generate: options => resource.generateEntityQuery(payload.generatorId, [...payload.nodeIds], options),
+  };
+}
 
 export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayload & { onClose(): void }>>(function GeneratedSqlDialog({ payload }) {
   const translate = useTranslate();
@@ -96,8 +140,8 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<GeneratedSqlPayl
         }
       }
 
-      await state.cancel();
       payload.onClose();
+      await state.cancel();
     } catch (error: any) {
       notificationService.logException(error, 'app_shared_sql_generators_error_title');
     } finally {

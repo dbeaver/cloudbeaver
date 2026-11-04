@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { SqlResultSetGeneratorId, type SqlQueryGeneratorOptions, type SqlResultRow } from '@cloudbeaver/core-sdk';
@@ -41,13 +40,13 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQ
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { getDefaultQueryGeneratorOptions, openGeneratedSqlDialog, SqlGeneratorsResource, DDL_GENERATOR_ID } from '@cloudbeaver/plugin-sql-generator';
+import { getDefaultQueryGeneratorOptions, SqlGenerationService, SqlGeneratorsResource, DDL_GENERATOR_ID } from '@cloudbeaver/plugin-sql-generator';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 @injectable(() => [
   ActionService,
   MenuService,
-  CommonDialogService,
+  SqlGenerationService,
   NotificationService,
   SqlGeneratorsResource,
   LocalizationService,
@@ -57,7 +56,7 @@ export class DataGridContextMenuGenerateSqlService {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly commonDialogService: CommonDialogService,
+    private readonly sqlGenerationService: SqlGenerationService,
     private readonly notificationService: NotificationService,
     private readonly sqlGeneratorsResource: SqlGeneratorsResource,
     private readonly localizationService: LocalizationService,
@@ -177,7 +176,7 @@ export class DataGridContextMenuGenerateSqlService {
         return;
       }
 
-      await openGeneratedSqlDialog(this.commonDialogService, {
+      await this.sqlGenerationService.openDialog({
         query,
         nodeId: nodePath ?? connectionId,
         nodeName: this.getEntityNameFromNodePath(containerNodePath, model.name),
@@ -235,7 +234,7 @@ export class DataGridContextMenuGenerateSqlService {
 
       const query = await this.sqlGeneratorsResource.generateEntityQuery(createGenerator.id, nodePathList, getDefaultQueryGeneratorOptions());
 
-      await openGeneratedSqlDialog(this.commonDialogService, {
+      await this.sqlGenerationService.openDialog({
         query,
         nodeId: nodePathList,
         nodeName: this.getEntityNameFromNodePath(nodePathList, model.name),

@@ -5,15 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, type DialogResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 import type { SqlQueryGenerator } from '@cloudbeaver/core-sdk';
 
 import { getDefaultQueryGeneratorOptions } from './SqlGeneratorsResource.js';
 import { isSqlGenerationNode } from './sqlGenerationSelection.js';
-import { openGeneratedSqlDialog } from './openGeneratedSqlDialog.js';
+import type { GeneratedSqlPayload } from './GeneratedSqlDialog.js';
+
+const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
 
 @injectable(() => [CommonDialogService, NotificationService])
 export class SqlGenerationService {
@@ -33,7 +36,7 @@ export class SqlGenerationService {
         return;
       }
 
-      await openGeneratedSqlDialog(this.commonDialogService, {
+      await this.openDialog({
         nodeIds: [first.uri, ...rest.map(node => node.uri)],
         nodeName: first.name,
         generatorId: generator.id,
@@ -43,5 +46,15 @@ export class SqlGenerationService {
     } catch (error: any) {
       this.notificationService.logException(error, 'app_shared_sql_generators_error_title');
     }
+  }
+
+  openDialog(payload: GeneratedSqlPayload): Promise<DialogResult> {
+    const dialog = this.commonDialogService.open(
+      GeneratedSqlDialog,
+      { ...payload, onClose: () => this.commonDialogService.rejectDialog(dialog) },
+      { persistent: true },
+    );
+
+    return dialog;
   }
 }

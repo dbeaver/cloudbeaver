@@ -12,4 +12,4 @@ export * from './SqlGenerators/SqlGeneratorsResource.js';
 export * from './SqlGenerators/SqlGeneratorsBootstrap.js';
 export * from './actions/ACTION_SQL_GENERATE.js';
 export * from './SqlGenerators/GeneratedSqlDialog.js';
-export * from './SqlGenerators/openGeneratedSqlDialog.js';
+export * from './SqlGenerators/SqlGenerationService.js';
