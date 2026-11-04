@@ -46,7 +46,7 @@ export class ServerSettingsService extends EditableSettingsSource {
   }
 
   isReadOnly(key: any): boolean {
-    return !this.sessionPermissionsResource.has(EAdminPermission.admin);
+    return !this.serverConfigResource.configurationMode && !this.sessionPermissionsResource.has(EAdminPermission.admin);
   }
 
   getValue(key: any): any {
@@ -54,7 +54,11 @@ export class ServerSettingsService extends EditableSettingsSource {
   }
 
   async save() {
-    await this.serverConfigResource.updateProductConfiguration(Object.fromEntries(this.changes));
+    await this.serverConfigResource.updateProductConfiguration(this.getChanges());
+  }
+
+  getChanges(): Record<string, unknown> {
+    return Object.fromEntries(this.changes);
   }
 
   protected getSnapshot() {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@ import { ACTION_TAB_CLOSE_SQL_RESULT_GROUP } from './ACTION_TAB_CLOSE_SQL_RESULT
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from './DATA_CONTEXT_SQL_EDITOR_STATE.js';
 import { DATA_CONTEXT_SQL_EDITOR_RESULT_ID } from './SqlResultTabs/DATA_CONTEXT_SQL_EDITOR_RESULT_ID.js';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService.js';
+import { SqlScriptErrorService } from './SqlResultTabs/SqlScriptErrorService.js';
 
-@injectable(() => [ActionService, MenuService, SqlResultTabsService])
+@injectable(() => [ActionService, MenuService, SqlResultTabsService, SqlScriptErrorService])
 export class SqlEditorGroupTabsBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly sqlResultTabsService: SqlResultTabsService,
+    private readonly sqlScriptErrorService: SqlScriptErrorService,
   ) {
     super();
   }
 
   override register(): void {
+    this.sqlScriptErrorService.register();
+
     this.menuService.addCreator({
       menus: [MENU_TAB],
       contexts: [DATA_CONTEXT_SQL_EDITOR_RESULT_ID, DATA_CONTEXT_SQL_EDITOR_STATE],

@@ -81,7 +81,17 @@ export const ConnectionForm = observer<IConnectionFormComponentProps>(function C
   }));
 
   return (
-    <Form context={form} contents>
+    <Form
+      context={form}
+      contents
+      onInvalidCapture={event => {
+        const target = event.target;
+
+        if (target instanceof HTMLElement && target.getClientRects().length === 0) {
+          event.preventDefault();
+        }
+      }}
+    >
       <TabsState container={connectionFormService.parts} localState={formState.parts} orientation="vertical" formState={formState}>
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>

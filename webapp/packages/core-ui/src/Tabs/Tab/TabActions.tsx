@@ -7,13 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Icon, s, useS, useTranslate, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
+import { Icon, s, useS, type IContextMenuPosition } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 
 import type { ITabsContext } from '../TabsContext.js';
 import TabStyle from './Tab.module.css';
 import style from './TabActions.module.css';
 import { TabMenu } from './TabMenu.js';
+import { TabAction } from './TabAction.js';
 
 interface TabActionsProps {
   tabId: string;
@@ -46,22 +47,5 @@ export const TabActions = observer(function TabActions({
         </div>
       </TabMenu>
     </div>
-  );
-});
-
-interface TabActionProps {
-  iconName: string;
-  title?: string;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-}
-
-const TabAction = observer(function TabAction({ iconName, title, onClick }: TabActionProps) {
-  const styles = useS(TabStyle, style);
-  const translate = useTranslate();
-
-  return (
-    <button type="button" className={s(styles, { tabAction: true })} title={translate(title)} onClick={onClick}>
-      <Icon className={s(styles, { icon: true })} name={iconName} viewBox="0 0 7 8" />
-    </button>
   );
 });

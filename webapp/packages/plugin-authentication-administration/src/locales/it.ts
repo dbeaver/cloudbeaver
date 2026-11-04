@@ -26,6 +26,7 @@ export default [
   ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
   ['authentication_administration_user_auth_method_no_details', 'No details available'],
   ['authentication_administration_item', 'Users and Teams'],
+  ['authentication_administration_create_user', 'Crea utente'],
   ['authentication_administration_tools_add_tooltip', 'Create new user'],
   ['authentication_administration_tools_refresh_tooltip', 'Aggiorna la lista utenti'],
   ['authentication_administration_tools_delete_tooltip', 'Elimina gli utenti selezionati'],
@@ -68,6 +69,8 @@ export default [
     'Are you sure you want to delete "{arg:originName}" auth method from "{arg:userId}"?',
   ],
 
+  ['administration_teams_search_placeholder', 'Cerca team...'],
+  ['administration_teams_create', 'Crea team'],
   ['administration_teams_team_info_created', 'Team created'],
   ['administration_teams_team_info_updated', 'Team updated'],
   ['administration_teams_team_info_id_invalid', "Field '{alias:administration_teams_team_id}' can't be empty"],

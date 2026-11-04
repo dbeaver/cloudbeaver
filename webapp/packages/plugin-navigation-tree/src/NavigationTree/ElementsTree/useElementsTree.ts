@@ -32,7 +32,11 @@ import type { INavTreeNodeInfo } from './INavTreeNodeInfo.js';
 import type { NavigationNodeRendererComponent } from './NavigationNodeComponent.js';
 import { transformNodeInfo } from './transformNodeInfo.js';
 
-export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
+export interface IElementsTreeCustomRenderer {
+  readonly matches: (nodeId: string) => boolean;
+  readonly Component: NavigationNodeRendererComponent;
+}
+
 export type IElementsTreeCustomNodeInfo = (nodeId: string, info: INavTreeNodeInfo) => INavTreeNodeInfo;
 
 export interface IElementsTreeNodeExpandedInfo {

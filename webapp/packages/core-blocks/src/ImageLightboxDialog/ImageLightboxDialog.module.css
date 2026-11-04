@@ -1,0 +1,41 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.lightbox {
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  width: calc(100vw - 2rem);
+  height: calc(100vh - 2rem);
+  height: calc(100dvh - 2rem);
+  max-width: none;
+  padding: 3rem 0 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: zoom-out;
+}
+
+.image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  cursor: default;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: var(--theme-surface);
+  color: var(--theme-on-surface);
+}
