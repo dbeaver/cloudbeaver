@@ -120,7 +120,8 @@ export class ConnectionAuthService {
       this.networkHandlerResource.load(CachedMapAllKey),
     ]);
 
-    const externalHandlers = new Set(await this.connectionInfoExternalNetworkHandlersService.getProvidedHandlers(key));
+    // Profile credentials are managed separately in Change credentials, but may be required when connecting.
+    const externalHandlers = new Set(resetCredentials ? await this.connectionInfoExternalNetworkHandlersService.getProvidedHandlers(key) : []);
     const networkHandlers = connectionNetworkHandlers
       .networkHandlersConfig!.filter(handler => {
         const target = handlers.find(h => h.id === handler.id);
