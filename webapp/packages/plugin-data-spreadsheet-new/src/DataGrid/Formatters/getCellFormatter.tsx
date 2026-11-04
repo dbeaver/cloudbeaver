@@ -5,14 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observer } from 'mobx-react-lite';
-import { useContext, useRef } from 'react';
-
 import { isBooleanValuePresentationAvailable, type IGridDataKey } from '@cloudbeaver/plugin-data-viewer';
 
-import { CellContext } from '../CellRenderer/CellContext.js';
-import { useFormattingContext } from '../FormattingContext.js';
-import { TableDataContext, type ITableData } from '../TableDataContext.js';
+import type { ITableData } from '../TableDataContext.js';
 import { BlobFormatter } from './CellFormatters/BlobFormatter.js';
 import { BooleanFormatter } from './CellFormatters/BooleanFormatter.js';
 import { TextFormatter } from './CellFormatters/TextFormatter.js';
@@ -56,39 +51,25 @@ const formatterSelectors: FormatterSelector[] = [
   },
 ];
 
-export const CellFormatterFactory = observer<ICellFormatterProps>(function CellFormatterFactory(props) {
-  const formatterRef = useRef<React.FC<ICellFormatterProps> | null>(null);
-  const tableDataContext = useContext(TableDataContext);
-  const formattingContext = useFormattingContext();
-  const cellContext = useContext(CellContext);
+export function getCellFormatter(tableDataContext: ITableData, cell: IGridDataKey | undefined, hasFormatters: boolean): React.FC<ICellFormatterProps> {
+  if (!cell) {
+    return IndexFormatter;
+  }
 
-  if (formatterRef.current === null) {
-    formatterRef.current = TextFormatter;
+  const context: IFormatterContext = {
+    tableDataContext,
+    hasFormatters,
+    holder: tableDataContext.getCellHolder(cell),
+    resultColumn: tableDataContext.getColumnInfo(cell.column),
+  };
 
-    if (cellContext.cell) {
-      const holder = tableDataContext.getCellHolder(cellContext.cell);
-      const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
-      const context: IFormatterContext = {
-        tableDataContext,
-        hasFormatters: formattingContext.formatters !== null,
-        holder,
-        resultColumn,
-      };
+  for (const selector of formatterSelectors) {
+    const formatter = selector(context, cell);
 
-      for (const selector of formatterSelectors) {
-        const formatter = selector(context, cellContext.cell);
-
-        if (formatter) {
-          formatterRef.current = formatter;
-          break;
-        }
-      }
-    } else {
-      formatterRef.current = IndexFormatter;
+    if (formatter) {
+      return formatter;
     }
   }
 
-  const Formatter = formatterRef.current!;
-
-  return <Formatter {...props} />;
-});
+  return TextFormatter;
+}
