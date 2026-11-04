@@ -28,6 +28,7 @@ export default [
   ['plugin_connections_connection_form_host_invalid', "Trường 'Máy chủ' không được để trống"],
   ['plugin_connections_connection_folder_delete_confirmation', 'Bạn sắp xóa "{arg:name}". Các kết nối sẽ không bị xóa. Bạn có chắc không?'],
   ['plugin_connections_menu_connections_label', 'Kết nối'],
+  ['plugin_connections_menu_security_label', 'Bảo mật'],
   ['plugin_connections_action_disconnect_all_label', 'Ngắt tất cả kết nối'],
   ['plugin_connections_settings', 'Kết nối'],
   ['plugin_connections_settings_hide_connections_view_name', 'Ẩn kết nối'],
@@ -48,4 +49,6 @@ export default [
   ['plugin_connections_connection_client_version', 'Phiên bản máy khách: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Phiên bản máy chủ: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Thời gian kết nối: {arg:time} \n'],
+
+  ['plugin_connections_change_db_password_menu_title', 'Đổi mật khẩu cơ sở dữ liệu hiện tại'],
 ];
