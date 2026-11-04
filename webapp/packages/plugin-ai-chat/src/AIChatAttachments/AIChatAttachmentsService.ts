@@ -220,8 +220,17 @@ export class AIChatAttachmentsService {
       return;
     }
 
-    event.dataTransfer.dropEffect = disabled ? 'none' : 'copy';
-    state.setDragOver(!disabled);
+    const acceptedTypes = new Set(
+      this.accept
+        .split(',')
+        .map(type => type.trim())
+        .filter(Boolean),
+    );
+
+    const canDrop = !disabled && Array.from(event.dataTransfer.items).some(item => item.kind === 'file' && acceptedTypes.has(item.type));
+
+    event.dataTransfer.dropEffect = canDrop ? 'copy' : 'none';
+    state.setDragOver(canDrop);
   }
 
   async attachFiles(input: IAIChatInputContext, files: File[]): Promise<void> {

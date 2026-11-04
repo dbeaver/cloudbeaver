@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const AI_PROFILES_TABLE_ROW_HEIGHT = 36;
+export default [['plugin_localization_administration_language', 'Язык']];

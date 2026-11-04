@@ -30,6 +30,7 @@
     "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-executor": "workspace:*",
+    "@cloudbeaver/core-links": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-projects": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
@@ -37,7 +38,6 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
-    "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-administration": "workspace:*",
     "@cloudbeaver/plugin-authentication": "workspace:*",
     "@cloudbeaver/plugin-data-grid": "workspace:*",
@@ -53,6 +53,7 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^19",
+    "@types/react-dom": "^19",
     "rimraf": "^6",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
