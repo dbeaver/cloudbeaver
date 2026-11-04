@@ -16,13 +16,12 @@ import {
   s,
   SContext,
   Split,
-  useExecutor,
   useS,
   useSplitUserState,
   type StyleRegistry,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { LeftBarPanelService, SideBarPanel, SideBarPanelService, TabStyles } from '@cloudbeaver/core-ui';
+import { LeftBarPanelService, SideBarPanel, SideBarPanelService, TabStyles, useSidebarActivationHost } from '@cloudbeaver/core-ui';
 
 import { PANEL_ID_LEFT_SIDEBAR, PANEL_ID_RIGHT_SIDEBAR } from './AppScreenService.js';
 import { RightArea } from './RightArea.js';
@@ -50,15 +49,30 @@ export const Main = observer(function Main() {
   const sideBarDisabled = getComputed(() => sideBarPanelService.tabsContainer.getDisplayed().length === 0);
   const leftBarDisabled = getComputed(() => leftBarPanelService.tabsContainer.getDisplayed().length === 0);
 
-  useExecutor({
-    executor: sideBarPanelService.tabsContainer.onTabSelect,
-    handlers: [
-      function showPanel() {
-        if (splitRightState.mode === 'minimize' && !sideBarDisabled) {
-          splitRightState.onModeChange?.('resize');
-        }
-      },
-    ],
+  useSidebarActivationHost(leftBarPanelService.tabsContainer, {
+    isVisible: () => !leftBarDisabled && splitMainState.mode !== 'minimize',
+    reveal() {
+      if (!leftBarDisabled && splitMainState.mode === 'minimize') {
+        splitMainState.onModeChange?.('resize');
+      }
+    },
+  });
+
+  useSidebarActivationHost(sideBarPanelService.tabsContainer, {
+    isVisible: () => !sideBarDisabled && splitMainState.mode !== 'maximize' && splitRightState.mode !== 'minimize',
+    reveal() {
+      if (sideBarDisabled) {
+        return;
+      }
+
+      if (splitMainState.mode === 'maximize') {
+        splitMainState.onModeChange?.('resize');
+      }
+
+      if (splitRightState.mode === 'minimize') {
+        splitRightState.onModeChange?.('resize');
+      }
+    },
   });
 
   return (
