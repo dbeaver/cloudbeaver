@@ -194,16 +194,40 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       id: 'connection-security',
       menus: [MENU_CONNECTION_SECURITY],
       getLoader: context => getSecurityMenuLoaders(context.get(DATA_CONTEXT_CONNECTION)!),
+      isDisabled: context => getSecurityMenuLoaders(context.get(DATA_CONTEXT_CONNECTION)!).some(loader => !loader.isLoaded()),
       isHidden: context => {
-        const items = this.menuService.getMenuItemCreators(context);
-        const loaders = getSecurityMenuLoaders(context.get(DATA_CONTEXT_CONNECTION)!);
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const loaders = getSecurityMenuLoaders(connectionKey);
 
         // Keep the submenu available until its visibility data has loaded.
         if (loaders.some(loader => !loader.isLoaded())) {
           return false;
         }
 
-        return this.menuService.getMenu(context, items).every(item => item.hidden);
+        const connection = this.connectionInfoResource.get(connectionKey);
+
+        if (!connection) {
+          return true;
+        }
+
+        const driver = this.dbDriverResource.get(connection.driverId);
+
+        return !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'connection-change-db-password',
+      menus: [MENU_CONNECTION_SECURITY],
+      actions: [ACTION_CONNECTION_CHANGE_DB_PASSWORD],
+      contexts: [DATA_CONTEXT_CONNECTION],
+      handler: async context => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+
+        await this.commonDialogService.open(ChangeDatabasePasswordDialog, {
+          projectId: connectionKey.projectId,
+          connectionId: connectionKey.connectionId,
+        });
       },
     });
 
@@ -287,12 +311,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'connection-management',
-      actions: [
-        ACTION_CONNECTION_CHANGE_DB_PASSWORD,
-        ACTION_CONNECTION_CHANGE_CREDENTIALS,
-        ACTION_CONNECTION_DISCONNECT,
-        ACTION_CONNECTION_DISCONNECT_ALL,
-      ],
+      actions: [ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -322,18 +341,9 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           return !!driver?.anonymousAccess || !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
         }
 
-        if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
-          const driver = this.dbDriverResource.get(connection.driverId);
-          return !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
-        }
-
         return true;
       },
       getLoader: (context, action) => {
-        if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
-          return [];
-        }
-
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
         const loaders = [getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true)];
 
@@ -365,15 +375,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
           case ACTION_CONNECTION_CHANGE_CREDENTIALS: {
             await this.connectionsManagerService.requireConnection({ connectionId: connection.id, projectId: connection.projectId }, true);
-            break;
-          }
-
-          case ACTION_CONNECTION_CHANGE_DB_PASSWORD: {
-            await this.commonDialogService.open(ChangeDatabasePasswordDialog, {
-              projectId: connection.projectId,
-              connectionId: connection.id,
-            });
-
             break;
           }
         }
