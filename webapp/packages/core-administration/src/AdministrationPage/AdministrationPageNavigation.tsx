@@ -12,5 +12,5 @@ import type { ComponentPropsWithRef } from 'react';
 import { clsx } from '@dbeaver/ui-kit';
 
 export const AdministrationPageNavigation = observer<ComponentPropsWithRef<'div'>>(function AdministrationPageNavigation({ className, ...props }) {
-  return <div {...props} className={clsx('tw:row-start-2 tw:col-start-1 tw:min-w-0', className)} />;
+  return <div {...props} className={clsx('tw:row-start-2 tw:col-start-1 tw:min-w-0 tw:-mt-2 tw:pb-5', className)} />;
 });

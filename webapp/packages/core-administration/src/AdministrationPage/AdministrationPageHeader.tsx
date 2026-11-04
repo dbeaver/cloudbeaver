@@ -26,7 +26,7 @@ export const AdministrationPageHeader = observer<IAdministrationPageHeaderProps>
     <header
       {...props}
       className={clsx(
-        'tw:row-start-1 tw:col-start-1 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-6 tw:gap-y-4 tw:mb-4',
+        'tw:row-start-1 tw:col-start-1 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-6 tw:gap-y-4 tw:mb-6',
         className,
       )}
     >

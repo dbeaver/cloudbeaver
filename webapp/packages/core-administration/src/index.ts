@@ -30,3 +30,4 @@ export type { IAdministrationPageHeaderProps } from './AdministrationPage/Admini
 export { default as AdministrationTableStyles } from './AdministrationTable/AdministrationTable.module.css';
 export * from './AdministrationTable/ADMINISTRATION_TABLE_CONFIG.js';
 export { AdministrationTable } from './AdministrationTable/AdministrationTableLazy.js';
+export type { IAdministrationTableColumn } from './AdministrationTable/IAdministrationTableColumn.js';
