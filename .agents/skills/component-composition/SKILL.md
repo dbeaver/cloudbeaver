@@ -9,6 +9,9 @@ Keep layout and behavior with the component; let its caller supply finished piec
 Design the interface around the component's own responsibilities. Let callers compose content
 and actions instead of configuring nested UI through data, flags, and callbacks.
 
+Keep one component implementation per production file, including local components and compound parts.
+Move a second component to its own file and compose it through imports.
+
 Components must have no more than **five props**, excluding `children` and UI slots.
 If an interface exceeds this limit, use composition to move UI regions and their configuration
 to the caller. Only genuine UI slots are exempt; renaming a configuration prop does not make it a slot.

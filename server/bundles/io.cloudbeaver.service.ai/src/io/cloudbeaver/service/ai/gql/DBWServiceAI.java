@@ -23,6 +23,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.service.ai.model.*;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
+import io.cloudbeaver.service.ai.model.inputs.WebAIChatAttachmentInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIChatConversationInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIConfigurationProfileInput;
 import io.cloudbeaver.service.ai.model.inputs.WebAIDataSourceSettingsInput;
@@ -140,7 +141,8 @@ public interface DBWServiceAI extends DBWService {
     WebAISendChatMessageInfo asyncSendChatMessage(
         @NotNull WebSession webSession,
         @NotNull String conversationId,
-        @NotNull String prompt
+        @NotNull String prompt,
+        @Nullable WebAIChatAttachmentInput[] attachments
     ) throws DBWebException;
 
     @WebAction
