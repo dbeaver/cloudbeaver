@@ -14,10 +14,12 @@ import { useService } from '@cloudbeaver/core-di';
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import {
   ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_NAME_COLUMN_WIDTH,
   ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT,
   ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH,
   AdministrationTable,
   AdministrationTableStyles,
+  type IAdministrationTableColumn,
 } from '@cloudbeaver/core-administration';
 import { DataGrid, useCellCopy, useCreateGridReactiveValue, TableRowSelect } from '@cloudbeaver/plugin-data-grid';
 
@@ -28,12 +30,12 @@ interface Props {
   teams: TeamInfo[];
 }
 
-const SELECT_COLUMN = { key: 'select', label: '' };
-const ID_COLUMN = { key: 'id', label: 'administration_teams_team_id' };
+const SELECT_COLUMN = { key: 'select', label: '', width: ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH };
+const ID_COLUMN = { key: 'id', label: 'administration_teams_team_id', width: ADMINISTRATION_TABLE_DEFAULT_NAME_COLUMN_WIDTH };
 const NAME_COLUMN = { key: 'name', label: 'administration_teams_team_name' };
 const DESCRIPTION_COLUMN = { key: 'description', label: 'administration_teams_team_description' };
 
-const COLUMNS = [SELECT_COLUMN, ID_COLUMN, NAME_COLUMN, DESCRIPTION_COLUMN];
+const COLUMNS: IAdministrationTableColumn[] = [SELECT_COLUMN, ID_COLUMN, NAME_COLUMN, DESCRIPTION_COLUMN];
 
 export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
   const translate = useTranslate();
@@ -123,7 +125,7 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams }) {
         getHeaderResizable={colIdx => colIdx > 0}
         getHeaderHeight={() => ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT}
         getRowHeight={() => ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT}
-        getHeaderWidth={colIdx => (colIdx === 0 ? ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH : 'auto')}
+        getHeaderWidth={colIdx => COLUMNS[colIdx]?.width ?? 'auto'}
         getHeaderPinned={colIdx => colIdx <= 0}
         headerText={headerText}
         headerElement={headerElement}
