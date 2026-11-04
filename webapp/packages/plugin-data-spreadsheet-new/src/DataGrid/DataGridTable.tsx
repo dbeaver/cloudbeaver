@@ -67,6 +67,7 @@ import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionC
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
 import './DataGridTable.css';
 import { CellFormatter } from './Formatters/CellFormatter.js';
+import { getCellFormatter } from './Formatters/getCellFormatter.js';
 import { FormattingContext } from './FormattingContext.js';
 import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
@@ -400,10 +401,23 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const headerHeight = getComputed(() => (tableData.hasDescription ? HEADER_WITH_DESC_HEIGHT : HEADER_HEIGHT));
 
   function getCell(rowIdx: number, colIdx: number) {
-    return <CellFormatter rowIdx={rowIdx} colIdx={colIdx} />;
+    const row = tableData.getRow(rowIdx);
+    const column = tableData.getColumn(colIdx)?.key;
+    const key = row && column ? { row, column } : undefined;
+    const Formatter = getCellFormatter(tableData, key, formatting.formatters !== null);
+
+    return (
+      <CellFormatter>
+        <Formatter rowIdx={rowIdx} colIdx={colIdx} />
+      </CellFormatter>
+    );
   }
 
-  const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), []);
+  const cell = useCreateGridReactiveValue(
+    getCell,
+    (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange),
+    [tableData, formatting],
+  );
 
   function getCellText(rowIdx: number, colIdx: number) {
     const row = tableData.rows[rowIdx];

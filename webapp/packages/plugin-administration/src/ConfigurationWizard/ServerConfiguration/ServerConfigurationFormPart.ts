@@ -15,6 +15,7 @@ import {
   PasswordPolicyResource,
   ProductInfoResource,
   ServerConfigResource,
+  ServerSettingsService,
   DEFAULT_NAVIGATOR_VIEW_SETTINGS,
 } from '@cloudbeaver/core-root';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
@@ -60,6 +61,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     private readonly passwordPolicyResource: PasswordPolicyResource,
     private readonly passwordPolicyService: PasswordPolicyService,
     private readonly localizationService: LocalizationService,
+    private readonly serverSettingsService: ServerSettingsService,
   ) {
     super(formState, DEFAULT_STATE_GETTER(), ServerConfigStateSchema);
   }
@@ -115,6 +117,9 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
   }
 
   protected override async saveChanges() {
+    const shouldSaveProductConfiguration = this.administrationScreenService.isConfigurationMode && this.serverSettingsService.isEdited();
+    const productConfiguration = shouldSaveProductConfiguration ? this.serverSettingsService.getChanges() : undefined;
+
     if (!isObjectsEqual(this.state.navigatorConfig, this.initialState.navigatorConfig)) {
       await this.defaultNavigatorSettingsResource.save(this.state.navigatorConfig);
     }
@@ -123,6 +128,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     const { adminPasswordRepeat, ...serverConfigToSave } = this.state.serverConfig;
     await this.serverConfigResource.save({
       ...serverConfigToSave,
+      productConfiguration,
       supportedHosts: Array.from(
         new Set(
           this.state.serverConfig.supportedHosts

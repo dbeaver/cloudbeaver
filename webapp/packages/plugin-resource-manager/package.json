@@ -27,7 +27,6 @@
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-projects": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
-    "@cloudbeaver/core-resource-manager": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-settings": "workspace:*",

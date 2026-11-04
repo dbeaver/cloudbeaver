@@ -32,6 +32,7 @@ export default [
   ['plugin_connections_connection_form_host_invalid', "Поле 'Хост' не может быть пустым"],
   ['plugin_connections_connection_folder_delete_confirmation', 'Вы удаляете "{arg:name}". Подключения не будут удалены. Вы уверены?'],
   ['plugin_connections_menu_connections_label', 'Подключение'],
+  ['plugin_connections_menu_security_label', 'Безопасность'],
   ['plugin_connections_action_disconnect_all_label', 'Отключить все'],
   ['plugin_connections_settings', 'Подключения'],
   ['plugin_connections_settings_hide_connections_view_name', 'Скрыть управление отображением подключений'],
@@ -54,4 +55,6 @@ export default [
   ['plugin_connections_connection_connection_time', 'Время подключения: {arg:time} \n'],
 
   ['plugin_connections_connection_type_label', 'Тип подключения'],
+
+  ['plugin_connections_change_db_password_menu_title', 'Изменить текущий пароль базы данных'],
 ];

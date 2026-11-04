@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 
 import { Shortcut } from './Shortcut.js';
-import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA.js';
+import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS, TREE_SHORTCUTS } from './SHORTCUTS_DATA.js';
 import style from './ShortcutsDialog.module.css';
 
 export const ShortcutsDialog: DialogComponent = function ShortcutsDialog({ rejectDialog }) {
@@ -62,6 +62,12 @@ export const ShortcutsDialog: DialogComponent = function ShortcutsDialog({ rejec
               </Link>
             </GroupTitle>
             {NAVIGATION_TREE_SHORTCUTS.map(shortcut => (
+              <Shortcut key={shortcut.label} shortcut={shortcut} />
+            ))}
+          </Group>
+          <Group box gap dense overflow>
+            <GroupTitle header>{translate('tree_shortcuts_title')}</GroupTitle>
+            {TREE_SHORTCUTS.map(shortcut => (
               <Shortcut key={shortcut.label} shortcut={shortcut} />
             ))}
           </Group>

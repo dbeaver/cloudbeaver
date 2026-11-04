@@ -36,7 +36,11 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
 
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { input, dragHandlers } = useAIChatInput({ conversationId: currentConversationId, connectionKey: context.connectionKey, textareaRef });
+  const { input, dragHandlers, onPaste } = useAIChatInput({
+    conversationId: currentConversationId,
+    connectionKey: context.connectionKey,
+    textareaRef,
+  });
 
   useExecutor({
     executor: aiChatConversationsService.onNewConversation,
@@ -101,6 +105,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
             readOnly={aiChatConversationsService.processing}
             autoFocus
             onChange={v => setValue(v)}
+            onPaste={context.disabled ? undefined : onPaste}
           />
           <Suspense fallback={null}>
             <Placeholder container={aiChatInputService.dragPreview} input={input} />
@@ -108,11 +113,17 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
           <div className={s(styles, { actions: true })}>
             <AIChatAttachmentsButton input={input} />
             {!aiChatConversationsService.processing ? (
-              <ActionIconButton name="/icons/send.svg" disabled={disabled} img onClick={sendMessage} />
+              <ActionIconButton
+                name="/icons/send.svg"
+                aria-label={translate('plugin_ai_chat_send_message')}
+                disabled={disabled}
+                img
+                onClick={sendMessage}
+              />
             ) : (
               <Command
                 className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
-                aria-label={translate('ui_processing_cancel')}
+                aria-label={translate('ui_processing_stop')}
                 onClick={cancel}
               >
                 <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />

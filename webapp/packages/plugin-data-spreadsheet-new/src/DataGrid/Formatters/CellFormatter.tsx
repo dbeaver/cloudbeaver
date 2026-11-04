@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { use, useContext } from 'react';
+import { use, useContext, type PropsWithChildren } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
 import { getComputed, IconButton, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
@@ -14,15 +14,9 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 
 import { CellContext } from '../CellRenderer/CellContext.js';
 import style from './CellFormatter.module.css';
-import { CellFormatterFactory } from './CellFormatterFactory.js';
 import { TableMenuContext } from '../CellRenderer/TableMenuContext.js';
 
-interface Props {
-  rowIdx: number;
-  colIdx: number;
-}
-
-export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, colIdx }) {
+export const CellFormatter = observer<PropsWithChildren>(function CellFormatter({ children }) {
   const innerCellContext = use(DataGridCellInnerContext);
   const cellContext = useContext(CellContext);
   const tableMenuContext = use(TableMenuContext);
@@ -54,7 +48,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   return (
     <div className={s(styles, { wrapper: true })}>
       <div className={s(styles, { container: true })}>
-        <CellFormatterFactory rowIdx={rowIdx} colIdx={colIdx} />
+        {children}
       </div>
       {showCellMenu && (
         <span>

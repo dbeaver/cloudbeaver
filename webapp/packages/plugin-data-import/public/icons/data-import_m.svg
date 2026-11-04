@@ -1,5 +1,4 @@
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_11584_7)">
 <g clip-path="url(#clip1_11584_7)">
 <path d="M13.5714 10.4286L22.4382 1.56987" stroke="#3387C5" stroke-width="1.5" stroke-miterlimit="10"/>
 <rect x="1" y="1" width="15.7143" height="1.57143" fill="#3387C5"/>
@@ -8,11 +7,7 @@
 <rect x="2.57143" y="1" width="22" height="1.57143" transform="rotate(90 2.57143 1)" fill="#3387C5"/>
 <path d="M13.5714 6.5V10.4286H17.5V12H12V6.5H13.5714Z" fill="#3387C5"/>
 </g>
-</g>
 <defs>
-<clipPath id="clip0_11584_7">
-<rect width="24" height="24" fill="white"/>
-</clipPath>
 <clipPath id="clip1_11584_7">
 <rect width="22" height="22" fill="white" transform="translate(1 1)"/>
 </clipPath>

@@ -1,5 +1,7 @@
 export default [
   ['shortcuts_title', 'Shortcuts'],
+  ['tree_shortcuts_title', 'Tất cả cây'],
+  ['tree_shortcut_collapse_all', 'Thu gọn tất cả các nút trong cây đang có tiêu điểm'],
 
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],

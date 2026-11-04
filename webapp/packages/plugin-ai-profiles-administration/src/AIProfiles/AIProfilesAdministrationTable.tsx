@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { useService } from '@cloudbeaver/core-di';
-import { useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { AIProfilesTable, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
@@ -40,13 +40,24 @@ export const AIProfilesAdministrationTable = observer<Props>(function AIProfiles
       nameLabel="plugin_ai_administration_profile_column_name"
       engineLabel="plugin_ai_administration_profile_column_engine"
       emptyPlaceholder="plugin_ai_administration_profiles_table_empty_placeholder"
+      additionalColumns={[
+        {
+          key: 'scope',
+          minWidth: 120,
+          label: 'plugin_ai_profiles_scope',
+          render: profile => (
+            <div className="tw:flex tw:items-center tw:gap-2">
+              {profile.global && <IconOrImage icon="document-global" width={16} />}
+              <span>{translate(profile.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user')}</span>
+            </div>
+          ),
+        },
+      ]}
       selectionDisabled={deletionDisabled}
       processing={processing}
       isProfileSelectable={profile => !isDefaultProfile(profile.id)}
       isProfileDeletable={profile => !deletionDisabled && !isDefaultProfile(profile.id)}
-      getSelectionTitle={profile =>
-        isDefaultProfile(profile.id) ? translate('plugin_ai_administration_profile_default_delete_info') : undefined
-      }
+      getSelectionTitle={profile => (isDefaultProfile(profile.id) ? translate('plugin_ai_administration_profile_default_delete_info') : undefined)}
       getProfileBadge={profile =>
         isDefaultProfile(profile.id) ? (
           <span className="tw:text-xs tw:opacity-60 tw:whitespace-nowrap">{translate('plugin_ai_administration_profile_default_badge')}</span>

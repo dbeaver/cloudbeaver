@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,13 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AuthProvidersResource, PasswordPolicyService } from '@cloudbeaver/core-authentication';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
-import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
+import {
+  DefaultNavigatorSettingsResource,
+  PasswordPolicyResource,
+  ProductInfoResource,
+  ServerConfigResource,
+  ServerSettingsService,
+} from '@cloudbeaver/core-root';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
@@ -27,6 +33,7 @@ export function getServerConfigurationFormPart(formState: IFormState<null>): Ser
     const passwordPolicyResource = di.getService(PasswordPolicyResource);
     const passwordPolicyService = di.getService(PasswordPolicyService);
     const localizationService = di.getService(LocalizationService);
+    const serverSettingsService = di.getService(ServerSettingsService);
 
     return new ServerConfigurationFormPart(
       formState,
@@ -38,6 +45,7 @@ export function getServerConfigurationFormPart(formState: IFormState<null>): Ser
       passwordPolicyResource,
       passwordPolicyService,
       localizationService,
+      serverSettingsService,
     );
   });
 }
