@@ -15,7 +15,7 @@ export const AdministrationPageContent = observer<ComponentPropsWithRef<'div'>>(
   return (
     <div
       {...props}
-      className={clsx('tw:row-start-3 tw:col-start-1 tw:flex tw:flex-col tw:min-w-0 tw:min-h-0 tw:gap-5 tw:pt-5 tw:overflow-auto', className)}
+      className={clsx('tw:row-start-3 tw:col-start-1 tw:flex tw:flex-col tw:min-w-0 tw:min-h-0 tw:gap-5 tw:overflow-auto', className)}
     />
   );
 });

@@ -32,6 +32,8 @@ export const WEBSITE_LINKS = {
   DATABASE_NAVIGATOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Database-Navigator/',
   USERS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Users/',
   TEAMS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Teams/',
+  PROJECTS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/team-edition/Projects/',
+  GLOBAL_PERMISSIONS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Global-Permissions/',
   DRIVERS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Drivers-Management/',
   AUTHENTICATION_METHODS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Authentication-methods/',
   CLOUD_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Cloud-Explorer/#cloud-configuration',
