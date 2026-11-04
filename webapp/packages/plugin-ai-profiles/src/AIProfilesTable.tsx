@@ -54,7 +54,7 @@ export interface IAIProfilesTableProps {
 }
 
 const SELECT_COLUMN = { key: 'select', label: '', width: ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH };
-const NAME_COLUMN = { key: 'name', minWidth: 160 };
+const NAME_COLUMN = { key: 'name', minWidth: 160, width: 160 };
 const ENGINE_COLUMN = { key: 'engine', width: 160 };
 
 export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfilesTable({
