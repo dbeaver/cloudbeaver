@@ -15,7 +15,6 @@ import {
   DATA_CONTEXT_CONNECTION,
   DBDriverResource,
   EConnectionFeature,
-  type IConnectionInfoParams,
   isConnectionNode,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -185,25 +184,19 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
     });
 
-    const getSecurityMenuLoaders = (connectionKey: IConnectionInfoParams) => [
-      getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey),
-      getCachedMapResourceLoaderState(this.dbDriverResource, () => this.connectionInfoResource.get(connectionKey)?.driverId ?? null),
-    ];
-
     this.menuService.setHandler({
       id: 'connection-security',
       menus: [MENU_CONNECTION_SECURITY],
-      getLoader: context => getSecurityMenuLoaders(context.get(DATA_CONTEXT_CONNECTION)!),
-      isDisabled: context => getSecurityMenuLoaders(context.get(DATA_CONTEXT_CONNECTION)!).some(loader => !loader.isLoaded()),
+      getLoader: context => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+
+        return [
+          getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey),
+          getCachedMapResourceLoaderState(this.dbDriverResource, () => this.connectionInfoResource.get(connectionKey)?.driverId ?? null),
+        ];
+      },
       isHidden: context => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
-        const loaders = getSecurityMenuLoaders(connectionKey);
-
-        // Keep the submenu available until its visibility data has loaded.
-        if (loaders.some(loader => !loader.isLoaded())) {
-          return false;
-        }
-
         const connection = this.connectionInfoResource.get(connectionKey);
 
         if (!connection) {
