@@ -50,18 +50,19 @@ export const Main = observer(function Main() {
   const leftBarDisabled = getComputed(() => leftBarPanelService.tabsContainer.getDisplayed().length === 0);
 
   useSidebarActivationHost(leftBarPanelService.tabsContainer, {
-    isVisible: () => !leftBarDisabled && splitMainState.mode !== 'minimize',
+    isVisible: () => leftBarPanelService.tabsContainer.getDisplayed().length > 0 && splitMainState.mode !== 'minimize',
     reveal() {
-      if (!leftBarDisabled && splitMainState.mode === 'minimize') {
+      if (leftBarPanelService.tabsContainer.getDisplayed().length > 0 && splitMainState.mode === 'minimize') {
         splitMainState.onModeChange?.('resize');
       }
     },
   });
 
   useSidebarActivationHost(sideBarPanelService.tabsContainer, {
-    isVisible: () => !sideBarDisabled && splitMainState.mode !== 'maximize' && splitRightState.mode !== 'minimize',
+    isVisible: () =>
+      sideBarPanelService.tabsContainer.getDisplayed().length > 0 && splitMainState.mode !== 'maximize' && splitRightState.mode !== 'minimize',
     reveal() {
-      if (sideBarDisabled) {
+      if (sideBarPanelService.tabsContainer.getDisplayed().length === 0) {
         return;
       }
 
