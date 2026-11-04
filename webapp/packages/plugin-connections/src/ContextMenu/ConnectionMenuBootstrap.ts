@@ -15,6 +15,7 @@ import {
   DATA_CONTEXT_CONNECTION,
   DBDriverResource,
   EConnectionFeature,
+  type IConnectionInfoParams,
   isConnectionNode,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -184,14 +185,20 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
     });
 
+    const getSecurityMenuLoaders = (connectionKey: IConnectionInfoParams) => [
+      getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey),
+      getCachedMapResourceLoaderState(this.dbDriverResource, () => this.connectionInfoResource.get(connectionKey)?.driverId ?? null),
+    ];
+
     this.menuService.setHandler({
       id: 'connection-security',
       menus: [MENU_CONNECTION_SECURITY],
+      getLoader: context => getSecurityMenuLoaders(context.get(DATA_CONTEXT_CONNECTION)!),
       isHidden: context => {
         const items = this.menuService.getMenuItemCreators(context);
-        const loaders = this.menuService.getMenuItemLoaders(context, items);
+        const loaders = getSecurityMenuLoaders(context.get(DATA_CONTEXT_CONNECTION)!);
 
-        // Keep the submenu available until its actions have loaded their permissions.
+        // Keep the submenu available until its visibility data has loaded.
         if (loaders.some(loader => !loader.isLoaded())) {
           return false;
         }
@@ -323,10 +330,14 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         return true;
       },
       getLoader: (context, action) => {
+        if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
+          return [];
+        }
+
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
         const loaders = [getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true)];
 
-        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS || action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
+        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           loaders.push(
             getCachedMapResourceLoaderState(this.dbDriverResource, () => this.connectionInfoResource.get(connectionKey)?.driverId ?? null),
           );
