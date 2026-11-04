@@ -61,6 +61,49 @@ function service(overrides: Partial<ConstructorParameters<typeof MenuModel>[0]> 
 }
 
 describe('MenuModel', () => {
+  it('retries the latest failed target after waiting for an in-flight load', async () => {
+    const first = resource();
+    const second = resource();
+    second.state.error = new Error('second failed');
+    second.loader.reload = vi.fn(async () => {
+      runInAction(() => {
+        second.state.error = null;
+      });
+      await second.loader.load();
+    });
+    let release!: () => void;
+    first.loader.load = () =>
+      new Promise<void>(resolve => {
+        release = resolve;
+      });
+    const key = observable.box('first');
+    const current = () => (key.get() === 'first' ? first.loader : second.loader);
+    const loader: ILoadableState = {
+      get exception() {
+        return current().exception;
+      },
+      isLoaded: () => current().isLoaded(),
+      isLoading: () => current().isLoading(),
+      isError: () => current().isError(),
+      load: () => current().load(),
+      captureRequest() {
+        const state = current();
+        return { state, isCurrent: () => current() === state };
+      },
+    };
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
+    const stop = model.start();
+    const loading = model.load();
+    const retry = model.reload();
+    runInAction(() => key.set('second'));
+    release();
+    await Promise.all([loading, retry]);
+    expect(second.loader.reload).toHaveBeenCalledOnce();
+    expect(model.exception).toBeNull();
+    expect(model.isLoaded()).toBe(true);
+    stop();
+  });
+
   it('loads a new target after retrying the previous target fails', async () => {
     const first = resource();
     const second = resource();
@@ -416,24 +459,34 @@ describe('MenuModel', () => {
   it('ignores an old request failure after the context switches to a different object', async () => {
     const key = createDataContext<string>('connection');
     let reject!: (error: Error) => void;
-    const loader = resource().loader;
-    loader.load = () =>
+    const first = resource();
+    const second = resource();
+    first.loader.load = () =>
       new Promise<void>((_, rejectLoad) => {
         reject = rejectLoad;
       });
-    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu);
-    loader.captureRequest = () => {
-      const connection = model.context.get(key);
-      return { state: loader, isCurrent: () => model.context.get(key) === connection };
+    const context = new DataContext().set(key, 'first', 'node');
+    const current = () => (context.get(key) === 'first' ? first.loader : second.loader);
+    const loader: ILoadableState = {
+      isLoaded: () => current().isLoaded(),
+      isLoading: () => current().isLoading(),
+      isError: () => current().isError(),
+      load: () => current().load(),
+      captureRequest() {
+        const state = current();
+        return { state, isCurrent: () => current() === state };
+      },
     };
-    model.context.set(key, 'first', 'node');
+    const model = new MenuModel(service({ getPreparationLoaders: () => [loader] }), rootMenu, context);
     const stop = model.start();
     const loading = model.load();
     model.context.set(key, 'second', 'node');
     reject(new Error('first connection failed'));
     await loading;
-    stop();
     expect(model.exception).toBeNull();
+    expect(second.loader.load).toHaveBeenCalledOnce();
+    expect(model.isLoaded()).toBe(true);
+    stop();
   });
 
   it('provides menu identity before effects and distinguishes uninitialized from empty', () => {
