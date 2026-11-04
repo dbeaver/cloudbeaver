@@ -8,6 +8,7 @@ export default [
   ['plugin_ai_chat_current_conversation_hint', 'Текущая'],
   ['plugin_ai_chat_execute_query_error', 'Не удалось выполнить запрос'],
   ['plugin_ai_chat_generate_response_error', 'Не удалось сгенерировать ответ'],
+  ['plugin_ai_chat_send_message', 'Отправить сообщение'],
   ['plugin_ai_chat_send_message_error', 'Не удалось отправить сообщение'],
   ['plugin_ai_chat_attachment_load_error', 'Не удалось прикрепить файл'],
   ['plugin_ai_chat_attachment_add', 'Добавить файлы'],
