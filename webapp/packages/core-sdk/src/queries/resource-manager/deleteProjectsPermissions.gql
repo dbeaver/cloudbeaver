@@ -1,3 +1,0 @@
-mutation deleteProjectsPermissions($projectIds: [ID!]!, $subjectIds: [ID!]!, $permissions: [String!]!) {
-  rmDeleteProjectsPermissions(projectIds: $projectIds, subjectIds: $subjectIds, permissions: $permissions)
-}
