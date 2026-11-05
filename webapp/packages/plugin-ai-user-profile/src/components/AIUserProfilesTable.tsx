@@ -52,7 +52,7 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
     {
       key: 'status',
       label: 'plugin_ai_user_profile_column_status',
-      width: 280,
+      width: 'auto',
       render: profile => {
         if (profile.global) {
           return translate('plugin_ai_user_profile_status_managed');

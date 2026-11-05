@@ -13,10 +13,12 @@ import type { ReactNode } from 'react';
 import { IconOrImage, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import {
   ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_NAME_COLUMN_WIDTH,
   ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT,
   ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH,
   AdministrationTable,
   AdministrationTableStyles,
+  type IAdministrationTableColumn,
 } from '@cloudbeaver/core-administration';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import { DataGrid, TableRowSelect, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
@@ -24,11 +26,7 @@ import { DataGrid, TableRowSelect, useCellCopy, useCreateGridReactiveValue } fro
 import type { AIProfile } from './AIProfilesResource.js';
 import { AIProfileNameCell } from './AIProfileNameCell.js';
 
-export interface IAIProfilesTableColumn {
-  key: string;
-  label: string;
-  width?: number | string;
-  minWidth?: number;
+export interface IAIProfilesTableColumn extends IAdministrationTableColumn {
   render: (profile: AIProfile) => ReactNode;
 }
 
@@ -54,8 +52,8 @@ export interface IAIProfilesTableProps {
 }
 
 const SELECT_COLUMN = { key: 'select', label: '', width: ADMINISTRATION_TABLE_DEFAULT_SELECTION_COLUMN_WIDTH };
-const NAME_COLUMN = { key: 'name', minWidth: 160 };
-const ENGINE_COLUMN = { key: 'engine', width: 160 };
+const NAME_COLUMN = { key: 'name', minWidth: 160, width: ADMINISTRATION_TABLE_DEFAULT_NAME_COLUMN_WIDTH };
+const ENGINE_COLUMN = { key: 'engine', minWidth: 160 };
 
 export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfilesTable({
   profiles,

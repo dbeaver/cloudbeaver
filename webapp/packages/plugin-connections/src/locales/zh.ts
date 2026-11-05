@@ -27,6 +27,7 @@ export default [
   ['plugin_connections_connection_form_host_invalid', "字段 '主机' 不可为空"],
   ['plugin_connections_connection_folder_delete_confirmation', '即将删除 "{arg:name}". 连接并不会删除，是否确定?'],
   ['plugin_connections_menu_connections_label', '连接'],
+  ['plugin_connections_menu_security_label', '安全'],
   ['plugin_connections_action_disconnect_all_label', '断开所有连接'],
   ['plugin_connections_settings', '连接'],
   ['plugin_connections_settings_hide_connections_view_name', 'Hide connection view management'],
@@ -41,4 +42,6 @@ export default [
   ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
+
+  ['plugin_connections_change_db_password_menu_title', '修改当前数据库密码'],
 ];
