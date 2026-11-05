@@ -27,6 +27,7 @@ export default [
   ['plugin_connections_connection_form_host_invalid', "Field 'Host' can't be empty"],
   ['plugin_connections_connection_folder_delete_confirmation', 'You\'re going to delete "{arg:name}". Connections won\'t be deleted. Are you sure?'],
   ['plugin_connections_menu_connections_label', 'Connessione'],
+  ['plugin_connections_menu_security_label', 'Sicurezza'],
   ['plugin_connections_action_disconnect_all_label', 'Scollegati da tutto'],
   ['plugin_connections_settings', 'Connections'],
   ['plugin_connections_settings_hide_connections_view_name', 'Hide connection view management'],
@@ -44,4 +45,6 @@ export default [
   ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
+
+  ['plugin_connections_change_db_password_menu_title', 'Modifica la password corrente del database'],
 ];

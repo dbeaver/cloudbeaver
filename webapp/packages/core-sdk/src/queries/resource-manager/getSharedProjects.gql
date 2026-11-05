@@ -1,5 +1,0 @@
-query getSharedProjects {
-  projects: rmListSharedProjects {
-    ...SharedProject
-  }
-}

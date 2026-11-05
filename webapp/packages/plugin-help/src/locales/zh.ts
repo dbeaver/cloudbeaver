@@ -1,5 +1,7 @@
 export default [
   ['shortcuts_title', '快捷操作'],
+  ['tree_shortcuts_title', '所有树视图'],
+  ['tree_shortcut_collapse_all', '折叠当前获得焦点的树视图中的所有节点'],
 
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],

@@ -1,7 +1,0 @@
-query getProject($projectId: String!) {
-  project: rmProject(
-    projectId: $projectId
-  ) {
-    ...SharedProject
-  }
-}

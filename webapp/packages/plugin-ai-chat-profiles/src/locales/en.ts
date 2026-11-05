@@ -9,6 +9,6 @@
 export default [
   ['plugin_ai_chat_profile_group', 'Active configuration'],
   ['plugin_ai_chat_profile_change_fail', 'Failed to change AI profile'],
-  ['plugin_ai_chat_profile_edit_credentials', 'Edit credentials'],
+  ['plugin_ai_chat_profile_edit_credentials', 'Edit credentials for {arg:name}'],
   ['plugin_ai_chat_profile_credentials_edit_fail', 'Failed to edit AI profile credentials'],
 ];
