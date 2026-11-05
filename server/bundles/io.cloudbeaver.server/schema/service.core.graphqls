@@ -631,8 +631,6 @@ type ObjectOrigin {
     type: ID!
     subType: ID
     displayName: String!
-    "Human-readable provider name, when available. For cloud origins, this is not the configuration name."
-    providerName: String @since(version: "26.2.5")
     icon: String
     configuration: Object
     details: [ObjectPropertyInfo!]

@@ -2,8 +2,6 @@ fragment DatabaseConnectionOriginDetails on ConnectionInfo {
   id
   projectId
   origin {
-    type
-    providerName
     ...OriginDetails
   }
 }
