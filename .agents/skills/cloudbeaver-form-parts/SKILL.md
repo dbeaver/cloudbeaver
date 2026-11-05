@@ -7,6 +7,8 @@ description: Guides CloudBeaver FormPart state and lifecycle handling. Use when 
 
 A `FormPart` adds functionality to a form, usually a tab. It loads, processes, and stores its own state and participates in the form lifecycle.
 
+Every successful execution path through `loader()` must call `setInitialState()`, including read-only, create-mode, and empty-data branches. Set the appropriate baseline before an early return. Loaders update state only through `setInitialState()`; leave direct `setState()` calls and `state` assignments to the part's editing or coordination methods. When another part owns the displayed configuration, respect that source when choosing the baseline.
+
 Keep `loader()`, `isOutdated()`, and `isLoaded()` in sync:
 
 - Include every resource used by `loader()` in both checks, including dependencies loaded through helpers.

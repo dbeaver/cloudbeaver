@@ -48,6 +48,17 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     return getSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
   }
 
+  override reset(): void {
+    const state = getDefaultState();
+    const handler = this.networkHandlerResource.get(SSH_TUNNEL_ID);
+
+    if (handler) {
+      this.copyInitialHandlerProperties(handler, state);
+    }
+
+    this.setState(state);
+  }
+
   override isOutdated(): boolean {
     if (this.networkHandlerResource.isOutdated(SSH_TUNNEL_ID)) {
       return true;
@@ -62,19 +73,12 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
 
   protected override async loader(): Promise<void> {
     const handler = await this.networkHandlerResource.load(SSH_TUNNEL_ID);
+    const connection = this.optionsPart.connectionKey ? await this.connectionInfoNetworkHandlersResource.load(this.optionsPart.connectionKey) : null;
 
-    if (!this.optionsPart.connectionKey) {
-      const state = getDefaultState();
-      this.copyInitialHandlerProperties(handler, state);
-      this.setInitialState(state);
-
-      return;
-    }
-
-    const connection = await this.connectionInfoNetworkHandlersResource.load(this.optionsPart.connectionKey);
     const sshHandler = connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID);
 
-    const state = toJS(sshHandler ?? getDefaultState());
+    // In read-only mode, the profile part has already applied the configuration.
+    const state = toJS(this.isReadOnly ? this.state : (sshHandler ?? getDefaultState()));
     this.copyInitialHandlerProperties(handler, state);
     this.setInitialState(state);
   }
