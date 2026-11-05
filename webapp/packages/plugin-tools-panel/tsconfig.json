@@ -8,12 +8,6 @@
   },
   "references": [
     {
-      "path": "../core-app"
-    },
-    {
-      "path": "../core-blocks"
-    },
-    {
       "path": "../core-cli"
     },
     {
@@ -24,9 +18,6 @@
     },
     {
       "path": "../core-settings"
-    },
-    {
-      "path": "../core-ui"
     },
     {
       "path": "../core-utils"
