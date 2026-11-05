@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { computed, makeObservable } from 'mobx';
 
-import { UserDataService } from '@cloudbeaver/core-authentication';
+import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
@@ -19,10 +19,10 @@ interface ISettings {
   active: boolean;
 }
 
-@injectable(() => [UserDataService, ToolsPanelService, LogViewerSettingsService])
+@injectable(() => [UserDataService, ToolsPanelService, LogViewerSettingsService, UserConfigurationStorage])
 export class LogViewerService {
   get settings() {
-    return this.userDataService.getUserData(logViewerSettingsKey, getLogViewerDefaultSettings);
+    return this.userDataService.withStorage(this.userConfigurationStorage).getUserData(logViewerSettingsKey, getLogViewerDefaultSettings);
   }
 
   get isActive(): boolean {
@@ -37,6 +37,7 @@ export class LogViewerService {
     private readonly userDataService: UserDataService,
     private readonly toolsPanelService: ToolsPanelService,
     private readonly logViewerSettingsService: LogViewerSettingsService,
+    private readonly userConfigurationStorage: UserConfigurationStorage,
   ) {
     makeObservable<LogViewerService>(this, {
       settings: computed,
