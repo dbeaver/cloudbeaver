@@ -103,6 +103,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         canClose={handleCanClose}
         reorderStateKey="sql-result-tabs"
         enabledBaseActions
+        enabledContextMenu
         onChange={handleSelect}
         onClose={handleClose}
         onReorder={handleReorder}
