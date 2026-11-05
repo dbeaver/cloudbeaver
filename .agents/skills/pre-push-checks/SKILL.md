@@ -1,56 +1,35 @@
 ---
 name: pre-push-checks
-description: Run ESLint and Prettier on all changed files before pushing CloudBeaver CE or EE changes. Use for git push, publishing a branch, or creating/updating a PR that requires a push.
+description: Run ESLint and Prettier before pushing CloudBeaver CE or EE changes, including branch publication and PR pushes.
 ---
 
 # Pre-push checks
 
-Validate the complete change set before executing a user-authorized push. Apply this independently to every repository being pushed.
+Apply these checks to each repository before a user-authorized push.
 
-## 1. Prepare ESLint and Prettier
+## 1. Prepare
 
-Read the repository instructions and `webapp/package.json`. Use the Node version specified by frontend CI and the pinned Yarn version. Run commands from the owning `webapp/` with its installed dependencies.
+Follow repository instructions and use its configured Node/Yarn versions. Run from the owning `webapp/` with installed dependencies and the applicable ESLint/Prettier configurations and ignores. For CE/EE cross-repository changes, use the intended sibling revisions.
 
-Read `webapp/eslint.config.mjs` and `webapp/.prettierrc.mjs`, including their shared configuration and applicable ignore rules. CE and EE use the shared `@cloudbeaver/eslint-config`; for cross-repository changes, check both workspaces against the intended sibling revisions.
+## 2. Select changed files
 
-Run **both ESLint and Prettier**: ESLint with `eslint-config-prettier` does not run the formatter.
+Use the actual PR base, or the repository's development branch unless the user specifies another target. Resolve missing refs explicitly. Record base and HEAD SHAs; compare the **whole branch** from their merge base:
 
-Completion: both commands have an identified working directory and configuration; missing dependencies or configuration are reported as blockers.
+`git diff --name-only -z --diff-filter=ACMRT <merge-base> HEAD`
 
-## 2. Determine all changed files
+For working-tree preflight, also include staged, unstaged and untracked non-ignored files. Deduplicate and keep existing regular files; handle nested repositories separately. Use NUL-delimited paths and argument arrays, batching as needed. Explicitly skip empty lists.
 
-Identify the repository root, current HEAD, and the PR target branch. For an existing PR, use its actual base; otherwise use the repository's development branch unless the user specified another target. Use the local base ref according to repository instructions; record its SHA. If it is missing, resolve it explicitly instead of guessing another branch.
+## 3. Run both checks
 
-Compute the merge base of the target and HEAD. Collect:
+Pass paths relative to `webapp/`, respecting each tool's configured scope and ignores:
 
-1. Added, copied, modified, renamed and type-changed destination paths from `git diff --name-only -z --diff-filter=ACMRT <merge-base> HEAD`.
-2. Staged and unstaged changed paths for a working-tree preflight.
-3. Untracked, non-ignored files from `git ls-files --others --exclude-standard -z`.
+- **ESLint:** `yarn lint -- <files>`. Keep warnings non-blocking.
+- **Prettier:** `yarn prettier --check --ignore-unknown -- <files>`. Include supported non-code files; report ignored/unsupported files as skipped.
 
-Deduplicate paths and keep existing regular files. Exclude deleted files from the ESLint and Prettier input lists. Handle nested repositories separately.
+ESLint does not run Prettier. Configuration changes may require broader checks under repository rules. Check first; apply `--fix` / `--write` only to intended files, review the diff and rerun affected checks. Preserve unrelated changes and resolve failures without suppressing rules or excluding failing files.
 
-Use NUL-delimited Git output and argument arrays, preserving spaces, Unicode and special characters in filenames. Batch long argument lists. An empty file list is an explicit skip, not a command with no arguments that accidentally scans the whole repository.
+## 4. Verify the pushed snapshot
 
-Compare the **whole branch against its target**, not only the last commit, staged files, or the tracking branch: earlier commits may still contain failures.
+Validate the committed HEAD being pushed. If the working tree differs, check HEAD in a configured isolated worktree or resolve/report the mismatch. Rerun affected checks after authorized fix commits or changes to HEAD, base, relevant files, configuration or dependencies.
 
-Completion: record the base SHA, HEAD SHA, file count and selected check scopes.
-
-## 3. Run ESLint and Prettier
-
-Pass file paths relative to the owning `webapp/`, using separate argument arrays for each command.
-
-- **ESLint:** run `yarn lint -- <files>` on every changed file covered by ESLint's configured file patterns. Preserve configured ignores. Warnings remain warnings; do not add `--max-warnings=0`.
-- **Prettier:** run `yarn prettier --check --ignore-unknown -- <files>` using the applicable configuration and ignore rules. Include supported non-code files such as JSON, CSS, Markdown, YAML and GraphQL, not only TS/TSX. Report ignored and unsupported files honestly.
-- **Configuration changes:** lint/format configuration changes can affect unchanged files. Follow the repository's broader verification requirements for those changes.
-
-Check mode comes first. Fix errors in the task's scope; use `--fix` / `--write` only on the intended files, review the diff, then rerun the affected checks. Preserve unrelated user changes. A check failure is not a reason to silently disable a rule or filter out its file.
-
-Completion: both commands have a result and every blocking failure is resolved or reported as a push blocker. Include nonzero setup/configuration exits, not just source diagnostics.
-
-## 4. Validate the snapshot being pushed
-
-The final gate must cover the committed content at the HEAD being pushed. A green working-tree check does not verify an older commit when staged or unstaged changes differ from HEAD. Check the committed snapshot in a correctly configured isolated worktree, or resolve/report the mismatch before pushing; preserve the user's working tree.
-
-After fixes are committed under the user's authorization, rerun checks for that final snapshot. If HEAD, relevant files, check configuration or dependency revisions change after validation, refresh the affected checks. A remote ref change that alters the intended PR base also invalidates the recorded comparison.
-
-Report the checked HEAD/base, commands, scopes and results. Proceed with the requested push only when the snapshot matches and ESLint and Prettier pass. This skill does not itself authorize a commit or push, and it does not install a Git hook for pushes made outside the agent.
+Report checked HEAD/base, commands, file counts/scopes and results. Push only with passing checks for that snapshot; setup errors and unresolved failures block the push. Commit/push authorization must come from the user.
