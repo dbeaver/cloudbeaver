@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 
 import { TabList } from '../Tabs/TabList.js';
 import TabPanelStyles from '../Tabs/TabPanel.module.css';
@@ -19,8 +18,7 @@ import styles from './shared/SideBarPanel.module.css';
 import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.module.css';
 import { useTabOrderPersistence } from '../Tabs/useTabOrderPersistence.js';
 import { useTabPersistence } from '../Tabs/useTabPersistence.js';
-import { SidebarActivationService } from './SidebarActivationService.js';
-import { useSidebarPanelActivation } from './useSidebarPanelActivation.js';
+import { SidebarPanelActivation } from './SidebarPanelActivation.js';
 
 export interface SideBarPanelProps {
   container: TabsContainer;
@@ -42,8 +40,6 @@ export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ 
 
   const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(panelId, () => container.getIdList());
   const selection = useTabPersistence(panelId, container);
-  const sidebarActivationService = useService(SidebarActivationService);
-  const ref = useSidebarPanelActivation(sidebarActivationService, container, selection);
 
   return (
     <SContext registry={sideBarPanelRegistry}>
@@ -56,7 +52,8 @@ export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ 
         onChange={tab => selection.selectTab(tab.tabId)}
         onReorder={onReorder}
       >
-        <div ref={ref} tabIndex={-1} className={s(style, { box: true })} data-panel-id={panelId} data-dialog-persistent-element>
+        <SidebarPanelActivation container={container} />
+        <div className={s(style, { box: true })} data-panel-id={panelId} data-dialog-persistent-element>
           <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>
             <TabPanelList />

@@ -6,27 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect } from 'react';
 
-import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 
 import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer.js';
-import type { SidebarActivationService } from './SidebarActivationService.js';
+import { useTabsState } from '../Tabs/useTabsState.js';
+import { useTabsStore } from '../Tabs/useTabsStore.js';
+import { SidebarActivationService } from './SidebarActivationService.js';
 
-interface ISidebarSelection {
-  selectedTabId: string | undefined;
-}
+export function useSidebarPanelActivation(container: TabsContainer): void {
+  const sidebarActivationService = useService(SidebarActivationService);
+  const store = useTabsStore();
+  const selectedId = useTabsState('selectedId');
+  const renderedItems = useTabsState('renderedItems');
+  const request = sidebarActivationService.getRequest(container);
 
-export function useSidebarPanelActivation(
-  service: SidebarActivationService,
-  container: TabsContainer,
-  selection: ISidebarSelection,
-): RefObject<HTMLDivElement | null> {
-  const ref = useRef<HTMLDivElement>(null);
-  const selectionRef = useObjectRef(selection);
-  const request = service.getRequest(container);
-
-  useEffect(() => service.registerPanel(container, () => selectionRef.selectedTabId), [service, container, selectionRef]);
+  useEffect(
+    () => sidebarActivationService.registerPanel(container, () => store.getState().selectedId ?? undefined),
+    [sidebarActivationService, container, store],
+  );
 
   useEffect(() => {
     if (!request) {
@@ -34,20 +33,21 @@ export function useSidebarPanelActivation(
     }
 
     if (!container.getIdList().includes(request.tabId)) {
-      service.completeRequest(container, request);
+      sidebarActivationService.completeRequest(container, request);
       return;
     }
 
-    if (selection.selectedTabId !== request.tabId) {
+    if (selectedId !== request.tabId) {
       container.select(request.tabId);
 
       return;
     }
 
-    const tab = Array.from(ref.current?.querySelectorAll<HTMLElement>('[role="tab"]') ?? []).find(tab => tab.dataset['id'] === request.tabId);
-    (tab ?? ref.current)?.focus({ preventScroll: true });
-    service.completeRequest(container, request);
-  }, [service, container, request, selection.selectedTabId, selectionRef]);
+    if (!renderedItems.some(item => item.id === request.tabId && item.element)) {
+      return;
+    }
 
-  return ref;
+    store.move(request.tabId);
+    sidebarActivationService.completeRequest(container, request);
+  }, [sidebarActivationService, container, store, request, selectedId, renderedItems]);
 }
