@@ -43,7 +43,7 @@ export const AIProfilesAdministrationTable = observer<Props>(function AIProfiles
       additionalColumns={[
         {
           key: 'scope',
-          width: 120,
+          minWidth: 120,
           label: 'plugin_ai_profiles_scope',
           render: profile => (
             <div className="tw:flex tw:items-center tw:gap-2">

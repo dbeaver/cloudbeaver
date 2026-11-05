@@ -1,5 +1,7 @@
 export default [
   ['shortcuts_title', 'Горячие клавиши'],
+  ['tree_shortcuts_title', 'Все деревья'],
+  ['tree_shortcut_collapse_all', 'Свернуть все узлы дерева, в котором находится фокус'],
 
   ['plugin_help_welcome_docs_label', 'Документация'],
   ['plugin_help_welcome_docs_description', 'Узнайте как использовать {arg:product}'],

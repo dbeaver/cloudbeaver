@@ -82,13 +82,12 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     private final Path rootPath;
     private final Path userProjectsPath;
-    private final Path sharedProjectsPath;
+    protected final Path sharedProjectsPath;
     private final String globalProjectName;
     private Supplier<SMAdminController> smControllerSupplier;
     protected final List<RMFileOperationHandler> fileHandlers;
 
     private final Map<String, RMLocalProject> projectRegistries = new LinkedHashMap<>();
-    private final ProjectsMetadataInfo sharedProjectsMetadataInfo;
 
     public LocalResourceController(
         @NotNull DBPWorkspace workspace,
@@ -108,7 +107,6 @@ public class LocalResourceController extends BaseLocalResourceController {
 
         this.globalProjectName = DBWorkbench.getPlatform().getApplication().getDefaultProjectName();
         this.fileHandlers = RMFileOperationHandlersRegistry.getInstance().getFileHandlers();
-        this.sharedProjectsMetadataInfo = new ProjectsMetadataInfo(sharedProjectsPath, lockController);
     }
 
     @NotNull
@@ -133,9 +131,7 @@ public class LocalResourceController extends BaseLocalResourceController {
             RMLocalProject project = projectRegistries.get(projectId);
             if (project == null || refresh) {
                 project = createWebProjectImpl(projectId, new SessionContextImpl(null));
-                if (project.getProjectType() == RMProjectType.SHARED) {
-                    project.setProjectInfo(sharedProjectsMetadataInfo.getProjectInfo(projectId));
-                }
+                loadProjectInfo(project);
                 projectRegistries.put(projectId, project);
             }
             return project;
@@ -153,14 +149,8 @@ public class LocalResourceController extends BaseLocalResourceController {
     @NotNull
     @Override
     public RMProject[] listAccessibleProjects() throws DBException {
-        List<RMProject> projects;
-        //TODO refactor after implement current user api in sm
+        List<RMProject> projects = new ArrayList<>(listAccessibleSharedProjects());
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
-        if (Files.exists(sharedProjectsPath) && activeUserCreds != null && activeUserCreds.getUserId() != null) {
-            projects = readAccessibleSharedProjects(activeUserCreds.getUserId());
-        } else {
-            projects = new ArrayList<>();
-        }
 
         //FIXME: remove legacy global project support
         //admin has all edit access
@@ -187,25 +177,16 @@ public class LocalResourceController extends BaseLocalResourceController {
         return projects.toArray(new RMProject[0]);
     }
 
-    private List<RMProject> readAccessibleSharedProjects(@NotNull String userId) throws DBException {
-        if (credentialsProvider.hasPermission(DBWConstants.PERMISSION_ADMIN) || credentialsProvider.hasPermission(RMConstants.PERMISSION_RM_ADMIN)) {
-            return new ArrayList<>(Arrays.asList(listAllSharedProjects()));
-        }
-        var accessibleSharedProjects = getSecurityController().getAllAvailableObjectsPermissions(SMObjectType.project);
-
-        return accessibleSharedProjects
-            .stream()
-            .filter(smObjectPermissions -> CommonUtils.isNotEmpty(smObjectPermissions.getObjectId()))
-            .map(projectPermission -> makeProjectFromPath(
-                sharedProjectsPath.resolve(WebRMUtils.parseProjectNameUnsafe(projectPermission.getObjectId()).getName()),
-                Arrays.stream(projectPermission.getPermissions()).map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
-                RMProjectType.SHARED, true)
-            )
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+    @NotNull
+    protected List<RMProject> listAccessibleSharedProjects() throws DBException {
+        return List.of();
     }
 
-    private Set<RMProjectPermission> getProjectPermissions(@Nullable String projectId, @NotNull RMProjectType projectType) throws DBException {
+    @NotNull
+    protected Set<RMProjectPermission> getProjectPermissions(
+        @Nullable String projectId,
+        @NotNull RMProjectType projectType
+    ) throws DBException {
         var activeUserCreds = credentialsProvider.getActiveUserCredentials();
 
         switch (projectType) {
@@ -214,14 +195,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                     ? Set.of(RMProjectPermission.PROJECT_ADMIN)
                     : Set.of(RMProjectPermission.RESOURCE_VIEW, RMProjectPermission.DATA_SOURCES_VIEW);
             case SHARED:
-                if (SMUtils.isRMAdmin(credentialsProvider)) {
-                    return Set.of(RMProjectPermission.PROJECT_ADMIN);
-                }
-
-                if (projectId == null) {
-                    throw new DBException("Project id required");
-                }
-                return getRmProjectPermissions(projectId, activeUserCreds);
+                return getSharedProjectPermissions(projectId, activeUserCreds);
             case USER:
                 var webApp = ServletAppUtils.getServletApplication();
                 if (userHasAccessToPrivateProject(webApp, activeUserCreds)) {
@@ -238,101 +212,29 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     @NotNull
-    private Set<RMProjectPermission> getRmProjectPermissions(
-        @NotNull String projectId, SMCredentials activeUserCreds
+    protected Set<RMProjectPermission> getSharedProjectPermissions(
+        @Nullable String projectId,
+        @Nullable SMCredentials activeUserCredentials
     ) throws DBException {
-        if (activeUserCreds.getUserId() == null) {
-            return Set.of();
-        }
-        String[] permissions = getSecurityController().getObjectPermissions(activeUserCreds.getUserId(),
-            projectId,
-            SMObjectType.project
-        ).getPermissions();
-        return Arrays.stream(permissions).map(RMProjectPermission::fromPermission).collect(Collectors.toSet());
+        throw new DBException("Shared projects are not supported");
     }
 
     @NotNull
     @Override
     public RMProject[] listAllSharedProjects() throws DBException {
-        try {
-            if (!Files.exists(sharedProjectsPath)) {
-                return new RMProject[0];
-            }
-            var projects = new ArrayList<RMProject>();
-            try (Stream<Path> list = Files.list(sharedProjectsPath)) {
-                var allPaths = list.toList();
-                for (Path path : allPaths) {
-                    var projectPerms = getProjectPermissions(
-                        RMUtils.makeProjectIdFromPath(path, RMProjectType.SHARED),
-                        RMProjectType.SHARED
-                    );
-                    var rmProject = makeProjectFromPath(path, projectPerms, RMProjectType.SHARED, false);
-                    projects.add(rmProject);
-                }
-                return projects.stream()
-                    .filter(Objects::nonNull)
-                    .toArray(RMProject[]::new);
-            }
-        } catch (IOException e) {
-            throw new DBException("Error reading shared projects", e);
-        }
+        return new RMProject[0];
     }
 
+    @NotNull
     @Override
     public RMProject createProject(@NotNull String name, @Nullable String description) throws DBException {
-        if (!Files.exists(sharedProjectsPath)) {
-            try {
-                Files.createDirectories(sharedProjectsPath);
-            } catch (IOException e) {
-                throw new DBException("Error creating shared project path", e);
-            }
-        }
-        GeneralUtils.validateResourceNameUnconditionally(name);
-        validateProjectName(null, name);
-        var projectPath = sharedProjectsPath.resolve(name);
-        if (Files.exists(projectPath)) {
-            throw new DBException("Project '" + name + "' already exists");
-        }
-        RMLocalProject webProject = new RMLocalProject(workspace, new SessionContextImpl(null), projectPath, RMProjectType.SHARED);
-        webProject.updateProject(name, description);
-        RMProject rmProject = createRmProjectFromWebProject(projectPath, webProject, new String[0]);
-        try {
-            log.debug("Creating project '" + rmProject.getId() + "'");
-            Files.createDirectories(projectPath);
-            fireRmProjectAddEvent(rmProject);
-            return rmProject;
-        } catch (IOException e) {
-            throw new DBException("Error creating project path", e);
-        }
+        throw new DBException("Shared projects are not supported");
     }
 
     @NotNull
     @Override
     public RMProject updateProject(@NotNull String projectId, @NotNull RMProjectInfo projectInfo) throws DBException {
-        validateProjectName(projectId, projectInfo.getName());
-        try (var ignoredLock = lockController.lock(LockTarget.of(projectId), LockOptions.of("updateProject"))) {
-            RMLocalProject project = getWebProject(projectId, false);
-            Path targetPath = getProjectPath(projectId);
-            if (!Files.exists(targetPath)) {
-                throw new DBException("Project folder '" + projectId + "' not found");
-            }
-            if (!project.canUpdateProjectName()) {
-                throw new DBException("Project '" + projectId + "' is not shared");
-            }
-            project.updateProject(projectInfo.getName(), projectInfo.getDescription());
-            sharedProjectsMetadataInfo.updateProjectInfo(projectId, projectInfo);
-            return WebRMUtils.createRmProjectFromWebProject(project);
-        }
-    }
-
-    private void validateProjectName(@Nullable String projectId, @Nullable String name) throws DBException {
-        boolean duplicatedName = Arrays.stream(listAllSharedProjects())
-            .filter(p -> !p.getId().equals(projectId))
-            .map(RMProject::getName)
-            .noneMatch(n -> n.equalsIgnoreCase(name));
-        if (!duplicatedName) {
-            throw new DBException("Project name '" + name + "' is already used");
-        }
+        throw new DBException("Shared projects are not supported");
     }
 
     @Override
@@ -348,14 +250,16 @@ public class LocalResourceController extends BaseLocalResourceController {
                 getSecurityController().deleteObject(projectId, projectId, SMObjectType.project);
                 log.debug("Deleting project '" + projectId + "' folder");
                 IOUtils.deleteDirectory(targetPath);
-                synchronized (projectRegistries) {
-                    projectRegistries.remove(projectId);
-                }
-                sharedProjectsMetadataInfo.updateProjectInfo(projectId, null);
+                removeProjectRegistration(projectId);
+                afterProjectDeleted(projectId);
             } catch (IOException e) {
                 throw new DBException("Error deleting project '" + projectId + "'", e);
             }
         }
+    }
+
+    protected void afterProjectDeleted(@NotNull String projectId) {
+        // Edition-specific project metadata can be cleaned up here.
     }
 
     @Nullable
@@ -1162,7 +1066,13 @@ public class LocalResourceController extends BaseLocalResourceController {
         return makeProjectFromPath(projectPath, permissions, projectName.getType(), false);
     }
 
-    private RMProject makeProjectFromPath(Path path, Set<RMProjectPermission> permissions, RMProjectType type, boolean checkExistence) {
+    @Nullable
+    protected RMProject makeProjectFromPath(
+        @Nullable Path path,
+        @NotNull Set<RMProjectPermission> permissions,
+        @NotNull RMProjectType type,
+        boolean checkExistence
+    ) {
         if (path == null) {
             return null;
         }
@@ -1180,10 +1090,18 @@ public class LocalResourceController extends BaseLocalResourceController {
             .toArray(String[]::new);
 
         RMLocalProject webProject = new RMLocalProject(workspace, new SessionContextImpl(null), path, type);
-        if (type == RMProjectType.SHARED) {
-            webProject.setProjectInfo(sharedProjectsMetadataInfo.getProjectInfo(webProject.getId()));
-        }
+        loadProjectInfo(webProject);
         return createRmProjectFromWebProject(path, webProject, allProjectPermissions);
+    }
+
+    protected void loadProjectInfo(@NotNull RMLocalProject project) {
+        // Shared project metadata is supplied by editions that support shared projects.
+    }
+
+    protected void removeProjectRegistration(@NotNull String projectId) {
+        synchronized (projectRegistries) {
+            projectRegistries.remove(projectId);
+        }
     }
 
     protected <T> T doProjectOperation(@NotNull String projectId, @NotNull RMFileOperation<T> operation) throws DBException {
@@ -1246,6 +1164,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         return result;
     }
 
+    @NotNull
     protected Path getProjectPath(@NotNull String projectId) throws DBException {
         RMProjectName project = WebRMUtils.parseProjectName(projectId);
         RMProjectType type = project.getType();
@@ -1258,7 +1177,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 }
                 return getGlobalProjectPath();
             case SHARED:
-                return sharedProjectsPath.resolve(projectName);
+                return getSharedProjectPath(projectName);
             case USER:
                 var activeUserCredentials = credentialsProvider.getActiveUserCredentials();
                 var userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
@@ -1270,6 +1189,11 @@ public class LocalResourceController extends BaseLocalResourceController {
             default:
                 throw new DBException("Invalid project type [" + type + "]");
         }
+    }
+
+    @NotNull
+    protected Path getSharedProjectPath(@NotNull String projectName) throws DBException {
+        throw new DBException("Shared projects are not supported");
     }
 
     private @NotNull List<RMResource> makeResourcePath(@NotNull String projectId, @NotNull Path targetPath, boolean recursive) throws DBException {
@@ -1447,7 +1371,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     @NotNull
-    private static RMProject createRmProjectFromWebProject(Path path, RMLocalProject webProject, String[] allProjectPermissions) {
+    protected static RMProject createRmProjectFromWebProject(Path path, RMLocalProject webProject, String[] allProjectPermissions) {
         RMProject project = WebRMUtils.createRmProjectFromWebProject(webProject);
         project.setProjectPermissions(allProjectPermissions);
         if (Files.exists(path)) {

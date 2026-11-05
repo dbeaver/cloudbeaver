@@ -8,6 +8,7 @@ export default [
   ['plugin_ai_chat_current_conversation_hint', 'Current'],
   ['plugin_ai_chat_execute_query_error', 'Failed to execute query'],
   ['plugin_ai_chat_generate_response_error', 'Failed to generate response'],
+  ['plugin_ai_chat_send_message', '发送消息'],
   ['plugin_ai_chat_send_message_error', 'Failed to send message'],
   ['plugin_ai_chat_attachment_load_error', '无法附加文件'],
   ['plugin_ai_chat_attachment_add', '添加文件'],

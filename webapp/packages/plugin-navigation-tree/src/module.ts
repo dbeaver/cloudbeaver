@@ -18,6 +18,7 @@ import { ElementsTreeToolsMenuService } from './NavigationTree/ElementsTree/Elem
 import { ElementsTreeService } from './NavigationTree/ElementsTree/ElementsTreeService.js';
 import { TreeToolbarMenuService } from './TreeNew/TreeToolbarMenuService.js';
 import { TreeSettingsMenuService } from './TreeNew/TreeSettingsMenuService.js';
+import { TreeViewService } from './TreeNew/TreeViewService.js';
 import { LocaleService } from './LocaleService.js';
 import { NodeDeletionService } from './NodesManager/NodeDeletion/NodeDeletionService.js';
 
@@ -41,6 +42,7 @@ export default ModuleRegistry.add({
       .addSingleton(ElementsTreeToolsMenuService)
       .addSingleton(TreeToolbarMenuService)
       .addSingleton(TreeSettingsMenuService)
+      .addSingleton(TreeViewService)
       .addSingleton(ElementsTreeService);
   },
 });

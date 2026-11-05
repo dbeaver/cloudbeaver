@@ -1,5 +1,7 @@
 export default [
   ['shortcuts_title', 'Shortcuts'],
+  ['tree_shortcuts_title', 'Tutti gli alberi'],
+  ['tree_shortcut_collapse_all', "Comprimi tutti i nodi dell'albero con il focus"],
 
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],

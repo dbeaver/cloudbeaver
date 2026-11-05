@@ -85,6 +85,7 @@ export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(
       {profiles.toSorted(compareAIProfiles).map(profile => {
         const isCurrent = conversation.profile === profile.id;
         const engine = aiEnginesResource.data.find(e => e.id === profile.engineId);
+        const title = translate('plugin_ai_chat_profile_edit_credentials', undefined, { name: profile.name });
 
         return (
           <MenuItemRadio
@@ -111,8 +112,8 @@ export const AIChatConversationProfile = observer<IAIChatConversationMenuProps>(
                 </div>
               ) : (
                 <ActionIconButton
-                  aria-label={translate('plugin_ai_chat_profile_edit_credentials')}
-                  title={translate('plugin_ai_chat_profile_edit_credentials')}
+                  aria-label={title}
+                  title={title}
                   disabled={isDisabled}
                   name="edit"
                   viewBox="0 0 13 13"
