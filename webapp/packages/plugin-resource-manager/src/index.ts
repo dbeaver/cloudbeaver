@@ -11,3 +11,4 @@ import './module.js';
 export * from './ResourceManagerSettingsService.js';
 export * from './RESOURCE_NAME_REGEX.js';
 export * from './ResourceManagerService.js';
+export * from './ResourceProjectsResource.js';
