@@ -7,11 +7,13 @@
  */
 
 .toolbarActions {
-  composes: theme-form-element-radius theme-background-surface theme-text-on-surface theme theme-border-color-background from global;
+  composes: theme-background-surface theme-text-on-surface theme from global;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  height: calc(var(--tw-spacing) * 8);
-  border: 2px solid;
+  height: 32px;
+  border: 1px solid var(--theme-input-border);
+  border-radius: var(--theme-form-element-radius);
+  overflow: hidden;
 }

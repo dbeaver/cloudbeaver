@@ -49,6 +49,7 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
     /** Marks a group boundary in items; separator items are not rendered. */
     isSeparator?: (item: TValue) => boolean;
     inline?: boolean;
+    overflowPadding?: number;
     allowCustomValue?: boolean;
     allowClear?: boolean;
     size?: 'small' | 'medium' | 'large';
@@ -88,6 +89,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
   readOnly,
   disabled,
   inline,
+  overflowPadding,
   description,
   allowCustomValue = false,
   allowClear = false,
@@ -326,6 +328,7 @@ export const Combobox: IComboboxType = observer(function Combobox({
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           {displayPopover && (
             <ComboboxPopover
+              overflowPadding={overflowPadding}
               className={clsx('theme-text-on-surface theme-background-surface', hasFooterItems && 'dbv-kit-combobox__popover--grouped')}
             >
               {hasFooterItems ? <div className="dbv-kit-combobox__popover-items">{renderItems()}</div> : renderItems()}
