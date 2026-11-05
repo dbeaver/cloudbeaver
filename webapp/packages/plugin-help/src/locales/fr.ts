@@ -1,5 +1,7 @@
 export default [
   ['shortcuts_title', 'Raccourcis'],
+  ['tree_shortcuts_title', 'Toutes les arborescences'],
+  ['tree_shortcut_collapse_all', "Replier tous les nœuds de l'arborescence qui a le focus"],
 
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Apprenez à utiliser {arg:product}'],

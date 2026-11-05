@@ -16,6 +16,7 @@
 
   .dbv-slide-dialog__dialog {
     --dbv-kit-dialog-content-background: var(--theme-surface);
+    --dbv-kit-dialog-content-foreground: var(--theme-on-surface);
     overflow: visible;
   }
 

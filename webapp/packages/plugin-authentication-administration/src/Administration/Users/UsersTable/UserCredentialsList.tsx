@@ -8,17 +8,16 @@
 import { observer } from 'mobx-react-lite';
 import { Fragment } from 'react';
 
-import { type PlaceholderComponent, s, useS } from '@cloudbeaver/core-blocks';
+import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
 import { Popover } from '@dbeaver/ui-kit';
 
 import type { IUserDetailsInfoProps } from '../UsersAdministrationService.js';
-import style from './UserCredentialsList.module.css';
+import { OverflowIndicator } from './OverflowIndicator.js';
 import { UserCredentials } from './UserCredentials.js';
 
 const MAX_VISIBLE_CREDENTIALS = 3;
 
 export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = observer(function UserCredentialsList({ user }) {
-  const styles = useS(style);
   const visibleCredentials = user.origins.slice(0, MAX_VISIBLE_CREDENTIALS);
 
   return (
@@ -30,9 +29,7 @@ export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = 
       {user.origins.length > MAX_VISIBLE_CREDENTIALS && (
         <Popover placement="top">
           <Popover.PopoverDisclosure>
-            <div className={s(styles, { hasMoreIndicator: true })}>
-              <span>+{user.origins.length - MAX_VISIBLE_CREDENTIALS}</span>
-            </div>
+            <OverflowIndicator count={user.origins.length - MAX_VISIBLE_CREDENTIALS} />
           </Popover.PopoverDisclosure>
 
           <Popover.PopoverContent className="tw:flex tw:gap-2" gutter={4} modal hideOnInteractOutside>

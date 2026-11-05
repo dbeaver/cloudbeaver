@@ -150,9 +150,9 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
       </AdministrationPageHeader>
       <AdministrationPageContent>
         {configurationWizard && (
-          <div className="tw:shrink-0 tw:max-w-prose">
+          <div className="tw:shrink-0">
             <h3 className="tw:text-xl tw:font-semibold">{translate('administration_configuration_wizard_configuration_title')}</h3>
-            <p className="tw:my-4 tw:whitespace-pre-wrap tw:leading-loose">
+            <p className="tw:mt-4 tw:mb-0 tw:whitespace-pre-wrap tw:leading-loose">
               {translate('administration_configuration_wizard_configuration_message')}
             </p>
           </div>
