@@ -11,12 +11,13 @@
   position: relative;
   box-sizing: border-box;
   flex-shrink: 0;
-  width: calc(var(--tw-spacing) * 7);
-  min-width: calc(var(--tw-spacing) * 7);
+  width: 28px;
+  min-width: 28px;
   height: 100%;
-  padding: var(--tw-spacing);
+  padding: 4px;
   border: none;
   border-radius: 0;
+  outline-offset: -2px;
   background: inherit;
   color: inherit;
   cursor: pointer;
