@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -113,6 +113,7 @@ export abstract class CachedMapResource<
     }
 
     key = this.aliases.transformToKey(key);
+
     return ResourceKeyUtils.every(key, key => this.dataHas(this.getKeyRef(key)));
   }
 
@@ -141,6 +142,7 @@ export abstract class CachedMapResource<
     } else {
       this.dataSet(this.getKeyRef(key), value as TValue);
     }
+
     this.markUpdated(key);
     this.markLoaded(key);
     this.cleanError(key);
@@ -163,6 +165,7 @@ export abstract class CachedMapResource<
     ResourceKeyUtils.forEach(key, key => {
       this.dataDelete(this.getKeyRef(key));
     });
+
     this.metadata.delete(originalKey);
 
     // rewrites pending outdate
@@ -188,7 +191,9 @@ export abstract class CachedMapResource<
     if (key === undefined) {
       key = CachedMapAllKey;
     }
+
     await this.loadData(key, true, includes);
+
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
@@ -211,7 +216,9 @@ export abstract class CachedMapResource<
     if (key === undefined) {
       key = CachedMapAllKey;
     }
+
     await this.loadData(key, false, includes);
+
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ export class MenuService {
     if (this.handlers.has(handler.id)) {
       throw new Error(`Menu handler with same id (${handler.id}) already exists`);
     }
+
     this.handlers.set(handler.id, {
       ...handler,
       menus: new Set(handler.menus),
@@ -71,11 +72,13 @@ export class MenuService {
           continue;
         }
       }
+
       for (const context of handler.contexts) {
         if (!contexts.has(context)) {
           continue handlers;
         }
       }
+
       if (handler.isApplicable?.(contexts) !== false) {
         return handler;
       }
@@ -108,9 +111,11 @@ export class MenuService {
             if (isAction(item)) {
               return items.includes(item);
             }
+
             return true;
           });
         }
+
         return items;
       },
       creators
@@ -131,11 +136,13 @@ export class MenuService {
         if (isAction(item)) {
           return this.createActionItem(context, item) as IMenuItem;
         }
+
         if (isMenu(item)) {
           return new MenuSubMenuItem({
             menu: item,
           });
         }
+
         return item;
       })
       .filter(Boolean);
@@ -149,6 +156,7 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
     if (creator.root && contexts.has(DATA_CONTEXT_MENU_NESTED)) {
       return false;
     }
+
     if (creator.menus.size > 0) {
       if (!isNotNullDefined(menu) || !creator.menus.has(menu)) {
         return false;

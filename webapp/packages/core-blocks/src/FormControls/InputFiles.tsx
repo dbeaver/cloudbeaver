@@ -129,12 +129,15 @@ export const InputFiles: InputFilesType = observer(
       }
 
       setInnerState(value);
+
       if (state) {
         state[name] = value;
       }
+
       if (onChange) {
         onChange(value, name);
       }
+
       if (context) {
         context.change(value, name);
       }
@@ -149,6 +152,7 @@ export const InputFiles: InputFilesType = observer(
 
       for (let i = 0; i < value.length; i++) {
         const file = value[i]!;
+
         if (index !== i) {
           dt.items.add(file);
         }

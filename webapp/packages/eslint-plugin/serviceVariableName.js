@@ -28,12 +28,16 @@ export default {
       if (node.type === 'Identifier') {
         for (let scope = sourceCode.getScope(node); scope; scope = scope.upper) {
           const variable = scope.set.get(node.name);
+
           if (!variable) {
             continue;
           }
+
           const imported = variable.defs.find(definition => definition.type === 'ImportBinding')?.node;
+
           return imported?.type === 'ImportSpecifier' ? (imported.imported.name ?? imported.imported.value) : node.name;
         }
+
         return node.name;
       }
 
@@ -56,11 +60,13 @@ export default {
       if (!serviceName || !/^[A-Z].*(?:Service|Resource)$/.test(serviceName) || identifier.type !== 'Identifier') {
         return;
       }
+
       if (['EESDKService', 'AWSSDKService'].includes(serviceName) && identifier.name === 'sdk') {
         return;
       }
 
       const expectedName = serviceName.replace(/^[A-Z]+(?=[A-Z][a-z]|$)|^[A-Z]/, prefix => prefix.toLowerCase());
+
       if (identifier.name !== expectedName) {
         context.report({
           node: identifier,
@@ -73,6 +79,7 @@ export default {
     return {
       VariableDeclarator(node) {
         let initializer = node.init;
+
         while (initializer && ['TSAsExpression', 'TSTypeAssertion', 'TSNonNullExpression'].includes(initializer.type)) {
           initializer = initializer.expression;
         }
@@ -88,6 +95,7 @@ export default {
 
         for (const parameter of node.value.params) {
           let identifier = parameter.type === 'TSParameterProperty' ? parameter.parameter : parameter;
+
           if (identifier.type === 'AssignmentPattern') {
             identifier = identifier.left;
           }

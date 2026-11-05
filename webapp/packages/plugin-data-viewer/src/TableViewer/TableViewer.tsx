@@ -77,11 +77,13 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const navRef = useListKeyboardNavigation(
       '[data-presentation][tabindex]:not(:disabled), [data-presentation-tools][tabindex]:not(:disabled), [data-presentation-header][tabindex]:not(:disabled), [data-presentation-bar][tabindex]:not(:disabled)',
     );
+
     const mergedRef = useMergeRefs(ref, navRef);
 
     const localActions = useObjectRef({
       clearConstraints() {
         const unknownModel = dataModel as any;
+
         if (!isResultSetDataModel<IDatabaseDataOptions>(unknownModel)) {
           return;
         }

@@ -52,6 +52,7 @@ export const TransactionLogTable = observer<Props>(function TransactionLogTable(
 
     return '';
   }
+
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [log]);
 
   function getHeaderText(colIdx: number) {

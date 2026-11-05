@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ export const UploadArea = observer(
     const styles = useS(style);
     const ref = useRefInherit<HTMLInputElement>(refInherit);
 
-    const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
       if (rest.onChange) {
         await (rest.onChange(event) as void | Promise<void>);
 
@@ -36,7 +36,7 @@ export const UploadArea = observer(
           target.value = '';
         }
       }
-    };
+    }
 
     useLayoutEffect(() => {
       if (ref.current && value !== undefined) {

@@ -9,6 +9,8 @@ export default [
   ['ai_administration_models_select_or_manual_description', 'Выберите модель из списка или введите её название вручную'],
   ['ai_administration_models_refresh_fail', 'Не удалось обновить модели'],
   ['plugin_ai_administration_profiles_title', 'Профили'],
+  ['plugin_ai_administration_create_profile', 'Создать профиль'],
+  ['plugin_ai_administration_profiles_search_placeholder', 'Поиск по названию профиля...'],
   ['plugin_ai_administration_profiles_table_empty_placeholder', 'Профили не найдены. Создайте новый профиль'],
   ['plugin_ai_administration_profile_column_name', 'Название'],
   ['plugin_ai_administration_profile_column_engine', 'Энджин'],

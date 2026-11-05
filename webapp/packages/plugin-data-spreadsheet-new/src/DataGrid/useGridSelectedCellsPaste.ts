@@ -28,6 +28,7 @@ function parseTSV(value: string): string[][] {
   }
 
   const normalized = value.replace(/\r\n/g, '\n');
+
   return normalized.split('\n').map(row => row.split('\t'));
 }
 
@@ -41,6 +42,7 @@ export function useGridSelectedCellsPaste(
     async (event: DataGridCellKeyboardEvent) => {
       const isPasteShortcut =
         (event.ctrlKey || event.metaKey) && !event.altKey && (event.key.toLowerCase() === 'v' || event.nativeEvent.code === EVENT_KEY_CODE.V);
+
       const selectedCells = selectAction?.getActiveElements();
 
       if (!isPasteShortcut) {
@@ -107,6 +109,7 @@ export function useGridSelectedCellsPaste(
 
         const updates = targets.filter(key => tableData.isCellEditable(key)).map(key => ({ key, value }));
         tableData.editor.setMany(updates);
+
         return;
       }
 

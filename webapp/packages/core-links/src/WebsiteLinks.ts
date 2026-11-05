@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,9 +9,11 @@ function extractDocsVersion(version: string | undefined): string | null {
   if (!version) {
     return null;
   }
+
   const parts = version.split('.');
   const major = parts[0];
   const minor = parts[1];
+
   if (!major || !minor) {
     return null;
   }
@@ -28,6 +30,25 @@ export const WEBSITE_LINKS = {
   SSL_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/SSL-Configuration/',
   SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas',
   DATABASE_NAVIGATOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Database-Navigator/',
+  USERS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Users/',
+  TEAMS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Teams/',
+  PROJECTS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/team-edition/Projects/',
+  GLOBAL_PERMISSIONS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Global-Permissions/',
+  DRIVERS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Drivers-Management/',
+  AUTHENTICATION_METHODS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Authentication-methods/',
+  CLOUD_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Cloud-Explorer/#cloud-configuration',
+  SECRET_MANAGEMENT_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Configure-Secret-Providers/',
+  AI_SETTINGS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/AI-Assistance-settings/',
+  AI_PROFILES_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/AI-Assistance-settings/#ai-profiles',
+  AI_TOOLS_AND_MCP_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/AI-Tools-and-MCP/',
+  LICENSE_IMPORT_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/How-to-Import-License/',
+  AUDIT_LOGGING_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Audit-Logging/',
+  QUERY_MANAGER_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Query-Manager/',
+  AWS_SETTINGS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/AWS-Settings/',
+  SETTINGS_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Settings/',
+  SERVER_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Server-configuration-administration/',
+  CONNECTION_TYPES_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Connection-Types/',
+  GLOBAL_PROFILES_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Network-profiles/#manage-global-profiles',
   AWS_DEPLOY_UPDATE_PAGE: 'https://github.com/dbeaver/cloudbeaver-deploy?tab=readme-ov-file#updating-the-cluster',
   PROXY_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Proxy-Configuration/',
   API_TOKEN_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Generate-API-access-token/',
@@ -54,6 +75,7 @@ export const WEBSITE_LINKS = {
     let url = distributed ? WEBSITE_LINKS.TEAM_EDITION_DOCS_PAGE : WEBSITE_LINKS.DOCS_PAGE;
 
     const majorMinor = extractDocsVersion(version);
+
     if (majorMinor) {
       url += `${majorMinor}/`;
     }

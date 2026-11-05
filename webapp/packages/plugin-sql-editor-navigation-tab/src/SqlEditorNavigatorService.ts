@@ -96,12 +96,16 @@ export class SqlEditorNavigatorService {
   openRecentEditor(connectionKey?: IConnectionInfoParams): boolean {
     for (const tabId of this.navigationTabsService.history.history) {
       const tab = this.navigationTabsService.getTab(tabId);
+
       if (tab && isSQLEditorTab(tab)) {
         const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+
         if (!dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
           continue;
         }
+
         const executionContext = dataSource.executionContext;
+
         if (
           connectionKey &&
           (!executionContext ||
@@ -109,10 +113,13 @@ export class SqlEditorNavigatorService {
         ) {
           continue;
         }
+
         this.navigationTabsService.selectTab(tab.id);
+
         return true;
       }
     }
+
     return false;
   }
 
@@ -198,6 +205,7 @@ export class SqlEditorNavigatorService {
           if (tab && data.connectionKey) {
             await this.sqlEditorTabService.setConnectionId(tab, data.connectionKey, data.catalogId, data.schemaId);
           }
+
           return;
         }
       }

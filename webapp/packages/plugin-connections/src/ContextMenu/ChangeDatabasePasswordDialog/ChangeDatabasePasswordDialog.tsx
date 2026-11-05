@@ -63,7 +63,9 @@ export const ChangeDatabasePasswordDialog: DialogComponent<ChangeDatabasePasswor
         if (state.submitting) {
           return;
         }
+
         state.submitting = true;
+
         try {
           await graphQLService.sdk.changeConnectionUserPassword({
             projectId: payload.projectId,
@@ -71,9 +73,11 @@ export const ChangeDatabasePasswordDialog: DialogComponent<ChangeDatabasePasswor
             oldPassword: state.currentPassword,
             newPassword: state.newPassword,
           });
+
           notificationService.logSuccess({
             title: 'plugin_connections_change_db_password_success',
           });
+
           resolveDialog(null);
         } catch (exception) {
           notificationService.logException(exception as Error, 'plugin_connections_change_db_password_failed');

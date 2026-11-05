@@ -62,6 +62,7 @@ export const AIChatConversationScope = observer<IAIChatConversationMenuProps>(fu
 
         const settings = await connectionInfoAiResource.refresh(key);
         const allowedScope = settings.scope === AiDatabaseScope.Custom ? await connectionInfoAiScopeResource.load(key) : null;
+
         if (!connectionInfoResource.isConnected(key)) {
           return;
         }
@@ -103,6 +104,7 @@ export const AIChatConversationScope = observer<IAIChatConversationMenuProps>(fu
     }
 
     result.push({ id: AiDatabaseScope.Custom, label: translate('plugin_ai_chat_scope_custom') });
+
     return result;
   }, [container, catalog, schema, translate]);
 

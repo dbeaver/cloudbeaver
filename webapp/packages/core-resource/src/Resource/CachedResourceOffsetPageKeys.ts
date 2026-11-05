@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,11 @@ export function getNextPageOffset(info: ICachedResourceOffsetPage): number {
       lastPage = page;
       continue;
     }
+
     if (page.from !== lastPage.to) {
       break;
     }
+
     lastPage = page;
   }
 
@@ -65,11 +67,13 @@ export function getNextPageOffset(info: ICachedResourceOffsetPage): number {
 export function isOffsetPageOutdated(pages: IResourceOffsetPage[], info: IOffsetPageInfo): boolean {
   const from = info.offset;
   const to = info.offset + info.limit;
+
   for (const page of pages) {
     if (page.isHasCommonSegment(from, to) && page.isOutdated()) {
       return true;
     }
   }
+
   return false;
 }
 
@@ -83,20 +87,26 @@ export function isOffsetPageInRange({ pages, end }: ICachedResourceOffsetPage, i
     if (lastIndex === -1) {
       lastIndex = from;
     }
+
     if (from !== lastIndex) {
       return false;
     }
+
     lastIndex = to;
+
     if (info.offset >= from) {
       meetFrom = true;
     }
+
     if (infoTo <= to || (end !== undefined && end <= infoTo)) {
       meetTo = true;
     }
+
     if (meetFrom && meetTo) {
       return true;
     }
   }
+
   return end !== undefined && end <= infoTo;
 }
 
@@ -124,24 +134,29 @@ export function expandOffsetPageRange(
   // Adjust overlapping existing pages
   while (i < pages.length && pages[i]!.from < newPage.to) {
     const current = pages[i]!;
+
     // If existing page starts before newPage
     if (current.from < newPage.from) {
       // Adjust the existing page to end at newPage.from
       current.setSize(current.from, newPage.from);
+
       if (current.to - current.from > 0) {
         mergedPages.push(current);
       }
     }
+
     // If existing page ends after newPage
     if (current.to > newPage.to) {
       // Adjust the existing page to start at newPage.to
       current.setSize(newPage.to, current.to);
+
       // Since we need to remove pages after newPage when hasNextPage is false,
       // we only include this adjusted page if hasNextPage is true
       if (hasNextPage && current.to - current.from > 0) {
         mergedPages.push(current);
       }
     }
+
     i++;
   }
 

@@ -8,6 +8,8 @@
 import { observer } from 'mobx-react-lite';
 
 import { clsx } from '@dbeaver/ui-kit';
+import { useService } from '@cloudbeaver/core-di';
+import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
 import { TreeContext } from './contexts/TreeContext.js';
@@ -26,6 +28,8 @@ import type { ITreeDnD } from './useTreeDnD.js';
 import { useTreeVirtualization } from './useTreeVirtualization.js';
 import { TreeMenuContextProvider } from './contexts/TreeMenuContext/TreeMenuContextProvider.js';
 import type { ITreeMenu } from './useTreeMenu.js';
+import { TreeViewService } from './TreeViewService.js';
+import { TreeViewContextProvider } from './contexts/TreeViewContextProvider.js';
 
 export interface NavigationTreeNewProps {
   data: ITreeData;
@@ -53,6 +57,7 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
   onNodeDoubleClick,
   getNodeHeight,
 }) {
+  const treeViewService = useService(TreeViewService);
   const tree = useTree({
     data,
     nodeRenderers,
@@ -60,22 +65,28 @@ export const Tree = observer<React.PropsWithChildren<NavigationTreeNewProps>>(fu
     onNodeDoubleClick,
     getNodeHeight,
   });
+
   const mountOptimization = useTreeVirtualization();
   const elementsSizeCache = useNodeSizeCache(tree, data);
+
   return (
     <NodeSizeCacheContext.Provider value={elementsSizeCache}>
       <TreeDataContext.Provider value={data}>
         <TreeSelectionContext.Provider value={selection}>
           <TreeContext.Provider value={tree}>
             <TreeDnDContext.Provider value={dnd ?? null}>
-              <TreeMenuContextProvider menu={menu ?? null}>
-                {children}
-                <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
-                  <TreeVirtualizationContext.Provider value={mountOptimization}>
-                    <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
-                  </TreeVirtualizationContext.Provider>
-                </div>
-              </TreeMenuContextProvider>
+              <CaptureView view={treeViewService} className="tw:flex tw:flex-col tw:flex-1 tw:min-h-0">
+                <TreeViewContextProvider>
+                  <TreeMenuContextProvider menu={menu ?? null}>
+                    {children}
+                    <div ref={mountOptimization.setRootRef} className={clsx('tw:relative tw:overflow-auto', className)}>
+                      <TreeVirtualizationContext.Provider value={mountOptimization}>
+                        <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
+                      </TreeVirtualizationContext.Provider>
+                    </div>
+                  </TreeMenuContextProvider>
+                </TreeViewContextProvider>
+              </CaptureView>
             </TreeDnDContext.Provider>
           </TreeContext.Provider>
         </TreeSelectionContext.Provider>

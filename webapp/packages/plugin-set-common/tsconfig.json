@@ -242,6 +242,9 @@
       "path": "../plugin-localization"
     },
     {
+      "path": "../plugin-localization-administration"
+    },
+    {
       "path": "../plugin-log-viewer"
     },
     {

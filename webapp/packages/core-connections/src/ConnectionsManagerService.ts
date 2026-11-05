@@ -124,6 +124,7 @@ export class ConnectionsManagerService {
       connections: [key],
       state: 'after',
     });
+
     return true;
   }
 
@@ -131,6 +132,7 @@ export class ConnectionsManagerService {
     if (connected) {
       return this.projectConnections.some(connection => connection.connected);
     }
+
     return !!this.projectConnections.length;
   }
 
@@ -181,9 +183,11 @@ export class ConnectionsManagerService {
 
   async closeConnectionAsync(key: IConnectionInfoParams): Promise<void> {
     const connection = this.connectionInfoResource.get(key);
+
     if (!connection || !connection.connected) {
       return;
     }
+
     const contexts = await this.onDisconnect.execute({
       connections: [key],
       state: 'before',

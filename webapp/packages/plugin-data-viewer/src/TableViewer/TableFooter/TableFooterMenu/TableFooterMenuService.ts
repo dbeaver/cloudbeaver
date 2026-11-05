@@ -138,6 +138,7 @@ export class TableFooterMenuService {
         return [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL, ...items];
       },
     });
+
     this.actionService.addHandler({
       id: 'data-base-editing-handler',
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
@@ -146,6 +147,7 @@ export class TableFooterMenuService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const currentMenu = context.getOwn(DATA_CONTEXT_MENU);
+
         if (currentMenu !== undefined && currentMenu !== DATA_VIEWER_DATA_MODEL_ACTIONS_MENU) {
           return false;
         }
@@ -172,6 +174,7 @@ export class TableFooterMenuService {
             return editor.hasFeature('revert');
           }
         }
+
         return true;
       },
       isDisabled(context, action) {
@@ -246,6 +249,7 @@ export class TableFooterMenuService {
     if (!editor) {
       return;
     }
+
     const selectedElements = getActiveElements(model, resultIndex);
 
     switch (action) {
@@ -277,6 +281,7 @@ export class TableFooterMenuService {
 
   private tableFooterMenuGetActionInfo(context: IDataContextProvider, action: IAction) {
     const t = this.localizationService.translate;
+
     switch (action) {
       case ACTION_ADD:
         return {

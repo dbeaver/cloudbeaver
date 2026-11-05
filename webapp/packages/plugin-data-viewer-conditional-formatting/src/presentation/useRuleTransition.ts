@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ export function useRuleTransition(rules: IFormatRuleState[], selectedRule: IForm
         prevRuleRef.current = { rule: selectedRule!, index: selectedRuleIndex };
         return undefined;
       }
+
       setPreviousRule(prevRuleRef.current.rule);
 
       setDirection(selectedRuleIndex >= prevRuleRef.current.index ? 'left' : 'right');
@@ -49,8 +50,10 @@ export function useRuleTransition(rules: IFormatRuleState[], selectedRule: IForm
       }, ANIMATION_DURATION);
 
       prevRuleRef.current = selectedRule ? { rule: selectedRule, index: selectedRuleIndex } : null;
+
       return () => clearTimeout(timer);
     }
+
     return undefined;
   }, [selectedRule]);
 

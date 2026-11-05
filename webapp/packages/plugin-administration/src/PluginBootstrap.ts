@@ -20,6 +20,7 @@ const AdministrationMenu = lazy(() => import('./AdministrationMenu/Administratio
 const AdministrationTopAppBarHeader = lazy(() =>
   import('./AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarHeader.js').then(m => ({ default: m.AdministrationTopAppBarHeader })),
 );
+
 const AppStateMenu = lazy(() => import('@cloudbeaver/plugin-top-app-bar').then(m => ({ default: m.AppStateMenu })));
 
 @injectable(() => [PermissionsService, ScreenService, AdministrationScreenService, AdministrationTopAppBarService, MenuService])

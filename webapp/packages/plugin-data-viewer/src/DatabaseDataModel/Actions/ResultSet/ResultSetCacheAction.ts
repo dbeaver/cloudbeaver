@@ -54,6 +54,7 @@ export class ResultSetCacheAction
 
   get<T>(key: IGridDataKey, scope: symbol): T | undefined {
     const keyCache = this.getKeyCache(key);
+
     if (!keyCache) {
       return;
     }
@@ -63,6 +64,7 @@ export class ResultSetCacheAction
 
   getRow<T>(key: IGridRowKey, scope: symbol): T | undefined {
     const keyCache = this.getRowCache(key);
+
     if (!keyCache) {
       return;
     }
@@ -72,6 +74,7 @@ export class ResultSetCacheAction
 
   getColumn<T>(key: IGridColumnKey, scope: symbol): T | undefined {
     const keyCache = this.getColumnCache(key);
+
     if (!keyCache) {
       return;
     }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,12 @@ export class ExtendedDDLResource extends CachedMapResource<string, string> {
     if (isResourceAlias(key)) {
       throw new Error('Aliases not supported by this resource.');
     }
+
     const values: string[] = [];
 
     await ResourceKeyUtils.forEachAsync(key, async nodeId => {
       const { metadataGetNodeExtendedDDL } = await this.graphQLService.sdk.metadataGetNodeExtendedDDL({ nodeId });
+
       if (metadataGetNodeExtendedDDL) {
         values.push(metadataGetNodeExtendedDDL);
       }

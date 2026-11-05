@@ -45,6 +45,7 @@ import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DI
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
+import { MENU_CONNECTION_SECURITY } from './MENU_CONNECTION_SECURITY.js';
 import { MENU_NAVIGATION_TREE_MANAGE, nodeDeletionPlanContext, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
 @injectable(() => [
@@ -108,6 +109,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.nodeDeletionService.prepareDeletion.addHandler(async (nodes, contexts) => {
       const plan = contexts.getContext(nodeDeletionPlanContext);
+
       for (const node of nodes.filter(isConnectionNode)) {
         const key = node.projectId && node.objectId ? createConnectionParam(node.projectId, node.objectId) : undefined;
         const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
@@ -117,11 +119,13 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           readOnly: connection?.features.includes(EConnectionFeature.readOnly),
           keepChildren: true,
         };
+
         // Readonly restricts database edits, not removal of the saved connection configuration.
         if (!key || !connection?.canDelete) {
           plan.exclude({ ...target, owner: 'connections', reason: 'plugin_navigation_tree_delete_unavailable' });
           continue;
         }
+
         plan.addOperation({
           id: `delete-connection:${node.uri}`,
           owner: 'connections',
@@ -132,19 +136,23 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           },
         });
       }
+
       for (const node of nodes.filter(node => this.isDatabaseNode(node))) {
         const key = node.projectId ? this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, node.uri) : undefined;
         const connection = key ? await this.connectionInfoResource.load(key).catch(() => undefined) : undefined;
         const readOnly = connection?.features.includes(EConnectionFeature.readOnly);
         const target = { node, type: 'plugin_connections_delete_database_object', readOnly };
+
         if ((key && !connection) || !this.canDeleteObject(node)) {
           plan.exclude({
             ...target,
             owner: 'database-objects',
             reason: readOnly ? 'plugin_connections_delete_read_only' : 'plugin_navigation_tree_delete_unavailable',
           });
+
           continue;
         }
+
         plan.addOperation({
           id: `delete-database-object:${node.uri}`,
           owner: 'database-objects',
@@ -156,11 +164,64 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         });
       }
     });
+
     this.addConnectionsMenuToTopAppBar();
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_MANAGE],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_EDIT, ACTION_CONNECTION_CLONE],
+    });
+
+    this.menuService.addCreator({
+      root: true,
+      contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
+      isApplicable: context => context.get(DATA_CONTEXT_NAV_NODE)!.objectFeatures.includes(EObjectFeature.dataSource),
+      getItems: (context, items) => [...items, MENU_CONNECTION_SECURITY],
+    });
+
+    this.menuService.addCreator({
+      menus: [MENU_CONNECTION_SECURITY],
+      getItems: (context, items) => [...items, ACTION_CONNECTION_CHANGE_DB_PASSWORD],
+    });
+
+    this.menuService.setHandler({
+      id: 'connection-security',
+      menus: [MENU_CONNECTION_SECURITY],
+      getLoader: context => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+
+        return [
+          getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey),
+          getCachedMapResourceLoaderState(this.dbDriverResource, () => this.connectionInfoResource.get(connectionKey)?.driverId ?? null),
+        ];
+      },
+      isHidden: context => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connection = this.connectionInfoResource.get(connectionKey);
+
+        if (!connection) {
+          return true;
+        }
+
+        const driver = this.dbDriverResource.get(connection.driverId);
+
+        return !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'connection-change-db-password',
+      menus: [MENU_CONNECTION_SECURITY],
+      actions: [ACTION_CONNECTION_CHANGE_DB_PASSWORD],
+      contexts: [DATA_CONTEXT_CONNECTION],
+      handler: async context => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+
+        await this.commonDialogService.open(ChangeDatabasePasswordDialog, {
+          projectId: connectionKey.projectId,
+          connectionId: connectionKey.connectionId,
+        });
+      },
     });
 
     this.menuService.addCreator({
@@ -234,6 +295,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             } catch (exception: any) {
               this.notificationService.logException(exception, 'plugin_connections_connection_clone_error');
             }
+
             break;
           }
         }
@@ -242,12 +304,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'connection-management',
-      actions: [
-        ACTION_CONNECTION_CHANGE_DB_PASSWORD,
-        ACTION_CONNECTION_CHANGE_CREDENTIALS,
-        ACTION_CONNECTION_DISCONNECT,
-        ACTION_CONNECTION_DISCONNECT_ALL,
-      ],
+      actions: [ACTION_CONNECTION_CHANGE_CREDENTIALS, ACTION_CONNECTION_DISCONNECT, ACTION_CONNECTION_DISCONNECT_ALL],
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       isActionApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -273,12 +330,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           const auth = this.connectionInfoAuthPropertiesResource.get(connectionKey);
           const driver = this.dbDriverResource.get(connection.driverId);
-          return !!driver?.anonymousAccess || !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
-        }
 
-        if (action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
-          const driver = this.dbDriverResource.get(connection.driverId);
-          return !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
+          return !!driver?.anonymousAccess || !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
         }
 
         return true;
@@ -287,7 +340,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
         const loaders = [getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true)];
 
-        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS || action === ACTION_CONNECTION_CHANGE_DB_PASSWORD) {
+        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           loaders.push(
             getCachedMapResourceLoaderState(this.dbDriverResource, () => this.connectionInfoResource.get(connectionKey)?.driverId ?? null),
           );
@@ -315,14 +368,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
           case ACTION_CONNECTION_CHANGE_CREDENTIALS: {
             await this.connectionsManagerService.requireConnection({ connectionId: connection.id, projectId: connection.projectId }, true);
-            break;
-          }
-
-          case ACTION_CONNECTION_CHANGE_DB_PASSWORD: {
-            await this.commonDialogService.open(ChangeDatabasePasswordDialog, {
-              projectId: connection.projectId,
-              connectionId: connection.id,
-            });
             break;
           }
         }
@@ -356,6 +401,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       menus: [MENU_APP_ACTIONS],
       getItems: (context, items) => [...items, MENU_CONNECTIONS],
     });
+
     this.menuService.setHandler({
       id: 'connections-menu-base',
       menus: [MENU_CONNECTIONS],

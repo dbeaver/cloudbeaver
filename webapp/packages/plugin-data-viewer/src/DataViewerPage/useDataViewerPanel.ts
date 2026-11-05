@@ -67,6 +67,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
             valuePresentationId: null,
             persistedState: {},
           });
+
           pageState = dataViewerTabService.page.getState(tab)!;
         }
 

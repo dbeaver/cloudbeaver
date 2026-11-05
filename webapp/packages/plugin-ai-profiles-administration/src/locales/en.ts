@@ -9,6 +9,8 @@ export default [
   ['ai_administration_models_select_or_manual_description', 'Select a model from the list or enter its name manually'],
   ['ai_administration_models_refresh_fail', 'Failed to refresh models'],
   ['plugin_ai_administration_profiles_title', 'Profiles'],
+  ['plugin_ai_administration_create_profile', 'Create profile'],
+  ['plugin_ai_administration_profiles_search_placeholder', 'Search for the profile name...'],
   ['plugin_ai_administration_profiles_table_empty_placeholder', 'No profiles found. Create a new profile'],
   ['plugin_ai_administration_profile_column_name', 'Name'],
   ['plugin_ai_administration_profile_column_engine', 'Engine'],

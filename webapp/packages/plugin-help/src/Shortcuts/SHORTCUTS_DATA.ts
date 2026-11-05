@@ -181,14 +181,17 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   },
 ];
 
+export const TREE_SHORTCUTS: IShortcut[] = [
+  {
+    label: 'tree_shortcut_collapse_all',
+    code: transformKeys(KEY_BINDING_COLLAPSE_ALL),
+  },
+];
+
 export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
   {
     label: 'navigation_tree_shortcut_enable_filter',
     code: transformKeys(KEY_BINDING_ENABLE_FILTER),
-  },
-  {
-    label: 'app_navigationTree_action_collapse_all',
-    code: transformKeys(KEY_BINDING_COLLAPSE_ALL),
   },
   {
     label: 'app_navigationTree_action_link_with_editor',

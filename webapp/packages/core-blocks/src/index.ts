@@ -24,6 +24,7 @@ export * from './CommonDialog/RenameDialog.js';
 export * from './CommonDialog/DialogsPortal.js';
 export * from './ExportImageDialog/ExportImageDialogLazy.js';
 export * from './ExportImageDialog/ExportImageFormats.js';
+export * from './ImageLightboxDialog/ImageLightboxDialogLazy.js';
 
 export * from './ErrorDetailsDialog/ErrorDetailsDialog.js';
 
@@ -202,6 +203,11 @@ export * from './IconButton.js';
 export * from './ActionIconButton.js';
 export { default as IconButtonStyles } from './IconButton.module.css';
 export { default as ActionIconButtonStyles } from './ActionIconButton.module.css';
+export * from './Toolbar/ToolbarActionLazy.js';
+export * from './Toolbar/ToolbarActionsLazy.js';
+export type { IToolbarActionProps } from './Toolbar/ToolbarAction.js';
+export { default as ToolbarActionStyles } from './Toolbar/ToolbarAction.module.css';
+export { default as ToolbarActionsStyles } from './Toolbar/ToolbarActions.module.css';
 export * from './IconOrImage.js';
 export * from './RadioIndicator.js';
 export * from './s.js';

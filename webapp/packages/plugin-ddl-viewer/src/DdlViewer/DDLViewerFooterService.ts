@@ -88,6 +88,7 @@ export class DDLViewerFooterService {
             if (container.schemaId) {
               path.push(container.schemaId);
             }
+
             if (node?.name && node.name !== container.schemaId) {
               path.push(node.name);
             }
@@ -103,6 +104,7 @@ export class DDLViewerFooterService {
               schemaId: container.schemaId,
               query: ddl,
             });
+
             break;
           }
         }
@@ -111,6 +113,7 @@ export class DDLViewerFooterService {
         if (action === ACTION_SQL_EDITOR_OPEN) {
           return { ...action.info, icon: '/icons/sql_script_m.svg' };
         }
+
         return action.info;
       },
     });
@@ -144,7 +147,7 @@ export class DDLViewerFooterService {
   private isFullDDLSupported(nodeId: string): boolean {
     const supportsFullDdl = this.navNodeInfoResource.get(nodeId)?.objectFeatures.includes(EObjectFeature.supportsFullDdl) ?? false;
     const ddlGenerator = this.sqlGeneratorsResource
-      .get(nodeId)
+      .get({ nodeIds: [nodeId] })
       ?.find(generator => generator.id.toLowerCase().includes(DDL_GENERATOR_ID.toLowerCase()));
 
     return supportsFullDdl && !!ddlGenerator;

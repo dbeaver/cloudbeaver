@@ -68,6 +68,7 @@ export class TransportSubject<T> extends Subject<T> {
     }
 
     const subscription = this.output.subscribe(subscriber);
+
     return subscription;
   }
 
@@ -83,6 +84,7 @@ export class TransportSubject<T> extends Subject<T> {
             console.warn('WebSocket failed, switching to polling');
 
             this.switchToPolling();
+
             return EMPTY;
           }
 
@@ -96,6 +98,7 @@ export class TransportSubject<T> extends Subject<T> {
           if (this.active === this.ws) {
             console.warn('WebSocket closed, switching to polling');
             this.switchToPolling();
+
             return;
           }
 

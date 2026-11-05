@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ interface Props {
 
 export const ConnectionImageWithMaskSvg: React.FC<Props> = ({ icon, connected, maskId, size = 16, markerRadius = 4, paddingSize = 0, className }) => {
   const styles = useS(style);
+
   if (!icon) {
     return null;
   }
@@ -32,10 +33,12 @@ export const ConnectionImageWithMaskSvg: React.FC<Props> = ({ icon, connected, m
     coordinate: size - markerRadius + paddingSize,
     radius: markerRadius + circleOffset + paddingSize,
   };
+
   const rectParams = {
     coordinate: size - markerRadius + paddingSize,
     size: markerRadius + rectOffset + paddingSize,
   };
+
   const url = isValidUrl(icon) ? icon : GlobalConstants.absoluteUrl(icon);
 
   return (

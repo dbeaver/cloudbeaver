@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
 
   return (
     <DialogHeader title={translate(tooltip ?? title)} className={s(computedStyles, { header: true }, className)}>
-      <div className={s(computedStyles, { iconContainer: true })}>
+      <div className={s(computedStyles, { iconContainer: true })} aria-hidden="true">
         {icon && <IconOrImage className={s(computedStyles, { icon: true, bigIcon })} icon={icon} viewBox={viewBox} />}
       </div>
       <div className={s(computedStyles, { headerTitleContainer: true })}>

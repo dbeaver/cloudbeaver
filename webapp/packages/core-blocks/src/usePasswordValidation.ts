@@ -23,6 +23,7 @@ export function usePasswordValidation(formContext?: IFormContext) {
     }
 
     const validation = passwordPolicyService.validatePassword(value);
+
     return validation.isValid ? null : validation.errorMessage;
   }, formContext);
 

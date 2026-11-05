@@ -13,6 +13,7 @@ import { useS } from '../useS.js';
 import style from './ToolsPanel.module.css';
 
 type TType = 'primary' | 'secondary';
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   className?: string;
   type?: TType;

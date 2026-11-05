@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -88,10 +88,12 @@ export class AsyncTask {
         so we need to wait a bit before retrying */
         setTimeout(() => this.updateInfoAsync.call(this, getter), 100);
       }
+
       return;
     }
 
     this.updatingAsync = true;
+
     try {
       if (this._cancelled && init) {
         throw new Error('Task was cancelled');
@@ -118,6 +120,7 @@ export class AsyncTask {
     }
 
     this._cancelled = true;
+
     try {
       await this.cancelTask();
     } catch (exception: any) {
@@ -143,6 +146,7 @@ export class AsyncTask {
         this.resolve(info);
       }
     }
+
     this.onStatusChange.execute(this.taskInfo);
   }
 

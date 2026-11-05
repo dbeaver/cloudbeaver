@@ -51,6 +51,7 @@ export class ExceptionsCatcherService extends Bootstrap {
     if (this.baseCatcher) {
       return this.baseCatcher(event, source, lineno, colno, _error);
     }
+
     return true;
   };
 }

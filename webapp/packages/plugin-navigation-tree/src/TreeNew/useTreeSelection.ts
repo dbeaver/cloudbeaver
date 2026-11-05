@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSel
     if (currentState.indeterminate) {
       selectionMap.set(nodeId, { selected: currentState.selected, indeterminate: false });
     }
+
     return;
   }
 
@@ -52,9 +53,11 @@ function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSel
 
   for (const childId of children) {
     const childState = selectionMap.get(childId) ?? getDefaultSelection();
+
     if (childState.selected) {
       selectedCount++;
     }
+
     if (childState.indeterminate) {
       indeterminateCount++;
     }
@@ -115,6 +118,7 @@ async function setSelectionWithLoad(
   } catch {
     treeData.updateState(nodeId, { expanded: false });
     selectionMap.set(nodeId, getDefaultSelection());
+
     return nodes;
   }
 

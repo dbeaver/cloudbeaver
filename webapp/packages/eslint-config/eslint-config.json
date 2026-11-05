@@ -142,7 +142,7 @@
     ],
     "operator-linebreak": "off",
     "multiline-ternary": "off",
-    "no-nested-ternary": "warn",
+    "no-nested-ternary": "error",
     "arrow-parens": ["error", "as-needed"],
     "comma-dangle": [
       "warn",

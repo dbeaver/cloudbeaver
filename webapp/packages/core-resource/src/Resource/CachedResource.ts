@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -110,9 +110,11 @@ export abstract class CachedResource<
             }
           }
         }
+
         return resourceKeyList(key.filter(value => keys.has(value)));
       },
     );
+
     this.aliases.add(
       CachedResourceOffsetPageKey,
       key => key.parent! as any,
@@ -136,6 +138,7 @@ export abstract class CachedResource<
             }
           }
         }
+
         return resourceKeyList(key.filter(value => keys.has(value)));
       },
     );
@@ -317,6 +320,7 @@ export abstract class CachedResource<
     }
 
     const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
+
     if (pageKey) {
       const pageInfo = this.offsetPagination.getPageInfo(pageKey);
 
@@ -386,6 +390,7 @@ export abstract class CachedResource<
 
       this.metadata.update(param, metadata => {
         metadata.loaded = true;
+
         if (includes) {
           this.commitIncludes(metadata, includes);
         }
@@ -415,10 +420,13 @@ export abstract class CachedResource<
         });
       }
     });
+
     if (isResourceAlias(key)) {
       key = this.aliases.transformToAlias(key);
     }
+
     this.onDataError.execute({ param: key, exception });
+
     return exception as ResourceError;
   }
 
@@ -451,6 +459,7 @@ export abstract class CachedResource<
     if (param === undefined) {
       param = CachedResourceParamKey;
     }
+
     const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
 
     this.metadata.update(param, metadata => {
@@ -487,9 +496,11 @@ export abstract class CachedResource<
     }
 
     this.cleanError(key);
+
     if (isResourceAlias(key)) {
       key = this.aliases.transformToAlias(key);
     }
+
     this.onDataUpdate.execute(key);
   }
 
@@ -497,7 +508,9 @@ export abstract class CachedResource<
     if (key === undefined) {
       key = CachedResourceParamKey;
     }
+
     await this.loadData(key, true, context);
+
     return this.data;
   }
 
@@ -512,7 +525,9 @@ export abstract class CachedResource<
     if (key === undefined) {
       key = CachedResourceParamKey;
     }
+
     await this.loadData(key, false, context);
+
     return this.data;
   }
 
@@ -526,6 +541,7 @@ export abstract class CachedResource<
     }
 
     const metadata = this.metadata.get(key);
+
     return metadata.includes;
   }
 
@@ -570,6 +586,7 @@ export abstract class CachedResource<
         metadata.includes.push(include);
       }
     }
+
     metadata.outdatedIncludes = observable(metadata.outdatedIncludes.filter(include => !includes.includes(include)));
   }
 
@@ -701,6 +718,7 @@ export abstract class CachedResource<
     }
 
     let loaded = false;
+
     return this.scheduler.schedule(
       key,
       async () => {
@@ -710,9 +728,11 @@ export abstract class CachedResource<
         }
 
         this.markLoading(key, true, include);
+
         try {
           const result = await this.taskWrapper(key, include, true, update);
           loaded = true;
+
           return result;
         } finally {
           this.markLoading(key, false, include);
@@ -743,9 +763,12 @@ export abstract class CachedResource<
     if (isResourceAlias(key)) {
       key = this.aliases.transformToAlias(key);
     }
+
     const contexts = new ExecutionContext(key);
+
     if (!refresh) {
       const exception = this.getException(key);
+
       if (isContainsException(exception)) {
         throw getFirstException(exception);
       }
@@ -778,10 +801,12 @@ export abstract class CachedResource<
         }
 
         this.markLoading(key, true, include);
+
         try {
           const result = await this.taskWrapper(key, include, refresh, this.loadingTask);
           loaded = true;
           this.markLoaded(key, include);
+
           return result;
         } finally {
           this.markLoading(key, false, include);
@@ -820,6 +845,7 @@ export abstract class CachedResource<
 
     const value = await promise(param, context, refresh);
     this.markUpdated(param);
+
     return value;
   }
 
@@ -828,6 +854,7 @@ export abstract class CachedResource<
       const key = this.outdateWaitList[i]!;
       this.markOutdatedSync(key);
     }
+
     this.outdateWaitList = [];
   }
 }

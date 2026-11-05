@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,18 @@ import { useValuePanelImageValue } from './useValuePanelImageValue.js';
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IGridDataKey } from '../../DatabaseDataModel/Actions/Grid/IGridDataKey.js';
 import type { IDatabaseValueHolder } from '../../DatabaseDataModel/Actions/IDatabaseValueHolder.js';
+import { ImageRenderer } from './ImageRenderer.js';
 
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps> = observer(function ImageValuePresentation({
   model: unknownModel,
   resultIndex,
 }) {
   const model = unknownModel as any;
+
   if (!isResultSetDataModel(model)) {
     throw new Error('ImageValuePresentation can be used only with ResultSetDataSource');
   }
+
   const translate = useTranslate();
   const suspense = useSuspense();
   const style = useS(styles);
@@ -48,6 +51,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       },
     ),
   );
+
   const data = useValuePanelImageValue({ model, resultIndex });
   const loading = model.isLoading();
   const valueSize = bytesToSize(isResultSetContentValue(data.cellValue) ? (data.cellValue.contentLength ?? 0) : 0);
@@ -56,6 +60,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     isTruncatedMessageDisplay &&
     !!data.selectedCell &&
     data.contentAction.isDownloadable(data.cellHolder as IDatabaseValueHolder<IGridDataKey, IResultSetValue>);
+
   const isCacheDownloading = isDownloadable && data.contentAction.isLoading(data.selectedCell);
   const debouncedDownload = useMemo(() => throttle(() => data.download(), 1000, false), []);
   const srcGetter = suspense.observedValue(
@@ -65,6 +70,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       if (src instanceof Blob) {
         return await blobToBase64(src);
       }
+
       return src;
     },
   );
@@ -117,20 +123,4 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       </Container>
     </Container>
   );
-});
-
-interface ImageRendererProps {
-  className?: string;
-  srcGetter: () => string | null;
-  onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
-}
-
-export const ImageRenderer = observer<ImageRendererProps>(function ImageRenderer({ srcGetter, className, onContextMenu }) {
-  const src = srcGetter();
-
-  if (!src) {
-    return null;
-  }
-
-  return <img src={src} className={className} onContextMenu={onContextMenu} />;
 });

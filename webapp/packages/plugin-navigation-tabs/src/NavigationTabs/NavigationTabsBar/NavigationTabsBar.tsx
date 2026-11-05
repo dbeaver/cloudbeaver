@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Loader, SContext, type StyleRegistry, useExecutor } from '@cloudbeaver/core-blocks';
@@ -42,6 +42,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   const userInfoResource = useService(UserInfoResource);
   const navigationTabsService = useService(NavigationTabsService);
   const navigationTabsSettingsService = useService(NavigationTabsSettingsService);
+  const containerRef = useRef<HTMLDivElement>(null);
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
   const [restoring, setRestoring] = useState(false);
@@ -57,6 +58,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
 
   async function restoreTabs() {
     setRestoring(true);
+
     try {
       await navigationTabsService.restoreTabs();
     } finally {
@@ -88,6 +90,18 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
     postHandlers: [unloadTabs, restoreTabs],
   });
 
+  useExecutor({
+    executor: navigationTabsService.onTabSelect,
+    handlers: [
+      function handleTabSelect(tab) {
+        requestAnimationFrame(() => {
+          const target = containerRef.current?.querySelector<HTMLElement>(`[data-id="${tab.id}"]`);
+          target?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        });
+      },
+    ],
+  });
+
   useEffect(() => {
     unloadTabs();
     restoreTabs();
@@ -110,7 +124,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           onChange={handleTabChange}
           onReorder={handleReorder}
         >
-          <div className="tw:outline-none! tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
+          <div ref={containerRef} className="tw:outline-none! tw:flex-1 tw:flex tw:flex-col tw:max-w-full">
             <TabList
               className={clsx(
                 'tw:overflow-auto tw:max-w-full theme-background-secondary theme-text-on-secondary',
