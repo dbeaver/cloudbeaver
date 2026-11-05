@@ -51,6 +51,8 @@ yarn validate-dependencies
 
 For a focused check, use a package's existing script, for example `yarn workspace @cloudbeaver/core-utils test` or `yarn workspace @cloudbeaver/plugin-sql-editor lint`. Do not invent a package script that is absent from its `package.json`.
 
+Before pushing CE or EE changes, read and follow `.agents/skills/pre-push-checks/SKILL.md` in this repository to run ESLint and Prettier on all changed files.
+
 ### Working conventions
 
 - Put changes in the smallest package that owns the behavior. Prefer existing `core-*` abstractions and UI primitives before adding cross-package helpers.
@@ -93,4 +95,5 @@ For a focused check, use a package's existing script, for example `yarn workspac
 - New arguments and input fields added to a released API must be optional.
 
 ### License header
+
 - Please use header from ../dbeaver/docs/license_header.txt for backend source files.

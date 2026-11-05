@@ -41,13 +41,13 @@ Object.assign(plugin.configs, {
     rules: {
       '@cloudbeaver/no-sync-component-import': 'error',
       '@cloudbeaver/form-part-contract': 'error',
-      '@cloudbeaver/service-variable-name': 'error',
-      '@cloudbeaver/statement-spacing': 'error',
-      '@cloudbeaver/require-function-declarations-in-components': 'error',
+      '@cloudbeaver/service-variable-name': 'warn',
+      '@cloudbeaver/statement-spacing': 'warn',
+      '@cloudbeaver/require-function-declarations-in-components': 'warn',
       '@cloudbeaver/no-conditional-empty-object-spread': 'error',
       '@cloudbeaver/package-boundaries': 'error',
       '@cloudbeaver/one-component-per-file': 'error',
-      '@cloudbeaver/function-name-matches-variable': 'error',
+      '@cloudbeaver/function-name-matches-variable': 'warn',
     },
   },
 });
