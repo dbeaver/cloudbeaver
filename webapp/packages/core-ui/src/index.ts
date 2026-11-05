@@ -95,6 +95,8 @@ export * from './Tabs/Tab/TabTitleLoader.js';
 export * from './Tabs/Tab/useTab.js';
 export * from './Tabs/TabsBootstrap.js';
 
+export * from './SideBarPanel/BottomPanelLoader.js';
+export * from './SideBarPanel/BottomPanelService.js';
 export * from './SideBarPanel/LeftBarPanelService.js';
 export * from './SideBarPanel/SideBarPanelLoader.js';
 export * from './SideBarPanel/SideBarPanelService.js';

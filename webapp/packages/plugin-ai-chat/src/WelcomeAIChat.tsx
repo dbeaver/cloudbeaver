@@ -12,11 +12,11 @@ import { Cell, IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ACTION_TOGGLE_AI_CHAT } from './actions/ACTION_TOGGLE_AI_CHAT.js';
-import { AIChatService } from './AIChat/AIChatService.js';
+import { AIChatTabService } from './AIChatTabService.js';
 
 export const WelcomeAIChat = observer(function WelcomeAIChat() {
   const translate = useTranslate();
-  const aiChatService = useService(AIChatService);
+  const aiChatTabService = useService(AIChatTabService);
 
   return (
     <Cell
@@ -25,7 +25,7 @@ export const WelcomeAIChat = observer(function WelcomeAIChat() {
       className="tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
       aria-label={translate(ACTION_TOGGLE_AI_CHAT.info.tooltip)}
       big
-      onClick={() => aiChatService.togglePanel()}
+      onClick={() => aiChatTabService.toggleTab()}
     >
       {translate(ACTION_TOGGLE_AI_CHAT.info.label)}
     </Cell>

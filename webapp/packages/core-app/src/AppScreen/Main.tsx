@@ -22,7 +22,7 @@ import {
   type StyleRegistry,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { LeftBarPanelService, SideBarPanel, SideBarPanelService, TabStyles } from '@cloudbeaver/core-ui';
+import { LeftBarPanelService, SideBarPanel, SideBarPanelService, TabStyles, useTabPersistence } from '@cloudbeaver/core-ui';
 
 import { PANEL_ID_LEFT_SIDEBAR, PANEL_ID_RIGHT_SIDEBAR } from './AppScreenService.js';
 import { RightArea } from './RightArea.js';
@@ -44,6 +44,9 @@ export const Main = observer(function Main() {
   const sideBarPanelService = useService(SideBarPanelService);
   const leftBarPanelService = useService(LeftBarPanelService);
 
+  const sideBarPanelState = useTabPersistence(PANEL_ID_RIGHT_SIDEBAR, sideBarPanelService.tabsContainer);
+  const leftBarPanelState = useTabPersistence(PANEL_ID_LEFT_SIDEBAR, leftBarPanelService.tabsContainer);
+
   const splitMainState = useSplitUserState('main');
   const splitRightState = useSplitUserState('main-right');
 
@@ -54,7 +57,15 @@ export const Main = observer(function Main() {
     executor: sideBarPanelService.tabsContainer.onTabSelect,
     handlers: [
       function showPanel() {
-        if (splitRightState.mode === 'minimize' && !sideBarDisabled) {
+        if (sideBarPanelService.tabsContainer.getDisplayed().length === 0) {
+          return;
+        }
+
+        if (splitRightState.size === 0) {
+          splitRightState.onResize?.(-1, -1);
+        }
+
+        if (splitRightState.mode === 'minimize') {
           splitRightState.onModeChange?.('resize');
         }
       },
@@ -68,7 +79,12 @@ export const Main = observer(function Main() {
           <Pane className={s(styles, { pane: true })} basis="250px" main>
             <Loader suspense>
               <SContext registry={LEFT_SIDEBAR_PANEL_REGISTRY}>
-                <SideBarPanel container={leftBarPanelService.tabsContainer} panelId={PANEL_ID_LEFT_SIDEBAR} />
+                <SideBarPanel
+                  container={leftBarPanelService.tabsContainer}
+                  panelId={PANEL_ID_LEFT_SIDEBAR}
+                  selectedTabId={leftBarPanelState.selectedTabId}
+                  onSelectTab={leftBarPanelState.selectTab}
+                />
               </SContext>
             </Loader>
           </Pane>
@@ -81,7 +97,12 @@ export const Main = observer(function Main() {
               <ResizerControls />
               <Pane className={s(styles, { pane: true })} basis="400px" main dialogPersistent>
                 <Loader className={s(styles, { loader: true })} suspense>
-                  <SideBarPanel container={sideBarPanelService.tabsContainer} panelId={PANEL_ID_RIGHT_SIDEBAR} />
+                  <SideBarPanel
+                    container={sideBarPanelService.tabsContainer}
+                    panelId={PANEL_ID_RIGHT_SIDEBAR}
+                    selectedTabId={sideBarPanelState.selectedTabId}
+                    onSelectTab={sideBarPanelState.selectTab}
+                  />
                 </Loader>
               </Pane>
             </Split>
