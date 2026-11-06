@@ -391,8 +391,8 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,
       updateRowCount: result.updateRowCount || 0,
-      loadedFully: (result.resultSet?.rowsWithMetaData?.length || 0) < limit,
-      count: result.resultSet?.rowsWithMetaData?.length || 0,
+      loadedFully: (result.resultSet?.timeSeriesData?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0) < limit,
+      count: result.resultSet?.timeSeriesData?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0,
       totalCount: null,
       // allays returns false
       // || !result.resultSet?.hasMoreData,

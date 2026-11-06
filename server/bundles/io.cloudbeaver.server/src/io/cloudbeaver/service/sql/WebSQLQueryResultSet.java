@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.timeseries.TSData;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +44,7 @@ public class WebSQLQueryResultSet {
     private boolean hasRowIdentifier;
     private WebSQLResultSetRowIdentifierState rowIdentifierState;
     private WebSQLResultSetRowIdentifier rowIdentifier;
+    private TSData timeSeriesData;
 
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
@@ -88,6 +90,19 @@ public class WebSQLQueryResultSet {
 
     public void setRows(List<WebSQLQueryResultSetRow> rows) {
         this.rows = rows;
+    }
+
+    @Property
+    @Nullable
+    public TSData getTimeSeriesData() {
+        return timeSeriesData;
+    }
+
+    /** Publish a graph-only result without duplicating the raw SQL rows. */
+    public void setTimeSeriesResult(@NotNull TSData timeSeriesData) {
+        this.timeSeriesData = timeSeriesData;
+        columns = new WebSQLQueryResultColumn[0];
+        rows = List.of();
     }
 
     @Property
