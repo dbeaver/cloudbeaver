@@ -29,10 +29,28 @@ public class WebAIMessage {
 
     private final AIChatMessage message;
     private final AIChatConversation conversation;
+    private final Boolean functionConfirmationRequired;
 
     public WebAIMessage(@NotNull AIChatMessage message, @NotNull AIChatConversation conversation) {
+        this(message, conversation, null);
+    }
+
+    public WebAIMessage(
+        @NotNull AIChatMessage message,
+        @NotNull AIChatConversation conversation,
+        @Nullable AIToolboxManager toolboxManager
+    ) {
         this.message = message;
         this.conversation = conversation;
+        this.functionConfirmationRequired = toolboxManager != null
+            && message.message().getConfirmation() instanceof AIFunctionCallConfirmation confirmation
+            ? !confirmation.getFunctionCallsToConfirm(toolboxManager).isEmpty()
+            : null;
+    }
+
+    @Nullable
+    public Boolean getFunctionConfirmationRequired() {
+        return functionConfirmationRequired;
     }
 
     @NotNull
