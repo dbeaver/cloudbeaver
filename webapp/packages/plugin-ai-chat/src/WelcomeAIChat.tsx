@@ -25,7 +25,7 @@ export const WelcomeAIChat = observer(function WelcomeAIChat() {
       className="tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
       aria-label={translate(ACTION_TOGGLE_AI_CHAT.info.tooltip)}
       big
-      onClick={() => aiChatTabService.toggleTab()}
+      onClick={() => aiChatTabService.open()}
     >
       {translate(ACTION_TOGGLE_AI_CHAT.info.label)}
     </Cell>

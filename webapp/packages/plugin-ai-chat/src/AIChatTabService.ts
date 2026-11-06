@@ -8,7 +8,7 @@
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { SideBarPanelService } from '@cloudbeaver/core-ui';
+import { SideBarPanelService, tabSelectionContext } from '@cloudbeaver/core-ui';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { AIChatService } from './AIChat/AIChatService.js';
@@ -39,14 +39,36 @@ export class AIChatTabService {
   }
 
   toggleTab(): void {
-    this.aiChatService.togglePanel();
+    if (!this.aiChatService.isEnabled) {
+      return;
+    }
 
-    if (this.aiChatService.isActive) {
-      this.selectTab();
+    const wasActive = this.aiChatService.isActive;
+
+    if (!wasActive) {
+      this.aiChatService.togglePanel();
+    }
+
+    const wasVisible = this.selectTab();
+
+    if (wasActive && wasVisible) {
+      this.aiChatService.togglePanel();
     }
   }
 
-  selectTab(): void {
-    this.sideBarPanelService.tabsContainer.select(AI_CHAT_TAB_ID);
+  open(): void {
+    if (!this.aiChatService.isEnabled) {
+      return;
+    }
+
+    if (!this.aiChatService.isActive) {
+      this.aiChatService.togglePanel();
+    }
+
+    this.selectTab();
+  }
+
+  selectTab(): boolean {
+    return this.sideBarPanelService.tabsContainer.select(AI_CHAT_TAB_ID)?.getContext(tabSelectionContext).wasVisible ?? false;
   }
 }

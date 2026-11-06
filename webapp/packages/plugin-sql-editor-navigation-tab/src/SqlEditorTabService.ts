@@ -42,6 +42,7 @@ import {
   ESqlDataSourceFeatures,
   type ISQLDatasourceUpdateData,
   type ISqlEditorTabState,
+  requestSqlEditorFocus,
   SQL_EDITOR_TAB_STATE_SCHEMA,
   SqlDataSourceService,
   SqlEditorModelService,
@@ -78,6 +79,9 @@ export class SqlEditorTabService extends Bootstrap {
   readonly tabHandler: TabHandler<ISqlEditorTabState>;
   readonly onCanClose: Executor<ITab<ISqlEditorTabState>>;
 
+  private initialized = false;
+  private focusModel: ReturnType<SqlEditorModelService['getOrCreate']> | null = null;
+
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
     private readonly notificationService: NotificationService,
@@ -101,6 +105,7 @@ export class SqlEditorTabService extends Bootstrap {
       key: sqlEditorTabHandlerKey,
       getTabComponent: () => SqlEditorTab,
       getPanelComponent: () => SqlEditorPanel,
+      onSelect: this.handleTabSelect.bind(this),
       onRestore: this.handleTabRestore.bind(this),
       onUnload: this.handleTabUnload.bind(this),
       onClose: this.handleTabClose.bind(this),
@@ -130,11 +135,39 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   override register(): void {
+    this.navigationTabsService.onInit.addHandler(this.handleNavigationInit.bind(this));
     this.sqlDataSourceService.onUpdate.addHandler(this.syncDatasourceUpdate.bind(this));
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
     this.connectionExecutionContextResource.onItemUpdate.addHandler(this.handleExecutionContextUpdate.bind(this));
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
+  }
+
+  private handleNavigationInit(initialized: boolean): void {
+    this.initialized = initialized;
+
+    if (!initialized) {
+      if (this.focusModel?.focusRequest) {
+        this.focusModel.completeFocusRequest(this.focusModel.focusRequest);
+      }
+
+      this.focusModel = null;
+    }
+  }
+
+  private handleTabSelect(tab: ITab<ISqlEditorTabState>): void {
+    if (!this.initialized) {
+      return;
+    }
+
+    const model = this.sqlEditorModelService.getOrCreate(tab.handlerState);
+
+    if (this.focusModel !== model && this.focusModel?.focusRequest) {
+      this.focusModel.completeFocusRequest(this.focusModel.focusRequest);
+    }
+
+    this.focusModel = model;
+    requestSqlEditorFocus(model, () => this.initialized && this.navigationTabsService.currentTabId === tab.id);
   }
 
   createNewEditor(

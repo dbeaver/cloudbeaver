@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { getComputed, s, SContext, type StyleRegistry, useS, useSplit } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, TabList, TabListStyles, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabListStyles, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { createConnectionParam, useConnectionTypeColor } from '@cloudbeaver/core-connections';
@@ -24,6 +24,7 @@ import SqlEditorTabList from './shared/SqlEditorTabList.module.css';
 import { SQLEditorActions } from './SQLEditorActions.js';
 import { useSqlEditor } from './useSqlEditor.js';
 import { useActiveQuery } from './useActiveQuery.js';
+import { SqlEditorModeTabList } from './SqlEditorModeTabList.js';
 
 const sqlEditorRegistry: StyleRegistry = [
   [TabListStyles, { mode: 'append', styles: [SqlEditorTabList] }],
@@ -82,7 +83,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           <TabPanelList />
           {displayedEditors > 1 ? (
             <div className={s(style, { tabs: true })} style={{ background: typeColor }}>
-              <TabList vertical rotated />
+              <SqlEditorModeTabList data={data} container={sqlEditorModeService.tabsContainer} />
             </div>
           ) : null}
         </div>

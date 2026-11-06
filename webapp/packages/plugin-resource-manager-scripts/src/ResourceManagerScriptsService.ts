@@ -14,7 +14,7 @@ import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
-import { SideBarPanelService } from '@cloudbeaver/core-ui';
+import { SideBarPanelService, tabSelectionContext } from '@cloudbeaver/core-ui';
 
 import { ResourceManagerScriptsSettingsService } from './ResourceManagerScriptsSettingsService.js';
 import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID.js';
@@ -77,15 +77,30 @@ export class ResourceManagerScriptsService {
   }
 
   toggleTab(): void {
-    this.togglePanel();
+    if (!this.enabled) {
+      return;
+    }
 
-    if (this.active) {
-      this.selectTab();
+    const wasActive = this.active;
+    this.settings.active = true;
+    const wasVisible = this.selectTab();
+
+    if (wasActive && wasVisible) {
+      this.togglePanel();
     }
   }
 
-  selectTab() {
-    this.sideBarPanelService.tabsContainer.select(SCRIPTS_TAB_ID);
+  openPanel(): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.settings.active = true;
+    this.selectTab();
+  }
+
+  selectTab(): boolean {
+    return this.sideBarPanelService.tabsContainer.select(SCRIPTS_TAB_ID)?.getContext(tabSelectionContext).wasVisible ?? false;
   }
 
   getRootFolder(project: ProjectInfo) {

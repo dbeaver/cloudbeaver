@@ -12,6 +12,7 @@ import { TabsContainer } from '../Tabs/TabsContainer/TabsContainer.js';
 @injectable()
 export class BottomPanelService {
   readonly tabsContainer: TabsContainer;
+  isDisabled: () => boolean = () => false;
 
   constructor() {
     this.tabsContainer = new TabsContainer('Bottom Panel');

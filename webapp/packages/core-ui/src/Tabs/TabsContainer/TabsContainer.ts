@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
-import { SyncExecutor } from '@cloudbeaver/core-executor';
+import { SyncExecutor, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer.js';
 
@@ -35,7 +35,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     return this.tabInfoMap.has(tabId);
   }
 
-  select(tabId: string, props: TProps): void {
+  select(tabId: string, props: TProps): IExecutionContextProvider<string> | undefined {
     const info = this.getDisplayedTabInfo(tabId, props);
 
     if (!info) {
@@ -47,7 +47,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
       props,
     });
 
-    this.onTabSelect.execute(tabId);
+    return this.onTabSelect.execute(tabId);
   }
 
   getTabInfo(tabId: string): ITabInfo<TProps, TOptions> | undefined {

@@ -56,14 +56,6 @@
       "path": "../plugin-tools-panel"
     }
   ],
-  "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
-    "src/**/*.json",
-    "src/**/*.css"
-  ],
-  "exclude": [
-    "**/node_modules",
-    "lib/**/*"
-  ]
+  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css"],
+  "exclude": ["**/node_modules", "lib/**/*"]
 }

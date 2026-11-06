@@ -23,7 +23,13 @@ export interface IBottomPanelProps {
   onSelectTab: (tabId: string) => void;
 }
 
-export const BottomPanel = observer<IBottomPanelProps>(function BottomPanel({ container, panelId, selectedTabId, onSelectTab }) {
+export const BottomPanel = observer<React.PropsWithChildren<IBottomPanelProps>>(function BottomPanel({
+  container,
+  panelId,
+  selectedTabId,
+  onSelectTab,
+  children,
+}) {
   const style = useS(styles);
   const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(panelId, () => container.getIdList());
 
@@ -43,6 +49,7 @@ export const BottomPanel = observer<IBottomPanelProps>(function BottomPanel({ co
           <TabPanelList />
         </div>
       </div>
+      {children}
     </TabsState>
   );
 });

@@ -28,8 +28,9 @@ import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion.js';
 import style from './SQLCodeEditorPanel.module.css';
 import { SqlEditorInfoBar } from './SqlEditorInfoBar.js';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel.js';
+import { useSQLCodeEditorFocus } from './useSQLCodeEditorFocus.js';
 
-export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data }) {
+export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data, tabId }) {
   const notificationService = useService(NotificationService);
   const navNodeManagerService = useService(NavNodeManagerService);
   const translate = useTranslate();
@@ -41,6 +42,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const sqlEditorSettingsService = useService(SqlEditorSettingsService);
 
   const panel = useSQLCodeEditorPanel(data, editor);
+  useSQLCodeEditorFocus(data, editor, tabId);
   const extensions = useCodemirrorExtensions(undefined, [
     ACTIVE_QUERY_EXTENSION,
     Prec.lowest(QUERY_STATUS_GUTTER_EXTENSION),
@@ -127,7 +129,6 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         incomingValue={data.incomingValue}
         extensions={extensions}
         readonly={data.readonly}
-        autoFocus
         lineNumbers
         onChange={panel.onQueryChange}
         onCursorChange={selection => panel.onCursorChange(selection.anchor, selection.head)}
