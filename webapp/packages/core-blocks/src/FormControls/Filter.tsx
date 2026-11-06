@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@ import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { ActionIconButton } from '../ActionIconButton.js';
 import { Container } from '../Containers/Container.js';
 import type { IContainerProps } from '../Containers/IContainerProps.js';
+import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
 import { useFocus } from '../useFocus.js';
 import { useS } from '../useS.js';
@@ -59,6 +60,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   ...rest
 }) {
   const styles = useS(filterStyle);
+  const translate = useTranslate();
   const [inputRef] = useFocus<HTMLInputElement>({});
 
   let valuePassedFromProps = isNotNullDefined(valueControlled);
@@ -126,10 +128,17 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
 
       <div className={s(styles, { actionButtons: true })}>
         {edited && !permanentSearchIcon ? (
-          <ActionIconButton name="cross" disabled={disabled || disabledActions} className={s(styles, { actionButton: true })} onClick={handleClear} />
+          <ActionIconButton
+            name="cross"
+            aria-label={translate('ui_clear')}
+            disabled={disabled || disabledActions}
+            className={s(styles, { actionButton: true })}
+            onClick={handleClear}
+          />
         ) : (
           <ActionIconButton
             name="search"
+            aria-label={translate('ui_search')}
             viewBox="4 4 16 16"
             disabled={disabled || disabledActions}
             className={s(styles, { actionButton: true })}
