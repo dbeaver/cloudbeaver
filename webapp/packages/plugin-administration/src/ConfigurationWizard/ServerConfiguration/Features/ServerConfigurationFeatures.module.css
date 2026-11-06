@@ -19,25 +19,9 @@
 }
 
 .group {
-  min-width: 0;
-  border: 1px solid var(--theme-background);
-  border-radius: 12px;
-  background: var(--theme-surface);
-  color: var(--theme-on-surface);
-
   &:has(> .content:empty) {
     display: none;
   }
-}
-
-.title {
-  margin: 0;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--theme-background);
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
 }
 
 .content {
@@ -50,12 +34,6 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  min-width: 0;
-  padding: 16px 20px;
-
-  & + & {
-    border-top: 1px solid var(--theme-background);
-  }
 
   &[data-disabled] {
     opacity: 0.6;

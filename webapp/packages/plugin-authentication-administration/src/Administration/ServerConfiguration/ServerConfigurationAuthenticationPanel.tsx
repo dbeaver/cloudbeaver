@@ -8,7 +8,6 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { Container } from '@cloudbeaver/core-blocks';
 import { getServerConfigurationFormPart, type ServerConfigurationFormProps } from '@cloudbeaver/plugin-administration';
 
 import { AuthenticationProviders } from './AuthenticationProviders.js';
@@ -19,9 +18,5 @@ export const ServerConfigurationAuthenticationPanel = observer<ServerConfigurati
 }) {
   const part = getServerConfigurationFormPart(formState);
 
-  return (
-    <Container wrap gap grid medium keepSize>
-      <AuthenticationProviders configurationWizard={configurationWizard} state={part.state} />
-    </Container>
-  );
+  return <AuthenticationProviders configurationWizard={configurationWizard} state={part.state} />;
 });

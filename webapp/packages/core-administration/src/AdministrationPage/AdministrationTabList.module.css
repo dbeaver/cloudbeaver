@@ -20,8 +20,8 @@
 .administrationTabs {
   & .tab {
     height: 100%;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 500;
     padding: 0 4px;
   }
 
@@ -35,5 +35,6 @@
 }
 
 .tabTitle {
-  font-weight: 700;
+  font-weight: 500;
+  text-transform: none;
 }

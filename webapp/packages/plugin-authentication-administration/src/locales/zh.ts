@@ -1,4 +1,12 @@
 export default [
+  ['authentication_administration_providers_search', '搜索提供商...'],
+  ['authentication_administration_providers_filter', '提供商状态'],
+  ['authentication_administration_providers_all', '全部'],
+  ['authentication_administration_providers_active', '已启用'],
+  ['authentication_administration_providers_available', '可用'],
+  ['authentication_administration_providers_empty', '没有符合筛选条件的提供商'],
+  ['authentication_administration_providers_built_in', '内置'],
+  ['authentication_administration_providers_required_features', '请启用以下服务以使用此提供商：{arg:features}'],
   ['authentication_administration_server_configuration_authentication', '身份验证'],
   ['plugin_authentication_administration_team_grant_manual', '管理员'],
   ['plugin_authentication_administration_team_grant_provider', '身份验证提供商'],

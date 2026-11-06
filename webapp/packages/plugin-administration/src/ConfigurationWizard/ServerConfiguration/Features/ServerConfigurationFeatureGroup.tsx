@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 import { useId, type PropsWithChildren } from 'react';
 
-import { s, useS } from '@cloudbeaver/core-blocks';
+import { Card, CardHeader, CardTitle, s, useS } from '@cloudbeaver/core-blocks';
 
 import styles from './ServerConfigurationFeatures.module.css';
 
@@ -23,12 +23,12 @@ export const ServerConfigurationFeatureGroup = observer<PropsWithChildren<IServe
     const titleId = useId();
 
     return (
-      <section className={s(classes, { group: true })} aria-labelledby={titleId}>
-        <h3 id={titleId} className={s(classes, { title: true })}>
-          {title}
-        </h3>
+      <Card className={s(classes, { group: true })} aria-labelledby={titleId}>
+        <CardHeader>
+          <CardTitle id={titleId}>{title}</CardTitle>
+        </CardHeader>
         <div className={s(classes, { content: true })}>{children}</div>
-      </section>
+      </Card>
     );
   },
 );

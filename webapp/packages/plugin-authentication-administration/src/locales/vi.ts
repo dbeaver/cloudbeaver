@@ -1,4 +1,12 @@
 export default [
+  ['authentication_administration_providers_search', 'Tìm nhà cung cấp...'],
+  ['authentication_administration_providers_filter', 'Trạng thái nhà cung cấp'],
+  ['authentication_administration_providers_all', 'Tất cả'],
+  ['authentication_administration_providers_active', 'Đang hoạt động'],
+  ['authentication_administration_providers_available', 'Khả dụng'],
+  ['authentication_administration_providers_empty', 'Không có nhà cung cấp nào phù hợp với bộ lọc'],
+  ['authentication_administration_providers_built_in', 'Tích hợp sẵn'],
+  ['authentication_administration_providers_required_features', 'Bật các dịch vụ sau để sử dụng nhà cung cấp này: {arg:features}'],
   ['authentication_administration_server_configuration_authentication', 'Xác thực'],
   ['plugin_authentication_administration_team_grant_manual', 'Quản trị viên'],
   ['plugin_authentication_administration_team_grant_provider', 'Nhà cung cấp xác thực'],

@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { type ReactNode, useId } from 'react';
 
 import {
+  CardSection,
   CheckboxMarkup,
   type CheckboxBaseProps,
   type CheckboxType,
@@ -54,7 +55,7 @@ export const ServerConfigurationFeature: CheckboxType<IServerConfigurationFeatur
   }
 
   return (
-    <div className={s(classes, { feature: true }, className)} data-disabled={props.disabled || props.readOnly || undefined}>
+    <CardSection className={s(classes, { feature: true }, className)} data-disabled={props.disabled || props.readOnly || undefined}>
       <CheckboxMarkup
         {...props}
         id={controlId}
@@ -75,6 +76,6 @@ export const ServerConfigurationFeature: CheckboxType<IServerConfigurationFeatur
           </span>
         )}
       </label>
-    </div>
+    </CardSection>
   );
 });
