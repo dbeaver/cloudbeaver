@@ -1,4 +1,13 @@
 export default [
+  ['authentication_administration_providers_search', 'Rechercher des fournisseurs...'],
+  ['authentication_administration_providers_filter', 'Statut du fournisseur'],
+  ['authentication_administration_providers_all', 'Tous'],
+  ['authentication_administration_providers_active', 'Actifs'],
+  ['authentication_administration_providers_available', 'Disponibles'],
+  ['authentication_administration_providers_empty', 'Aucun fournisseur ne correspond aux filtres'],
+  ['authentication_administration_providers_built_in', 'Intégré'],
+  ['authentication_administration_providers_required_features', 'Activez les services suivants pour utiliser ce fournisseur : {arg:features}'],
+  ['authentication_administration_server_configuration_authentication', 'Authentification'],
   ['plugin_authentication_administration_team_grant_manual', 'Administrateur'],
   ['plugin_authentication_administration_team_grant_provider', 'Fournisseur d’authentification'],
   ['plugin_authentication_administration_team_grant_default', 'Équipe par défaut'],

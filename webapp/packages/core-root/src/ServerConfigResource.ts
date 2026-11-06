@@ -16,6 +16,20 @@ import { ServerConfigEventHandler } from './ServerConfigEventHandler.js';
 export const FEATURE_GIT_ID = 'git';
 export const FEATURE_AI_ID = 'ai';
 
+export {
+  FEATURE_AWS_ID,
+  FEATURE_AZURE_ID,
+  FEATURE_DESKTOP_APP_ID,
+  FEATURE_DRIVERS_DOWNLOAD_ID,
+  FEATURE_FILE_SYSTEM_ID,
+  FEATURE_GCP_ID,
+  FEATURE_MCP_ID,
+  FEATURE_PROXY_DRIVER_ID,
+  FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID,
+  FEATURE_SSH_ID,
+  FEATURE_UDBT_ID,
+} from '@cloudbeaver/core-sdk';
+
 export type ServerConfig = ServerConfigFragment;
 
 @injectable(() => [GraphQLService, DataSynchronizationService, ServerConfigEventHandler])

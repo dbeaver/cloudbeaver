@@ -163,6 +163,8 @@ export * from './Containers/ColoredContainer.js';
 export * from './Containers/IContainerProps.js';
 export * from './Containers/ILayoutSizeProps.js';
 
+export * from './Card/CardLazy.js';
+
 export * from './FolderExplorer/FolderExplorer.js';
 export * from './FolderExplorer/FolderExplorerContext.js';
 export * from './FolderExplorer/FolderExplorerPath.js';

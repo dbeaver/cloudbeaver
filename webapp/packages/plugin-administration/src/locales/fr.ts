@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Connexions'],
+  ['administration_server_configuration_settings_ai', 'IA'],
+  ['administration_server_configuration_settings_cloud', 'Cloud'],
+  ['administration_server_configuration_settings_workspace', 'Espace de travail'],
+  ['administration_server_configuration_tab_drivers', 'Pilotes'],
   ['administration_server_configuration_save_confirmation_title', 'Mise à jour des paramètres du serveur'],
   ['administration_server_configuration_save_confirmation_message', 'Vous êtes sur le point de changer des paramètres critiques. Êtes-vous sûr?'],
 
@@ -62,7 +67,7 @@ export default [
     "Ici, vous pouvez spécifier le nombre de minutes pendant lesquelles vous souhaitez que la session reste inactive avant qu'elle n'expire",
   ],
 
-  ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
+  ['administration_configuration_wizard_configuration_plugins', 'Fonctionnalités'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Activer les connexions privées'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Permet aux utilisateurs de créer des connexions privées'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Vue simple du navigateur'],

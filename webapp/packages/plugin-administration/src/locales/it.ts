@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Connessioni'],
+  ['administration_server_configuration_settings_ai', 'IA'],
+  ['administration_server_configuration_settings_cloud', 'Cloud'],
+  ['administration_server_configuration_settings_workspace', 'Area di lavoro'],
+  ['administration_server_configuration_tab_drivers', 'Driver'],
   ['administration_server_configuration_save_confirmation_title', 'Aggiornamento delle impostazioni del Server'],
   ['administration_server_configuration_save_confirmation_message', 'Stai per modificare impostazioni critiche. Sei sicuro?'],
 
@@ -61,7 +66,7 @@ export default [
     'Qua puoi specificare il numero di minuti che vorresti permettere alla sessione di rimanere in attesa prima che scadi',
   ],
 
-  ['administration_configuration_wizard_configuration_plugins', 'Configurazione'],
+  ['administration_configuration_wizard_configuration_plugins', 'Funzionalità'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Abilita connessioni custom'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Permette agli utenti di creare connessioni custom'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Vista semplice del navigatore'],

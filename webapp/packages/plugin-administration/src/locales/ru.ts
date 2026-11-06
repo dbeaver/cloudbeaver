@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Подключения'],
+  ['administration_server_configuration_settings_ai', 'ИИ'],
+  ['administration_server_configuration_settings_cloud', 'Облачные сервисы'],
+  ['administration_server_configuration_settings_workspace', 'Рабочее пространство'],
+  ['administration_server_configuration_tab_drivers', 'Драйверы'],
   ['administration_server_configuration_save_confirmation_title', 'Изменение настроек сервера'],
   ['administration_server_configuration_save_confirmation_message', 'Будут изменены критичные настройки. Вы уверены?'],
 
@@ -38,7 +43,7 @@ export default [
   ['administration_configuration_tools_save_tooltip', 'Сохранить конфигурацию'],
   ['administration_configuration_tools_cancel_tooltip', 'Отменить изменения'],
 
-  ['administration_configuration_wizard_configuration_plugins', 'Настройки'],
+  ['administration_configuration_wizard_configuration_plugins', 'Возможности'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Разрешить пользовательские подключения'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Позволяет пользователям создавать собственные подключения'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Упрощенная версия дерева навигации'],

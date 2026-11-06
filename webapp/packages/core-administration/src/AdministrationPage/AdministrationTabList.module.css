@@ -16,3 +16,25 @@
   border-bottom: 1px solid var(--theme-background);
   overflow-x: auto;
 }
+
+.administrationTabs {
+  & .tab {
+    height: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 0 4px;
+  }
+
+  & .tabInner {
+    height: 100%;
+  }
+
+  & .tabOuter {
+    height: 100%;
+  }
+}
+
+.tabTitle {
+  font-weight: 500;
+  text-transform: none;
+}

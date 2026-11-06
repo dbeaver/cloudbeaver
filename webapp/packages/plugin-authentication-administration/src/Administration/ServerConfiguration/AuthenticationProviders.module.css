@@ -1,0 +1,74 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  flex-shrink: 0;
+  container-type: inline-size;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.search {
+  flex: 0 1 22rem;
+  width: 22rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--theme-secondary);
+}
+
+.filter {
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--theme-on-secondary);
+  font-weight: 600;
+
+  &[aria-pressed='true'] {
+    border-color: var(--theme-background);
+    background: var(--theme-surface);
+    color: var(--theme-on-surface);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--theme-on-surface) 10%, transparent);
+  }
+}
+
+.count {
+  color: var(--theme-on-secondary);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+
+@container (min-width: 48rem) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

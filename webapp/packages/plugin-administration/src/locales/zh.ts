@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', '连接'],
+  ['administration_server_configuration_settings_ai', 'AI'],
+  ['administration_server_configuration_settings_cloud', '云服务'],
+  ['administration_server_configuration_settings_workspace', '工作区'],
+  ['administration_server_configuration_tab_drivers', '驱动程序'],
   ['administration_server_configuration_save_confirmation_title', '服务器设置更新'],
   ['administration_server_configuration_save_confirmation_message', '即将更改关键设置。您确定吗？'],
 
@@ -52,7 +57,7 @@ export default [
   ['administration_configuration_wizard_configuration_server_info_unsaved_navigate', '打开'],
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', '您可以在此处指定您希望会话在到期前保持空闲的分钟数'],
 
-  ['administration_configuration_wizard_configuration_plugins', '配置'],
+  ['administration_configuration_wizard_configuration_plugins', '功能'],
   ['administration_configuration_wizard_configuration_custom_connections', '允许自定义连接'],
   ['administration_configuration_wizard_configuration_custom_connections_description', '允许用户创建自定义连接'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', '导航器简单视图'],
