@@ -3,14 +3,14 @@
 ####################################################
 
 enum AIMessageType {
-    SYSTEM,
-    USER,
-    ASSISTANT,
-    ERROR,
-    WARNING,
-    CONFIRMATION,
-    ATTACHMENT,
-    FUNCTION
+  SYSTEM
+  USER
+  ASSISTANT
+  ERROR
+  WARNING
+  CONFIRMATION
+  ATTACHMENT
+  FUNCTION
 }
 
 """
@@ -18,367 +18,413 @@ Scope of the AI chat conversation.
 Can be a database connection, a current database, a current schema or a custom scope.
 """
 enum AIDatabaseScope @since(version: "25.1.1") {
-    CURRENT_SCHEMA
-    CURRENT_DATABASE
-    CURRENT_DATASOURCE
-    CUSTOM
+  CURRENT_SCHEMA
+  CURRENT_DATABASE
+  CURRENT_DATASOURCE
+  CUSTOM
 }
 
 type AISettingsInfo @since(version: "23.2.2") {
-    activeEngine: ID!
-    defaultConfiguration: ID
-    language: String
+  activeEngine: ID!
+  defaultConfiguration: ID
+  language: String
 }
 
 type AIEngineInfo @since(version: "23.2.2") {
-    "Unique identifier of the AI engine."
-    id: ID!
-    "Name of the AI engine."
-    name: String!
-    "Path to the AI engine icon."
-    icon: String
+  "Unique identifier of the AI engine."
+  id: ID!
+  "Name of the AI engine."
+  name: String!
+  "Path to the AI engine icon."
+  icon: String
 }
 
 type AIModelInfo @since(version: "26.2.0") {
-    "Unique model identifier used by the AI provider."
-    id: ID!
-    "Maximum model context window size, if reported by the provider."
-    contextWindowSize: Int
-    "Default model temperature."
-    defaultTemperature: Float!
-    "Capabilities reported for the model."
-    features: [String!]!
+  "Unique model identifier used by the AI provider."
+  id: ID!
+  "Maximum model context window size, if reported by the provider."
+  contextWindowSize: Int
+  "Default model temperature."
+  defaultTemperature: Float!
+  "Capabilities reported for the model."
+  features: [String!]!
 }
 
 type AIChatConversationInfo @since(version: "25.1.1") {
-    dataSourceId: DataSourceId
-    id: ID!
-    promptGeneratorId: ID
-    caption: String!
-    "Last message creation time."
-    time: DateTime!
-    messages: [AIMessage!]!
-    settings: AIChatConversationSettings
-    waitingForResponse: Boolean! @since(version: "25.1.5")
-    metrics: AIChatConversationMetrics @since(version: "25.3.5")
-    "ID of the AI engine configuration profile used for this conversation."
-    profile: ID @since(version: "26.1.3")
+  dataSourceId: DataSourceId
+  id: ID!
+  promptGeneratorId: ID
+  caption: String!
+  "Last message creation time."
+  time: DateTime!
+  messages: [AIMessage!]!
+  settings: AIChatConversationSettings
+  waitingForResponse: Boolean! @since(version: "25.1.5")
+  metrics: AIChatConversationMetrics @since(version: "25.3.5")
+  "ID of the AI engine configuration profile used for this conversation."
+  profile: ID @since(version: "26.1.3")
 }
 
 type AIChatConversationMetrics @since(version: "25.3.5") {
-    totalInputTokens: Int!
-    totalOutputTokens: Int!
+  totalInputTokens: Int!
+  totalOutputTokens: Int!
 }
 
 type AIChatConversationSettings {
-    metaTransferConfirmed: Boolean!
-    scope: AIDatabaseScope
-    "If the scope is set to CUSTOM, this field is required."
-    customObjectIds: [ID!]
+  metaTransferConfirmed: Boolean!
+  scope: AIDatabaseScope
+  "If the scope is set to CUSTOM, this field is required."
+  customObjectIds: [ID!]
 }
 
 type AIMessage {
-    conversationId: ID!
-    id: ID!
-    role: AIMessageType!
-    content: String!
-    displayMessage: String!
-    time: DateTime!
-    "Attachments associated with this message. Empty when the message has no attachments."
-    attachments: [AIChatAttachment!]! @since(version: "26.2.4")
-    "Present only with CONFIRMATION role"
-    functionConfirmation: AIFunctionConfirmation
-    "Whether any tool in this message requires approval under the current AI tool settings."
-    functionConfirmationRequired: Boolean @since(version: "26.3.0")
-    "Present only with FUNCTION role"
-    functionCall: AIFunctionCall
-    "Present only with FUNCTION role"
-    functionResult: AIFunctionResult
+  conversationId: ID!
+  id: ID!
+  role: AIMessageType!
+  content: String!
+  displayMessage: String!
+  time: DateTime!
+  "Attachments associated with this message. Empty when the message has no attachments."
+  attachments: [AIChatAttachment!]! @since(version: "26.2.4")
+  "Present only with CONFIRMATION role"
+  functionConfirmation: AIFunctionConfirmation
+  "Whether any tool in this message requires approval under the current AI tool settings."
+  functionConfirmationRequired: Boolean @since(version: "26.3.0")
+  "Present only with FUNCTION role"
+  functionCall: AIFunctionCall
+  "Present only with FUNCTION role"
+  functionResult: AIFunctionResult
 }
 
 type AISendChatMessageInfo @since(version: "25.1.1") {
-    conversation: AIChatConversationInfo!
-    userMessage: AIMessage!
-    "Message that would be received via websockets."
-    assistantMessage: AIMessage!
+  conversation: AIChatConversationInfo!
+  userMessage: AIMessage!
+  "Message that would be received via websockets."
+  assistantMessage: AIMessage!
 }
 
 type AIImageAttachment @since(version: "26.2.4") {
-    name: String!
-    mediaType: String!
-    "Base64-encoded image content, without a data URL prefix."
-    data: String!
+  name: String!
+  mediaType: String!
+  "Base64-encoded image content, without a data URL prefix."
+  data: String!
 }
 
 type AIChatAttachment @since(version: "26.2.4") {
-    "Image payload. Each attachment contains one payload matching its kind."
-    image: AIImageAttachment
+  "Image payload. Each attachment contains one payload matching its kind."
+  image: AIImageAttachment
 }
 
 input AIImageAttachmentInput @since(version: "26.2.4") {
-    name: String!
-    mediaType: String!
-    data: String!
+  name: String!
+  mediaType: String!
+  data: String!
 }
 
 input AIChatAttachmentInput @since(version: "26.2.4") {
-    image: AIImageAttachmentInput
+  image: AIImageAttachmentInput
 }
 
 type AIDataSourceSettingsInfo @since(version: "25.3.3") {
-    "Indicates whether user confirmed meta transfer to AI for the current data source."
-    metaTransferConfirmed: Boolean!
-    "Default scope for AI operations in this data source."
-    scope: AIDatabaseScope
-    "If the scope is set to CUSTOM, this field is required."
-    customObjectIds: [ID!]
+  "Indicates whether user confirmed meta transfer to AI for the current data source."
+  metaTransferConfirmed: Boolean!
+  "Default scope for AI operations in this data source."
+  scope: AIDatabaseScope
+  "If the scope is set to CUSTOM, this field is required."
+  customObjectIds: [ID!]
 }
 
 type DataSourceId @since(version: "25.1.1") {
-    projectId: ID!
-    connectionId: ID!
+  projectId: ID!
+  connectionId: ID!
 }
 
 type AIConfigurationProfileInfo @since(version: "26.1.3") {
-    "Unique identifier of the AI engine profile."
-    id: ID!
-    "Whether this is the administrator-selected default AI profile."
-    isDefault: Boolean! @since(version: "26.2.0")
-    "Name of the AI engine profile."
-    name: String!
-    "ID of the AI engine that this profile belongs to."
-    engineId: ID!
-    "Whether this profile uses global administrator-managed credentials."
-    global: Boolean! @since(version: "26.2.0")
-    "Whether the current user has saved credentials for the selected authentication method. Does not validate provider access."
-    credentialsSaved: Boolean! @since(version: "26.2.0")
-    "Whether the current user selected subscription authentication for this non-global profile. Defaults to false."
-    accountAuthentication: Boolean! @since(version: "26.2.0")
-    "Whether device authorization is available for this profile."
-    deviceAuthorizationAvailable: Boolean! @since(version: "26.2.0")
-    "Device authorization provider display name, such as ChatGPT. Null for global profiles and engines without server-side device authorization support."
-    accountProvider: String @since(version: "26.2.0")
-    "Whether the current user has a saved API token, independently of the selected authentication method."
-    tokenSaved: Boolean! @since(version: "26.2.0")
-    "Current user's connected subscription account, independently of the selected authentication method. Null when disconnected; email may be unavailable."
-    account: AIAccountInfo @since(version: "26.2.0")
+  "Unique identifier of the AI engine profile."
+  id: ID!
+  "Whether this is the administrator-selected default AI profile."
+  isDefault: Boolean! @since(version: "26.2.0")
+  "Name of the AI engine profile."
+  name: String!
+  "ID of the AI engine that this profile belongs to."
+  engineId: ID!
+  "Whether this profile uses global administrator-managed credentials."
+  global: Boolean! @since(version: "26.2.0")
+  "Whether the current user has saved credentials for the selected authentication method. Does not validate provider access."
+  credentialsSaved: Boolean! @since(version: "26.2.0")
+  "Whether the current user selected subscription authentication for this non-global profile. Defaults to false."
+  accountAuthentication: Boolean! @since(version: "26.2.0")
+  "Whether device authorization is available for this profile."
+  deviceAuthorizationAvailable: Boolean! @since(version: "26.2.0")
+  "Device authorization provider display name, such as ChatGPT. Null for global profiles and engines without server-side device authorization support."
+  accountProvider: String @since(version: "26.2.0")
+  "Whether the current user has a saved API token, independently of the selected authentication method."
+  tokenSaved: Boolean! @since(version: "26.2.0")
+  "Current user's connected subscription account, independently of the selected authentication method. Null when disconnected; email may be unavailable."
+  account: AIAccountInfo @since(version: "26.2.0")
 }
 
 type AIAccountInfo @since(version: "26.2.0") {
-    "Email reported by the account provider, if available."
-    email: String
+  "Email reported by the account provider, if available."
+  email: String
 }
 
 type AIDeviceAuthorizationInfo @since(version: "26.2.0") {
-    "Code that the user must enter on the provider verification page."
-    userCode: String!
-    "Provider page where the user confirms device authorization."
-    verificationUri: String!
-    "Number of seconds before the authorization attempt expires."
-    expiresInSeconds: Int!
-    "Asynchronous task that waits for authorization and saves the account credentials."
-    taskInfo: AsyncTaskInfo!
+  "Code that the user must enter on the provider verification page."
+  userCode: String!
+  "Provider page where the user confirms device authorization."
+  verificationUri: String!
+  "Number of seconds before the authorization attempt expires."
+  expiresInSeconds: Int!
+  "Asynchronous task that waits for authorization and saves the account credentials."
+  taskInfo: AsyncTaskInfo!
 }
 
 type AIAdminConfigurationProfileInfo @since(version: "26.1.3") {
-    "Unique identifier of the AI engine profile."
-    id: ID!
-    "Whether this is the administrator-selected default AI profile."
-    isDefault: Boolean! @since(version: "26.2.0")
-    "Name of the AI engine profile."
-    name: String!
-    "ID of the AI engine that this profile belongs to."
-    engineId: ID!
-    "Whether this profile uses global administrator-managed credentials."
-    global: Boolean! @since(version: "26.2.0")
-    "Whether the current user has saved credentials for the selected authentication method. Does not validate provider access."
-    credentialsSaved: Boolean! @since(version: "26.2.0")
-    "Whether the current user selected subscription authentication for this non-global profile. Defaults to false."
-    accountAuthentication: Boolean! @since(version: "26.2.0")
-    "Whether device authorization is available for this profile."
-    deviceAuthorizationAvailable: Boolean! @since(version: "26.2.0")
-    "Device authorization provider display name, such as ChatGPT. Null for global profiles and engines without server-side device authorization support."
-    accountProvider: String @since(version: "26.2.0")
-    "Whether the current user has a saved API token, independently of the selected authentication method."
-    tokenSaved: Boolean! @since(version: "26.2.0")
-    "Current user's connected subscription account, independently of the selected authentication method. Null when disconnected; email may be unavailable."
-    account: AIAccountInfo @since(version: "26.2.0")
-    "Configuration of the AI engine profile."
-    configuration: [ObjectPropertyInfo!]!
+  "Unique identifier of the AI engine profile."
+  id: ID!
+  "Whether this is the administrator-selected default AI profile."
+  isDefault: Boolean! @since(version: "26.2.0")
+  "Name of the AI engine profile."
+  name: String!
+  "ID of the AI engine that this profile belongs to."
+  engineId: ID!
+  "Whether this profile uses global administrator-managed credentials."
+  global: Boolean! @since(version: "26.2.0")
+  "Whether the current user has saved credentials for the selected authentication method. Does not validate provider access."
+  credentialsSaved: Boolean! @since(version: "26.2.0")
+  "Whether the current user selected subscription authentication for this non-global profile. Defaults to false."
+  accountAuthentication: Boolean! @since(version: "26.2.0")
+  "Whether device authorization is available for this profile."
+  deviceAuthorizationAvailable: Boolean! @since(version: "26.2.0")
+  "Device authorization provider display name, such as ChatGPT. Null for global profiles and engines without server-side device authorization support."
+  accountProvider: String @since(version: "26.2.0")
+  "Whether the current user has a saved API token, independently of the selected authentication method."
+  tokenSaved: Boolean! @since(version: "26.2.0")
+  "Current user's connected subscription account, independently of the selected authentication method. Null when disconnected; email may be unavailable."
+  account: AIAccountInfo @since(version: "26.2.0")
+  "Configuration of the AI engine profile."
+  configuration: [ObjectPropertyInfo!]!
 }
 
 type AIFunction @since(version: "26.0.4") {
-    "Unique identifier of the function (combines toolbox ID and function ID)"
-    id: ID!
-    "Human-readable name of the function"
-    name: String!
-    "Detailed description of what the function does"
-    description: String
-    "URL or path to the function icon"
-    icon: String
-    "Indicates whether the function is a system function (can be auto-confirmed when required)"
-    system: Boolean!
+  "Unique identifier of the function (combines toolbox ID and function ID)"
+  id: ID!
+  "Human-readable name of the function"
+  name: String!
+  "Detailed description of what the function does"
+  description: String
+  "URL or path to the function icon"
+  icon: String
+  "Indicates whether the function is a system function (can be auto-confirmed when required)"
+  system: Boolean!
 }
 
 type AIFunctionCall @since(version: "26.0.3") {
-    id: ID!
-    functionName: String!
-    arguments: Object
-    hint: String
+  id: ID!
+  functionName: String!
+  arguments: Object
+  hint: String
 }
 
 type AIFunctionConfirmation @since(version: "26.0.3") {
-    functionCalls: [AIFunctionCall!]!
+  functionCalls: [AIFunctionCall!]!
 }
 
 enum AIFunctionType {
-    ACTION
-    INFORMATION
+  ACTION
+  INFORMATION
 }
 
 type AIFunctionResult @since(version: "26.0.3") {
-    type: AIFunctionType!
-    value: Object!
+  type: AIFunctionType!
+  value: Object!
 }
 
 input AISettingsConfig @since(version: "23.2.2") {
-    "Default configuration profile ID. May be null if AI wasn't configured"
-    defaultConfiguration: ID
-    "Language to be used as a default for AI responses"
-    language: String
+  "Default configuration profile ID. May be null if AI wasn't configured"
+  defaultConfiguration: ID
+  "Language to be used as a default for AI responses"
+  language: String
 }
 
 input AIEngineConfig @since(version: "23.2.2") {
-    properties: Object
+  properties: Object
 }
 
 input AIDatabaseScopeInput {
-    id: AIDatabaseScope!
-    "If custom scope is selected, this field is required."
-    customScopes: [ID!]
+  id: AIDatabaseScope!
+  "If custom scope is selected, this field is required."
+  customScopes: [ID!]
 }
 
 input DataSourceIdInput @since(version: "25.1.1") {
-    projectId: ID!
-    connectionId: ID!
+  projectId: ID!
+  connectionId: ID!
 }
 
 input AIChatConversationInput {
-    dataSourceId: DataSourceIdInput
-    caption: String
-    settings: AIChatConversationSettingsInput
-    "ID of the prompt generator to use for this conversation (sql - by default)."
-    promptGeneratorId: ID
+  dataSourceId: DataSourceIdInput
+  caption: String
+  settings: AIChatConversationSettingsInput
+  "ID of the prompt generator to use for this conversation (sql - by default)."
+  promptGeneratorId: ID
 }
 
 input AIChatConversationSettingsInput {
-    metaTransferConfirmed: Boolean
-    scope: AIDatabaseScope
-    profile: ID
-    customObjectIds: [ID!]
+  metaTransferConfirmed: Boolean
+  scope: AIDatabaseScope
+  profile: ID
+  customObjectIds: [ID!]
 }
 
 input AIDataSourceSettingsInput @since(version: "25.3.3") {
-    "Flag indicating whether MCP integration is enabled for the current data source."
-    mcpEnabled: Boolean
-    "Flag indicating whether user confirmed meta transfer to AI."
-    metaTransferConfirmed: Boolean
-    "Default scope for AI operations in this data source."
-    scope: AIDatabaseScope
-    "If custom scope is selected, this field is required."
-    customObjectIds: [ID!]
+  "Flag indicating whether MCP integration is enabled for the current data source."
+  mcpEnabled: Boolean
+  "Flag indicating whether user confirmed meta transfer to AI."
+  metaTransferConfirmed: Boolean
+  "Default scope for AI operations in this data source."
+  scope: AIDatabaseScope
+  "If custom scope is selected, this field is required."
+  customObjectIds: [ID!]
 }
 
 input AIConfigurationProfileInput @since(version: "26.1.3") {
-    "Unique identifier of the AI engine profile."
-    profileId: ID!
-    "Name of the AI engine profile."
-    profileName: String
-    "ID of the AI engine that this profile belongs to."
-    engineId: ID
-    "Configuration of the AI engine profile."
-    configuration: AIEngineConfig
+  "Unique identifier of the AI engine profile."
+  profileId: ID!
+  "Name of the AI engine profile."
+  profileName: String
+  "ID of the AI engine that this profile belongs to."
+  engineId: ID
+  "Configuration of the AI engine profile."
+  configuration: AIEngineConfig
 }
 
 input AIProfileCredentialsInput @since(version: "26.2.0") {
-    "Credential property values keyed by AI engine property ID. Omitted properties remain unchanged; an empty token clears only the API token."
-    properties: Object!
-    "Selects the current user's authentication method without changing the shared profile. Omit to keep the current selection. Does not delete either kind of credentials."
-    accountAuthentication: Boolean @since(version: "26.2.0")
+  "Credential property values keyed by AI engine property ID. Omitted properties remain unchanged; an empty token clears only the API token."
+  properties: Object!
+  "Selects the current user's authentication method without changing the shared profile. Omit to keep the current selection. Does not delete either kind of credentials."
+  accountAuthentication: Boolean @since(version: "26.2.0")
 }
 
 extend type Query @since(version: "23.2.2") {
-    "Returns the list of available AI engines."
-    aiListEngines: [AIEngineInfo!]
-    "Returns the global AI settings."
-    aiSettings: AISettingsInfo!
-    "Returns the properties of the specified AI engine for displaying it in the UI. In case settings are passed, fills it with defaults and returns back."
-    aiListEngineProperties(engineId: ID!, profileId: ID, settings: AIEngineConfig): [ObjectPropertyInfo!]!
-    "Returns models available for the specified AI engine configuration."
-    aiListEngineModels(engineId: ID!, profileId: ID, settings: AIEngineConfig): [AIModelInfo!]! @since(version: "26.2.0")
+  "Returns the list of available AI engines."
+  aiListEngines: [AIEngineInfo!]
+  "Returns the global AI settings."
+  aiSettings: AISettingsInfo!
+  "Returns the properties of the specified AI engine for displaying it in the UI. In case settings are passed, fills it with defaults and returns back."
+  aiListEngineProperties(
+    engineId: ID!
+    profileId: ID
+    settings: AIEngineConfig
+  ): [ObjectPropertyInfo!]!
+  "Returns models available for the specified AI engine configuration."
+  aiListEngineModels(
+    engineId: ID!
+    profileId: ID
+    settings: AIEngineConfig
+  ): [AIModelInfo!]! @since(version: "26.2.0")
 
-    "Return the list of available AI functions."
-    aiListFunctions: [AIFunction!] @since(version: "26.0.4")
+  "Return the list of available AI functions."
+  aiListFunctions: [AIFunction!] @since(version: "26.0.4")
 
-    "Returns the list of available AI engine configuration profiles."
-    aiListProfiles: [AIConfigurationProfileInfo!]! @since(version: "26.1.3")
+  "Returns the list of available AI engine configuration profiles."
+  aiListProfiles: [AIConfigurationProfileInfo!]! @since(version: "26.1.3")
 
-    "Returns AI chat conversation info for the specified conversation ID."
-    aiChatConversationInfo(conversationId: ID!, loadMetrics: Boolean): AIChatConversationInfo! @since(version: "25.1.1")
-    "Returns list of AI chat conversations for the specified connection."
-    aiListChatConversations(dataSourceId: DataSourceIdInput): [AIChatConversationInfo!]! @since(version: "25.1.1")
+  "Returns AI chat conversation info for the specified conversation ID."
+  aiChatConversationInfo(
+    conversationId: ID!
+    loadMetrics: Boolean
+  ): AIChatConversationInfo! @since(version: "25.1.1")
+  "Returns list of AI chat conversations for the specified connection."
+  aiListChatConversations(
+    dataSourceId: DataSourceIdInput
+  ): [AIChatConversationInfo!]! @since(version: "25.1.1")
 
-    "Returns AI settings for the specified connection."
-    aiDataSourceSettings(dataSourceId: DataSourceIdInput!): AIDataSourceSettingsInfo! @since(version: "25.3.3")
+  "Returns AI settings for the specified connection."
+  aiDataSourceSettings(
+    dataSourceId: DataSourceIdInput!
+  ): AIDataSourceSettingsInfo! @since(version: "25.3.3")
 }
 
 extend type Mutation @since(version: "23.2.2") {
-    "Saves the global AI settings (active AI engine)."
-    aiSaveSettings(settings: AISettingsConfig!): AISettingsInfo!
-    "Saves the configuration of the specified AI engine."
-    aiSaveEngineConfiguration(profileId: ID!, settings : AIEngineConfig!): Boolean! @deprecated(reason: "use profiles api")
-    "Creates an anync task to perform AI query completion."
-    asyncAiPerformQueryCompletion(projectId: ID, connectionId: ID!, contextId: ID!, request: String!): AsyncTaskInfo!
-    "Retrieves the result of an async AI query completion task."
-    asyncAiPerformQueryCompletionResult(taskId: ID!): String
+  "Saves the global AI settings (active AI engine)."
+  aiSaveSettings(settings: AISettingsConfig!): AISettingsInfo!
+  "Saves the configuration of the specified AI engine."
+  aiSaveEngineConfiguration(
+    profileId: ID!
+    settings: AIEngineConfig!
+  ): Boolean! @deprecated(reason: "use profiles api")
+  "Creates an anync task to perform AI query completion."
+  asyncAiPerformQueryCompletion(
+    projectId: ID
+    connectionId: ID!
+    contextId: ID!
+    request: String!
+  ): AsyncTaskInfo!
+  "Retrieves the result of an async AI query completion task."
+  asyncAiPerformQueryCompletionResult(taskId: ID!): String
 
-    "Creates a new AI engine configuration profile."
-    aiCreateProfile(config: AIConfigurationProfileInput!): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
-    "Creates a copy of an existing AI engine configuration profile with a generated unique ID and name."
-    aiCopyProfile(profileId: ID!): AIAdminConfigurationProfileInfo! @since(version: "26.2.3")
-    "Updates the configuration of the specified AI engine configuration profile."
-    aiUpdateProfile(config: AIConfigurationProfileInput!): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
-    "Deletes the specified AI engine configuration profile."
-    aiDeleteProfile(profileId: ID!): Boolean! @since(version: "26.1.3")
-    "Saves or updates the current user's credentials for a non-global profile. Empty values clear credentials."
-    aiSaveProfileCredentials(profileId: ID!, credentials: AIProfileCredentialsInput!): Boolean! @since(version: "26.2.0")
-    "Starts device authorization for the current user and a supported non-global profile, regardless of its configured authentication. Successful completion saves the account and selects subscription authentication for this user. Failure or cancellation leaves existing credentials and selection unchanged."
-    aiStartDeviceAuthorization(profileId: ID!): AIDeviceAuthorizationInfo! @since(version: "26.2.0")
-    "Removes only the current user's account credentials and cancels pending authorization for this non-global profile. Preserves the API token and selected authentication method."
-    aiDisconnectAccount(profileId: ID!): Boolean! @since(version: "26.2.0")
+  "Creates a new AI engine configuration profile."
+  aiCreateProfile(
+    config: AIConfigurationProfileInput!
+  ): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
+  "Creates a copy of an existing AI engine configuration profile with a generated unique ID and name."
+  aiCopyProfile(profileId: ID!): AIAdminConfigurationProfileInfo!
+    @since(version: "26.2.3")
+  "Updates the configuration of the specified AI engine configuration profile."
+  aiUpdateProfile(
+    config: AIConfigurationProfileInput!
+  ): AIAdminConfigurationProfileInfo! @since(version: "26.1.3")
+  "Deletes the specified AI engine configuration profile."
+  aiDeleteProfile(profileId: ID!): Boolean! @since(version: "26.1.3")
+  "Saves or updates the current user's credentials for a non-global profile. Empty values clear credentials."
+  aiSaveProfileCredentials(
+    profileId: ID!
+    credentials: AIProfileCredentialsInput!
+  ): Boolean! @since(version: "26.2.0")
+  "Starts device authorization for the current user and a supported non-global profile, regardless of its configured authentication. Successful completion saves the account and selects subscription authentication for this user. Failure or cancellation leaves existing credentials and selection unchanged."
+  aiStartDeviceAuthorization(profileId: ID!): AIDeviceAuthorizationInfo!
+    @since(version: "26.2.0")
+  "Removes only the current user's account credentials and cancels pending authorization for this non-global profile. Preserves the API token and selected authentication method."
+  aiDisconnectAccount(profileId: ID!): Boolean! @since(version: "26.2.0")
 
-    """
-    Creates a new AI chat conversation.
-    Conversation is created in the context of a project and connection.
-    If the connection and project are not specified, the conversation will be created without a context.
-    """
-    aiCreateChatConversation(config: AIChatConversationInput!): AIChatConversationInfo! @since(version: "25.1.1")
+  """
+  Creates a new AI chat conversation.
+  Conversation is created in the context of a project and connection.
+  If the connection and project are not specified, the conversation will be created without a context.
+  """
+  aiCreateChatConversation(
+    config: AIChatConversationInput!
+  ): AIChatConversationInfo! @since(version: "25.1.1")
 
-    "Updates the caption of the AI chat conversation"
-    aiUpdateChatConversation(conversationId: ID!, config: AIChatConversationInput!): AIChatConversationInfo! @since(version: "25.1.1")
+  "Updates the caption of the AI chat conversation"
+  aiUpdateChatConversation(
+    conversationId: ID!
+    config: AIChatConversationInput!
+  ): AIChatConversationInfo! @since(version: "25.1.1")
 
-    "Deletes the specified AI chat conversation"
-    aiDeleteChatConversation(conversationId: ID!): Boolean! @since(version: "25.1.1")
+  "Deletes the specified AI chat conversation"
+  aiDeleteChatConversation(conversationId: ID!): Boolean!
+    @since(version: "25.1.1")
 
-    "Sends a chat message to the AI chat conversation and returns a message ID from response. The response will be received partially via websockets."
-    aiSendChatMessage(conversationId: ID!, prompt: String!, attachments: [AIChatAttachmentInput!] @since(version: "26.2.4")): AISendChatMessageInfo! @since(version: "25.1.1")
+  "Sends a chat message to the AI chat conversation and returns a message ID from response. The response will be received partially via websockets."
+  aiSendChatMessage(
+    conversationId: ID!
+    prompt: String!
+    attachments: [AIChatAttachmentInput!] @since(version: "26.2.4")
+  ): AISendChatMessageInfo! @since(version: "25.1.1")
 
-    "Clears the chat messages in the AI chat conversation. The messages will be removed from the conversation."
-    aiClearLastChatMessages(conversationId: ID!, messageId: ID!): Boolean! @since(version: "25.1.1")
+  "Clears the chat messages in the AI chat conversation. The messages will be removed from the conversation."
+  aiClearLastChatMessages(conversationId: ID!, messageId: ID!): Boolean!
+    @since(version: "25.1.1")
 
-    "Cancels the in-progress AI response generation in the specified conversation."
-    aiCancelChatMessage(conversationId: ID!): Boolean! @since(version: "26.1.5")
+  "Cancels the in-progress AI response generation in the specified conversation."
+  aiCancelChatMessage(conversationId: ID!): Boolean! @since(version: "26.1.5")
 
-    "Saves AI settings (e.g. supporting confirming metadata transfer) for the specified connection."
-    aiSaveDataSourceSettings(dataSourceId: DataSourceIdInput!, settings: AIDataSourceSettingsInput!): AIDataSourceSettingsInfo! @since(version: "25.3.3")
+  "Saves AI settings (e.g. supporting confirming metadata transfer) for the specified connection."
+  aiSaveDataSourceSettings(
+    dataSourceId: DataSourceIdInput!
+    settings: AIDataSourceSettingsInput!
+  ): AIDataSourceSettingsInfo! @since(version: "25.3.3")
 }
