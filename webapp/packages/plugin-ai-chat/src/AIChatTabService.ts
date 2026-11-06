@@ -8,7 +8,7 @@
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { SideBarPanelService } from '@cloudbeaver/core-ui';
+import { SidebarActivationService, SideBarPanelService } from '@cloudbeaver/core-ui';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { AIChatService } from './AIChat/AIChatService.js';
@@ -18,12 +18,13 @@ const AI_CHAT_TAB_ID = 'ai-chat-tab';
 
 const AIChatPanel = importLazyComponent(() => import('./AIChatPanel.js').then(m => m.AIChatPanel));
 
-@injectable(() => [SideBarPanelService, AIChatService, AIFunctionsResource])
+@injectable(() => [SideBarPanelService, AIChatService, AIFunctionsResource, SidebarActivationService])
 export class AIChatTabService {
   constructor(
     private readonly sideBarPanelService: SideBarPanelService,
     private readonly aiChatService: AIChatService,
     private readonly aiFunctionsResource: AIFunctionsResource,
+    private readonly sidebarActivationService: SidebarActivationService,
   ) {}
 
   register(): void {
@@ -39,6 +40,26 @@ export class AIChatTabService {
   }
 
   selectTab(): void {
-    this.sideBarPanelService.tabsContainer.select(AI_CHAT_TAB_ID);
+    this.sidebarActivationService.reveal(AI_CHAT_TAB_ID);
+  }
+
+  open(): void {
+    if (!this.aiChatService.isEnabled) {
+      return;
+    }
+
+    if (!this.aiChatService.isActive) {
+      this.aiChatService.togglePanel();
+    }
+
+    this.selectTab();
+  }
+
+  toggle(): void {
+    if (this.sidebarActivationService.isRevealed(AI_CHAT_TAB_ID)) {
+      this.aiChatService.togglePanel();
+    } else {
+      this.open();
+    }
   }
 }

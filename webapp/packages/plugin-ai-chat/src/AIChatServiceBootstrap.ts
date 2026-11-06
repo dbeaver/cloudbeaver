@@ -88,7 +88,7 @@ export class AIChatServiceBootstrap extends Bootstrap {
       handler: (context, action) => {
         switch (action) {
           case ACTION_TOGGLE_AI_CHAT: {
-            this.aiChatService.togglePanel();
+            this.aiChatTabService.toggle();
             break;
           }
         }

@@ -235,11 +235,7 @@ export class PluginBootstrap extends Bootstrap {
           message: nameWithoutExtension,
         });
 
-        if (!this.resourceManagerScriptsService.active) {
-          this.resourceManagerScriptsService.togglePanel();
-        } else {
-          this.resourceManagerScriptsService.selectTab();
-        }
+        this.resourceManagerScriptsService.openPanel();
       } catch (exception) {
         this.notificationService.logException(exception as any, 'plugin_sql_editor_navigation_tab_resource_save_script_error');
       }

@@ -14,7 +14,7 @@ import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
-import { SideBarPanelService } from '@cloudbeaver/core-ui';
+import { SidebarActivationService } from '@cloudbeaver/core-ui';
 
 import { ResourceManagerScriptsSettingsService } from './ResourceManagerScriptsSettingsService.js';
 import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID.js';
@@ -40,7 +40,7 @@ export const SCRIPTS_TAB_ID = 'resource-manager-scripts-tab';
   ResourceManagerService,
   ResourceManagerResource,
   ResourceManagerScriptsSettingsService,
-  SideBarPanelService,
+  SidebarActivationService,
 ])
 export class ResourceManagerScriptsService {
   get active() {
@@ -61,7 +61,7 @@ export class ResourceManagerScriptsService {
     private readonly resourceManagerService: ResourceManagerService,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceManagerScriptsSettingsService: ResourceManagerScriptsSettingsService,
-    private readonly sideBarPanelService: SideBarPanelService,
+    private readonly sidebarActivationService: SidebarActivationService,
   ) {
     this.togglePanel = this.togglePanel.bind(this);
 
@@ -76,8 +76,25 @@ export class ResourceManagerScriptsService {
     this.settings.active = !this.settings.active;
   }
 
-  selectTab() {
-    this.sideBarPanelService.tabsContainer.select(SCRIPTS_TAB_ID);
+  selectTab(): void {
+    this.sidebarActivationService.reveal(SCRIPTS_TAB_ID);
+  }
+
+  openPanel(): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.settings.active = true;
+    this.selectTab();
+  }
+
+  toggleVisiblePanel(): void {
+    if (this.sidebarActivationService.isRevealed(SCRIPTS_TAB_ID)) {
+      this.togglePanel();
+    } else {
+      this.openPanel();
+    }
   }
 
   getRootFolder(project: ProjectInfo) {

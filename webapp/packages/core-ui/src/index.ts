@@ -98,6 +98,8 @@ export * from './Tabs/TabsBootstrap.js';
 export * from './SideBarPanel/LeftBarPanelService.js';
 export * from './SideBarPanel/SideBarPanelLoader.js';
 export * from './SideBarPanel/SideBarPanelService.js';
+export * from './SideBarPanel/SidebarActivationService.js';
+export * from './SideBarPanel/useSidebarActivationHost.js';
 
 export * from './Screens/AppScreen/BaseOptionsPanelService.js';
 export * from './ContextMenu/ContextMenuSearch/ContextMenuSearchItem.js';
