@@ -45,6 +45,8 @@ type WSAIChatMessageEvent implements CBServerEvent @since(version: "25.3.5") {
     attachments: [AIChatAttachment!]! @since(version: "26.2.4")
     "Present only with CONFIRMATION role"
     functionConfirmation: AIFunctionConfirmation
+    "Whether any tool in this message requires approval under the current AI tool settings."
+    functionConfirmationRequired: Boolean @since(version: "26.3.0")
     "Present only with FUNCTION role"
     functionCall: AIFunctionCall
     "Present only with FUNCTION role"
