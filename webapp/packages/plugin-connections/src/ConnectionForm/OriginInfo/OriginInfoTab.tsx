@@ -21,7 +21,7 @@ export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = obs
 
   return (
     <Tab {...rest} title={title}>
-      <TabIcon icon="/icons/plugin_connection_globe.svg" viewBox="0 0 16 16" />
+      <TabIcon icon="/icons/core_blocks_globe.svg" viewBox="0 0 16 16" />
       <TabTitle>
         <Translate token={title} />
       </TabTitle>
