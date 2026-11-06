@@ -13,6 +13,7 @@ import {
   ExceptionMessage,
   Loader,
   ObjectPropertyInfoForm,
+  Placeholder,
   s,
   TextPlaceholder,
   useAutoLoad,
@@ -27,10 +28,12 @@ import {
   DatabaseAuthModelsResource,
   DBDriverResource,
 } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import styles from './OriginInfo.module.css';
 import { ConnectionSectionWrapper } from '../ConnectionSectionWrapper.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
 import { getConnectionFormOriginInfoFormPart } from './getConnectionFormOriginInfoFormPart.js';
@@ -42,6 +45,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const originInfoPart = getConnectionFormOriginInfoFormPart(formState);
   const style = useS(styles);
   const optionsPart = getConnectionFormOptionsPart(formState);
+  const connectionFormService = useService(ConnectionFormService);
 
   const connectionInfoAuthPropertiesResource = useResource(OriginInfo, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
     active: tab.selected,
@@ -110,7 +114,9 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     );
   }
 
-  if (!connectionOriginDetailsResource.data?.origin.details || connectionOriginDetailsResource.data?.origin.details.length === 0) {
+  const properties = connectionOriginDetailsResource.data?.origin.details ?? [];
+
+  if (properties.length === 0 && connectionFormService.originInfoContainer.getDisplayed({ formState }).length === 0) {
     return (
       <ColoredContainer className={s(style, { coloredContainer: true })} parent surface>
         <TextPlaceholder>{translate('core_connections_connection_no_information')}</TextPlaceholder>
@@ -121,7 +127,8 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} surface>
       <ConnectionSectionWrapper className="tw:block! tw:space-y-4">
-        <ObjectPropertyInfoForm properties={connectionOriginDetailsResource.data.origin.details} readOnly small autoHide />
+        <Placeholder container={connectionFormService.originInfoContainer} formState={formState} />
+        <ObjectPropertyInfoForm properties={properties} readOnly small autoHide />
       </ConnectionSectionWrapper>
       <Loader key="overlay" className={s(style, { loader: true })} loading={connection.isLoading()} overlay />
     </ColoredContainer>
