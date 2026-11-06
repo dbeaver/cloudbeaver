@@ -1,0 +1,5 @@
+query getUserConfiguration {
+  user: activeUser {
+    userConfiguration
+  }
+}
