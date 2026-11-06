@@ -6,13 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tabList {
-  position: relative;
-  flex-shrink: 0;
-  height: 44px;
-  align-items: center;
-  gap: 24px;
-  padding: 0;
-  border-bottom: 1px solid var(--theme-background);
-  overflow-x: auto;
-}
+export const SERVER_CONFIGURATION_FEATURE_GROUPS = {
+  ai: 'ai',
+  clouds: 'clouds',
+  connections: 'connections',
+  desktopClient: 'desktop-client',
+  drivers: 'drivers',
+  git: 'git',
+} as const;

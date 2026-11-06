@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_server_configuration_authentication', '身份验证'],
   ['plugin_authentication_administration_team_grant_manual', '管理员'],
   ['plugin_authentication_administration_team_grant_provider', '身份验证提供商'],
   ['plugin_authentication_administration_team_grant_default', '默认团队'],

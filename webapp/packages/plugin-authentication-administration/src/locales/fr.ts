@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_server_configuration_authentication', 'Authentification'],
   ['plugin_authentication_administration_team_grant_manual', 'Administrateur'],
   ['plugin_authentication_administration_team_grant_provider', 'Fournisseur d’authentification'],
   ['plugin_authentication_administration_team_grant_default', 'Équipe par défaut'],

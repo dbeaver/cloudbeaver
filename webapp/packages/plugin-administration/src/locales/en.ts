@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Connections'],
+  ['administration_server_configuration_settings_ai', 'AI'],
+  ['administration_server_configuration_settings_cloud', 'Cloud'],
+  ['administration_server_configuration_settings_workspace', 'Workspace'],
+  ['administration_server_configuration_tab_drivers', 'Drivers'],
   ['administration_server_configuration_save_confirmation_title', 'Server settings update'],
   ['administration_server_configuration_save_confirmation_message', 'You are about to change critical settings. Are you sure?'],
 
@@ -59,7 +64,7 @@ export default [
     'Here you may specify the number of minutes that you wish the session to be allowed to remain idle before it expires',
   ],
 
-  ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
+  ['administration_configuration_wizard_configuration_plugins', 'Features'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Enable private connections'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Allows users to create private connections'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Navigator simple view'],

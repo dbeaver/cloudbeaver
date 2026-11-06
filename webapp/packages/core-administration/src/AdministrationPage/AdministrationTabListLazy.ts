@@ -6,13 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tabList {
-  position: relative;
-  flex-shrink: 0;
-  height: 44px;
-  align-items: center;
-  gap: 24px;
-  padding: 0;
-  border-bottom: 1px solid var(--theme-background);
-  overflow-x: auto;
-}
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+export const AdministrationTabList = importLazyComponent(() => import('./AdministrationTabList.js').then(m => m.AdministrationTabList));

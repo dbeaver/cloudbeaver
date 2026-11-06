@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_server_configuration_authentication', 'Xác thực'],
   ['plugin_authentication_administration_team_grant_manual', 'Quản trị viên'],
   ['plugin_authentication_administration_team_grant_provider', 'Nhà cung cấp xác thực'],
   ['plugin_authentication_administration_team_grant_default', 'Nhóm mặc định'],

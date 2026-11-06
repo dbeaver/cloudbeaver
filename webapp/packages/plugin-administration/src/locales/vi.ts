@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Kết nối'],
+  ['administration_server_configuration_settings_ai', 'AI'],
+  ['administration_server_configuration_settings_cloud', 'Đám mây'],
+  ['administration_server_configuration_settings_workspace', 'Không gian làm việc'],
+  ['administration_server_configuration_tab_drivers', 'Trình điều khiển'],
   ['administration_server_configuration_save_confirmation_title', 'Cập nhật cài đặt server'],
   ['administration_server_configuration_save_confirmation_message', 'Bạn sắp thay đổi các cài đặt quan trọng. Bạn có chắc chắn không?'],
   ['administration_configuration_wizard_welcome', 'Chào mừng'],
@@ -50,7 +55,7 @@ export default [
     'administration_configuration_wizard_configuration_server_session_lifetime_description',
     'Tại đây, bạn có thể chỉ định số phút mà phiên được phép ở trạng thái không hoạt động trước khi hết hạn',
   ],
-  ['administration_configuration_wizard_configuration_plugins', 'Cấu hình'],
+  ['administration_configuration_wizard_configuration_plugins', 'Tính năng'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Bật kết nối riêng tư'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Cho phép người dùng tạo kết nối riêng tư'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Chế độ xem đơn giản của Navigator'],

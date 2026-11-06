@@ -23,6 +23,8 @@ export { AdministrationPageTitle } from './AdministrationPage/AdministrationPage
 export { AdministrationPageLayout } from './AdministrationPage/AdministrationPageLayoutLazy.js';
 export { AdministrationPageHeader } from './AdministrationPage/AdministrationPageHeaderLazy.js';
 export { AdministrationPageNavigation } from './AdministrationPage/AdministrationPageNavigationLazy.js';
+export { AdministrationTabList } from './AdministrationPage/AdministrationTabListLazy.js';
+export type { AdministrationTabListProps } from './AdministrationPage/AdministrationTabList.js';
 export { AdministrationPageContent } from './AdministrationPage/AdministrationPageContentLazy.js';
 export type { AdministrationPageLayoutProps } from './AdministrationPage/AdministrationPageLayout.js';
 export type { IAdministrationPageHeaderProps } from './AdministrationPage/AdministrationPageHeader.js';
