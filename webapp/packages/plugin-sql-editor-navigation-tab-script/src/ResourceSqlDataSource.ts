@@ -434,7 +434,13 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
+        const executionContext = this.isExecutionContextSaved ? undefined : toJS(this.executionContext);
+
         await this.readData();
+
+        if (executionContext) {
+          this.setExecutionContext(executionContext);
+        }
 
         if (!this.isIncomingChanges) {
           this.loadingMessage = 'plugin_sql_editor_navigation_tab_script_state_saving';
