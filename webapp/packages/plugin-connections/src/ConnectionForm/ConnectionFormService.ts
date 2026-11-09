@@ -25,6 +25,7 @@ export class ConnectionFormService extends FormBaseService<IConnectionFormState,
   readonly providerPropertiesContainer: PlaceholderContainer<ConnectionFormContainerProps>;
   readonly connectionContainer: PlaceholderContainer<ConnectionFormContainerProps>;
   readonly optionsPresentationContainer: PlaceholderContainer<ConnectionFormContainerProps>;
+  readonly originInfoContainer: PlaceholderContainer<ConnectionFormContainerProps>;
 
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Connection form');
@@ -32,6 +33,7 @@ export class ConnectionFormService extends FormBaseService<IConnectionFormState,
     this.providerPropertiesContainer = new PlaceholderContainer<ConnectionFormContainerProps>();
     this.connectionContainer = new PlaceholderContainer<ConnectionFormContainerProps>();
     this.optionsPresentationContainer = new PlaceholderContainer<ConnectionFormContainerProps>();
+    this.originInfoContainer = new PlaceholderContainer<ConnectionFormContainerProps>();
     this.actionsContainer.add(ConnectionFormBaseActionsLoader);
   }
 }
