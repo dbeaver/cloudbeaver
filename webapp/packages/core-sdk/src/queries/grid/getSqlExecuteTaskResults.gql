@@ -11,17 +11,7 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
       sourceQuery
       dataFormat
       resultSet {
-        timeSeriesData {
-          sourceRowCount
-          series {
-            id
-            label
-            points {
-              timestamp
-              value
-            }
-          }
-        }
+        sourceRowCount
         id
         readOnly
         columns {

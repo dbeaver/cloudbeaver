@@ -24,7 +24,6 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.timeseries.TSData;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +43,8 @@ public class WebSQLQueryResultSet {
     private boolean hasRowIdentifier;
     private WebSQLResultSetRowIdentifierState rowIdentifierState;
     private WebSQLResultSetRowIdentifier rowIdentifier;
-    private TSData timeSeriesData;
+    private Object presentationData;
+    private Integer sourceRowCount;
 
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
@@ -92,17 +92,23 @@ public class WebSQLQueryResultSet {
         this.rows = rows;
     }
 
-    @Property
     @Nullable
-    public TSData getTimeSeriesData() {
-        return timeSeriesData;
+    public Object getPresentationData() {
+        return presentationData;
     }
 
-    /** Publish a graph-only result without duplicating the raw SQL rows. */
-    public void setTimeSeriesResult(@NotNull TSData timeSeriesData) {
-        this.timeSeriesData = timeSeriesData;
-        columns = new WebSQLQueryResultColumn[0];
-        rows = List.of();
+    public void setPresentationData(@NotNull Object presentationData) {
+        this.presentationData = presentationData;
+    }
+
+    @Property
+    @Nullable
+    public Integer getSourceRowCount() {
+        return sourceRowCount;
+    }
+
+    public void setSourceRowCount(int sourceRowCount) {
+        this.sourceRowCount = sourceRowCount;
     }
 
     @Property

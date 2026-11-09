@@ -243,9 +243,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     this.currentTask = executionContext.run(
       async () => {
         const info = await this.asyncTaskInfoService.run(task);
-        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
-
-        return result;
+        return this.loadTaskResults(info.id);
       },
       () => this.asyncTaskInfoService.cancel(task.id),
       () => {
@@ -391,8 +389,8 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,
       updateRowCount: result.updateRowCount || 0,
-      loadedFully: (result.resultSet?.timeSeriesData?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0) < limit,
-      count: result.resultSet?.timeSeriesData?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0,
+      loadedFully: (result.resultSet?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0) < limit,
+      count: result.resultSet?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0,
       totalCount: null,
       // allays returns false
       // || !result.resultSet?.hasMoreData,

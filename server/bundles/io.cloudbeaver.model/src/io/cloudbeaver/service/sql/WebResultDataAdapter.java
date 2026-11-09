@@ -14,18 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.timeseries;
+package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.timeseries.TSData;
 
-/** Converts raw result-set values to graph data for data sources that support time series. */
-public interface WebTimeSeriesDataAdapter {
+/** Produces presentation data from raw result-set values. */
+public interface WebResultDataAdapter {
     @NotNull
-    TSData build(
+    WebDataFormat getDataFormat();
+
+    @NotNull
+    Object build(
         @NotNull DBSDataContainer container,
         @NotNull DBDAttributeBinding[] bindings,
         @NotNull Object[][] rows

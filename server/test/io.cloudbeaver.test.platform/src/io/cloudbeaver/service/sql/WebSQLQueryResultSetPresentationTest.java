@@ -16,42 +16,49 @@
  */
 package io.cloudbeaver.service.sql;
 
-import org.jkiss.dbeaver.model.timeseries.TSData;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class WebSQLQueryResultSetTimeSeriesTest {
+public class WebSQLQueryResultSetPresentationTest {
     @Test
-    void graphResultDoesNotDuplicateSourceRows() {
+    void presentationResultKeepsSourceCountWithoutRows() {
         WebSQLQueryResultSet result = new WebSQLQueryResultSet();
         result.setHasMoreData(true);
-        TSData graph = new TSData(1, List.of(
-            new TSData.Series("a", "first", List.of(new TSData.Point(1000, 2)))
-        ));
-
-        var row = new WebSQLQueryResultSetRow(new Object[] {1000L, 2.0}, null);
-        result.setRows(List.of(row));
-        result.setTimeSeriesResult(graph);
+        result.setRows(List.of());
+        result.setColumns(new WebSQLQueryResultColumn[0]);
+        result.setSourceRowCount(1);
+        Object graph = new Object();
+        result.setPresentationData(graph);
 
         assertTrue(result.isHasMoreData());
         assertTrue(result.getRowsWithMetaData().isEmpty());
         assertEquals(0, result.getColumns().length);
-        assertEquals(1, result.getTimeSeriesData().sourceRowCount());
-        assertEquals(graph, result.getTimeSeriesData());
+        assertEquals(1, result.getSourceRowCount());
+        assertEquals(graph, result.getPresentationData());
     }
 
     @Test
-    void ordinaryResultRetainsRowsWithoutGraphData() {
+    void ordinaryResultRetainsRowsWithoutPresentationData() {
         WebSQLQueryResultSet result = new WebSQLQueryResultSet();
         var row = new WebSQLQueryResultSetRow(new Object[] {"2026-11-05 12:34:56", "12.50"}, null);
         result.setRows(List.of(row));
 
         assertEquals(List.of(row), result.getRowsWithMetaData());
-        assertNull(result.getTimeSeriesData());
+        assertNull(result.getSourceRowCount());
+        assertNull(result.getPresentationData());
+    }
+
+    @Test
+    void emptyPresentationRetainsFetchedRowCount() {
+        WebSQLQueryResultSet result = new WebSQLQueryResultSet();
+        result.setSourceRowCount(3);
+
+        assertTrue(result.getRowsWithMetaData().isEmpty());
+        assertEquals(3, result.getSourceRowCount());
     }
 }

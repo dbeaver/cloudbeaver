@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.timeseries.WebTimeSeriesDataAdapter;
 import io.cloudbeaver.service.sql.WebSQLResultSetRowIdentifier.WebSQLResultSetRowIdentifierState;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
@@ -181,22 +180,23 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             log.error("Error binding attributes", e);
         }
 
-        if (dataFormat == WebDataFormat.timeseries) {
-            WebTimeSeriesDataAdapter adapter = GeneralUtils.adapt(
-                dataContainer.getDataSource(), WebTimeSeriesDataAdapter.class);
+        WebResultDataAdapter adapter = GeneralUtils.adapt(dataContainer.getDataSource(), WebResultDataAdapter.class);
+        if (adapter != null && adapter.getDataFormat() == dataFormat) {
             try {
-                if (adapter == null) {
-                    throw new DBCException("Time-series data is not supported by this data source");
-                }
-                webResultSet.setTimeSeriesResult(adapter.build(
+                webResultSet.setPresentationData(adapter.build(
                     dataContainer,
                     bindings,
                     rows.stream().map(WebSQLQueryResultSetRow::getData).toArray(Object[][]::new)
                 ));
+                webResultSet.setSourceRowCount(rows.size());
+                webResultSet.setColumns(new WebSQLQueryResultColumn[0]);
             } catch (DBException e) {
-                throw new DBCException("Error reading time-series data", e);
+                throw new DBCException("Error reading presentation data", e);
             }
         } else {
+            if (dataFormat != null && dataFormat != WebDataFormat.resultset && dataFormat != WebDataFormat.document) {
+                throw new DBCException("Unsupported presentation data format: " + dataFormat);
+            }
             if (dataFormat != WebDataFormat.document) {
                 convertComplexValuesToRelationalView(session);
             }
