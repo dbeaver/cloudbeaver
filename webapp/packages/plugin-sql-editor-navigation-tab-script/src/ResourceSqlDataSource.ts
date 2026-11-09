@@ -434,13 +434,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
-        const executionContext = this.isExecutionContextSaved ? undefined : toJS(this.executionContext);
-
         await this.readData();
-
-        if (executionContext) {
-          this.setExecutionContext(executionContext);
-        }
 
         if (!this.isIncomingChanges) {
           this.loadingMessage = 'plugin_sql_editor_navigation_tab_script_state_saving';
@@ -469,19 +463,27 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       }
 
       runInAction(() => {
+        const isExecutionContextSaved = this.isExecutionContextSaved;
+
         if (!this.loaded) {
           if (this.baseScript !== script) {
             this.setScript(script);
           }
 
-          if (!isObjectsEqual(toJS(this.baseExecutionContext), executionContext)) {
+          if (isExecutionContextSaved && !isObjectsEqual(toJS(this.baseExecutionContext), executionContext)) {
             this.setExecutionContext(executionContext);
           }
 
           this.setBaseScript(script);
           this.setBaseExecutionContext(executionContext);
         } else {
-          this.setIncomingExecutionContext(executionContext);
+          // Refresh the saved properties without overwriting a locally changed connection.
+          if (isExecutionContextSaved) {
+            this.setIncomingExecutionContext(executionContext);
+          } else {
+            this.setBaseExecutionContext(executionContext);
+          }
+
           this.setIncomingScript(script);
         }
 
