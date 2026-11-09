@@ -21,6 +21,7 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
+    "@cloudbeaver/core-administration": "workspace:*",
     "@cloudbeaver/core-authentication": "workspace:*",
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-connections": "workspace:*",

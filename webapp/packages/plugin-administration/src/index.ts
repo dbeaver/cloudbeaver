@@ -18,7 +18,6 @@ export * from './ConfigurationWizard/ServerConfiguration/Form/ServerConfiguratio
 export * from './ConfigurationWizard/ServerConfiguration/Features/ServerConfigurationFeatureLazy.js';
 export * from './ConfigurationWizard/ServerConfiguration/Features/ServerConfigurationFeatureGroupLazy.js';
 export * from './ConfigurationWizard/ServerConfiguration/Features/ServerConfigurationFeatureListLazy.js';
-export * from './ConfigurationWizard/ServerConfiguration/Features/SERVER_CONFIGURATION_FEATURE_GROUPS.js';
 export * from './ConfigurationWizard/ServerConfiguration/IServerConfigurationPageState.js';
 export * from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService.js';
 export * from './ConfigurationWizard/ServerConfiguration/ServerConfigurationFormService.js';

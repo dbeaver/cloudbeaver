@@ -6,8 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable } from 'mobx';
-
 import { importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -20,23 +18,11 @@ const ServerConfigurationConfigurationPanel = importLazyComponent(() =>
 
 @injectable(() => [ServerConfigurationFormService])
 export class ServerConfigurationConfigurationService {
-  readonly featureGroups = new Map<string, string>();
-
   readonly settingsContainer = new PlaceholderContainer<IConfigurationPlaceholderProps>();
   readonly connectionsContainer = new PlaceholderContainer<IConfigurationPlaceholderProps>();
   readonly workspaceContainer = new PlaceholderContainer<IConfigurationPlaceholderProps>();
 
-  constructor(private readonly serverConfigurationFormService: ServerConfigurationFormService) {
-    makeObservable(this, {
-      featureGroups: observable.shallow,
-    });
-  }
-
-  assignFeaturesToGroup(groupId: string, featureIds: readonly string[]): void {
-    for (const featureId of featureIds) {
-      this.featureGroups.set(featureId, groupId);
-    }
-  }
+  constructor(private readonly serverConfigurationFormService: ServerConfigurationFormService) {}
 
   register(): void {
     this.serverConfigurationFormService.parts.add({

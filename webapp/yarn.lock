@@ -3019,6 +3019,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connection-network-handlers@workspace:packages/plugin-connection-network-handlers"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-connections": "workspace:*"
@@ -3191,6 +3192,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connections@workspace:packages/plugin-connections"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"

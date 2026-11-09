@@ -8,11 +8,11 @@
 
 import { observer } from 'mobx-react-lite';
 
+import { ServerConfigurationFeatureGroupsService } from '@cloudbeaver/core-administration';
 import { useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { FeaturesResource, sortFeature } from '@cloudbeaver/core-root';
 
-import { ServerConfigurationConfigurationService } from '../ServerConfigurationConfigurationService.js';
 import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService.js';
 import { ServerConfigurationFeature } from './ServerConfigurationFeature.js';
 
@@ -26,7 +26,7 @@ export const ServerConfigurationFeatureList = observer<IServerConfigurationFeatu
   configurationWizard,
 }) {
   const featuresResource = useResource(ServerConfigurationFeatureList, FeaturesResource, configurationWizard ? null : undefined);
-  const serverConfigurationConfigurationService = useService(ServerConfigurationConfigurationService);
+  const serverConfigurationFeatureGroupsService = useService(ServerConfigurationFeatureGroupsService);
   const features = featuresResource.data.slice().sort(sortFeature);
 
   if (configurationWizard || features.length === 0) {
@@ -36,7 +36,7 @@ export const ServerConfigurationFeatureList = observer<IServerConfigurationFeatu
   return (
     <>
       {features
-        .filter(feature => serverConfigurationConfigurationService.featureGroups.get(feature.id) === groupId)
+        .filter(feature => serverConfigurationFeatureGroupsService.featureGroups.get(feature.id) === groupId)
         .map(feature => (
           <ServerConfigurationFeature
             key={feature.id}

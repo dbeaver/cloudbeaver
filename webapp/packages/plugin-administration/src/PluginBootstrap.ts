@@ -10,13 +10,12 @@ import { lazy } from 'react';
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { EAdminPermission, FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID, FEATURE_SSH_ID, PermissionsService } from '@cloudbeaver/core-root';
+import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { MenuBaseItem, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService.js';
-import { SERVER_CONFIGURATION_FEATURE_GROUPS } from './ConfigurationWizard/ServerConfiguration/Features/SERVER_CONFIGURATION_FEATURE_GROUPS.js';
 import { ServerConfigurationConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationConfigurationService.js';
 import { ServerConfigurationFormService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationFormService.js';
 
@@ -108,10 +107,6 @@ export class PluginBootstrap extends Bootstrap {
     });
 
     this.serverConfigurationConfigurationService.register();
-    this.serverConfigurationConfigurationService.assignFeaturesToGroup(SERVER_CONFIGURATION_FEATURE_GROUPS.connections, [
-      FEATURE_SSH_ID,
-      FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID,
-    ]);
 
     this.serverConfigurationConfigurationService.settingsContainer.add(ServerConfigurationConnectionsSection, 0);
     this.serverConfigurationConfigurationService.settingsContainer.add(ServerConfigurationWorkspaceSection, 3);

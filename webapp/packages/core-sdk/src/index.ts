@@ -12,7 +12,6 @@ export * from './CustomGraphQLClient.js';
 export * from './DetailsError.js';
 export * from './EnvironmentService.js';
 export * from './EServerErrorCode.js';
-export * from './FEATURE_IDS.js';
 export * from './getGQLResponse.js';
 export * from './getObjectPropertyType.js';
 export * from './getObjectPropertyValueType.js';

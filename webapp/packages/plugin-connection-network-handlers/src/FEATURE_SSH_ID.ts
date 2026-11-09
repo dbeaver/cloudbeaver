@@ -6,11 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const SERVER_CONFIGURATION_FEATURE_GROUPS = {
-  ai: 'ai',
-  clouds: 'clouds',
-  connections: 'connections',
-  desktopClient: 'desktop-client',
-  drivers: 'drivers',
-  git: 'git',
-} as const;
+export const FEATURE_SSH_ID = 'ssh';

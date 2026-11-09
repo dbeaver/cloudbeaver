@@ -9,9 +9,9 @@
 import { observer } from 'mobx-react-lite';
 
 import { type PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
+import { FEATURE_GROUP_AI_ID } from '@cloudbeaver/plugin-ai';
 import {
   type IConfigurationPlaceholderProps,
-  SERVER_CONFIGURATION_FEATURE_GROUPS,
   ServerConfigurationFeatureGroup,
   ServerConfigurationFeatureList,
 } from '@cloudbeaver/plugin-administration';
@@ -22,7 +22,7 @@ export const ServerConfigurationAISection: PlaceholderComponent<IConfigurationPl
 
     return (
       <ServerConfigurationFeatureGroup title={translate('administration_server_configuration_settings_ai')}>
-        <ServerConfigurationFeatureList {...props} groupId={SERVER_CONFIGURATION_FEATURE_GROUPS.ai} />
+        <ServerConfigurationFeatureList {...props} groupId={FEATURE_GROUP_AI_ID} />
       </ServerConfigurationFeatureGroup>
     );
   },

@@ -8,13 +8,13 @@
 
 import { observer } from 'mobx-react-lite';
 
+import { FEATURE_GROUP_CONNECTIONS_ID } from '@cloudbeaver/core-connections';
 import type { PlaceholderComponent } from '@cloudbeaver/core-blocks';
 
 import { ServerConfigurationConfigurationForm } from '../Form/ServerConfigurationConfigurationForm.js';
 import { ServerConfigurationNavigatorViewForm } from '../Form/ServerConfigurationNavigatorViewForm.js';
 import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService.js';
 import { ServerConfigurationFeatureList } from './ServerConfigurationFeatureList.js';
-import { SERVER_CONFIGURATION_FEATURE_GROUPS } from './SERVER_CONFIGURATION_FEATURE_GROUPS.js';
 
 export const ServerConfigurationConnectionFeatures: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(
   function ServerConfigurationConnectionFeatures(props) {
@@ -22,7 +22,7 @@ export const ServerConfigurationConnectionFeatures: PlaceholderComponent<IConfig
       <>
         <ServerConfigurationConfigurationForm serverConfig={props.state.serverConfig} />
         <ServerConfigurationNavigatorViewForm configs={props.state} />
-        <ServerConfigurationFeatureList {...props} groupId={SERVER_CONFIGURATION_FEATURE_GROUPS.connections} />
+        <ServerConfigurationFeatureList {...props} groupId={FEATURE_GROUP_CONNECTIONS_ID} />
       </>
     );
   },
