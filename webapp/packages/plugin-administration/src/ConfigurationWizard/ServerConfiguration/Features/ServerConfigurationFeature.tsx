@@ -12,6 +12,8 @@ import { type ReactNode, useId } from 'react';
 import {
   CardSection,
   CheckboxMarkup,
+  FieldDescription,
+  FieldLabel,
   type CheckboxBaseProps,
   type CheckboxType,
   type ICheckboxControlledProps,
@@ -66,16 +68,12 @@ export const ServerConfigurationFeature: CheckboxType<IServerConfigurationFeatur
         aria-describedby={[props['aria-describedby'], description && descriptionId].filter(Boolean).join(' ') || undefined}
         onChange={checkboxState.change}
       />
-      <label className={s(classes, { label: true })} htmlFor={controlId}>
-        <span id={labelId} className={s(classes, { name: true })}>
+      <div className={s(classes, { details: true })}>
+        <FieldLabel id={labelId} className={s(classes, { name: true })} htmlFor={controlId}>
           {children}
-        </span>
-        {description && (
-          <span id={descriptionId} className={s(classes, { description: true })}>
-            {description}
-          </span>
-        )}
-      </label>
+        </FieldLabel>
+        {description && <FieldDescription id={descriptionId}>{description}</FieldDescription>}
+      </div>
     </CardSection>
   );
 });

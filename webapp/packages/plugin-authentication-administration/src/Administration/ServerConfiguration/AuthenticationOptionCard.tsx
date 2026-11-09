@@ -8,7 +8,7 @@
 
 import type { ReactNode } from 'react';
 
-import { Card, s, useS } from '@cloudbeaver/core-blocks';
+import { Card, FieldDescription, FieldLabel, s, useS } from '@cloudbeaver/core-blocks';
 
 import styles from './AuthenticationOptionCard.module.css';
 
@@ -47,9 +47,9 @@ export const AuthenticationOptionCard: React.FC<Props> = function Authentication
             {iconSlot}
           </div>
           <div className={s(classes, { heading: true })}>
-            <label id={labelId} className={s(classes, { name: true })} htmlFor={controlId}>
+            <FieldLabel id={labelId} className={s(classes, { name: true })} htmlFor={controlId}>
               {label}
-            </label>
+            </FieldLabel>
             {typeSlot && <span className={s(classes, { type: true })}>{typeSlot}</span>}
           </div>
         </div>
@@ -58,9 +58,9 @@ export const AuthenticationOptionCard: React.FC<Props> = function Authentication
       {(description || actionsSlot) && (
         <div className={s(classes, { content: true })}>
           {description && (
-            <p id={descriptionId} className={s(classes, { description: true })}>
+            <FieldDescription id={descriptionId} className={s(classes, { description: true })}>
               {description}
-            </p>
+            </FieldDescription>
           )}
           {actionsSlot && <div className={s(classes, { actions: true })}>{actionsSlot}</div>}
         </div>

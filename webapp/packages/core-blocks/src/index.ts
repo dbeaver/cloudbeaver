@@ -271,3 +271,4 @@ export * from './useVisible.js';
 export * from './SAVED_VALUE_INDICATOR.js';
 export * from './FormControls/Field.js';
 export * from './FormControls/FieldLabel.js';
+export * from './FormControls/FieldDescription.js';

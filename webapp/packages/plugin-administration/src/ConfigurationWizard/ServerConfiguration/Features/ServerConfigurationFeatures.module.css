@@ -38,7 +38,7 @@
   &[data-disabled] {
     opacity: 0.6;
 
-    & .label {
+    & .name {
       cursor: default;
     }
   }
@@ -55,31 +55,22 @@
   }
 }
 
-.label {
-  display: flex;
+.details {
   flex: 1;
-  flex-direction: column;
-  gap: 4px;
   min-width: 0;
-  cursor: pointer;
   overflow-wrap: anywhere;
+}
+
+.name {
+  display: block;
+  font-weight: 500;
+  overflow: visible;
+  white-space: normal;
+  cursor: pointer;
 
   &::before {
     content: '';
     position: absolute;
     inset: 0;
   }
-}
-
-.name {
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.description {
-  max-width: 75ch;
-  color: var(--theme-on-secondary);
-  font-size: 0.875rem;
-  line-height: 1.5;
 }

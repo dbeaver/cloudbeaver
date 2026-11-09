@@ -63,9 +63,9 @@
 }
 
 .name {
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.5;
+  font-weight: 500;
+  overflow: visible;
+  white-space: normal;
   overflow-wrap: anywhere;
   cursor: pointer;
 }
@@ -92,11 +92,6 @@
 
 .description {
   flex: 1 1 16rem;
-  max-width: 75ch;
-  margin: 0;
-  color: var(--theme-on-secondary);
-  font-size: 0.875rem;
-  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
