@@ -90,8 +90,12 @@ public class WebAIChatConversation {
     }
 
     @Nullable
-    public WebAIChatConversationSettings getSettings() {
-        AIContextSettingsChatConversation settings = conversation.getCustomSettings();
+    public WebAIChatConversationSettings getSettings() throws DBException {
+        if (conversation.getDataSource() == null) {
+            return null;
+        }
+        AIContextSettingsChatConversation settings = WebAIUtils.getConversationSettings(
+            WebAIUtils.getAiChatSession(webSession), conversation);
         if (settings == null) {
             return null;
         }
