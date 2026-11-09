@@ -38,6 +38,14 @@ export class AIChatTabService {
     });
   }
 
+  toggleTab(): void {
+    this.aiChatService.togglePanel();
+
+    if (this.aiChatService.isActive) {
+      this.selectTab();
+    }
+  }
+
   selectTab(): void {
     this.sideBarPanelService.tabsContainer.select(AI_CHAT_TAB_ID);
   }

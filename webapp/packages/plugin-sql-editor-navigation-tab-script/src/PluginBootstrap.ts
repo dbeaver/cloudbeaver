@@ -236,7 +236,7 @@ export class PluginBootstrap extends Bootstrap {
         });
 
         if (!this.resourceManagerScriptsService.active) {
-          this.resourceManagerScriptsService.togglePanel();
+          this.resourceManagerScriptsService.toggleTab();
         } else {
           this.resourceManagerScriptsService.selectTab();
         }
