@@ -477,7 +477,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
           this.setBaseScript(script);
           this.setBaseExecutionContext(executionContext);
         } else {
-          // Refresh the saved properties without overwriting a locally changed connection.
           if (isExecutionContextSaved) {
             this.setIncomingExecutionContext(executionContext);
           } else {
