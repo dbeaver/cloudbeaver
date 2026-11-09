@@ -22,11 +22,13 @@ export class SQLTaskResultsService {
 
   async load(dataFormat: ResultDataFormat, taskId: string): Promise<SqlExecuteInfo> {
     const loader = this.loaders.get(dataFormat);
+
     if (loader) {
       return loader(taskId);
     }
 
     const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId });
+
     return result;
   }
 }
