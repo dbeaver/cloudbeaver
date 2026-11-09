@@ -30,6 +30,9 @@ import org.jkiss.dbeaver.model.security.SMStandardMeta;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.util.HashMap;
@@ -42,6 +45,8 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 
 public class LdapAuthenticationTest {
     private static final String USER_LOGIN = "test-user";
@@ -120,6 +125,131 @@ public class LdapAuthenticationTest {
         Mockito.verify(bindUserContext).close();
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void matchingDescendantDoesNotGrantUserAccess(boolean withBindUser) throws Exception {
+        DirContext validationContext = Mockito.mock(DirContext.class);
+        DirContext userContext = withBindUser ? Mockito.mock(DirContext.class) : validationContext;
+        NamingEnumeration<SearchResult> userSearchResult = mockUserSearchResult();
+        Mockito.when(validationContext.search(
+            Mockito.eq(USER_DN),
+            Mockito.eq(FILTER),
+            Mockito.any(SearchControls.class)
+        )).thenAnswer(invocation -> {
+            SearchControls controls = invocation.getArgument(2);
+            // Only a descendant matches: a subtree search would incorrectly authorize the user.
+            return mockFilterSearchResult(controls.getSearchScope() != SearchControls.OBJECT_SCOPE);
+        });
+        Mockito.when(userContext.search(
+            Mockito.eq(USER_DN),
+            Mockito.eq("objectClass=*"),
+            Mockito.any(SearchControls.class)
+        )).thenReturn(userSearchResult);
+        LdapAuthProvider provider = Mockito.spy(new LdapAuthProvider());
+        if (withBindUser) {
+            Mockito.doReturn(validationContext, userContext).when(provider).initConnection(Mockito.anyMap());
+        } else {
+            Mockito.doReturn(userContext).when(provider).initConnection(Mockito.anyMap());
+        }
+
+        DBException exception = Assertions.assertThrows(
+            DBException.class,
+            () -> authenticate(provider, FILTER, bindUserParameters(withBindUser))
+        );
+
+        Assertions.assertTrue(exception.getMessage().endsWith("Access denied"));
+        Mockito.verify(validationContext).search(
+            Mockito.eq(USER_DN),
+            Mockito.eq(FILTER),
+            Mockito.argThat(controls -> controls.getSearchScope() == SearchControls.OBJECT_SCOPE)
+        );
+        Mockito.verify(provider).initConnection(Mockito.anyMap());
+        Mockito.verify(userContext, Mockito.never()).search(
+            Mockito.eq(USER_DN),
+            Mockito.eq("objectClass=*"),
+            Mockito.any(SearchControls.class)
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void matchingUserCanLogInWithObjectScope(boolean withBindUser) throws Exception {
+        DirContext validationContext = Mockito.mock(DirContext.class);
+        DirContext userContext = withBindUser ? Mockito.mock(DirContext.class) : validationContext;
+        NamingEnumeration<SearchResult> filterSearchResult = mockFilterSearchResult(true);
+        NamingEnumeration<SearchResult> userSearchResult = mockUserSearchResult();
+        Mockito.when(validationContext.search(
+            Mockito.eq(USER_DN),
+            Mockito.eq(FILTER),
+            Mockito.argThat(controls -> controls != null && controls.getSearchScope() == SearchControls.OBJECT_SCOPE)
+        )).thenReturn(filterSearchResult);
+        Mockito.when(userContext.search(
+            Mockito.eq(USER_DN),
+            Mockito.eq("objectClass=*"),
+            Mockito.argThat(controls -> controls != null && controls.getSearchScope() == SearchControls.OBJECT_SCOPE)
+        )).thenReturn(userSearchResult);
+        LdapAuthProvider provider = Mockito.spy(new LdapAuthProvider());
+        if (withBindUser) {
+            Mockito.doReturn(validationContext, userContext).when(provider).initConnection(Mockito.anyMap());
+        } else {
+            Mockito.doReturn(userContext).when(provider).initConnection(Mockito.anyMap());
+        }
+
+        Map<String, Object> userData = authenticate(provider, FILTER, bindUserParameters(withBindUser));
+
+        Assertions.assertEquals(USER_DN, userData.get(LdapConstants.CRED_USER_DN));
+        Assertions.assertEquals("test-user-id", userData.get(LdapConstants.CRED_USERNAME));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "alice", "cnalice", "Doe, John", "alice+admin", "alice\"admin", "alice\\admin", "alice;admin",
+        "#alice", " alice", "alice ", "Алиса", "Doe, John=admin", "alice,ou=admins"
+    })
+    public void plainUsernameIsOneEscapedRdn(@NotNull String userName) throws Exception {
+        Map<String, Object> userData = authenticateUsername(userName, Map.of());
+
+        LdapName userDN = new LdapName((String) userData.get(LdapConstants.CRED_USER_DN));
+        LdapName baseDN = new LdapName("dc=example,dc=com");
+        Assertions.assertTrue(userDN.startsWith(baseDN));
+        Assertions.assertEquals(baseDN.size() + 1, userDN.size());
+        Rdn userRdn = userDN.getRdn(baseDN.size());
+        Assertions.assertEquals("cn", userRdn.getType());
+        Assertions.assertEquals(userName, userRdn.getValue());
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "cn=alice|cn=alice,dc=example,dc=com",
+        "cn=alice,ou=people|cn=alice,ou=people,dc=example,dc=com",
+        "cn=alice,dc=example,dc=com|cn=alice,dc=example,dc=com",
+        "CN=alice, DC=EXAMPLE, DC=COM|cn=alice,dc=example,dc=com",
+        "cn=Doe\\, John,ou=people|cn=Doe\\, John,ou=people,dc=example,dc=com",
+        "cn=alice+uid=123,ou=people|cn=alice+uid=123,ou=people,dc=example,dc=com",
+        "cn=alice,dc=notexample,dc=com|cn=alice,dc=notexample,dc=com,dc=example,dc=com",
+        "cn=alice,notdc=example,dc=com|cn=alice,notdc=example,dc=com,dc=example,dc=com"
+    }, delimiter = '|')
+    public void explicitFullAndRelativeDnsArePreserved(
+        @NotNull String userName,
+        @NotNull String expectedDN
+    ) throws Exception {
+        Map<String, Object> userData = authenticateUsername(userName, Map.of());
+
+        Assertions.assertEquals(new LdapName(expectedDN), new LdapName((String) userData.get(LdapConstants.CRED_USER_DN)));
+    }
+
+    @Test
+    public void plainUsernameSupportsCustomIdentifierAndEmptyBase() throws Exception {
+        Map<String, Object> userData = authenticateUsername(
+            "uidalice,admin",
+            Map.of(LdapConstants.PARAM_USER_IDENTIFIER_ATTR, "uid", LdapConstants.PARAM_DN, "")
+        );
+
+        LdapName userDN = new LdapName((String) userData.get(LdapConstants.CRED_USER_DN));
+        Assertions.assertEquals(1, userDN.size());
+        Assertions.assertEquals(new Rdn("uid", "uidalice,admin"), userDN.getRdn(0));
+    }
+
     @Test
     public void usernameLoginClosesServiceResources() throws Exception {
         DirContext serviceContext = Mockito.mock(DirContext.class);
@@ -157,6 +287,12 @@ public class LdapAuthenticationTest {
         );
 
         Assertions.assertEquals(USER_LOGIN, userData.get(LdapConstants.CRED_USERNAME));
+        Mockito.verify(serviceContext).search(
+            Mockito.eq("dc=example,dc=com"),
+            Mockito.eq("(&(uid={0})" + FILTER + ")"),
+            Mockito.any(Object[].class),
+            Mockito.argThat(controls -> controls.getSearchScope() == SearchControls.SUBTREE_SCOPE)
+        );
         Mockito.verify(userLookupResults).close();
         Mockito.verify(serviceContext).close();
         Mockito.verify(userContext).close();
@@ -475,6 +611,38 @@ public class LdapAuthenticationTest {
         )).thenReturn(userSearchResult);
 
         return authenticate(new TestLdapAuthProvider(userContext), "", additionalParameters);
+    }
+
+    @NotNull
+    private static Map<String, Object> bindUserParameters(boolean withBindUser) {
+        return withBindUser ? Map.of(
+            LdapConstants.PARAM_BIND_USER, BIND_USER_DN,
+            LdapConstants.PARAM_BIND_USER_PASSWORD, BIND_USER_PASSWORD
+        ) : Map.of();
+    }
+
+    @NotNull
+    private static Map<String, Object> authenticateUsername(
+        @NotNull String userName,
+        @NotNull Map<String, Object> additionalParameters
+    ) throws Exception {
+        DirContext userContext = Mockito.mock(DirContext.class);
+        NamingEnumeration<SearchResult> userSearchResult = mockUserSearchResult();
+        Mockito.when(userContext.search(
+            Mockito.anyString(),
+            Mockito.eq("objectClass=*"),
+            Mockito.argThat(controls -> controls != null && controls.getSearchScope() == SearchControls.OBJECT_SCOPE)
+        )).thenReturn(userSearchResult);
+        LdapAuthProvider provider = Mockito.spy(new LdapAuthProvider());
+        Mockito.doReturn(userContext).when(provider).initConnection(Mockito.anyMap());
+
+        Map<String, Object> userData = authenticate(provider, "", userName, additionalParameters);
+
+        Mockito.verify(provider).initConnection(Mockito.argThat(environment ->
+            userData.get(LdapConstants.CRED_USER_DN).equals(environment.get(Context.SECURITY_PRINCIPAL))
+                && USER_PASSWORD.equals(environment.get(Context.SECURITY_CREDENTIALS))
+        ));
+        return userData;
     }
 
     @NotNull

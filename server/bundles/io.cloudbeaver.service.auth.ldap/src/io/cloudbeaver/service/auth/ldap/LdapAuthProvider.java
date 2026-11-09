@@ -51,6 +51,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.naming.Context;
+import javax.naming.InvalidNameException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.PartialResultException;
@@ -541,22 +542,27 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return cred.get(LdapConstants.CRED_USER_DN);
     }
 
-    private String buildFullUserDN(String userName, LdapSettings ldapSettings) {
-        String fullUserDN = userName;
-
-        if (!CommonUtils.startsWithIgnoreCase(fullUserDN, ldapSettings.getUserIdentifierAttr())) {
-            fullUserDN = String.join("=", ldapSettings.getUserIdentifierAttr(), userName);
+    @NotNull
+    private String buildFullUserDN(@NotNull String userName, @NotNull LdapSettings ldapSettings) throws DBException {
+        try {
+            LdapName userDN;
+            try {
+                // Explicit full and relative DNs are supported login forms. Other input is a literal RDN value.
+                userDN = new LdapName(userName);
+            } catch (InvalidNameException e) {
+                userDN = new LdapName(List.of(new Rdn(ldapSettings.getUserIdentifierAttr(), userName)));
+            }
+            LdapName baseDN = new LdapName(ldapSettings.getBaseDN());
+            return userDN.startsWith(baseDN) ? userDN.toString() : baseDN.addAll(userDN).toString();
+        } catch (InvalidNameException e) {
+            throw new DBException("Invalid LDAP user DN", e);
         }
-        if (CommonUtils.isNotEmpty(ldapSettings.getBaseDN()) && !CommonUtils.endsWithIgnoreCase(fullUserDN, ldapSettings.getBaseDN())) {
-            fullUserDN = String.join(",", fullUserDN, ldapSettings.getBaseDN());
-        }
-
-        return fullUserDN;
     }
 
     private SearchControls createSearchControls() {
         SearchControls searchControls = new SearchControls();
-        searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        // Access validation and profile reads must only examine the authenticating user's entry.
+        searchControls.setSearchScope(SearchControls.OBJECT_SCOPE);
         searchControls.setTimeLimit(DEFAULT_TIME_LIMIT);
         searchControls.setReturningAttributes(new String[]{"*", "+"});
         return searchControls;
