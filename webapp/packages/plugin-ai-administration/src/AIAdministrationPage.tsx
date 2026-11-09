@@ -110,6 +110,7 @@ export const AIAdministrationPage = observer<{
             state={settingsInfoPart.state}
             items={LANGUAGE_OPTIONS}
             description={translate('plugin_ai_administration_language_description')}
+            overflowPadding={0}
             allowCustomValue
             allowClear
           >

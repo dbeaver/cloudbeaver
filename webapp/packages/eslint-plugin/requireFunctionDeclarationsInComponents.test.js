@@ -147,8 +147,8 @@ ruleTester.run('require-function-declarations-in-components', rule, {
   ],
 });
 
-it('registers require-function-declarations-in-components as a recommended error', () => {
+it('registers require-function-declarations-in-components as a recommended warning', () => {
   const name = 'require-function-declarations-in-components';
   assert.equal(plugin.rules[name], rule);
-  assert.equal(plugin.configs.recommended.rules[`@cloudbeaver/${name}`], 'error');
+  assert.equal(plugin.configs.recommended.rules[`@cloudbeaver/${name}`], 'warn');
 });

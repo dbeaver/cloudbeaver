@@ -20,7 +20,7 @@ export default {
       try {
         const importerExtension = path.extname(context.filename).substring(1);
 
-        if (node.importKind === 'type' || node.exportKind === 'type' || importerExtension !== 'ts') {
+        if (node.importKind === 'type' || node.exportKind === 'type' || importerExtension !== 'ts' || context.filename.endsWith('.d.ts')) {
           return;
         }
 
@@ -37,29 +37,18 @@ export default {
         let resolvedPath = importPath;
 
         if (importPath.startsWith('./') || importPath.startsWith('../')) {
-          resolvedPath = path.resolve(path.dirname(context.filename), importPath.replace('.js', ''));
+          const filePath = path.resolve(path.dirname(context.filename), importPath);
+          const extension = path.extname(filePath);
 
-          if (path.extname(resolvedPath) === '') {
-            resolvedPath += '.tsx';
+          if (extension === '.js' || extension === '.jsx' || extension === '') {
+            const stem = extension ? filePath.slice(0, -extension.length) : filePath;
+            // Match TypeScript extension substitution: a .ts sibling takes precedence over .tsx for .js imports.
+            const candidates = extension === '.jsx' ? [`${stem}.tsx`] : [`${stem}.ts`, `${stem}.tsx`];
+            resolvedPath = candidates.find(candidate => fs.existsSync(candidate));
+          } else {
+            resolvedPath = fs.existsSync(filePath) ? filePath : undefined;
           }
-
-          if (!fs.existsSync(resolvedPath)) {
-            return;
-          }
-        } // else {
-
-        //   resolvedPath = pnpapi.resolveRequest(importPath, context.filename);
-
-        //   if (resolvedPath === null) {
-        //     return;
-        //   }
-
-        //   const possibleSrcFile = resolvedPath.replace('/dist/', '/src/').replace('.js', '.tsx');
-        //   console.log(resolvedPath, possibleSrcFile);
-        //   if (!fs.existsSync(possibleSrcFile)) {
-        //     return;
-        //   }
-        // }
+        }
 
         if (!resolvedPath) {
           return;

@@ -139,7 +139,7 @@ ruleTester.run('statement-spacing', statementSpacing, {
   ],
 });
 
-it('registers statement-spacing as a recommended error', () => {
+it('registers statement-spacing as a recommended warning', () => {
   assert.equal(plugin.rules['statement-spacing'], statementSpacing);
-  assert.equal(plugin.configs.recommended.rules['@cloudbeaver/statement-spacing'], 'error');
+  assert.equal(plugin.configs.recommended.rules['@cloudbeaver/statement-spacing'], 'warn');
 });

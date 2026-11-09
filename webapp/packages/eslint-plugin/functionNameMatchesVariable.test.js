@@ -83,8 +83,8 @@ ruleTester.run('function-name-matches-variable', rule, {
   ],
 });
 
-it('registers function-name-matches-variable as a recommended error without an unsafe rename fix', () => {
+it('registers function-name-matches-variable as a recommended warning without an unsafe rename fix', () => {
   assert.equal(plugin.rules['function-name-matches-variable'], rule);
-  assert.equal(plugin.configs.recommended.rules['@cloudbeaver/function-name-matches-variable'], 'error');
+  assert.equal(plugin.configs.recommended.rules['@cloudbeaver/function-name-matches-variable'], 'warn');
   assert.equal(rule.meta.fixable, undefined);
 });
