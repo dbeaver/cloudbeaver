@@ -25,11 +25,9 @@ export default [
   ['app_navigationTree_openNodeTab', 'Открыть'],
   ['app_navigationTree_search', 'Искать элементы...'],
   ['app_navigationTree_limited', 'Отображено {arg:limit} элементов'],
-
   ['app_navigationTree_action_collapse_all', 'Свернуть все элементы'],
   ['app_navigationTree_settings_filter_objects_description', 'Показывать описание объектов'],
   ['plugin_navigation_tree_settings_filter_table_contents', 'Показывать элементы таблицы'],
-
   ['app_navigationTree_settings_filter_title', 'Фильтр'],
   ['app_navigationTree_settings_filter_description', 'Показывать фильтр'],
   ['app_navigationTree_settings_filter_all_title', 'Фильтровать скрытые элементы'],
@@ -40,7 +38,6 @@ export default [
   ['app_navigationTree_node_folder_delete_confirmation', 'Все содержимое выбранной папки будет удалено.'],
   ['app_navigationTree_node_delete_error', 'Ошибка удаления "{arg:name}'],
   ['app_navigationTree_node_rename_error', 'Ошибка переименования ноды'],
-
   ['app_navigationTree_node_empty', 'Пусто'],
   ['app_navigationTree_node_no_results', "Извините, не удалось найти элементы содержащие '{arg:filter}'"],
   ['app_navigationTree_node_not_found', 'Элемент не найден'],
@@ -52,7 +49,7 @@ export default [
   ['app_navigationTree_connection_group_user', 'Пользовательские подключения'],
   ['app_navigationTree_connection_group_shared', 'Общие подключения'],
   ['app_navigationTree_empty_placeholder', 'Нет подключений.\nИспользуйте верхнее меню для создания подключения к базе.'],
-  ['app_navigationTree_drop_here', 'Drop here...'],
+  ['app_navigationTree_drop_here', 'Перетащите сюда...'],
   ['plugin_navigation_tree_settings_projects_description', 'Группировать элементы по проектам'],
   ['plugin_navigation_tree_settings_projects_title', 'Группировать по проектам'],
   ['plugin_navigation_tree_settings_disable', 'Отключить'],

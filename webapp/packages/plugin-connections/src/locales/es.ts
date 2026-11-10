@@ -1,0 +1,81 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+export default [
+  ['plugin_connections_delete_connection', 'Conexión'],
+  ['plugin_connections_delete_database_object', 'Objeto de base de datos'],
+  ['plugin_connections_delete_read_only', 'Conexión de solo lectura.'],
+  ['plugin_connections_delete_folder_warning', 'Las conexiones dentro de las carpetas no se eliminarán a menos que estén seleccionadas.'],
+  ['plugin_connections_new_connection_dialog_title', 'Nueva conexión'],
+  ['plugin_connections_connection_form_part_main', 'Principal'],
+  ['plugin_connections_connection_form_part_main_auth_model', 'Modelo de autenticación'],
+  ['plugin_connections_connection_form_part_properties', 'Propiedades del controlador'],
+  ['plugin_connections_connection_form_part_advanced', 'Configuración avanzada'],
+  ['plugin_connections_connection_form_part_initialization_settings', 'Configuración de inicialización'],
+  ['plugin_connections_connection_form_connection_details', 'Detalles de la conexión'],
+  ['plugin_connections_connection_form_part_main_custom_host', 'Host'],
+  ['plugin_connections_connection_form_part_main_custom_port', 'Puerto'],
+  ['plugin_connections_connection_form_part_main_custom_server_name', 'Nombre del servidor'],
+  ['plugin_connections_connection_form_part_main_custom_database', 'Base de datos'],
+  ['plugin_connections_connection_form_part_main_url_jdbc', 'URL JDBC'],
+  ['plugin_connections_connection_form_part_main_folder', 'Carpeta'],
+  ['plugin_connections_connection_edit_menu_item_title', 'Editar conexión'],
+  ['plugin_connections_connection_clone', 'Clonar'],
+  ['plugin_connections_connection_clone_error', 'No se pudo clonar la conexión'],
+  ['plugin_connections_connection_edit_reconnect_title', 'Conexión actualizada'],
+  ['plugin_connections_connection_edit_reconnect_message', 'La conexión se ha actualizado. ¿Desea volver a conectarse?'],
+  ['plugin_connections_connection_edit_reconnect_failed', 'No se pudo reconectar'],
+  ['plugin_connections_connection_folder_move_failed', 'No se pudo mover a la carpeta'],
+  [
+    'plugin_connections_connection_folder_move_duplication',
+    'La carpeta de destino o las carpetas seleccionadas contienen una carpeta con el mismo nombre ({arg:name})',
+  ],
+  [
+    'plugin_connections_connection_cloud_auth_required',
+    'Debe iniciar sesión con las credenciales de "{arg:providerLabel}" para trabajar con esta conexión.',
+  ],
+  ['plugin_connections_connection_form_project_invalid', 'No tiene permiso para crear conexiones en el proyecto seleccionado'],
+  ['plugin_connections_connection_form_host_configuration_invalid', 'La configuración de host no es compatible'],
+  ['plugin_connections_connection_form_name_invalid', "El campo 'Nombre de la conexión' no puede estar vacío"],
+  ['plugin_connections_connection_form_host_invalid', "El campo 'Host' no puede estar vacío"],
+  ['plugin_connections_connection_folder_delete_confirmation', 'Va a eliminar "{arg:name}". Las conexiones no se eliminarán. ¿Está seguro?'],
+  ['plugin_connections_menu_connections_label', 'Conexión'],
+  ['plugin_connections_menu_security_label', 'Seguridad'],
+  ['plugin_connections_action_disconnect_all_label', 'Desconectar todo'],
+  ['plugin_connections_settings', 'Conexiones'],
+  ['plugin_connections_settings_hide_connections_view_name', 'Ocultar gestión de vistas de conexión'],
+  [
+    'plugin_connections_settings_hide_connections_view_description',
+    'El submenú de vistas de conexión se ocultará para todos los usuarios excepto los administradores',
+  ],
+  ['plugin_connections_connection_form_shared_credentials_manage_info', 'Puede gestionar las credenciales en la '],
+  ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'pestaña Credenciales'],
+  [
+    'plugin_connections_connection_auth_secret_description',
+    'Hay varias credenciales disponibles para la autenticación.\nElija las credenciales que desea usar.',
+  ],
+  ['plugin_connections_connection_create_menu_title', 'Nueva conexión'],
+  [
+    'plugin_connections_connection_driver_not_installed_message',
+    'El controlador no está instalado. Puede instalarlo en la sección "Administración".',
+  ],
+  ['plugin_connections_connection_established', 'Conexión establecida'],
+  ['plugin_connections_connection_client_version', 'Versión del cliente: {arg:version} \n'],
+  ['plugin_connections_connection_server_version', 'Versión del servidor: {arg:version} \n'],
+  ['plugin_connections_connection_connection_time', 'Tiempo de conexión: {arg:time} \n'],
+  ['plugin_connections_connection_type_label', 'Tipo de conexión'],
+  ['plugin_connections_change_db_password_menu_title', 'Cambiar contraseña actual de la base de datos'],
+  ['plugin_connections_change_db_password_dialog_title', 'Cambiar contraseña actual de la base de datos'],
+  ['plugin_connections_change_db_password_current', 'Contraseña actual'],
+  ['plugin_connections_change_db_password_new', 'Nueva contraseña'],
+  ['plugin_connections_change_db_password_repeat', 'Confirmar contraseña'],
+  ['plugin_connections_change_db_password_submit', 'Cambiar'],
+  ['plugin_connections_change_db_password_success', 'Contraseña de la base de datos cambiada'],
+  ['plugin_connections_change_db_password_mismatch', 'Las nuevas contraseñas no coinciden'],
+  ['plugin_connections_change_db_password_failed', 'No se pudo cambiar la contraseña'],
+];

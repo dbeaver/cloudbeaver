@@ -7,6 +7,11 @@ export default [
   ['app_shared_settingsMenu_lang', 'Lingua'],
   ['app_shared_inlineEditor_dialog_title', 'Modalità modifica'],
   ['app_shared_inlineEditor_dialog_apply', 'Applica'],
-  ['app_shared_inlineEditor_dialog_cancel', 'Cancella'],
-  ['app_shared_navigationTabsBar_placeholder', 'Non ci sono oggetti da mostrare. Fai doppio click su un oggetto per aprirlo.'],
+  ['app_shared_inlineEditor_dialog_cancel', 'Annulla'],
+  [
+    'app_shared_navigationTabsBar_placeholder',
+    'Non ci sono oggetti da mostrare. Fai doppio clic su un oggetto nell’albero di navigazione per aprirlo.',
+  ],
+  ['app_shared_sql_generators_panel_title', 'Genera SQL'],
+  ['app_shared_sql_generators_dialog_title', 'SQL generato'],
 ];

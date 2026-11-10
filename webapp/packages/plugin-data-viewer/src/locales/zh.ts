@@ -1,4 +1,6 @@
 export default [
+  ['data_viewer_presentations_label', '数据展示方式'],
+  ['data_viewer_panels_label', '数据面板'],
   ['plugin_data_viewer_data_viewer_settings_group', '資料編輯器'],
   ['table_header_sql_expression', '输入SQL表达式以过滤结果'],
   ['table_header_sql_expression_not_supported', '不支持数据过滤器'],
@@ -49,10 +51,10 @@ export default [
   ['data_viewer_script_preview_dialog_title', '预览更改'],
   ['data_viewer_script_preview_error_title', '无法获取脚本'],
   ['data_viewer_refresh_result_set', '刷新结果设置'],
-  ['data_viewer_total_count_failed', '获取总数失败'],
   ['data_viewer_total_count_tooltip', '获取总数'],
   ['data_viewer_total_count_canceled_title', '取消计算总数'],
   ['data_viewer_total_count_canceled_message', '由于用户请求，计数已被取消'],
+  ['data_viewer_total_count_failed', '获取总数失败'],
   ['data_viewer_model_not_loaded', '表模型未加载'],
   ['data_viewer_copy_not_allowed', '复制数据的功能已禁用'],
   ['data_viewer_copy_not_allowed_message', '如果这是意外的，请联系管理员'],

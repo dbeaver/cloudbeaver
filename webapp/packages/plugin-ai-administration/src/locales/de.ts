@@ -18,6 +18,6 @@ export default [
   ['plugin_ai_administration_language_length_validation_error', 'Die Sprache darf nicht länger als 128 Zeichen sein'],
   ['plugin_ai_administration_default_profile_label', 'Standardprofil'],
   ['plugin_ai_administration_default_profile_description', 'Profil, das standardmäßig für KI-Funktionen verwendet wird'],
-  ['plugin_ai_administration_default_profile_no_profiles_title', 'No profiles available'],
+  ['plugin_ai_administration_default_profile_no_profiles_title', 'Keine Profile verfügbar'],
   ['plugin_ai_administration_default_profile_no_profiles_message', 'Erstellen Sie ein Profil, bevor Sie ein Standardprofil auswählen'],
 ];

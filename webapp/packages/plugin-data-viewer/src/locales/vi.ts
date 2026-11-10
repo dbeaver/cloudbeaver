@@ -1,4 +1,6 @@
 export default [
+  ['data_viewer_presentations_label', 'Dạng trình bày dữ liệu'],
+  ['data_viewer_panels_label', 'Bảng điều khiển dữ liệu'],
   ['plugin_data_viewer_data_viewer_settings_group', 'Trình chỉnh sửa dữ liệu'],
   ['table_header_sql_expression', 'Nhập biểu thức SQL để lọc kết quả, ví dụ: column_name=10'],
   ['table_header_sql_expression_not_supported', 'Lọc dữ liệu không được hỗ trợ'],
