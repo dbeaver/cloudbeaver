@@ -10,28 +10,20 @@ import { observer } from 'mobx-react-lite';
 import {
   AdministrationPageLayout,
   AdministrationPageNavigation,
+  AdministrationTabList,
   type AdministrationItemContentComponent,
   type AdministrationItemContentProps,
 } from '@cloudbeaver/core-administration';
-import { s, SContext, type StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, TabList, TabPanelList, TabsState, TabStyles, TabTitleStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { ProductInfoNavigationService } from './ProductInfoNavigationService.js';
 import { ProductInfoService } from './ProductInfoService.js';
-import style from './shared/ProductInfoPage.module.css';
-import tabStyle from './shared/ProductInfoPageTab.module.css';
-import TabTitleModuleStyles from './shared/ProductInfoPageTabTitle.module.css';
-
-const mainTabsRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [tabStyle] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabTitleModuleStyles] }],
-];
 
 export const ProductInfoPage: AdministrationItemContentComponent = observer(function ProductInfoPage({ item, configurationWizard, sub }) {
   const translate = useTranslate();
   const productInfoNavigationService = useService(ProductInfoNavigationService);
-  const styles = useS(style, tabStyle);
   const productInfoService = useService(ProductInfoService);
 
   function openSub(data: ITabData<AdministrationItemContentProps>) {
@@ -49,13 +41,7 @@ export const ProductInfoPage: AdministrationItemContentComponent = observer(func
         onChange={openSub}
       >
         <AdministrationPageNavigation>
-          <SContext registry={mainTabsRegistry}>
-            <TabList
-              className={s(styles, { tabList: true, administrationTabs: true })}
-              aria-label={translate('administration_settings_menu_title')}
-              underline
-            />
-          </SContext>
+          <AdministrationTabList aria-label={translate('administration_settings_menu_title')} />
         </AdministrationPageNavigation>
         <TabPanelList contents />
       </TabsState>

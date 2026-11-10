@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Kết nối'],
+  ['administration_server_configuration_settings_ai', 'AI'],
+  ['administration_server_configuration_settings_cloud', 'Đám mây'],
+  ['administration_server_configuration_settings_workspace', 'Không gian làm việc'],
+  ['administration_server_configuration_tab_drivers', 'Trình điều khiển'],
   ['administration_server_configuration_save_confirmation_title', 'Cập nhật cài đặt server'],
   ['administration_server_configuration_save_confirmation_message', 'Bạn sắp thay đổi các cài đặt quan trọng. Bạn có chắc chắn không?'],
   ['administration_configuration_wizard_welcome', 'Chào mừng'],
@@ -11,12 +16,15 @@ export default [
   ['administration_configuration_wizard_welcome_note', 'Lưu ý: bạn sẽ có thể thay đổi các tham số cấu hình này sau trong bảng quản trị.'],
   ['administration_configuration_wizard_configuration', 'Cấu hình Server'],
   ['administration_configuration_wizard_configuration_step_description', 'Cấu hình server chính'],
-  ['administration_configuration_wizard_configuration_title', 'Bạn có thể cấu hình các tham số server chính tại đây.'],
-  ['administration_configuration_wizard_configuration_save_error', 'Không thể lưu cấu hình server'],
   [
-    'administration_configuration_wizard_configuration_message',
-    'Bạn sẽ có thể thêm các dịch vụ bổ sung sau khi cấu hình server.\n\rQuản trị viên là siêu người dùng có thể cấu hình server, thiết lập kết nối cơ sở dữ liệu, quản lý người dùng khác và nhiều hơn nữa. Vui lòng ghi nhớ mật khẩu đã nhập. Không thể khôi phục mật khẩu quản trị viên tự động.',
+    'administration_configuration_wizard_configuration_description',
+    'Cấu hình các tham số chính của server. Bạn có thể thêm các dịch vụ khác sau khi hoàn tất thiết lập.',
   ],
+  [
+    'administration_configuration_wizard_configuration_password_warning',
+    'Hãy ghi nhớ mật khẩu quản trị viên. Không thể khôi phục mật khẩu này tự động.',
+  ],
+  ['administration_configuration_wizard_configuration_save_error', 'Không thể lưu cấu hình server'],
   ['administration_configuration_wizard_configuration_secure_cookies', 'Force HTTPS mode'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
@@ -50,7 +58,7 @@ export default [
     'administration_configuration_wizard_configuration_server_session_lifetime_description',
     'Tại đây, bạn có thể chỉ định số phút mà phiên được phép ở trạng thái không hoạt động trước khi hết hạn',
   ],
-  ['administration_configuration_wizard_configuration_plugins', 'Cấu hình'],
+  ['administration_configuration_wizard_configuration_plugins', 'Tính năng'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Bật kết nối riêng tư'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Cho phép người dùng tạo kết nối riêng tư'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Chế độ xem đơn giản của Navigator'],

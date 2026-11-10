@@ -34,7 +34,7 @@ export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
 
   return (
     <Tab {...props} title={handler.description}>
-      <TabIcon icon="/icons/plugin_connection_padlock.svg" viewBox="0 0 16 16" />
+      <TabIcon icon="/icons/core_blocks_padlock.svg" viewBox="0 0 16 16" />
       <TabTitle>
         <Translate token={handler.label} />
       </TabTitle>

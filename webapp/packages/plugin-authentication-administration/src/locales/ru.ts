@@ -1,4 +1,13 @@
 export default [
+  ['authentication_administration_server_configuration_authentication', 'Аутентификация'],
+  ['authentication_administration_providers_search', 'Поиск провайдеров...'],
+  ['authentication_administration_providers_filter', 'Статус провайдера'],
+  ['authentication_administration_providers_all', 'Все'],
+  ['authentication_administration_providers_active', 'Активные'],
+  ['authentication_administration_providers_available', 'Доступные'],
+  ['authentication_administration_providers_empty', 'Нет провайдеров, соответствующих фильтрам'],
+  ['authentication_administration_providers_built_in', 'Встроенный'],
+  ['authentication_administration_providers_required_features', 'Для использования провайдера включите сервисы: {arg:features}'],
   ['plugin_authentication_administration_team_grant_manual', 'Администратор'],
   ['plugin_authentication_administration_team_grant_provider', 'Провайдер аутентификации'],
   ['plugin_authentication_administration_team_grant_default', 'Команда по умолчанию'],

@@ -6,13 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionTypeResource } from '@cloudbeaver/core-connections';
+import { ServerConfigurationFeatureGroupsService } from '@cloudbeaver/core-administration';
+import { ConnectionTypeResource, FEATURE_GROUP_CONNECTIONS_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-@injectable(() => [ConnectionTypeResource])
+import { FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID } from './FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID.js';
+
+@injectable(() => [ServerConfigurationFeatureGroupsService, ConnectionTypeResource])
 export class PluginBootstrap extends Bootstrap {
-  constructor() {
+  constructor(private readonly serverConfigurationFeatureGroupsService: ServerConfigurationFeatureGroupsService) {
     super();
+  }
+
+  override register(): void {
+    this.serverConfigurationFeatureGroupsService.assignFeaturesToGroup(FEATURE_GROUP_CONNECTIONS_ID, [FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID]);
   }
 
   override async load(): Promise<void> {}

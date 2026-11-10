@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Connessioni'],
+  ['administration_server_configuration_settings_ai', 'IA'],
+  ['administration_server_configuration_settings_cloud', 'Cloud'],
+  ['administration_server_configuration_settings_workspace', 'Area di lavoro'],
+  ['administration_server_configuration_tab_drivers', 'Driver'],
   ['administration_server_configuration_save_confirmation_title', 'Aggiornamento delle impostazioni del Server'],
   ['administration_server_configuration_save_confirmation_message', 'Stai per modificare impostazioni critiche. Sei sicuro?'],
 
@@ -16,12 +21,15 @@ export default [
 
   ['administration_configuration_wizard_configuration', 'Configurazione del Server'],
   ['administration_configuration_wizard_configuration_step_description', 'Configurazione del server principale'],
-  ['administration_configuration_wizard_configuration_title', 'Puoi configurare i parametri del server principale qui.'],
-  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
   [
-    'administration_configuration_wizard_configuration_message',
-    "L'amministratore è un super utente che può configurare server, impostare connessioni ai database, gestire altri utenti e molto di più. Si prega di ricordare la password inserita: non sarà possibile recuperarla in maniera automatica.",
+    'administration_configuration_wizard_configuration_description',
+    'Configura i parametri principali del server. Potrai aggiungere altri servizi al termine della configurazione.',
   ],
+  [
+    'administration_configuration_wizard_configuration_password_warning',
+    "Ricorda la password dell'amministratore. Non può essere recuperata automaticamente.",
+  ],
+  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
 
   ['administration_configuration_tools_save_tooltip', 'Salva la configurazione'],
   ['administration_configuration_tools_cancel_tooltip', 'Annulla le modifiche'],
@@ -61,7 +69,7 @@ export default [
     'Qua puoi specificare il numero di minuti che vorresti permettere alla sessione di rimanere in attesa prima che scadi',
   ],
 
-  ['administration_configuration_wizard_configuration_plugins', 'Configurazione'],
+  ['administration_configuration_wizard_configuration_plugins', 'Funzionalità'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Abilita connessioni custom'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Permette agli utenti di creare connessioni custom'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Vista semplice del navigatore'],

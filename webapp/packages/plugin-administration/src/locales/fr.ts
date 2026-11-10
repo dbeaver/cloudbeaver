@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Connexions'],
+  ['administration_server_configuration_settings_ai', 'IA'],
+  ['administration_server_configuration_settings_cloud', 'Cloud'],
+  ['administration_server_configuration_settings_workspace', 'Espace de travail'],
+  ['administration_server_configuration_tab_drivers', 'Pilotes'],
   ['administration_server_configuration_save_confirmation_title', 'Mise à jour des paramètres du serveur'],
   ['administration_server_configuration_save_confirmation_message', 'Vous êtes sur le point de changer des paramètres critiques. Êtes-vous sûr?'],
 
@@ -16,12 +21,15 @@ export default [
 
   ['administration_configuration_wizard_configuration', 'Configuration du serveur'],
   ['administration_configuration_wizard_configuration_step_description', 'Configuration principale du serveur'],
-  ['administration_configuration_wizard_configuration_title', 'Vous pouvez configurer ici les paramètres principaux du serveur.'],
-  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
   [
-    'administration_configuration_wizard_configuration_message',
-    "Vous pourrez ajouter des services supplémentaires après la configuration du serveur.\nL'administrateur est un super utilisateur qui peut configurer le serveur, définir les connexions aux bases de données, gérer les autres utilisateurs et bien plus encore. Veuillez vous souvenir du mot de passe saisi. Il n'est pas possible de récupérer automatiquement le mot de passe de l'administrateur.",
+    'administration_configuration_wizard_configuration_description',
+    "Configurez les principaux paramètres du serveur. Vous pourrez ajouter d'autres services une fois la configuration terminée.",
   ],
+  [
+    'administration_configuration_wizard_configuration_password_warning',
+    "Mémorisez le mot de passe de l'administrateur. Il ne peut pas être récupéré automatiquement.",
+  ],
+  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
 
   ['administration_configuration_tools_save_tooltip', 'Enregistrer la configuration'],
   ['administration_configuration_tools_cancel_tooltip', 'Réinitialiser les modifications'],
@@ -62,7 +70,7 @@ export default [
     "Ici, vous pouvez spécifier le nombre de minutes pendant lesquelles vous souhaitez que la session reste inactive avant qu'elle n'expire",
   ],
 
-  ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
+  ['administration_configuration_wizard_configuration_plugins', 'Fonctionnalités'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Activer les connexions privées'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Permet aux utilisateurs de créer des connexions privées'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Vue simple du navigateur'],
