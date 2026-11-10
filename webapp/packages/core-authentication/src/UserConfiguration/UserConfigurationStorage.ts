@@ -8,15 +8,19 @@
 import { injectable } from '@cloudbeaver/core-di';
 
 import type { IUserDataStorage } from '../IUserDataStorage.js';
+import { LocalUserDataStorage } from '../LocalUserDataStorage.js';
+import { UserDataService } from '../UserDataService.js';
 import { UserInfoResource } from '../UserInfoResource.js';
 import { UserConfigurationResource } from './UserConfigurationResource.js';
 import { UserConfigurationStore } from './UserConfigurationStore.js';
 
-@injectable(() => [UserConfigurationResource, UserInfoResource])
+@injectable(() => [UserConfigurationResource, UserInfoResource, UserDataService, LocalUserDataStorage])
 export class UserConfigurationStorage implements IUserDataStorage<UserConfigurationStore> {
   constructor(
     private readonly userConfigurationResource: UserConfigurationResource,
     private readonly userInfoResource: UserInfoResource,
+    private readonly userDataService: UserDataService,
+    private readonly localUserDataStorage: LocalUserDataStorage,
   ) {}
 
   isAvailable(): boolean {
@@ -24,9 +28,13 @@ export class UserConfigurationStorage implements IUserDataStorage<UserConfigurat
   }
 
   createStore(getUserId: () => string): UserConfigurationStore {
-    return new UserConfigurationStore(getUserId, {
-      load: () => this.userConfigurationResource.load(),
-      save: data => this.userConfigurationResource.saveConfiguration(data),
-    });
+    return new UserConfigurationStore(
+      getUserId,
+      {
+        load: () => this.userConfigurationResource.load(),
+        save: data => this.userConfigurationResource.saveConfiguration(data),
+      },
+      this.userDataService.registerStorage(this.localUserDataStorage),
+    );
   }
 }
