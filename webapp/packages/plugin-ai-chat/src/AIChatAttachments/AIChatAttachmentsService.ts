@@ -11,7 +11,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { AiChatAttachment, AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { observable, runInAction, type ObservableMap } from 'mobx';
 
 import {
   AIChatInputService,
@@ -22,7 +21,7 @@ import {
 } from '../AIChat/AIChatInput/AIChatInputService.js';
 import { AIChatMessageService, type MessageSendExecutorData } from '../AIChat/AIChatMessage/AIChatMessageService.js';
 import { aiChatMessageRequestContext } from '../AIChat/AIChatMessage/aiChatMessageRequestContext.js';
-import { AIChatAttachmentsState } from './AIChatAttachmentsState.js';
+import type { AIChatAttachmentsState } from './AIChatAttachmentsState.js';
 
 const AIChatAttachmentsDropPreview = importLazyComponent(() => import('./AIChatAttachmentsDropPreview.js').then(m => m.AIChatAttachmentsDropPreview));
 const AIChatAttachmentsInputContent = importLazyComponent(() =>
@@ -55,7 +54,6 @@ export interface IAIChatAttachmentHandler {
 }
 
 interface IAIChatAttachmentsSubmission {
-  input: IAIChatInputContext;
   state: AIChatAttachmentsState;
   attachments: readonly IAIChatAttachment[];
 }
@@ -77,7 +75,6 @@ export class AIChatAttachmentsService {
   }
 
   private readonly handlers = new Map<string, IAIChatAttachmentHandler>();
-  private readonly states = new WeakMap<IAIChatInputContext['textareaRef'], ObservableMap<string, AIChatAttachmentsState>>();
 
   constructor(
     private readonly notificationService: NotificationService,
@@ -97,17 +94,7 @@ export class AIChatAttachmentsService {
   }
 
   getState(input: IAIChatInputContext): AIChatAttachmentsState {
-    const states = this.getStates(input);
-    const key = this.getStateKey(input);
-    let state = states.get(key);
-
-    if (!state) {
-      const newState = new AIChatAttachmentsState();
-      states.set(key, newState);
-      state = newState;
-    }
-
-    return state;
+    return this.aiChatInputService.getState(input).attachments;
   }
 
   addHandler(handler: IAIChatAttachmentHandler): void {
@@ -148,7 +135,7 @@ export class AIChatAttachmentsService {
       this.getRegisteredHandler(type).validate?.(group);
     }
 
-    contexts.getContext(aiChatAttachmentsSubmissionContext).submission = { input, state, attachments };
+    contexts.getContext(aiChatAttachmentsSubmissionContext).submission = { state, attachments };
   }
 
   async handleMessageSend(data: MessageSendExecutorData, contexts: IExecutionContextProvider<MessageSendExecutorData>): Promise<void> {
@@ -165,15 +152,6 @@ export class AIChatAttachmentsService {
 
       return;
     }
-
-    runInAction(() => {
-      const states = this.getStates(submission.input);
-      states.set(this.getStateKey(submission.input, data.data.conversationId), submission.state);
-
-      if (submission.input.conversationId === null) {
-        states.delete(this.getStateKey(submission.input));
-      }
-    });
 
     if (submission.attachments.length > 0) {
       const attachments: AiChatAttachmentInput[] = [];
@@ -262,20 +240,5 @@ export class AIChatAttachmentsService {
     }
 
     return handler;
-  }
-
-  private getStates(input: IAIChatInputContext): ObservableMap<string, AIChatAttachmentsState> {
-    let states = this.states.get(input.textareaRef);
-
-    if (!states) {
-      states = observable.map<string, AIChatAttachmentsState>(undefined, { deep: false });
-      this.states.set(input.textareaRef, states);
-    }
-
-    return states;
-  }
-
-  private getStateKey(input: IAIChatInputContext, conversationId = input.conversationId): string {
-    return JSON.stringify([conversationId, input.connectionKey?.projectId, input.connectionKey?.connectionId]);
   }
 }
