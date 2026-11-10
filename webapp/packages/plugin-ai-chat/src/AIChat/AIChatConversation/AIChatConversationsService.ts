@@ -71,6 +71,7 @@ export class AIChatConversationsService extends Disposable {
   }
 
   private conversationId: string | null;
+  private contextVersion = 0;
   private reactionDisposer: IReactionDisposer | null = null;
 
   constructor(
@@ -105,6 +106,8 @@ export class AIChatConversationsService extends Disposable {
     this.reactionDisposer = reaction(
       () => [this.aiChatService.isActive, this.aiChatContextService.currentContext] as const,
       ([active]) => {
+        this.contextVersion++;
+
         if (active) {
           this.ensureConversation().catch((exception: Error) => {
             this.notificationService.logException(exception, 'plugin_ai_chat_conversation_initialization_failed');
@@ -151,6 +154,7 @@ export class AIChatConversationsService extends Disposable {
     generatorId?: EAIConversationPromptGeneratorId,
     config: AIChatConversationConfig = {},
   ): Promise<AIChatConversationInfo> {
+    const contextVersion = this.contextVersion;
     const data: CreateConversationExecutorData = { stage: 'before', data: { key, generatorId, config } };
     const executionContext = new ExecutionContext<CreateConversationExecutorData>(data);
     executionContext.contexts.set(conversationConfigContext, toJS(config));
@@ -163,7 +167,10 @@ export class AIChatConversationsService extends Disposable {
       executionContext.getContext(conversationConfigContext),
     );
 
-    this.selectConversation(conversation.id);
+    if (contextVersion === this.contextVersion) {
+      this.selectConversation(conversation.id);
+    }
+
     await this.onCreateConversation.execute({ stage: 'after', data: conversation }, executionContext);
 
     return conversation;
@@ -186,7 +193,12 @@ export class AIChatConversationsService extends Disposable {
 
   private async ensureConversation(): Promise<void> {
     const context = this.aiChatContextService.currentContext;
+    const contextVersion = this.contextVersion;
     await this.aiChatConversationsResource.load(ChatConversationConnectionKey(context?.connectionKey));
+
+    if (contextVersion !== this.contextVersion || !this.aiChatService.isActive) {
+      return;
+    }
 
     if (!this.currentConversationId) {
       await this.createConversation(context?.connectionKey ?? null);
