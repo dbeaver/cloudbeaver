@@ -8,6 +8,11 @@ export default [
   ['administration_server_configuration_save_confirmation_message', 'Будут изменены критичные настройки. Вы уверены?'],
 
   ['administration_configuration_wizard_configuration', 'Настройки сервера'],
+  [
+    'administration_configuration_wizard_configuration_description',
+    'Настройте основные параметры сервера. Дополнительные сервисы можно добавить после завершения настройки.',
+  ],
+  ['administration_configuration_wizard_configuration_password_warning', 'Запомните пароль администратора. Его нельзя восстановить автоматически.'],
   ['administration_configuration_wizard_configuration_save_error', 'Не удалось сохранить конфигурацию сервера'],
 
   ['administration_configuration_wizard_configuration_secure_cookies', 'Принудительный HTTPS режим'],

@@ -12,7 +12,6 @@ import {
   AdministrationPageHeader,
   AdministrationPageLayout,
   AdministrationPageNavigation,
-  AdministrationPageTitle,
   AdministrationTabList,
   type AdministrationItemContentComponent,
   ConfigurationWizardService,
@@ -21,13 +20,13 @@ import { Button, ConfirmationDialog, Form, Loader, useAutoLoad, useFocus, useFor
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { getServerConfigurationFormPart } from './getServerConfigurationFormPart.js';
 import { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
 import { ServerConfigurationFormStateManager } from './ServerConfigurationFormStateManager.js';
+import { ServerConfigurationPageHeader } from './ServerConfigurationPageHeader.js';
 import { ServerConfigurationService } from './ServerConfigurationService.js';
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
@@ -129,9 +128,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
           )
         }
       >
-        <AdministrationPageTitle docLink={WEBSITE_LINKS.SERVER_CONFIGURATION_DOCUMENTATION_PAGE}>
-          {translate('administration_configuration_wizard_configuration')}
-        </AdministrationPageTitle>
+        <ServerConfigurationPageHeader configurationWizard={configurationWizard} />
       </AdministrationPageHeader>
       <Form ref={focusedRef} context={form} name="server_config" contents onChange={handleChange}>
         <TabsState container={serverConfigurationFormService.parts} formState={formState} configurationWizard={configurationWizard}>
@@ -139,14 +136,6 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             <AdministrationTabList aria-label={translate('administration_configuration_wizard_configuration')} />
           </AdministrationPageNavigation>
           <AdministrationPageContent>
-            {configurationWizard && (
-              <div className="tw:shrink-0">
-                <h3 className="tw:text-xl tw:font-semibold">{translate('administration_configuration_wizard_configuration_title')}</h3>
-                <p className="tw:mt-4 tw:mb-0 tw:whitespace-pre-wrap tw:leading-loose">
-                  {translate('administration_configuration_wizard_configuration_message')}
-                </p>
-              </div>
-            )}
             <TabPanelList contents />
           </AdministrationPageContent>
         </TabsState>

@@ -18,12 +18,9 @@ export default [
 
   ['administration_configuration_wizard_configuration', '服务器配置'],
   ['administration_configuration_wizard_configuration_step_description', '主要的服务器配置'],
-  ['administration_configuration_wizard_configuration_title', '您可以在这里配置主要的服务器参数'],
+  ['administration_configuration_wizard_configuration_description', '配置服务器的主要参数。完成设置后，您可以添加更多服务。'],
+  ['administration_configuration_wizard_configuration_password_warning', '请牢记管理员密码。此密码无法自动恢复。'],
   ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
-  [
-    'administration_configuration_wizard_configuration_message',
-    '管理员是一个超级用户，可以配置服务器、设置数据库连接、管理其他用户等等。请记住输入的密码。无法自动恢复管理员密码。',
-  ],
 
   ['administration_configuration_tools_save_tooltip', '保存配置'],
   ['administration_configuration_tools_cancel_tooltip', '重置更改'],

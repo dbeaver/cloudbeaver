@@ -21,12 +21,15 @@ export default [
 
   ['administration_configuration_wizard_configuration', 'Configurazione del Server'],
   ['administration_configuration_wizard_configuration_step_description', 'Configurazione del server principale'],
-  ['administration_configuration_wizard_configuration_title', 'Puoi configurare i parametri del server principale qui.'],
-  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
   [
-    'administration_configuration_wizard_configuration_message',
-    "L'amministratore è un super utente che può configurare server, impostare connessioni ai database, gestire altri utenti e molto di più. Si prega di ricordare la password inserita: non sarà possibile recuperarla in maniera automatica.",
+    'administration_configuration_wizard_configuration_description',
+    'Configura i parametri principali del server. Potrai aggiungere altri servizi al termine della configurazione.',
   ],
+  [
+    'administration_configuration_wizard_configuration_password_warning',
+    "Ricorda la password dell'amministratore. Non può essere recuperata automaticamente.",
+  ],
+  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
 
   ['administration_configuration_tools_save_tooltip', 'Salva la configurazione'],
   ['administration_configuration_tools_cancel_tooltip', 'Annulla le modifiche'],
