@@ -25,7 +25,7 @@ import {
   validateElementsTreeSettings,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { UserConfigurationStorage, UserInfoResource } from '@cloudbeaver/core-authentication';
 
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter.js';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare.js';
@@ -54,6 +54,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const resourceManagerService = useService(ResourceManagerService);
   const navTreeResource = useService(NavTreeResource);
   const userInfoResource = useService(UserInfoResource);
+  const userConfigurationStorage = useService(UserConfigurationStorage);
 
   const key = getComputed<string[]>(() => projectsService.activeProjects.map(project => getRmResourcePath(project.id)), isArraysEqual);
   useResource(ResourceManagerTree, ResourceManagerResource, resourceKeyList(key));
@@ -63,6 +64,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
     createElementsTreeSettings,
     () => {},
     validateElementsTreeSettings,
+    userConfigurationStorage,
   );
 
   const projectsRendererRenderer = useMemo(
