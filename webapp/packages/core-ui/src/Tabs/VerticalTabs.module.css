@@ -33,13 +33,18 @@
 
 .tab:global([role='tab']) {
   height: auto;
-  min-height: 28px;
+  min-height: 32px;
   max-height: 48px;
+  border: none;
   padding-top: 4px;
   padding-bottom: 4px;
   overflow: hidden;
   box-sizing: border-box;
   white-space: normal;
+}
+
+.tabIcon {
+  height: auto;
 }
 
 .tabTitle {

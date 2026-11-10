@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { UserDataService } from '@cloudbeaver/core-authentication';
+import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import { type IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ProjectInfo } from '@cloudbeaver/core-projects';
@@ -41,6 +41,7 @@ export const SCRIPTS_TAB_ID = 'resource-manager-scripts-tab';
   ResourceManagerResource,
   ResourceManagerScriptsSettingsService,
   SideBarPanelService,
+  UserConfigurationStorage,
 ])
 export class ResourceManagerScriptsService {
   get active() {
@@ -48,7 +49,9 @@ export class ResourceManagerScriptsService {
   }
 
   get settings() {
-    return this.userDataService.getUserData(queryResourceManagerScriptsSettingsKey, getResourceManagerDefaultSettings);
+    return this.userDataService
+      .withStorage(this.userConfigurationStorage)
+      .getUserData(queryResourceManagerScriptsSettingsKey, getResourceManagerDefaultSettings);
   }
 
   get enabled() {
@@ -62,6 +65,7 @@ export class ResourceManagerScriptsService {
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceManagerScriptsSettingsService: ResourceManagerScriptsSettingsService,
     private readonly sideBarPanelService: SideBarPanelService,
+    private readonly userConfigurationStorage: UserConfigurationStorage,
   ) {
     this.togglePanel = this.togglePanel.bind(this);
 

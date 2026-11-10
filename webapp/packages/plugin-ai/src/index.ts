@@ -8,5 +8,6 @@
 
 import './module.js';
 
+export * from './FEATURE_GROUP_AI_ID.js';
 export * from './AiEnginesResource.js';
 export * from './AISettingsResource.js';

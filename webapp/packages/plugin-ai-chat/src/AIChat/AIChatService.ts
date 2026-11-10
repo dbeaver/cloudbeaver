@@ -9,7 +9,7 @@
 import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { UserDataService } from '@cloudbeaver/core-authentication';
+import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { AIChatContextService } from './AIChatContext/AIChatContextService.js';
@@ -22,10 +22,10 @@ interface ISettings {
   metrics: boolean;
 }
 
-@injectable(() => [ServerConfigResource, UserDataService, AIChatContextService, AIChatSettingsService])
+@injectable(() => [ServerConfigResource, UserDataService, AIChatContextService, AIChatSettingsService, UserConfigurationStorage])
 export class AIChatService {
   get settings(): ISettings {
-    return this.userDataService.getUserData(queryAiChatSettingsKey, getAiChatDefaultSettings);
+    return this.userDataService.withStorage(this.userConfigurationStorage).getUserData(queryAiChatSettingsKey, getAiChatDefaultSettings);
   }
 
   get isEnabled(): boolean {
@@ -45,6 +45,7 @@ export class AIChatService {
     private readonly userDataService: UserDataService,
     private readonly aiChatContextService: AIChatContextService,
     private readonly aiChatSettingsService: AIChatSettingsService,
+    private readonly userConfigurationStorage: UserConfigurationStorage,
   ) {
     this.togglePanel = this.togglePanel.bind(this);
 

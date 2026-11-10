@@ -56,17 +56,12 @@
       "path": "../core-storage"
     },
     {
+      "path": "../core-ui"
+    },
+    {
       "path": "../core-utils"
     }
   ],
-  "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
-    "src/**/*.json",
-    "src/**/*.css"
-  ],
-  "exclude": [
-    "**/node_modules",
-    "lib/**/*"
-  ]
+  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css"],
+  "exclude": ["**/node_modules", "lib/**/*"]
 }

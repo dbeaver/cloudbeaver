@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useMemo, useRef } from 'react';
 
+import { UserConfigurationStorage } from '@cloudbeaver/core-authentication';
 import { s, SContext, type StyleRegistry, Translate, useExecutor, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
@@ -61,6 +62,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const navNodeViewService = useService(NavNodeViewService);
+  const userConfigurationStorage = useService(UserConfigurationStorage);
 
   useConnectionTypeLoader();
 
@@ -74,6 +76,7 @@ export const NavigationTree = observer(function NavigationTree() {
     createElementsTreeSettings,
     () => {},
     validateElementsTreeSettings,
+    userConfigurationStorage,
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);

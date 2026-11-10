@@ -34,6 +34,7 @@
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@cloudbeaver/plugin-administration": "workspace:*",
     "@cloudbeaver/plugin-ai": "workspace:*",
     "@cloudbeaver/plugin-ai-profiles": "workspace:*",
     "@dbeaver/js-helpers": "workspace:*",

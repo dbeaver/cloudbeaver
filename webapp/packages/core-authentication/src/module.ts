@@ -15,6 +15,10 @@ import { UserInfoResource } from './UserInfoResource.js';
 import { UserMetaParametersResource } from './UserMetaParametersResource.js';
 import { UserInfoMetaParametersResource } from './UserInfoMetaParametersResource.js';
 import { UserDataService } from './UserDataService.js';
+import { UserConfigurationService } from './UserConfiguration/UserConfigurationService.js';
+import { LocalUserDataStorage } from './LocalUserDataStorage.js';
+import { UserConfigurationStorage } from './UserConfiguration/UserConfigurationStorage.js';
+import { UserConfigurationResource } from './UserConfiguration/UserConfigurationResource.js';
 import { UserConfigurationBootstrap } from './UserConfigurationBootstrap.js';
 import { TeamsResource } from './TeamsResource.js';
 import { TeamsManagerService } from './TeamsManagerService.js';
@@ -45,6 +49,7 @@ export default ModuleRegistry.add({
       .addSingleton(Dependency, proxy(UsersOriginDetailsResource))
       .addSingleton(Dependency, proxy(UsersMetaParametersResource))
       .addSingleton(Dependency, proxy(UserInfoResource))
+      .addSingleton(Dependency, proxy(UserConfigurationResource))
       .addSingleton(Dependency, proxy(UserMetaParametersResource))
       .addSingleton(Dependency, proxy(UserInfoMetaParametersResource))
       .addSingleton(Dependency, proxy(TeamsResource))
@@ -61,9 +66,13 @@ export default ModuleRegistry.add({
       .addSingleton(UsersOriginDetailsResource)
       .addSingleton(UsersMetaParametersResource)
       .addSingleton(UserInfoResource)
+      .addSingleton(UserConfigurationResource)
       .addSingleton(UserMetaParametersResource)
       .addSingleton(UserInfoMetaParametersResource)
       .addSingleton(UserDataService)
+      .addSingleton(UserConfigurationService)
+      .addSingleton(LocalUserDataStorage)
+      .addSingleton(UserConfigurationStorage)
       .addSingleton(TeamsResource)
       .addSingleton(TeamsManagerService)
       .addSingleton(TeamRolesResource)

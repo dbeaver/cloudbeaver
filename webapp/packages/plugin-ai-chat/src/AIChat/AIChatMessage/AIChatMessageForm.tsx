@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { Suspense, useContext, useRef, useState, type PropsWithChildren } from 'react';
+import { Suspense, useContext, useRef, type PropsWithChildren } from 'react';
 
 import { ActionIconButton, AutoResizeTextarea, Form, Placeholder, s, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -34,13 +34,14 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const aiChatConversationsService = useService(AIChatConversationsService);
   const aiChatInputService = useService(AIChatInputService);
 
-  const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { input, dragHandlers, onPaste } = useAIChatInput({
     conversationId: currentConversationId,
     connectionKey: context.connectionKey,
     textareaRef,
   });
+
+  const state = aiChatInputService.getState(input);
 
   useExecutor({
     executor: aiChatConversationsService.onNewConversation,
@@ -55,11 +56,11 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
 
   async function sendMessage() {
     try {
-      const v = value.trim();
-      const message = await aiChatInputService.submit(input, v);
+      const prompt = state.prompt.trim();
+      const message = await aiChatInputService.submit(input, prompt);
 
       if (message) {
-        setValue('');
+        state.setPrompt('');
       }
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_send_message_error');
@@ -83,7 +84,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
     return translate('plugin_ai_chat_submit_message_placeholder', undefined, { symbol });
   }
 
-  const disabled = context.disabled || !aiChatInputService.canSubmit(input, value);
+  const disabled = context.disabled || !aiChatInputService.canSubmit(input, state.prompt);
 
   return (
     <div className={s(styles, { container: true })}>
@@ -101,10 +102,10 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
             ref={textareaRef}
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
-            value={value}
+            value={state.prompt}
             readOnly={aiChatConversationsService.processing}
             autoFocus
-            onChange={v => setValue(v)}
+            onChange={value => state.setPrompt(value)}
             onPaste={context.disabled ? undefined : onPaste}
           />
           <Suspense fallback={null}>

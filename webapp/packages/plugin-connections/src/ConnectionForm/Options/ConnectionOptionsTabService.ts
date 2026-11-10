@@ -27,7 +27,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       key: 'options',
       name: 'plugin_connections_connection_form_part_main',
       title: 'plugin_connections_connection_form_part_main',
-      icon: '/icons/plugin_connection_plug.svg',
+      icon: '/icons/core_blocks_plug.svg',
       order: 1,
       panel: () => Options,
     });

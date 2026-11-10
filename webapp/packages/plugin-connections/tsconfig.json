@@ -17,6 +17,9 @@
       "path": "../../common-typescript/@dbeaver/js-helpers"
     },
     {
+      "path": "../core-administration"
+    },
+    {
       "path": "../core-authentication"
     },
     {
@@ -98,14 +101,6 @@
       "path": "../plugin-top-app-bar"
     }
   ],
-  "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
-    "src/**/*.json",
-    "src/**/*.css"
-  ],
-  "exclude": [
-    "**/node_modules",
-    "lib/**/*"
-  ]
+  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css"],
+  "exclude": ["**/node_modules", "lib/**/*"]
 }

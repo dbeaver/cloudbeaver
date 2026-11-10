@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Connections'],
+  ['administration_server_configuration_settings_ai', 'AI'],
+  ['administration_server_configuration_settings_cloud', 'Cloud'],
+  ['administration_server_configuration_settings_workspace', 'Workspace'],
+  ['administration_server_configuration_tab_drivers', 'Drivers'],
   ['administration_server_configuration_save_confirmation_title', 'Server settings update'],
   ['administration_server_configuration_save_confirmation_message', 'You are about to change critical settings. Are you sure?'],
 
@@ -16,12 +21,12 @@ export default [
 
   ['administration_configuration_wizard_configuration', 'Server Configuration'],
   ['administration_configuration_wizard_configuration_step_description', 'Main server configuration'],
-  ['administration_configuration_wizard_configuration_title', 'You can configure the main server parameters here.'],
-  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
   [
-    'administration_configuration_wizard_configuration_message',
-    'You will be able to add additional services after the server configuration.\n\rAdministrator is a super user who can configure server, set databases connections, manage other users and much more. Please, remember the entered password. It is not possible to recover administrator password automatically.',
+    'administration_configuration_wizard_configuration_description',
+    'Configure the main server parameters. You can add more services after the setup is complete.',
   ],
+  ['administration_configuration_wizard_configuration_password_warning', "Remember the administrator password. It can't be recovered automatically."],
+  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
 
   ['administration_configuration_tools_save_tooltip', 'Save configuration'],
   ['administration_configuration_tools_cancel_tooltip', 'Reset changes'],
@@ -59,7 +64,7 @@ export default [
     'Here you may specify the number of minutes that you wish the session to be allowed to remain idle before it expires',
   ],
 
-  ['administration_configuration_wizard_configuration_plugins', 'Configuration'],
+  ['administration_configuration_wizard_configuration_plugins', 'Features'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Enable private connections'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Allows users to create private connections'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Navigator simple view'],
