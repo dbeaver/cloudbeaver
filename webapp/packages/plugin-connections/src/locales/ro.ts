@@ -1,0 +1,78 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+export default [
+  ['plugin_connections_delete_connection', 'Conexiune'],
+  ['plugin_connections_delete_database_object', 'Obiect al bazei de date'],
+  ['plugin_connections_delete_read_only', 'Conexiune doar în citire.'],
+  ['plugin_connections_delete_folder_warning', 'Conexiunile din dosare nu vor fi șterse decât dacă sunt selectate.'],
+  ['plugin_connections_new_connection_dialog_title', 'Conexiune nouă'],
+  ['plugin_connections_connection_form_part_main', 'Principal'],
+  ['plugin_connections_connection_form_part_main_auth_model', 'Model de autentificare'],
+  ['plugin_connections_connection_form_part_properties', 'Proprietățile driverului'],
+  ['plugin_connections_connection_form_part_advanced', 'Setări avansate'],
+  ['plugin_connections_connection_form_part_initialization_settings', 'Setări de inițializare'],
+  ['plugin_connections_connection_form_connection_details', 'Detaliile conexiunii'],
+  ['plugin_connections_connection_form_part_main_custom_host', 'Gazdă'],
+  ['plugin_connections_connection_form_part_main_custom_port', 'Port'],
+  ['plugin_connections_connection_form_part_main_custom_server_name', 'Numele serverului'],
+  ['plugin_connections_connection_form_part_main_custom_database', 'Bază de date'],
+  ['plugin_connections_connection_form_part_main_url_jdbc', 'URL JDBC'],
+  ['plugin_connections_connection_form_part_main_folder', 'Dosar'],
+  ['plugin_connections_connection_edit_menu_item_title', 'Editează conexiunea'],
+  ['plugin_connections_connection_clone', 'Clonează'],
+  ['plugin_connections_connection_clone_error', 'Nu s-a putut clona conexiunea'],
+  ['plugin_connections_connection_edit_reconnect_title', 'Conexiune actualizată'],
+  ['plugin_connections_connection_edit_reconnect_message', 'Conexiunea a fost actualizată. Vrei să te reconectezi?'],
+  ['plugin_connections_connection_edit_reconnect_failed', 'Reconectarea a eșuat'],
+  ['plugin_connections_connection_folder_move_failed', 'Nu s-a putut muta în dosar'],
+  ['plugin_connections_connection_folder_move_duplication', 'Dosarul destinație sau dosarele selectate conțin un dosar cu același nume ({arg:name})'],
+  [
+    'plugin_connections_connection_cloud_auth_required',
+    'Trebuie să te conectezi cu datele de autentificare „{arg:providerLabel}” pentru a utiliza această conexiune.',
+  ],
+  ['plugin_connections_connection_form_project_invalid', 'Nu ai dreptul să creezi conexiuni în proiectul selectat'],
+  ['plugin_connections_connection_form_host_configuration_invalid', 'Configurarea gazdei nu este acceptată'],
+  ['plugin_connections_connection_form_name_invalid', 'Câmpul „Numele conexiunii” nu poate fi gol'],
+  ['plugin_connections_connection_form_host_invalid', 'Câmpul „Gazdă” nu poate fi gol'],
+  [
+    'plugin_connections_connection_folder_delete_confirmation',
+    'Urmează să ștergi „{arg:name}”. Conexiunile nu vor fi șterse. Sigur vrei să continui?',
+  ],
+  ['plugin_connections_menu_connections_label', 'Conexiune'],
+  ['plugin_connections_menu_security_label', 'Securitate'],
+  ['plugin_connections_action_disconnect_all_label', 'Deconectează toate'],
+  ['plugin_connections_settings', 'Conexiuni'],
+  ['plugin_connections_settings_hide_connections_view_name', 'Ascunde gestionarea vizualizării conexiunilor'],
+  [
+    'plugin_connections_settings_hide_connections_view_description',
+    'Submeniul vizualizării conexiunilor va fi ascuns pentru toți utilizatorii, cu excepția administratorilor',
+  ],
+  ['plugin_connections_connection_form_shared_credentials_manage_info', 'Poți gestiona datele de autentificare în '],
+  ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'fila Date de autentificare'],
+  [
+    'plugin_connections_connection_auth_secret_description',
+    'Sunt disponibile mai multe seturi de date de autentificare.\nAlege datele pe care vrei să le folosești.',
+  ],
+  ['plugin_connections_connection_create_menu_title', 'Conexiune nouă'],
+  ['plugin_connections_connection_driver_not_installed_message', 'Driverul nu este instalat. Îl poți instala în secțiunea „Administrare”.'],
+  ['plugin_connections_connection_established', 'Conexiunea este stabilită'],
+  ['plugin_connections_connection_client_version', 'Versiunea clientului: {arg:version} \n'],
+  ['plugin_connections_connection_server_version', 'Versiunea serverului: {arg:version} \n'],
+  ['plugin_connections_connection_connection_time', 'Durata conexiunii: {arg:time} \n'],
+  ['plugin_connections_connection_type_label', 'Tipul conexiunii'],
+  ['plugin_connections_change_db_password_menu_title', 'Schimbă parola curentă a bazei de date'],
+  ['plugin_connections_change_db_password_dialog_title', 'Schimbă parola curentă a bazei de date'],
+  ['plugin_connections_change_db_password_current', 'Parola curentă'],
+  ['plugin_connections_change_db_password_new', 'Parolă nouă'],
+  ['plugin_connections_change_db_password_repeat', 'Confirmă parola'],
+  ['plugin_connections_change_db_password_submit', 'Schimbă'],
+  ['plugin_connections_change_db_password_success', 'Parola bazei de date a fost schimbată'],
+  ['plugin_connections_change_db_password_mismatch', 'Parolele noi nu coincid'],
+  ['plugin_connections_change_db_password_failed', 'Schimbarea parolei a eșuat'],
+];

@@ -7,8 +7,8 @@
  */
 
 export default [
-  ['plugin_ai_chat_profile_group', 'Active configuration'],
-  ['plugin_ai_chat_profile_change_fail', 'Failed to change AI profile'],
+  ['plugin_ai_chat_profile_group', 'Configurazione attiva'],
+  ['plugin_ai_chat_profile_change_fail', 'Impossibile cambiare il profilo IA'],
   ['plugin_ai_chat_profile_edit_credentials', 'Modifica credenziali per {arg:name}'],
   ['plugin_ai_chat_profile_credentials_edit_fail', 'Impossibile modificare le credenziali del profilo IA'],
 ];

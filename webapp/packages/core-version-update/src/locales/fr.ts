@@ -6,8 +6,8 @@ export default [
   ['version_update_versions_refresh_successful', 'Liste des versions rafraîchie avec succès'],
   ['version_update_versions_refresh_fail', 'Échec du rafraîchissement de la liste des versions'],
   ['version_update_how_to_update', 'Comment mettre à jour'],
-  ['version_update_info', 'Info'],
-  ['version_update_instruction', 'To update version, please follow'],
-  ['version_update_instruction_link', 'the instructions'],
-  ['version_update_instruction_link_not_provided', 'Instructions link is not provided. Please contact support.'],
+  ['version_update_info', 'Informations'],
+  ['version_update_instruction', 'Pour mettre à jour la version, veuillez suivre'],
+  ['version_update_instruction_link', 'les instructions'],
+  ['version_update_instruction_link_not_provided', 'Le lien vers les instructions n’est pas fourni. Veuillez contacter l’assistance.'],
 ];

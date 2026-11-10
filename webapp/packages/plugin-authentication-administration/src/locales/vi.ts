@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_server_configuration_authentication', 'Xác thực'],
   ['authentication_administration_providers_search', 'Tìm nhà cung cấp...'],
   ['authentication_administration_providers_filter', 'Trạng thái nhà cung cấp'],
   ['authentication_administration_providers_all', 'Tất cả'],
@@ -7,7 +8,6 @@ export default [
   ['authentication_administration_providers_empty', 'Không có nhà cung cấp nào phù hợp với bộ lọc'],
   ['authentication_administration_providers_built_in', 'Tích hợp sẵn'],
   ['authentication_administration_providers_required_features', 'Bật các dịch vụ sau để sử dụng nhà cung cấp này: {arg:features}'],
-  ['authentication_administration_server_configuration_authentication', 'Xác thực'],
   ['plugin_authentication_administration_team_grant_manual', 'Quản trị viên'],
   ['plugin_authentication_administration_team_grant_provider', 'Nhà cung cấp xác thực'],
   ['plugin_authentication_administration_team_grant_default', 'Nhóm mặc định'],
@@ -17,7 +17,7 @@ export default [
     'Người dùng được thêm tự động vì nhóm này được cấu hình làm nhóm mặc định cho người dùng.',
   ],
   ['plugin_authentication_administration_team_grant_provider_tooltip', 'Được chỉ định bởi nhà cung cấp xác thực và đồng bộ khi đăng nhập.'],
-  ['authentication_administration_pages_label', 'Pages'],
+  ['authentication_administration_pages_label', 'Trang'],
   ['authentication_administration_user_connections_user_add', 'Tạo Người dùng'],
   ['authentication_administration_user_connections_user_new', 'Người dùng mới'],
   ['authentication_administration_user_connections_access_load_fail', 'Tải kết nối được cấp cho người dùng thất bại'],
@@ -54,7 +54,7 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'BẬT'],
   ['authentication_administration_users_filters_status_disabled', 'TẮT'],
   ['authentication_administration_users_filters_status_all', 'TẤT CẢ'],
-  ['authentication_administration_users_filters_filter_label', 'Filter'],
+  ['authentication_administration_users_filters_filter_label', 'Lọc'],
   ['authentication_administration_users_empty', 'Không có người dùng nào'],
   ['authentication_administration_users_delete_user', 'Xóa người dùng'],
   ['authentication_administration_users_delete_user_fail', 'Xóa người dùng thất bại'],
@@ -164,13 +164,12 @@ export default [
   ['plugin_authentication_administration_team_form_edit_label', 'Biểu mẫu chỉnh sửa nhóm'],
   ['plugin_authentication_administration_user_form_edit_label', 'Biểu mẫu chỉnh sửa người dùng'],
   ['plugin_authentication_administration_user_last_login', 'Lần đăng nhập cuối'],
-
   [
     'plugin_authentication_administration_user_username_validation_error',
-    "User's name may not contain the following symbols / : \" \\ ' <> | ? * and can't start with a dot",
+    'Tên người dùng không được chứa các ký hiệu / : " \\ \' <> | ? * và không được bắt đầu bằng dấu chấm',
   ],
   [
     'plugin_authentication_administration_team_id_validation_error',
-    "Team's ID may not contain the following symbols / : \" \\ ' <> | ? * and can't start with a dot",
+    'ID nhóm không được chứa các ký hiệu / : " \\ \' <> | ? * và không được bắt đầu bằng dấu chấm',
   ],
 ];

@@ -8,7 +8,6 @@ export default [
   ['plugin_user_profile_info', '用户信息'],
   ['plugin_user_profile_auth_tokens', '认证令牌'],
   ['plugin_user_profile_auth_providers_active', '认证处于活跃状态'],
-
   ['plugin_user_profile_authentication_change_password', '更改密码'],
   ['plugin_user_profile_authentication_change_password_current_password', '当前密码'],
   ['plugin_user_profile_authentication_change_password_new_password', '新密码'],

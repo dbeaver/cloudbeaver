@@ -1,9 +1,9 @@
 export default [
-  ['version', 'Version'],
-  ['versions', 'Versions'],
-  ['version_date', 'Release date'],
-  ['version_tag', 'Tag'],
-  ['version_latest', 'Latest'],
-  ['version_current', 'Current'],
-  ['versions_load_fail', 'Could not get the latest app version info'],
+  ['version', 'Versione'],
+  ['versions', 'Versioni'],
+  ['version_date', 'Data di rilascio'],
+  ['version_tag', 'Etichetta'],
+  ['version_latest', 'Più recente'],
+  ['version_current', 'Attuale'],
+  ['versions_load_fail', 'Impossibile ottenere informazioni sull’ultima versione dell’applicazione'],
 ];

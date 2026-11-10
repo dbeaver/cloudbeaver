@@ -6,7 +6,6 @@ export default [
   ['administration_server_configuration_tab_drivers', 'Pilotes'],
   ['administration_server_configuration_save_confirmation_title', 'Mise à jour des paramètres du serveur'],
   ['administration_server_configuration_save_confirmation_message', 'Vous êtes sur le point de changer des paramètres critiques. Êtes-vous sûr?'],
-
   ['administration_configuration_wizard_welcome', 'Bienvenue'],
   ['administration_configuration_wizard_welcome_step_description', 'Bienvenue sur {alias:product_full_name}'],
   ['administration_configuration_wizard_welcome_title', 'Bienvenue sur {alias:product_full_name}, le système de gestion de base de données cloud!'],
@@ -18,7 +17,6 @@ export default [
     'administration_configuration_wizard_welcome_note',
     "Note : vous pourrez changer ces paramètres de configuration plus tard dans le panneau d'administration.",
   ],
-
   ['administration_configuration_wizard_configuration', 'Configuration du serveur'],
   ['administration_configuration_wizard_configuration_step_description', 'Configuration principale du serveur'],
   [
@@ -29,31 +27,28 @@ export default [
     'administration_configuration_wizard_configuration_password_warning',
     "Mémorisez le mot de passe de l'administrateur. Il ne peut pas être récupéré automatiquement.",
   ],
-  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
-
+  ['administration_configuration_wizard_configuration_save_error', 'Impossible d’enregistrer la configuration du serveur'],
   ['administration_configuration_tools_save_tooltip', 'Enregistrer la configuration'],
   ['administration_configuration_tools_cancel_tooltip', 'Réinitialiser les modifications'],
-
-  ['administration_configuration_wizard_configuration_secure_cookies', 'Force HTTPS mode'],
+  ['administration_configuration_wizard_configuration_secure_cookies', 'Imposer le mode HTTPS'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
-    'Enable force HTTPS to secure server-client communication. Recommended for production. Ensure your HTTPS proxy is properly configured for correct app functionality',
+    'Imposez HTTPS pour sécuriser les communications entre le serveur et le client. Recommandé en production. Vérifiez la configuration de votre proxy HTTPS pour assurer le bon fonctionnement de l’application',
   ],
   [
     'administration_configuration_wizard_configuration_secure_cookies_warning',
-    "The data won't be encrypted if forced HTTPS mode is disabled. This makes it vulnerable",
+    'Les données ne seront pas chiffrées si le mode HTTPS forcé est désactivé. Elles seront donc vulnérables',
   ],
-  ['administration_configuration_wizard_configuration_secure_cookies_docs', 'Server proxy configuration documentation'],
-  ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
+  ['administration_configuration_wizard_configuration_secure_cookies_docs', 'Documentation de configuration du proxy du serveur'],
+  ['administration_configuration_wizard_configuration_supported_hosts', 'URL de serveur autorisées'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
-    'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed. Access from the IP-addresses is always allowed.',
+    'Vous pouvez spécifier plusieurs URL de serveur, séparées par un saut de ligne. Une valeur vide autorise toutes les URL. L’accès par adresse IP est toujours autorisé.',
   ],
   [
     'administration_configuration_wizard_configuration_supported_hosts_warning',
-    'You cannot remove your current domain ({arg:host}). Open the server configuration from another allowed domain or IP-address to remove this domain.',
+    'Vous ne pouvez pas supprimer votre domaine actuel ({arg:host}). Ouvrez la configuration du serveur depuis un autre domaine autorisé ou une adresse IP pour supprimer ce domaine.',
   ],
-
   ['administration_configuration_wizard_configuration_server_info', 'Informations sur le serveur'],
   ['administration_configuration_wizard_configuration_server_name', 'Nom du serveur'],
   ['administration_configuration_wizard_configuration_server_url', 'URL du serveur'],
@@ -69,7 +64,6 @@ export default [
     'administration_configuration_wizard_configuration_server_session_lifetime_description',
     "Ici, vous pouvez spécifier le nombre de minutes pendant lesquelles vous souhaitez que la session reste inactive avant qu'elle n'expire",
   ],
-
   ['administration_configuration_wizard_configuration_plugins', 'Fonctionnalités'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Activer les connexions privées'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Permet aux utilisateurs de créer des connexions privées'],
@@ -78,7 +72,6 @@ export default [
     'administration_configuration_wizard_configuration_navigation_tree_view_description',
     "Par défaut, toutes les nouvelles connexions des utilisateurs ne contiendront que des informations de base dans l'arborescence de navigation",
   ],
-
   ['administration_configuration_wizard_configuration_security', 'Sécurité'],
   ['administration_configuration_wizard_configuration_security_admin_credentials', 'Enregistrer les identifiants'],
   [
@@ -90,6 +83,14 @@ export default [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
     "Permet d'enregistrer les identifiants pour les utilisateurs non administrateurs",
   ],
+  [
+    'administration_configuration_wizard_configuration_security_db_user_password_change',
+    'Autoriser le changement du mot de passe de l’utilisateur de base de données',
+  ],
+  [
+    'administration_configuration_wizard_configuration_security_db_user_password_change_description',
+    'Permet aux utilisateurs de changer le mot de passe de l’utilisateur associé à une connexion de base de données',
+  ],
   ['administration_configuration_wizard_configuration_navigator', 'Navigateur'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Masquer les dossiers'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Masquer les schémas'],
@@ -98,9 +99,7 @@ export default [
   ['administration_configuration_wizard_configuration_navigator_show_only_entities', 'Seulement les entités'],
   ['administration_configuration_wizard_configuration_navigator_show_system_objects', 'Objets système'],
   ['administration_configuration_wizard_configuration_navigator_show_utility_objects', 'Objets utilitaires'],
-
   ['administration_configuration_wizard_step_validation_message', "Échec du passage à l'étape suivante"],
-
   ['administration_configuration_wizard_finish', 'Confirmation'],
   ['administration_configuration_wizard_finish_step_description', 'Confirmation'],
   ['administration_configuration_wizard_finish_title', "C'est presque terminé."],
@@ -108,11 +107,10 @@ export default [
     'administration_configuration_wizard_finish_message',
     "Appuyez sur le bouton Terminer pour compléter la configuration du serveur. Vous pouvez revenir aux pages précédentes si vous souhaitez modifier ou ajouter quelque chose.\nLorsque la configuration est terminée, tous les paramètres saisis seront appliqués à votre serveur. Vous serez redirigé vers la page principale pour commencer à travailler.\nVous pouvez toujours vous connecter au système en tant qu'administrateur pour modifier les paramètres du serveur.",
   ],
-
   ['administration_disabled_drivers_title', 'Pilotes désactivés'],
   ['administration_disabled_drivers_search_placeholder', 'Rechercher le pilote...'],
   [
     'administration_disabled_drivers_enable_unsafe_driver_message',
-    'Enabling this database driver may allow access to files on the server where this application is running. This could potentially expose sensitive system files or other protected data.\n\nOnly proceed if you fully understand the implications and trust the database configuration. Unauthorized or improper use of this driver may lead to security risks.\n\nDo you want to enable the "{arg:driverName}" driver?',
+    'L’activation de ce pilote de base de données peut permettre l’accès aux fichiers du serveur hébergeant cette application. Des fichiers système sensibles ou d’autres données protégées pourraient être exposés.\n\nNe continuez que si vous comprenez pleinement les conséquences et faites confiance à la configuration de la base de données. Une utilisation non autorisée ou incorrecte de ce pilote peut entraîner des risques de sécurité.\n\nVoulez-vous activer le pilote « {arg:driverName} » ?',
   ],
 ];
