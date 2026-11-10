@@ -556,7 +556,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
     private SearchControls createSearchControls() {
         SearchControls searchControls = new SearchControls();
-        searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        // Access validation and profile reads must only examine the authenticating user's entry.
+        searchControls.setSearchScope(SearchControls.OBJECT_SCOPE);
         searchControls.setTimeLimit(DEFAULT_TIME_LIMIT);
         searchControls.setReturningAttributes(new String[]{"*", "+"});
         return searchControls;
