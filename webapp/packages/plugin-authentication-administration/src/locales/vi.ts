@@ -11,6 +11,8 @@ export default [
   ['plugin_authentication_administration_team_grant_manual', 'Quản trị viên'],
   ['plugin_authentication_administration_team_grant_provider', 'Nhà cung cấp xác thực'],
   ['plugin_authentication_administration_team_grant_default', 'Nhóm mặc định'],
+  ['plugin_authentication_administration_team_grant_unknown', 'Nguồn không xác định'],
+  ['plugin_authentication_administration_team_grant_unknown_tooltip', 'Không xác định được nguồn thêm người dùng vào nhóm này.'],
   ['plugin_authentication_administration_team_grant_manual_tooltip', 'Được quản trị viên thêm thủ công.'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',

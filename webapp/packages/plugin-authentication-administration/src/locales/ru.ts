@@ -11,6 +11,8 @@ export default [
   ['plugin_authentication_administration_team_grant_manual', 'Администратор'],
   ['plugin_authentication_administration_team_grant_provider', 'Провайдер аутентификации'],
   ['plugin_authentication_administration_team_grant_default', 'Команда по умолчанию'],
+  ['plugin_authentication_administration_team_grant_unknown', 'Неизвестный источник'],
+  ['plugin_authentication_administration_team_grant_unknown_tooltip', 'Источник добавления пользователя в эту команду неизвестен.'],
   ['plugin_authentication_administration_team_grant_manual_tooltip', 'Добавлен вручную администратором.'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',

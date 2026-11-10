@@ -35,6 +35,8 @@ export function useTeamGrantLabel() {
         return translate('plugin_authentication_administration_team_grant_default');
       case 'MANUAL':
         return translate('plugin_authentication_administration_team_grant_manual');
+      case 'UNKNOWN':
+        return translate('plugin_authentication_administration_team_grant_unknown');
       default:
         return '-';
     }
