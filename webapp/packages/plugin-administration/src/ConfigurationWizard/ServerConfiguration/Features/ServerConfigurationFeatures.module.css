@@ -1,0 +1,76 @@
+.layout {
+  container-type: inline-size;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+@container (min-width: 58rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.group {
+  &:has(> .content:empty) {
+    display: none;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.feature {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  &[data-disabled] {
+    opacity: 0.6;
+
+    & .name {
+      cursor: default;
+    }
+  }
+}
+
+.checkbox {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  padding-top: 2px;
+
+  & :global(.dbv-kit-checkbox__check) {
+    margin: 0;
+  }
+}
+
+.details {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.name {
+  display: block;
+  font-weight: 500;
+  overflow: visible;
+  white-space: normal;
+  cursor: pointer;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+}

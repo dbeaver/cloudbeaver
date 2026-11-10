@@ -27,15 +27,11 @@ export interface IServerInfoPlaceholderProps extends IConfigurationPlaceholderPr
 export class ServerConfigurationService {
   isDone: boolean;
 
-  readonly configurationContainer: PlaceholderContainer<IConfigurationPlaceholderProps>;
-  readonly pluginsContainer: PlaceholderContainer<IConfigurationPlaceholderProps>;
   readonly securitySettingsContainer: PlaceholderContainer<IConfigurationPlaceholderProps>;
   readonly serverInfoContainer: PlaceholderContainer<IServerInfoPlaceholderProps>;
 
   constructor(private readonly serverConfigurationFormService: ServerConfigurationFormService) {
     this.isDone = false;
-    this.configurationContainer = new PlaceholderContainer();
-    this.pluginsContainer = new PlaceholderContainer();
     this.securitySettingsContainer = new PlaceholderContainer();
     this.serverInfoContainer = new PlaceholderContainer();
 
@@ -49,7 +45,7 @@ export class ServerConfigurationService {
     });
   }
 
-  setDone(value: boolean) {
+  setDone(value: boolean): void {
     this.isDone = value;
   }
 }

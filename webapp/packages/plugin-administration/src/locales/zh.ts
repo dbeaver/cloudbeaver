@@ -1,4 +1,9 @@
 export default [
+  ['administration_server_configuration_settings_connections', '连接'],
+  ['administration_server_configuration_settings_ai', 'AI'],
+  ['administration_server_configuration_settings_cloud', '云服务'],
+  ['administration_server_configuration_settings_workspace', '工作区'],
+  ['administration_server_configuration_tab_drivers', '驱动程序'],
   ['administration_server_configuration_save_confirmation_title', '服务器设置更新'],
   ['administration_server_configuration_save_confirmation_message', '即将更改关键设置。您确定吗？'],
 
@@ -13,12 +18,9 @@ export default [
 
   ['administration_configuration_wizard_configuration', '服务器配置'],
   ['administration_configuration_wizard_configuration_step_description', '主要的服务器配置'],
-  ['administration_configuration_wizard_configuration_title', '您可以在这里配置主要的服务器参数'],
+  ['administration_configuration_wizard_configuration_description', '配置服务器的主要参数。完成设置后，您可以添加更多服务。'],
+  ['administration_configuration_wizard_configuration_password_warning', '请牢记管理员密码。此密码无法自动恢复。'],
   ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
-  [
-    'administration_configuration_wizard_configuration_message',
-    '管理员是一个超级用户，可以配置服务器、设置数据库连接、管理其他用户等等。请记住输入的密码。无法自动恢复管理员密码。',
-  ],
 
   ['administration_configuration_tools_save_tooltip', '保存配置'],
   ['administration_configuration_tools_cancel_tooltip', '重置更改'],
@@ -52,7 +54,7 @@ export default [
   ['administration_configuration_wizard_configuration_server_info_unsaved_navigate', '打开'],
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', '您可以在此处指定您希望会话在到期前保持空闲的分钟数'],
 
-  ['administration_configuration_wizard_configuration_plugins', '配置'],
+  ['administration_configuration_wizard_configuration_plugins', '功能'],
   ['administration_configuration_wizard_configuration_custom_connections', '允许自定义连接'],
   ['administration_configuration_wizard_configuration_custom_connections_description', '允许用户创建自定义连接'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', '导航器简单视图'],

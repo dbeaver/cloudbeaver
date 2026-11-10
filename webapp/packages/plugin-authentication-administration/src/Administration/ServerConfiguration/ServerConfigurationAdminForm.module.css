@@ -1,0 +1,27 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.card {
+  box-sizing: border-box;
+  align-self: flex-start;
+  inline-size: 100%;
+}
+
+.passwords {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  align-items: start;
+  gap: 16px;
+  min-width: 0;
+}
+
+@container (min-width: 48rem) {
+  .card {
+    inline-size: calc((100% - 16px) / 2);
+  }
+}
