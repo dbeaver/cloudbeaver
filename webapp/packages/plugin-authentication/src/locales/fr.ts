@@ -20,9 +20,8 @@ export default [
   ['authentication_request_token', 'Une authentification supplémentaire est requise'],
   ['authentication_identity_provider_search_placeholder', 'Rechercher le nom ou la description de la configuration...'],
   ['authentication_identity_provider_dialog_subtitle', 'Choisissez la configuration avec laquelle vous souhaitez vous connecter'],
-
   ['authentication_user_name', "Nom d'utilisateur"],
-  ['authentication_user_name_description', "User's identifier is stored in lowercase"],
+  ['authentication_user_name_description', 'L’identifiant de l’utilisateur est enregistré en minuscules'],
   ['authentication_user_role', 'Rôle'],
   ['authentication_user_credentials', 'Identifiants'],
   ['authentication_user_meta_parameters', 'Paramètres'],
@@ -41,14 +40,12 @@ export default [
   ['authentication_user_login_cant_be_used', 'Désolé, ce nom ne peut pas être utilisé'],
   ['authentication_user_icon_tooltip', 'Utilisateur'],
   ['authentication_team_icon_tooltip', 'Équipe'],
-
   ['plugin_authentication_user_loading_error', 'Impossible de charger les données utilisateur'],
   ['plugin_authentication_loading_error_dialog_title', "Erreur d'authentification"],
   [
     'plugin_authentication_loading_error_dialog_message',
     'Une erreur est survenue lors du chargement des données utilisateur. Voulez-vous vous déconnecter ?',
   ],
-
   [
     'plugin_authentication_authentication_method_disabled',
     "La méthode d'authentification est désactivée, veuillez configurer les méthodes d'authentification dans les paramètres",

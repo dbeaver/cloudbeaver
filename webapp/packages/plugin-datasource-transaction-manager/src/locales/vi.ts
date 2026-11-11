@@ -1,5 +1,5 @@
 export default [
-  ['plugin_datasource_transaction_manager_commit', 'Commit'],
+  ['plugin_datasource_transaction_manager_commit', 'Xác nhận giao dịch'],
   ['plugin_datasource_transaction_manager_rollback', 'Hoàn tác'],
   ['plugin_datasource_transaction_manager_commit_mode_switch_to_auto', 'Chuyển sang commit tự động'],
   ['plugin_datasource_transaction_manager_commit_mode_switch_to_manual', 'Chuyển sang commit thủ công'],
@@ -7,7 +7,6 @@ export default [
   ['plugin_datasource_transaction_manager_rollback_fail', 'Không thể hoàn tác giao dịch'],
   ['plugin_datasource_transaction_manager_commit_mode_fail', 'Không thể thay đổi chế độ commit'],
   ['plugin_datasource_transaction_manager_commit_confirmation_message', 'Bạn có muốn commit các thay đổi không?'],
-
   ['plugin_datasource_transaction_manager_logs', 'Nhật ký giao dịch'],
   ['plugin_datasource_transaction_manager_logs_tooltip', 'Mở nhật ký giao dịch'],
   ['plugin_datasource_transaction_manager_logs_tooltip_count', 'Tổng số câu lệnh: {arg:count}'],

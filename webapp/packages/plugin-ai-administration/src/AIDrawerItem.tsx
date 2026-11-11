@@ -12,7 +12,7 @@ import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 export const AIDrawerItem: React.FC<AdministrationItemDrawerProps> = function AIDrawerItem({ item, onSelect, disabled }) {
   return (
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
-      <TabIcon icon="/icons/ai-management.svg" />
+      <TabIcon icon="/icons/core_blocks_sparkles.svg" />
       <TabTitle>
         <Translate token="ai_administration_tab_title" />
       </TabTitle>

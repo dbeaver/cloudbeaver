@@ -1,6 +1,6 @@
 export default [
   ['plugin_resource_manager_scripts_action_enable_label', 'Hiển thị scripts'],
-  ['plugin_resource_manager_scripts_title', 'Scripts'],
+  ['plugin_resource_manager_scripts_title', 'Tập lệnh'],
   ['plugin_resource_manager_scripts_no_resources_placeholder', 'Chưa có scripts nào'],
   ['plugin_resource_manager_scripts_save_script', 'Lưu scripts'],
   [

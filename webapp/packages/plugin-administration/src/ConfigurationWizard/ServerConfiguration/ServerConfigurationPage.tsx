@@ -11,45 +11,29 @@ import {
   AdministrationPageContent,
   AdministrationPageHeader,
   AdministrationPageLayout,
-  AdministrationPageTitle,
+  AdministrationPageNavigation,
+  AdministrationTabList,
   type AdministrationItemContentComponent,
   ConfigurationWizardService,
 } from '@cloudbeaver/core-administration';
-import {
-  Button,
-  ConfirmationDialog,
-  Container,
-  Form,
-  Group,
-  GroupTitle,
-  Loader,
-  Placeholder,
-  useAutoLoad,
-  useFocus,
-  useForm,
-  useFormValidator,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Button, ConfirmationDialog, Form, Loader, useAutoLoad, useFocus, useForm, useFormValidator, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { getFirstException } from '@cloudbeaver/core-utils';
+import { TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
-import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm.js';
-import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm.js';
-import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm.js';
-import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm.js';
-import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm.js';
 import { getServerConfigurationFormPart } from './getServerConfigurationFormPart.js';
-import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm.js';
+import { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
 import { ServerConfigurationFormStateManager } from './ServerConfigurationFormStateManager.js';
+import { ServerConfigurationPageHeader } from './ServerConfigurationPageHeader.js';
 import { ServerConfigurationService } from './ServerConfigurationService.js';
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();
   const [focusedRef, ref] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const serverConfigurationService = useService(ServerConfigurationService);
+  const serverConfigurationFormService = useService(ServerConfigurationFormService);
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const serverConfigurationFormStateManager = useService(ServerConfigurationFormStateManager);
@@ -144,35 +128,18 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
           )
         }
       >
-        <AdministrationPageTitle docLink={WEBSITE_LINKS.SERVER_CONFIGURATION_DOCUMENTATION_PAGE}>
-          {translate('administration_configuration_wizard_configuration')}
-        </AdministrationPageTitle>
+        <ServerConfigurationPageHeader configurationWizard={configurationWizard} />
       </AdministrationPageHeader>
-      <AdministrationPageContent>
-        {configurationWizard && (
-          <div className="tw:shrink-0">
-            <h3 className="tw:text-xl tw:font-semibold">{translate('administration_configuration_wizard_configuration_title')}</h3>
-            <p className="tw:mt-4 tw:mb-0 tw:whitespace-pre-wrap tw:leading-loose">
-              {translate('administration_configuration_wizard_configuration_message')}
-            </p>
-          </div>
-        )}
-        <Form ref={focusedRef} context={form} name="server_config" contents onChange={handleChange}>
-          <Container wrap gap grid medium keepSize>
-            <ServerConfigurationInfoForm state={part.state} formState={formState} configurationWizard={configurationWizard} />
-            <Group form gap>
-              <GroupTitle>{translate('administration_configuration_wizard_configuration_plugins')}</GroupTitle>
-              <ServerConfigurationConfigurationForm serverConfig={part.state.serverConfig} />
-              <ServerConfigurationNavigatorViewForm configs={part.state} />
-              <ServerConfigurationFeaturesForm state={part.state} configurationWizard={configurationWizard} />
-              <Placeholder container={serverConfigurationService.pluginsContainer} configurationWizard={configurationWizard} state={part.state} />
-            </Group>
-            <Placeholder container={serverConfigurationService.configurationContainer} configurationWizard={configurationWizard} state={part.state} />
-            <ServerConfigurationSecurityForm configurationWizard={configurationWizard} state={part.state} />
-            <ServerConfigurationDriversForm initialServerConfig={part.initialState.serverConfig} serverConfig={part.state.serverConfig} />
-          </Container>
-        </Form>
-      </AdministrationPageContent>
+      <Form ref={focusedRef} context={form} name="server_config" contents onChange={handleChange}>
+        <TabsState container={serverConfigurationFormService.parts} formState={formState} configurationWizard={configurationWizard}>
+          <AdministrationPageNavigation>
+            <AdministrationTabList aria-label={translate('administration_configuration_wizard_configuration')} />
+          </AdministrationPageNavigation>
+          <AdministrationPageContent>
+            <TabPanelList contents />
+          </AdministrationPageContent>
+        </TabsState>
+      </Form>
     </AdministrationPageLayout>
   );
 });

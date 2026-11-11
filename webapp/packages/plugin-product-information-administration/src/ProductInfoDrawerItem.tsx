@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ export const ProductInfoDrawerItem: React.FC<AdministrationItemDrawerProps> = fu
       disabled={disabled}
       onOpen={() => onSelect(item.name)}
     >
-      <TabIcon icon="/icons/license.svg" viewBox="0 0 16 16" />
+      <TabIcon icon="/icons/plugin_product_information_info.svg" />
       <TabTitle>
         <Translate token="administration_settings_menu_title" />
       </TabTitle>

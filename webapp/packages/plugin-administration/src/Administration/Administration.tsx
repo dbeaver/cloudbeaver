@@ -16,7 +16,7 @@ import {
 } from '@cloudbeaver/core-administration';
 import { s, SContext, SlideDialog, type StyleRegistry, ToolsActionStyles, ToolsPanelStyles, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { OptionsPanelService, TabList, TabListStyles, TabsState, VerticalTabsStyleRegistry } from '@cloudbeaver/core-ui';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 import { SupportService } from '@cloudbeaver/core-support';
@@ -26,7 +26,6 @@ import { AdministrationViewService } from './AdministrationViewService.js';
 import { DrawerItem } from './DrawerItem.js';
 import { ItemContent } from './ItemContent.js';
 import style from './shared/Administration.module.css';
-import AdministrationStylesTab from './shared/AdministrationTab.module.css';
 import AdministrationStylesTabList from './shared/AdministrationTabList.module.css';
 import AdministrationToolsPanelStyles from './shared/AdministrationToolsPanel.module.css';
 
@@ -54,13 +53,7 @@ const adminPageRegistry: StyleRegistry = [
 ];
 
 const tabsRegistry: StyleRegistry = [
-  [
-    TabStyles,
-    {
-      mode: 'append',
-      styles: [AdministrationStylesTab],
-    },
-  ],
+  ...VerticalTabsStyleRegistry,
   [
     TabListStyles,
     {

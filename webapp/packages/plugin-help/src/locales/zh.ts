@@ -2,10 +2,8 @@ export default [
   ['shortcuts_title', '快捷操作'],
   ['tree_shortcuts_title', '所有树视图'],
   ['tree_shortcut_collapse_all', '折叠当前获得焦点的树视图中的所有节点'],
-
-  ['plugin_help_welcome_docs_label', 'Documentation'],
-  ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],
-
+  ['plugin_help_welcome_docs_label', '文档'],
+  ['plugin_help_welcome_docs_description', '了解如何使用 {arg:product}'],
   ['data_viewer_shortcut_open_cell_context_menu', '打开所选单元格的上下文菜单'],
   ['data_viewer_shortcut_start_inline_editing', '为所选单元格打开内联编辑器'],
   ['data_viewer_shortcut_add_new_row', '添加行'],
@@ -14,7 +12,6 @@ export default [
   ['data_viewer_shortcut_revert_inline_editor_changes', '还原内联编辑器更改'],
   ['data_viewer_shortcut_past_value', '粘贴剪贴板内容至单元格'],
   ['data_viewer_shortcut_copy_value', '复制单元格值至剪贴板'],
-
   ['sql_editor_shortcut_execute_statement', '执行SQL语句'],
   ['sql_editor_shortcut_execute_statement_new_tab', '在新标签下执行SQL语句'],
   ['sql_editor_shortcut_execute_script', '执行脚本'],
@@ -30,6 +27,11 @@ export default [
   ['sql_editor_shortcut_accept_completion', '接受自动完成'],
   ['sql_editor_shortcut_escape', '退出编辑器'],
   ['plugin_search_panel_find', '查找'],
-
   ['navigation_tree_shortcut_enable_filter', '启用过滤'],
+  ['plugin_help_multi_tab_support_title', '不支持多标签页'],
+  [
+    'plugin_help_multi_tab_support_description',
+    '数据未与其他浏览器标签页关联。\n  已打开的应用程序标签页不会保存，关闭浏览器标签页后很可能丢失。\n  关闭浏览器标签页后，本地应用程序设置将丢失。\n  您可以为此标签页加载标签页和设置',
+  ],
+  ['plugin_help_multi_tab_support_load_settings', '加载标签页和设置'],
 ];
