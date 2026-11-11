@@ -43,8 +43,6 @@ public class WebSQLQueryResultSet {
     private boolean hasRowIdentifier;
     private WebSQLResultSetRowIdentifierState rowIdentifierState;
     private WebSQLResultSetRowIdentifier rowIdentifier;
-    private Object presentationData;
-    private Integer sourceRowCount;
 
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
@@ -90,25 +88,6 @@ public class WebSQLQueryResultSet {
 
     public void setRows(List<WebSQLQueryResultSetRow> rows) {
         this.rows = rows;
-    }
-
-    @Nullable
-    public Object getPresentationData() {
-        return presentationData;
-    }
-
-    public void setPresentationData(@NotNull Object presentationData) {
-        this.presentationData = presentationData;
-    }
-
-    @Property
-    @Nullable
-    public Integer getSourceRowCount() {
-        return sourceRowCount;
-    }
-
-    public void setSourceRowCount(int sourceRowCount) {
-        this.sourceRowCount = sourceRowCount;
     }
 
     @Property

@@ -23,7 +23,6 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
-import io.cloudbeaver.service.sql.WebResultDataAdapter;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
@@ -54,7 +53,6 @@ import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
@@ -339,10 +337,6 @@ public class WebConnectionInfo {
         }
         if (Boolean.TRUE.equals(dataSource.getDataSourceFeature(DBPDataSource.FEATURE_DOCUMENT_DATA_SOURCE))) {
             formats.add(WebDataFormat.document);
-        }
-        WebResultDataAdapter adapter = GeneralUtils.adapt(dataSource, WebResultDataAdapter.class);
-        if (adapter != null && !formats.contains(adapter.getDataFormat())) {
-            formats.add(adapter.getDataFormat());
         }
         return formats;
     }

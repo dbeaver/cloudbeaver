@@ -94,7 +94,6 @@ export * from './TableViewer/TableHeader/TableHeaderService.js';
 
 export * from './ContainerDataSource.js';
 export * from './ResultSet/ResultSetDataSource.js';
-export * from './ResultSet/SQLTaskResultsService.js';
 export * from './ResultSet/isResultSetDataModel.js';
 export * from './DataPresentationService.js';
 export * from './DataViewerDataChangeConfirmationService.js';

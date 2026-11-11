@@ -43,7 +43,6 @@ import { GridHistoryAction } from './DatabaseDataModel/Actions/Grid/GridHistoryA
 import { IDatabaseDataViewAction } from './DatabaseDataModel/Actions/IDatabaseDataViewAction.js';
 import { IDatabaseReferencesAction } from './DatabaseDataModel/Actions/IDatabaseReferencesAction.js';
 import { ResultSetDataAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction.js';
-import { SQLTaskResultsService } from './ResultSet/SQLTaskResultsService.js';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
 import { ResultSetViewAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
 import { ResultSetSelectAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
@@ -74,7 +73,6 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, proxy(TextValuePresentationBootstrap))
       .addSingleton(Dependency, proxy(DataViewerSettingsService))
       .addSingleton(DataPresentationService)
-      .addSingleton(SQLTaskResultsService)
       .addSingleton(TextValuePresentationBootstrap)
       .addSingleton(ImageValuePresentationBootstrap)
       .addSingleton(BooleanValuePresentationBootstrap)

@@ -11,7 +11,7 @@ import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } fro
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
-import type { GraphQLService, SqlExecuteInfo, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
+import type { GraphQLService, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
@@ -35,7 +35,6 @@ import { ResultSetEditAction } from '../DatabaseDataModel/Actions/ResultSet/Resu
 import { ResultSetFormatAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import { ResultSetSelectAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
 import { ResultSetViewAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
-import { SQLTaskResultsService } from './SQLTaskResultsService.js';
 import { IDatabaseDataSelectAction } from '../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
 import { DatabaseDataFeature } from '../DatabaseDataModel/IDatabaseDataSource.js';
 import { IDatabaseReferencesAction } from '../DatabaseDataModel/Actions/IDatabaseReferencesAction.js';
@@ -90,10 +89,6 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
 
   protected override onPersistedStateLoaded(): void {
     applyPersistedDataFilterConstraints(this);
-  }
-
-  protected loadTaskResults(taskId: string): Promise<SqlExecuteInfo> {
-    return this.serviceProvider.getService(SQLTaskResultsService).load(this.dataFormat, taskId);
   }
 
   override isReadonly(resultIndex: number): boolean {

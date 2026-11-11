@@ -29,7 +29,6 @@ import io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdateTest;
 import io.cloudbeaver.service.ai.AIProfileCopyTest;
 import io.cloudbeaver.service.ai.WebAIConfigurationProfileTest;
 import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
-import io.cloudbeaver.service.sql.WebSQLQueryResultSetPresentationTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
@@ -75,8 +74,7 @@ import org.junit.platform.suite.api.Suite;
         BlankLineDelimiterTest.class,
         GenerateSQLResultSetTest.class,
         WebSQLDataUpdateTest.class,
-         WebSQLQueryDataContainerTest.class,
-         WebSQLQueryResultSetPresentationTest.class,
+        WebSQLQueryDataContainerTest.class,
         WebSQLResultsInfoTest.class,
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,

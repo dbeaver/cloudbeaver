@@ -47,7 +47,7 @@ export class DataViewerDataChangeConfirmationService {
 
       try {
         for (let resultIndex = 0; resultIndex < results.length; resultIndex++) {
-          const editor = model.source.tryGetAction(resultIndex, IDatabaseDataEditAction);
+          const editor = model.source.getAction(resultIndex, IDatabaseDataEditAction);
 
           if (editor?.isEdited() && !model.isDisabled(resultIndex)) {
             if (confirmationContext.confirmed) {

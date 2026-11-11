@@ -17,17 +17,16 @@
 package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 
-/** Produces presentation data from raw result-set values. */
-public interface WebResultDataAdapter {
-    @NotNull
-    WebDataFormat getDataFormat();
+import java.util.function.Consumer;
 
-    @NotNull
-    Object build(
+public interface WebSQLResultSetExtension {
+    @Nullable
+    Consumer<WebSQLResultsInfo> prepare(
         @NotNull DBSDataContainer container,
         @NotNull DBDAttributeBinding[] bindings,
         @NotNull Object[][] rows
