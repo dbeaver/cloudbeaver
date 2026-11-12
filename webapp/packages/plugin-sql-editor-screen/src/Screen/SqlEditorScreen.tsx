@@ -7,7 +7,6 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 
 import { Loader, TextPlaceholder, useObservableRef, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import {
@@ -19,15 +18,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 import { uuid } from '@cloudbeaver/core-utils';
-import {
-  type ISqlEditorTabState,
-  MemorySqlDataSource,
-  requestSqlEditorFocus,
-  SqlDataSourceService,
-  SqlEditor,
-  SqlEditorModelService,
-  SqlEditorService,
-} from '@cloudbeaver/plugin-sql-editor';
+import { type ISqlEditorTabState, MemorySqlDataSource, SqlDataSourceService, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams.js';
 
@@ -36,7 +27,6 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
   const connectionExecutionContextResource = useResource(SqlEditorScreen, ConnectionExecutionContextResource, CachedMapAllKey);
   const sqlDataSourceService = useService(SqlDataSourceService);
   const sqlEditorService = useService(SqlEditorService);
-  const sqlEditorModelService = useService(SqlEditorModelService);
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
   const context = connectionExecutionContextService.get(contextId);
 
@@ -69,24 +59,6 @@ export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer
   if (context?.context?.id !== state.dataSource?.executionContext?.id) {
     state.setState(context?.context);
   }
-
-  const editorState = state.state;
-
-  useEffect(() => {
-    if (!editorState) {
-      return;
-    }
-
-    const model = sqlEditorModelService.getOrCreate(editorState);
-    requestSqlEditorFocus(model, () => state.state === editorState);
-    const request = model.focusRequest;
-
-    return () => {
-      if (request) {
-        model.completeFocusRequest(request);
-      }
-    };
-  }, [editorState, sqlEditorModelService, state]);
 
   return (
     <Loader state={[connectionExecutionContextResource]}>

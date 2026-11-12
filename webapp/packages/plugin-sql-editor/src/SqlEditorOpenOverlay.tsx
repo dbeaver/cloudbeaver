@@ -23,15 +23,13 @@ import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource.js';
 
 interface Props {
   dataSource: ISqlDataSource | undefined;
-  onOpen?: () => void;
 }
 
 // TODO: probably we need to combine this component with SqlEditorOverlay and use common API for overlays
-export const SqlEditorOpenOverlay = observer<Props>(function SqlEditorOpenOverlay({ dataSource, onOpen }) {
+export const SqlEditorOpenOverlay = observer<Props>(function SqlEditorOpenOverlay({ dataSource }) {
   const translate = useTranslate();
 
   function openHandler() {
-    onOpen?.();
     dataSource?.open();
   }
 

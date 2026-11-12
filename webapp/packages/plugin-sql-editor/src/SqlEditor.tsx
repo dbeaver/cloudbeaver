@@ -21,8 +21,6 @@ import { SqlEditorView } from './SqlEditorView.js';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs.js';
 import { useDataSource } from './useDataSource.js';
 import { SqlEditorConnectionBar } from './SqlEditorConnectionBar.js';
-import { SqlEditorModelService } from './SqlEditorModel/SqlEditorModelService.js';
-import { requestSqlEditorFocus } from './SqlEditorModel/requestSqlEditorFocus.js';
 
 export interface SqlEditorProps {
   state: ISqlEditorTabState;
@@ -32,18 +30,12 @@ export const SqlEditor = observer<SqlEditorProps>(function SqlEditor({ state }) 
   const styles = useS(style);
   const sqlEditorView = useService(SqlEditorView);
   const sqlDataSourceService = useService(SqlDataSourceService);
-  const sqlEditorModelService = useService(SqlEditorModelService);
   const dataSource = sqlDataSourceService.get(state.editorId);
 
   useDataSource(dataSource);
   const splitState = useSplitUserState(`sql-editor-${dataSource?.sourceKey ?? 'default'}`);
 
   const opened = dataSource?.isOpened() || false;
-
-  function handleOpen() {
-    const model = sqlEditorModelService.getOrCreate(state);
-    requestSqlEditorFocus(model, () => model.dataSource === dataSource);
-  }
 
   return (
     <Loader suspense>
@@ -60,7 +52,7 @@ export const SqlEditor = observer<SqlEditorProps>(function SqlEditor({ state }) 
             </Loader>
           </Pane>
         </Split>
-        {!opened && <SqlEditorOpenOverlay dataSource={dataSource} onOpen={handleOpen} />}
+        {!opened && <SqlEditorOpenOverlay dataSource={dataSource} />}
         <SqlEditorStatusBar dataSource={dataSource} />
       </CaptureView>
     </Loader>

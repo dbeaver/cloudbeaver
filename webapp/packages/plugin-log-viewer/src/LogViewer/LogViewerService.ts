@@ -9,7 +9,7 @@ import { computed, makeObservable } from 'mobx';
 
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { BottomPanelService, tabSelectionContext } from '@cloudbeaver/core-ui';
+import { BottomPanelService } from '@cloudbeaver/core-ui';
 import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
 import { LogViewerSettingsService } from './LogViewerSettingsService.js';
@@ -61,17 +61,15 @@ export class LogViewerService {
       return;
     }
 
-    const wasActive = this.isActive;
-    this.settings.active = true;
-    const wasVisible = this.selectTab();
+    this.toggle();
 
-    if (wasActive && wasVisible) {
-      this.toggle();
+    if (this.isActive) {
+      this.selectTab();
     }
   }
 
-  selectTab(): boolean {
-    return this.bottomPanelService.tabsContainer.select(LOG_VIEWER_TAB_ID)?.getContext(tabSelectionContext).wasVisible ?? false;
+  selectTab(): void {
+    this.bottomPanelService.tabsContainer.select(LOG_VIEWER_TAB_ID);
   }
 }
 

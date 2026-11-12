@@ -35,13 +35,7 @@ const sideBarPanelRegistry: StyleRegistry = [
   ],
 ];
 
-export const SideBarPanel = observer<React.PropsWithChildren<ISideBarPanelProps>>(function SideBarPanel({
-  container,
-  panelId,
-  selectedTabId,
-  onSelectTab,
-  children,
-}) {
+export const SideBarPanel = observer<ISideBarPanelProps>(function SideBarPanel({ container, panelId, selectedTabId, onSelectTab }) {
   const style = useS(styles);
 
   const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(panelId, () => container.getIdList());
@@ -63,7 +57,6 @@ export const SideBarPanel = observer<React.PropsWithChildren<ISideBarPanelProps>
             <TabPanelList />
           </div>
         </div>
-        {children}
       </TabsState>
     </SContext>
   );

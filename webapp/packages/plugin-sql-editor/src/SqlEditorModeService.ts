@@ -16,13 +16,9 @@ export interface ISqlEditorModeProps {
   data: ISQLEditorData;
 }
 
-export interface ISqlEditorModeOptions extends Record<string, unknown> {
-  focusPanelOnSelect?: boolean;
-}
-
 @injectable()
 export class SqlEditorModeService {
-  readonly tabsContainer: TabsContainer<ISqlEditorModeProps, ISqlEditorModeOptions>;
+  readonly tabsContainer: TabsContainer<ISqlEditorModeProps>;
 
   constructor() {
     this.tabsContainer = new TabsContainer('SQL Editor Mode');

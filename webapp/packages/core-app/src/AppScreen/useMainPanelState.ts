@@ -6,24 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useObjectRef, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { useExecutor, useObjectRef, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import {
-  BottomPanelService,
-  type IPanelActivation,
-  LeftBarPanelService,
-  SideBarPanelService,
-  type TabsContainer,
-  usePanelActivation,
-  useTabPersistence,
-} from '@cloudbeaver/core-ui';
+import { BottomPanelService, LeftBarPanelService, SideBarPanelService, type TabsContainer, useTabPersistence } from '@cloudbeaver/core-ui';
 
 import { PANEL_ID_BOTTOM_PANEL, PANEL_ID_LEFT_SIDEBAR, PANEL_ID_RIGHT_SIDEBAR } from './AppScreenService.js';
 
 interface IMainPanel {
   readonly container: TabsContainer;
   readonly selection: ReturnType<typeof useTabPersistence>;
-  readonly activation: IPanelActivation;
 }
 
 interface IMainPanelState {
@@ -74,26 +65,6 @@ export function useMainPanelState(): IMainPanelState {
       },
       get bottomMode() {
         return this.bottomDisabled ? 'minimize' : this.bottomSplit.mode;
-      },
-      get leftVisible() {
-        return !this.leftDisabled && this.mainMode !== 'minimize' && (this.mainMode === 'maximize' || this.mainSplit.size !== 0);
-      },
-      get rightVisible() {
-        return (
-          !this.rightDisabled &&
-          this.mainMode !== 'maximize' &&
-          this.rightMode !== 'minimize' &&
-          (this.rightMode === 'maximize' || this.rightSplit.size !== 0)
-        );
-      },
-      get bottomVisible() {
-        return (
-          !this.bottomDisabled &&
-          this.mainMode !== 'maximize' &&
-          this.rightMode !== 'maximize' &&
-          this.bottomMode !== 'minimize' &&
-          (this.bottomMode === 'maximize' || this.bottomSplit.size !== 0)
-        );
       },
       revealMainContent() {
         if (this.mainMode === 'maximize') {
@@ -168,24 +139,42 @@ export function useMainPanelState(): IMainPanelState {
     ['revealLeft', 'revealRight', 'revealBottom'],
   );
 
-  const leftActivation = usePanelActivation(layout.leftContainer, leftSelection, {
-    isVisible: () => layout.leftVisible,
-    reveal: layout.revealLeft,
+  useExecutor({
+    executor: layout.leftContainer.onTabSelect,
+    handlers: [
+      tabId => {
+        if (layout.leftContainer.getIdList().includes(tabId)) {
+          layout.revealLeft();
+        }
+      },
+    ],
   });
 
-  const rightActivation = usePanelActivation(layout.rightContainer, rightSelection, {
-    isVisible: () => layout.rightVisible,
-    reveal: layout.revealRight,
+  useExecutor({
+    executor: layout.rightContainer.onTabSelect,
+    handlers: [
+      tabId => {
+        if (layout.rightContainer.getIdList().includes(tabId)) {
+          layout.revealRight();
+        }
+      },
+    ],
   });
 
-  const bottomActivation = usePanelActivation(layout.bottomContainer, bottomSelection, {
-    isVisible: () => layout.bottomVisible,
-    reveal: layout.revealBottom,
+  useExecutor({
+    executor: layout.bottomContainer.onTabSelect,
+    handlers: [
+      tabId => {
+        if (layout.bottomContainer.getIdList().includes(tabId)) {
+          layout.revealBottom();
+        }
+      },
+    ],
   });
 
-  const left = useObjectRef({ container: layout.leftContainer, selection: leftSelection, activation: leftActivation });
-  const right = useObjectRef({ container: layout.rightContainer, selection: rightSelection, activation: rightActivation });
-  const bottom = useObjectRef({ container: layout.bottomContainer, selection: bottomSelection, activation: bottomActivation });
+  const left = useObjectRef({ container: layout.leftContainer, selection: leftSelection });
+  const right = useObjectRef({ container: layout.rightContainer, selection: rightSelection });
+  const bottom = useObjectRef({ container: layout.bottomContainer, selection: bottomSelection });
 
   return useObjectRef({ layout, left, right, bottom });
 }

@@ -17,17 +17,15 @@ import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
 import { SqlEditorService } from '../SqlEditorService.js';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import { computed, makeObservable, observable, reaction } from 'mobx';
 import { debouncePromise, memoizeLast } from '@dbeaver/js-helpers';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
-import type { ISqlEditorFocusRequest } from './ISqlEditorFocusRequest.js';
 
 const ZERO_CURSOR: ISqlEditorCursor = { anchor: 0, head: 0 };
 
 @injectable(() => [SqlDataSourceService, SqlEditorService, NotificationService, SqlEditorSettingsService])
 export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposable implements ISqlEditorModel<TDataSource> {
   state: ISqlEditorTabState | null;
-  focusRequest: ISqlEditorFocusRequest | null = null;
   get cursor(): ISqlEditorCursor {
     return this.dataSource?.cursor ?? ZERO_CURSOR;
   }
@@ -85,25 +83,12 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
       state: observable.shallow,
       dataSource: computed,
       cursor: computed,
-      focusRequest: observable.ref,
-      requestFocus: action,
-      completeFocusRequest: action,
     });
   }
 
   setState(state: ISqlEditorTabState | null): void {
     this.state = state;
     this.onUpdate.execute();
-  }
-
-  requestFocus(canFocus: () => boolean): void {
-    this.focusRequest = { canFocus };
-  }
-
-  completeFocusRequest(request: ISqlEditorFocusRequest): void {
-    if (this.focusRequest === request) {
-      this.focusRequest = null;
-    }
   }
 
   async getResolvedSegment(): Promise<ISQLScriptSegment | undefined> {
@@ -187,10 +172,6 @@ export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposa
   }
 
   protected override dispose(): Promise<void> | void {
-    if (this.focusRequest) {
-      this.completeFocusRequest(this.focusRequest);
-    }
-
     this.dataSourceListener();
     this.dataSource?.onSetScript.removeHandler(this.syncScriptWithDataSource);
   }

@@ -12,7 +12,6 @@ import type { IDataQueryOptions, QueryDataSource } from '../QueryDataSource.js';
 import type { ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource.js';
 import type { ISQLScriptSegment, SQLParser } from '../SQLParser.js';
 import type { SyncExecutor } from '@cloudbeaver/core-executor';
-import type { ISqlEditorFocusRequest } from './ISqlEditorFocusRequest.js';
 
 export interface ISqlEditorModel<TDataSource extends QueryDataSource = QueryDataSource<IDataQueryOptions>> extends Disposable {
   readonly cursor: ISqlEditorCursor;
@@ -20,12 +19,9 @@ export interface ISqlEditorModel<TDataSource extends QueryDataSource = QueryData
   readonly parser: SQLParser;
   readonly state: ISqlEditorTabState | null;
   readonly dataSource: ISqlDataSource<TDataSource> | undefined;
-  readonly focusRequest: ISqlEditorFocusRequest | null;
 
   readonly onUpdate: SyncExecutor;
 
   setState(state: ISqlEditorTabState): void;
-  requestFocus(canFocus: () => boolean): void;
-  completeFocusRequest(request: ISqlEditorFocusRequest): void;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
 }

@@ -9,7 +9,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Loader, Pane, ResizerControls, s, SContext, Split, useS, type StyleRegistry } from '@cloudbeaver/core-blocks';
-import { BottomPanel, PanelFocus, SideBarPanel, TabStyles } from '@cloudbeaver/core-ui';
+import { BottomPanel, SideBarPanel, TabStyles } from '@cloudbeaver/core-ui';
 
 import { PANEL_ID_BOTTOM_PANEL, PANEL_ID_LEFT_SIDEBAR, PANEL_ID_RIGHT_SIDEBAR } from './AppScreenService.js';
 import { RightArea } from './RightArea.js';
@@ -43,9 +43,7 @@ export const Main = observer(function Main() {
                   panelId={PANEL_ID_LEFT_SIDEBAR}
                   selectedTabId={panels.left.selection.selectedTabId}
                   onSelectTab={panels.left.selection.selectTab}
-                >
-                  <PanelFocus activation={panels.left.activation} />
-                </SideBarPanel>
+                />
               </SContext>
             </Loader>
           </Pane>
@@ -62,9 +60,7 @@ export const Main = observer(function Main() {
                       panelId={PANEL_ID_BOTTOM_PANEL}
                       selectedTabId={panels.bottom.selection.selectedTabId}
                       onSelectTab={panels.bottom.selection.selectTab}
-                    >
-                      <PanelFocus activation={panels.bottom.activation} />
-                    </BottomPanel>
+                    />
                   }
                 />
               </Pane>
@@ -76,9 +72,7 @@ export const Main = observer(function Main() {
                     panelId={PANEL_ID_RIGHT_SIDEBAR}
                     selectedTabId={panels.right.selection.selectedTabId}
                     onSelectTab={panels.right.selection.selectTab}
-                  >
-                    <PanelFocus activation={panels.right.activation} />
-                  </SideBarPanel>
+                  />
                 </Loader>
               </Pane>
             </Split>

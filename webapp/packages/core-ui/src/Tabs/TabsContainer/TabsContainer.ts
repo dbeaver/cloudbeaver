@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
-import { SyncExecutor, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer.js';
 
@@ -35,7 +35,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     return this.tabInfoMap.has(tabId);
   }
 
-  select(tabId: string, props: TProps): IExecutionContextProvider<string> | undefined {
+  select(tabId: string, props: TProps): void {
     const info = this.getDisplayedTabInfo(tabId, props);
 
     if (!info) {
@@ -47,7 +47,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
       props,
     });
 
-    return this.onTabSelect.execute(tabId);
+    this.onTabSelect.execute(tabId);
   }
 
   getTabInfo(tabId: string): ITabInfo<TProps, TOptions> | undefined {

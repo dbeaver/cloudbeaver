@@ -41,8 +41,6 @@ export * from './SqlResultTabs/OutputLogs/OutputLogsEventHandler.js';
 export * from './SqlResultTabs/OutputLogs/OutputLogsResource.js';
 export * from './SqlResultTabs/OutputLogs/OutputLogsService.js';
 export * from './SqlEditorModel/SqlEditorModelService.js';
-export * from './SqlEditorModel/ISqlEditorFocusRequest.js';
-export * from './SqlEditorModel/requestSqlEditorFocus.js';
 export * from './DATA_CONTEXT_SQL_EDITOR_STATE.js';
 export * from './getSqlEditorName.js';
 export * from './QueryDataSource.js';

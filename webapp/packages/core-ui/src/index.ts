@@ -65,7 +65,6 @@ export * from './Tabs/useTabState.js';
 export * from './Tabs/useTabLocalState.js';
 export * from './Tabs/useTabOrderPersistence.js';
 export * from './Tabs/useTabPersistence.js';
-export * from './Tabs/tabSelectionContext.js';
 export * from './Tabs/useTabsStore.js';
 export * from './Tabs/useTabsState.js';
 export * from './Tabs/VerticalTabsStyleRegistry.js';
@@ -98,8 +97,6 @@ export * from './Tabs/TabsBootstrap.js';
 
 export * from './SideBarPanel/BottomPanelLoader.js';
 export * from './SideBarPanel/BottomPanelService.js';
-export * from './SideBarPanel/PanelFocusLoader.js';
-export * from './SideBarPanel/usePanelActivation.js';
 export * from './SideBarPanel/LeftBarPanelService.js';
 export * from './SideBarPanel/SideBarPanelLoader.js';
 export * from './SideBarPanel/SideBarPanelService.js';
