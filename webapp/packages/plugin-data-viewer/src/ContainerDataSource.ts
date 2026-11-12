@@ -79,9 +79,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     this.currentTask = executionContext.run(
       async () => {
         const info = await this.asyncTaskInfoService.run(task);
-        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
-
-        return result;
+        return this.loadTaskResults(info.id);
       },
       () => this.asyncTaskInfoService.cancel(task.id),
       () => this.asyncTaskInfoService.remove(task.id),
@@ -256,8 +254,8 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
       contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,
       updateRowCount: result.updateRowCount || 0,
-      loadedFully: (result.resultSet?.rowsWithMetaData?.length || 0) < limit,
-      count: result.resultSet?.rowsWithMetaData?.length || 0,
+      loadedFully: (result.resultSet?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0) < limit,
+      count: result.resultSet?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0,
       totalCount: null,
       data: result.resultSet,
     }));
