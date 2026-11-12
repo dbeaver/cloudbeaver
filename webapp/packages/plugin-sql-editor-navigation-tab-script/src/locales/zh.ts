@@ -5,7 +5,7 @@ export default [
   ['plugin_sql_editor_navigation_tab_script_state_saving', '保存脚本中...'],
   ['plugin_sql_editor_navigation_tab_script_state_updating', '更新脚本信息...'],
   ['plugin_sql_editor_navigation_tab_script_state_different_project', '连接项目与脚本项目不同 - 不会保存连接更改。'],
-  ['plugin_sql_editor_navigation_tab_script_state_readonly', 'This is readonly script. Any changes will not be saved.'],
+  ['plugin_sql_editor_navigation_tab_script_state_readonly', '此脚本为只读，任何更改都不会保存。'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_success', '脚本保存成功'],
   ['plugin_sql_editor_navigation_tab_resource_open_script_error', '打开脚本失败'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_error', '打开脚本出错'],

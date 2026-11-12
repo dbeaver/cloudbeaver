@@ -10,7 +10,7 @@ import { schema } from '@cloudbeaver/core-utils';
 const GRANTED_USER_STATE = schema.object({
   userId: schema.string(),
   teamRole: schema.string().nullable(),
-  grantType: schema.enum(['MANUAL', 'AUTH_PROVIDER', 'DEFAULT']).optional(),
+  grantType: schema.enum(['MANUAL', 'AUTH_PROVIDER', 'DEFAULT', 'UNKNOWN']).optional(),
   grantedBy: schema.string().optional(),
 });
 

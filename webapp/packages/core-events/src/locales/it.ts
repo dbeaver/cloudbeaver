@@ -1,5 +1,5 @@
 export default [
-  ['core_events_notifications_settings_group', 'Notifications'],
-  ['core_events_notifications_settings_pool_size', 'Max notifications count'],
-  ['core_events_notifications_settings_pool_size_description', 'Exceeding this amount, the oldest notifications will be deleted'],
+  ['core_events_notifications_settings_group', 'Notifiche'],
+  ['core_events_notifications_settings_pool_size', 'Numero massimo di notifiche'],
+  ['core_events_notifications_settings_pool_size_description', 'Superato questo numero, verranno eliminate le notifiche meno recenti'],
 ];

@@ -218,6 +218,26 @@ export class LocalizationService extends Bootstrap {
 
   private async coreProvider(locale: string) {
     switch (locale) {
+      case 'de':
+        return (await import('./locales/de.js')).default;
+      case 'pl':
+        return (await import('./locales/pl.js')).default;
+      case 'ja':
+        return (await import('./locales/ja.js')).default;
+      case 'ko':
+        return (await import('./locales/ko.js')).default;
+      case 'pt_BR':
+        return (await import('./locales/pt_BR.js')).default;
+      case 'ro':
+        return (await import('./locales/ro.js')).default;
+      case 'es':
+        return (await import('./locales/es.js')).default;
+      case 'tw':
+        return (await import('./locales/tw.js')).default;
+      case 'uk':
+        return (await import('./locales/uk.js')).default;
+      case 'ar':
+        return (await import('./locales/ar.js')).default;
       case 'ru':
         return (await import('./locales/ru.js')).default;
       case 'it':

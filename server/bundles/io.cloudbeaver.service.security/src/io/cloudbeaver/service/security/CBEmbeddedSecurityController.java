@@ -580,7 +580,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull SMTeamGrantType grantType
     ) throws DBCException {
         if (grantType == SMTeamGrantType.AUTH_PROVIDER) {
-            syncAuthProviderTeams(userId, grantorId, teamIds);
+            syncAuthProviderTeams(userId, grantorId, teamIds, true);
             return;
         }
         boolean changed;
@@ -3186,15 +3186,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 ).stream())
                 .map(SMTeam::getTeamId)
                 .toArray(String[]::new);
-            String[] providerManagedTeamIds = Arrays.stream(allTeams)
-                .filter(team -> CommonUtils.isNotEmpty(team.getMetaParameters().get(externalTeamIdMetadataFieldName)))
-                .map(SMTeam::getTeamId)
-                .toArray(String[]::new);
             syncAuthProviderTeams(
                 userId,
                 authProvider.getId(),
                 newTeamIds,
-                providerManagedTeamIds,
                 autoAssign.isTeamAssignmentsAuthoritative()
             );
         }
@@ -3203,27 +3198,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void syncAuthProviderTeams(
         @NotNull String userId,
         @NotNull String authProviderId,
-        @NotNull String[] teamIds
-    ) throws DBCException {
-        String[] providerManagedTeamIds = teamIds;
-        WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
-        if (authProvider != null && authProvider.getInstance() instanceof SMAuthProviderAssigner assigner) {
-            String metadataFieldName = assigner.getExternalTeamIdMetadataFieldName();
-            if (CommonUtils.isNotEmpty(metadataFieldName)) {
-                providerManagedTeamIds = Arrays.stream(readAllTeams())
-                    .filter(team -> CommonUtils.isNotEmpty(team.getMetaParameters().get(metadataFieldName)))
-                    .map(SMTeam::getTeamId)
-                    .toArray(String[]::new);
-            }
-        }
-        syncAuthProviderTeams(userId, authProviderId, teamIds, providerManagedTeamIds, true);
-    }
-
-    private void syncAuthProviderTeams(
-        @NotNull String userId,
-        @NotNull String authProviderId,
         @NotNull String[] teamIds,
-        @NotNull String[] providerManagedTeamIds,
         boolean authoritative
     ) throws DBCException {
         boolean changed = false;
@@ -3231,8 +3206,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 lockUserTeamGrants(dbCon, userId);
                 Set<String> mappedTeamIds = new LinkedHashSet<>(Arrays.asList(teamIds));
-                Set<String> managedTeamIds = new LinkedHashSet<>(Arrays.asList(providerManagedTeamIds));
-                managedTeamIds.addAll(mappedTeamIds);
                 Map<String, UserTeamGrant> currentGrants = getCurrentUserTeamGrants(dbCon, userId);
 
                 if (authoritative) {
@@ -3254,26 +3227,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 }
 
                 String defaultUserTeam = getDefaultUserTeam();
-                // A configured provider mapping owns membership in that team, even if the existing grant was manual.
-                if (authoritative) {
-                    for (String teamId : managedTeamIds) {
-                        UserTeamGrant currentGrant = currentGrants.get(teamId);
-                        if (currentGrant == null
-                            || currentGrant.grantType() == SMTeamGrantType.AUTH_PROVIDER
-                            || teamId.equals(defaultUserTeam)
-                            || mappedTeamIds.contains(teamId)) {
-                            continue;
-                        }
-                        try (PreparedStatement dbStat = dbCon.prepareStatement(
-                            "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? AND TEAM_ID=?")
-                        ) {
-                            dbStat.setString(1, userId);
-                            dbStat.setString(2, teamId);
-                            changed |= dbStat.executeUpdate() > 0;
-                        }
-                    }
-                }
-
                 for (String teamId : mappedTeamIds) {
                     UserTeamGrant currentGrant = currentGrants.get(teamId);
                     if (currentGrant == null) {
@@ -3286,8 +3239,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         );
                         changed = true;
                     } else if (!teamId.equals(defaultUserTeam)
-                        && (currentGrant.grantType() != SMTeamGrantType.AUTH_PROVIDER
-                            || !authProviderId.equals(currentGrant.grantedBy()))) {
+                        // Only confirmed legacy memberships and provider-owned grants may change ownership.
+                        && (currentGrant.grantType() == SMTeamGrantType.UNKNOWN
+                            || (currentGrant.grantType() == SMTeamGrantType.AUTH_PROVIDER
+                                && !authProviderId.equals(currentGrant.grantedBy())))) {
                         updateUserTeamGrant(
                             dbCon,
                             userId,

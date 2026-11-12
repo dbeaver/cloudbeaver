@@ -1,6 +1,6 @@
 export default [
   ['plugin_navigation_tree_filters_title', 'Filtres'],
-  ['plugin_navigation_tree_filters_info', 'Vous pouvez utiliser des masques (%_and%)'],
+  ['plugin_navigation_tree_filters_info', 'Vous pouvez utiliser des masques (%,_and*)'],
   ['plugin_navigation_tree_filters_configuration', 'Configurer le filtre "{arg:name}"'],
   ['plugin_navigation_tree_filters_reset', 'Réinitialiser le filtre'],
   ['plugin_navigation_tree_filters_filter', 'Filtrer'],
