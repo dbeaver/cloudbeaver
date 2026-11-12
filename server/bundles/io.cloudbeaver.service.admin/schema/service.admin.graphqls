@@ -35,6 +35,7 @@ type AdminUserTeamGrantInfo @since(version: "24.0.5"){
 }
 
 enum AdminTeamGrantType @since(version: "26.3.0") {
+    UNKNOWN
     MANUAL
     AUTH_PROVIDER
     DEFAULT
