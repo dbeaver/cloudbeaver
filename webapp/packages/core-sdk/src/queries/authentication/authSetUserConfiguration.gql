@@ -1,0 +1,3 @@
+mutation authSetUserConfiguration($configuration: Object!) {
+  configuration: authSetUserConfiguration(configuration: $configuration)
+}

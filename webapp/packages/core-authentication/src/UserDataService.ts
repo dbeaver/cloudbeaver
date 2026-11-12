@@ -1,51 +1,49 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
-import { StorageService } from '@cloudbeaver/core-storage';
-import { TempMap } from '@cloudbeaver/core-utils';
 
+import type { IUserDataStorage } from './IUserDataStorage.js';
+import { LocalUserDataStorage } from './LocalUserDataStorage.js';
+import type { UserDataStore } from './UserDataStore.js';
 import { UserInfoResource } from './UserInfoResource.js';
 
-@injectable(() => [UserInfoResource, StorageService])
+@injectable(() => [UserInfoResource, LocalUserDataStorage])
 export class UserDataService {
-  private readonly userData: Map<string, Record<string, any>>;
-  private readonly tempData: TempMap<string, Record<string, any>>;
+  private readonly stores: Map<IUserDataStorage, UserDataStore>;
 
   constructor(
     private readonly userInfoResource: UserInfoResource,
-    private readonly storageService: StorageService,
+    private readonly localUserDataStorage: LocalUserDataStorage,
   ) {
-    this.userData = new Map();
-
-    makeObservable<this, 'userData'>(this, {
-      userData: observable,
-    });
-
-    this.tempData = new TempMap(this.userData);
-
-    this.storageService.registerSettings('user_data', this.userData, () => new Map());
+    this.stores = new Map();
+    this.registerStorage(this.localUserDataStorage);
   }
 
   getUserData<T extends Record<any, any>>(key: string, defaultValue: () => T, validate?: (data: T) => boolean): T {
-    const userId = this.userInfoResource.getId();
+    return this.withStorage(this.localUserDataStorage).getUserData(key, defaultValue, validate);
+  }
 
-    if (!this.tempData.has(userId)) {
-      this.tempData.set(userId, observable({}));
+  withStorage(requested: IUserDataStorage): UserDataStore {
+    const storage = requested.isAvailable() ? requested : this.localUserDataStorage;
+
+    return this.registerStorage(storage);
+  }
+
+  registerStorage<TStore extends UserDataStore>(storage: IUserDataStorage<TStore>): TStore {
+    const existing = this.stores.get(storage);
+
+    if (existing) {
+      return existing as TStore;
     }
 
-    const data = this.tempData.get(userId)!;
+    const store = storage.createStore(() => this.userInfoResource.getId());
+    this.stores.set(storage, store);
 
-    if (!(key in data) || validate?.(data[key]) === false) {
-      data[key] = observable(defaultValue());
-    }
-
-    return data[key];
+    return store;
   }
 }

@@ -1,6 +1,6 @@
 export default [
   ['plugin_navigation_tabs_welcome_start', '开始'],
-  ['plugin_navigation_tabs_navigation_tabs_group', 'Navigation Tabs'],
-  ['plugin_navigation_tabs_multiple_rows', 'Multiple rows for tabs'],
-  ['plugin_navigation_tabs_multiple_rows_description', 'Display navigation tabs in multiple rows instead of scrolling'],
+  ['plugin_navigation_tabs_navigation_tabs_group', '导航标签页'],
+  ['plugin_navigation_tabs_multiple_rows', '多行标签页'],
+  ['plugin_navigation_tabs_multiple_rows_description', '将导航标签页分多行显示，而非滚动显示'],
 ];

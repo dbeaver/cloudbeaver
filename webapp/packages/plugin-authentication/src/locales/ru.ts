@@ -7,8 +7,8 @@ export default [
   ['authentication_authorizing', 'Авторизация...'],
   ['authentication_auth_federated', 'Федеративная'],
   ['authentication_auth_force_session_logout', 'Принудительный выход из всех сессий'],
-  ['authentication_auth_force_session_logout_popup_message', 'Текущие сессии для всех пользователей будут прерваны на всех устройствах. Продолжить?'],
   ['authentication_auth_force_session_logout_popup_title', 'Выход из всех сессий'],
+  ['authentication_auth_force_session_logout_popup_message', 'Текущие сессии для всех пользователей будут прерваны на всех устройствах. Продолжить?'],
   ['authentication_auth_force_session_logout_checkbox_tooltip', 'Для применения этой опции вам нужно войти снова'],
   ['authentication_auth_additional', 'Дополнительная'],
   ['authentication_select_provider', 'Выберите способ аутентификации'],
@@ -17,7 +17,6 @@ export default [
   ['authentication_request_token', 'Необходима дополнительная аутентификация'],
   ['authentication_identity_provider_search_placeholder', 'Поиск по имени или описанию конфигурации...'],
   ['authentication_identity_provider_dialog_subtitle', 'Выберите конфигурацию, с помощью которой вы хотите войти'],
-
   ['authentication_user_name', 'Имя'],
   ['authentication_user_name_description', 'Идентификатор пользователя хранится в нижнем регистре'],
   ['authentication_user_role', 'Роль'],
@@ -32,17 +31,15 @@ export default [
   ['authentication_user_login_not_set', 'Логин не может быть пустым'],
   ['authentication_user_team_not_set', 'Должна быть выбрана минимум одна команда'],
   ['authentication_user_role_not_set', '{alias:authentication_user_role} не задана'],
-  ['authentication_user_password_not_set', 'Пароль не задан'],
+  ['authentication_user_password_not_set', 'Необходимо указать {alias:authentication_user_password}'],
   ['authentication_user_passwords_not_match', 'Пароли не совпадают'],
   ['authentication_user_login_already_exists', 'Пользователь с таким именем уже существует'],
   ['authentication_user_login_cant_be_used', 'Данное имя нельзя использовать'],
   ['authentication_user_icon_tooltip', 'Пользователь'],
   ['authentication_team_icon_tooltip', 'Команда'],
-
   ['plugin_authentication_user_loading_error', 'Не удалось загрузить данные пользователя'],
   ['plugin_authentication_loading_error_dialog_title', 'Ошибка аутентификации'],
   ['plugin_authentication_loading_error_dialog_message', 'Произошла ошибка при загрузке данных пользователя. Выйти?'],
-
   [
     'plugin_authentication_authentication_method_disabled',
     'Способ аутентификации отключен, пожалуйста настройте способы аутентификации в настройках',

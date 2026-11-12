@@ -11,23 +11,16 @@ import { observer } from 'mobx-react-lite';
 import {
   AdministrationPageLayout,
   AdministrationPageNavigation,
+  AdministrationTabList,
   type AdministrationItemContentComponent,
   type AdministrationItemContentProps,
 } from '@cloudbeaver/core-administration';
-import { s, SContext, type StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, TabList, TabPanelList, TabsState, TabStyles, TabTitleStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
-import style from './shared/ConnectionsAdministration.module.css';
-import tabStyle from './shared/ConnectionsAdministrationTab.module.css';
-import TabTitleModuleStyles from './shared/ConnectionsAdministrationTabTitle.module.css';
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 import { ConnectionsAdministrationTabService } from './ConnectionsAdministrationTabService.js';
-
-const mainTabsRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [tabStyle] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabTitleModuleStyles] }],
-];
 
 export const ConnectionsAdministration: AdministrationItemContentComponent = observer(function ConnectionsAdministration({
   item,
@@ -38,7 +31,6 @@ export const ConnectionsAdministration: AdministrationItemContentComponent = obs
   const translate = useTranslate();
   const connectionsAdministrationNavService = useService(ConnectionsAdministrationNavService);
   const connectionsAdministrationTabService = useService(ConnectionsAdministrationTabService);
-  const styles = useS(style, tabStyle);
 
   function openSub({ tabId }: ITabData<AdministrationItemContentProps>) {
     if (sub?.name === tabId) {
@@ -61,14 +53,7 @@ export const ConnectionsAdministration: AdministrationItemContentComponent = obs
         onChange={openSub}
       >
         <AdministrationPageNavigation>
-          <SContext registry={mainTabsRegistry}>
-            <TabList
-              className={s(styles, { tabList: true, administrationTabs: true })}
-              aria-label={translate('plugin_connection_administration_label')}
-              childrenFirst
-              underline
-            />
-          </SContext>
+          <AdministrationTabList aria-label={translate('plugin_connection_administration_label')} childrenFirst />
         </AdministrationPageNavigation>
         <TabPanelList contents />
       </TabsState>

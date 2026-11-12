@@ -16,6 +16,6 @@ export default [
     'Diese Zugangsdaten werden für die automatische Verbindung für alle Benutzer mit Zugriff verwendet',
   ],
   ['plugin_network_handlers_ssh_tunnel_enable', 'SSH-Tunnel verwenden'],
-  ['plugin_network_handlers_ssh_test_fail', 'Tunnel test failed'],
-  ['plugin_network_handlers_ssh_test_success', 'Tunnel test success'],
+  ['plugin_network_handlers_ssh_test_fail', 'Tunneltest fehlgeschlagen'],
+  ['plugin_network_handlers_ssh_test_success', 'Tunneltest erfolgreich'],
 ];

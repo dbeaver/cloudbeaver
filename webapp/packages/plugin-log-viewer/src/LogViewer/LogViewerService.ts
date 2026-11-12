@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { UserDataService } from '@cloudbeaver/core-authentication';
+import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { BottomPanelService } from '@cloudbeaver/core-ui';
 import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
@@ -22,10 +22,10 @@ interface ISettings {
   active: boolean;
 }
 
-@injectable(() => [UserDataService, ToolsPanelService, LogViewerSettingsService, BottomPanelService])
+@injectable(() => [UserDataService, ToolsPanelService, LogViewerSettingsService, BottomPanelService, UserConfigurationStorage])
 export class LogViewerService {
   get settings() {
-    return this.userDataService.getUserData(logViewerSettingsKey, getLogViewerDefaultSettings);
+    return this.userDataService.withStorage(this.userConfigurationStorage).getUserData(logViewerSettingsKey, getLogViewerDefaultSettings);
   }
 
   get isActive(): boolean {
@@ -41,6 +41,7 @@ export class LogViewerService {
     private readonly toolsPanelService: ToolsPanelService,
     private readonly logViewerSettingsService: LogViewerSettingsService,
     private readonly bottomPanelService: BottomPanelService,
+    private readonly userConfigurationStorage: UserConfigurationStorage,
   ) {
     makeObservable<LogViewerService>(this, {
       settings: computed,

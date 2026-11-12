@@ -7,6 +7,7 @@
  */
 
 import './module.js';
+export * from './FEATURE_GROUP_CONNECTIONS_ID.js';
 export * from './ConnectionExecutionContext/ConnectionExecutionContext.js';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextResource.js';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextService.js';

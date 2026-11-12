@@ -1,27 +1,25 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
-import {
-  AUTH_PROVIDER_LOCAL_ID,
-  AuthProviderService,
-  AuthProvidersResource,
-  AuthSettingsService,
-  sortProvider,
-} from '@cloudbeaver/core-authentication';
-import { FormContext, Group, GroupTitle, type PlaceholderComponent, Switch, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProviderService, AuthProvidersResource, AuthSettingsService } from '@cloudbeaver/core-authentication';
+import { FormContext, type PlaceholderComponent, s, useExecutor, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { isDefined } from '@dbeaver/js-helpers';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
+import { AnonymousAccessCard } from './AnonymousAccessCard.js';
+import { AuthenticationProviderCard } from './AuthenticationProviderCard.js';
+import { AuthenticationProviderFilters } from './AuthenticationProviderFilters.js';
+import styles from './AuthenticationProviders.module.css';
 import { ServerConfigurationAdminForm } from './ServerConfigurationAdminForm.js';
+import { useAuthenticationProviderList } from './useAuthenticationProviderList.js';
 
 export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(function AuthenticationProviders({
   state: { serverConfig },
@@ -32,34 +30,18 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   const translate = useTranslate();
   const formContext = useContext(FormContext);
   const authSettingsService = useService(AuthSettingsService);
+  const classes = useS(styles);
+  const list = useAuthenticationProviderList(providers.resource, serverConfig, configurationWizard);
 
   if (formContext === null) {
     throw new Error('Form state should be provided');
   }
 
   const localProvider = providers.resource.get(AUTH_PROVIDER_LOCAL_ID);
-  const providerList = providers.data
-    .filter(isDefined)
-    .filter(provider => {
-      if (provider.private) {
-        return false;
-      }
-
-      if (configurationWizard) {
-        const disabledByFeature = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
-
-        if (provider.configurable || disabledByFeature || provider.authHidden) {
-          return false;
-        }
-      }
-
-      return true;
-    })
-    .sort(sortProvider);
-
-  const externalAuthentication = providerList.length === 0;
+  const externalAuthentication = list.providerList.length === 0;
   const authenticationDisabled = serverConfig.enabledAuthProviders?.length === 0;
   const isAnonymousAccessDisabled = authSettingsService.disableAnonymousAccess;
+  const showAnonymousAccess = !!localProvider && !isAnonymousAccessDisabled && serverConfig.anonymousAccessEnabled != null;
 
   useExecutor({
     executor: formContext.onChange,
@@ -86,56 +68,37 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   }
 
   return (
-    <React.Fragment>
-      <Group key="authentication" form gap>
-        <GroupTitle>{translate('administration_configuration_wizard_configuration_authentication_group')}</GroupTitle>
-        {localProvider && !isAnonymousAccessDisabled ? (
-          <Switch
-            name="anonymousAccessEnabled"
-            state={serverConfig}
-            description={translate('administration_configuration_wizard_configuration_anonymous_access_description')}
-            mod={['primary']}
-            disabled={authenticationDisabled}
-            small
-            autoHide
-          >
-            {translate('administration_configuration_wizard_configuration_anonymous_access')}
-          </Switch>
-        ) : null}
+    <div className={s(classes, { layout: true })}>
+      <AuthenticationProviderFilters list={list} />
+      {(showAnonymousAccess || list.visibleProviders.length > 0) && (
+        <div
+          role="list"
+          aria-label={translate('authentication_administration_server_configuration_authentication')}
+          className={s(classes, { list: true })}
+        >
+          {showAnonymousAccess && <AnonymousAccessCard serverConfig={serverConfig} disabled={authenticationDisabled} />}
+          {list.visibleProviders.map(provider => {
+            const links = authProviderService.getServiceDescriptionLinks(provider);
 
-        {providerList.map(provider => {
-          const links = authProviderService.getServiceDescriptionLinks(provider);
-          const disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
-          const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
-
-          return (
-            <Switch
-              key={provider.id}
-              id={`authProvider_${provider.id}`}
-              title={tooltip}
-              value={provider.id}
-              name="enabledAuthProviders"
-              state={serverConfig}
-              description={
-                <>
-                  {provider.description}
-                  {links.map(link => {
-                    const Description = link.description();
-                    return <Description key={link.id} configurationWizard={configurationWizard} />;
-                  })}
-                </>
-              }
-              mod={['primary']}
-              disabled={disabled}
-              small
-              autoHide
-            >
-              {provider.label}
-            </Switch>
-          );
-        })}
-      </Group>
+            return (
+              <AuthenticationProviderCard
+                key={provider.id}
+                provider={provider}
+                serverConfig={serverConfig}
+                actionsSlot={
+                  links.length > 0
+                    ? links.map(link => {
+                        const Description = link.description();
+                        return <Description key={link.id} configurationWizard={configurationWizard} />;
+                      })
+                    : undefined
+                }
+              />
+            );
+          })}
+        </div>
+      )}
       {configurationWizard && localProvider && <ServerConfigurationAdminForm serverConfig={serverConfig} />}
-    </React.Fragment>
+    </div>
   );
 });

@@ -1,3 +1,1 @@
-export default [
-  ['plugin_settings_default_administration_settings_tab_name', 'Default'],
-];
+export default [['plugin_settings_default_administration_settings_tab_name', 'Predefinito']];

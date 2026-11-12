@@ -1,8 +1,6 @@
 export default [
   ['plugin_data_viewer_conditional_formatting_presentation_title', 'Formattazione condizionale'],
-
-  ['plugin_data_viewer_conditional_formatting_style_text_sample', 'Par défaut'],
-
+  ['plugin_data_viewer_conditional_formatting_style_text_sample', 'Predefinito'],
   ['plugin_data_viewer_conditional_formatting_all_columns', 'Tutte le colonne'],
   ['plugin_data_viewer_conditional_formatting_format_rules', 'Regole di formattazione'],
   ['plugin_data_viewer_conditional_formatting_column', 'Colonna'],
@@ -12,7 +10,6 @@ export default [
   ['plugin_data_viewer_conditional_formatting_color_scale', 'Scala di colori'],
   ['plugin_data_viewer_conditional_formatting_select_rule', 'Seleziona regola'],
   ['plugin_data_viewer_conditional_formatting_format_cells_if', 'Formatta celle se...'],
-
   ['plugin_data_viewer_conditional_formatting_parameter_text_color', 'Colore del testo'],
   ['plugin_data_viewer_conditional_formatting_parameter_background_color', 'Colore di sfondo'],
   ['plugin_data_viewer_conditional_formatting_parameter_value', 'Valore della formula'],
@@ -23,7 +20,6 @@ export default [
   ['plugin_data_viewer_conditional_formatting_parameter_text_decoration_underline', 'Sottolineato'],
   ['plugin_data_viewer_conditional_formatting_parameter_text_decoration_overline', 'Linea sopra'],
   ['plugin_data_viewer_conditional_formatting_parameter_text_decoration_line_through', 'Barrato'],
-
   ['plugin_data_viewer_conditional_formatting_rule_is_empty', 'È vuoto'],
   ['plugin_data_viewer_conditional_formatting_rule_is_not_empty', 'Non è vuoto'],
   ['plugin_data_viewer_conditional_formatting_rule_text_contains', 'Il testo contiene'],
@@ -31,7 +27,6 @@ export default [
   ['plugin_data_viewer_conditional_formatting_rule_text_starts_with', 'Il testo inizia con'],
   ['plugin_data_viewer_conditional_formatting_rule_text_ends_with', 'Il testo termina con'],
   ['plugin_data_viewer_conditional_formatting_rule_text_is_exactly', 'Il testo è esattamente'],
-
   ['plugin_data_viewer_conditional_formatting_rule_color_scale', 'Scala di colori'],
   ['plugin_data_viewer_conditional_formatting_parameter_minpoint', 'Punto minimo'],
   ['plugin_data_viewer_conditional_formatting_parameter_midpoint', 'Punto medio'],

@@ -3,20 +3,19 @@ export default [
   ['plugin_connections_delete_database_object', 'Объект базы данных'],
   ['plugin_connections_delete_read_only', 'Соединение доступно только для чтения.'],
   ['plugin_connections_delete_folder_warning', 'Соединения внутри папок не будут удалены, если они не выбраны.'],
+  ['plugin_connections_new_connection_dialog_title', 'Новое подключение'],
   ['plugin_connections_connection_form_part_main', 'Главное'],
+  ['plugin_connections_connection_form_part_main_auth_model', 'Модель аутентификации'],
   ['plugin_connections_connection_form_part_properties', 'Параметры драйвера'],
   ['plugin_connections_connection_form_part_advanced', 'Расширенные настройки'],
   ['plugin_connections_connection_form_part_initialization_settings', 'Настройки инициализации'],
   ['plugin_connections_connection_form_connection_details', 'Параметры подключения'],
-  ['plugin_connections_connection_form_part_main_auth_model', 'Модель аутентификации'],
   ['plugin_connections_connection_form_part_main_custom_host', 'Хост'],
   ['plugin_connections_connection_form_part_main_custom_port', 'Порт'],
   ['plugin_connections_connection_form_part_main_custom_server_name', 'Имя сервера'],
   ['plugin_connections_connection_form_part_main_custom_database', 'База'],
   ['plugin_connections_connection_form_part_main_url_jdbc', 'JDBC URL'],
   ['plugin_connections_connection_form_part_main_folder', 'Папка'],
-  ['plugin_connections_new_connection_dialog_title', 'Новое подключение'],
-
   ['plugin_connections_connection_edit_menu_item_title', 'Изменить подключение'],
   ['plugin_connections_connection_clone', 'Клонировать'],
   ['plugin_connections_connection_clone_error', 'Не удалось клонировать подключение'],
@@ -40,7 +39,6 @@ export default [
     'plugin_connections_settings_hide_connections_view_description',
     'Подменю выбора отображения подключения будет скрыто для всех пользователей, кроме администраторов',
   ],
-
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'Вы можете указать учетные данные в '],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'во вкладке "Учетные данные"'],
   [
@@ -53,8 +51,14 @@ export default [
   ['plugin_connections_connection_client_version', 'Версия клиента: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Версия сервера: {arg:version} \n'],
   ['plugin_connections_connection_connection_time', 'Время подключения: {arg:time} \n'],
-
   ['plugin_connections_connection_type_label', 'Тип подключения'],
-
   ['plugin_connections_change_db_password_menu_title', 'Изменить текущий пароль базы данных'],
+  ['plugin_connections_change_db_password_dialog_title', 'Изменить текущий пароль базы данных'],
+  ['plugin_connections_change_db_password_current', 'Текущий пароль'],
+  ['plugin_connections_change_db_password_new', 'Новый пароль'],
+  ['plugin_connections_change_db_password_repeat', 'Подтвердите пароль'],
+  ['plugin_connections_change_db_password_submit', 'Изменить'],
+  ['plugin_connections_change_db_password_success', 'Пароль пользователя БД изменён'],
+  ['plugin_connections_change_db_password_mismatch', 'Новые пароли не совпадают'],
+  ['plugin_connections_change_db_password_failed', 'Не удалось изменить пароль'],
 ];

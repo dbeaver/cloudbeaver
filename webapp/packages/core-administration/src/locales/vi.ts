@@ -1,5 +1,6 @@
 export default [
   ['administration_menu_enter', 'Quản trị'],
+  ['core_administration_settings_group', 'Quản trị'],
   ['administration_menu_back', 'Quay lại ứng dụng'],
   ['administration_configuration_wizard_title', 'Cấu hình Khởi tạo Server'],
   ['administration_configuration_wizard_finish_success_title', 'Server đã được cấu hình'],

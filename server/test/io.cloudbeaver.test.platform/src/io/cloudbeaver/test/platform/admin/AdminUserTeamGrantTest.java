@@ -20,6 +20,7 @@ import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.service.auth.ldap.LdapAuthProvider;
 import io.cloudbeaver.service.auth.ldap.LdapConstants;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMTeamGrantType;
@@ -120,7 +121,7 @@ public class AdminUserTeamGrantTest extends CloudbeaverMockTest {
             PROVIDER_A,
             SMTeamGrantType.AUTH_PROVIDER
         );
-        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
+        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.MANUAL, ADMIN_USER);
     }
 
     @Test
@@ -137,12 +138,21 @@ public class AdminUserTeamGrantTest extends CloudbeaverMockTest {
     }
 
     @Test
-    public void testAuthoritativeMappingRemovesManualGrant() throws Exception {
+    public void testAuthoritativeMappingPreservesManualGrant() throws Exception {
         securityController.setSubjectMetas(
             providerTeamOne,
             Map.of(LdapConstants.LDAP_META_GROUP_NAME, "mapped-group")
         );
         securityController.setUserTeams(userId, new String[]{providerTeamOne}, ADMIN_USER);
+        securityController.setUserTeamRole(userId, providerTeamOne, "manual-role");
+
+        securityController.setUserTeams(
+            userId,
+            new String[]{providerTeamOne},
+            LdapAuthProvider.LDAP_AUTH_PROVIDER_ID,
+            SMTeamGrantType.AUTH_PROVIDER
+        );
+        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.MANUAL, ADMIN_USER);
 
         securityController.setUserTeams(
             userId,
@@ -151,7 +161,85 @@ public class AdminUserTeamGrantTest extends CloudbeaverMockTest {
             SMTeamGrantType.AUTH_PROVIDER
         );
 
+        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.MANUAL, ADMIN_USER);
+        Assertions.assertEquals("manual-role", getGrants().get(providerTeamOne).getTeamRole());
+    }
+
+    @Test
+    public void testProviderTakesOwnershipOfConfirmedUnknownGrant() throws Exception {
+        securityController.setUserTeams(
+            userId,
+            new String[]{providerTeamOne},
+            userId,
+            SMTeamGrantType.UNKNOWN
+        );
+        securityController.setUserTeamRole(userId, providerTeamOne, "legacy-role");
+
+        securityController.setUserTeams(
+            userId,
+            new String[]{providerTeamOne},
+            PROVIDER_A,
+            SMTeamGrantType.AUTH_PROVIDER
+        );
+
+        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
+        Assertions.assertEquals("legacy-role", getGrants().get(providerTeamOne).getTeamRole());
+
+        securityController.setUserTeams(userId, new String[0], PROVIDER_B, SMTeamGrantType.AUTH_PROVIDER);
+        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
+        securityController.setUserTeams(userId, new String[0], PROVIDER_A, SMTeamGrantType.AUTH_PROVIDER);
         Assertions.assertFalse(getGrants().containsKey(providerTeamOne));
+    }
+
+    @Test
+    public void testAuthoritativeMappingPreservesUnconfirmedUnknownGrants() throws Exception {
+        securityController.setSubjectMetas(
+            providerTeamOne,
+            Map.of(LdapConstants.LDAP_META_GROUP_NAME, "mapped-group")
+        );
+        securityController.setUserTeams(
+            userId,
+            new String[]{providerTeamOne, providerTeamTwo},
+            userId,
+            SMTeamGrantType.UNKNOWN
+        );
+
+        securityController.setUserTeams(
+            userId,
+            new String[0],
+            LdapAuthProvider.LDAP_AUTH_PROVIDER_ID,
+            SMTeamGrantType.AUTH_PROVIDER
+        );
+
+        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.UNKNOWN, userId);
+        assertGrant(getGrants(), providerTeamTwo, SMTeamGrantType.UNKNOWN, userId);
+    }
+
+    @Test
+    public void testPartialSynchronizationOnlyClaimsConfirmedUnknownGrants() throws Exception {
+        securityController.setUserTeams(
+            userId,
+            new String[]{providerTeamOne, providerTeamTwo},
+            userId,
+            SMTeamGrantType.UNKNOWN
+        );
+        securityController.addUserTeams(userId, new String[]{manualTeam}, ADMIN_USER);
+        var sync = CBEmbeddedSecurityController.class.getDeclaredMethod(
+            "syncAuthProviderTeams", String.class, String.class, String[].class, boolean.class
+        );
+        sync.setAccessible(true);
+        String defaultTeam = CEAppStarter.getTestApp().getAppConfiguration().getDefaultUserTeam();
+        sync.invoke(securityController, userId, PROVIDER_A, new String[]{providerTeamOne, manualTeam, defaultTeam}, false);
+
+        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
+        assertGrant(getGrants(), providerTeamTwo, SMTeamGrantType.UNKNOWN, userId);
+        assertGrant(getGrants(), manualTeam, SMTeamGrantType.MANUAL, ADMIN_USER);
+        assertGrant(getGrants(), defaultTeam, SMTeamGrantType.DEFAULT, userId);
+
+        sync.invoke(securityController, userId, PROVIDER_A, new String[0], false);
+        assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
+        assertGrant(getGrants(), providerTeamTwo, SMTeamGrantType.UNKNOWN, userId);
+        assertGrant(getGrants(), manualTeam, SMTeamGrantType.MANUAL, ADMIN_USER);
     }
 
     @Test
