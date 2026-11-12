@@ -1,5 +1,5 @@
 export default [
-  ['sql_editor_execution_plan_button_tooltip', "Afficher le plan d'exécution"],
+  ['sql_editor_execution_plan_button_tooltip', 'Expliquer le plan d’exécution'],
   ['plugin_sql_execution_plan_placeholder', "Le plan d'exécution est vide"],
   ['plugin_sql_execution_plan_properties_panel_placeholder', 'Aucun élément à afficher'],
   ['plugin_sql_execution_plan_properties_panel_name', 'Nom'],

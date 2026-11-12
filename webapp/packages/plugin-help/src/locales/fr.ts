@@ -1,9 +1,9 @@
 export default [
   ['shortcuts_title', 'Raccourcis'],
-
+  ['tree_shortcuts_title', 'Toutes les arborescences'],
+  ['tree_shortcut_collapse_all', "Replier tous les nœuds de l'arborescence qui a le focus"],
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Apprenez à utiliser {arg:product}'],
-
   ['data_viewer_shortcut_open_cell_context_menu', 'Ouvrir le menu contextuel pour la cellule sélectionnée'],
   ['data_viewer_shortcut_start_inline_editing', "Ouvrir l'éditeur en ligne pour la cellule sélectionnée"],
   ['data_viewer_shortcut_add_new_row', 'Ajouter une nouvelle ligne'],
@@ -12,8 +12,8 @@ export default [
   ['data_viewer_shortcut_revert_inline_editor_changes', "Annuler les modifications de l'éditeur en ligne"],
   ['data_viewer_shortcut_past_value', 'Coller la valeur du Presse-papiers'],
   ['data_viewer_shortcut_copy_value', 'Copier la valeur dans le Presse-papiers'],
-  ['sql_editor_shortcut_execute_statement', 'Exécuter la déclaration SQL'],
-  ['sql_editor_shortcut_execute_statement_new_tab', 'Exécuter la déclaration SQL dans un nouvel onglet'],
+  ['sql_editor_shortcut_execute_statement', 'Exécuter l’instruction SQL'],
+  ['sql_editor_shortcut_execute_statement_new_tab', 'Exécuter l’instruction SQL dans un nouvel onglet'],
   ['sql_editor_shortcut_execute_script', 'Exécuter le script'],
   ['sql_editor_shortcut_show_execution_plan', "Afficher le plan d'exécution"],
   ['sql_editor_shortcut_format', 'Formater le script'],
@@ -25,13 +25,13 @@ export default [
   ['sql_editor_shortcut_comment_uncomment_selection', 'Commenter/Décommenter la sélection'],
   ['sql_editor_shortcut_start_completion', 'Afficher les suggestions de saisie semi-automatique'],
   ['sql_editor_shortcut_accept_completion', 'Accepter la saisie semi-automatique'],
-  ['sql_editor_shortcut_escape', "Échapper l'éditeur"],
+  ['sql_editor_shortcut_escape', 'Quitter l’éditeur'],
   ['plugin_search_panel_find', 'Rechercher'],
   ['navigation_tree_shortcut_enable_filter', 'Activer le filtrage'],
   ['plugin_help_multi_tab_support_title', "Le multi-onglet n'est pas supporté"],
   [
     'plugin_help_multi_tab_support_description',
-    "Les données ne sont pas connectées à d'autres onglets du navigateur. Tout onglet d'application ouvert ne sera pas sauvegardé et sera probablement perdu après la fermeture de l'onglet. Vos paramètres et données locaux seront perdus après la fermeture de l'onglet. Vous pouvez charger les onglets et les paramètres pour cet onglet.",
+    'Les données ne sont pas liées aux autres onglets du navigateur.\n  Les onglets ouverts de l’application ne seront pas enregistrés et seront probablement perdus après la fermeture de cet onglet.\n  Vos paramètres locaux de l’application seront perdus après la fermeture de l’onglet du navigateur.\n  Vous pouvez charger les onglets et les paramètres pour cet onglet',
   ],
   ['plugin_help_multi_tab_support_load_settings', 'Charger les onglets et les paramètres'],
 ];

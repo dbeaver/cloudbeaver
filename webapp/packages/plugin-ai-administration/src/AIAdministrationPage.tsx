@@ -7,18 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
+import { AdministrationPageContent, AdministrationPageHeader, AdministrationPageTitle } from '@cloudbeaver/core-administration';
 import {
   Alert,
-  ColoredContainer,
+  Button,
   Select,
-  Container,
   Form,
-  Group,
-  GroupTitle,
   StatusMessage,
   Text,
-  ToolsAction,
-  ToolsPanel,
   useAutoLoad,
   useForm,
   useResource,
@@ -26,6 +22,7 @@ import {
   Combobox,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { AIProfilesResource, compareAIProfiles } from '@cloudbeaver/plugin-ai-profiles';
@@ -72,64 +69,60 @@ export const AIAdministrationPage = observer<{
 
   return (
     <Form context={form} contents>
-      <ColoredContainer vertical wrap parent gap>
-        <Group box keepSize>
-          <ToolsPanel rounded>
-            <ToolsAction
-              disabled={!changed}
-              title={translate('ui_processing_save')}
-              icon="admin-save"
-              viewBox="0 0 24 24"
-              onClick={() => form.submit()}
-            >
-              {translate('ui_processing_save')}
-            </ToolsAction>
-            <ToolsAction disabled={!changed} title={translate('ui_processing_cancel')} icon="admin-cancel" viewBox="0 0 24 24" onClick={handleReset}>
+      <AdministrationPageHeader
+        actionsSlot={
+          <>
+            <Button type="button" variant="secondary" disabled={!changed} onClick={handleReset}>
               {translate('ui_processing_cancel')}
-            </ToolsAction>
-          </ToolsPanel>
-        </Group>
-        <Group gap keepSize medium>
-          <Container gap vertical>
-            <GroupTitle>{translate('ai_administration_settings')}</GroupTitle>
-            {!profiles.length && (
-              <Alert title={translate('plugin_ai_administration_default_profile_no_profiles_title')}>
-                <Text>{translate('plugin_ai_administration_default_profile_no_profiles_message')}</Text>
-              </Alert>
-            )}
-            <Select
-              items={profiles}
-              valueSelector={value => value.name}
-              keySelector={value => value.id}
-              state={settingsInfoPart.state}
-              name="defaultConfiguration"
-              description={translate('plugin_ai_administration_default_profile_description')}
-              disabled={!profiles.length}
-              iconSelector={value => aiEnginesResource.data.find(e => e.id === value.engineId)?.icon}
-              small
-            >
-              {translate('plugin_ai_administration_default_profile_label')}
-            </Select>
+            </Button>
+            <Button type="button" variant="primary" disabled={!changed} onClick={() => form.submit()}>
+              {translate('ui_processing_save')}
+            </Button>
+          </>
+        }
+      >
+        <AdministrationPageTitle docLink={WEBSITE_LINKS.AI_SETTINGS_DOCUMENTATION_PAGE}>
+          {translate('ai_administration_settings')}
+        </AdministrationPageTitle>
+      </AdministrationPageHeader>
+      <AdministrationPageContent>
+        <div className="tw:flex tw:max-w-sm tw:flex-col tw:gap-6">
+          {!profiles.length && (
+            <Alert title={translate('plugin_ai_administration_default_profile_no_profiles_title')}>
+              <Text>{translate('plugin_ai_administration_default_profile_no_profiles_message')}</Text>
+            </Alert>
+          )}
+          <Select
+            items={profiles}
+            valueSelector={value => value.name}
+            keySelector={value => value.id}
+            state={settingsInfoPart.state}
+            name="defaultConfiguration"
+            description={translate('plugin_ai_administration_default_profile_description')}
+            disabled={!profiles.length}
+            iconSelector={value => aiEnginesResource.data.find(e => e.id === value.engineId)?.icon}
+          >
+            {translate('plugin_ai_administration_default_profile_label')}
+          </Select>
 
-            <Combobox
-              name="language"
-              state={settingsInfoPart.state}
-              items={LANGUAGE_OPTIONS}
-              description={translate('plugin_ai_administration_language_description')}
-              allowCustomValue
-              allowClear
-              small
-            >
-              {translate('plugin_ai_administration_language_label')}
-            </Combobox>
-            {exception && (
-              <div>
-                <StatusMessage exception={exception} type={ENotificationType.Error} />
-              </div>
-            )}
-          </Container>
-        </Group>
-      </ColoredContainer>
+          <Combobox
+            name="language"
+            state={settingsInfoPart.state}
+            items={LANGUAGE_OPTIONS}
+            description={translate('plugin_ai_administration_language_description')}
+            overflowPadding={0}
+            allowCustomValue
+            allowClear
+          >
+            {translate('plugin_ai_administration_language_label')}
+          </Combobox>
+          {exception && (
+            <div>
+              <StatusMessage exception={exception} type={ENotificationType.Error} />
+            </div>
+          )}
+        </div>
+      </AdministrationPageContent>
     </Form>
   );
 });

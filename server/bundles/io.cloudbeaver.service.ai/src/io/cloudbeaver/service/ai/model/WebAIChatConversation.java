@@ -17,10 +17,12 @@
 package io.cloudbeaver.service.ai.model;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.gql.WebServiceAI;
 import io.cloudbeaver.service.ai.model.inputs.DataSourceId;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.ai.AIChatConversation;
 import org.jkiss.dbeaver.model.ai.AIContextSettingsChatConversation;
@@ -88,8 +90,9 @@ public class WebAIChatConversation {
     }
 
     @Nullable
-    public WebAIChatConversationSettings getSettings() {
-        AIContextSettingsChatConversation settings = conversation.getCustomSettings();
+    public WebAIChatConversationSettings getSettings() throws DBException {
+        AIContextSettingsChatConversation settings = WebAIUtils.getConversationSettings(
+            WebAIUtils.getAiChatSession(webSession), conversation);
         if (settings == null) {
             return null;
         }
@@ -105,7 +108,10 @@ public class WebAIChatConversation {
     }
 
     @NotNull
-    public List<WebAIMessage> getMessages() {
+    public List<WebAIMessage> getMessages() throws DBException {
+        if (!conversation.areImagesLoaded()) {
+            WebAIUtils.getAiChatSession(webSession).loadConversationImages(webSession.getProgressMonitor(), conversation);
+        }
         return conversation.getMessages().stream()
             .map(message -> new WebAIMessage(message, conversation))
             .toList();

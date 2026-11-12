@@ -7,8 +7,8 @@
  */
 
 export default [
-  ['plugin_ai_chat_profile_group', 'Active configuration'],
-  ['plugin_ai_chat_profile_change_fail', 'Failed to change AI profile'],
-  ['plugin_ai_chat_profile_edit_credentials', '编辑凭据'],
+  ['plugin_ai_chat_profile_group', '当前配置'],
+  ['plugin_ai_chat_profile_change_fail', 'AI 配置切换失败'],
+  ['plugin_ai_chat_profile_edit_credentials', '编辑 {arg:name} 的凭据'],
   ['plugin_ai_chat_profile_credentials_edit_fail', '无法编辑 AI 配置文件凭据'],
 ];

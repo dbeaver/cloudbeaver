@@ -1,5 +1,7 @@
 export default [
   ['shortcuts_title', 'Shortcuts'],
+  ['tree_shortcuts_title', 'All trees'],
+  ['tree_shortcut_collapse_all', 'Collapse all nodes in the focused tree'],
 
   ['plugin_help_welcome_docs_label', 'Documentation'],
   ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],

@@ -8,6 +8,7 @@
 import type { StyleRegistry } from '@cloudbeaver/core-blocks';
 
 import TabStyles from './Tab/Tab.module.css';
+import TabIconStyles from './Tab/TabIcon.module.css';
 import TabTitleStyles from './Tab/TabTitle.module.css';
 import TabListStyles from './TabList.module.css';
 import VerticalTabsStyles from './VerticalTabs.module.css';
@@ -15,5 +16,6 @@ import VerticalTabsStyles from './VerticalTabs.module.css';
 export const VerticalTabsStyleRegistry: StyleRegistry = [
   [TabListStyles, { mode: 'append', styles: [VerticalTabsStyles] }],
   [TabStyles, { mode: 'append', styles: [VerticalTabsStyles] }],
+  [TabIconStyles, { mode: 'append', styles: [VerticalTabsStyles] }],
   [TabTitleStyles, { mode: 'append', styles: [VerticalTabsStyles] }],
 ];

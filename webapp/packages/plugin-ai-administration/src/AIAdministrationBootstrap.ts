@@ -7,16 +7,27 @@
  */
 import React from 'react';
 
-import { AdministrationItemService, AdministrationItemType, type IAdministrationItem } from '@cloudbeaver/core-administration';
+import {
+  AdministrationItemService,
+  AdministrationItemType,
+  type IAdministrationItem,
+  ServerConfigurationFeatureGroupsService,
+} from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { ServerConfigurationConfigurationService } from '@cloudbeaver/plugin-administration';
+import { FEATURE_GROUP_AI_ID } from '@cloudbeaver/plugin-ai';
 
 import { ADMINISTRATION_AI_PAGE } from './ADMINISTRATION_AI_PAGE.js';
 import { AISettingsService } from './AISettingsService.js';
 import { EAIAdministrationSub } from './AIAdministrationNavigationService.js';
+
+const ServerConfigurationAISection = importLazyComponent(() =>
+  import('./ServerConfiguration/ServerConfigurationAISection.js').then(m => m.ServerConfigurationAISection),
+);
 
 const AIAdministrationPanel = React.lazy(async () => {
   const { AIAdministrationPanel } = await import('./AIAdministrationPanel.js');
@@ -28,7 +39,14 @@ const AIDrawerItem = React.lazy(async () => {
   return { default: AIDrawerItem };
 });
 
-@injectable(() => [AdministrationItemService, ServerConfigResource, AISettingsService, CommonDialogService])
+@injectable(() => [
+  AdministrationItemService,
+  ServerConfigResource,
+  AISettingsService,
+  CommonDialogService,
+  ServerConfigurationConfigurationService,
+  ServerConfigurationFeatureGroupsService,
+])
 export class AIAdministrationBootstrap extends Bootstrap {
   administrationItem!: IAdministrationItem;
 
@@ -37,11 +55,16 @@ export class AIAdministrationBootstrap extends Bootstrap {
     private readonly serverConfigResource: ServerConfigResource,
     private readonly aiSettingsService: AISettingsService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly serverConfigurationConfigurationService: ServerConfigurationConfigurationService,
+    private readonly serverConfigurationFeatureGroupsService: ServerConfigurationFeatureGroupsService,
   ) {
     super();
   }
 
   override register(): void {
+    this.serverConfigurationFeatureGroupsService.assignFeaturesToGroup(FEATURE_GROUP_AI_ID, [FEATURE_AI_ID]);
+    this.serverConfigurationConfigurationService.settingsContainer.add(ServerConfigurationAISection, 2);
+
     this.administrationItem = this.administrationItemService.create({
       name: ADMINISTRATION_AI_PAGE,
       type: AdministrationItemType.Administration,

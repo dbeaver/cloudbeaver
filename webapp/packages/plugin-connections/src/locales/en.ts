@@ -32,6 +32,7 @@ export default [
   ['plugin_connections_connection_form_host_invalid', "Field 'Host' can't be empty"],
   ['plugin_connections_connection_folder_delete_confirmation', 'You\'re going to delete "{arg:name}". Connections won\'t be deleted. Are you sure?'],
   ['plugin_connections_menu_connections_label', 'Connection'],
+  ['plugin_connections_menu_security_label', 'Security'],
   ['plugin_connections_action_disconnect_all_label', 'Disconnect All'],
   ['plugin_connections_settings', 'Connections'],
   ['plugin_connections_settings_hide_connections_view_name', 'Hide connection view management'],

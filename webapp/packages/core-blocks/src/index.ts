@@ -24,6 +24,7 @@ export * from './CommonDialog/RenameDialog.js';
 export * from './CommonDialog/DialogsPortal.js';
 export * from './ExportImageDialog/ExportImageDialogLazy.js';
 export * from './ExportImageDialog/ExportImageFormats.js';
+export * from './ImageLightboxDialog/ImageLightboxDialogLazy.js';
 
 export * from './ErrorDetailsDialog/ErrorDetailsDialog.js';
 
@@ -162,6 +163,8 @@ export * from './Containers/ColoredContainer.js';
 export * from './Containers/IContainerProps.js';
 export * from './Containers/ILayoutSizeProps.js';
 
+export * from './Card/CardLazy.js';
+
 export * from './FolderExplorer/FolderExplorer.js';
 export * from './FolderExplorer/FolderExplorerContext.js';
 export * from './FolderExplorer/FolderExplorerPath.js';
@@ -202,6 +205,11 @@ export * from './IconButton.js';
 export * from './ActionIconButton.js';
 export { default as IconButtonStyles } from './IconButton.module.css';
 export { default as ActionIconButtonStyles } from './ActionIconButton.module.css';
+export * from './Toolbar/ToolbarActionLazy.js';
+export * from './Toolbar/ToolbarActionsLazy.js';
+export type { IToolbarActionProps } from './Toolbar/ToolbarAction.js';
+export { default as ToolbarActionStyles } from './Toolbar/ToolbarAction.module.css';
+export { default as ToolbarActionsStyles } from './Toolbar/ToolbarActions.module.css';
 export * from './IconOrImage.js';
 export * from './RadioIndicator.js';
 export * from './s.js';
@@ -263,3 +271,4 @@ export * from './useVisible.js';
 export * from './SAVED_VALUE_INDICATOR.js';
 export * from './FormControls/Field.js';
 export * from './FormControls/FieldLabel.js';
+export * from './FormControls/FieldDescription.js';

@@ -30,7 +30,7 @@
     "default-param-last": "off",
     "function-call-spacing": "off",
     "keyword-spacing": "off",
-    "no-duplicate-imports": "error",
+    "no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
     "object-curly-spacing": "off",
     "quotes": "off",
     "space-before-function-paren": "off",
@@ -39,6 +39,8 @@
     "no-inner-declarations": "off",
     "no-constant-condition": "off",
     "space-before-blocks": "error",
+    "func-names": ["warn", "always"],
+    "require-await": "warn",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-invalid-void-type": "off",
     "@typescript-eslint/dot-notation": "off",
@@ -65,7 +67,7 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/naming-convention": [
-      "error",
+      "warn",
       {
         "selector": "interface",
         "modifiers": ["exported"],
@@ -76,7 +78,7 @@
         }
       }
     ],
-    "@typescript-eslint/semi": ["error", "always"],
+    "@typescript-eslint/semi": ["warn", "always"],
     "@typescript-eslint/consistent-type-assertions": [
       "error",
       {
@@ -155,7 +157,7 @@
       }
     ],
     "max-len": [
-      "error",
+      "warn",
       {
         "code": 150,
         "ignoreTrailingComments": true,
@@ -212,7 +214,7 @@
       }
     ],
     "react/jsx-sort-props": [
-      "error",
+      "warn",
       {
         "callbacksLast": true,
         "shorthandLast": true,

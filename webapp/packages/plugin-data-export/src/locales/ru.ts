@@ -13,8 +13,9 @@ export default [
   ['data_transfer_notification_delete', 'Удалить'],
   ['data_transfer_exporting_table', 'Таблица:'],
   ['data_transfer_exporting_sql', 'SQL:'],
+  ['data_transfer_format_settings', 'Формат'],
   ['data_transfer_dialog_select_processor_fail', 'Не удалось выбрать обработчик данных'],
-
+  ['data_transfer_output_settings', 'Вывод логов'],
   ['data_transfer_output_settings_compress', 'Сжатие'],
   ['plugin_data_export_download_process_info', 'Начало загрузки может занять некоторое время'],
 ];

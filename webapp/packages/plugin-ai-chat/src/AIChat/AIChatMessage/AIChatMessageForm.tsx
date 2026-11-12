@@ -7,17 +7,19 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { useContext, useRef, useState, type PropsWithChildren } from 'react';
+import { Suspense, useContext, useRef, type PropsWithChildren } from 'react';
 
-import { ActionIconButton, AutoResizeTextarea, Form, s, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, AutoResizeTextarea, Form, Placeholder, s, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Command } from '@dbeaver/ui-kit';
 
-import { AIChatMessageService } from './AIChatMessageService.js';
 import { AIChatConversationsService } from '../AIChatConversation/AIChatConversationsService.js';
 import { AIChatContext } from '../AIChatContext.js';
+import { AIChatInputService } from '../AIChatInput/AIChatInputService.js';
+import { useAIChatInput } from '../AIChatInput/useAIChatInput.js';
+import { AIChatAttachmentsButton } from '../../AIChatAttachments/AIChatAttachmentsButton.js';
 import classes from './AIChatMessageForm.module.css';
 
 interface Props {
@@ -29,11 +31,17 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const translate = useTranslate();
   const context = useContext(AIChatContext);
   const notificationService = useService(NotificationService);
-  const aiChatMessageService = useService(AIChatMessageService);
   const aiChatConversationsService = useService(AIChatConversationsService);
+  const aiChatInputService = useService(AIChatInputService);
 
-  const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { input, dragHandlers, onPaste } = useAIChatInput({
+    conversationId: currentConversationId,
+    connectionKey: context.connectionKey,
+    textareaRef,
+  });
+
+  const state = aiChatInputService.getState(input);
 
   useExecutor({
     executor: aiChatConversationsService.onNewConversation,
@@ -47,20 +55,12 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   });
 
   async function sendMessage() {
-    let conversationId = currentConversationId;
-
     try {
-      if (!conversationId) {
-        const conversation = await aiChatConversationsService.createConversation(context.connectionKey ?? null);
-        conversationId = conversation.id;
-      }
-
-      const v = value.trim();
-
-      const message = await aiChatMessageService.sendMessage(conversationId, v);
+      const prompt = state.prompt.trim();
+      const message = await aiChatInputService.submit(input, prompt);
 
       if (message) {
-        setValue('');
+        state.setPrompt('');
       }
     } catch (exception: any) {
       notificationService.logException(exception, 'plugin_ai_chat_send_message_error');
@@ -84,7 +84,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
     return translate('plugin_ai_chat_submit_message_placeholder', undefined, { symbol });
   }
 
-  const disabled = !value.trim() || context.disabled;
+  const disabled = context.disabled || !aiChatInputService.canSubmit(input, state.prompt);
 
   return (
     <div className={s(styles, { container: true })}>
@@ -94,27 +94,43 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
         contents
         onSubmit={aiChatConversationsService.processing ? cancel : sendMessage}
       >
-        <div className={s(styles, { textareaContainer: true })}>
+        <div {...dragHandlers} className={s(styles, { textareaContainer: true }, 'tw:relative')}>
+          <Suspense fallback={null}>
+            <Placeholder container={aiChatInputService.beforeInput} input={input} />
+          </Suspense>
           <AutoResizeTextarea
             ref={textareaRef}
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
-            value={value}
+            value={state.prompt}
             readOnly={aiChatConversationsService.processing}
             autoFocus
-            onChange={v => setValue(v)}
+            onChange={value => state.setPrompt(value)}
+            onPaste={context.disabled ? undefined : onPaste}
           />
-          {!aiChatConversationsService.processing ? (
-            <ActionIconButton name="/icons/send.svg" disabled={disabled} img onClick={sendMessage} />
-          ) : (
-            <Command
-              className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
-              aria-label={translate('ui_processing_cancel')}
-              onClick={cancel}
-            >
-              <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />
-            </Command>
-          )}
+          <Suspense fallback={null}>
+            <Placeholder container={aiChatInputService.dragPreview} input={input} />
+          </Suspense>
+          <div className={s(styles, { actions: true })}>
+            <AIChatAttachmentsButton input={input} />
+            {!aiChatConversationsService.processing ? (
+              <ActionIconButton
+                name="/icons/send.svg"
+                aria-label={translate('plugin_ai_chat_send_message')}
+                disabled={disabled}
+                img
+                onClick={sendMessage}
+              />
+            ) : (
+              <Command
+                className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
+                aria-label={translate('ui_processing_stop')}
+                onClick={cancel}
+              >
+                <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />
+              </Command>
+            )}
+          </div>
         </div>
       </Form>
       {children}

@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { Fragment } from 'react';
 
-import { type AdminUserOrigin, UsersOriginDetailsResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { type AdminUserOrigin, AuthProvidersResource, UsersOriginDetailsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
   Select,
@@ -25,6 +25,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { FormMode, type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { UserFormProps } from '../AdministrationUserFormService.js';
@@ -55,15 +56,18 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
     active: editing,
   });
 
+  const authProvidersLoader = useResource(UserFormOriginInfoPanel, AuthProvidersResource, CachedMapAllKey, { active: editing });
+
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
-  const origins = userInfoLoader.data?.origins ?? [];
+  const allOrigins = userInfoLoader.data?.origins ?? [];
+  const origins = allOrigins.filter(origin => !authProvidersLoader.resource.get(origin.type)?.authHidden);
   const origin: AdminUserOrigin | undefined = origins[localState.selectedOrigin as any];
   const usersOriginDetailsResource = useResource(UserFormOriginInfoPanel, UsersOriginDetailsResource, state.userId, {
     active: editing,
   });
 
-  const originDetails = usersOriginDetailsResource.data?.origins?.[localState.selectedOrigin as any]?.details ?? [];
+  const originDetails = origin ? (usersOriginDetailsResource.data?.origins?.[allOrigins.indexOf(origin)]?.details ?? []) : [];
 
   const { selected } = useTab(tabId);
 

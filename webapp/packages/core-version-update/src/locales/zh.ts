@@ -7,7 +7,7 @@ export default [
   ['version_update_versions_refresh_fail', '版本列表刷新失败'],
   ['version_update_how_to_update', '如何升级'],
   ['version_update_info', '信息'],
-  ['version_update_instruction', 'To update version, please follow'],
-  ['version_update_instruction_link', 'the instructions'],
-  ['version_update_instruction_link_not_provided', 'Instructions link is not provided. Please contact support.'],
+  ['version_update_instruction', '如需更新版本，请按照'],
+  ['version_update_instruction_link', '操作说明'],
+  ['version_update_instruction_link_not_provided', '未提供操作说明链接。请联系支持团队。'],
 ];

@@ -1,7 +1,18 @@
 export default [
+  ['authentication_administration_server_configuration_authentication', 'Аутентификация'],
+  ['authentication_administration_providers_search', 'Поиск провайдеров...'],
+  ['authentication_administration_providers_filter', 'Статус провайдера'],
+  ['authentication_administration_providers_all', 'Все'],
+  ['authentication_administration_providers_active', 'Активные'],
+  ['authentication_administration_providers_available', 'Доступные'],
+  ['authentication_administration_providers_empty', 'Нет провайдеров, соответствующих фильтрам'],
+  ['authentication_administration_providers_built_in', 'Встроенный'],
+  ['authentication_administration_providers_required_features', 'Для использования провайдера включите сервисы: {arg:features}'],
   ['plugin_authentication_administration_team_grant_manual', 'Администратор'],
   ['plugin_authentication_administration_team_grant_provider', 'Провайдер аутентификации'],
   ['plugin_authentication_administration_team_grant_default', 'Команда по умолчанию'],
+  ['plugin_authentication_administration_team_grant_unknown', 'Неизвестный источник'],
+  ['plugin_authentication_administration_team_grant_unknown_tooltip', 'Источник добавления пользователя в эту команду неизвестен.'],
   ['plugin_authentication_administration_team_grant_manual_tooltip', 'Добавлен вручную администратором.'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',
@@ -27,6 +38,7 @@ export default [
   ['authentication_administration_user_auth_methods_empty', 'Нет доступных способов входа'],
   ['authentication_administration_user_auth_method_no_details', 'Дополнительная информация не доступна'],
   ['authentication_administration_item', 'Пользователи и команды'],
+  ['authentication_administration_create_user', 'Создать пользователя'],
   ['authentication_administration_item_users', 'Пользователи'],
   ['authentication_administration_item_metaParameters', 'Свойства Пользователей'],
   ['authentication_administration_tools_add_tooltip', 'Создать нового пользователя'],
@@ -64,14 +76,12 @@ export default [
     'authentication_administration_users_delete_user_info',
     'Удаление этой учетной записи навсегда уберет все связанные с ней пользовательские данные из системы. Пожалуйста, подтвердите, что вы хотите произвести удаление пользователя "{arg:username}"',
   ],
-
   ['authentication_administration_user_delete_credentials_error', 'Не удалось удалить учетные данные пользователя'],
   ['authentication_administration_user_delete_credentials_success', 'Учетные данные пользователя удалены'],
   [
     'authentication_administration_user_delete_credentials_confirmation_message',
     'Вы уверены что хотите удалить "{arg:originName}" способ авторизации у "{arg:userId}"?',
   ],
-
   ['administration_configuration_wizard_configuration_admin', 'Учетные данные администратора'],
   ['administration_configuration_wizard_configuration_admin_name', 'Логин'],
   ['administration_configuration_wizard_configuration_admin_password', 'Пароль'],
@@ -82,12 +92,12 @@ export default [
   ],
   ['administration_configuration_wizard_configuration_authentication_group', 'Настройки аутентификации'],
   ['administration_configuration_wizard_configuration_services_group', 'Сервисы'],
+  ['administration_configuration_wizard_configuration_services', 'Сервисы'],
   ['administration_configuration_wizard_configuration_authentication', 'Включить пользовательскую аутентификацию'],
   [
     'administration_configuration_wizard_configuration_authentication_description',
     'Позволяет пользователям аутентифицироваться. Иначе будет включен анонимный доступ',
   ],
-
   ['administration_identity_providers_tab_title', 'Провайдеры идентификации'],
   ['administration_identity_providers_provider', 'Тип провайдера'],
   ['administration_identity_providers_provider_id', 'Идентификатор'],
@@ -111,9 +121,10 @@ export default [
   ['administration_identity_providers_configuration_list_update_success', 'Список конфигураций успешно обновлен'],
   ['administration_identity_providers_configuration_list_update_fail', 'Не удалось обновить список конфигураций'],
   ['administration_identity_providers_service_link', 'Настроить'],
-
   ['administration_teams_tab_title', 'Команды'],
   ['administration_teams_tab_description', 'Управление командами'],
+  ['administration_teams_search_placeholder', 'Поиск команд...'],
+  ['administration_teams_create', 'Создать команду'],
   ['administration_teams_team_creation', 'Создание Команды'],
   ['administration_teams_team_id', 'ID Команды'],
   ['administration_teams_team_name', 'Название команды'],
@@ -135,7 +146,6 @@ export default [
     'administration_teams_delete_confirmation_users_note',
     'Обратите внимание, что пользователи потеряют принадлежность к команде и права полученные от этой команды',
   ],
-
   ['administration_teams_team_granted_users_tab_title', 'Пользователи'],
   ['administration_teams_team_granted_users_search_placeholder', 'Поиск по ID пользователя...'],
   ['administration_teams_team_granted_users_user_id', 'ID пользователя'],
@@ -146,11 +156,9 @@ export default [
     'administration_teams_team_granted_users_only_admin_team',
     'Вы не можете управлять своими правами доступа, поскольку это единственная команда администраторов, в которой вы состоите',
   ],
-
   ['administration_teams_team_granted_connections_tab_title', 'Подключения'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Поиск по названию подключения...'],
   ['administration_teams_team_granted_connections_empty', 'Нет доступных подключений'],
-
   ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Команда по умолчанию. Не может быть отозвана'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Команда по умолчанию. Содержит всех пользователей'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Супервайзер'],
@@ -158,11 +166,9 @@ export default [
     'plugin_authentication_administration_team_user_team_role_supervisor_description',
     'Супервайзеры могут просматривать выполненные запросы своей команды',
   ],
-
   ['plugin_authentication_administration_team_form_edit_label', 'Форма редактирования команды'],
   ['plugin_authentication_administration_user_form_edit_label', 'Форма редактирования пользователя'],
   ['plugin_authentication_administration_user_last_login', 'Последний вход'],
-
   [
     'plugin_authentication_administration_user_username_validation_error',
     'Имя пользователя не может содержать следующие символы / : " \\ \' <> | ? * и не может начинаться с точки',

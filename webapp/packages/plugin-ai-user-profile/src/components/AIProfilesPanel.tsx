@@ -21,7 +21,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   const notificationService = useService(NotificationService);
   const profilesLoader = useResource(AIProfilesPanel, AIProfilesResource, CachedMapAllKey);
   const enginesLoader = useResource(AIProfilesPanel, AiEnginesResource, undefined);
-  const profiles = profilesLoader.data.filter((profile): profile is AIProfile => profile !== undefined);
+  const profiles = profilesLoader.data.filter((profile): profile is AIProfile => profile !== undefined && !profile.global);
 
   async function refresh(): Promise<void> {
     try {

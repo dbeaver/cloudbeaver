@@ -35,6 +35,7 @@ type AdminUserTeamGrantInfo @since(version: "24.0.5"){
 }
 
 enum AdminTeamGrantType @since(version: "26.3.0") {
+    UNKNOWN
     MANUAL
     AUTH_PROVIDER
     DEFAULT
@@ -246,6 +247,8 @@ input ServerConfigInput {
     supportedHosts: [String!] @since(version: "25.1.3")
     "Bind session to client IP address"
     bindSessionToIp: String @since(version: "25.1.4")
+    "Global settings changes to save with the server configuration"
+    productConfiguration: Object @since(version: "26.2.5")
 }
 
 "Filter input for searching users in the admin interface"

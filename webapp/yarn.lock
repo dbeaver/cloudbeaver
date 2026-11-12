@@ -1430,6 +1430,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-administration@workspace:packages/core-administration"
   dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-data-context": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
@@ -1442,14 +1443,22 @@ __metadata:
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
+    "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
     mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -1949,7 +1958,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-resource-manager@workspace:packages/core-resource-manager"
   dependencies:
-    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
@@ -1961,7 +1969,6 @@ __metadata:
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    mobx: "npm:^6"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2493,11 +2500,13 @@ __metadata:
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-ai": "workspace:*"
     "@cloudbeaver/plugin-ai-profiles": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
@@ -2550,6 +2559,7 @@ __metadata:
   dependencies:
     "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-connections": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
@@ -2596,6 +2606,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-ai-profiles-administration@workspace:packages/plugin-ai-profiles-administration"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-data-context": "workspace:*"
@@ -2603,6 +2614,7 @@ __metadata:
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
@@ -2623,7 +2635,6 @@ __metadata:
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -2790,6 +2801,7 @@ __metadata:
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-projects": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
@@ -2797,7 +2809,6 @@ __metadata:
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
-    "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-authentication": "workspace:*"
     "@cloudbeaver/plugin-data-grid": "workspace:*"
@@ -2805,6 +2816,7 @@ __metadata:
     "@dbeaver/js-helpers": "workspace:*"
     "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
+    "@types/react-dom": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
@@ -3007,6 +3019,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connection-network-handlers@workspace:packages/plugin-connection-network-handlers"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-connections": "workspace:*"
@@ -3179,6 +3192,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connections@workspace:packages/plugin-connections"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
@@ -3297,6 +3311,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-grid@workspace:packages/plugin-data-grid"
   dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
@@ -3845,6 +3860,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-localization-administration@workspace:*, @cloudbeaver/plugin-localization-administration@workspace:packages/plugin-localization-administration":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-localization-administration@workspace:packages/plugin-localization-administration"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-localization@workspace:*, @cloudbeaver/plugin-localization@workspace:packages/plugin-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-localization@workspace:packages/plugin-localization"
@@ -4300,7 +4336,6 @@ __metadata:
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-projects": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
-    "@cloudbeaver/core-resource-manager": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
@@ -4475,6 +4510,7 @@ __metadata:
     "@cloudbeaver/plugin-holidays": "workspace:*"
     "@cloudbeaver/plugin-holidays-administration": "workspace:*"
     "@cloudbeaver/plugin-localization": "workspace:*"
+    "@cloudbeaver/plugin-localization-administration": "workspace:*"
     "@cloudbeaver/plugin-log-viewer": "workspace:*"
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
@@ -4534,6 +4570,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
@@ -4902,9 +4939,11 @@ __metadata:
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-navigation-tree": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
@@ -4914,7 +4953,7 @@ __metadata:
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-codemirror6": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
-    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-codemirror": "workspace:*"
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
@@ -12053,10 +12092,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"decode-uri-component@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "decode-uri-component@npm:0.5.0"
-  checksum: 10c0/b913bb2ec3a83b4c96d961dcd7808c538f2f69f9a8581ab1bfbbb3d48c90e36779cc4580334198315d4c17f9c32d88ae4467c96582419a70b5f35df2c5a05cb1
+"decode-uri-component@npm:>=0.5.1":
+  version: 0.5.1
+  resolution: "decode-uri-component@npm:0.5.1"
+  checksum: 10c0/70e30722bb8671c9795a1301bd20b12e6011a401a8703becf480846c3ad13e8c6ee3c9cbd2b3a82532197eb4d422f54b1151b9a617d8ec3b74874fac1e87e14c
   languageName: node
   linkType: hard
 
@@ -13365,13 +13404,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:>=1.16.1":
-  version: 1.16.1
-  resolution: "follow-redirects@npm:1.16.1"
+"follow-redirects@npm:>=1.16.2":
+  version: 1.16.2
+  resolution: "follow-redirects@npm:1.16.2"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 10c0/544e24ccb93b7afb5dd5a2199bd556e167b84de2af7c13b2ced08494239677359d7883bae56ae43a9ca98ac5451e75cf4834a5fadd6fa79053b9248fac5447a4
+  checksum: 10c0/ff38c8ceb904e505021057f58d395ea5f2e7c34257032960a76b21df1726395ce753f5678b6ee3b15210a557277c00b2607c67b682ee4dec1f33cb5147e08e90
   languageName: node
   linkType: hard
 
@@ -13792,9 +13831,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:^21":
-  version: 21.0.3
-  resolution: "happy-dom@npm:21.0.3"
+"happy-dom@npm:>=21.0.4":
+  version: 21.0.4
+  resolution: "happy-dom@npm:21.0.4"
   dependencies:
     "@types/node": "npm:>=20.0.0"
     "@types/whatwg-mimetype": "npm:^3.0.2"
@@ -13803,7 +13842,7 @@ __metadata:
     entities: "npm:^7.0.1"
     whatwg-mimetype: "npm:^3.0.0"
     ws: "npm:^8.21.0"
-  checksum: 10c0/1147cd9d22594d202058e042f7a0351f8ec83a6152df14d10e7935eda32fafd298077635770188a346f49ea98dc5f7a69fa1304db668dcb8d4368f1fd5fc3189
+  checksum: 10c0/9368af9739a5ba07776a116368d13d6b2690de81a6525096a1fec36e4cd1270b569151d021e2a56fb314fba73674572de562f1364090b01df6c68e9843b002e8
   languageName: node
   linkType: hard
 

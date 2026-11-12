@@ -15,12 +15,20 @@ import { useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT, AdministrationTableStyles } from '@cloudbeaver/core-administration';
+import {
+  ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT,
+  ADMINISTRATION_TABLE_DEFAULT_NAME_COLUMN_WIDTH,
+  ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT,
+  AdministrationTable,
+  AdministrationTableStyles,
+  type IAdministrationTableColumn,
+} from '@cloudbeaver/core-administration';
 import { DataGrid, useCellCopy, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
 import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.js';
 import { UsersAdministrationService } from '../UsersAdministrationService.js';
 import { Command } from '@dbeaver/ui-kit';
+import { UserTeamsCell } from './UserTeamsCell.js';
 
 interface Props {
   users: AdminUserInfoFragment[];
@@ -29,14 +37,14 @@ interface Props {
   onLoadMore?: () => void;
 }
 
-const ID_COLUMN = { key: 'id', label: 'authentication_user_name' };
+const ID_COLUMN = { key: 'id', label: 'authentication_user_name', width: ADMINISTRATION_TABLE_DEFAULT_NAME_COLUMN_WIDTH };
 const ROLE_COLUMN = { key: 'role', label: 'authentication_user_role' };
 const TEAM_COLUMN = { key: 'team', label: 'authentication_user_team' };
 const ENABLED_COLUMN = { key: 'enabled', label: 'authentication_user_enabled' };
 const AUTH_COLUMN = { key: 'auth', label: 'authentication_administration_user_auth_methods' };
 const LAST_LOGIN_COLUMN = { key: 'lastLogin', label: 'plugin_authentication_administration_user_last_login' };
 
-const COLUMNS = [ID_COLUMN, TEAM_COLUMN, ENABLED_COLUMN, AUTH_COLUMN, LAST_LOGIN_COLUMN];
+const COLUMNS: IAdministrationTableColumn[] = [ID_COLUMN, TEAM_COLUMN, AUTH_COLUMN, LAST_LOGIN_COLUMN, ENABLED_COLUMN];
 
 export const UsersTable = observer<Props>(function UsersTable({ users, isManageable, displayAuthRole, onLoadMore }) {
   const translate = useTranslate();
@@ -106,8 +114,7 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
     }
 
     if (column.key === TEAM_COLUMN.key) {
-      const teams = row.grantedTeams.join(', ');
-      return <span title={teams}>{teams}</span>;
+      return <UserTeamsCell teams={row.grantedTeams} />;
     }
 
     if (column.key === ENABLED_COLUMN.key) {
@@ -159,25 +166,42 @@ export const UsersTable = observer<Props>(function UsersTable({ users, isManagea
     return translate(columns[colIdx]?.label) ?? '';
   }
 
+  function getHeaderElement(colIdx: number) {
+    if (columns[colIdx]?.key === ENABLED_COLUMN.key) {
+      return <div className="tw:text-center">{getHeaderText(colIdx)}</div>;
+    }
+
+    return getHeaderText(colIdx);
+  }
+
+  const headerElement = useCreateGridReactiveValue(
+    getHeaderElement,
+    (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
+    [columns, translate],
+  );
+
   const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), [
     columns,
     translate,
   ]);
 
   return (
-    <div className="tw:h-full tw:max-w-full theme-text-on-surface">
+    <AdministrationTable>
       <DataGrid
         columnCount={columnsCount}
         rowCount={rowsCount}
-        getHeaderResizable={colIdx => colIdx > 0}
+        getHeaderResizable={() => true}
+        getHeaderHeight={() => ADMINISTRATION_TABLE_DEFAULT_HEADER_HEIGHT}
         getRowHeight={() => ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT}
+        getHeaderWidth={colIdx => columns[colIdx]?.width ?? 'auto'}
         getHeaderPinned={colIdx => colIdx <= 0}
         headerText={headerText}
+        headerElement={headerElement}
         cell={cell}
         className={s(styles, { table: true })}
         onScrollToBottom={onLoadMore}
         onCellKeyDown={cellCopy.handleKeyDown}
       />
-    </div>
+    </AdministrationTable>
   );
 });

@@ -1,21 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { UserDataService } from '@cloudbeaver/core-authentication';
+import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  ACTION_COLLAPSE_ALL,
-  ACTION_FILTER,
-  ActionService,
-  type IAction,
-  KeyBindingService,
-  MenuService,
-} from '@cloudbeaver/core-view';
+import { ACTION_COLLAPSE_ALL, ACTION_FILTER, ActionService, type IAction, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 
 import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId.js';
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE.js';
@@ -25,14 +18,15 @@ import { createElementsTreeSettings, validateElementsTreeSettings } from './Navi
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
 import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER.js';
 
-@injectable(() => [ActionService, KeyBindingService, UserDataService, MenuService])
+@injectable(() => [ActionService, KeyBindingService, UserDataService, MenuService, UserConfigurationStorage])
 export class ElementsTreeToolsMenuService {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
     private readonly userDataService: UserDataService,
     private readonly menuService: MenuService,
-  ) { }
+    private readonly userConfigurationStorage: UserConfigurationStorage,
+  ) {}
 
   register() {
     this.actionService.addHandler({
@@ -98,6 +92,7 @@ export class ElementsTreeToolsMenuService {
       id: 'elements-tree-collapse',
       binding: KEY_BINDING_COLLAPSE_ALL,
       actions: [ACTION_COLLAPSE_ALL],
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
       handler: this.elementsTreeActionHandler.bind(this),
     });
   }
@@ -109,11 +104,9 @@ export class ElementsTreeToolsMenuService {
       return;
     }
 
-    const state = this.userDataService.getUserData(
-      getNavigationTreeUserSettingsId(context),
-      createElementsTreeSettings,
-      validateElementsTreeSettings,
-    );
+    const state = this.userDataService
+      .withStorage(this.userConfigurationStorage)
+      .getUserData(getNavigationTreeUserSettingsId(context), createElementsTreeSettings, validateElementsTreeSettings);
 
     state.filter = !state.filter;
   }

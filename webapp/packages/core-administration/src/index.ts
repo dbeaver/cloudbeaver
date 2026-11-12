@@ -1,12 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 import './module.js';
+export * from './ServerConfigurationFeatureGroupsService.js';
 export * from './AdministrationItem/AdministrationItemService.js';
 export * from './AdministrationItem/filterConfigurationWizard.js';
 export * from './AdministrationItem/IAdministrationItem.js';
@@ -19,6 +20,18 @@ export * from './DataContext/DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE.js';
 export * from './AdministrationLocaleService.js';
 export * from './PermissionsResource.js';
 export * from './ADMINISTRATION_SETTINGS_GROUP.js';
+export { AdministrationPageTitle } from './AdministrationPage/AdministrationPageTitleLazy.js';
+export { AdministrationPageDescription } from './AdministrationPage/AdministrationPageDescriptionLazy.js';
+export { AdministrationPageLayout } from './AdministrationPage/AdministrationPageLayoutLazy.js';
+export { AdministrationPageHeader } from './AdministrationPage/AdministrationPageHeaderLazy.js';
+export { AdministrationPageNavigation } from './AdministrationPage/AdministrationPageNavigationLazy.js';
+export { AdministrationTabList } from './AdministrationPage/AdministrationTabListLazy.js';
+export type { AdministrationTabListProps } from './AdministrationPage/AdministrationTabList.js';
+export { AdministrationPageContent } from './AdministrationPage/AdministrationPageContentLazy.js';
+export type { AdministrationPageLayoutProps } from './AdministrationPage/AdministrationPageLayout.js';
+export type { IAdministrationPageHeaderProps } from './AdministrationPage/AdministrationPageHeader.js';
 
 export { default as AdministrationTableStyles } from './AdministrationTable/AdministrationTable.module.css';
-export { ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT } from './AdministrationTable/ADMINISTRATION_TABLE_DEFAULT_ROW_HEIGHT.js';
+export * from './AdministrationTable/ADMINISTRATION_TABLE_CONFIG.js';
+export { AdministrationTable } from './AdministrationTable/AdministrationTableLazy.js';
+export type { IAdministrationTableColumn } from './AdministrationTable/IAdministrationTableColumn.js';

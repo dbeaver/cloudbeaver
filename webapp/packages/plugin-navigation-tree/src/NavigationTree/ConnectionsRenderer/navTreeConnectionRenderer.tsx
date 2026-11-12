@@ -19,18 +19,13 @@ import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTre
 import { ConnectionNavNodeControl } from './ConnectionNavNodeControl.js';
 
 export function navTreeConnectionRenderer(navNodeInfoResource: NavNodeInfoResource): IElementsTreeCustomRenderer {
-  return nodeId => {
-    const node = navNodeInfoResource.get(nodeId);
-
-    if (node?.nodeType === NAV_NODE_TYPE_CONNECTION) {
-      return ConnectionRenderer;
-    }
-
-    return undefined;
+  return {
+    matches: nodeId => navNodeInfoResource.get(nodeId)?.nodeType === NAV_NODE_TYPE_CONNECTION,
+    Component: ConnectionRenderer,
   };
 }
 
-const ConnectionRenderer: NavigationNodeRendererComponent = observer(function ManageableGroup({
+const ConnectionRenderer: NavigationNodeRendererComponent = observer(function ConnectionRenderer({
   nodeId,
   path,
   dragging,

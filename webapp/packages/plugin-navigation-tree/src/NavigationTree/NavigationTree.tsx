@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useMemo, useRef } from 'react';
 
+import { UserConfigurationStorage } from '@cloudbeaver/core-authentication';
 import { s, SContext, type StyleRegistry, Translate, useExecutor, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
@@ -18,7 +19,7 @@ import { useConnectionTypeLoader } from '@cloudbeaver/core-connections';
 import { ElementsTreeToolsStyles } from '../index.js';
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService.js';
 import { navigationTreeConnectionGroupFilter } from './ConnectionGroup/navigationTreeConnectionGroupFilter.js';
-import { navigationTreeConnectionGroupRenderer } from './ConnectionGroup/navigationTreeConnectionGroupRenderer.js';
+import { navigationTreeConnectionGroupRenderers } from './ConnectionGroup/navigationTreeConnectionGroupRenderer.js';
 import { navTreeConnectionRenderer } from './ConnectionsRenderer/navTreeConnectionRenderer.js';
 import { ElementsTree } from './ElementsTree/ElementsTree.js';
 import {
@@ -61,6 +62,7 @@ export const NavigationTree = observer(function NavigationTree() {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const navNodeViewService = useService(NavNodeViewService);
+  const userConfigurationStorage = useService(UserConfigurationStorage);
 
   useConnectionTypeLoader();
 
@@ -74,6 +76,7 @@ export const NavigationTree = observer(function NavigationTree() {
     createElementsTreeSettings,
     () => {},
     validateElementsTreeSettings,
+    userConfigurationStorage,
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
@@ -115,7 +118,7 @@ export const NavigationTree = observer(function NavigationTree() {
           root={root}
           localState={navigationTreeService.treeState}
           filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
-          renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer]}
+          renderers={[projectsRendererRenderer, ...navigationTreeConnectionGroupRenderers, connectionRenderer]}
           navNodeFilterCompare={navigationTreeProjectSearchCompare}
           nodeInfoTransformers={[transformFilteredNode, transformDescriptionNode]}
           expandStateGetters={[projectsExpandStateGetter]}

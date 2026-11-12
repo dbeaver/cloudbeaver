@@ -1,9 +1,9 @@
 export default [
   ['shortcuts_title', 'Горячие клавиши'],
-
+  ['tree_shortcuts_title', 'Все деревья'],
+  ['tree_shortcut_collapse_all', 'Свернуть все узлы дерева, в котором находится фокус'],
   ['plugin_help_welcome_docs_label', 'Документация'],
   ['plugin_help_welcome_docs_description', 'Узнайте как использовать {arg:product}'],
-
   ['data_viewer_shortcut_open_cell_context_menu', 'Открыть контекстное меню для выбранной ячейки'],
   ['data_viewer_shortcut_start_inline_editing', 'Начать редактирование ячейки во встроенном редакторе'],
   ['data_viewer_shortcut_add_new_row', 'Добавить новую строку'],
@@ -12,7 +12,6 @@ export default [
   ['data_viewer_shortcut_revert_inline_editor_changes', 'Отменить изменения во встроенном редакторе'],
   ['data_viewer_shortcut_past_value', 'Вставить значение из буфера обмена в ячейку'],
   ['data_viewer_shortcut_copy_value', 'Скопировать значение ячейки в буфер обмена'],
-
   ['sql_editor_shortcut_execute_statement', 'Выполнить SQL выражение'],
   ['sql_editor_shortcut_execute_statement_new_tab', 'Выполнить SQL выражение в новой вкладке'],
   ['sql_editor_shortcut_execute_script', 'Выполнить скрипт'],
@@ -28,6 +27,11 @@ export default [
   ['sql_editor_shortcut_accept_completion', 'Принять автодополнение'],
   ['sql_editor_shortcut_escape', 'Выйти из редактора'],
   ['plugin_search_panel_find', 'Найти'],
-
   ['navigation_tree_shortcut_enable_filter', 'Включить фильтрацию'],
+  ['plugin_help_multi_tab_support_title', 'Работа в нескольких вкладках не поддерживается'],
+  [
+    'plugin_help_multi_tab_support_description',
+    'Данные не связаны с другими вкладками браузера.\n  Открытые вкладки приложения не будут сохранены и, скорее всего, будут потеряны после закрытия вкладки браузера.\n  Локальные настройки приложения будут потеряны после закрытия вкладки браузера.\n  Вы можете загрузить вкладки и настройки для этой вкладки',
+  ],
+  ['plugin_help_multi_tab_support_load_settings', 'Загрузить вкладки и настройки'],
 ];

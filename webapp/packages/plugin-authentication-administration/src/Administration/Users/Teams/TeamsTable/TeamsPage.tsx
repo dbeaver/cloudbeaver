@@ -8,70 +8,65 @@
 
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Container, Group, ToolsAction, ToolsPanel, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { TableSelectionContext, useTableSelection } from '@cloudbeaver/plugin-data-grid';
 import { compareTeams, TeamsResource } from '@cloudbeaver/core-authentication';
-import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { isDefined } from '@dbeaver/js-helpers';
+import { AdministrationPageHeader, AdministrationPageContent, AdministrationPageTitle } from '@cloudbeaver/core-administration';
+import { Filter, IconOrImage, Placeholder, s, ToolbarAction, ToolbarActions, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { TableSelectionContext, useTableSelection } from '@cloudbeaver/plugin-data-grid';
+import { isDefined } from '@dbeaver/js-helpers';
 
-import { CreateTeamService } from './CreateTeamService.js';
-import { useTeamsTable } from './useTeamsTable.js';
 import { TeamsTable } from './TeamsTable.js';
+import style from '../../shared/UsersAdministration.module.css';
+import { TeamsAdministrationService } from '../TeamsAdministrationService.js';
+import { useTeamsTableFilters } from './Filters/useTeamsTableFilters.js';
+import { TeamsTableContext } from './TeamsTableContext.js';
+import { useTeamsTable } from './useTeamsTable.js';
 
-interface Props {
-  param?: string | null;
-}
-
-export const TeamsPage = observer<Props>(function TeamsPage() {
+export const TeamsPage = observer(function TeamsPage() {
   const translate = useTranslate();
-  const createTeamService = useService(CreateTeamService);
-
+  const styles = useS(style);
+  const teamsAdministrationService = useService(TeamsAdministrationService);
   const teamsLoader = useResource(TeamsPage, TeamsResource, CachedMapAllKey);
   const teams = teamsLoader.data.filter(isDefined).sort(compareTeams);
-
-  const selection = useTableSelection(teams.map(t => t.teamId));
+  const filters = useTeamsTableFilters(teams);
+  const selection = useTableSelection(filters.filteredTeams.map(team => team.teamId));
   const table = useTeamsTable(selection);
 
   return (
-    <ColoredContainer vertical wrap gap parent maximum>
-      <Group box keepSize>
-        <ToolsPanel rounded>
-          <ToolsAction
-            title={translate('administration_teams_add_tooltip')}
-            icon="add"
-            viewBox="0 0 24 24"
-            disabled={!!createTeamService.formState || table.processing}
-            onClick={createTeamService.create}
-          >
-            {translate('ui_create')}
-          </ToolsAction>
-          <ToolsAction
-            title={translate('administration_teams_refresh_tooltip')}
-            icon="refresh"
-            viewBox="0 0 24 24"
-            disabled={table.processing}
-            onClick={table.update}
-          >
-            {translate('ui_refresh')}
-          </ToolsAction>
-          <ToolsAction
-            title={translate('administration_teams_delete_tooltip')}
-            icon="trash"
-            viewBox="0 0 24 24"
-            disabled={!selection.list.length || table.processing}
-            onClick={table.delete}
-          >
-            {translate('ui_delete')}
-          </ToolsAction>
-        </ToolsPanel>
-      </Group>
+    <TeamsTableContext value={{ selection, table }}>
+      <AdministrationPageHeader actionsSlot={<Placeholder container={teamsAdministrationService.actions} />}>
+        <AdministrationPageTitle docLink={WEBSITE_LINKS.TEAMS_DOCUMENTATION_PAGE}>
+          {translate('administration_teams_tab_title')}
+        </AdministrationPageTitle>
+      </AdministrationPageHeader>
+      <AdministrationPageContent>
+        <div className={s(styles, { toolbar: true })}>
+          <Filter
+            className="tw:w-full tw:max-w-sm"
+            placeholder={translate('administration_teams_search_placeholder')}
+            value={filters.search}
+            onChange={filters.setSearch}
+          />
+          <ToolbarActions className="tw:ml-auto">
+            <ToolbarAction
+              aria-label={translate('administration_teams_refresh_tooltip')}
+              title={translate('administration_teams_refresh_tooltip')}
+              disabled={table.processing}
+              onClick={table.update}
+            >
+              <IconOrImage className="tw:w-full tw:h-full" icon="refresh" viewBox="0 0 24 24" />
+            </ToolbarAction>
+          </ToolbarActions>
+        </div>
 
-      <Container overflow gap maximum>
-        <TableSelectionContext value={selection}>
-          <TeamsTable teams={teams} />
-        </TableSelectionContext>
-      </Container>
-    </ColoredContainer>
+        <div className={s(styles, { tableContainer: true })}>
+          <TableSelectionContext value={selection}>
+            <TeamsTable teams={filters.filteredTeams} />
+          </TableSelectionContext>
+        </div>
+      </AdministrationPageContent>
+    </TeamsTableContext>
   );
 });

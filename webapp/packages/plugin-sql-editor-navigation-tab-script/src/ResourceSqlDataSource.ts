@@ -463,19 +463,26 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
       }
 
       runInAction(() => {
+        const isExecutionContextSaved = this.isExecutionContextSaved;
+
         if (!this.loaded) {
           if (this.baseScript !== script) {
             this.setScript(script);
           }
 
-          if (!isObjectsEqual(toJS(this.baseExecutionContext), executionContext)) {
+          if (isExecutionContextSaved && !isObjectsEqual(toJS(this.baseExecutionContext), executionContext)) {
             this.setExecutionContext(executionContext);
           }
 
           this.setBaseScript(script);
           this.setBaseExecutionContext(executionContext);
         } else {
-          this.setIncomingExecutionContext(executionContext);
+          if (isExecutionContextSaved) {
+            this.setIncomingExecutionContext(executionContext);
+          } else {
+            this.setBaseExecutionContext(executionContext);
+          }
+
           this.setIncomingScript(script);
         }
 
