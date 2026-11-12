@@ -31,6 +31,8 @@ export const TeamGrantSource = observer<Props>(function TeamGrantSource({ grant 
         return translate('plugin_authentication_administration_team_grant_provider_tooltip');
       case 'DEFAULT':
         return translate('plugin_authentication_administration_team_grant_default_tooltip');
+      case 'UNKNOWN':
+        return translate('plugin_authentication_administration_team_grant_unknown_tooltip');
       default:
         return undefined;
     }

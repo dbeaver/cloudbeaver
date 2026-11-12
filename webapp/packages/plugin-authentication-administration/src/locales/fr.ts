@@ -11,6 +11,8 @@ export default [
   ['plugin_authentication_administration_team_grant_manual', 'Administrateur'],
   ['plugin_authentication_administration_team_grant_provider', 'Fournisseur d’authentification'],
   ['plugin_authentication_administration_team_grant_default', 'Équipe par défaut'],
+  ['plugin_authentication_administration_team_grant_unknown', 'Source inconnue'],
+  ['plugin_authentication_administration_team_grant_unknown_tooltip', 'La source de cette appartenance à l’équipe est inconnue.'],
   ['plugin_authentication_administration_team_grant_manual_tooltip', 'Ajouté manuellement par un administrateur.'],
   [
     'plugin_authentication_administration_team_grant_default_tooltip',
