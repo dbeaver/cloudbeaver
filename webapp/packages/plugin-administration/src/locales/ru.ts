@@ -1,10 +1,29 @@
 export default [
+  ['administration_server_configuration_settings_connections', 'Подключения'],
+  ['administration_server_configuration_settings_ai', 'ИИ'],
+  ['administration_server_configuration_settings_cloud', 'Облачные сервисы'],
+  ['administration_server_configuration_settings_workspace', 'Рабочее пространство'],
+  ['administration_server_configuration_tab_drivers', 'Драйверы'],
   ['administration_server_configuration_save_confirmation_title', 'Изменение настроек сервера'],
   ['administration_server_configuration_save_confirmation_message', 'Будут изменены критичные настройки. Вы уверены?'],
-
+  ['administration_configuration_wizard_welcome', 'Добро пожаловать'],
+  ['administration_configuration_wizard_welcome_step_description', 'Добро пожаловать в {alias:product_full_name}'],
+  ['administration_configuration_wizard_welcome_title', 'Добро пожаловать в {alias:product_full_name}, облачную систему управления базами данных'],
+  [
+    'administration_configuration_wizard_welcome_message',
+    'Мастер поможет настроить сервер за несколько простых шагов. Вам потребуется указать сведения о сервере и учётные данные администратора. Дополнительные параметры сервера можно настроить после завершения работы мастера.',
+  ],
+  ['administration_configuration_wizard_welcome_note', 'Примечание: эти параметры можно будет изменить позже в панели администрирования.'],
   ['administration_configuration_wizard_configuration', 'Настройки сервера'],
+  ['administration_configuration_wizard_configuration_step_description', 'Основные настройки сервера'],
+  [
+    'administration_configuration_wizard_configuration_description',
+    'Настройте основные параметры сервера. Дополнительные сервисы можно добавить после завершения настройки.',
+  ],
+  ['administration_configuration_wizard_configuration_password_warning', 'Запомните пароль администратора. Его нельзя восстановить автоматически.'],
   ['administration_configuration_wizard_configuration_save_error', 'Не удалось сохранить конфигурацию сервера'],
-
+  ['administration_configuration_tools_save_tooltip', 'Сохранить конфигурацию'],
+  ['administration_configuration_tools_cancel_tooltip', 'Отменить изменения'],
   ['administration_configuration_wizard_configuration_secure_cookies', 'Принудительный HTTPS режим'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
@@ -22,23 +41,21 @@ export default [
   ],
   [
     'administration_configuration_wizard_configuration_supported_hosts_warning',
-    'You cannot remove your current domain ({arg:host}). Open the server configuration from another allowed domain or IP-address to remove this domain.',
+    'Нельзя удалить текущий домен ({arg:host}). Чтобы удалить его, откройте настройки сервера через другой разрешённый домен или IP-адрес.',
   ],
-
   ['administration_configuration_wizard_configuration_server_info', 'Информация о сервере'],
   ['administration_configuration_wizard_configuration_server_name', 'Название сервера'],
   ['administration_configuration_wizard_configuration_server_url', 'URL Сервера'],
-  ['administration_configuration_wizard_configuration_server_info_unsaved', 'Есть несохранённые изменения'],
+  ['administration_configuration_wizard_configuration_server_url_description', 'URL сервера для внешнего доступа'],
+  ['administration_configuration_wizard_configuration_server_info_unsaved_title', 'Несохранённые настройки'],
+  ['administration_configuration_wizard_configuration_server_info_unsaved_message', 'Настройки можно сохранить на странице конфигурации сервера'],
+  ['administration_configuration_wizard_configuration_server_info_unsaved_navigate', 'Открыть'],
   ['administration_configuration_wizard_configuration_server_session_lifetime', 'Время сессии, мин'],
   [
     'administration_configuration_wizard_configuration_server_session_lifetime_description',
     'В случае бездействия пользователя на протяжении указанного количества минут, его сессия будет закрыта.',
   ],
-
-  ['administration_configuration_tools_save_tooltip', 'Сохранить конфигурацию'],
-  ['administration_configuration_tools_cancel_tooltip', 'Отменить изменения'],
-
-  ['administration_configuration_wizard_configuration_plugins', 'Настройки'],
+  ['administration_configuration_wizard_configuration_plugins', 'Возможности'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Разрешить пользовательские подключения'],
   ['administration_configuration_wizard_configuration_custom_connections_description', 'Позволяет пользователям создавать собственные подключения'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Упрощенная версия дерева навигации'],
@@ -46,21 +63,38 @@ export default [
     'administration_configuration_wizard_configuration_navigation_tree_view_description',
     'Все новые подключения, созданные пользователем, будут иметь только базовую информацию в дереве навигации',
   ],
-
-  ['administration_configuration_wizard_step_validation_message', 'Не удалось перейти к следующему шагу'],
-
   ['administration_configuration_wizard_configuration_security', 'Безопасность'],
   ['administration_configuration_wizard_configuration_security_admin_credentials', 'Позволить сохранять приватные данные'],
-  ['administration_configuration_wizard_configuration_security_public_credentials', 'Позволить сохранять приватные данные для пользователей'],
   [
     'administration_configuration_wizard_configuration_security_admin_credentials_description',
     'Позволяет сохранять приватные данные для настроенных подключений',
   ],
+  ['administration_configuration_wizard_configuration_security_public_credentials', 'Позволить сохранять приватные данные для пользователей'],
   [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
     'Позволяет сохранять приватные данные (такие как пароли и SSH ключи) для пользователей, не являющихся администраторами',
   ],
-
+  ['administration_configuration_wizard_configuration_security_db_user_password_change', 'Разрешить смену пароля пользователя БД'],
+  [
+    'administration_configuration_wizard_configuration_security_db_user_password_change_description',
+    'Позволяет менять пароль пользователя, связанного с подключением к базе данных',
+  ],
+  ['administration_configuration_wizard_configuration_navigator', 'Навигатор'],
+  ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Скрывать папки'],
+  ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Скрывать схемы'],
+  ['administration_configuration_wizard_configuration_navigator_hide_virtual_model', 'Скрывать виртуальную модель'],
+  ['administration_configuration_wizard_configuration_navigator_merge_entities', 'Объединять сущности'],
+  ['administration_configuration_wizard_configuration_navigator_show_only_entities', 'Только сущности'],
+  ['administration_configuration_wizard_configuration_navigator_show_system_objects', 'Системные объекты'],
+  ['administration_configuration_wizard_configuration_navigator_show_utility_objects', 'Служебные объекты'],
+  ['administration_configuration_wizard_step_validation_message', 'Не удалось перейти к следующему шагу'],
+  ['administration_configuration_wizard_finish', 'Подтверждение'],
+  ['administration_configuration_wizard_finish_step_description', 'Подтверждение'],
+  ['administration_configuration_wizard_finish_title', 'Почти готово.'],
+  [
+    'administration_configuration_wizard_finish_message',
+    'Нажмите «Готово», чтобы завершить настройку сервера. Вы можете вернуться на предыдущие страницы, чтобы что-либо изменить или добавить.\nПосле завершения настройки все введённые параметры будут применены к серверу. Вы будете перенаправлены на главную страницу и сможете начать работу.\nВы всегда можете войти в систему как администратор, чтобы изменить настройки сервера.',
+  ],
   ['administration_disabled_drivers_title', 'Отключенные драйверы'],
   ['administration_disabled_drivers_search_placeholder', 'Поиск по драйверу...'],
   [

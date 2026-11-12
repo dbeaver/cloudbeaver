@@ -8,6 +8,7 @@
 
 import './module.js';
 
+export * from './FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID.js';
 export * from './ConnectionAuthentication/IConnectionAuthenticationConfig.js';
 export * from './ConnectionAuthentication/PROPERTY_FEATURE_SECURED.js';
 export * from './ConnectionAuthentication/ConnectionAuthenticationFormLoader.js';

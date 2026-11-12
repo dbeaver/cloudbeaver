@@ -1,4 +1,4 @@
 export default [
-  ['core_theming_settings_theme_name', 'Theme'],
-  ['core_theming_settings_theme_description', 'Application color theme'],
+  ['core_theming_settings_theme_name', 'Tema'],
+  ['core_theming_settings_theme_description', 'Tema cromatico dell’applicazione'],
 ];

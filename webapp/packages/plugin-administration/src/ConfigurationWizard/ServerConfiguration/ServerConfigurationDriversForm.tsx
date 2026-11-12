@@ -1,14 +1,28 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { useCallback, useId } from 'react';
 
-import { Combobox, ConfirmationDialog, Group, GroupTitle, type ITag, s, Tag, Tags, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  Combobox,
+  ConfirmationDialog,
+  Container,
+  type ITag,
+  s,
+  Tag,
+  Tags,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { isDefined } from '@dbeaver/js-helpers';
@@ -26,6 +40,7 @@ interface Props {
 export const ServerConfigurationDriversForm = observer<Props>(function ServerConfigurationDriversForm({ serverConfig, initialServerConfig }) {
   const styles = useS(style);
   const translate = useTranslate();
+  const titleId = useId();
   const driversResource = useResource(ServerConfigurationDriversForm, DBDriverResource, CachedMapAllKey);
 
   const drivers = driversResource.data.filter(isDefined).sort(driversResource.resource.compare);
@@ -80,22 +95,26 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
   }
 
   return (
-    <Group maximum gap>
-      <GroupTitle>{translate('administration_disabled_drivers_title')}</GroupTitle>
-      <Combobox
-        keySelector={item => item.id}
-        valueSelector={value => value.name || value.id}
-        iconSelector={value => value.icon}
-        isDisabled={item => serverConfig.disabledDrivers?.includes(item.id) ?? false}
-        items={drivers}
-        placeholder={translate('administration_disabled_drivers_search_placeholder')}
-        onSelect={handleSelect}
-      />
-      <Tags className={s(styles, { wrapper: true })}>
-        {tags.map(tag => (
-          <Tag key={tag.id} id={tag.id} label={tag.label} icon={tag.icon} onRemove={handleRemove} />
-        ))}
-      </Tags>
-    </Group>
+    <Card aria-labelledby={titleId}>
+      <CardHeader>
+        <CardTitle id={titleId}>{translate('administration_disabled_drivers_title')}</CardTitle>
+      </CardHeader>
+      <Container maximum gap parent>
+        <Combobox
+          keySelector={item => item.id}
+          valueSelector={value => value.name || value.id}
+          iconSelector={value => value.icon}
+          isDisabled={item => serverConfig.disabledDrivers?.includes(item.id) ?? false}
+          items={drivers}
+          placeholder={translate('administration_disabled_drivers_search_placeholder')}
+          onSelect={handleSelect}
+        />
+        <Tags className={s(styles, { wrapper: true })}>
+          {tags.map(tag => (
+            <Tag key={tag.id} id={tag.id} label={tag.label} icon={tag.icon} onRemove={handleRemove} />
+          ))}
+        </Tags>
+      </Container>
+    </Card>
   );
 });

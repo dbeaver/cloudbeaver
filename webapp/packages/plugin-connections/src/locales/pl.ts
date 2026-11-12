@@ -1,0 +1,78 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+export default [
+  ['plugin_connections_delete_connection', 'Połączenie'],
+  ['plugin_connections_delete_database_object', 'Obiekt bazy danych'],
+  ['plugin_connections_delete_read_only', 'Połączenie tylko do odczytu.'],
+  ['plugin_connections_delete_folder_warning', 'Połączenia wewnątrz folderów nie zostaną usunięte, chyba że są zaznaczone.'],
+  ['plugin_connections_new_connection_dialog_title', 'Nowe połączenie'],
+  ['plugin_connections_connection_form_part_main', 'Główne'],
+  ['plugin_connections_connection_form_part_main_auth_model', 'Model uwierzytelniania'],
+  ['plugin_connections_connection_form_part_properties', 'Właściwości sterownika'],
+  ['plugin_connections_connection_form_part_advanced', 'Ustawienia zaawansowane'],
+  ['plugin_connections_connection_form_part_initialization_settings', 'Ustawienia inicjalizacji'],
+  ['plugin_connections_connection_form_connection_details', 'Szczegóły połączenia'],
+  ['plugin_connections_connection_form_part_main_custom_host', 'Host'],
+  ['plugin_connections_connection_form_part_main_custom_port', 'Port'],
+  ['plugin_connections_connection_form_part_main_custom_server_name', 'Nazwa serwera'],
+  ['plugin_connections_connection_form_part_main_custom_database', 'Baza danych'],
+  ['plugin_connections_connection_form_part_main_url_jdbc', 'Adres URL JDBC'],
+  ['plugin_connections_connection_form_part_main_folder', 'Folder'],
+  ['plugin_connections_connection_edit_menu_item_title', 'Edytuj połączenie'],
+  ['plugin_connections_connection_clone', 'Klonuj'],
+  ['plugin_connections_connection_clone_error', 'Nie udało się sklonować połączenia'],
+  ['plugin_connections_connection_edit_reconnect_title', 'Połączenie zostało zaktualizowane'],
+  ['plugin_connections_connection_edit_reconnect_message', 'Połączenie zostało zaktualizowane. Czy chcesz połączyć się ponownie?'],
+  ['plugin_connections_connection_edit_reconnect_failed', 'Nie udało się połączyć ponownie'],
+  ['plugin_connections_connection_folder_move_failed', 'Nie udało się przenieść do folderu'],
+  ['plugin_connections_connection_folder_move_duplication', 'Folder docelowy lub wybrane foldery zawierają folder o tej samej nazwie ({arg:name})'],
+  [
+    'plugin_connections_connection_cloud_auth_required',
+    'Aby korzystać z tego połączenia, zaloguj się danymi uwierzytelniającymi „{arg:providerLabel}”.',
+  ],
+  ['plugin_connections_connection_form_project_invalid', 'Nie masz uprawnień do tworzenia połączeń w wybranym projekcie'],
+  ['plugin_connections_connection_form_host_configuration_invalid', 'Konfiguracja hosta nie jest obsługiwana'],
+  ['plugin_connections_connection_form_name_invalid', 'Pole „Nazwa połączenia” nie może być puste'],
+  ['plugin_connections_connection_form_host_invalid', 'Pole „Host” nie może być puste'],
+  ['plugin_connections_connection_folder_delete_confirmation', 'Zamierzasz usunąć „{arg:name}”. Połączenia nie zostaną usunięte. Czy na pewno?'],
+  ['plugin_connections_menu_connections_label', 'Połączenie'],
+  ['plugin_connections_menu_security_label', 'Bezpieczeństwo'],
+  ['plugin_connections_action_disconnect_all_label', 'Rozłącz wszystkie'],
+  ['plugin_connections_settings', 'Połączenia'],
+  ['plugin_connections_settings_hide_connections_view_name', 'Ukryj zarządzanie widokiem połączeń'],
+  [
+    'plugin_connections_settings_hide_connections_view_description',
+    'Podmenu widoku połączeń będzie ukryte dla wszystkich użytkowników poza administratorami',
+  ],
+  ['plugin_connections_connection_form_shared_credentials_manage_info', 'Danymi uwierzytelniającymi możesz zarządzać na '],
+  ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'karcie danych uwierzytelniających'],
+  [
+    'plugin_connections_connection_auth_secret_description',
+    'Dostępnych jest wiele zestawów danych uwierzytelniających.\nWybierz dane, których chcesz użyć.',
+  ],
+  ['plugin_connections_connection_create_menu_title', 'Nowe połączenie'],
+  [
+    'plugin_connections_connection_driver_not_installed_message',
+    'Sterownik nie jest zainstalowany. Możesz go zainstalować w części „Administracja”.',
+  ],
+  ['plugin_connections_connection_established', 'Połączenie zostało nawiązane'],
+  ['plugin_connections_connection_client_version', 'Wersja klienta: {arg:version} \n'],
+  ['plugin_connections_connection_server_version', 'Wersja serwera: {arg:version} \n'],
+  ['plugin_connections_connection_connection_time', 'Czas połączenia: {arg:time} \n'],
+  ['plugin_connections_connection_type_label', 'Typ połączenia'],
+  ['plugin_connections_change_db_password_menu_title', 'Zmień bieżące hasło bazy danych'],
+  ['plugin_connections_change_db_password_dialog_title', 'Zmień bieżące hasło bazy danych'],
+  ['plugin_connections_change_db_password_current', 'Bieżące hasło'],
+  ['plugin_connections_change_db_password_new', 'Nowe hasło'],
+  ['plugin_connections_change_db_password_repeat', 'Potwierdź hasło'],
+  ['plugin_connections_change_db_password_submit', 'Zmień'],
+  ['plugin_connections_change_db_password_success', 'Hasło bazy danych zostało zmienione'],
+  ['plugin_connections_change_db_password_mismatch', 'Nowe hasła nie są zgodne'],
+  ['plugin_connections_change_db_password_failed', 'Zmiana hasła nie powiodła się'],
+];

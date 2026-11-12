@@ -6,31 +6,37 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ServerConfigurationAdministrationNavService, ServerConfigurationService } from '@cloudbeaver/plugin-administration';
-import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ServerConfigurationAdministrationNavService, ServerConfigurationFormService } from '@cloudbeaver/plugin-administration';
+import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { TeamsAdministrationService } from './Administration/Users/Teams/TeamsAdministrationService.js';
 
-const AuthenticationProviders = importLazyComponent(() =>
-  import('./Administration/ServerConfiguration/AuthenticationProviders.js').then(m => m.AuthenticationProviders),
+const ServerConfigurationAuthenticationPanel = importLazyComponent(() =>
+  import('./Administration/ServerConfiguration/ServerConfigurationAuthenticationPanel.js').then(m => m.ServerConfigurationAuthenticationPanel),
 );
 
-@injectable(() => [ServerConfigurationService, ServerConfigurationAdministrationNavService, AuthenticationService, TeamsAdministrationService])
+@injectable(() => [ServerConfigurationAdministrationNavService, AuthenticationService, TeamsAdministrationService, ServerConfigurationFormService])
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly serverConfigurationService: ServerConfigurationService,
     private readonly serverConfigurationAdministrationNavService: ServerConfigurationAdministrationNavService,
     private readonly authenticationService: AuthenticationService,
     private readonly teamsAdministrationService: TeamsAdministrationService,
+    private readonly serverConfigurationFormService: ServerConfigurationFormService,
   ) {
     super();
   }
 
   override register(): void {
+    this.serverConfigurationFormService.parts.add({
+      key: 'authentication',
+      name: 'authentication_administration_server_configuration_authentication',
+      order: 2,
+      panel: () => ServerConfigurationAuthenticationPanel,
+    });
+
     this.teamsAdministrationService.register();
-    this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
     this.authenticationService.setConfigureAuthProvider(() => this.serverConfigurationAdministrationNavService.navToSettings());
   }
 }

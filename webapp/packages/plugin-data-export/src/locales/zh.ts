@@ -13,7 +13,9 @@ export default [
   ['data_transfer_notification_delete', '删除'],
   ['data_transfer_exporting_table', '表：'],
   ['data_transfer_exporting_sql', 'SQL：'],
+  ['data_transfer_format_settings', '格式'],
   ['data_transfer_dialog_select_processor_fail', '选择处理器失败'],
-
+  ['data_transfer_output_settings', '输出'],
   ['data_transfer_output_settings_compress', '压缩'],
+  ['plugin_data_export_download_process_info', '下载过程可能需要一些时间才能开始'],
 ];

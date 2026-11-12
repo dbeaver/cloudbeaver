@@ -7,6 +7,7 @@
  */
 
 import './module.js';
+export * from './ServerConfigurationFeatureGroupsService.js';
 export * from './AdministrationItem/AdministrationItemService.js';
 export * from './AdministrationItem/filterConfigurationWizard.js';
 export * from './AdministrationItem/IAdministrationItem.js';
@@ -20,9 +21,12 @@ export * from './AdministrationLocaleService.js';
 export * from './PermissionsResource.js';
 export * from './ADMINISTRATION_SETTINGS_GROUP.js';
 export { AdministrationPageTitle } from './AdministrationPage/AdministrationPageTitleLazy.js';
+export { AdministrationPageDescription } from './AdministrationPage/AdministrationPageDescriptionLazy.js';
 export { AdministrationPageLayout } from './AdministrationPage/AdministrationPageLayoutLazy.js';
 export { AdministrationPageHeader } from './AdministrationPage/AdministrationPageHeaderLazy.js';
 export { AdministrationPageNavigation } from './AdministrationPage/AdministrationPageNavigationLazy.js';
+export { AdministrationTabList } from './AdministrationPage/AdministrationTabListLazy.js';
+export type { AdministrationTabListProps } from './AdministrationPage/AdministrationTabList.js';
 export { AdministrationPageContent } from './AdministrationPage/AdministrationPageContentLazy.js';
 export type { AdministrationPageLayoutProps } from './AdministrationPage/AdministrationPageLayout.js';
 export type { IAdministrationPageHeaderProps } from './AdministrationPage/AdministrationPageHeader.js';
