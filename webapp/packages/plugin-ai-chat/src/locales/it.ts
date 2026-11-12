@@ -33,7 +33,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'Sostituisci query'],
   ['plugin_ai_chat_query_replace_confirmation_message', 'La query attiva verrà sostituita con la nuova. Vuoi continuare?'],
   ['plugin_ai_chat_conversation_new', 'Nuova conversazione'],
-  ['plugin_ai_chat_conversation_initialization_failed', 'Impossibile inizializzare la conversazione'],
   ['plugin_ai_chat_message_user_description', 'Il tuo messaggio'],
   ['plugin_ai_chat_message_assistant_description', "Messaggio dell'assistente"],
   ['plugin_ai_chat_message_sr_user_description', 'Il tuo messaggio: '],

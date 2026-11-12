@@ -41,7 +41,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'クエリを置換'],
   ['plugin_ai_chat_query_replace_confirmation_message', '現在のクエリは新しいクエリに置き換えられます。続行しますか？'],
   ['plugin_ai_chat_conversation_new', '新しい会話'],
-  ['plugin_ai_chat_conversation_initialization_failed', '会話の初期化に失敗しました'],
   ['plugin_ai_chat_message_user_description', 'あなたのメッセージ'],
   ['plugin_ai_chat_message_assistant_description', 'アシスタントのメッセージ'],
   ['plugin_ai_chat_message_sr_user_description', 'あなたのメッセージ: '],

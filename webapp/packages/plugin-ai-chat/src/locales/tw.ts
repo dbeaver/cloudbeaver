@@ -41,7 +41,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', '取代查詢'],
   ['plugin_ai_chat_query_replace_confirmation_message', '目前的查詢將被新查詢取代。是否繼續？'],
   ['plugin_ai_chat_conversation_new', '新增對話'],
-  ['plugin_ai_chat_conversation_initialization_failed', '無法初始化對話'],
   ['plugin_ai_chat_message_user_description', '您的訊息'],
   ['plugin_ai_chat_message_assistant_description', '助理訊息'],
   ['plugin_ai_chat_message_sr_user_description', '您的訊息： '],

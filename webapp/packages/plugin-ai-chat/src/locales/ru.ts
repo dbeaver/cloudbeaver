@@ -33,7 +33,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'Заменить запрос'],
   ['plugin_ai_chat_query_replace_confirmation_message', 'Активный запрос будет заменен новым. Вы хотите продолжить?'],
   ['plugin_ai_chat_conversation_new', 'Новая беседа'],
-  ['plugin_ai_chat_conversation_initialization_failed', 'Не удалось подготовить беседу'],
   ['plugin_ai_chat_message_user_description', 'Ваше сообщение'],
   ['plugin_ai_chat_message_assistant_description', 'Сообщение Ассистента'],
   ['plugin_ai_chat_message_sr_user_description', 'Ваше сообщение: '],

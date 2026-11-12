@@ -33,7 +33,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', '替换查询'],
   ['plugin_ai_chat_query_replace_confirmation_message', '当前查询将被新查询替换。是否继续？'],
   ['plugin_ai_chat_conversation_new', '新对话'],
-  ['plugin_ai_chat_conversation_initialization_failed', '无法初始化对话'],
   ['plugin_ai_chat_message_user_description', '您的消息'],
   ['plugin_ai_chat_message_assistant_description', '助手消息'],
   ['plugin_ai_chat_message_sr_user_description', '您的消息： '],

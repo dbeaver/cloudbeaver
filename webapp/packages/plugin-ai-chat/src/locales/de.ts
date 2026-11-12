@@ -44,7 +44,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'Abfrage ersetzen'],
   ['plugin_ai_chat_query_replace_confirmation_message', 'Die aktive Abfrage wird durch die neue ersetzt. Möchten Sie fortfahren?'],
   ['plugin_ai_chat_conversation_new', 'Neues Gespräch'],
-  ['plugin_ai_chat_conversation_initialization_failed', 'Gespräch konnte nicht initialisiert werden'],
   ['plugin_ai_chat_message_user_description', 'Ihre Nachricht'],
   ['plugin_ai_chat_message_assistant_description', 'Nachricht des Assistenten'],
   ['plugin_ai_chat_message_sr_user_description', 'Ihre Nachricht: '],

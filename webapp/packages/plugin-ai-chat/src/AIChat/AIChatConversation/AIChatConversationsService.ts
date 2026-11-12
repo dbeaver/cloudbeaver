@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { comparer, computed, makeObservable, observable, reaction, toJS, type IReactionDisposer } from 'mobx';
+import { computed, makeObservable, observable, toJS } from 'mobx';
 
-import { Disposable, injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { injectable } from '@cloudbeaver/core-di';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { isDefined } from '@dbeaver/js-helpers';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
@@ -26,7 +25,6 @@ import { AIChatContextService } from '../AIChatContext/AIChatContextService.js';
 import { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
 import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.js';
 import { conversationConfigContext } from './conversationConfigContext.js';
-import { AIChatService } from '../AIChatService.js';
 
 type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
@@ -40,8 +38,8 @@ export interface IAIChatConversationMenuProps {
   conversation: AIChatConversationInfo;
 }
 
-@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource, AIChatService, NotificationService])
-export class AIChatConversationsService extends Disposable {
+@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource])
+export class AIChatConversationsService {
   readonly menuSections = new PlaceholderContainer<IAIChatConversationMenuProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
   readonly onCancelConversation: Executor<CancelConversationExecutorData>;
@@ -71,17 +69,12 @@ export class AIChatConversationsService extends Disposable {
   }
 
   private conversationId: string | null;
-  private reactionDisposer: IReactionDisposer | null = null;
 
   constructor(
     private readonly aiChatContextService: AIChatContextService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
     private readonly aiChatMessagesResource: AIChatMessagesResource,
-    private readonly aiChatService: AIChatService,
-    private readonly notificationService: NotificationService,
   ) {
-    super();
-
     this.onNewConversation = new Executor();
     this.onCancelConversation = new Executor();
     this.onCreateConversation = new Executor();
@@ -101,22 +94,6 @@ export class AIChatConversationsService extends Disposable {
       defaultConversation: computed,
       processing: computed,
     });
-
-    this.reactionDisposer = reaction(
-      () => [this.aiChatService.isActive, this.aiChatContextService.currentContext] as const,
-      ([active]) => {
-        if (active) {
-          this.ensureConversation().catch((exception: Error) => {
-            this.notificationService.logException(exception, 'plugin_ai_chat_conversation_initialization_failed');
-          });
-        }
-      },
-      { fireImmediately: true, equals: comparer.shallow },
-    );
-  }
-
-  override dispose(): void {
-    this.reactionDisposer?.();
   }
 
   selectConversation(conversationId: string | null): void {
@@ -182,15 +159,6 @@ export class AIChatConversationsService extends Disposable {
     await this.onNewConversation.execute({ stage: 'after', data: conversation });
 
     return conversation;
-  }
-
-  private async ensureConversation(): Promise<void> {
-    const context = this.aiChatContextService.currentContext;
-    await this.aiChatConversationsResource.load(ChatConversationConnectionKey(context?.connectionKey));
-
-    if (!this.currentConversationId) {
-      await this.createConversation(context?.connectionKey ?? null);
-    }
   }
 
   private resetConversation(): void {

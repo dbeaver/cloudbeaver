@@ -41,7 +41,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'Înlocuiește interogarea'],
   ['plugin_ai_chat_query_replace_confirmation_message', 'Interogarea activă va fi înlocuită cu cea nouă. Vrei să continui?'],
   ['plugin_ai_chat_conversation_new', 'Conversație nouă'],
-  ['plugin_ai_chat_conversation_initialization_failed', 'Nu s-a putut inițializa conversația'],
   ['plugin_ai_chat_message_user_description', 'Mesajul tău'],
   ['plugin_ai_chat_message_assistant_description', 'Mesajul asistentului'],
   ['plugin_ai_chat_message_sr_user_description', 'Mesajul tău: '],

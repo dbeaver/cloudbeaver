@@ -41,7 +41,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'Reemplazar consulta'],
   ['plugin_ai_chat_query_replace_confirmation_message', 'La consulta activa se reemplazará por la nueva. ¿Desea continuar?'],
   ['plugin_ai_chat_conversation_new', 'Nueva conversación'],
-  ['plugin_ai_chat_conversation_initialization_failed', 'No se pudo iniciar la conversación'],
   ['plugin_ai_chat_message_user_description', 'Su mensaje'],
   ['plugin_ai_chat_message_assistant_description', 'Mensaje del asistente'],
   ['plugin_ai_chat_message_sr_user_description', 'Su mensaje: '],

@@ -41,7 +41,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'Thay thế truy vấn'],
   ['plugin_ai_chat_query_replace_confirmation_message', 'Truy vấn đang dùng sẽ bị thay thế bằng truy vấn mới. Bạn có muốn tiếp tục không?'],
   ['plugin_ai_chat_conversation_new', 'Hội thoại mới'],
-  ['plugin_ai_chat_conversation_initialization_failed', 'Không thể khởi tạo hội thoại'],
   ['plugin_ai_chat_message_user_description', 'Tin nhắn của bạn'],
   ['plugin_ai_chat_message_assistant_description', 'Tin nhắn của trợ lý'],
   ['plugin_ai_chat_message_sr_user_description', 'Tin nhắn của bạn: '],

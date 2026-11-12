@@ -41,7 +41,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'استبدال الاستعلام'],
   ['plugin_ai_chat_query_replace_confirmation_message', 'سيُستبدل الاستعلام النشط بالاستعلام الجديد. هل تريد المتابعة؟'],
   ['plugin_ai_chat_conversation_new', 'محادثة جديدة'],
-  ['plugin_ai_chat_conversation_initialization_failed', 'تعذر تهيئة المحادثة'],
   ['plugin_ai_chat_message_user_description', 'رسالتك'],
   ['plugin_ai_chat_message_assistant_description', 'رسالة المساعد'],
   ['plugin_ai_chat_message_sr_user_description', 'رسالتك: '],

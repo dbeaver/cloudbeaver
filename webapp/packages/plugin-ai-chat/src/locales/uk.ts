@@ -41,7 +41,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', 'Замінити запит'],
   ['plugin_ai_chat_query_replace_confirmation_message', 'Активний запит буде замінено новим. Продовжити?'],
   ['plugin_ai_chat_conversation_new', 'Нова розмова'],
-  ['plugin_ai_chat_conversation_initialization_failed', 'Не вдалося ініціалізувати розмову'],
   ['plugin_ai_chat_message_user_description', 'Ваше повідомлення'],
   ['plugin_ai_chat_message_assistant_description', 'Повідомлення асистента'],
   ['plugin_ai_chat_message_sr_user_description', 'Ваше повідомлення: '],

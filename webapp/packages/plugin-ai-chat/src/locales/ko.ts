@@ -41,7 +41,6 @@ export default [
   ['plugin_ai_chat_query_replace_confirmation_title', '쿼리 바꾸기'],
   ['plugin_ai_chat_query_replace_confirmation_message', '활성 쿼리가 새 쿼리로 바뀝니다. 계속하시겠습니까?'],
   ['plugin_ai_chat_conversation_new', '새 대화'],
-  ['plugin_ai_chat_conversation_initialization_failed', '대화 초기화에 실패했습니다'],
   ['plugin_ai_chat_message_user_description', '내 메시지'],
   ['plugin_ai_chat_message_assistant_description', '도우미 메시지'],
   ['plugin_ai_chat_message_sr_user_description', '내 메시지: '],
