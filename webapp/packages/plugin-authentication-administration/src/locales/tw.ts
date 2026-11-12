@@ -141,7 +141,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', '連線'],
   ['administration_teams_team_granted_connections_search_placeholder', '搜尋連線名稱...'],
   ['administration_teams_team_granted_connections_empty', '沒有可用的連線'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', '預設團隊。無法撤銷'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', '預設團隊。無法從團隊中移除使用者'],
   ['plugin_authentication_administration_team_default_users_tooltip', '預設團隊。包含所有使用者'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', '主管'],
   ['plugin_authentication_administration_team_user_team_role_supervisor_description', '主管可以檢視團隊已執行的查詢'],

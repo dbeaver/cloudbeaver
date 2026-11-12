@@ -156,7 +156,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Kết nối'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Tìm kiếm tên kết nối...'],
   ['administration_teams_team_granted_connections_empty', 'Không có kết nối nào khả dụng'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Nhóm mặc định. Không thể thu hồi'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Nhóm mặc định. Không thể xóa người dùng khỏi nhóm'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Nhóm mặc định. Chứa tất cả người dùng'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Giám sát'],
   [

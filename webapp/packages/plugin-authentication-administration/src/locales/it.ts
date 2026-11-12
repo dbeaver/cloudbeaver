@@ -153,7 +153,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Connessioni'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Cerca per nome della connessione...'],
   ['administration_teams_team_granted_connections_empty', 'Nessuna connessione disponibile'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Gruppo predefinito. Non può essere revocato'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Team predefinito. L'utente non può essere rimosso"],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Gruppo predefinito. Contiene tutti gli utenti'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Supervisore'],
   [

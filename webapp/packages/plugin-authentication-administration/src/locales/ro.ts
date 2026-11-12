@@ -165,7 +165,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Conexiuni'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Caută numele conexiunii...'],
   ['administration_teams_team_granted_connections_empty', 'Nu există conexiuni disponibile'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Echipă implicită. Apartenența nu poate fi revocată'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Echipă implicită. Utilizatorul nu poate fi eliminat din echipă'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Echipă implicită. Include toți utilizatorii'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Supervizor'],
   ['plugin_authentication_administration_team_user_team_role_supervisor_description', 'Supervizorii pot vedea interogările executate de echipa lor'],

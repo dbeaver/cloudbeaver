@@ -162,7 +162,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Підключення'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Пошук назви підключення...'],
   ['administration_teams_team_granted_connections_empty', 'Немає доступних підключень'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Типова команда. Членство не можна скасувати'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Типова команда. Користувача не можна виключити'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Типова команда. Містить усіх користувачів'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Керівник'],
   [

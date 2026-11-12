@@ -147,7 +147,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', '연결'],
   ['administration_teams_team_granted_connections_search_placeholder', '연결 이름 검색...'],
   ['administration_teams_team_granted_connections_empty', '사용 가능한 연결이 없습니다'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', '기본 팀입니다. 철회할 수 없습니다'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', '기본 팀입니다. 팀에서 사용자를 제거할 수 없습니다'],
   ['plugin_authentication_administration_team_default_users_tooltip', '기본 팀입니다. 모든 사용자를 포함합니다'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', '감독자'],
   ['plugin_authentication_administration_team_user_team_role_supervisor_description', '감독자는 팀에서 실행한 쿼리를 볼 수 있습니다'],
