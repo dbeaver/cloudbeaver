@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * Web query results info.
  */
-public class WebSQLResultsInfo {
+public class WebSQLResultsInfo implements AutoCloseable {
 
     @NotNull
     private final DBSDataContainer dataContainer;
@@ -49,6 +49,7 @@ public class WebSQLResultsInfo {
     @Nullable
     private DBDDataFilter dataFilter;
     private String queryText;
+    private volatile boolean closed;
 
     public WebSQLResultsInfo(@NotNull DBSDataContainer dataContainer, @NotNull String id) {
         this.dataContainer = dataContainer;
@@ -58,6 +59,15 @@ public class WebSQLResultsInfo {
     @NotNull
     public String getId() {
         return id;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    @Override
+    public void close() {
+        closed = true;
     }
 
     @NotNull

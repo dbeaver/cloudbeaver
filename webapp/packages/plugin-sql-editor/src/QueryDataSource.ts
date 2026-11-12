@@ -240,31 +240,31 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     this.currentQueryAsyncTask = task;
 
     this.currentTask = executionContext.run(
-      async () => {
-        const info = await this.asyncTaskInfoService.run(task);
-        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
-
-        return result;
-      },
+      () => this.readTaskResults(task),
       () => this.asyncTaskInfoService.cancel(task.id),
-      () => {
-        this.asyncTaskInfoService.remove(task.id);
-        this.currentQueryAsyncTask = null;
+      async () => {
+        try {
+          await this.releaseTask(task);
+        } finally {
+          this.currentQueryAsyncTask = null;
+        }
       },
     );
 
     try {
       const response = await this.currentTask;
 
-      const results = this.innerGetResults(executionContextInfo, response, limit);
+      const results = this.innerGetResults(executionContextInfo, response, limit, task.info?.id);
       this.clearError();
 
       if (!results) {
+        await this.releaseResultTasks();
         return prevResults;
       }
 
       return results;
     } catch (exception: any) {
+      await this.releaseResultTasks();
       this.error = exception;
       throw exception;
     }
@@ -364,6 +364,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     executionContextInfo: IConnectionExecutionContextInfo,
     response: SqlExecuteInfo,
     limit: number,
+    taskId?: string,
   ): IDatabaseResultSet[] | null {
     this.requestInfo = {
       originalQuery: response.originalQuery || '',
@@ -379,12 +380,18 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       return null;
     }
 
-    return this.transformResults(executionContextInfo, response.results, limit);
+    return this.transformResults(executionContextInfo, response.results, limit, taskId);
   }
 
-  private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
+  private transformResults(
+    executionContextInfo: IConnectionExecutionContextInfo,
+    results: SqlQueryResults[],
+    limit: number,
+    taskId?: string,
+  ): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || null,
+      taskId,
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.dataFormat}_${index}`,
       projectId: executionContextInfo.projectId,
       connectionId: executionContextInfo.connectionId,
