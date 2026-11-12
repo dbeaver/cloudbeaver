@@ -6,45 +6,37 @@ export default [
   ['administration_server_configuration_tab_drivers', '驱动程序'],
   ['administration_server_configuration_save_confirmation_title', '服务器设置更新'],
   ['administration_server_configuration_save_confirmation_message', '即将更改关键设置。您确定吗？'],
-
   ['administration_configuration_wizard_welcome', '欢迎'],
-  ['administration_configuration_wizard_welcome_step_description', '欢迎来到CloudBeaver'],
-  ['administration_configuration_wizard_welcome_title', '欢迎来到CloudBeaver，云数据库管理系统！'],
+  ['administration_configuration_wizard_welcome_step_description', '欢迎使用 {alias:product_full_name}'],
+  ['administration_configuration_wizard_welcome_title', '欢迎使用 {alias:product_full_name} 云数据库管理系统'],
   [
     'administration_configuration_wizard_welcome_message',
-    '简单配置向导将引导您通过几个简单的步骤来设置CloudBeaver服务器。您将需要设置服务器信息和管理员凭据。您还可以在此处添加第一个数据库连接。',
+    '简易配置向导将引导您通过几个简单步骤完成服务器设置。您需要填写服务器信息和管理员凭据。完成简易配置后，可以设置其他服务器参数。',
   ],
   ['administration_configuration_wizard_welcome_note', '注意：稍后您能够在管理面板更改这些配置参数。'],
-
   ['administration_configuration_wizard_configuration', '服务器配置'],
   ['administration_configuration_wizard_configuration_step_description', '主要的服务器配置'],
   ['administration_configuration_wizard_configuration_description', '配置服务器的主要参数。完成设置后，您可以添加更多服务。'],
   ['administration_configuration_wizard_configuration_password_warning', '请牢记管理员密码。此密码无法自动恢复。'],
-  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
-
+  ['administration_configuration_wizard_configuration_save_error', '服务器配置保存失败'],
   ['administration_configuration_tools_save_tooltip', '保存配置'],
   ['administration_configuration_tools_cancel_tooltip', '重置更改'],
-
-  ['administration_configuration_wizard_configuration_secure_cookies', 'Force HTTPS mode'],
+  ['administration_configuration_wizard_configuration_secure_cookies', '强制使用 HTTPS'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
-    'Enable force HTTPS to secure server-client communication. Recommended for production. Ensure your HTTPS proxy is properly configured for correct app functionality',
+    '启用强制 HTTPS 以保护客户端与服务器之间的通信。建议在生产环境中启用。请确保 HTTPS 代理配置正确，以保证应用程序正常运行',
   ],
-  [
-    'administration_configuration_wizard_configuration_secure_cookies_warning',
-    "The data won't be encrypted if forced HTTPS mode is disabled. This makes it vulnerable",
-  ],
-  ['administration_configuration_wizard_configuration_secure_cookies_docs', 'Server proxy configuration documentation'],
-  ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
+  ['administration_configuration_wizard_configuration_secure_cookies_warning', '禁用强制 HTTPS 模式后，数据将不会加密，因此存在安全风险'],
+  ['administration_configuration_wizard_configuration_secure_cookies_docs', '服务器代理配置文档'],
+  ['administration_configuration_wizard_configuration_supported_hosts', '允许的服务器 URL'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
-    'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed. Access from the IP-addresses is always allowed.',
+    '可以指定多个服务器 URL，每行一个。留空表示允许所有 URL。始终允许通过 IP 地址访问。',
   ],
   [
     'administration_configuration_wizard_configuration_supported_hosts_warning',
-    'You cannot remove your current domain ({arg:host}). Open the server configuration from another allowed domain or IP-address to remove this domain.',
+    '无法移除当前域名（{arg:host}）。请通过其他允许的域名或 IP 地址打开服务器配置，然后移除此域名。',
   ],
-
   ['administration_configuration_wizard_configuration_server_info', '服务器信息'],
   ['administration_configuration_wizard_configuration_server_name', '服务器名称'],
   ['administration_configuration_wizard_configuration_server_url', '服务器URL'],
@@ -52,20 +44,20 @@ export default [
   ['administration_configuration_wizard_configuration_server_info_unsaved_title', '未保存的设置'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_message', '服务器配置页面可以保存设置'],
   ['administration_configuration_wizard_configuration_server_info_unsaved_navigate', '打开'],
+  ['administration_configuration_wizard_configuration_server_session_lifetime', '会话有效期（分钟）'],
   ['administration_configuration_wizard_configuration_server_session_lifetime_description', '您可以在此处指定您希望会话在到期前保持空闲的分钟数'],
-
   ['administration_configuration_wizard_configuration_plugins', '功能'],
   ['administration_configuration_wizard_configuration_custom_connections', '允许自定义连接'],
   ['administration_configuration_wizard_configuration_custom_connections_description', '允许用户创建自定义连接'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', '导航器简单视图'],
   ['administration_configuration_wizard_configuration_navigation_tree_view_description', '默认情况下，所有用户的新连接在导航树中将仅包含基本信息'],
-
   ['administration_configuration_wizard_configuration_security', '安全'],
   ['administration_configuration_wizard_configuration_security_admin_credentials', '保存凭据'],
   ['administration_configuration_wizard_configuration_security_admin_credentials_description', '允许保存预配置数据库的凭据'],
   ['administration_configuration_wizard_configuration_security_public_credentials', '保存用户凭据'],
   ['administration_configuration_wizard_configuration_security_public_credentials_description', '允许为非管理员用户保存凭据'],
-
+  ['administration_configuration_wizard_configuration_security_db_user_password_change', '允许更改数据库用户密码'],
+  ['administration_configuration_wizard_configuration_security_db_user_password_change_description', '允许用户更改数据库连接所用用户的密码'],
   ['administration_configuration_wizard_configuration_navigator', '导航器'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', '隐藏文件夹'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', '隐藏结构'],
@@ -74,9 +66,7 @@ export default [
   ['administration_configuration_wizard_configuration_navigator_show_only_entities', '仅实体'],
   ['administration_configuration_wizard_configuration_navigator_show_system_objects', '系统对象'],
   ['administration_configuration_wizard_configuration_navigator_show_utility_objects', '实用程序对象'],
-
   ['administration_configuration_wizard_step_validation_message', '无法继续执行下一步'],
-
   ['administration_configuration_wizard_finish', '确认'],
   ['administration_configuration_wizard_finish_step_description', '确认'],
   ['administration_configuration_wizard_finish_title', '差不多就这样。'],
@@ -84,11 +74,10 @@ export default [
     'administration_configuration_wizard_finish_message',
     '按完成按钮完成服务器配置。如果您想更改或添加某些内容，可以返回到前面的页面。\n配置完成后，所有输入的设置都将应用于您的CloudBeaver服务器。您将被重定向到主页面开始工作。\n您可以随时以管理员身份登录系统以更改服务器设置。',
   ],
-
   ['administration_disabled_drivers_title', '已禁用的驱动'],
   ['administration_disabled_drivers_search_placeholder', '搜索驱动...'],
   [
     'administration_disabled_drivers_enable_unsafe_driver_message',
-    'Enabling this database driver may allow access to files on the server where this application is running. This could potentially expose sensitive system files or other protected data.\n\nOnly proceed if you fully understand the implications and trust the database configuration. Unauthorized or improper use of this driver may lead to security risks.\n\nDo you want to enable the "{arg:driverName}" driver?',
+    '启用此数据库驱动程序可能允许访问运行此应用程序的服务器上的文件。这可能导致敏感系统文件或其他受保护数据泄露。\n\n只有在您完全了解相关影响并信任数据库配置时才应继续。未经授权或不当使用此驱动程序可能带来安全风险。\n\n是否启用“{arg:driverName}”驱动程序？',
   ],
 ];

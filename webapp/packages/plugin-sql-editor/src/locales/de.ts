@@ -1,0 +1,77 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+export default [
+  ['sql_editor_settings_blank_line_delimiter_name', 'Leerzeile als Anweisungstrennzeichen'],
+  [
+    'sql_editor_settings_blank_line_delimiter_desc',
+    'Legt fest, ob Leerzeilen SQL-Anweisungen trennen. Wählen Sie „Nie“, um Leerzeilen innerhalb einer Anweisung zu erlauben.',
+  ],
+  ['sql_editor_settings_blank_line_delimiter_always', 'Immer'],
+  ['sql_editor_settings_blank_line_delimiter_never', 'Nie'],
+  ['sql_editor_settings_blank_line_delimiter_smart', 'Intelligent'],
+  ['plugin_sql_editor_sql_editor_settings_group', 'SQL-Editor'],
+  ['sql_editor_settings_content_assistant_experimental_mode_name', 'Vervollständigungs-Engine'],
+  ['sql_editor_settings_content_assistant_experimental_mode_desc', 'Modus des Inhaltsassistenten im SQL-Editor'],
+  ['sql_editor_settings_content_assistant_experimental_mode_default', 'Klassisch'],
+  ['sql_editor_settings_content_assistant_experimental_mode_new', 'Semantisch'],
+  ['sql_editor_settings_insert_table_aliases_name', 'Tabellenaliase einfügen (in FROM-Klausel)'],
+  ['sql_editor_settings_insert_table_aliases_desc', 'Fügt Tabellenaliase automatisch ein'],
+  ['sql_editor_menu', 'SQL-Editor'],
+  ['sql_editor_script_editor', 'SQL-Editor'],
+  ['sql_editor_alias_loading_error', 'Beim Laden des Knotenalias ist ein Fehler aufgetreten'],
+  ['sql_editor_restore_message', 'Möchten Sie die Verbindung wiederherstellen?'],
+  ['sql_editor_restore', 'Wiederherstellen'],
+  ['sql_editor_placeholder', 'Führen Sie die Abfrage mit Strg+Enter aus, um Ergebnisse zu sehen'],
+  ['sql_editor_hint_empty', 'Keine Vorschläge vorhanden...'],
+  ['sql_editor_tools_more_menu_tooltip', 'Weitere Werkzeuge'],
+  ['sql_editor_output_logs_button_tooltip', 'Serverausgabe anzeigen'],
+  ['sql_editor_output_logs_tab_title', 'Ausgabe'],
+  ['sql_editor_output_logs_input_placeholder', 'Geben Sie hier einen Teil einer Nachricht zum Suchen ein'],
+  ['sql_editor_output_logs_wrap_mode', 'Zeilenumbruchmodus'],
+  ['sql_editor_sql_execution_button_tooltip', 'SQL-Anweisung ausführen'],
+  ['sql_editor_sql_execution_new_tab_button_tooltip', 'SQL-Anweisung in neuem Tab ausführen'],
+  ['sql_editor_sql_execution_script_button_tooltip', 'SQL-Skript ausführen'],
+  ['sql_editor_sql_format_button_tooltip', 'SQL-Skript formatieren'],
+  ['sql_editor_sql_execution_script_lock_tooltip', 'Editor sperren, um Änderungen zu verhindern'],
+  ['sql_editor_sql_statistics_unavailable', 'Statistik ist nicht verfügbar'],
+  ['sql_editor_sql_execution_executed_queries', 'Ausgeführte Abfragen:'],
+  ['sql_editor_sql_execution_executing', 'Wird ausgeführt...'],
+  ['sql_editor_script_error_title', 'Fehler bei der Skriptausführung'],
+  [
+    'sql_editor_script_error_message',
+    'Beim Ausführen dieser Anweisung ist ein Fehler aufgetreten. Wählen Sie, wie das Skript fortgesetzt werden soll.',
+  ],
+  ['sql_editor_script_error_skip_all', 'Alle überspringen'],
+  ['sql_editor_upload_script_tooltip', 'SQL-Skript hochladen'],
+  ['sql_editor_download_script_tooltip', 'SQL-Skript herunterladen'],
+  [
+    'sql_editor_upload_script_unsaved_changes_dialog_message',
+    'Ihr aktuelles Skript wird durch das hochgeladene Skript überschrieben. Möchten Sie es zuerst speichern?',
+  ],
+  ['sql_editor_upload_script_max_size_title', 'Dateigröße überschreitet die maximale Größe'],
+  ['sql_editor_close_result_tabs_dialog_title', 'Schließen der Tabs bestätigen'],
+  ['plugin_sql_editor_action_overlay_title', 'Aktion erforderlich'],
+  ['plugin_sql_editor_action_overlay_description', 'Bitte öffnen Sie den Editor erneut, um weiterzuarbeiten.'],
+  ['plugin_sql_editor_action_close_group', 'Alle Tabs derselben Abfrage schließen'],
+  ['plugin_sql_editor_settings_disable', 'Deaktivieren'],
+  ['plugin_sql_editor_settings_disable_description', 'SQL-Editor für alle Benutzer deaktivieren'],
+  ['plugin_sql_editor_settings_import_max_size', 'Importlimit (KB)'],
+  ['plugin_sql_editor_settings_import_max_size_description', 'Maximale Dateigröße für den Import in KB'],
+  ['plugin_sql_editor_settings_auto_save', 'Skriptdateien automatisch speichern'],
+  ['plugin_sql_editor_settings_auto_save_description', 'Skriptdateien automatisch speichern'],
+  [
+    'plugin_sql_editor_settings_auto_save_description_git_integration',
+    'Skriptdateien automatisch speichern. Diese Funktion ist nur verfügbar, wenn die Git-Integration deaktiviert ist',
+  ],
+  ['plugin_sql_editor_settings_highlight_white_space', 'Leerraumzeichen hervorheben'],
+  ['plugin_sql_editor_settings_highlight_white_space_description', 'Leerzeichen, Tabulatoren und andere Leerraumzeichen im SQL-Editor hervorheben'],
+  ['plugin_sql_editor_bind_parameters_dialog_alert_title', 'Zeichenkettenwerte müssen in Anführungszeichen stehen'],
+  ['plugin_sql_editor_export_local_tab', 'ins Betriebssystem (lokal)'],
+  ['plugin_sql_editor_script_exported', 'Skript erfolgreich exportiert'],
+];

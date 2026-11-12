@@ -1,11 +1,9 @@
 export default [
-  ['shortcuts_title', 'Shortcuts'],
+  ['shortcuts_title', 'Phím tắt'],
   ['tree_shortcuts_title', 'Tất cả cây'],
   ['tree_shortcut_collapse_all', 'Thu gọn tất cả các nút trong cây đang có tiêu điểm'],
-
-  ['plugin_help_welcome_docs_label', 'Documentation'],
-  ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],
-
+  ['plugin_help_welcome_docs_label', 'Tài liệu'],
+  ['plugin_help_welcome_docs_description', 'Tìm hiểu cách sử dụng {arg:product}'],
   ['data_viewer_shortcut_open_cell_context_menu', 'Mở menu ngữ cảnh cho ô được chọn'],
   ['data_viewer_shortcut_start_inline_editing', 'Mở Trình chỉnh sửa inline cho ô được chọn'],
   ['data_viewer_shortcut_add_new_row', 'Thêm một hàng mới'],
@@ -14,7 +12,6 @@ export default [
   ['data_viewer_shortcut_revert_inline_editor_changes', 'Hoàn nguyên các thay đổi trong Trình chỉnh sửa inline'],
   ['data_viewer_shortcut_past_value', 'Dán giá trị vào ô từ Clipboard'],
   ['data_viewer_shortcut_copy_value', 'Sao chép giá trị ô vào Clipboard'],
-
   ['sql_editor_shortcut_execute_statement', 'Thực thi câu lệnh SQL'],
   ['sql_editor_shortcut_execute_statement_new_tab', 'Thực thi câu lệnh SQL trong tab mới'],
   ['sql_editor_shortcut_execute_script', 'Thực thi kịch bản'],
@@ -30,16 +27,11 @@ export default [
   ['sql_editor_shortcut_accept_completion', 'Chấp nhận tự động hoàn thành'],
   ['sql_editor_shortcut_escape', 'Thoát khỏi trình chỉnh sửa'],
   ['plugin_search_panel_find', 'Tìm kiếm'],
-
   ['navigation_tree_shortcut_enable_filter', 'Bật lọc'],
-
   ['plugin_help_multi_tab_support_title', 'Không hỗ trợ nhiều tab'],
   [
     'plugin_help_multi_tab_support_description',
-    `Dữ liệu không được kết nối với các tab khác.
-  Mọi tab ứng dụng đang mở sẽ không được lưu và có khả năng bị mất sau khi đóng tab.
-  Cài đặt ứng dụng cục bộ của bạn sẽ bị mất sau khi đóng tab.
-  Bạn có thể tải các tab và cài đặt cho tab này`,
+    'Dữ liệu không được kết nối với các tab khác.\n  Mọi tab ứng dụng đang mở sẽ không được lưu và có khả năng bị mất sau khi đóng tab.\n  Cài đặt ứng dụng cục bộ của bạn sẽ bị mất sau khi đóng tab.\n  Bạn có thể tải các tab và cài đặt cho tab này',
   ],
   ['plugin_help_multi_tab_support_load_settings', 'Tải tab và cài đặt'],
 ];

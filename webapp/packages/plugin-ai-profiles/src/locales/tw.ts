@@ -1,0 +1,55 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+export default [
+  ['plugin_ai_profiles_profile_menu', '設定檔動作'],
+  ['plugin_ai_profiles_profile_clone', '複製'],
+  ['plugin_ai_profiles_default_badge', '（預設）'],
+  ['plugin_ai_profiles_default_description', 'AI 請求的預設設定檔。在聊天中選取設定檔，或使用「設為預設」來變更。'],
+  ['plugin_ai_profiles_set_default', '設為預設'],
+  ['plugin_ai_profiles_default_save_failed', '無法儲存預設 AI 設定檔'],
+  ['plugin_ai_profiles_scope', '範圍'],
+  ['plugin_ai_profiles_scope_global', '全域'],
+  ['plugin_ai_profiles_scope_user', '使用者'],
+  ['plugin_ai_credentials_dialog_title', 'AI 設定檔認證資訊'],
+  ['plugin_ai_credentials_dialog_description', '請提供此 AI 設定檔用於您使用者帳戶的認證資訊。'],
+  ['plugin_ai_credentials_profile', '設定檔'],
+  ['plugin_ai_credentials_engine', '引擎'],
+  ['plugin_ai_credentials_token', 'API 權杖'],
+  ['plugin_ai_credentials_token_required', '請輸入 API 權杖。'],
+  ['plugin_ai_credentials_method', '驗證方式'],
+  ['plugin_ai_credentials_subscription', '訂閱'],
+  ['plugin_ai_credentials_account', '{arg:provider} 帳戶'],
+  ['plugin_ai_account_connect', '連結帳戶'],
+  ['plugin_ai_account_connected', '帳戶已連結'],
+  ['plugin_ai_account_disconnected', '帳戶已取消連結'],
+  ['plugin_ai_account_not_connected', '帳戶未連結'],
+  ['plugin_ai_account_disconnect', '取消連結帳戶'],
+  ['plugin_ai_account_disconnect_confirmation', '是否取消帳戶與此 AI 設定檔的連結？已儲存的 API 權杖會保留，但驗證方式不會變更。'],
+  ['plugin_ai_account_disconnect_failed', '無法取消連結帳戶'],
+  ['plugin_ai_device_code', '裝置代碼'],
+  ['plugin_ai_device_open_provider', '開啟 {arg:provider} 授權頁面'],
+  ['plugin_ai_device_instructions', '請在供應商頁面輸入此代碼並核准存取。連結期間請保持此視窗開啟。關閉視窗將取消嘗試。'],
+  ['plugin_ai_device_waiting', '正在等候帳戶授權…'],
+  ['plugin_ai_device_expiration', '此代碼的有效時間最長為 {arg:minutes} 分鐘。'],
+  ['plugin_ai_device_retry', '再試一次'],
+  ['plugin_ai_device_failed', '無法連結帳戶'],
+  ['plugin_ai_device_cancel_failed', '無法取消帳戶授權'],
+  ['plugin_ai_device_cancel_title', '是否取消帳戶授權？'],
+  ['plugin_ai_device_cancel_confirmation', '帳戶授權仍在進行中。是否取消？'],
+  ['plugin_ai_device_cancel', '取消'],
+  ['plugin_ai_device_continue', '繼續'],
+  ['plugin_ai_credentials_reset', '重設認證資訊'],
+  ['plugin_ai_credentials_reset_title', '重設 AI 設定檔認證資訊'],
+  ['plugin_ai_credentials_reset_confirmation', '是否移除已儲存的 API 權杖？已連結的訂閱帳戶會保留。'],
+  ['plugin_ai_credentials_profile_not_found', '找不到 AI 設定檔'],
+  ['plugin_ai_credentials_saved', 'AI 設定檔認證資訊已儲存'],
+  ['plugin_ai_credentials_reset_success', 'AI 設定檔認證資訊已重設'],
+  ['plugin_ai_credentials_save_failed', '無法儲存 AI 設定檔認證資訊'],
+  ['plugin_ai_credentials_reset_failed', '無法重設 AI 設定檔認證資訊'],
+];

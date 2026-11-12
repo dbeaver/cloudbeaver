@@ -40,6 +40,10 @@ export class UserDataStore {
     this.tempData.set(userId, observable(toJS(data)));
   }
 
+  getExistingData(userId: string): UserData | undefined {
+    return this.tempData.get(userId);
+  }
+
   protected getData(userId: string): UserData {
     if (!this.tempData.has(userId)) {
       this.tempData.set(userId, observable({}));
