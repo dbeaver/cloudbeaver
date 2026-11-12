@@ -209,19 +209,13 @@ public class WebAIUtils {
         String aiChatSessionUser = webSession.getAttribute(AI_CHAT_USER_ATTR);
         boolean sameUser = webSession.isAuthorizedInSecurityManager() &&
             CommonUtils.equalObjects(webSession.getUserId(), aiChatSessionUser);
-        AIChatSession aiChatSession = null;
         if (sameUser || webSession.getUserId() == null) {
-            aiChatSession = webSession.getAttribute(AI_CHAT_ATTR);
+            AIChatSession aiChatSession = webSession.getAttribute(AI_CHAT_ATTR);
+            if (aiChatSession != null) {
+                return aiChatSession;
+            }
         }
-        if (aiChatSession == null) {
-            aiChatSession = createChatSession(webSession);
-        }
-        try {
-            aiChatSession.init(webSession.getProgressMonitor());
-        } catch (DBException e) {
-            throw new DBWebException("Error initializing AI chat session", e);
-        }
-        return aiChatSession;
+        return createChatSession(webSession);
     }
 
     @NotNull
