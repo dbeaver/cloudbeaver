@@ -1,16 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { computed, makeObservable } from 'mobx';
-import { compare, gte, parse } from 'semver';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
+
+import { compareProductVersions, parseProductVersion } from './productVersion.js';
 
 const VERSION_REGEX = /(\d+\.\d+\.\d+)/;
 
@@ -36,8 +37,8 @@ export class VersionService {
     let backendVersion = this.serverConfigResource.data?.version || '';
 
     if (short) {
-      frontendVersion = VERSION_REGEX.exec(frontendVersion)?.[1] ?? frontendVersion;
-      backendVersion = VERSION_REGEX.exec(backendVersion)?.[1] ?? backendVersion;
+      frontendVersion = parseProductVersion(frontendVersion)?.release ?? VERSION_REGEX.exec(frontendVersion)?.[1] ?? frontendVersion;
+      backendVersion = parseProductVersion(backendVersion)?.release ?? VERSION_REGEX.exec(backendVersion)?.[1] ?? backendVersion;
     }
 
     return {
@@ -47,14 +48,18 @@ export class VersionService {
   }
 
   greaterOrEqual(v1: string, v2: string) {
-    return gte(v1, v2);
+    return this.compareVersions(v1, v2) >= 0;
   }
 
   parseVersion(version: string) {
-    return parse(version);
+    return parseProductVersion(version)?.base ?? null;
+  }
+
+  isHotfix(version: string): boolean {
+    return (parseProductVersion(version)?.hotfixVersion ?? 0) > 0;
   }
 
   compareVersions(v1: string, v2: string): number {
-    return compare(v1, v2);
+    return compareProductVersions(v1, v2);
   }
 }

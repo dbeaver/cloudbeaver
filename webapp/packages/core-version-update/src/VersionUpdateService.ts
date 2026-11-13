@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,24 @@ export class VersionUpdateService {
   versionInstructionGetter: (() => InstructionComponent) | null;
   instructionLink: string | null;
 
-  get newVersionAvailable() {
+  get newVersionAvailable(): boolean {
     if (!this.versionService.current || !this.versionResource.latest) {
       return false;
     }
 
     return this.versionService.compareVersions(this.versionResource.latest.number, this.versionService.current) === 1;
+  }
+
+  get availableVersions(): IVersion[] {
+    return this.versionResource.values
+      .filter(version => this.versionService.greaterOrEqual(version.number, this.versionService.current))
+      .sort((a, b) => this.versionService.compareVersions(b.number, a.number));
+  }
+
+  get latestHotfix(): IVersion | undefined {
+    return this.availableVersions.find(
+      version => this.versionService.isHotfix(version.number) && this.versionService.compareVersions(version.number, this.versionService.current) > 0,
+    );
   }
 
   constructor(
@@ -42,6 +54,8 @@ export class VersionUpdateService {
 
     makeObservable(this, {
       newVersionAvailable: computed,
+      availableVersions: computed,
+      latestHotfix: computed,
       instructionLink: observable.ref,
     });
   }

@@ -17,7 +17,7 @@ import { s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { VersionResource, VersionService } from '@cloudbeaver/core-version';
+import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 import { VersionChecker } from './VersionChecker.js';
@@ -27,14 +27,13 @@ import styles from './VersionUpdate.module.css';
 export const VersionUpdate: TabContainerPanelComponent<AdministrationItemContentProps> = observer(function VersionUpdate() {
   const translate = useTranslate();
   const style = useS(styles);
-  const versionService = useService(VersionService);
   const versionUpdateService = useService(VersionUpdateService);
-  const versionResource = useResource(VersionUpdate, VersionResource, CachedMapAllKey, {
+  useResource(VersionUpdate, VersionResource, CachedMapAllKey, {
     silent: true,
   });
 
   const GeneralInstructions = versionUpdateService.generalInstructionsGetter?.();
-  const versions = versionResource.resource.values.filter(v => versionService.greaterOrEqual(v.number, versionService.current));
+  const versions = versionUpdateService.availableVersions;
 
   return (
     <>
