@@ -7,7 +7,7 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService, type IConnectionExecutorData } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
@@ -27,17 +27,7 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 const DataViewerTab = importLazyComponent(() => import('./DataViewerPage/DataViewerTab.js').then(module => module.DataViewerTab));
 const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataViewerPanel.js').then(module => module.DataViewerPanel));
 
-@injectable(() => [
-  NavNodeManagerService,
-  ObjectViewerTabService,
-  DBObjectPageService,
-  NotificationService,
-  ConnectionsManagerService,
-  NavigationTabsService,
-  ConnectionInfoResource,
-  TableViewerStorageService,
-])
-export class DataViewerTabService {
+export class DataViewerTabServiceImpl {
   readonly page: ObjectPage<IDataViewerPageState>;
 
   constructor(
@@ -155,3 +145,72 @@ export class DataViewerTabService {
     }
   }
 }
+
+export type DataViewerTabService = DataViewerTabServiceImpl;
+
+export class DataViewerTabServiceDI extends Context.Service<DataViewerTabServiceDI, DataViewerTabServiceImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DataViewerTabService#DataViewerTabService',
+) {
+  static readonly implementation = DataViewerTabServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavNodeManagerService,
+      ObjectViewerTabService,
+      DBObjectPageService,
+      NotificationService,
+      ConnectionsManagerService,
+      NavigationTabsService,
+      ConnectionInfoResource,
+      TableViewerStorageService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    DataViewerTabServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ObjectViewerTabService>
+    | Context.Service.Identifier<typeof DBObjectPageService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof TableViewerStorageService>
+  > = Effect.gen(function* makeDataViewerTabService() {
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const objectViewerTabService = yield* ObjectViewerTabService;
+    const dbObjectPageService = yield* DBObjectPageService;
+    const notificationService = yield* NotificationService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const navigationTabsService = yield* NavigationTabsService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const tableViewerStorageService = yield* TableViewerStorageService;
+
+    return new DataViewerTabServiceImpl(
+      navNodeManagerService,
+      objectViewerTabService,
+      dbObjectPageService,
+      notificationService,
+      connectionsManagerService,
+      navigationTabsService,
+      connectionInfoResource,
+      tableViewerStorageService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    DataViewerTabServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ObjectViewerTabService>
+    | Context.Service.Identifier<typeof DBObjectPageService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof TableViewerStorageService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataViewerTabService = DataViewerTabServiceDI;

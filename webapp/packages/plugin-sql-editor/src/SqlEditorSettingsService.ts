@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
   FEATURE_GIT_ID,
   HIGHEST_SETTINGS_LAYER,
@@ -97,15 +97,7 @@ const defaultSettings = schema.object({
 type SqlEditorSettingsSchema = typeof defaultSettings;
 export type SqlEditorSettings = schema.infer<SqlEditorSettingsSchema>;
 
-@injectable(() => [
-  SettingsProviderService,
-  SettingsManagerService,
-  SettingsResolverService,
-  SettingsTransformationService,
-  ServerSettingsManagerService,
-  ServerConfigResource,
-])
-export class SqlEditorSettingsService {
+export class SqlEditorSettingsServiceImpl {
   get scriptExecutionEnabled(): boolean {
     return this.settings.getValue('plugin.sql-editor.script.executionEnabled');
   }
@@ -295,3 +287,62 @@ export class SqlEditorSettingsService {
     });
   }
 }
+
+export type SqlEditorSettingsService = SqlEditorSettingsServiceImpl;
+
+export class SqlEditorSettingsServiceDI extends Context.Service<SqlEditorSettingsServiceDI, SqlEditorSettingsServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlEditorSettingsService#SqlEditorSettingsService',
+) {
+  static readonly implementation = SqlEditorSettingsServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      SettingsProviderService,
+      SettingsManagerService,
+      SettingsResolverService,
+      SettingsTransformationService,
+      ServerSettingsManagerService,
+      ServerConfigResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    SqlEditorSettingsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof SettingsProviderService>
+    | Context.Service.Identifier<typeof SettingsManagerService>
+    | Context.Service.Identifier<typeof SettingsResolverService>
+    | Context.Service.Identifier<typeof SettingsTransformationService>
+    | Context.Service.Identifier<typeof ServerSettingsManagerService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+  > = Effect.gen(function* makeSqlEditorSettingsService() {
+    const settingsProviderService = yield* SettingsProviderService;
+    const settingsManagerService = yield* SettingsManagerService;
+    const settingsResolverService = yield* SettingsResolverService;
+    const settingsTransformationService = yield* SettingsTransformationService;
+    const serverSettingsManagerService = yield* ServerSettingsManagerService;
+    const serverConfigResource = yield* ServerConfigResource;
+
+    return new SqlEditorSettingsServiceImpl(
+      settingsProviderService,
+      settingsManagerService,
+      settingsResolverService,
+      settingsTransformationService,
+      serverSettingsManagerService,
+      serverConfigResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SqlEditorSettingsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof SettingsProviderService>
+    | Context.Service.Identifier<typeof SettingsManagerService>
+    | Context.Service.Identifier<typeof SettingsResolverService>
+    | Context.Service.Identifier<typeof SettingsTransformationService>
+    | Context.Service.Identifier<typeof ServerSettingsManagerService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlEditorSettingsService = SqlEditorSettingsServiceDI;

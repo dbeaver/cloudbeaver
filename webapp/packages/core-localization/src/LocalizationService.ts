@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, type IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
+import { computed, makeObservable, observable, reaction, type IReactionDisposer } from 'mobx';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
 import { DEFAULT_LOCALE } from './DEFAULT_LOCALE.js';
@@ -15,8 +15,7 @@ import type { ILocale } from './ILocale.js';
 import type { ILocaleProvider } from './ILocaleProvider.js';
 import type { TLocalizationToken } from './TLocalizationToken.js';
 
-@injectable()
-export class LocalizationService extends Bootstrap {
+export class LocalizationServiceImpl extends Bootstrap {
   get currentLanguage(): string {
     const lang = this.language;
 
@@ -269,3 +268,20 @@ export class LocalizationService extends Bootstrap {
     this.localeMap.set(localeKey, locale);
   }
 }
+
+export type LocalizationService = LocalizationServiceImpl;
+
+export class LocalizationServiceDI extends Context.Service<LocalizationServiceDI, LocalizationServiceImpl>()(
+  '@cloudbeaver/core-localization/LocalizationService#LocalizationService',
+) {
+  static readonly implementation = LocalizationServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<LocalizationServiceImpl, never, never> = Effect.sync(() => new LocalizationServiceImpl());
+  static readonly layer: Layer.Layer<LocalizationServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const LocalizationService = LocalizationServiceDI;

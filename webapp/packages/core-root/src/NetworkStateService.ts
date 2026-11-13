@@ -7,15 +7,14 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 import { isNetworkFetchError, NetworkError } from './NetworkError.js';
 
-@injectable(() => [GraphQLService])
-export class NetworkStateService extends Bootstrap {
+export class NetworkStateServiceImpl extends Bootstrap {
   get state(): boolean {
     return this.networkState;
   }
@@ -73,3 +72,26 @@ export class NetworkStateService extends Bootstrap {
     }
   }
 }
+
+export type NetworkStateService = NetworkStateServiceImpl;
+
+export class NetworkStateServiceDI extends Context.Service<NetworkStateServiceDI, NetworkStateServiceImpl>()(
+  '@cloudbeaver/core-root/NetworkStateService#NetworkStateService',
+) {
+  static readonly implementation = NetworkStateServiceImpl;
+
+  static readonly dependencies = () => [GraphQLService] as const;
+  static readonly make: Effect.Effect<NetworkStateServiceImpl, never, Context.Service.Identifier<typeof GraphQLService>> = Effect.gen(
+    function* makeNetworkStateService() {
+      const graphQLService = yield* GraphQLService;
+
+      return new NetworkStateServiceImpl(graphQLService);
+    },
+  );
+  static readonly layer: Layer.Layer<NetworkStateServiceDI, never, Context.Service.Identifier<typeof GraphQLService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NetworkStateService = NetworkStateServiceDI;

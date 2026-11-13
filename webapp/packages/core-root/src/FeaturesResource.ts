@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, type WebFeatureSet } from '@cloudbeaver/core-sdk';
 
@@ -16,8 +16,7 @@ import { SessionPermissionsResource } from './SessionPermissionsResource.js';
 
 export type ApplicationFeature = WebFeatureSet;
 
-@injectable(() => [GraphQLService, SessionPermissionsResource])
-export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
+export class FeaturesResourceImpl extends CachedDataResource<ApplicationFeature[]> {
   private baseFeatures: string[];
 
   constructor(
@@ -48,6 +47,36 @@ export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
     return features;
   }
 }
+
+export type FeaturesResource = FeaturesResourceImpl;
+
+export class FeaturesResourceDI extends Context.Service<FeaturesResourceDI, FeaturesResourceImpl>()(
+  '@cloudbeaver/core-root/FeaturesResource#FeaturesResource',
+) {
+  static readonly implementation = FeaturesResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, SessionPermissionsResource] as const;
+  static readonly make: Effect.Effect<
+    FeaturesResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Effect.gen(function* makeFeaturesResource() {
+    const graphQLService = yield* GraphQLService;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+
+    return new FeaturesResourceImpl(graphQLService, sessionPermissionsResource);
+  });
+  static readonly layer: Layer.Layer<
+    FeaturesResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const FeaturesResource = FeaturesResourceDI;
 
 export function sortFeature(a: ApplicationFeature, b: ApplicationFeature): number {
   return a.label.localeCompare(b.label);

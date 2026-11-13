@@ -6,22 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { ConfirmationDialog, type ConfirmationDialogResult } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, type DialogResult } from '@cloudbeaver/core-dialogs';
 import { executorHandlerFilter } from '@cloudbeaver/core-executor';
 import {
+  AsyncTask,
+  AsyncTaskInfoEventHandler,
   AsyncTaskInfoService,
   ClientEventId,
   ServerEventId,
   type IBaseAsyncTaskEvent,
-  AsyncTaskInfoEventHandler,
-  AsyncTask,
 } from '@cloudbeaver/core-root';
 import type { WsSessionTaskConfirmationEvent, WsSessionTaskQueryConfirmationRequestEvent } from '@cloudbeaver/core-sdk';
 import { renderQueryForConfirmation } from './renderQueryForConfirmation.js';
 
-@injectable(() => [AsyncTaskInfoService, CommonDialogService, AsyncTaskInfoEventHandler])
-export class SqlQueryAsyncTaskConfirmationBootstrap extends Bootstrap {
+export class SqlQueryAsyncTaskConfirmationBootstrapImpl extends Bootstrap {
   private pendingConfirmations: Map<string, Promise<DialogResult<ConfirmationDialogResult>>> = new Map();
   constructor(
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
@@ -82,3 +81,39 @@ export class SqlQueryAsyncTaskConfirmationBootstrap extends Bootstrap {
     this.asyncTaskInfoService.onExecuteEvent.removeHandler(this.handleEvent);
   }
 }
+
+export type SqlQueryAsyncTaskConfirmationBootstrap = SqlQueryAsyncTaskConfirmationBootstrapImpl;
+
+export class SqlQueryAsyncTaskConfirmationBootstrapDI extends Context.Service<
+  SqlQueryAsyncTaskConfirmationBootstrapDI,
+  SqlQueryAsyncTaskConfirmationBootstrapImpl
+>()('@cloudbeaver/plugin-sql-async-task-confirmation/SqlQueryAsyncTaskConfirmationBootstrap#SqlQueryAsyncTaskConfirmationBootstrap') {
+  static readonly implementation = SqlQueryAsyncTaskConfirmationBootstrapImpl;
+
+  static readonly dependencies = () => [AsyncTaskInfoService, CommonDialogService, AsyncTaskInfoEventHandler] as const;
+  static readonly make: Effect.Effect<
+    SqlQueryAsyncTaskConfirmationBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoEventHandler>
+  > = Effect.gen(function* makeSqlQueryAsyncTaskConfirmationBootstrap() {
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+    const commonDialogService = yield* CommonDialogService;
+    const asyncTaskInfoEventHandler = yield* AsyncTaskInfoEventHandler;
+
+    return new SqlQueryAsyncTaskConfirmationBootstrapImpl(asyncTaskInfoService, commonDialogService, asyncTaskInfoEventHandler);
+  });
+  static readonly layer: Layer.Layer<
+    SqlQueryAsyncTaskConfirmationBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlQueryAsyncTaskConfirmationBootstrap = SqlQueryAsyncTaskConfirmationBootstrapDI;

@@ -16,7 +16,7 @@ import {
   isObjectCatalogProvider,
   isObjectSchemaProvider,
 } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
@@ -53,22 +53,7 @@ interface IActiveConnectionContext {
   schemaId?: string;
 }
 
-@injectable(() => [
-  SqlEditorNavigatorService,
-  NavigationTabsService,
-  ViewService,
-  ActionService,
-  MenuService,
-  SessionActionService,
-  CommonDialogService,
-  SqlEditorTabService,
-  SqlDataSourceService,
-  ConnectionInfoResource,
-  SqlEditorService,
-  LocalizationService,
-  SqlEditorSettingsService,
-])
-export class SqlEditorBootstrap extends Bootstrap {
+export class SqlEditorBootstrapImpl extends Bootstrap {
   constructor(
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,
     private readonly navigationTabsService: NavigationTabsService,
@@ -325,3 +310,97 @@ export class SqlEditorBootstrap extends Bootstrap {
     }
   };
 }
+
+export type SqlEditorBootstrap = SqlEditorBootstrapImpl;
+
+export class SqlEditorBootstrapDI extends Context.Service<SqlEditorBootstrapDI, SqlEditorBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-editor-navigation-tab/SqlEditorBootstrap#SqlEditorBootstrap',
+) {
+  static readonly implementation = SqlEditorBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      SqlEditorNavigatorService,
+      NavigationTabsService,
+      ViewService,
+      ActionService,
+      MenuService,
+      SessionActionService,
+      CommonDialogService,
+      SqlEditorTabService,
+      SqlDataSourceService,
+      ConnectionInfoResource,
+      SqlEditorService,
+      LocalizationService,
+      SqlEditorSettingsService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    SqlEditorBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ViewService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SessionActionService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof SqlEditorTabService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof SqlEditorService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof SqlEditorSettingsService>
+  > = Effect.gen(function* makeSqlEditorBootstrap() {
+    const sqlEditorNavigatorService = yield* SqlEditorNavigatorService;
+    const navigationTabsService = yield* NavigationTabsService;
+    const viewService = yield* ViewService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const sessionActionService = yield* SessionActionService;
+    const commonDialogService = yield* CommonDialogService;
+    const sqlEditorTabService = yield* SqlEditorTabService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const sqlEditorService = yield* SqlEditorService;
+    const localizationService = yield* LocalizationService;
+    const sqlEditorSettingsService = yield* SqlEditorSettingsService;
+
+    return new SqlEditorBootstrapImpl(
+      sqlEditorNavigatorService,
+      navigationTabsService,
+      viewService,
+      actionService,
+      menuService,
+      sessionActionService,
+      commonDialogService,
+      sqlEditorTabService,
+      sqlDataSourceService,
+      connectionInfoResource,
+      sqlEditorService,
+      localizationService,
+      sqlEditorSettingsService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SqlEditorBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ViewService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SessionActionService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof SqlEditorTabService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof SqlEditorService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof SqlEditorSettingsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlEditorBootstrap = SqlEditorBootstrapDI;

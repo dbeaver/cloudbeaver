@@ -1,18 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService } from '@cloudbeaver/core-settings';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { DATA_EDITOR_SETTINGS_GROUP, type DataViewerSettingsSchema } from '@cloudbeaver/plugin-data-viewer';
 import type { DataImportSettingsSchema } from '@cloudbeaver/plugin-data-import';
+import { DATA_EDITOR_SETTINGS_GROUP, type DataViewerSettingsSchema } from '@cloudbeaver/plugin-data-viewer';
 
-@injectable(() => [SettingsManagerService])
-export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
+export class PluginDataEditorPublicSettingsBootstrapImpl extends Bootstrap {
   constructor(private readonly settingsManagerService: SettingsManagerService) {
     super();
   }
@@ -65,3 +64,27 @@ export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
     ]);
   }
 }
+
+export type PluginDataEditorPublicSettingsBootstrap = PluginDataEditorPublicSettingsBootstrapImpl;
+
+export class PluginDataEditorPublicSettingsBootstrapDI extends Context.Service<
+  PluginDataEditorPublicSettingsBootstrapDI,
+  PluginDataEditorPublicSettingsBootstrapImpl
+>()('@cloudbeaver/plugin-data-editor-public-settings/PluginDataEditorPublicSettingsBootstrap#PluginDataEditorPublicSettingsBootstrap') {
+  static readonly implementation = PluginDataEditorPublicSettingsBootstrapImpl;
+
+  static readonly dependencies = () => [SettingsManagerService] as const;
+  static readonly make: Effect.Effect<PluginDataEditorPublicSettingsBootstrapImpl, never, Context.Service.Identifier<typeof SettingsManagerService>> =
+    Effect.gen(function* makePluginDataEditorPublicSettingsBootstrap() {
+      const settingsManagerService = yield* SettingsManagerService;
+
+      return new PluginDataEditorPublicSettingsBootstrapImpl(settingsManagerService);
+    });
+  static readonly layer: Layer.Layer<PluginDataEditorPublicSettingsBootstrapDI, never, Context.Service.Identifier<typeof SettingsManagerService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const PluginDataEditorPublicSettingsBootstrap = PluginDataEditorPublicSettingsBootstrapDI;

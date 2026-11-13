@@ -6,22 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
+import { ProjectInfoBootstrap } from './ProjectInfoBootstrap.js';
 import { ProjectInfoFormOptionsTabBootstrap } from './ProjectInfoForm/Options/ProjectInfoFormOptionsTabBootstrap.js';
 import { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
 import { ProjectInfoOptionsPanelService } from './ProjectInfoForm/ProjectInfoOptionsPanelService.js';
-import { ProjectInfoBootstrap } from './ProjectInfoBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-project-info',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, ProjectInfoBootstrap)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, ProjectInfoFormOptionsTabBootstrap)
-      .addSingleton(ProjectInfoOptionsPanelService)
-      .addSingleton(ProjectInfoFormService);
-  },
+  services: () => [ProjectInfoOptionsPanelService, ProjectInfoFormService],
+  bootstraps: () => [ProjectInfoBootstrap, LocaleService, ProjectInfoFormOptionsTabBootstrap],
 });

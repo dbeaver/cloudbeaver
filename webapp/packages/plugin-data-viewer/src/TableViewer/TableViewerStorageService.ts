@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
@@ -19,8 +19,7 @@ export interface ITableViewerStorageChangeEventData {
   model: IDatabaseDataModel<any>;
 }
 
-@injectable()
-export class TableViewerStorageService implements IDataViewerTableStorage {
+export class TableViewerStorageServiceImpl implements IDataViewerTableStorage {
   readonly onChange: ISyncExecutor<ITableViewerStorageChangeEventData>;
   private readonly tableModelMap: Map<string, IDatabaseDataModel<any>> = new Map();
 
@@ -72,3 +71,20 @@ export class TableViewerStorageService implements IDataViewerTableStorage {
     }
   }
 }
+
+export type TableViewerStorageService = TableViewerStorageServiceImpl;
+
+export class TableViewerStorageServiceDI extends Context.Service<TableViewerStorageServiceDI, TableViewerStorageServiceImpl>()(
+  '@cloudbeaver/plugin-data-viewer/TableViewer/TableViewerStorageService#TableViewerStorageService',
+) {
+  static readonly implementation = TableViewerStorageServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<TableViewerStorageServiceImpl, never, never> = Effect.sync(() => new TableViewerStorageServiceImpl());
+  static readonly layer: Layer.Layer<TableViewerStorageServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TableViewerStorageService = TableViewerStorageServiceDI;

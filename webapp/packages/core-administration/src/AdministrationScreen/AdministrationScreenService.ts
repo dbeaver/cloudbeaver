@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
@@ -23,16 +23,7 @@ import { ADMINISTRATION_SCREEN_STATE_SCHEMA, type IAdministrationScreenInfo } fr
 
 const ADMINISTRATION_INFO = 'administration_info';
 
-@injectable(() => [
-  SessionPermissionsResource,
-  PermissionsService,
-  ScreenService,
-  AdministrationItemService,
-  StorageService,
-  ServerConfigResource,
-  NotificationService,
-])
-export class AdministrationScreenService {
+export class AdministrationScreenServiceImpl {
   static screenName = 'administration';
   static itemRouteName = 'administration.item';
   static itemSubRouteName = 'administration.item.sub';
@@ -170,30 +161,30 @@ export class AdministrationScreenService {
       if (item) {
         if (sub) {
           if (param) {
-            return AdministrationScreenService.setupItemSubParamRouteName;
+            return AdministrationScreenServiceImpl.setupItemSubParamRouteName;
           }
 
-          return AdministrationScreenService.setupItemSubRouteName;
+          return AdministrationScreenServiceImpl.setupItemSubRouteName;
         }
 
-        return AdministrationScreenService.setupItemRouteName;
+        return AdministrationScreenServiceImpl.setupItemRouteName;
       }
 
-      return AdministrationScreenService.setupName;
+      return AdministrationScreenServiceImpl.setupName;
     } else {
       if (item) {
         if (sub) {
           if (param) {
-            return AdministrationScreenService.itemSubParamRouteName;
+            return AdministrationScreenServiceImpl.itemSubParamRouteName;
           }
 
-          return AdministrationScreenService.itemSubRouteName;
+          return AdministrationScreenServiceImpl.itemSubRouteName;
         }
 
-        return AdministrationScreenService.itemRouteName;
+        return AdministrationScreenServiceImpl.itemRouteName;
       }
 
-      return AdministrationScreenService.screenName;
+      return AdministrationScreenServiceImpl.screenName;
     }
   }
 
@@ -248,8 +239,8 @@ export class AdministrationScreenService {
 
   isAdministrationRouteActive(routeName: string): boolean {
     return (
-      this.screenService.isActive(routeName, AdministrationScreenService.screenName) ||
-      this.screenService.isActive(routeName, AdministrationScreenService.setupName)
+      this.screenService.isActive(routeName, AdministrationScreenServiceImpl.screenName) ||
+      this.screenService.isActive(routeName, AdministrationScreenServiceImpl.setupName)
     );
   }
 
@@ -265,7 +256,7 @@ export class AdministrationScreenService {
       await this.administrationItemService.deActivate(screen, this.isConfigurationMode, screen.item !== toScreen?.item, toScreen === null);
     }
 
-    if (this.isConfigurationMode && !this.screenService.isActive(nextState.name, AdministrationScreenService.setupName)) {
+    if (this.isConfigurationMode && !this.screenService.isActive(nextState.name, AdministrationScreenServiceImpl.setupName)) {
       this.navigateToRoot();
     }
   }
@@ -341,7 +332,7 @@ export class AdministrationScreenService {
       return true;
     }
 
-    if (this.screenService.isActive(state.name, AdministrationScreenService.setupName)) {
+    if (this.screenService.isActive(state.name, AdministrationScreenServiceImpl.setupName)) {
       return false;
     }
 
@@ -356,6 +347,77 @@ export class AdministrationScreenService {
     return true;
   }
 }
+
+export type AdministrationScreenService = AdministrationScreenServiceImpl;
+
+export class AdministrationScreenServiceDI extends Context.Service<AdministrationScreenServiceDI, AdministrationScreenServiceImpl>()(
+  '@cloudbeaver/core-administration/AdministrationScreen/AdministrationScreenService#AdministrationScreenService',
+) {
+  static readonly implementation = AdministrationScreenServiceImpl;
+  static readonly screenName = AdministrationScreenServiceImpl.screenName;
+  static readonly itemRouteName = AdministrationScreenServiceImpl.itemRouteName;
+  static readonly itemSubRouteName = AdministrationScreenServiceImpl.itemSubRouteName;
+  static readonly itemSubParamRouteName = AdministrationScreenServiceImpl.itemSubParamRouteName;
+  static readonly setupName = AdministrationScreenServiceImpl.setupName;
+  static readonly setupItemRouteName = AdministrationScreenServiceImpl.setupItemRouteName;
+  static readonly setupItemSubRouteName = AdministrationScreenServiceImpl.setupItemSubRouteName;
+  static readonly setupItemSubParamRouteName = AdministrationScreenServiceImpl.setupItemSubParamRouteName;
+  static readonly dependencies = () =>
+    [
+      SessionPermissionsResource,
+      PermissionsService,
+      ScreenService,
+      AdministrationItemService,
+      StorageService,
+      ServerConfigResource,
+      NotificationService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    AdministrationScreenServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof ScreenService>
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof StorageService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeAdministrationScreenService() {
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+    const permissionsService = yield* PermissionsService;
+    const screenService = yield* ScreenService;
+    const administrationItemService = yield* AdministrationItemService;
+    const storageService = yield* StorageService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const notificationService = yield* NotificationService;
+
+    return new AdministrationScreenServiceImpl(
+      sessionPermissionsResource,
+      permissionsService,
+      screenService,
+      administrationItemService,
+      storageService,
+      serverConfigResource,
+      notificationService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AdministrationScreenServiceDI,
+    never,
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof ScreenService>
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof StorageService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AdministrationScreenService = AdministrationScreenServiceDI;
 
 function getDefaultAdministrationScreenInfo(): IAdministrationScreenInfo {
   return {

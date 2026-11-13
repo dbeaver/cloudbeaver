@@ -1,19 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
-import { createSettingsLayer, ROOT_SETTINGS_LAYER, EditableSettingsSource } from '@cloudbeaver/core-settings';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { createSettingsLayer, EditableSettingsSource, ROOT_SETTINGS_LAYER } from '@cloudbeaver/core-settings';
 
 export const PRODUCT_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'product');
 
-@injectable()
-export class ProductSettingsService extends EditableSettingsSource {
+export class ProductSettingsServiceImpl extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
 
   constructor() {
@@ -65,3 +64,20 @@ export class ProductSettingsService extends EditableSettingsSource {
     return Object.fromEntries(this.settings.entries());
   }
 }
+
+export type ProductSettingsService = ProductSettingsServiceImpl;
+
+export class ProductSettingsServiceDI extends Context.Service<ProductSettingsServiceDI, ProductSettingsServiceImpl>()(
+  '@cloudbeaver/core-product/ProductSettingsService#ProductSettingsService',
+) {
+  static readonly implementation = ProductSettingsServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<ProductSettingsServiceImpl, never, never> = Effect.sync(() => new ProductSettingsServiceImpl());
+  static readonly layer: Layer.Layer<ProductSettingsServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ProductSettingsService = ProductSettingsServiceDI;

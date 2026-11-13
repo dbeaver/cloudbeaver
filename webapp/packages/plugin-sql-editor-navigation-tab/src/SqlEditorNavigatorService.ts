@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { ConnectionInfoResource, createConnectionParam, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { NavigationService } from '@cloudbeaver/core-ui';
@@ -58,17 +58,7 @@ export interface ISQLEditorAction extends ISQLEditorActionContext {
   resultId: string;
 }
 
-@injectable(() => [
-  NavigationTabsService,
-  NotificationService,
-  SqlEditorTabService,
-  SqlResultTabsService,
-  ConnectionInfoResource,
-  NavigationService,
-  SqlDataSourceService,
-  SqlQueryService,
-])
-export class SqlEditorNavigatorService {
+export class SqlEditorNavigatorServiceImpl {
   private readonly navigator: IExecutor<ISQLCreateAction | ISQLEditorAction>;
 
   constructor(
@@ -234,3 +224,72 @@ export class SqlEditorNavigatorService {
     }
   }
 }
+
+export type SqlEditorNavigatorService = SqlEditorNavigatorServiceImpl;
+
+export class SqlEditorNavigatorServiceDI extends Context.Service<SqlEditorNavigatorServiceDI, SqlEditorNavigatorServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor-navigation-tab/SqlEditorNavigatorService#SqlEditorNavigatorService',
+) {
+  static readonly implementation = SqlEditorNavigatorServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavigationTabsService,
+      NotificationService,
+      SqlEditorTabService,
+      SqlResultTabsService,
+      ConnectionInfoResource,
+      NavigationService,
+      SqlDataSourceService,
+      SqlQueryService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    SqlEditorNavigatorServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlEditorTabService>
+    | Context.Service.Identifier<typeof SqlResultTabsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavigationService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof SqlQueryService>
+  > = Effect.gen(function* makeSqlEditorNavigatorService() {
+    const navigationTabsService = yield* NavigationTabsService;
+    const notificationService = yield* NotificationService;
+    const sqlEditorTabService = yield* SqlEditorTabService;
+    const sqlResultTabsService = yield* SqlResultTabsService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const navigationService = yield* NavigationService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const sqlQueryService = yield* SqlQueryService;
+
+    return new SqlEditorNavigatorServiceImpl(
+      navigationTabsService,
+      notificationService,
+      sqlEditorTabService,
+      sqlResultTabsService,
+      connectionInfoResource,
+      navigationService,
+      sqlDataSourceService,
+      sqlQueryService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SqlEditorNavigatorServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlEditorTabService>
+    | Context.Service.Identifier<typeof SqlResultTabsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavigationService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof SqlQueryService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlEditorNavigatorService = SqlEditorNavigatorServiceDI;

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import {
   type CachedResourceIncludeArgs,
@@ -25,8 +25,7 @@ import { ResourceManagerEventHandler } from './ResourceManagerEventHandler.js';
 export type ResourceInfoIncludes = Omit<GetResourceListQueryVariables, 'projectId'>;
 export type RmResourceInfo = RmResource;
 
-@injectable(() => [GraphQLService, ProjectsService, ResourceManagerEventHandler, DataSynchronizationService])
-export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, ResourceInfoIncludes> {
+export class ResourceManagerResourceImpl extends CachedTreeResource<RmResourceInfo, ResourceInfoIncludes> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly projectsService: ProjectsService,
@@ -256,6 +255,44 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
     };
   }
 }
+
+export type ResourceManagerResource = ResourceManagerResourceImpl;
+
+export class ResourceManagerResourceDI extends Context.Service<ResourceManagerResourceDI, ResourceManagerResourceImpl>()(
+  '@cloudbeaver/core-resource-manager/ResourceManagerResource#ResourceManagerResource',
+) {
+  static readonly implementation = ResourceManagerResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ProjectsService, ResourceManagerEventHandler, DataSynchronizationService] as const;
+  static readonly make: Effect.Effect<
+    ResourceManagerResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ResourceManagerEventHandler>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+  > = Effect.gen(function* makeResourceManagerResource() {
+    const graphQLService = yield* GraphQLService;
+    const projectsService = yield* ProjectsService;
+    const resourceManagerEventHandler = yield* ResourceManagerEventHandler;
+    const dataSynchronizationService = yield* DataSynchronizationService;
+
+    return new ResourceManagerResourceImpl(graphQLService, projectsService, resourceManagerEventHandler, dataSynchronizationService);
+  });
+  static readonly layer: Layer.Layer<
+    ResourceManagerResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ResourceManagerEventHandler>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResourceManagerResource = ResourceManagerResourceDI;
 
 export function getRmResourcePath(projectId: string, path?: string): string {
   return createPath(projectId, path);

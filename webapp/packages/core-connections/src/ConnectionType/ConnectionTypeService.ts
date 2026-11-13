@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ThemeService } from '@cloudbeaver/core-theming';
 
-import { ConnectionTypeResource, mapColorValue, PREDEFINED_UNSET_COLOR } from './ConnectionTypeResource.js';
-import { ConnectionInfoResource } from '../ConnectionInfoResource.js';
 import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';
+import { ConnectionInfoResource } from '../ConnectionInfoResource.js';
+import { ConnectionTypeResource, mapColorValue, PREDEFINED_UNSET_COLOR } from './ConnectionTypeResource.js';
 
-@injectable(() => [ConnectionTypeResource, ConnectionInfoResource, ThemeService])
-export class ConnectionTypeService {
+export class ConnectionTypeServiceImpl {
   constructor(
     private readonly connectionTypeResource: ConnectionTypeResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -52,3 +51,38 @@ export class ConnectionTypeService {
     return mapColorValue(color);
   }
 }
+
+export type ConnectionTypeService = ConnectionTypeServiceImpl;
+
+export class ConnectionTypeServiceDI extends Context.Service<ConnectionTypeServiceDI, ConnectionTypeServiceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionType/ConnectionTypeService#ConnectionTypeService',
+) {
+  static readonly implementation = ConnectionTypeServiceImpl;
+
+  static readonly dependencies = () => [ConnectionTypeResource, ConnectionInfoResource, ThemeService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionTypeServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionTypeResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ThemeService>
+  > = Effect.gen(function* makeConnectionTypeService() {
+    const connectionTypeResource = yield* ConnectionTypeResource;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const themeService = yield* ThemeService;
+
+    return new ConnectionTypeServiceImpl(connectionTypeResource, connectionInfoResource, themeService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionTypeServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionTypeResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ThemeService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionTypeService = ConnectionTypeServiceDI;

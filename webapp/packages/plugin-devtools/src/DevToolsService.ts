@@ -8,7 +8,7 @@
 /// <reference types="vite/client" />
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { StorageService } from '@cloudbeaver/core-storage';
 
@@ -21,8 +21,7 @@ interface IDevToolsSettings {
 
 const DEVTOOLS = 'devtools';
 
-@injectable(() => [ServerConfigResource, StorageService])
-export class DevToolsService {
+export class DevToolsServiceImpl {
   get isEnabled(): boolean {
     return this.settings.enabled;
   }
@@ -97,6 +96,36 @@ export class DevToolsService {
     }
   }
 }
+
+export type DevToolsService = DevToolsServiceImpl;
+
+export class DevToolsServiceDI extends Context.Service<DevToolsServiceDI, DevToolsServiceImpl>()(
+  '@cloudbeaver/plugin-devtools/DevToolsService#DevToolsService',
+) {
+  static readonly implementation = DevToolsServiceImpl;
+
+  static readonly dependencies = () => [ServerConfigResource, StorageService] as const;
+  static readonly make: Effect.Effect<
+    DevToolsServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ServerConfigResource> | Context.Service.Identifier<typeof StorageService>
+  > = Effect.gen(function* makeDevToolsService() {
+    const serverConfigResource = yield* ServerConfigResource;
+    const storageService = yield* StorageService;
+
+    return new DevToolsServiceImpl(serverConfigResource, storageService);
+  });
+  static readonly layer: Layer.Layer<
+    DevToolsServiceDI,
+    never,
+    Context.Service.Identifier<typeof ServerConfigResource> | Context.Service.Identifier<typeof StorageService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DevToolsService = DevToolsServiceDI;
 
 function getDefaultDevToolsSettings(): IDevToolsSettings {
   return {

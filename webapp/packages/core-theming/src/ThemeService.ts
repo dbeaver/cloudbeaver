@@ -7,7 +7,7 @@
  */
 import { computed, type IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { UIError } from '@cloudbeaver/core-events';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
@@ -17,16 +17,16 @@ import './styles/main/color.pure.css';
 import './styles/main/fonts.pure.css';
 import './styles/theme-utilities.css';
 // TODO: important to keep normalize first
-import './styles/main/normalize.pure.css';
-import './styles/UiIconButton.css';
-import './styles/UiSpinner.css';
-import './styles/UiInput.css';
-import './styles/UISearch.css';
-import './styles/UiPopover.css';
-import './styles/UiMenu.css';
-import './styles/UiColorPicker.css';
-import './styles/UiSwitch.css';
 import './styles/form-controls.css';
+import './styles/main/normalize.pure.css';
+import './styles/UiColorPicker.css';
+import './styles/UiIconButton.css';
+import './styles/UiInput.css';
+import './styles/UiMenu.css';
+import './styles/UiPopover.css';
+import './styles/UISearch.css';
+import './styles/UiSpinner.css';
+import './styles/UiSwitch.css';
 import { FALLBACK_THEME_ID, themes } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
 
@@ -46,8 +46,7 @@ export interface IStyleRegistry {
   styles: Style[];
 }
 
-@injectable(() => [ThemeSettingsService])
-export class ThemeService extends Bootstrap {
+export class ThemeServiceImpl extends Bootstrap {
   get themes(): ITheme[] {
     return Array.from(this.themeMap.values());
   }
@@ -199,3 +198,24 @@ export class ThemeService extends Bootstrap {
     }
   }
 }
+
+export type ThemeService = ThemeServiceImpl;
+
+export class ThemeServiceDI extends Context.Service<ThemeServiceDI, ThemeServiceImpl>()('@cloudbeaver/core-theming/ThemeService#ThemeService') {
+  static readonly implementation = ThemeServiceImpl;
+
+  static readonly dependencies = () => [ThemeSettingsService] as const;
+  static readonly make: Effect.Effect<ThemeServiceImpl, never, Context.Service.Identifier<typeof ThemeSettingsService>> = Effect.gen(
+    function* makeThemeService() {
+      const themeSettingsService = yield* ThemeSettingsService;
+
+      return new ThemeServiceImpl(themeSettingsService);
+    },
+  );
+  static readonly layer: Layer.Layer<ThemeServiceDI, never, Context.Service.Identifier<typeof ThemeSettingsService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ThemeService = ThemeServiceDI;

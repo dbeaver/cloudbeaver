@@ -5,21 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, NavNodeInfoResource, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE } from '@cloudbeaver/plugin-navigation-tree';
 
-import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 import { getSqlGenerationActions } from './getSqlGenerationActions.js';
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
 import { getSqlGenerationNodes, isSqlGenerationNode } from './sqlGenerationSelection.js';
 import { SqlGenerationService } from './SqlGenerationService.js';
+import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 
-@injectable(() => [SqlGeneratorsResource, SqlGenerationService, MenuService, NavNodeInfoResource])
-export class SqlGeneratorsBootstrap extends Bootstrap {
+export class SqlGeneratorsBootstrapImpl extends Bootstrap {
   constructor(
     private readonly sqlGeneratorsResource: SqlGeneratorsResource,
     private readonly sqlGenerationService: SqlGenerationService,
@@ -84,3 +83,41 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
     return getSqlGenerationNodes(node, tree?.getSelected().map(id => this.navNodeInfoResource.get(id)) ?? []).filter(isSqlGenerationNode);
   }
 }
+
+export type SqlGeneratorsBootstrap = SqlGeneratorsBootstrapImpl;
+
+export class SqlGeneratorsBootstrapDI extends Context.Service<SqlGeneratorsBootstrapDI, SqlGeneratorsBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-generator/SqlGenerators/SqlGeneratorsBootstrap#SqlGeneratorsBootstrap',
+) {
+  static readonly implementation = SqlGeneratorsBootstrapImpl;
+
+  static readonly dependencies = () => [SqlGeneratorsResource, SqlGenerationService, MenuService, NavNodeInfoResource] as const;
+  static readonly make: Effect.Effect<
+    SqlGeneratorsBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof SqlGeneratorsResource>
+    | Context.Service.Identifier<typeof SqlGenerationService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Effect.gen(function* makeSqlGeneratorsBootstrap() {
+    const sqlGeneratorsResource = yield* SqlGeneratorsResource;
+    const sqlGenerationService = yield* SqlGenerationService;
+    const menuService = yield* MenuService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+
+    return new SqlGeneratorsBootstrapImpl(sqlGeneratorsResource, sqlGenerationService, menuService, navNodeInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    SqlGeneratorsBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof SqlGeneratorsResource>
+    | Context.Service.Identifier<typeof SqlGenerationService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlGeneratorsBootstrap = SqlGeneratorsBootstrapDI;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { MENU_TAB } from '@cloudbeaver/core-ui';
 import { ACTION_OPEN_IN_TAB, ActionService, type IAction, KEY_BINDING_OPEN_IN_TAB, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
@@ -16,16 +16,7 @@ import { DATA_CONTEXT_SQL_EDITOR_TAB } from '@cloudbeaver/plugin-sql-editor-navi
 import { SqlEditorScreenService } from './Screen/SqlEditorScreenService.js';
 import { SqlEditorScreenSettingsService } from './SqlEditorScreenSettingsService.js';
 
-@injectable(() => [
-  ActionService,
-  KeyBindingService,
-  SqlEditorScreenService,
-  NotificationService,
-  MenuService,
-  SqlDataSourceService,
-  SqlEditorScreenSettingsService,
-])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
@@ -102,3 +93,67 @@ export class PluginBootstrap extends Bootstrap {
     window.open(url, '_blank')?.focus();
   }
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-editor-screen/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      ActionService,
+      KeyBindingService,
+      SqlEditorScreenService,
+      NotificationService,
+      MenuService,
+      SqlDataSourceService,
+      SqlEditorScreenSettingsService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof SqlEditorScreenService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof SqlEditorScreenSettingsService>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const actionService = yield* ActionService;
+    const keyBindingService = yield* KeyBindingService;
+    const sqlEditorScreenService = yield* SqlEditorScreenService;
+    const notificationService = yield* NotificationService;
+    const menuService = yield* MenuService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const sqlEditorScreenSettingsService = yield* SqlEditorScreenSettingsService;
+
+    return new PluginBootstrapImpl(
+      actionService,
+      keyBindingService,
+      sqlEditorScreenService,
+      notificationService,
+      menuService,
+      sqlDataSourceService,
+      sqlEditorScreenSettingsService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof SqlEditorScreenService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof SqlEditorScreenSettingsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

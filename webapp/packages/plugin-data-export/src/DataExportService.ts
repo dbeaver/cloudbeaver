@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { DataTransferParameters } from '@cloudbeaver/core-sdk';
 
@@ -13,8 +13,7 @@ import { DataExportProcessService } from './DataExportProcessService.js';
 import { ExportNotification } from './ExportNotification/ExportNotification.js';
 import type { IExportContext } from './IExportContext.js';
 
-@injectable(() => [NotificationService, DataExportProcessService])
-export class DataExportService {
+export class DataExportServiceImpl {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly dataExportProcessService: DataExportProcessService,
@@ -36,3 +35,33 @@ export class DataExportService {
     return taskId;
   }
 }
+
+export type DataExportService = DataExportServiceImpl;
+
+export class DataExportServiceDI extends Context.Service<DataExportServiceDI, DataExportServiceImpl>()(
+  '@cloudbeaver/plugin-data-export/DataExportService#DataExportService',
+) {
+  static readonly implementation = DataExportServiceImpl;
+
+  static readonly dependencies = () => [NotificationService, DataExportProcessService] as const;
+  static readonly make: Effect.Effect<
+    DataExportServiceImpl,
+    never,
+    Context.Service.Identifier<typeof NotificationService> | Context.Service.Identifier<typeof DataExportProcessService>
+  > = Effect.gen(function* makeDataExportService() {
+    const notificationService = yield* NotificationService;
+    const dataExportProcessService = yield* DataExportProcessService;
+
+    return new DataExportServiceImpl(notificationService, dataExportProcessService);
+  });
+  static readonly layer: Layer.Layer<
+    DataExportServiceDI,
+    never,
+    Context.Service.Identifier<typeof NotificationService> | Context.Service.Identifier<typeof DataExportProcessService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataExportService = DataExportServiceDI;

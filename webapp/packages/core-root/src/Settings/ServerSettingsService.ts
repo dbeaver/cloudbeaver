@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { PRODUCT_SETTINGS_LAYER } from '@cloudbeaver/core-product';
 import { createSettingsLayer, EditableSettingsSource } from '@cloudbeaver/core-settings';
 
@@ -17,8 +17,7 @@ import { SessionPermissionsResource } from '../SessionPermissionsResource.js';
 
 export const SERVER_SETTINGS_LAYER = createSettingsLayer(PRODUCT_SETTINGS_LAYER, 'server');
 
-@injectable(() => [ServerConfigResource, SessionPermissionsResource])
-export class ServerSettingsService extends EditableSettingsSource {
+export class ServerSettingsServiceImpl extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
   private lastConfig: any;
 
@@ -97,3 +96,33 @@ export class ServerSettingsService extends EditableSettingsSource {
     });
   }
 }
+
+export type ServerSettingsService = ServerSettingsServiceImpl;
+
+export class ServerSettingsServiceDI extends Context.Service<ServerSettingsServiceDI, ServerSettingsServiceImpl>()(
+  '@cloudbeaver/core-root/Settings/ServerSettingsService#ServerSettingsService',
+) {
+  static readonly implementation = ServerSettingsServiceImpl;
+
+  static readonly dependencies = () => [ServerConfigResource, SessionPermissionsResource] as const;
+  static readonly make: Effect.Effect<
+    ServerSettingsServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ServerConfigResource> | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Effect.gen(function* makeServerSettingsService() {
+    const serverConfigResource = yield* ServerConfigResource;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+
+    return new ServerSettingsServiceImpl(serverConfigResource, sessionPermissionsResource);
+  });
+  static readonly layer: Layer.Layer<
+    ServerSettingsServiceDI,
+    never,
+    Context.Service.Identifier<typeof ServerConfigResource> | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServerSettingsService = ServerSettingsServiceDI;

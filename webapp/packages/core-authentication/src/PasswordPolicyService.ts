@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { computed, makeObservable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { PasswordPolicyResource } from '@cloudbeaver/core-root';
 import type { PasswordPolicyConfig } from '@cloudbeaver/core-sdk';
@@ -21,8 +21,7 @@ const DEFAULT_PASSWORD_POLICY: PasswordPolicyConfig = {
 
 type ValidationResult = { isValid: true; errorMessage: null } | { isValid: false; errorMessage: string };
 
-@injectable(() => [PasswordPolicyResource, LocalizationService])
-export class PasswordPolicyService {
+export class PasswordPolicyServiceImpl {
   get config(): PasswordPolicyConfig {
     return {
       minLength: this.passwordPolicyResource.data?.minLength || DEFAULT_PASSWORD_POLICY.minLength,
@@ -79,3 +78,33 @@ export class PasswordPolicyService {
     return { isValid: true, errorMessage: null };
   }
 }
+
+export type PasswordPolicyService = PasswordPolicyServiceImpl;
+
+export class PasswordPolicyServiceDI extends Context.Service<PasswordPolicyServiceDI, PasswordPolicyServiceImpl>()(
+  '@cloudbeaver/core-authentication/PasswordPolicyService#PasswordPolicyService',
+) {
+  static readonly implementation = PasswordPolicyServiceImpl;
+
+  static readonly dependencies = () => [PasswordPolicyResource, LocalizationService] as const;
+  static readonly make: Effect.Effect<
+    PasswordPolicyServiceImpl,
+    never,
+    Context.Service.Identifier<typeof PasswordPolicyResource> | Context.Service.Identifier<typeof LocalizationService>
+  > = Effect.gen(function* makePasswordPolicyService() {
+    const passwordPolicyResource = yield* PasswordPolicyResource;
+    const localizationService = yield* LocalizationService;
+
+    return new PasswordPolicyServiceImpl(passwordPolicyResource, localizationService);
+  });
+  static readonly layer: Layer.Layer<
+    PasswordPolicyServiceDI,
+    never,
+    Context.Service.Identifier<typeof PasswordPolicyResource> | Context.Service.Identifier<typeof LocalizationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PasswordPolicyService = PasswordPolicyServiceDI;

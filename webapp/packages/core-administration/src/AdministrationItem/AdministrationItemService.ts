@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import type { RouterState } from '@cloudbeaver/core-routing';
 
@@ -28,8 +28,7 @@ interface IActivationData {
   outsideAdminPage: boolean;
 }
 
-@injectable()
-export class AdministrationItemService {
+export class AdministrationItemServiceImpl {
   items: IAdministrationItem[] = [];
 
   itemActivating: boolean;
@@ -293,6 +292,23 @@ export class AdministrationItemService {
     }
   };
 }
+
+export type AdministrationItemService = AdministrationItemServiceImpl;
+
+export class AdministrationItemServiceDI extends Context.Service<AdministrationItemServiceDI, AdministrationItemServiceImpl>()(
+  '@cloudbeaver/core-administration/AdministrationItem/AdministrationItemService#AdministrationItemService',
+) {
+  static readonly implementation = AdministrationItemServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<AdministrationItemServiceImpl, never, never> = Effect.sync(() => new AdministrationItemServiceImpl());
+  static readonly layer: Layer.Layer<AdministrationItemServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AdministrationItemService = AdministrationItemServiceDI;
 
 export function filterHiddenAdministrationItem(configurationWizard: boolean): (item: IAdministrationItem) => boolean {
   return function filterHiddenAdministrationItem(item: IAdministrationItem) {

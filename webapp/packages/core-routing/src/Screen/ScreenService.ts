@@ -8,14 +8,13 @@
 import { computed, makeObservable } from 'mobx';
 import type { SubscribeState } from 'router5';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 
 import { RouterService, type RouterTransitionData } from '../RouterService.js';
 import type { IScreen, ScreenRoute } from './IScreen.js';
 
-@injectable(() => [RouterService])
-export class ScreenService {
+export class ScreenServiceImpl {
   get screen(): IScreen<any> | undefined {
     return this.getScreenByRoute(this.routerService.route);
   }
@@ -124,3 +123,26 @@ export class ScreenService {
     await this.getScreenByRoute(state.route.name)?.onActivate?.(state.route, state.previousRoute);
   }
 }
+
+export type ScreenService = ScreenServiceImpl;
+
+export class ScreenServiceDI extends Context.Service<ScreenServiceDI, ScreenServiceImpl>()(
+  '@cloudbeaver/core-routing/Screen/ScreenService#ScreenService',
+) {
+  static readonly implementation = ScreenServiceImpl;
+
+  static readonly dependencies = () => [RouterService] as const;
+  static readonly make: Effect.Effect<ScreenServiceImpl, never, Context.Service.Identifier<typeof RouterService>> = Effect.gen(
+    function* makeScreenService() {
+      const routerService = yield* RouterService;
+
+      return new ScreenServiceImpl(routerService);
+    },
+  );
+  static readonly layer: Layer.Layer<ScreenServiceDI, never, Context.Service.Identifier<typeof RouterService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ScreenService = ScreenServiceDI;

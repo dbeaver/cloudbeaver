@@ -6,39 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
-import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, SQL_EDITOR_ACTIONS_MENU, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
+import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, ESqlDataSourceFeatures, SQL_EDITOR_ACTIONS_MENU, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { AIChatService } from './AIChat/AIChatService.js';
 import { ACTION_TOGGLE_AI_CHAT } from './actions/ACTION_TOGGLE_AI_CHAT.js';
-import { AIChatTabService } from './AIChatTabService.js';
-import { AIChatFunctionsService } from './AIChatFunctionsService.js';
-import { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
+import { AIChatService } from './AIChat/AIChatService.js';
 import { AIChatAttachmentsPasteService } from './AIChatAttachments/AIChatAttachmentsPasteService.js';
+import { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
 import { AIChatAttachmentsImageHandlerService } from './AIChatAttachmentsHandlers/AIChatAttachmentsImageHandler/AIChatAttachmentsImageHandlerService.js';
+import { AIChatFunctionsService } from './AIChatFunctionsService.js';
+import { AIChatTabService } from './AIChatTabService.js';
 
 const WelcomeAIChat = importLazyComponent(() => import('./WelcomeAIChat.js').then(m => m.WelcomeAIChat));
 
-@injectable(() => [
-  MenuService,
-  ActionService,
-  AIChatService,
-  UserInfoResource,
-  SqlDataSourceService,
-  NavigationTabsService,
-  AIChatTabService,
-  AIChatFunctionsService,
-  AIChatAttachmentsService,
-  AIChatAttachmentsPasteService,
-  AIChatAttachmentsImageHandlerService,
-])
-export class AIChatServiceBootstrap extends Bootstrap {
+export class AIChatServiceBootstrapImpl extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
@@ -111,3 +98,87 @@ export class AIChatServiceBootstrap extends Bootstrap {
     this.navigationTabsService.welcomeContainer.add(WelcomeAIChat, undefined, () => !this.aiChatService.isEnabled);
   }
 }
+
+export type AIChatServiceBootstrap = AIChatServiceBootstrapImpl;
+
+export class AIChatServiceBootstrapDI extends Context.Service<AIChatServiceBootstrapDI, AIChatServiceBootstrapImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChatServiceBootstrap#AIChatServiceBootstrap',
+) {
+  static readonly implementation = AIChatServiceBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      MenuService,
+      ActionService,
+      AIChatService,
+      UserInfoResource,
+      SqlDataSourceService,
+      NavigationTabsService,
+      AIChatTabService,
+      AIChatFunctionsService,
+      AIChatAttachmentsService,
+      AIChatAttachmentsPasteService,
+      AIChatAttachmentsImageHandlerService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    AIChatServiceBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof AIChatService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof AIChatTabService>
+    | Context.Service.Identifier<typeof AIChatFunctionsService>
+    | Context.Service.Identifier<typeof AIChatAttachmentsService>
+    | Context.Service.Identifier<typeof AIChatAttachmentsPasteService>
+    | Context.Service.Identifier<typeof AIChatAttachmentsImageHandlerService>
+  > = Effect.gen(function* makeAIChatServiceBootstrap() {
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const aiChatService = yield* AIChatService;
+    const userInfoResource = yield* UserInfoResource;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const navigationTabsService = yield* NavigationTabsService;
+    const aiChatTabService = yield* AIChatTabService;
+    const aiChatFunctionsService = yield* AIChatFunctionsService;
+    const aiChatAttachmentsService = yield* AIChatAttachmentsService;
+    const aiChatAttachmentsPasteService = yield* AIChatAttachmentsPasteService;
+    const aiChatAttachmentsImageHandlerService = yield* AIChatAttachmentsImageHandlerService;
+
+    return new AIChatServiceBootstrapImpl(
+      menuService,
+      actionService,
+      aiChatService,
+      userInfoResource,
+      sqlDataSourceService,
+      navigationTabsService,
+      aiChatTabService,
+      aiChatFunctionsService,
+      aiChatAttachmentsService,
+      aiChatAttachmentsPasteService,
+      aiChatAttachmentsImageHandlerService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIChatServiceBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof AIChatService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof AIChatTabService>
+    | Context.Service.Identifier<typeof AIChatFunctionsService>
+    | Context.Service.Identifier<typeof AIChatAttachmentsService>
+    | Context.Service.Identifier<typeof AIChatAttachmentsPasteService>
+    | Context.Service.Identifier<typeof AIChatAttachmentsImageHandlerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatServiceBootstrap = AIChatServiceBootstrapDI;

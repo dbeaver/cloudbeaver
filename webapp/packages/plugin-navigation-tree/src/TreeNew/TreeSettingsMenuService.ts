@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_TREE_SETTINGS } from './DATA_CONTEXT_TREE.js';
@@ -19,12 +19,11 @@ import { TREE_SETTINGS_FILTER_ENABLED } from './useTreeFilter.js';
 export const TREE_SETTINGS_SHOW_DESCRIPTIONS = 'tree.showDescriptions';
 export const TREE_SETTINGS_SAVE_STATE = 'tree.saveState';
 
-@injectable(() => [ActionService, MenuService])
-export class TreeSettingsMenuService {
+export class TreeSettingsMenuServiceImpl {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-  ) { }
+  ) {}
 
   register(): void {
     this.actionService.addHandler({
@@ -80,3 +79,33 @@ export class TreeSettingsMenuService {
     });
   }
 }
+
+export type TreeSettingsMenuService = TreeSettingsMenuServiceImpl;
+
+export class TreeSettingsMenuServiceDI extends Context.Service<TreeSettingsMenuServiceDI, TreeSettingsMenuServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/TreeNew/TreeSettingsMenuService#TreeSettingsMenuService',
+) {
+  static readonly implementation = TreeSettingsMenuServiceImpl;
+
+  static readonly dependencies = () => [ActionService, MenuService] as const;
+  static readonly make: Effect.Effect<
+    TreeSettingsMenuServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ActionService> | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makeTreeSettingsMenuService() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+
+    return new TreeSettingsMenuServiceImpl(actionService, menuService);
+  });
+  static readonly layer: Layer.Layer<
+    TreeSettingsMenuServiceDI,
+    never,
+    Context.Service.Identifier<typeof ActionService> | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TreeSettingsMenuService = TreeSettingsMenuServiceDI;

@@ -8,13 +8,17 @@
 
 import { comparer, computed, makeObservable, observable, reaction, toJS, type IReactionDisposer } from 'mobx';
 
-import { Disposable, injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { isDefined } from '@dbeaver/js-helpers';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { Context, Disposable, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutionContext, Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { isDefined } from '@dbeaver/js-helpers';
 
+import { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
+import { AIChatContextService } from '../AIChatContext/AIChatContextService.js';
+import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.js';
+import { AIChatService } from '../AIChatService.js';
 import {
   AIChatConversationsResource,
   ChatConversationConnectionKey,
@@ -22,11 +26,7 @@ import {
   type AIChatConversationConfig,
   type AIChatConversationInfo,
 } from './AIChatConversationsResource.js';
-import { AIChatContextService } from '../AIChatContext/AIChatContextService.js';
-import { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
-import { AIChatMessagesResource } from '../AIChatMessage/AIChatMessagesResource.js';
 import { conversationConfigContext } from './conversationConfigContext.js';
-import { AIChatService } from '../AIChatService.js';
 
 type NewConversationExecutorData = { stage: 'before'; data: IConnectionInfoParams | null } | { stage: 'after'; data: AIChatConversationInfo };
 
@@ -40,8 +40,7 @@ export interface IAIChatConversationMenuProps {
   conversation: AIChatConversationInfo;
 }
 
-@injectable(() => [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource, AIChatService, NotificationService])
-export class AIChatConversationsService extends Disposable {
+export class AIChatConversationsServiceImpl extends Disposable {
   readonly menuSections = new PlaceholderContainer<IAIChatConversationMenuProps>();
   readonly onNewConversation: Executor<NewConversationExecutorData>;
   readonly onCancelConversation: Executor<CancelConversationExecutorData>;
@@ -211,3 +210,51 @@ export class AIChatConversationsService extends Disposable {
     return await this.aiChatConversationsResource.load(conversationId);
   }
 }
+
+export type AIChatConversationsService = AIChatConversationsServiceImpl;
+
+export class AIChatConversationsServiceDI extends Context.Service<AIChatConversationsServiceDI, AIChatConversationsServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChat/AIChatConversation/AIChatConversationsService#AIChatConversationsService',
+) {
+  static readonly implementation = AIChatConversationsServiceImpl;
+
+  static readonly dependencies = () =>
+    [AIChatContextService, AIChatConversationsResource, AIChatMessagesResource, AIChatService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    AIChatConversationsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof AIChatContextService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof AIChatMessagesResource>
+    | Context.Service.Identifier<typeof AIChatService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeAIChatConversationsService() {
+    const aiChatContextService = yield* AIChatContextService;
+    const aiChatConversationsResource = yield* AIChatConversationsResource;
+    const aiChatMessagesResource = yield* AIChatMessagesResource;
+    const aiChatService = yield* AIChatService;
+    const notificationService = yield* NotificationService;
+
+    return new AIChatConversationsServiceImpl(
+      aiChatContextService,
+      aiChatConversationsResource,
+      aiChatMessagesResource,
+      aiChatService,
+      notificationService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIChatConversationsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof AIChatContextService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof AIChatMessagesResource>
+    | Context.Service.Identifier<typeof AIChatService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatConversationsService = AIChatConversationsServiceDI;

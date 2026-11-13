@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { type ProjectInfo, ProjectsService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
@@ -22,8 +22,7 @@ interface ISelectedNode {
 
 type NodeIdGetter = (projectId: string) => string;
 
-@injectable(() => [NavNodeInfoResource, ProjectsService, ProjectsNavNodeService])
-export class TreeSelectionService {
+export class TreeSelectionServiceImpl {
   constructor(
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectsService: ProjectsService,
@@ -99,3 +98,38 @@ export class TreeSelectionService {
     return this.navNodeInfoResource.get(resourceKeyList(parentIds)).filter(isNotNullDefined);
   }
 }
+
+export type TreeSelectionService = TreeSelectionServiceImpl;
+
+export class TreeSelectionServiceDI extends Context.Service<TreeSelectionServiceDI, TreeSelectionServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/NavigationTree/ElementsTree/TreeSelectionService#TreeSelectionService',
+) {
+  static readonly implementation = TreeSelectionServiceImpl;
+
+  static readonly dependencies = () => [NavNodeInfoResource, ProjectsService, ProjectsNavNodeService] as const;
+  static readonly make: Effect.Effect<
+    TreeSelectionServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ProjectsNavNodeService>
+  > = Effect.gen(function* makeTreeSelectionService() {
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const projectsService = yield* ProjectsService;
+    const projectsNavNodeService = yield* ProjectsNavNodeService;
+
+    return new TreeSelectionServiceImpl(navNodeInfoResource, projectsService, projectsNavNodeService);
+  });
+  static readonly layer: Layer.Layer<
+    TreeSelectionServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ProjectsNavNodeService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TreeSelectionService = TreeSelectionServiceDI;

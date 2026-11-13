@@ -7,14 +7,14 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { injectable } from '@cloudbeaver/core-di';
 import { isNumber } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 
 export interface IHistoryEntry<TData = unknown> {
   timestamp: number;
@@ -28,8 +28,10 @@ export type CompressedEntryFactory<TData> = (entries: IHistoryEntry<TData>[]) =>
 
 const MAX_HISTORY_SIZE = 50;
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
-export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult> extends DatabaseDataAction<any, TResult> {
+export class GridHistoryActionImpl<TData = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult> extends DatabaseDataAction<
+  any,
+  TResult
+> {
   readonly onAdd: ISyncExecutor<IHistoryEntry<TData>>;
   readonly onUndo: ISyncExecutor<IHistoryEntry<TData>>;
   readonly onRedo: ISyncExecutor<IHistoryEntry<TData>>;
@@ -229,3 +231,33 @@ export class GridHistoryAction<TData = unknown, TResult extends IDatabaseDataRes
     this.currentIndex = Math.min(this.currentIndex, newTargetIndex);
   }
 }
+
+export type GridHistoryAction<TData = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult> = GridHistoryActionImpl<TData, TResult>;
+
+export class GridHistoryActionDI extends Context.Service<GridHistoryActionDI, GridHistoryActionImpl<any, any>>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/Grid/GridHistoryAction#GridHistoryAction',
+) {
+  static readonly implementation = GridHistoryActionImpl;
+
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult] as const;
+  static readonly make: Effect.Effect<
+    GridHistoryActionImpl<any, any>,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Effect.gen(function* makeGridHistoryAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+
+    return new GridHistoryActionImpl(source, result);
+  });
+  static readonly layer: Layer.Layer<
+    GridHistoryActionDI,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GridHistoryAction = GridHistoryActionDI;

@@ -7,14 +7,13 @@
  */
 
 import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { type NavigatorViewSettings } from '@cloudbeaver/core-root';
 
 import { ConnectionViewResource } from './ConnectionViewResource.js';
 
-@injectable(() => [ConnectionInfoResource, NavNodeManagerService, ConnectionViewResource])
-export class ConnectionViewService {
+export class ConnectionViewServiceImpl {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
@@ -44,3 +43,38 @@ export class ConnectionViewService {
     }
   }
 }
+
+export type ConnectionViewService = ConnectionViewServiceImpl;
+
+export class ConnectionViewServiceDI extends Context.Service<ConnectionViewServiceDI, ConnectionViewServiceImpl>()(
+  '@cloudbeaver/plugin-connection-view/ConnectionViewService#ConnectionViewService',
+) {
+  static readonly implementation = ConnectionViewServiceImpl;
+
+  static readonly dependencies = () => [ConnectionInfoResource, NavNodeManagerService, ConnectionViewResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionViewServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ConnectionViewResource>
+  > = Effect.gen(function* makeConnectionViewService() {
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const connectionViewResource = yield* ConnectionViewResource;
+
+    return new ConnectionViewServiceImpl(connectionInfoResource, navNodeManagerService, connectionViewResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionViewServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ConnectionViewResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionViewService = ConnectionViewServiceDI;

@@ -10,42 +10,42 @@ import './module.js';
 
 export * from './AIChat/AIChatContext.js';
 
-export { AIChatSettingsService } from './AIChatSettingsService.js';
-export { AIChatFunctionsService } from './AIChatFunctionsService.js';
-export { AIChatFunctionRegistryService } from './AIChatFunctionRegistryService.js';
+export { AIChatFunctionRegistryService, AIChatFunctionRegistryServiceImpl } from './AIChatFunctionRegistryService.js';
 export type {
   IAIChatFunctionAction,
   IAIChatFunctionContext,
   IAIChatFunctionInteractionDefinition,
   IAIChatFunctionInteractionProps,
 } from './AIChatFunctionRegistryService.js';
+export { AIChatFunctionsService, AIChatFunctionsServiceImpl } from './AIChatFunctionsService.js';
+export { AIChatSettingsService, AIChatSettingsServiceImpl } from './AIChatSettingsService.js';
 
-export * from './AIChat/AIChatService.js';
-export * from './AIChat/AIChatConversation/AIChatConversationsService.js';
-export * from './AIChat/AIChatConversation/AIChatConversationsResource.js';
-export * from './AIChat/AIChatConversation/conversationConfigContext.js';
 export * from './AIChat/AIChatContext/AIChatContextService.js';
-export * from './AIChat/AIChatMessage/AIChatMessageService.js';
-export * from './AIChat/AIChatMessage/AIChatMessagesResource.js';
-export * from './AIChatTabService.js';
-export * from './EAIConversationPromptGeneratorId.js';
-export { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
-export type {
-  IAIChatAttachment,
-  IAIChatAttachmentProps,
-  IAIChatMessageAttachmentProps,
-  IAIChatAttachmentHandler,
-} from './AIChatAttachments/AIChatAttachmentsService.js';
-export { AIChatAttachmentsState } from './AIChatAttachments/AIChatAttachmentsState.js';
-export { AIChatInputService } from './AIChat/AIChatInput/AIChatInputService.js';
+export * from './AIChat/AIChatConversation/AIChatConversationsResource.js';
+export * from './AIChat/AIChatConversation/AIChatConversationsService.js';
+export * from './AIChat/AIChatConversation/conversationConfigContext.js';
+export { AIChatInputService, AIChatInputServiceImpl } from './AIChat/AIChatInput/AIChatInputService.js';
 export type {
   IAIChatInputContext,
-  IAIChatInputProps,
   IAIChatInputDragEvent,
   IAIChatInputPasteEvent,
-  IAIChatInputValidation,
+  IAIChatInputProps,
   IAIChatInputSubmission,
+  IAIChatInputValidation,
 } from './AIChat/AIChatInput/AIChatInputService.js';
 export { useAIChatInput } from './AIChat/AIChatInput/useAIChatInput.js';
 export { aiChatMessageRequestContext } from './AIChat/AIChatMessage/aiChatMessageRequestContext.js';
 export type { AIChatMessageRequestConfig } from './AIChat/AIChatMessage/aiChatMessageRequestContext.js';
+export * from './AIChat/AIChatMessage/AIChatMessageService.js';
+export * from './AIChat/AIChatMessage/AIChatMessagesResource.js';
+export * from './AIChat/AIChatService.js';
+export { AIChatAttachmentsService, AIChatAttachmentsServiceImpl } from './AIChatAttachments/AIChatAttachmentsService.js';
+export type {
+  IAIChatAttachment,
+  IAIChatAttachmentHandler,
+  IAIChatAttachmentProps,
+  IAIChatMessageAttachmentProps,
+} from './AIChatAttachments/AIChatAttachmentsService.js';
+export { AIChatAttachmentsState } from './AIChatAttachments/AIChatAttachmentsState.js';
+export * from './AIChatTabService.js';
+export * from './EAIConversationPromptGeneratorId.js';

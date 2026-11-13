@@ -9,7 +9,7 @@ import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
@@ -18,13 +18,12 @@ import { DATA_CONTEXT_NAV_NODE, type NavNode, NavNodeInfoResource } from '@cloud
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../../NavigationTree/ElementsTree/DATA_CONTEXT_ELEMENTS_TREE.js';
-import type { INodeDeletionItem, INodeDeletionDialogItem, INodeDeletionOperation, INodeDeletionResult } from './NodeDeletionPlan.js';
+import type { INodeDeletionDialogItem, INodeDeletionItem, INodeDeletionOperation, INodeDeletionResult } from './NodeDeletionPlan.js';
 import { nodeDeletionPlanContext } from './nodeDeletionPlanContext.js';
 
 const NodeDeletionDialog = importLazyComponent(() => import('./NodeDeletionDialog.js').then(m => m.NodeDeletionDialog));
 
-@injectable(() => [CommonDialogService, NotificationService, LocalizationService, NavNodeInfoResource, ProjectInfoResource])
-export class NodeDeletionService {
+export class NodeDeletionServiceImpl {
   readonly prepareDeletion = new Executor<NavNode[]>();
   private deleting = false;
 
@@ -232,3 +231,45 @@ export class NodeDeletionService {
     }
   }
 }
+
+export type NodeDeletionService = NodeDeletionServiceImpl;
+
+export class NodeDeletionServiceDI extends Context.Service<NodeDeletionServiceDI, NodeDeletionServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/NodesManager/NodeDeletion/NodeDeletionService#NodeDeletionService',
+) {
+  static readonly implementation = NodeDeletionServiceImpl;
+
+  static readonly dependencies = () =>
+    [CommonDialogService, NotificationService, LocalizationService, NavNodeInfoResource, ProjectInfoResource] as const;
+  static readonly make: Effect.Effect<
+    NodeDeletionServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+  > = Effect.gen(function* makeNodeDeletionService() {
+    const commonDialogService = yield* CommonDialogService;
+    const notificationService = yield* NotificationService;
+    const localizationService = yield* LocalizationService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const projectInfoResource = yield* ProjectInfoResource;
+
+    return new NodeDeletionServiceImpl(commonDialogService, notificationService, localizationService, navNodeInfoResource, projectInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    NodeDeletionServiceDI,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NodeDeletionService = NodeDeletionServiceDI;

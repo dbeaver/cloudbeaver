@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
@@ -17,8 +17,7 @@ const defaultSettings = schema.object({
 export type AIChatSettingsSchema = typeof defaultSettings;
 export type AIChatSettings = schema.infer<typeof defaultSettings>;
 
-@injectable(() => [SettingsProviderService])
-export class AIChatSettingsService {
+export class AIChatSettingsServiceImpl {
   get disabled(): boolean {
     return this.settings.getValue('plugin.ai-chat.disabled');
   }
@@ -29,3 +28,26 @@ export class AIChatSettingsService {
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
   }
 }
+
+export type AIChatSettingsService = AIChatSettingsServiceImpl;
+
+export class AIChatSettingsServiceDI extends Context.Service<AIChatSettingsServiceDI, AIChatSettingsServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChatSettingsService#AIChatSettingsService',
+) {
+  static readonly implementation = AIChatSettingsServiceImpl;
+
+  static readonly dependencies = () => [SettingsProviderService] as const;
+  static readonly make: Effect.Effect<AIChatSettingsServiceImpl, never, Context.Service.Identifier<typeof SettingsProviderService>> = Effect.gen(
+    function* makeAIChatSettingsService() {
+      const settingsProviderService = yield* SettingsProviderService;
+
+      return new AIChatSettingsServiceImpl(settingsProviderService);
+    },
+  );
+  static readonly layer: Layer.Layer<AIChatSettingsServiceDI, never, Context.Service.Identifier<typeof SettingsProviderService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatSettingsService = AIChatSettingsServiceDI;

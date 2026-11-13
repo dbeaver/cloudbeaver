@@ -8,17 +8,17 @@
 
 import { runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import { DialogueStateResult, CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ExecutionContext, Executor, ExecutorInterrupter, type IExecutionContext, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { ExecutionContext, Executor, ExecutorInterrupter, type IExecutionContext, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import type { AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
 
-import { AIChatMessagesResource, isFunctionConfirmationMessage, isFunctionMessage, type IMessageParam } from './AIChatMessagesResource.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 import { aiChatMessageRequestContext } from './aiChatMessageRequestContext.js';
+import { AIChatMessagesResource, isFunctionConfirmationMessage, isFunctionMessage, type IMessageParam } from './AIChatMessagesResource.js';
 
 type IAiSendChatMessageInfo = AiSendChatMessageInfoFragment;
 
@@ -45,8 +45,7 @@ interface IMessageSendExecutorAfterData {
 
 export type MessageSendExecutorData = IMessageSendExecutorBeforeData | IMessageSendExecutorAfterData;
 
-@injectable(() => [AIChatMessagesResource, AIChatConversationsResource, CommonDialogService, LocalizationService, ConnectionsManagerService])
-export class AIChatMessageService {
+export class AIChatMessageServiceImpl {
   onMessageSend: Executor<MessageSendExecutorData>;
 
   constructor(
@@ -175,3 +174,51 @@ export class AIChatMessageService {
     }
   }
 }
+
+export type AIChatMessageService = AIChatMessageServiceImpl;
+
+export class AIChatMessageServiceDI extends Context.Service<AIChatMessageServiceDI, AIChatMessageServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChat/AIChatMessage/AIChatMessageService#AIChatMessageService',
+) {
+  static readonly implementation = AIChatMessageServiceImpl;
+
+  static readonly dependencies = () =>
+    [AIChatMessagesResource, AIChatConversationsResource, CommonDialogService, LocalizationService, ConnectionsManagerService] as const;
+  static readonly make: Effect.Effect<
+    AIChatMessageServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof AIChatMessagesResource>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+  > = Effect.gen(function* makeAIChatMessageService() {
+    const aiChatMessagesResource = yield* AIChatMessagesResource;
+    const aiChatConversationsResource = yield* AIChatConversationsResource;
+    const commonDialogService = yield* CommonDialogService;
+    const localizationService = yield* LocalizationService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+
+    return new AIChatMessageServiceImpl(
+      aiChatMessagesResource,
+      aiChatConversationsResource,
+      commonDialogService,
+      localizationService,
+      connectionsManagerService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIChatMessageServiceDI,
+    never,
+    | Context.Service.Identifier<typeof AIChatMessagesResource>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatMessageService = AIChatMessageServiceDI;

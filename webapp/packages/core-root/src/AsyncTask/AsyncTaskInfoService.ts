@@ -7,22 +7,21 @@
  */
 import type { Subscription } from 'rxjs';
 
-import { Disposable, injectable } from '@cloudbeaver/core-di';
-import { type AsyncTaskInfo, GraphQLService, type WsAsyncTaskInfo } from '@cloudbeaver/core-sdk';
+import { Context, Disposable, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { GraphQLService, type AsyncTaskInfo, type WsAsyncTaskInfo } from '@cloudbeaver/core-sdk';
 
+import { Executor, SyncExecutor, type IExecutor, type ISyncExecutor } from '@cloudbeaver/core-executor';
 import type { Unsubscribe } from '../ServerEventEmitter/IServerEventEmitter.js';
 import { ServerEventId } from '../SessionEventSource.js';
 import { AsyncTask } from './AsyncTask.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTaskInfoEventHandler.js';
-import { Executor, SyncExecutor, type IExecutor, type ISyncExecutor } from '@cloudbeaver/core-executor';
 
 export interface IBaseAsyncTaskEvent {
   id: string;
   taskId: string;
 }
 
-@injectable(() => [GraphQLService, AsyncTaskInfoEventHandler])
-export class AsyncTaskInfoService extends Disposable {
+export class AsyncTaskInfoServiceImpl extends Disposable {
   readonly onExecuteEvent: IExecutor<IBaseAsyncTaskEvent>;
   readonly onTaskUpdated: ISyncExecutor<AsyncTask>;
 
@@ -193,3 +192,33 @@ export class AsyncTaskInfoService extends Disposable {
     });
   }
 }
+
+export type AsyncTaskInfoService = AsyncTaskInfoServiceImpl;
+
+export class AsyncTaskInfoServiceDI extends Context.Service<AsyncTaskInfoServiceDI, AsyncTaskInfoServiceImpl>()(
+  '@cloudbeaver/core-root/AsyncTask/AsyncTaskInfoService#AsyncTaskInfoService',
+) {
+  static readonly implementation = AsyncTaskInfoServiceImpl;
+
+  static readonly dependencies = () => [GraphQLService, AsyncTaskInfoEventHandler] as const;
+  static readonly make: Effect.Effect<
+    AsyncTaskInfoServiceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof AsyncTaskInfoEventHandler>
+  > = Effect.gen(function* makeAsyncTaskInfoService() {
+    const graphQLService = yield* GraphQLService;
+    const asyncTaskInfoEventHandler = yield* AsyncTaskInfoEventHandler;
+
+    return new AsyncTaskInfoServiceImpl(graphQLService, asyncTaskInfoEventHandler);
+  });
+  static readonly layer: Layer.Layer<
+    AsyncTaskInfoServiceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof AsyncTaskInfoEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AsyncTaskInfoService = AsyncTaskInfoServiceDI;

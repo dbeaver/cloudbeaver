@@ -7,14 +7,13 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { BaseOptionsPanelService, OptionsPanelService } from '@cloudbeaver/core-ui';
 
 const ProjectInfoForm = importLazyComponent(() => import('./ProjectInfoForm.js').then(m => m.ProjectInfoForm));
 const panelGetter = () => ProjectInfoForm;
 
-@injectable(() => [OptionsPanelService])
-export class ProjectInfoOptionsPanelService extends BaseOptionsPanelService<string | undefined> {
+export class ProjectInfoOptionsPanelServiceImpl extends BaseOptionsPanelService<string | undefined> {
   constructor(optionsPanelService: OptionsPanelService) {
     super(optionsPanelService, panelGetter);
   }
@@ -23,3 +22,26 @@ export class ProjectInfoOptionsPanelService extends BaseOptionsPanelService<stri
     return super.open(tabId);
   }
 }
+
+export type ProjectInfoOptionsPanelService = ProjectInfoOptionsPanelServiceImpl;
+
+export class ProjectInfoOptionsPanelServiceDI extends Context.Service<ProjectInfoOptionsPanelServiceDI, ProjectInfoOptionsPanelServiceImpl>()(
+  '@cloudbeaver/plugin-project-info/ProjectInfoForm/ProjectInfoOptionsPanelService#ProjectInfoOptionsPanelService',
+) {
+  static readonly implementation = ProjectInfoOptionsPanelServiceImpl;
+
+  static readonly dependencies = () => [OptionsPanelService] as const;
+  static readonly make: Effect.Effect<ProjectInfoOptionsPanelServiceImpl, never, Context.Service.Identifier<typeof OptionsPanelService>> = Effect.gen(
+    function* makeProjectInfoOptionsPanelService() {
+      const optionsPanelService = yield* OptionsPanelService;
+
+      return new ProjectInfoOptionsPanelServiceImpl(optionsPanelService);
+    },
+  );
+  static readonly layer: Layer.Layer<ProjectInfoOptionsPanelServiceDI, never, Context.Service.Identifier<typeof OptionsPanelService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ProjectInfoOptionsPanelService = ProjectInfoOptionsPanelServiceDI;

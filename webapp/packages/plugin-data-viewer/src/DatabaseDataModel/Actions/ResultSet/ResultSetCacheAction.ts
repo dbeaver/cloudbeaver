@@ -9,19 +9,18 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
 import type { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
 
 const SHARED_CACHE_KEY = 'shared';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction])
-export class ResultSetCacheAction
+export class ResultSetCacheActionImpl
   extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataCacheAction<IGridDataKey, IDatabaseResultSet>
 {
@@ -274,3 +273,38 @@ export class ResultSetCacheAction
     return sharedCache;
   }
 }
+
+export type ResultSetCacheAction = ResultSetCacheActionImpl;
+
+export class ResultSetCacheActionDI extends Context.Service<ResultSetCacheActionDI, ResultSetCacheActionImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/ResultSet/ResultSetCacheAction#ResultSetCacheAction',
+) {
+  static readonly implementation = ResultSetCacheActionImpl;
+  static readonly dataFormat = ResultSetCacheActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction] as const;
+  static readonly make: Effect.Effect<
+    ResultSetCacheActionImpl,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof ResultSetDataAction>
+  > = Effect.gen(function* makeResultSetCacheAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const data = yield* ResultSetDataAction;
+
+    return new ResultSetCacheActionImpl(source, result, data);
+  });
+  static readonly layer: Layer.Layer<
+    ResultSetCacheActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof ResultSetDataAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResultSetCacheAction = ResultSetCacheActionDI;

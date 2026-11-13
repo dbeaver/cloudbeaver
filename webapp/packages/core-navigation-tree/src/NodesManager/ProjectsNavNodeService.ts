@@ -1,18 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NAV_NODE_TYPE_PROJECT, type ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 import { NavNodeInfoResource } from './NavNodeInfoResource.js';
 
-@injectable(() => [NavNodeInfoResource, ProjectInfoResource])
-export class ProjectsNavNodeService {
+export class ProjectsNavNodeServiceImpl {
   projectTypes: string[];
   projectPrefixes: string[];
 
@@ -49,3 +48,33 @@ export class ProjectsNavNodeService {
     return this.projectInfoResource.get(this.projectPrefixes.reduce((nodeId, prefix) => nodeId.replace(prefix, ''), nodeId));
   }
 }
+
+export type ProjectsNavNodeService = ProjectsNavNodeServiceImpl;
+
+export class ProjectsNavNodeServiceDI extends Context.Service<ProjectsNavNodeServiceDI, ProjectsNavNodeServiceImpl>()(
+  '@cloudbeaver/core-navigation-tree/NodesManager/ProjectsNavNodeService#ProjectsNavNodeService',
+) {
+  static readonly implementation = ProjectsNavNodeServiceImpl;
+
+  static readonly dependencies = () => [NavNodeInfoResource, ProjectInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ProjectsNavNodeServiceImpl,
+    never,
+    Context.Service.Identifier<typeof NavNodeInfoResource> | Context.Service.Identifier<typeof ProjectInfoResource>
+  > = Effect.gen(function* makeProjectsNavNodeService() {
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const projectInfoResource = yield* ProjectInfoResource;
+
+    return new ProjectsNavNodeServiceImpl(navNodeInfoResource, projectInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ProjectsNavNodeServiceDI,
+    never,
+    Context.Service.Identifier<typeof NavNodeInfoResource> | Context.Service.Identifier<typeof ProjectInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ProjectsNavNodeService = ProjectsNavNodeServiceDI;

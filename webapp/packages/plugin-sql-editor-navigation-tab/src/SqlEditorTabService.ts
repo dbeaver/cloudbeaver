@@ -28,7 +28,7 @@ import {
   objectSchemaProvider,
   objectSchemaSetter,
 } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -55,22 +55,7 @@ import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey.js';
 const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel.js').then(m => m.SqlEditorPanel));
 const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(m => m.SqlEditorTab));
 
-@injectable(() => [
-  NavigationTabsService,
-  NotificationService,
-  SqlEditorService,
-  SqlResultTabsService,
-  ConnectionExecutionContextService,
-  ConnectionExecutionContextResource,
-  ConnectionInfoResource,
-  NavNodeInfoResource,
-  SqlDataSourceService,
-  ConnectionsManagerService,
-  ContainerResource,
-  CommonDialogService,
-  SqlEditorModelService,
-])
-export class SqlEditorTabService extends Bootstrap {
+export class SqlEditorTabServiceImpl extends Bootstrap {
   get sqlEditorTabs(): ITab<ISqlEditorTabState>[] {
     return Array.from(this.navigationTabsService.findTabs<ISqlEditorTabState>(isSQLEditorTab));
   }
@@ -575,6 +560,100 @@ export class SqlEditorTabService extends Bootstrap {
     await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
   }
 }
+
+export type SqlEditorTabService = SqlEditorTabServiceImpl;
+
+export class SqlEditorTabServiceDI extends Context.Service<SqlEditorTabServiceDI, SqlEditorTabServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor-navigation-tab/SqlEditorTabService#SqlEditorTabService',
+) {
+  static readonly implementation = SqlEditorTabServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavigationTabsService,
+      NotificationService,
+      SqlEditorService,
+      SqlResultTabsService,
+      ConnectionExecutionContextService,
+      ConnectionExecutionContextResource,
+      ConnectionInfoResource,
+      NavNodeInfoResource,
+      SqlDataSourceService,
+      ConnectionsManagerService,
+      ContainerResource,
+      CommonDialogService,
+      SqlEditorModelService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    SqlEditorTabServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlEditorService>
+    | Context.Service.Identifier<typeof SqlResultTabsService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof ContainerResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof SqlEditorModelService>
+  > = Effect.gen(function* makeSqlEditorTabService() {
+    const navigationTabsService = yield* NavigationTabsService;
+    const notificationService = yield* NotificationService;
+    const sqlEditorService = yield* SqlEditorService;
+    const sqlResultTabsService = yield* SqlResultTabsService;
+    const connectionExecutionContextService = yield* ConnectionExecutionContextService;
+    const connectionExecutionContextResource = yield* ConnectionExecutionContextResource;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const containerResource = yield* ContainerResource;
+    const commonDialogService = yield* CommonDialogService;
+    const sqlEditorModelService = yield* SqlEditorModelService;
+
+    return new SqlEditorTabServiceImpl(
+      navigationTabsService,
+      notificationService,
+      sqlEditorService,
+      sqlResultTabsService,
+      connectionExecutionContextService,
+      connectionExecutionContextResource,
+      connectionInfoResource,
+      navNodeInfoResource,
+      sqlDataSourceService,
+      connectionsManagerService,
+      containerResource,
+      commonDialogService,
+      sqlEditorModelService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SqlEditorTabServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlEditorService>
+    | Context.Service.Identifier<typeof SqlResultTabsService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof ContainerResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof SqlEditorModelService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlEditorTabService = SqlEditorTabServiceDI;
 
 function findMinimalFree(array: number[], base: number): number {
   return array.sort((a, b) => b - a).reduceRight((prev, cur) => (prev === cur ? prev + 1 : prev), base);

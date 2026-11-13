@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { ActionService, getMenuLabelClipped, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
@@ -14,38 +14,37 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
+  DatabaseDataFeature,
+  GridDataResultAction,
+  GridViewAction,
   IDatabaseDataConstraintAction,
+  IDatabaseDataFormatAction,
   type IDatabaseDataModel,
+  IDatabaseDataResultAction,
+  IDatabaseDataViewAction,
   type IGridColumnKey,
   IS_NOT_NULL_ID,
   IS_NULL_ID,
   isFilterConstraint,
   isResultSetDataSource,
   nullOperationsFilter,
-  IDatabaseDataResultAction,
+  ResultSetDataAction,
   ResultSetDataSource,
   wrapOperationArgument,
-  GridDataResultAction,
-  ResultSetDataAction,
-  IDatabaseDataFormatAction,
-  IDatabaseDataViewAction,
-  GridViewAction,
-  DatabaseDataFeature,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import { LocalizationService } from '@cloudbeaver/core-localization';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN } from '../../Actions/Filters/ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN.js';
 import { ACTION_DATA_GRID_FILTERS_RESET_ALL } from '../../Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_ALL.js';
 import { MENU_DATA_GRID_FILTERS } from './MENU_DATA_GRID_FILTERS.js';
 import { MENU_DATA_GRID_FILTERS_CELL_VALUE } from './MENU_DATA_GRID_FILTERS_CELL_VALUE.js';
 import { MENU_DATA_GRID_FILTERS_CLIPBOARD } from './MENU_DATA_GRID_FILTERS_CLIPBOARD.js';
 import { MENU_DATA_GRID_FILTERS_CUSTOM } from './MENU_DATA_GRID_FILTERS_CUSTOM.js';
-import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import { ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN } from '../../Actions/Filters/ACTION_DATA_GRID_FILTER_DELETE_FOR_COLUMN.js';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 
 const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog.js').then(m => m.FilterCustomValueDialog));
 
-@injectable(() => [CommonDialogService, ClipboardService, ActionService, MenuService, LocalizationService])
-export class DataGridContextMenuFilterService {
+export class DataGridContextMenuFilterServiceImpl {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly clipboardService: ClipboardService,
@@ -462,3 +461,44 @@ export class DataGridContextMenuFilterService {
     });
   }
 }
+
+export type DataGridContextMenuFilterService = DataGridContextMenuFilterServiceImpl;
+
+export class DataGridContextMenuFilterServiceDI extends Context.Service<DataGridContextMenuFilterServiceDI, DataGridContextMenuFilterServiceImpl>()(
+  '@cloudbeaver/plugin-data-spreadsheet-new/DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService#DataGridContextMenuFilterService',
+) {
+  static readonly implementation = DataGridContextMenuFilterServiceImpl;
+
+  static readonly dependencies = () => [CommonDialogService, ClipboardService, ActionService, MenuService, LocalizationService] as const;
+  static readonly make: Effect.Effect<
+    DataGridContextMenuFilterServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ClipboardService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof LocalizationService>
+  > = Effect.gen(function* makeDataGridContextMenuFilterService() {
+    const commonDialogService = yield* CommonDialogService;
+    const clipboardService = yield* ClipboardService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const localizationService = yield* LocalizationService;
+
+    return new DataGridContextMenuFilterServiceImpl(commonDialogService, clipboardService, actionService, menuService, localizationService);
+  });
+  static readonly layer: Layer.Layer<
+    DataGridContextMenuFilterServiceDI,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ClipboardService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof LocalizationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataGridContextMenuFilterService = DataGridContextMenuFilterServiceDI;

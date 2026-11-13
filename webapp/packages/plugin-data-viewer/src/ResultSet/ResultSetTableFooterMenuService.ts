@@ -6,10 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 
+import { IDatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
+import { IDatabaseDataMetadataAction } from '../DatabaseDataModel/Actions/IDatabaseDataMetadataAction.js';
 import { DATA_CONTEXT_DV_DDM } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
 import { type IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
@@ -18,8 +20,6 @@ import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../TableViewer/TableFooter/
 import { ACTION_COUNT_TOTAL_ELEMENTS } from './ACTION_COUNT_TOTAL_ELEMENTS.js';
 import { isResultSetDataModel } from './isResultSetDataModel.js';
 import { ResultSetDataSource } from './ResultSetDataSource.js';
-import { IDatabaseDataMetadataAction } from '../DatabaseDataModel/Actions/IDatabaseDataMetadataAction.js';
-import { IDatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
 
 interface IResultSetActionsMetadata {
   totalCount: {
@@ -27,8 +27,7 @@ interface IResultSetActionsMetadata {
   };
 }
 
-@injectable(() => [ActionService, MenuService, NotificationService])
-export class ResultSetTableFooterMenuService {
+export class ResultSetTableFooterMenuServiceImpl {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -193,3 +192,38 @@ export class ResultSetTableFooterMenuService {
     return metadataAction.get<IResultSetActionsMetadata>('result-set-database-metadata', () => ({ totalCount: { loading: false } }));
   }
 }
+
+export type ResultSetTableFooterMenuService = ResultSetTableFooterMenuServiceImpl;
+
+export class ResultSetTableFooterMenuServiceDI extends Context.Service<ResultSetTableFooterMenuServiceDI, ResultSetTableFooterMenuServiceImpl>()(
+  '@cloudbeaver/plugin-data-viewer/ResultSet/ResultSetTableFooterMenuService#ResultSetTableFooterMenuService',
+) {
+  static readonly implementation = ResultSetTableFooterMenuServiceImpl;
+
+  static readonly dependencies = () => [ActionService, MenuService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    ResultSetTableFooterMenuServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeResultSetTableFooterMenuService() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const notificationService = yield* NotificationService;
+
+    return new ResultSetTableFooterMenuServiceImpl(actionService, menuService, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    ResultSetTableFooterMenuServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResultSetTableFooterMenuService = ResultSetTableFooterMenuServiceDI;

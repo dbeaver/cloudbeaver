@@ -7,7 +7,8 @@
  */
 import { runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { Executor } from '@cloudbeaver/core-executor';
 import {
   CachedMapAllKey,
   CachedMapResource,
@@ -30,12 +31,11 @@ import {
   type GetUsersListQueryVariables,
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
-import { Executor } from '@cloudbeaver/core-executor';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthInfoService } from './AuthInfoService.js';
 import { AuthProviderService } from './AuthProviderService.js';
-import { compareUsersById, isNewUser, NEW_USER_SYMBOL, type AdminUserNew } from './compareUser.js';
+import { type AdminUserNew, compareUsersById, isNewUser, NEW_USER_SYMBOL } from './compareUser.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
 
 export type AdminUser = AdminUserInfoFragment;
@@ -62,8 +62,7 @@ interface UserCreateOptions {
   enabled?: boolean;
 }
 
-@injectable(() => [GraphQLService, ServerConfigResource, AuthProviderService, AuthInfoService, SessionPermissionsResource])
-export class UsersResource extends CachedMapResource<string, AdminUser, UserResourceIncludes> {
+export class UsersResourceImpl extends CachedMapResource<string, AdminUser, UserResourceIncludes> {
   readonly onUserCreate: Executor<AdminUser>;
 
   constructor(
@@ -331,3 +330,45 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return typeof key === 'string';
   }
 }
+
+export type UsersResource = UsersResourceImpl;
+
+export class UsersResourceDI extends Context.Service<UsersResourceDI, UsersResourceImpl>()(
+  '@cloudbeaver/core-authentication/UsersResource#UsersResource',
+) {
+  static readonly implementation = UsersResourceImpl;
+
+  static readonly dependencies = () =>
+    [GraphQLService, ServerConfigResource, AuthProviderService, AuthInfoService, SessionPermissionsResource] as const;
+  static readonly make: Effect.Effect<
+    UsersResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof AuthProviderService>
+    | Context.Service.Identifier<typeof AuthInfoService>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Effect.gen(function* makeUsersResource() {
+    const graphQLService = yield* GraphQLService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const authProviderService = yield* AuthProviderService;
+    const authInfoService = yield* AuthInfoService;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+
+    return new UsersResourceImpl(graphQLService, serverConfigResource, authProviderService, authInfoService, sessionPermissionsResource);
+  });
+  static readonly layer: Layer.Layer<
+    UsersResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof AuthProviderService>
+    | Context.Service.Identifier<typeof AuthInfoService>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UsersResource = UsersResourceDI;

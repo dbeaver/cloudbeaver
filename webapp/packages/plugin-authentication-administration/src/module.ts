@@ -6,57 +6,58 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { PluginBootstrap } from './PluginBootstrap.js';
-import { AuthenticationLocaleService } from './AuthenticationLocaleService.js';
-import { UsersTableOptionsPanelService } from './Administration/Users/UsersTable/UsersTableOptionsPanelService.js';
-import { CreateUserService } from './Administration/Users/UsersTable/CreateUserService.js';
-import { AdministrationUsersManagementService } from './AdministrationUsersManagementService.js';
-import { CreateUserBootstrap } from './Administration/Users/UsersTable/CreateUserBootstrap.js';
-import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService.js';
-import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap.js';
-import { UsersAdministrationNavigationService } from './Administration/Users/UsersAdministrationNavigationService.js';
-import { UserFormOriginPartBootstrap } from './Administration/Users/UserForm/Origin/UserFormOriginPartBootstrap.js';
-import { UserFormInfoPartService } from './Administration/Users/UserForm/Info/UserFormInfoPartService.js';
-import { UserFormInfoPartBootstrap } from './Administration/Users/UserForm/Info/UserFormInfoPartBootstrap.js';
-import { UserFormConnectionAccessPartBootstrap } from './Administration/Users/UserForm/ConnectionAccess/UserFormConnectionAccessPartBootstrap.js';
-import { TeamsTableOptionsPanelService } from './Administration/Users/Teams/TeamsTable/TeamsTableOptionsPanelService.js';
-import { AdministrationUserFormService } from './Administration/Users/UserForm/AdministrationUserFormService.js';
-import { CreateTeamService } from './Administration/Users/Teams/TeamsTable/CreateTeamService.js';
-import { TeamsAdministrationFormService } from './Administration/Users/Teams/TeamsForm/TeamsAdministrationFormService.js';
-import { TeamOptionsTabService } from './Administration/Users/Teams/TeamsForm/Options/TeamOptionsTabService.js';
-import { GrantedUsersTabService } from './Administration/Users/Teams/TeamsForm/GrantedUsers/GrantedUsersTabService.js';
-import { GrantedConnectionsTabService } from './Administration/Users/Teams/TeamsForm/GrantedConnections/GrantedConnectionsTabService.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { TeamsAdministrationNavService } from './Administration/Users/Teams/TeamsAdministrationNavService.js';
 import { TeamsAdministrationService } from './Administration/Users/Teams/TeamsAdministrationService.js';
+import { GrantedConnectionsTabService } from './Administration/Users/Teams/TeamsForm/GrantedConnections/GrantedConnectionsTabService.js';
+import { GrantedUsersTabService } from './Administration/Users/Teams/TeamsForm/GrantedUsers/GrantedUsersTabService.js';
+import { TeamOptionsTabService } from './Administration/Users/Teams/TeamsForm/Options/TeamOptionsTabService.js';
+import { TeamsAdministrationFormService } from './Administration/Users/Teams/TeamsForm/TeamsAdministrationFormService.js';
+import { CreateTeamService } from './Administration/Users/Teams/TeamsTable/CreateTeamService.js';
+import { TeamsTableOptionsPanelService } from './Administration/Users/Teams/TeamsTable/TeamsTableOptionsPanelService.js';
+import { AdministrationUserFormService } from './Administration/Users/UserForm/AdministrationUserFormService.js';
+import { UserFormConnectionAccessPartBootstrap } from './Administration/Users/UserForm/ConnectionAccess/UserFormConnectionAccessPartBootstrap.js';
+import { UserFormInfoPartBootstrap } from './Administration/Users/UserForm/Info/UserFormInfoPartBootstrap.js';
+import { UserFormInfoPartService } from './Administration/Users/UserForm/Info/UserFormInfoPartService.js';
+import { UserFormOriginPartBootstrap } from './Administration/Users/UserForm/Origin/UserFormOriginPartBootstrap.js';
+import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap.js';
+import { UsersAdministrationNavigationService } from './Administration/Users/UsersAdministrationNavigationService.js';
+import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService.js';
+import { CreateUserBootstrap } from './Administration/Users/UsersTable/CreateUserBootstrap.js';
+import { CreateUserService } from './Administration/Users/UsersTable/CreateUserService.js';
+import { UsersTableOptionsPanelService } from './Administration/Users/UsersTable/UsersTableOptionsPanelService.js';
+import { AdministrationUsersManagementService } from './AdministrationUsersManagementService.js';
+import { AuthenticationLocaleService } from './AuthenticationLocaleService.js';
+import { PluginBootstrap } from './PluginBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-authentication-administration',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, PluginBootstrap)
-      .addSingleton(Bootstrap, CreateUserBootstrap)
-      .addSingleton(Bootstrap, UserFormBaseBootstrap)
-      .addSingleton(Bootstrap, UserFormOriginPartBootstrap)
-      .addSingleton(Bootstrap, UserFormInfoPartBootstrap)
-      .addSingleton(Bootstrap, UserFormConnectionAccessPartBootstrap)
-      .addSingleton(Bootstrap, proxy(UsersAdministrationService))
-      .addSingleton(Bootstrap, TeamOptionsTabService)
-      .addSingleton(Bootstrap, AuthenticationLocaleService)
-      .addSingleton(Bootstrap, GrantedUsersTabService)
-      .addSingleton(Bootstrap, GrantedConnectionsTabService)
-      .addSingleton(TeamsAdministrationService)
-      .addSingleton(UsersTableOptionsPanelService)
-      .addSingleton(CreateUserService)
-      .addSingleton(AdministrationUsersManagementService)
-      .addSingleton(UsersAdministrationService)
-      .addSingleton(UsersAdministrationNavigationService)
-      .addSingleton(UserFormInfoPartService)
-      .addSingleton(TeamsTableOptionsPanelService)
-      .addSingleton(AdministrationUserFormService)
-      .addSingleton(CreateTeamService)
-      .addSingleton(TeamsAdministrationFormService)
-      .addSingleton(TeamsAdministrationNavService);
-  },
+  services: () => [
+    TeamsAdministrationService,
+    UsersTableOptionsPanelService,
+    CreateUserService,
+    AdministrationUsersManagementService,
+    UsersAdministrationService,
+    UsersAdministrationNavigationService,
+    UserFormInfoPartService,
+    TeamsTableOptionsPanelService,
+    AdministrationUserFormService,
+    CreateTeamService,
+    TeamsAdministrationFormService,
+    TeamsAdministrationNavService,
+  ],
+  bootstraps: () => [
+    PluginBootstrap,
+    CreateUserBootstrap,
+    UserFormBaseBootstrap,
+    UserFormOriginPartBootstrap,
+    UserFormInfoPartBootstrap,
+    UserFormConnectionAccessPartBootstrap,
+    UsersAdministrationService,
+    TeamOptionsTabService,
+    AuthenticationLocaleService,
+    GrantedUsersTabService,
+    GrantedConnectionsTabService,
+  ],
 });

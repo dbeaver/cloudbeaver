@@ -9,7 +9,7 @@
 /// <reference lib="WebWorker" />
 import { Workbox, type WorkboxLifecycleEvent, type WorkboxMessageEvent } from 'workbox-window';
 
-import { Disposable, injectable } from '@cloudbeaver/core-di';
+import { Context, Disposable, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
@@ -18,8 +18,7 @@ export interface IUpdateData {
   progress?: number;
 }
 
-@injectable()
-export class ServiceWorkerService extends Disposable {
+export class ServiceWorkerServiceImpl extends Disposable {
   readonly onUpdate: IExecutor<IUpdateData>;
 
   private readonly workerURL: string;
@@ -139,3 +138,20 @@ export class ServiceWorkerService extends Disposable {
     window.location.reload();
   }
 }
+
+export type ServiceWorkerService = ServiceWorkerServiceImpl;
+
+export class ServiceWorkerServiceDI extends Context.Service<ServiceWorkerServiceDI, ServiceWorkerServiceImpl>()(
+  '@cloudbeaver/core-browser/ServiceWorkerService#ServiceWorkerService',
+) {
+  static readonly implementation = ServiceWorkerServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<ServiceWorkerServiceImpl, never, never> = Effect.sync(() => new ServiceWorkerServiceImpl());
+  static readonly layer: Layer.Layer<ServiceWorkerServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServiceWorkerService = ServiceWorkerServiceDI;

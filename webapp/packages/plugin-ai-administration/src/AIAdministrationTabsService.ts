@@ -5,18 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { TabsContainer } from '@cloudbeaver/core-ui';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { EAIAdministrationSub } from './AIAdministrationNavigationService.js';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { TabsContainer } from '@cloudbeaver/core-ui';
 import { AIAdministrationBootstrap } from './AIAdministrationBootstrap.js';
+import { EAIAdministrationSub } from './AIAdministrationNavigationService.js';
 
 const AIAdministrationMainTabPanel = importLazyComponent(() =>
   import('./AIAdministrationMainTabPanel.js').then(module => module.AIAdministrationMainTabPanel),
 );
 
-@injectable(() => [AIAdministrationBootstrap])
-export class AIAdministrationTabsService extends Bootstrap {
+export class AIAdministrationTabsServiceImpl extends Bootstrap {
   readonly tabsContainer: TabsContainer;
 
   constructor(private readonly aiAdministrationBootstrap: AIAdministrationBootstrap) {
@@ -35,3 +34,26 @@ export class AIAdministrationTabsService extends Bootstrap {
     this.aiAdministrationBootstrap.administrationItem.sub.push({ name: EAIAdministrationSub.Settings });
   }
 }
+
+export type AIAdministrationTabsService = AIAdministrationTabsServiceImpl;
+
+export class AIAdministrationTabsServiceDI extends Context.Service<AIAdministrationTabsServiceDI, AIAdministrationTabsServiceImpl>()(
+  '@cloudbeaver/plugin-ai-administration/AIAdministrationTabsService#AIAdministrationTabsService',
+) {
+  static readonly implementation = AIAdministrationTabsServiceImpl;
+
+  static readonly dependencies = () => [AIAdministrationBootstrap] as const;
+  static readonly make: Effect.Effect<AIAdministrationTabsServiceImpl, never, Context.Service.Identifier<typeof AIAdministrationBootstrap>> =
+    Effect.gen(function* makeAIAdministrationTabsService() {
+      const aiAdministrationBootstrap = yield* AIAdministrationBootstrap;
+
+      return new AIAdministrationTabsServiceImpl(aiAdministrationBootstrap);
+    });
+  static readonly layer: Layer.Layer<AIAdministrationTabsServiceDI, never, Context.Service.Identifier<typeof AIAdministrationBootstrap>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const AIAdministrationTabsService = AIAdministrationTabsServiceDI;

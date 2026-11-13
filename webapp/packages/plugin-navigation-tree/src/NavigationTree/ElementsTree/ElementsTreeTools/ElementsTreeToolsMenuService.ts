@@ -7,7 +7,7 @@
  */
 import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, ActionService, type IAction, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 
 import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId.js';
@@ -18,8 +18,7 @@ import { createElementsTreeSettings, validateElementsTreeSettings } from './Navi
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
 import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER.js';
 
-@injectable(() => [ActionService, KeyBindingService, UserDataService, MenuService, UserConfigurationStorage])
-export class ElementsTreeToolsMenuService {
+export class ElementsTreeToolsMenuServiceImpl {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
@@ -125,3 +124,43 @@ export class ElementsTreeToolsMenuService {
     }
   }
 }
+
+export type ElementsTreeToolsMenuService = ElementsTreeToolsMenuServiceImpl;
+
+export class ElementsTreeToolsMenuServiceDI extends Context.Service<ElementsTreeToolsMenuServiceDI, ElementsTreeToolsMenuServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService#ElementsTreeToolsMenuService',
+) {
+  static readonly implementation = ElementsTreeToolsMenuServiceImpl;
+  static readonly dependencies = () => [ActionService, KeyBindingService, UserDataService, MenuService, UserConfigurationStorage] as const;
+  static readonly make: Effect.Effect<
+    ElementsTreeToolsMenuServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Effect.gen(function* makeElementsTreeToolsMenuService() {
+    const actionService = yield* ActionService;
+    const keyBindingService = yield* KeyBindingService;
+    const userDataService = yield* UserDataService;
+    const menuService = yield* MenuService;
+    const userConfigurationStorage = yield* UserConfigurationStorage;
+
+    return new ElementsTreeToolsMenuServiceImpl(actionService, keyBindingService, userDataService, menuService, userConfigurationStorage);
+  });
+  static readonly layer: Layer.Layer<
+    ElementsTreeToolsMenuServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ElementsTreeToolsMenuService = ElementsTreeToolsMenuServiceDI;

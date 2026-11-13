@@ -8,7 +8,7 @@
 import { action } from 'mobx';
 
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
   Executor,
   type IExecutionContextProvider,
@@ -106,8 +106,7 @@ export interface INavNodeCache {
   canMove: boolean;
 }
 
-@injectable(() => [NavTreeResource, NavNodeInfoResource, ProjectsNavNodeService, NavigationService])
-export class NavNodeManagerService extends Bootstrap {
+export class NavNodeManagerServiceImpl extends Bootstrap {
   readonly onCanOpen: ISyncExecutor<INodeNavigationData>;
   readonly navigator: IExecutor<INodeNavigationData>;
   readonly onMove: IExecutor<INodeMoveData>;
@@ -409,6 +408,44 @@ export class NavNodeManagerService extends Bootstrap {
 
   private async navigateHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): Promise<void> {}
 }
+
+export type NavNodeManagerService = NavNodeManagerServiceImpl;
+
+export class NavNodeManagerServiceDI extends Context.Service<NavNodeManagerServiceDI, NavNodeManagerServiceImpl>()(
+  '@cloudbeaver/core-navigation-tree/NodesManager/NavNodeManagerService#NavNodeManagerService',
+) {
+  static readonly implementation = NavNodeManagerServiceImpl;
+
+  static readonly dependencies = () => [NavTreeResource, NavNodeInfoResource, ProjectsNavNodeService, NavigationService] as const;
+  static readonly make: Effect.Effect<
+    NavNodeManagerServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof ProjectsNavNodeService>
+    | Context.Service.Identifier<typeof NavigationService>
+  > = Effect.gen(function* makeNavNodeManagerService() {
+    const navTreeResource = yield* NavTreeResource;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const projectsNavNodeService = yield* ProjectsNavNodeService;
+    const navigationService = yield* NavigationService;
+
+    return new NavNodeManagerServiceImpl(navTreeResource, navNodeInfoResource, projectsNavNodeService, navigationService);
+  });
+  static readonly layer: Layer.Layer<
+    NavNodeManagerServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof ProjectsNavNodeService>
+    | Context.Service.Identifier<typeof NavigationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavNodeManagerService = NavNodeManagerServiceDI;
 
 export function parseNodeParentId(nodeId: string): string {
   const parentId = nodeId.slice(0, nodeId.lastIndexOf('/'));

@@ -7,7 +7,7 @@
  */
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ExecutionContext, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { BaseOptionsPanelService, OptionsPanelService } from '@cloudbeaver/core-ui';
 
@@ -16,8 +16,7 @@ import { userProfileContext } from './userProfileContext.js';
 const UserProfileOptionsPanel = importLazyComponent(() => import('./UserProfileOptionsPanel.js').then(m => m.UserProfileOptionsPanel));
 const panelGetter = () => UserProfileOptionsPanel;
 
-@injectable(() => [OptionsPanelService, UserInfoResource])
-export class UserProfileOptionsPanelService extends BaseOptionsPanelService<void> {
+export class UserProfileOptionsPanelServiceImpl extends BaseOptionsPanelService<void> {
   readonly onOpen: ISyncExecutor;
 
   constructor(
@@ -65,3 +64,33 @@ export class UserProfileOptionsPanelService extends BaseOptionsPanelService<void
     }
   }
 }
+
+export type UserProfileOptionsPanelService = UserProfileOptionsPanelServiceImpl;
+
+export class UserProfileOptionsPanelServiceDI extends Context.Service<UserProfileOptionsPanelServiceDI, UserProfileOptionsPanelServiceImpl>()(
+  '@cloudbeaver/plugin-user-profile/UserProfileOptionsPanelService#UserProfileOptionsPanelService',
+) {
+  static readonly implementation = UserProfileOptionsPanelServiceImpl;
+
+  static readonly dependencies = () => [OptionsPanelService, UserInfoResource] as const;
+  static readonly make: Effect.Effect<
+    UserProfileOptionsPanelServiceImpl,
+    never,
+    Context.Service.Identifier<typeof OptionsPanelService> | Context.Service.Identifier<typeof UserInfoResource>
+  > = Effect.gen(function* makeUserProfileOptionsPanelService() {
+    const optionsPanelService = yield* OptionsPanelService;
+    const userInfoResource = yield* UserInfoResource;
+
+    return new UserProfileOptionsPanelServiceImpl(optionsPanelService, userInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    UserProfileOptionsPanelServiceDI,
+    never,
+    Context.Service.Identifier<typeof OptionsPanelService> | Context.Service.Identifier<typeof UserInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UserProfileOptionsPanelService = UserProfileOptionsPanelServiceDI;

@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
@@ -15,7 +16,6 @@ import {
   type SqlQueryGenerator,
   type SqlQueryGeneratorOptions,
 } from '@cloudbeaver/core-sdk';
-import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export interface ISqlGeneratorsKey {
@@ -31,8 +31,7 @@ export const getDefaultQueryGeneratorOptions = (): SqlQueryGeneratorOptions => (
 
 export const DDL_GENERATOR_ID = 'tableDDL';
 
-@injectable(() => [GraphQLService, AsyncTaskInfoService, NavNodeInfoResource])
-export class SqlGeneratorsResource extends CachedMapResource<ISqlGeneratorsKey, SqlQueryGenerator[]> {
+export class SqlGeneratorsResourceImpl extends CachedMapResource<ISqlGeneratorsKey, SqlQueryGenerator[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
@@ -115,3 +114,38 @@ export class SqlGeneratorsResource extends CachedMapResource<ISqlGeneratorsKey, 
     return Array.isArray(key.nodeIds) && key.nodeIds.length > 0 && key.nodeIds.every(id => typeof id === 'string');
   }
 }
+
+export type SqlGeneratorsResource = SqlGeneratorsResourceImpl;
+
+export class SqlGeneratorsResourceDI extends Context.Service<SqlGeneratorsResourceDI, SqlGeneratorsResourceImpl>()(
+  '@cloudbeaver/plugin-sql-generator/SqlGenerators/SqlGeneratorsResource#SqlGeneratorsResource',
+) {
+  static readonly implementation = SqlGeneratorsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, AsyncTaskInfoService, NavNodeInfoResource] as const;
+  static readonly make: Effect.Effect<
+    SqlGeneratorsResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Effect.gen(function* makeSqlGeneratorsResource() {
+    const graphQLService = yield* GraphQLService;
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+
+    return new SqlGeneratorsResourceImpl(graphQLService, asyncTaskInfoService, navNodeInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    SqlGeneratorsResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlGeneratorsResource = SqlGeneratorsResourceDI;

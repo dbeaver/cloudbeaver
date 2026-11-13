@@ -7,14 +7,13 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, Effect, IServiceProvider, Layer, disposeService } from '@cloudbeaver/core-di';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
 import { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
 import { ServerConfigurationFormState } from './ServerConfigurationFormState.js';
 
-@injectable(() => [IServiceProvider, ServerConfigurationFormService])
-export class ServerConfigurationFormStateManager {
+export class ServerConfigurationFormStateManagerImpl {
   formState: ServerConfigurationFormState | null;
 
   constructor(
@@ -53,3 +52,36 @@ export class ServerConfigurationFormStateManager {
     }
   }
 }
+
+export type ServerConfigurationFormStateManager = ServerConfigurationFormStateManagerImpl;
+
+export class ServerConfigurationFormStateManagerDI extends Context.Service<
+  ServerConfigurationFormStateManagerDI,
+  ServerConfigurationFormStateManagerImpl
+>()(
+  '@cloudbeaver/plugin-administration/ConfigurationWizard/ServerConfiguration/ServerConfigurationFormStateManager#ServerConfigurationFormStateManager',
+) {
+  static readonly implementation = ServerConfigurationFormStateManagerImpl;
+
+  static readonly dependencies = () => [IServiceProvider, ServerConfigurationFormService] as const;
+  static readonly make: Effect.Effect<
+    ServerConfigurationFormStateManagerImpl,
+    never,
+    Context.Service.Identifier<typeof IServiceProvider> | Context.Service.Identifier<typeof ServerConfigurationFormService>
+  > = Effect.gen(function* makeServerConfigurationFormStateManager() {
+    const serviceProvider = yield* IServiceProvider;
+    const serverConfigurationFormService = yield* ServerConfigurationFormService;
+
+    return new ServerConfigurationFormStateManagerImpl(serviceProvider, serverConfigurationFormService);
+  });
+  static readonly layer: Layer.Layer<
+    ServerConfigurationFormStateManagerDI,
+    never,
+    Context.Service.Identifier<typeof IServiceProvider> | Context.Service.Identifier<typeof ServerConfigurationFormService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServerConfigurationFormStateManager = ServerConfigurationFormStateManagerDI;

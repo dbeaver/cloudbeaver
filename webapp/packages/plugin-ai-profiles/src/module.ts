@@ -6,27 +6,24 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 
-import { AIProfileCredentialsService } from './AIProfileCredentials/AIProfileCredentialsService.js';
+import { AIDefaultProfileService } from './AIDefaultProfileService.js';
 import { AIProfileAuthorizationService } from './AIProfileCredentials/AIProfileAuthorizationService.js';
 import { AIProfileCredentialsFormService } from './AIProfileCredentials/AIProfileCredentialsFormService.js';
+import { AIProfileCredentialsService } from './AIProfileCredentials/AIProfileCredentialsService.js';
 import { AIProfilesResource } from './AIProfilesResource.js';
-import { AIDefaultProfileService } from './AIDefaultProfileService.js';
 import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-profiles',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Dependency, proxy(AIProfilesResource))
-      .addSingleton(AIProfilesResource)
-      .addSingleton(Dependency, proxy(AIDefaultProfileService))
-      .addSingleton(AIDefaultProfileService)
-      .addSingleton(AIProfileCredentialsFormService)
-      .addSingleton(AIProfileAuthorizationService)
-      .addSingleton(AIProfileCredentialsService);
-  },
+  services: () => [
+    AIProfilesResource,
+    AIDefaultProfileService,
+    AIProfileCredentialsFormService,
+    AIProfileAuthorizationService,
+    AIProfileCredentialsService,
+  ],
+  bootstraps: () => [LocaleService],
 });

@@ -28,7 +28,7 @@ import {
   timer,
 } from 'rxjs';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   CbClientEventId as ClientEventId,
@@ -43,7 +43,7 @@ import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Unsub
 import { SessionExpireService } from './SessionExpireService.js';
 import { TransportSubject } from './TransportSubject.js';
 
-export { ServerEventId, SessionEventTopic, ClientEventId };
+export { ClientEventId, ServerEventId, SessionEventTopic };
 
 export type SessionEventId = ServerEventId | ClientEventId | string;
 
@@ -61,8 +61,7 @@ export interface ITopicSubEvent extends ISessionEvent {
 const RETRY_INTERVALS = [1000, 5000, 30000, 60000]; // 1s, 5s, 30s, 1m
 const MAX_RETRY_ATTEMPTS = 4;
 
-@injectable(() => [SessionExpireService, EnvironmentService])
-export class SessionEventSource implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
+export class SessionEventSourceImpl implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   readonly eventsSubject: Observable<ISessionEvent>;
   readonly onActivate: IExecutor;
   readonly onInit: ISyncExecutor;
@@ -233,3 +232,33 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     return throwError(() => error);
   }
 }
+
+export type SessionEventSource = SessionEventSourceImpl;
+
+export class SessionEventSourceDI extends Context.Service<SessionEventSourceDI, SessionEventSourceImpl>()(
+  '@cloudbeaver/core-root/SessionEventSource#SessionEventSource',
+) {
+  static readonly implementation = SessionEventSourceImpl;
+
+  static readonly dependencies = () => [SessionExpireService, EnvironmentService] as const;
+  static readonly make: Effect.Effect<
+    SessionEventSourceImpl,
+    never,
+    Context.Service.Identifier<typeof SessionExpireService> | Context.Service.Identifier<typeof EnvironmentService>
+  > = Effect.gen(function* makeSessionEventSource() {
+    const sessionExpireService = yield* SessionExpireService;
+    const environmentService = yield* EnvironmentService;
+
+    return new SessionEventSourceImpl(sessionExpireService, environmentService);
+  });
+  static readonly layer: Layer.Layer<
+    SessionEventSourceDI,
+    never,
+    Context.Service.Identifier<typeof SessionExpireService> | Context.Service.Identifier<typeof EnvironmentService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SessionEventSource = SessionEventSourceDI;

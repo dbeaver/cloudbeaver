@@ -5,15 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
 import { type IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState.js';
 import type { QueryDataSource } from '../QueryDataSource.js';
 
-@injectable(() => [TableViewerStorageService])
-export class SqlQueryResultService {
+export class SqlQueryResultServiceImpl {
   constructor(private readonly tableViewerStorageService: TableViewerStorageService) {}
 
   getSelectedGroup(editorState: ISqlEditorTabState): IResultGroup | null {
@@ -254,3 +253,26 @@ export class SqlQueryResultService {
     return name;
   }
 }
+
+export type SqlQueryResultService = SqlQueryResultServiceImpl;
+
+export class SqlQueryResultServiceDI extends Context.Service<SqlQueryResultServiceDI, SqlQueryResultServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlResultTabs/SqlQueryResultService#SqlQueryResultService',
+) {
+  static readonly implementation = SqlQueryResultServiceImpl;
+
+  static readonly dependencies = () => [TableViewerStorageService] as const;
+  static readonly make: Effect.Effect<SqlQueryResultServiceImpl, never, Context.Service.Identifier<typeof TableViewerStorageService>> = Effect.gen(
+    function* makeSqlQueryResultService() {
+      const tableViewerStorageService = yield* TableViewerStorageService;
+
+      return new SqlQueryResultServiceImpl(tableViewerStorageService);
+    },
+  );
+  static readonly layer: Layer.Layer<SqlQueryResultServiceDI, never, Context.Service.Identifier<typeof TableViewerStorageService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlQueryResultService = SqlQueryResultServiceDI;

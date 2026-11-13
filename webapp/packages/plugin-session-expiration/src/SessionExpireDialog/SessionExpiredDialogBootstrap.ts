@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { ActionSnackbar } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { SessionExpireService } from '@cloudbeaver/core-root';
@@ -14,8 +14,7 @@ import { RouterService } from '@cloudbeaver/core-routing';
 
 import { SessionExpiredDialog } from './SessionExpiredDialog.js';
 
-@injectable(() => [RouterService, NotificationService, CommonDialogService, SessionExpireService])
-export class SessionExpiredDialogBootstrap extends Bootstrap {
+export class SessionExpiredDialogBootstrapImpl extends Bootstrap {
   constructor(
     private readonly routerService: RouterService,
     private readonly notificationService: NotificationService,
@@ -44,3 +43,41 @@ export class SessionExpiredDialogBootstrap extends Bootstrap {
     }
   }
 }
+
+export type SessionExpiredDialogBootstrap = SessionExpiredDialogBootstrapImpl;
+
+export class SessionExpiredDialogBootstrapDI extends Context.Service<SessionExpiredDialogBootstrapDI, SessionExpiredDialogBootstrapImpl>()(
+  '@cloudbeaver/plugin-session-expiration/SessionExpireDialog/SessionExpiredDialogBootstrap#SessionExpiredDialogBootstrap',
+) {
+  static readonly implementation = SessionExpiredDialogBootstrapImpl;
+
+  static readonly dependencies = () => [RouterService, NotificationService, CommonDialogService, SessionExpireService] as const;
+  static readonly make: Effect.Effect<
+    SessionExpiredDialogBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof RouterService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof SessionExpireService>
+  > = Effect.gen(function* makeSessionExpiredDialogBootstrap() {
+    const routerService = yield* RouterService;
+    const notificationService = yield* NotificationService;
+    const commonDialogService = yield* CommonDialogService;
+    const sessionExpireService = yield* SessionExpireService;
+
+    return new SessionExpiredDialogBootstrapImpl(routerService, notificationService, commonDialogService, sessionExpireService);
+  });
+  static readonly layer: Layer.Layer<
+    SessionExpiredDialogBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof RouterService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof SessionExpireService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SessionExpiredDialogBootstrap = SessionExpiredDialogBootstrapDI;

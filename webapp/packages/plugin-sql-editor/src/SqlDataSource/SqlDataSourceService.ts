@@ -8,13 +8,13 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import type { QueryDataSource } from '../QueryDataSource.js';
 import type { ISqlDataSource } from './ISqlDataSource.js';
 import { MemorySqlDataSource } from './MemorySqlDataSource.js';
-import type { QueryDataSource } from '../QueryDataSource.js';
 
 export interface ISqlDataSourceOptions {
   name?: string;
@@ -44,8 +44,7 @@ export interface ISQLDatasourceUpdateData {
   datasource: ISqlDataSource;
 }
 
-@injectable()
-export class SqlDataSourceService {
+export class SqlDataSourceServiceImpl {
   get dataSources(): [string, ISqlDataSource][] {
     return Array.from(this.providers.entries()).map(([editorId, provider]) => [editorId, provider.dataSource]);
   }
@@ -186,3 +185,20 @@ export class SqlDataSourceService {
     await provider.dataSource.dispose();
   }
 }
+
+export type SqlDataSourceService = SqlDataSourceServiceImpl;
+
+export class SqlDataSourceServiceDI extends Context.Service<SqlDataSourceServiceDI, SqlDataSourceServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlDataSource/SqlDataSourceService#SqlDataSourceService',
+) {
+  static readonly implementation = SqlDataSourceServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<SqlDataSourceServiceImpl, never, never> = Effect.sync(() => new SqlDataSourceServiceImpl());
+  static readonly layer: Layer.Layer<SqlDataSourceServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlDataSourceService = SqlDataSourceServiceDI;

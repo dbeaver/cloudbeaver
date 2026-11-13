@@ -1,20 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, type DialogResult } from '@cloudbeaver/core-dialogs';
 
-import type { IAuthOptions } from '../IAuthOptions.js';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import type { IAuthOptions } from '../IAuthOptions.js';
 
 const AuthDialog = importLazyComponent(() => import('./AuthDialog.js').then(m => m.AuthDialog));
 
-@injectable(() => [CommonDialogService])
-export class AuthDialogService {
+export class AuthDialogServiceImpl {
   get isPersistent(): boolean {
     return this.persistent;
   }
@@ -53,3 +52,26 @@ export class AuthDialogService {
     }
   }
 }
+
+export type AuthDialogService = AuthDialogServiceImpl;
+
+export class AuthDialogServiceDI extends Context.Service<AuthDialogServiceDI, AuthDialogServiceImpl>()(
+  '@cloudbeaver/plugin-authentication/Dialog/AuthDialogService#AuthDialogService',
+) {
+  static readonly implementation = AuthDialogServiceImpl;
+
+  static readonly dependencies = () => [CommonDialogService] as const;
+  static readonly make: Effect.Effect<AuthDialogServiceImpl, never, Context.Service.Identifier<typeof CommonDialogService>> = Effect.gen(
+    function* makeAuthDialogService() {
+      const commonDialogService = yield* CommonDialogService;
+
+      return new AuthDialogServiceImpl(commonDialogService);
+    },
+  );
+  static readonly layer: Layer.Layer<AuthDialogServiceDI, never, Context.Service.Identifier<typeof CommonDialogService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AuthDialogService = AuthDialogServiceDI;

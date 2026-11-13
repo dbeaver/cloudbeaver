@@ -5,30 +5,29 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, type IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, reaction, toJS, type IReactionDisposer } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import { DatabaseSelectAction } from '../DatabaseSelectAction.js';
+import { GridDataKeysUtils } from '../Grid/GridDataKeysUtils.js';
 import {
   DatabaseEditChangeType,
   IDatabaseDataEditAction,
   type IDatabaseDataEditActionData,
   type IDatabaseDataEditApplyActionData,
 } from '../IDatabaseDataEditAction.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { GridDataKeysUtils } from '../Grid/GridDataKeysUtils.js';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
-import { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
-import type { GridViewAction } from './GridViewAction.js';
-import type { GridEditAction, IGridEditApplyActionData } from './GridEditAction.js';
+import { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
 import type { GridDataResultAction } from './GridDataResultAction.js';
+import type { GridEditAction, IGridEditApplyActionData } from './GridEditAction.js';
+import type { GridViewAction } from './GridViewAction.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataViewAction, IDatabaseDataEditAction])
-export class GridSelectAction<
+export class GridSelectActionImpl<
   TColumn = unknown,
   TRow = unknown,
   TCell = unknown,
@@ -411,3 +410,51 @@ export class GridSelectAction<
     }
   }
 }
+
+export type GridSelectAction<
+  TColumn = unknown,
+  TRow = unknown,
+  TCell = unknown,
+  TKey extends IGridDataKey = IGridDataKey,
+  TResult extends IDatabaseDataResult = IDatabaseDataResult,
+> = GridSelectActionImpl<TColumn, TRow, TCell, TKey, TResult>;
+
+export class GridSelectActionDI extends Context.Service<GridSelectActionDI, GridSelectActionImpl<any, any, any, any, any>>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/Grid/GridSelectAction#GridSelectAction',
+) {
+  static readonly implementation = GridSelectActionImpl;
+  static readonly dataFormat = GridSelectActionImpl.dataFormat;
+  static readonly dependencies = () =>
+    [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataViewAction, IDatabaseDataEditAction] as const;
+  static readonly make: Effect.Effect<
+    GridSelectActionImpl<any, any, any, any, any>,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataResultAction>
+    | Context.Service.Identifier<typeof IDatabaseDataViewAction>
+    | Context.Service.Identifier<typeof IDatabaseDataEditAction>
+  > = Effect.gen(function* makeGridSelectAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const data = yield* IDatabaseDataResultAction;
+    const view = yield* IDatabaseDataViewAction;
+    const edit = yield* IDatabaseDataEditAction;
+
+    return new GridSelectActionImpl(source, result, data, view, edit);
+  });
+  static readonly layer: Layer.Layer<
+    GridSelectActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataResultAction>
+    | Context.Service.Identifier<typeof IDatabaseDataViewAction>
+    | Context.Service.Identifier<typeof IDatabaseDataEditAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GridSelectAction = GridSelectActionDI;

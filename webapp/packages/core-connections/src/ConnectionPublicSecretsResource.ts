@@ -7,7 +7,7 @@
  */
 import { toJS } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService, type SecretInfo } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
@@ -24,8 +24,7 @@ import {
 
 export type PublicSecretInfo = SecretInfo;
 
-@injectable(() => [GraphQLService, ConnectionInfoResource])
-export class ConnectionPublicSecretsResource extends CachedMapResource<IConnectionInfoParams, PublicSecretInfo[]> {
+export class ConnectionPublicSecretsResourceImpl extends CachedMapResource<IConnectionInfoParams, PublicSecretInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private connectionInfoResource: ConnectionInfoResource,
@@ -96,3 +95,33 @@ export class ConnectionPublicSecretsResource extends CachedMapResource<IConnecti
     return parse.success;
   }
 }
+
+export type ConnectionPublicSecretsResource = ConnectionPublicSecretsResourceImpl;
+
+export class ConnectionPublicSecretsResourceDI extends Context.Service<ConnectionPublicSecretsResourceDI, ConnectionPublicSecretsResourceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionPublicSecretsResource#ConnectionPublicSecretsResource',
+) {
+  static readonly implementation = ConnectionPublicSecretsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionPublicSecretsResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeConnectionPublicSecretsResource() {
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new ConnectionPublicSecretsResourceImpl(graphQLService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionPublicSecretsResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionPublicSecretsResource = ConnectionPublicSecretsResourceDI;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ActionService, KeyBindingService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   ACTION_SQL_EDITOR_SHOW_OUTPUT,
@@ -20,8 +20,7 @@ import { ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/ACTION_SQL_EDIT
 import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
 import { SqlExecutionPlanService } from './SqlExecutionPlanService.js';
 
-@injectable(() => [MenuService, ActionService, KeyBindingService, SqlEditorView, SqlExecutionPlanService])
-export class SqlExecutionPlanMenuBootstrap extends Bootstrap {
+export class SqlExecutionPlanMenuBootstrapImpl extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
@@ -97,3 +96,44 @@ export class SqlExecutionPlanMenuBootstrap extends Bootstrap {
     } catch {}
   }
 }
+
+export type SqlExecutionPlanMenuBootstrap = SqlExecutionPlanMenuBootstrapImpl;
+
+export class SqlExecutionPlanMenuBootstrapDI extends Context.Service<SqlExecutionPlanMenuBootstrapDI, SqlExecutionPlanMenuBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-editor-execution-plan/SqlExecutionPlanMenuBootstrap#SqlExecutionPlanMenuBootstrap',
+) {
+  static readonly implementation = SqlExecutionPlanMenuBootstrapImpl;
+
+  static readonly dependencies = () => [MenuService, ActionService, KeyBindingService, SqlEditorView, SqlExecutionPlanService] as const;
+  static readonly make: Effect.Effect<
+    SqlExecutionPlanMenuBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof SqlEditorView>
+    | Context.Service.Identifier<typeof SqlExecutionPlanService>
+  > = Effect.gen(function* makeSqlExecutionPlanMenuBootstrap() {
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const keyBindingService = yield* KeyBindingService;
+    const sqlEditorView = yield* SqlEditorView;
+    const sqlExecutionPlanService = yield* SqlExecutionPlanService;
+
+    return new SqlExecutionPlanMenuBootstrapImpl(menuService, actionService, keyBindingService, sqlEditorView, sqlExecutionPlanService);
+  });
+  static readonly layer: Layer.Layer<
+    SqlExecutionPlanMenuBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof SqlEditorView>
+    | Context.Service.Identifier<typeof SqlExecutionPlanService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlExecutionPlanMenuBootstrap = SqlExecutionPlanMenuBootstrapDI;

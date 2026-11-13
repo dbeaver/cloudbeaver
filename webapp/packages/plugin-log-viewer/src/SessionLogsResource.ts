@@ -8,7 +8,7 @@
 import { runInAction } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
 import { GraphQLService, type LogEntry } from '@cloudbeaver/core-sdk';
@@ -21,8 +21,7 @@ export interface ILogEntry extends LogEntry {
   id: string;
 }
 
-@injectable(() => [GraphQLService, LogViewerSettingsService, SessionDataResource, AppAuthService, SessionLogsEventHandler])
-export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
+export class SessionLogsResourceImpl extends CachedDataResource<ILogEntry[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly logViewerSettingsService: LogViewerSettingsService,
@@ -78,3 +77,45 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     return this.data;
   }
 }
+
+export type SessionLogsResource = SessionLogsResourceImpl;
+
+export class SessionLogsResourceDI extends Context.Service<SessionLogsResourceDI, SessionLogsResourceImpl>()(
+  '@cloudbeaver/plugin-log-viewer/SessionLogsResource#SessionLogsResource',
+) {
+  static readonly implementation = SessionLogsResourceImpl;
+
+  static readonly dependencies = () =>
+    [GraphQLService, LogViewerSettingsService, SessionDataResource, AppAuthService, SessionLogsEventHandler] as const;
+  static readonly make: Effect.Effect<
+    SessionLogsResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof LogViewerSettingsService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+    | Context.Service.Identifier<typeof SessionLogsEventHandler>
+  > = Effect.gen(function* makeSessionLogsResource() {
+    const graphQLService = yield* GraphQLService;
+    const logViewerSettingsService = yield* LogViewerSettingsService;
+    const sessionDataResource = yield* SessionDataResource;
+    const appAuthService = yield* AppAuthService;
+    const sessionLogsEventHandler = yield* SessionLogsEventHandler;
+
+    return new SessionLogsResourceImpl(graphQLService, logViewerSettingsService, sessionDataResource, appAuthService, sessionLogsEventHandler);
+  });
+  static readonly layer: Layer.Layer<
+    SessionLogsResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof LogViewerSettingsService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+    | Context.Service.Identifier<typeof SessionLogsEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SessionLogsResource = SessionLogsResourceDI;

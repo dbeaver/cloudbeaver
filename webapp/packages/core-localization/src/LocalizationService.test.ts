@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,13 +9,13 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { DEFAULT_LOCALE } from './DEFAULT_LOCALE.js';
 import { type ILocale } from './ILocale.js';
-import { LocalizationService } from './LocalizationService.js';
+import { LocalizationService, LocalizationServiceImpl } from './LocalizationService.js';
 
 describe('LocalizationService', () => {
   let service: LocalizationService;
 
   beforeEach(() => {
-    service = new LocalizationService();
+    service = new LocalizationServiceImpl();
   });
 
   it('should initialize with default locale', () => {

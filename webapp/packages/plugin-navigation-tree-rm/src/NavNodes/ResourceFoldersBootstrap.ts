@@ -8,7 +8,7 @@
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { CONNECTION_FOLDER_NAME_VALIDATION } from '@cloudbeaver/core-connections';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -57,23 +57,7 @@ import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId.js';
 import { getResourceNodeId } from './getResourceNodeId.js';
 import { getRmProjectNodeId } from './getRmProjectNodeId.js';
 
-@injectable(() => [
-  LocalizationService,
-  NavTreeResource,
-  NotificationService,
-  UserInfoResource,
-  NavNodeManagerService,
-  ResourceManagerResource,
-  ResourceManagerService,
-  ProjectInfoResource,
-  CommonDialogService,
-  ActionService,
-  MenuService,
-  NavResourceNodeService,
-  TreeSelectionService,
-  ProjectsNavNodeService,
-])
-export class ResourceFoldersBootstrap extends Bootstrap {
+export class ResourceFoldersBootstrapImpl extends Bootstrap {
   constructor(
     private readonly localizationService: LocalizationService,
     private readonly navTreeResource: NavTreeResource,
@@ -308,3 +292,102 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     });
   }
 }
+
+export type ResourceFoldersBootstrap = ResourceFoldersBootstrapImpl;
+
+export class ResourceFoldersBootstrapDI extends Context.Service<ResourceFoldersBootstrapDI, ResourceFoldersBootstrapImpl>()(
+  '@cloudbeaver/plugin-navigation-tree-rm/NavNodes/ResourceFoldersBootstrap#ResourceFoldersBootstrap',
+) {
+  static readonly implementation = ResourceFoldersBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      LocalizationService,
+      NavTreeResource,
+      NotificationService,
+      UserInfoResource,
+      NavNodeManagerService,
+      ResourceManagerResource,
+      ResourceManagerService,
+      ProjectInfoResource,
+      CommonDialogService,
+      ActionService,
+      MenuService,
+      NavResourceNodeService,
+      TreeSelectionService,
+      ProjectsNavNodeService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ResourceFoldersBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof NavResourceNodeService>
+    | Context.Service.Identifier<typeof TreeSelectionService>
+    | Context.Service.Identifier<typeof ProjectsNavNodeService>
+  > = Effect.gen(function* makeResourceFoldersBootstrap() {
+    const localizationService = yield* LocalizationService;
+    const navTreeResource = yield* NavTreeResource;
+    const notificationService = yield* NotificationService;
+    const userInfoResource = yield* UserInfoResource;
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const resourceManagerResource = yield* ResourceManagerResource;
+    const resourceManagerService = yield* ResourceManagerService;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const commonDialogService = yield* CommonDialogService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const navResourceNodeService = yield* NavResourceNodeService;
+    const treeSelectionService = yield* TreeSelectionService;
+    const projectsNavNodeService = yield* ProjectsNavNodeService;
+
+    return new ResourceFoldersBootstrapImpl(
+      localizationService,
+      navTreeResource,
+      notificationService,
+      userInfoResource,
+      navNodeManagerService,
+      resourceManagerResource,
+      resourceManagerService,
+      projectInfoResource,
+      commonDialogService,
+      actionService,
+      menuService,
+      navResourceNodeService,
+      treeSelectionService,
+      projectsNavNodeService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ResourceFoldersBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof NavResourceNodeService>
+    | Context.Service.Identifier<typeof TreeSelectionService>
+    | Context.Service.Identifier<typeof ProjectsNavNodeService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResourceFoldersBootstrap = ResourceFoldersBootstrapDI;

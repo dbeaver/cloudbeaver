@@ -7,14 +7,13 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import { UserProfileOptionsPanelService } from './UserProfileOptionsPanelService.js';
 
-@injectable(() => [UserProfileOptionsPanelService])
-export class UserProfileTabsService {
+export class UserProfileTabsServiceImpl {
   selectedTabId: string | null;
   readonly tabContainer: TabsContainer;
   readonly onBeforeTabChange: IExecutor<string>;
@@ -60,3 +59,26 @@ export class UserProfileTabsService {
     return true;
   }
 }
+
+export type UserProfileTabsService = UserProfileTabsServiceImpl;
+
+export class UserProfileTabsServiceDI extends Context.Service<UserProfileTabsServiceDI, UserProfileTabsServiceImpl>()(
+  '@cloudbeaver/plugin-user-profile/UserProfileTabsService#UserProfileTabsService',
+) {
+  static readonly implementation = UserProfileTabsServiceImpl;
+
+  static readonly dependencies = () => [UserProfileOptionsPanelService] as const;
+  static readonly make: Effect.Effect<UserProfileTabsServiceImpl, never, Context.Service.Identifier<typeof UserProfileOptionsPanelService>> =
+    Effect.gen(function* makeUserProfileTabsService() {
+      const userProfileOptionsPanelService = yield* UserProfileOptionsPanelService;
+
+      return new UserProfileTabsServiceImpl(userProfileOptionsPanelService);
+    });
+  static readonly layer: Layer.Layer<UserProfileTabsServiceDI, never, Context.Service.Identifier<typeof UserProfileOptionsPanelService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const UserProfileTabsService = UserProfileTabsServiceDI;

@@ -9,7 +9,7 @@ import { lazy } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { MenuBaseItem, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
@@ -62,16 +62,7 @@ const ServerConfigurationUngroupedFeatures = importLazyComponent(() =>
   ),
 );
 
-@injectable(() => [
-  PermissionsService,
-  ScreenService,
-  AdministrationScreenService,
-  AdministrationTopAppBarService,
-  MenuService,
-  ServerConfigurationFormService,
-  ServerConfigurationConfigurationService,
-])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly permissionsService: PermissionsService,
     private readonly screenService: ScreenService,
@@ -158,3 +149,65 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-administration/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+  static readonly dependencies = () =>
+    [
+      PermissionsService,
+      ScreenService,
+      AdministrationScreenService,
+      AdministrationTopAppBarService,
+      MenuService,
+      ServerConfigurationFormService,
+      ServerConfigurationConfigurationService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof ScreenService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof AdministrationTopAppBarService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ServerConfigurationFormService>
+    | Context.Service.Identifier<typeof ServerConfigurationConfigurationService>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const permissionsService = yield* PermissionsService;
+    const screenService = yield* ScreenService;
+    const administrationScreenService = yield* AdministrationScreenService;
+    const administrationTopAppBarService = yield* AdministrationTopAppBarService;
+    const menuService = yield* MenuService;
+    const serverConfigurationFormService = yield* ServerConfigurationFormService;
+    const serverConfigurationConfigurationService = yield* ServerConfigurationConfigurationService;
+    return new PluginBootstrapImpl(
+      permissionsService,
+      screenService,
+      administrationScreenService,
+      administrationTopAppBarService,
+      menuService,
+      serverConfigurationFormService,
+      serverConfigurationConfigurationService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof ScreenService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof AdministrationTopAppBarService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ServerConfigurationFormService>
+    | Context.Service.Identifier<typeof ServerConfigurationConfigurationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

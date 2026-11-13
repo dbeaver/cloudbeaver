@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ActionService, MenuRadioItem, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -23,12 +23,11 @@ import {
   type Order,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { ACTION_DATA_GRID_ORDERING_DISABLE_ALL } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DISABLE_ALL.js';
 import { MENU_DATA_GRID_ORDERING } from './MENU_DATA_GRID_ORDERING.js';
-import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
-@injectable(() => [ActionService, MenuService])
-export class DataGridContextMenuOrderService {
+export class DataGridContextMenuOrderServiceImpl {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -149,3 +148,33 @@ export class DataGridContextMenuOrderService {
     });
   }
 }
+
+export type DataGridContextMenuOrderService = DataGridContextMenuOrderServiceImpl;
+
+export class DataGridContextMenuOrderServiceDI extends Context.Service<DataGridContextMenuOrderServiceDI, DataGridContextMenuOrderServiceImpl>()(
+  '@cloudbeaver/plugin-data-spreadsheet-new/DataGrid/DataGridContextMenu/DataGridContextMenuOrderService#DataGridContextMenuOrderService',
+) {
+  static readonly implementation = DataGridContextMenuOrderServiceImpl;
+
+  static readonly dependencies = () => [ActionService, MenuService] as const;
+  static readonly make: Effect.Effect<
+    DataGridContextMenuOrderServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ActionService> | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makeDataGridContextMenuOrderService() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+
+    return new DataGridContextMenuOrderServiceImpl(actionService, menuService);
+  });
+  static readonly layer: Layer.Layer<
+    DataGridContextMenuOrderServiceDI,
+    never,
+    Context.Service.Identifier<typeof ActionService> | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataGridContextMenuOrderService = DataGridContextMenuOrderServiceDI;

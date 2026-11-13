@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_TABS_CONTEXT, MENU_TAB } from '@cloudbeaver/core-ui';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 
@@ -16,8 +16,7 @@ import { DATA_CONTEXT_SQL_EDITOR_RESULT_ID } from './SqlResultTabs/DATA_CONTEXT_
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService.js';
 import { SqlScriptErrorService } from './SqlResultTabs/SqlScriptErrorService.js';
 
-@injectable(() => [ActionService, MenuService, SqlResultTabsService, SqlScriptErrorService])
-export class SqlEditorGroupTabsBootstrap extends Bootstrap {
+export class SqlEditorGroupTabsBootstrapImpl extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -84,3 +83,41 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
     });
   }
 }
+
+export type SqlEditorGroupTabsBootstrap = SqlEditorGroupTabsBootstrapImpl;
+
+export class SqlEditorGroupTabsBootstrapDI extends Context.Service<SqlEditorGroupTabsBootstrapDI, SqlEditorGroupTabsBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlEditorGroupTabsBootstrap#SqlEditorGroupTabsBootstrap',
+) {
+  static readonly implementation = SqlEditorGroupTabsBootstrapImpl;
+
+  static readonly dependencies = () => [ActionService, MenuService, SqlResultTabsService, SqlScriptErrorService] as const;
+  static readonly make: Effect.Effect<
+    SqlEditorGroupTabsBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlResultTabsService>
+    | Context.Service.Identifier<typeof SqlScriptErrorService>
+  > = Effect.gen(function* makeSqlEditorGroupTabsBootstrap() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const sqlResultTabsService = yield* SqlResultTabsService;
+    const sqlScriptErrorService = yield* SqlScriptErrorService;
+
+    return new SqlEditorGroupTabsBootstrapImpl(actionService, menuService, sqlResultTabsService, sqlScriptErrorService);
+  });
+  static readonly layer: Layer.Layer<
+    SqlEditorGroupTabsBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlResultTabsService>
+    | Context.Service.Identifier<typeof SqlScriptErrorService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlEditorGroupTabsBootstrap = SqlEditorGroupTabsBootstrapDI;

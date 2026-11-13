@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
@@ -28,8 +28,7 @@ export interface IExecutionPlanData {
   selectedNode: string | null;
 }
 
-@injectable(() => [GraphQLService, NotificationService, AsyncTaskInfoService, ConnectionExecutionContextService, SqlDataSourceService])
-export class SqlExecutionPlanService {
+export class SqlExecutionPlanServiceImpl {
   data: Map<string, IExecutionPlanData>;
 
   constructor(
@@ -178,3 +177,51 @@ export class SqlExecutionPlanService {
     return id;
   }
 }
+
+export type SqlExecutionPlanService = SqlExecutionPlanServiceImpl;
+
+export class SqlExecutionPlanServiceDI extends Context.Service<SqlExecutionPlanServiceDI, SqlExecutionPlanServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor-execution-plan/SqlExecutionPlanService#SqlExecutionPlanService',
+) {
+  static readonly implementation = SqlExecutionPlanServiceImpl;
+
+  static readonly dependencies = () =>
+    [GraphQLService, NotificationService, AsyncTaskInfoService, ConnectionExecutionContextService, SqlDataSourceService] as const;
+  static readonly make: Effect.Effect<
+    SqlExecutionPlanServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+  > = Effect.gen(function* makeSqlExecutionPlanService() {
+    const graphQLService = yield* GraphQLService;
+    const notificationService = yield* NotificationService;
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+    const connectionExecutionContextService = yield* ConnectionExecutionContextService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+
+    return new SqlExecutionPlanServiceImpl(
+      graphQLService,
+      notificationService,
+      asyncTaskInfoService,
+      connectionExecutionContextService,
+      sqlDataSourceService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SqlExecutionPlanServiceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlExecutionPlanService = SqlExecutionPlanServiceDI;

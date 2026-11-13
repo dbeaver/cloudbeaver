@@ -8,7 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { DataSynchronizationService, ServerConfigResource, ServerEventId } from '@cloudbeaver/core-root';
@@ -28,16 +28,7 @@ interface IProjectsUserSettings {
   activeProjectIds: string[];
 }
 
-@injectable(() => [
-  ServerConfigResource,
-  ProjectInfoResource,
-  UserInfoResource,
-  UserDataService,
-  ProjectInfoEventHandler,
-  DataSynchronizationService,
-  NavigationService,
-])
-export class ProjectsService {
+export class ProjectsServiceImpl {
   get userProject(): ProjectInfo | undefined {
     let project: ProjectInfo | undefined;
 
@@ -227,3 +218,67 @@ export class ProjectsService {
     await this.projectInfoResource.load(CachedMapAllKey);
   }
 }
+
+export type ProjectsService = ProjectsServiceImpl;
+
+export class ProjectsServiceDI extends Context.Service<ProjectsServiceDI, ProjectsServiceImpl>()(
+  '@cloudbeaver/core-projects/ProjectsService#ProjectsService',
+) {
+  static readonly implementation = ProjectsServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      ServerConfigResource,
+      ProjectInfoResource,
+      UserInfoResource,
+      UserDataService,
+      ProjectInfoEventHandler,
+      DataSynchronizationService,
+      NavigationService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ProjectsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof ProjectInfoEventHandler>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+    | Context.Service.Identifier<typeof NavigationService>
+  > = Effect.gen(function* makeProjectsService() {
+    const serverConfigResource = yield* ServerConfigResource;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const userInfoResource = yield* UserInfoResource;
+    const userDataService = yield* UserDataService;
+    const projectInfoEventHandler = yield* ProjectInfoEventHandler;
+    const dataSynchronizationService = yield* DataSynchronizationService;
+    const navigationService = yield* NavigationService;
+
+    return new ProjectsServiceImpl(
+      serverConfigResource,
+      projectInfoResource,
+      userInfoResource,
+      userDataService,
+      projectInfoEventHandler,
+      dataSynchronizationService,
+      navigationService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ProjectsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof ProjectInfoEventHandler>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+    | Context.Service.Identifier<typeof NavigationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ProjectsService = ProjectsServiceDI;

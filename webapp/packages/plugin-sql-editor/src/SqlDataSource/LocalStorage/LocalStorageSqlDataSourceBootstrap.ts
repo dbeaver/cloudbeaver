@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { StorageService } from '@cloudbeaver/core-storage';
 
 import { createSqlDataSourceHistoryInitialState } from '../SqlDataSourceHistory/createSqlDataSourceHistoryInitialState.js';
@@ -18,8 +18,7 @@ import { LocalStorageSqlDataSource } from './LocalStorageSqlDataSource.js';
 
 const localStorageKey = 'local-storage-sql-data-source';
 
-@injectable(() => [SqlDataSourceService, StorageService])
-export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
+export class LocalStorageSqlDataSourceBootstrapImpl extends Bootstrap {
   private readonly dataSourceStateState = new Map<string, ILocalStorageSqlDataSourceState>();
 
   constructor(
@@ -104,3 +103,34 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
     this.dataSourceStateState.delete(editorId);
   }
 }
+
+export type LocalStorageSqlDataSourceBootstrap = LocalStorageSqlDataSourceBootstrapImpl;
+
+export class LocalStorageSqlDataSourceBootstrapDI extends Context.Service<
+  LocalStorageSqlDataSourceBootstrapDI,
+  LocalStorageSqlDataSourceBootstrapImpl
+>()('@cloudbeaver/plugin-sql-editor/SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap#LocalStorageSqlDataSourceBootstrap') {
+  static readonly implementation = LocalStorageSqlDataSourceBootstrapImpl;
+
+  static readonly dependencies = () => [SqlDataSourceService, StorageService] as const;
+  static readonly make: Effect.Effect<
+    LocalStorageSqlDataSourceBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof SqlDataSourceService> | Context.Service.Identifier<typeof StorageService>
+  > = Effect.gen(function* makeLocalStorageSqlDataSourceBootstrap() {
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const storageService = yield* StorageService;
+
+    return new LocalStorageSqlDataSourceBootstrapImpl(sqlDataSourceService, storageService);
+  });
+  static readonly layer: Layer.Layer<
+    LocalStorageSqlDataSourceBootstrapDI,
+    never,
+    Context.Service.Identifier<typeof SqlDataSourceService> | Context.Service.Identifier<typeof StorageService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const LocalStorageSqlDataSourceBootstrap = LocalStorageSqlDataSourceBootstrapDI;

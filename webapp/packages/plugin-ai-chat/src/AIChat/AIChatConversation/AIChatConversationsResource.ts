@@ -8,7 +8,7 @@
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { isConnectionInfoParamEqual, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
   CachedMapResource,
   isResourceAlias,
@@ -17,7 +17,7 @@ import {
   ResourceKeyUtils,
   type ResourceKey,
 } from '@cloudbeaver/core-resource';
-import { type AiChatConversationFragment, type AiChatConversationInput, GraphQLService } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type AiChatConversationFragment, type AiChatConversationInput } from '@cloudbeaver/core-sdk';
 
 import type { EAIConversationPromptGeneratorId } from '../../EAIConversationPromptGeneratorId.js';
 
@@ -32,8 +32,7 @@ export const ChatConversationConnectionKey = resourceKeyListAliasFactory(
   }),
 );
 
-@injectable(() => [GraphQLService, UserInfoResource])
-export class AIChatConversationsResource extends CachedMapResource<string, AIChatConversationInfo> {
+export class AIChatConversationsResourceImpl extends CachedMapResource<string, AIChatConversationInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     userInfoResource: UserInfoResource,
@@ -130,6 +129,36 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
     return typeof key === 'string';
   }
 }
+
+export type AIChatConversationsResource = AIChatConversationsResourceImpl;
+
+export class AIChatConversationsResourceDI extends Context.Service<AIChatConversationsResourceDI, AIChatConversationsResourceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChat/AIChatConversation/AIChatConversationsResource#AIChatConversationsResource',
+) {
+  static readonly implementation = AIChatConversationsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, UserInfoResource] as const;
+  static readonly make: Effect.Effect<
+    AIChatConversationsResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof UserInfoResource>
+  > = Effect.gen(function* makeAIChatConversationsResource() {
+    const graphQLService = yield* GraphQLService;
+    const userInfoResource = yield* UserInfoResource;
+
+    return new AIChatConversationsResourceImpl(graphQLService, userInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatConversationsResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof UserInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatConversationsResource = AIChatConversationsResourceDI;
 
 export function compareConversations(a: AIChatConversationInfo, b: AIChatConversationInfo): number {
   return new Date(b.time).getTime() - new Date(a.time).getTime();

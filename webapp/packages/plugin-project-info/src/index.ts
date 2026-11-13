@@ -8,5 +8,5 @@
 
 import './module.js';
 
-export { ProjectInfoFormService } from './ProjectInfoForm/ProjectInfoFormService.js';
-export { ProjectInfoOptionsPanelService } from './ProjectInfoForm/ProjectInfoOptionsPanelService.js';
+export { ProjectInfoFormService, ProjectInfoFormServiceImpl } from './ProjectInfoForm/ProjectInfoFormService.js';
+export { ProjectInfoOptionsPanelService, ProjectInfoOptionsPanelServiceImpl } from './ProjectInfoForm/ProjectInfoOptionsPanelService.js';

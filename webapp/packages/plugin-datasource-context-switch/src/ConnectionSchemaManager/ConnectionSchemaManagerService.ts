@@ -35,7 +35,7 @@ import {
   type ObjectContainer,
   serializeConnectionParam,
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExtensionUtils, type IExtension } from '@cloudbeaver/core-extensions';
 import { type IDataContextActiveNode, type IObjectNavNodeProvider, isObjectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
@@ -74,8 +74,7 @@ interface IActiveItem<T> {
   changeSchemaId?: IObjectSchemaSetter<T>;
 }
 
-@injectable(() => [NavigationTabsService, ConnectionInfoResource, ConnectionsManagerService, DBDriverResource, NotificationService])
-export class ConnectionSchemaManagerService {
+export class ConnectionSchemaManagerServiceImpl {
   get activeNavNode(): IDataContextActiveNode | null | undefined {
     if (!this.activeItem?.getCurrentNavNode) {
       return null;
@@ -509,3 +508,51 @@ export class ConnectionSchemaManagerService {
       });
   }
 }
+
+export type ConnectionSchemaManagerService = ConnectionSchemaManagerServiceImpl;
+
+export class ConnectionSchemaManagerServiceDI extends Context.Service<ConnectionSchemaManagerServiceDI, ConnectionSchemaManagerServiceImpl>()(
+  '@cloudbeaver/plugin-datasource-context-switch/ConnectionSchemaManager/ConnectionSchemaManagerService#ConnectionSchemaManagerService',
+) {
+  static readonly implementation = ConnectionSchemaManagerServiceImpl;
+
+  static readonly dependencies = () =>
+    [NavigationTabsService, ConnectionInfoResource, ConnectionsManagerService, DBDriverResource, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionSchemaManagerServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeConnectionSchemaManagerService() {
+    const navigationTabsService = yield* NavigationTabsService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const dbDriverResource = yield* DBDriverResource;
+    const notificationService = yield* NotificationService;
+
+    return new ConnectionSchemaManagerServiceImpl(
+      navigationTabsService,
+      connectionInfoResource,
+      connectionsManagerService,
+      dbDriverResource,
+      notificationService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionSchemaManagerServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionSchemaManagerService = ConnectionSchemaManagerServiceDI;

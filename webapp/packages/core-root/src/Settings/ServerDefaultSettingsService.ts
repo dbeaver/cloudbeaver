@@ -1,20 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
-import { SettingsSource } from '@cloudbeaver/core-settings';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { getObjectPropertyDefaultValue } from '@cloudbeaver/core-sdk';
+import { SettingsSource } from '@cloudbeaver/core-settings';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { ServerSettingsResource } from './ServerSettingsResource.js';
 
-@injectable(() => [ServerSettingsResource])
-export class ServerDefaultSettingsService extends SettingsSource {
+export class ServerDefaultSettingsServiceImpl extends SettingsSource {
   private readonly settings: Map<string, any>;
 
   constructor(private readonly serverSettingsResource: ServerSettingsResource) {
@@ -63,3 +62,25 @@ export class ServerDefaultSettingsService extends SettingsSource {
     });
   }
 }
+
+export type ServerDefaultSettingsService = ServerDefaultSettingsServiceImpl;
+
+export class ServerDefaultSettingsServiceDI extends Context.Service<ServerDefaultSettingsServiceDI, ServerDefaultSettingsServiceImpl>()(
+  '@cloudbeaver/core-root/Settings/ServerDefaultSettingsService#ServerDefaultSettingsService',
+) {
+  static readonly implementation = ServerDefaultSettingsServiceImpl;
+
+  static readonly dependencies = () => [ServerSettingsResource] as const;
+  static readonly make: Effect.Effect<ServerDefaultSettingsServiceImpl, never, Context.Service.Identifier<typeof ServerSettingsResource>> =
+    Effect.gen(function* makeServerDefaultSettingsService() {
+      const serverSettingsResource = yield* ServerSettingsResource;
+
+      return new ServerDefaultSettingsServiceImpl(serverSettingsResource);
+    });
+  static readonly layer: Layer.Layer<ServerDefaultSettingsServiceDI, never, Context.Service.Identifier<typeof ServerSettingsResource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServerDefaultSettingsService = ServerDefaultSettingsServiceDI;

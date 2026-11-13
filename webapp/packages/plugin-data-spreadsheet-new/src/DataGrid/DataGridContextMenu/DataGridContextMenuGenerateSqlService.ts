@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { SqlResultSetGeneratorId, type SqlQueryGeneratorOptions, type SqlResultRow } from '@cloudbeaver/core-sdk';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { SqlResultSetGeneratorId, type SqlQueryGeneratorOptions, type SqlResultRow } from '@cloudbeaver/core-sdk';
 import { ActionService, MenuService, type IAction } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -25,13 +25,16 @@ import {
   IDatabaseDataSource,
   isResultSetDataModel,
   ResultSetDataAction,
-  type IDataContainerOptions,
   type IDatabaseDataModel,
+  type IDataContainerOptions,
   type IGridColumnKey,
   type IGridDataKey,
   type IGridRowKey,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { DDL_GENERATOR_ID, getDefaultQueryGeneratorOptions, SqlGenerationService, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { ACTION_DATA_GRID_GENERATE_SQL_CREATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_CREATE.js';
 import { ACTION_DATA_GRID_GENERATE_SQL_DELETE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_DELETE.js';
 import { ACTION_DATA_GRID_GENERATE_SQL_INSERT } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_INSERT.js';
@@ -39,20 +42,8 @@ import { ACTION_DATA_GRID_GENERATE_SQL_SELECT } from '../Actions/GenerateSQL/ACT
 import { ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_SELECT_MANY.js';
 import { ACTION_DATA_GRID_GENERATE_SQL_UPDATE } from '../Actions/GenerateSQL/ACTION_DATA_GRID_GENERATE_SQL_UPDATE.js';
 import { MENU_DATA_GRID_GENERATE_SQL } from './GenerateSQL/MENU_DATA_GRID_GENERATE_SQL.js';
-import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { getDefaultQueryGeneratorOptions, SqlGenerationService, SqlGeneratorsResource, DDL_GENERATOR_ID } from '@cloudbeaver/plugin-sql-generator';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-@injectable(() => [
-  ActionService,
-  MenuService,
-  SqlGenerationService,
-  NotificationService,
-  SqlGeneratorsResource,
-  LocalizationService,
-  NavNodeInfoResource,
-])
-export class DataGridContextMenuGenerateSqlService {
+export class DataGridContextMenuGenerateSqlServiceImpl {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -294,6 +285,65 @@ export class DataGridContextMenuGenerateSqlService {
     return fallbackName ?? undefined;
   }
 }
+
+export type DataGridContextMenuGenerateSqlService = DataGridContextMenuGenerateSqlServiceImpl;
+
+export class DataGridContextMenuGenerateSqlServiceDI extends Context.Service<
+  DataGridContextMenuGenerateSqlServiceDI,
+  DataGridContextMenuGenerateSqlServiceImpl
+>()(
+  '@cloudbeaver/plugin-data-spreadsheet-new/DataGrid/DataGridContextMenu/DataGridContextMenuGenerateSqlService#DataGridContextMenuGenerateSqlService',
+) {
+  static readonly implementation = DataGridContextMenuGenerateSqlServiceImpl;
+
+  static readonly dependencies = () =>
+    [ActionService, MenuService, SqlGenerationService, NotificationService, SqlGeneratorsResource, LocalizationService, NavNodeInfoResource] as const;
+  static readonly make: Effect.Effect<
+    DataGridContextMenuGenerateSqlServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlGenerationService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlGeneratorsResource>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Effect.gen(function* makeDataGridContextMenuGenerateSqlService() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const sqlGenerationService = yield* SqlGenerationService;
+    const notificationService = yield* NotificationService;
+    const sqlGeneratorsResource = yield* SqlGeneratorsResource;
+    const localizationService = yield* LocalizationService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+
+    return new DataGridContextMenuGenerateSqlServiceImpl(
+      actionService,
+      menuService,
+      sqlGenerationService,
+      notificationService,
+      sqlGeneratorsResource,
+      localizationService,
+      navNodeInfoResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    DataGridContextMenuGenerateSqlServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlGenerationService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlGeneratorsResource>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataGridContextMenuGenerateSqlService = DataGridContextMenuGenerateSqlServiceDI;
 
 function mapGeneratorIdFromAction(action: IAction): SqlResultSetGeneratorId {
   switch (action) {

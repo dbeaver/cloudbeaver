@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerConfigResource, ServerEventId, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
 import { type AiSettingsConfig, type AiSettingsInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
 export type AISettings = AiSettingsInfo;
 
-@injectable(() => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler])
-export class AISettingsResource extends CachedDataResource<AISettings | null> {
+export class AISettingsResourceImpl extends CachedDataResource<AISettings | null> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource,
@@ -38,3 +37,38 @@ export class AISettingsResource extends CachedDataResource<AISettings | null> {
     return settings;
   }
 }
+
+export type AISettingsResource = AISettingsResourceImpl;
+
+export class AISettingsResourceDI extends Context.Service<AISettingsResourceDI, AISettingsResourceImpl>()(
+  '@cloudbeaver/plugin-ai/AISettingsResource#AISettingsResource',
+) {
+  static readonly implementation = AISettingsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler] as const;
+  static readonly make: Effect.Effect<
+    AISettingsResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof WorkspaceConfigEventHandler>
+  > = Effect.gen(function* makeAISettingsResource() {
+    const graphQLService = yield* GraphQLService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const workspaceConfigEventHandler = yield* WorkspaceConfigEventHandler;
+
+    return new AISettingsResourceImpl(graphQLService, serverConfigResource, workspaceConfigEventHandler);
+  });
+  static readonly layer: Layer.Layer<
+    AISettingsResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof WorkspaceConfigEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AISettingsResource = AISettingsResourceDI;

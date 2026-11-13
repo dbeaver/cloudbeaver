@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
@@ -40,8 +40,7 @@ interface ObjectContainerParams {
   catalogId?: string;
 }
 
-@injectable(() => [GraphQLService, NavTreeResource, ConnectionInfoResource, AppAuthService])
-export class ContainerResource extends CachedMapResource<ObjectContainerParams, IStructContainers> {
+export class ContainerResourceImpl extends CachedMapResource<ObjectContainerParams, IStructContainers> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navTreeResource: NavTreeResource,
@@ -166,3 +165,41 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
     );
   }
 }
+
+export type ContainerResource = ContainerResourceImpl;
+
+export class ContainerResourceDI extends Context.Service<ContainerResourceDI, ContainerResourceImpl>()(
+  '@cloudbeaver/core-connections/ContainerResource#ContainerResource',
+) {
+  static readonly implementation = ContainerResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, NavTreeResource, ConnectionInfoResource, AppAuthService] as const;
+  static readonly make: Effect.Effect<
+    ContainerResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Effect.gen(function* makeContainerResource() {
+    const graphQLService = yield* GraphQLService;
+    const navTreeResource = yield* NavTreeResource;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const appAuthService = yield* AppAuthService;
+
+    return new ContainerResourceImpl(graphQLService, navTreeResource, connectionInfoResource, appAuthService);
+  });
+  static readonly layer: Layer.Layer<
+    ContainerResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ContainerResource = ContainerResourceDI;

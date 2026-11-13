@@ -7,22 +7,22 @@
  */
 import { action, computed, makeObservable } from 'mobx';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { isDefined } from '@dbeaver/js-helpers';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
-import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
-import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
+import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
+import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
+import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 import { compareGridRowKeys } from './compareGridRowKeys.js';
+import { GridDataKeysUtils } from './GridDataKeysUtils.js';
 import { GridDataResultAction } from './GridDataResultAction.js';
 import { GridEditAction } from './GridEditAction.js';
-import { GridDataKeysUtils } from './GridDataKeysUtils.js';
-import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { injectable } from '@cloudbeaver/core-di';
-import type { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
-import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
-import { IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
-import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
 
 const PINNED_COLUMNS_KEY = 'pinnedColumns';
 const COLUMN_ORDER_KEY = 'columnOrder';
@@ -52,8 +52,7 @@ function refKey(ref: IColumnRef): string {
   return `${ref.name}\0${ref.position}`;
 }
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction])
-export class GridViewAction<
+export class GridViewActionImpl<
   TColumn = unknown,
   TRow = unknown,
   TKey extends IGridDataKey = IGridDataKey,
@@ -424,3 +423,47 @@ export class GridViewAction<
     return resolved;
   }
 }
+
+export type GridViewAction<
+  TColumn = unknown,
+  TRow = unknown,
+  TKey extends IGridDataKey = IGridDataKey,
+  TCell = unknown,
+  TResult extends IDatabaseDataResult = IDatabaseDataResult,
+> = GridViewActionImpl<TColumn, TRow, TKey, TCell, TResult>;
+
+export class GridViewActionDI extends Context.Service<GridViewActionDI, GridViewActionImpl<any, any, any, any, any>>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/Grid/GridViewAction#GridViewAction',
+) {
+  static readonly implementation = GridViewActionImpl;
+  static readonly dataFormat = GridViewActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, IDatabaseDataEditAction] as const;
+  static readonly make: Effect.Effect<
+    GridViewActionImpl<any, any, any, any, any>,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataResultAction>
+    | Context.Service.Identifier<typeof IDatabaseDataEditAction>
+  > = Effect.gen(function* makeGridViewAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const data = yield* IDatabaseDataResultAction;
+    const editor = yield* IDatabaseDataEditAction;
+
+    return new GridViewActionImpl(source, result, data, editor);
+  });
+  static readonly layer: Layer.Layer<
+    GridViewActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataResultAction>
+    | Context.Service.Identifier<typeof IDatabaseDataEditAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GridViewAction = GridViewActionDI;

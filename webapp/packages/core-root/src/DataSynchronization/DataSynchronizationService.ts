@@ -1,20 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { ISynchronizationMessage, ISynchronizationMessageResolveCallback } from './ISynchronizationMessage.js';
 import { SynchronizationMessage } from './SynchronizationMessage.js';
 
-@injectable()
-export class DataSynchronizationService {
+export class DataSynchronizationServiceImpl {
   readonly queue: Map<string, ISynchronizationMessage>;
   readonly onSynchronizationRequest: ISyncExecutor;
 
@@ -64,3 +63,20 @@ export class DataSynchronizationService {
     }
   }
 }
+
+export type DataSynchronizationService = DataSynchronizationServiceImpl;
+
+export class DataSynchronizationServiceDI extends Context.Service<DataSynchronizationServiceDI, DataSynchronizationServiceImpl>()(
+  '@cloudbeaver/core-root/DataSynchronization/DataSynchronizationService#DataSynchronizationService',
+) {
+  static readonly implementation = DataSynchronizationServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<DataSynchronizationServiceImpl, never, never> = Effect.sync(() => new DataSynchronizationServiceImpl());
+  static readonly layer: Layer.Layer<DataSynchronizationServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataSynchronizationService = DataSynchronizationServiceDI;

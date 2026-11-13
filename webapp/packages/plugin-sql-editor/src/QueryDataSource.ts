@@ -7,8 +7,10 @@
  */
 import { makeObservable, observable } from 'mobx';
 
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { createConnectionParam, type IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
+import { DialogueStateResult, type CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { executorHandlerFilter, type IExecutorHandler, type ITask } from '@cloudbeaver/core-executor';
 import {
   AsyncTask,
@@ -21,10 +23,10 @@ import {
 import {
   GraphQLService,
   ResultDataFormat,
+  type AsyncTaskInfo,
+  type AsyncUpdateResultsDataBatchMutationVariables,
   type SqlExecuteInfo,
   type SqlQueryResults,
-  type AsyncUpdateResultsDataBatchMutationVariables,
-  type AsyncTaskInfo,
   type WsSessionTaskQueryParamsConfirmationEvent,
   type WsSessionTaskWithParametersConfirmationEvent,
 } from '@cloudbeaver/core-sdk';
@@ -32,15 +34,14 @@ import { isArraysEqual, uuid } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataFeature,
   DocumentEditAction,
+  ResultSetDataSource,
+  ResultSetEditAction,
+  ResultSetEditActionImpl,
   type IDatabaseDataOptions,
   type IDatabaseResultSet,
   type IRequestInfo,
   type IResultSetBlobValue,
-  ResultSetDataSource,
-  ResultSetEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import { DialogueStateResult, type CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { renderQueryParamsForConfirmation } from './renderQueryParamsForConfirmation.js';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
@@ -155,7 +156,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
         let blobs: IResultSetBlobValue[] = [];
 
-        if (editor instanceof ResultSetEditAction) {
+        if (editor instanceof ResultSetEditActionImpl) {
           blobs = editor.getBlobsToUpload();
         }
 

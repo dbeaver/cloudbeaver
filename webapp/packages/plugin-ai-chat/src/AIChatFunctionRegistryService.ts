@@ -8,13 +8,13 @@
 
 import type { ComponentType } from 'react';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import type { TranslateFn } from '@cloudbeaver/core-localization';
 import type { AiFunction, AiFunctionCall } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 
-import { AIFunctionsResource } from './AIFunctionsResource.js';
 import type { IAIFunctionConfirmationMessage } from './AIChat/AIChatMessage/AIChatMessagesResource.js';
+import { AIFunctionsResource } from './AIFunctionsResource.js';
 
 export interface IAIChatFunctionContext {
   message: IAIFunctionConfirmationMessage;
@@ -57,8 +57,7 @@ interface IAIChatFunctionInteractionHandler {
 
 type AIFunctionHandler = IAIChatFunctionActionHandler | IAIChatFunctionInteractionHandler;
 
-@injectable(() => [AIFunctionsResource])
-export class AIChatFunctionRegistryService {
+export class AIChatFunctionRegistryServiceImpl {
   private readonly handlers = new Map<string, AIFunctionHandler>();
 
   constructor(private readonly aiFunctionsResource: AIFunctionsResource) {}
@@ -152,3 +151,26 @@ export class AIChatFunctionRegistryService {
     }
   }
 }
+
+export type AIChatFunctionRegistryService = AIChatFunctionRegistryServiceImpl;
+
+export class AIChatFunctionRegistryServiceDI extends Context.Service<AIChatFunctionRegistryServiceDI, AIChatFunctionRegistryServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChatFunctionRegistryService#AIChatFunctionRegistryService',
+) {
+  static readonly implementation = AIChatFunctionRegistryServiceImpl;
+
+  static readonly dependencies = () => [AIFunctionsResource] as const;
+  static readonly make: Effect.Effect<AIChatFunctionRegistryServiceImpl, never, Context.Service.Identifier<typeof AIFunctionsResource>> = Effect.gen(
+    function* makeAIChatFunctionRegistryService() {
+      const aiFunctionsResource = yield* AIFunctionsResource;
+
+      return new AIChatFunctionRegistryServiceImpl(aiFunctionsResource);
+    },
+  );
+  static readonly layer: Layer.Layer<AIChatFunctionRegistryServiceDI, never, Context.Service.Identifier<typeof AIFunctionsResource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatFunctionRegistryService = AIChatFunctionRegistryServiceDI;

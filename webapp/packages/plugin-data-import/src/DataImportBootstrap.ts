@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ConnectionInfoResource, createConnectionParam, EConnectionFeature } from '@cloudbeaver/core-connections';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ACTION_IMPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
-import { ConnectionInfoResource, createConnectionParam, EConnectionFeature } from '@cloudbeaver/core-connections';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -24,8 +24,7 @@ import {
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy.js';
 import { DataImportService } from './DataImportService.js';
 
-@injectable(() => [MenuService, ActionService, CommonDialogService, DataImportService, ConnectionInfoResource])
-export class DataImportBootstrap extends Bootstrap {
+export class DataImportBootstrapImpl extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
@@ -140,3 +139,44 @@ export class DataImportBootstrap extends Bootstrap {
     });
   }
 }
+
+export type DataImportBootstrap = DataImportBootstrapImpl;
+
+export class DataImportBootstrapDI extends Context.Service<DataImportBootstrapDI, DataImportBootstrapImpl>()(
+  '@cloudbeaver/plugin-data-import/DataImportBootstrap#DataImportBootstrap',
+) {
+  static readonly implementation = DataImportBootstrapImpl;
+
+  static readonly dependencies = () => [MenuService, ActionService, CommonDialogService, DataImportService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    DataImportBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof DataImportService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeDataImportBootstrap() {
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const commonDialogService = yield* CommonDialogService;
+    const dataImportService = yield* DataImportService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new DataImportBootstrapImpl(menuService, actionService, commonDialogService, dataImportService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    DataImportBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof DataImportService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataImportBootstrap = DataImportBootstrapDI;

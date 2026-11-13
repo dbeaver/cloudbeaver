@@ -9,10 +9,10 @@ import { observable } from 'mobx';
 
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
-import { injectable } from '@cloudbeaver/core-di';
 
 export interface IDatabaseRefreshState {
   interval: number;
@@ -20,8 +20,7 @@ export interface IDatabaseRefreshState {
   stopOnError: boolean;
 }
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
-export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends DatabaseDataAction<any, TResult> {
+export class DatabaseRefreshActionImpl<TResult extends IDatabaseDataResult> extends DatabaseDataAction<any, TResult> {
   static dataFormat: ResultDataFormat[] | null = null;
 
   get isAutoRefresh(): boolean {
@@ -112,3 +111,33 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
     }
   }
 }
+
+export type DatabaseRefreshAction<TResult extends IDatabaseDataResult> = DatabaseRefreshActionImpl<TResult>;
+
+export class DatabaseRefreshActionDI extends Context.Service<DatabaseRefreshActionDI, DatabaseRefreshActionImpl<any>>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/General/DatabaseRefreshAction#DatabaseRefreshAction',
+) {
+  static readonly implementation = DatabaseRefreshActionImpl;
+  static readonly dataFormat = DatabaseRefreshActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult] as const;
+  static readonly make: Effect.Effect<
+    DatabaseRefreshActionImpl<any>,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Effect.gen(function* makeDatabaseRefreshAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+
+    return new DatabaseRefreshActionImpl(source, result);
+  });
+  static readonly layer: Layer.Layer<
+    DatabaseRefreshActionDI,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DatabaseRefreshAction = DatabaseRefreshActionDI;

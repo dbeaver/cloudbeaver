@@ -8,10 +8,13 @@
 
 import { computed, makeObservable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { createConnectionParam, isConnectionInfoParamEqual, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService, type TLocalizationToken } from '@cloudbeaver/core-localization';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 import {
   ESqlDataSourceFeatures,
   LocalStorageSqlDataSource,
@@ -21,29 +24,14 @@ import {
   type ILocalStorageSqlDataSourceState,
   type ISqlEditorTabState,
 } from '@cloudbeaver/plugin-sql-editor';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { LocalizationService, type TLocalizationToken } from '@cloudbeaver/core-localization';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { AIChatContextService } from '../AIChatContext/AIChatContextService.js';
 import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 
 const AI_CHAT_ID_METADATA_KEY = 'aiChatId';
 
-@injectable(() => [
-  SqlEditorService,
-  NavigationTabsService,
-  SqlEditorNavigatorService,
-  AIChatContextService,
-  AIChatConversationsResource,
-  NotificationService,
-  SqlDataSourceService,
-  LocalizationService,
-  CommonDialogService,
-  SqlEditorPermissionService,
-])
-export class AIChatMessageActionsService {
+export class AIChatMessageActionsServiceImpl {
   get isDisabled(): boolean {
     return !this.aiChatContextService.currentContext;
   }
@@ -243,3 +231,82 @@ export class AIChatMessageActionsService {
     });
   }
 }
+
+export type AIChatMessageActionsService = AIChatMessageActionsServiceImpl;
+
+export class AIChatMessageActionsServiceDI extends Context.Service<AIChatMessageActionsServiceDI, AIChatMessageActionsServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChat/AIChatMessage/AIChatMessageActionsService#AIChatMessageActionsService',
+) {
+  static readonly implementation = AIChatMessageActionsServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      SqlEditorService,
+      NavigationTabsService,
+      SqlEditorNavigatorService,
+      AIChatContextService,
+      AIChatConversationsResource,
+      NotificationService,
+      SqlDataSourceService,
+      LocalizationService,
+      CommonDialogService,
+      SqlEditorPermissionService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    AIChatMessageActionsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof SqlEditorService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof AIChatContextService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof SqlEditorPermissionService>
+  > = Effect.gen(function* makeAIChatMessageActionsService() {
+    const sqlEditorService = yield* SqlEditorService;
+    const navigationTabsService = yield* NavigationTabsService;
+    const sqlEditorNavigatorService = yield* SqlEditorNavigatorService;
+    const aiChatContextService = yield* AIChatContextService;
+    const aiChatConversationsResource = yield* AIChatConversationsResource;
+    const notificationService = yield* NotificationService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const localizationService = yield* LocalizationService;
+    const commonDialogService = yield* CommonDialogService;
+    const sqlEditorPermissionService = yield* SqlEditorPermissionService;
+
+    return new AIChatMessageActionsServiceImpl(
+      sqlEditorService,
+      navigationTabsService,
+      sqlEditorNavigatorService,
+      aiChatContextService,
+      aiChatConversationsResource,
+      notificationService,
+      sqlDataSourceService,
+      localizationService,
+      commonDialogService,
+      sqlEditorPermissionService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIChatMessageActionsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof SqlEditorService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof AIChatContextService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof SqlEditorPermissionService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatMessageActionsService = AIChatMessageActionsServiceDI;

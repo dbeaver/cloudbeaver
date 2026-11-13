@@ -7,13 +7,12 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { WizardTopAppBarService } from '@cloudbeaver/plugin-administration';
 
 const LanguageSelector = importLazyComponent(() => import('./LanguageSelector.js').then(module => module.LanguageSelector));
 
-@injectable(() => [WizardTopAppBarService])
-export class LocalizationAdministrationPluginBootstrap extends Bootstrap {
+export class LocalizationAdministrationPluginBootstrapImpl extends Bootstrap {
   constructor(private readonly wizardTopAppBarService: WizardTopAppBarService) {
     super();
   }
@@ -22,3 +21,30 @@ export class LocalizationAdministrationPluginBootstrap extends Bootstrap {
     this.wizardTopAppBarService.placeholder.add(LanguageSelector, 4);
   }
 }
+
+export type LocalizationAdministrationPluginBootstrap = LocalizationAdministrationPluginBootstrapImpl;
+
+export class LocalizationAdministrationPluginBootstrapDI extends Context.Service<
+  LocalizationAdministrationPluginBootstrapDI,
+  LocalizationAdministrationPluginBootstrapImpl
+>()('@cloudbeaver/plugin-localization-administration/PluginBootstrap#LocalizationAdministrationPluginBootstrap') {
+  static readonly implementation = LocalizationAdministrationPluginBootstrapImpl;
+
+  static readonly dependencies = () => [WizardTopAppBarService] as const;
+  static readonly make: Effect.Effect<
+    LocalizationAdministrationPluginBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof WizardTopAppBarService>
+  > = Effect.gen(function* makeLocalizationAdministrationPluginBootstrap() {
+    const wizardTopAppBarService = yield* WizardTopAppBarService;
+
+    return new LocalizationAdministrationPluginBootstrapImpl(wizardTopAppBarService);
+  });
+  static readonly layer: Layer.Layer<LocalizationAdministrationPluginBootstrapDI, never, Context.Service.Identifier<typeof WizardTopAppBarService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const LocalizationAdministrationPluginBootstrap = LocalizationAdministrationPluginBootstrapDI;
