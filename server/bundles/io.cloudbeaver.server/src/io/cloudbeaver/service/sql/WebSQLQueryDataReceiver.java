@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.model.meta.MetaData;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
@@ -179,6 +181,20 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             log.error("Error binding attributes", e);
         }
 
+        Consumer<WebSQLResultsInfo> resultExtension = null;
+        try {
+            WebSQLResultSetExtension extension = GeneralUtils.adapt(dataContainer.getDataSource(), WebSQLResultSetExtension.class);
+            if (extension != null) {
+                resultExtension = extension.prepare(
+                    dataContainer,
+                    bindings,
+                    rows.stream().map(WebSQLQueryResultSetRow::getData).toArray(Object[][]::new)
+                );
+            }
+        } catch (DBException | RuntimeException e) {
+            log.warn("Error preparing result extension", e);
+        }
+
         if (dataFormat != WebDataFormat.document) {
             convertComplexValuesToRelationalView(session);
         }
@@ -213,6 +229,13 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         resultsInfo.setDataFilter(dataFilter);
         resultsInfo.setQueryText(resultSet.getSourceStatement().getQueryString());
         webResultSet.setResultsInfo(resultsInfo);
+        if (resultExtension != null) {
+            try {
+                resultExtension.accept(resultsInfo);
+            } catch (RuntimeException e) {
+                log.warn("Error attaching result extension", e);
+            }
+        }
 
         boolean isSingleEntity = DBExecUtils.detectSingleSourceTable(bindings) != null;
 
