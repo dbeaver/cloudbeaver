@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,17 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
                 getArgumentVal(env, "nodePath"),
                 getArgument(env, "include"),
                 getArgument(env, "exclude")
+            ))
+            .dataFetcher("navSetUserFolderFilter", env -> getService(env).setUserNavigatorNodeFilter(
+                getWebSession(env),
+                getArgumentVal(env, "nodePath"),
+                getArgument(env, "include"),
+                getArgument(env, "exclude")
+            ))
+            .dataFetcher("navResetUserFilters", env -> getService(env).resetUserNavigatorFilters(
+                getWebSession(env),
+                getWebConnection(env),
+                getArgument(env, "nodePath")
             ))
             .dataFetcher("navRenameNode", env -> getService(env).renameNode(
                 getWebSession(env),

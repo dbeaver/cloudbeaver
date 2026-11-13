@@ -50,6 +50,7 @@ import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
 import org.jkiss.dbeaver.registry.DataSourcePreferenceStore;
+import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -534,6 +535,11 @@ public class WebConnectionInfo {
     @Property
     public boolean isCanDelete() {
         return isCanEdit();
+    }
+
+    @Property
+    public boolean isHasUserFilters() {
+        return UserDBSObjectFilterUtils.hasUserFilters(dataSourceContainer);
     }
 
     @Property
