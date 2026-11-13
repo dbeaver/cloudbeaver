@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,17 @@ import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBManifestServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
+import io.cloudbeaver.server.websockets.CBEventOriginFilter;
 import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import io.cloudbeaver.server.websockets.CBEventsWebSocket;
 import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
+import jakarta.servlet.DispatcherType;
 import jakarta.websocket.server.ServerEndpointConfig;
 import org.eclipse.jetty.ee11.servlet.*;
 import org.eclipse.jetty.ee11.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
+import org.eclipse.jetty.ee11.websocket.servlet.WebSocketUpgradeFilter;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.xml.XmlConfiguration;
@@ -48,6 +51,7 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -168,6 +172,21 @@ public class CBJettyServer {
                         }
                     }
                 }
+                // Jetty prepends its WebSocket upgrade filter. Register it first so that origin validation
+                // runs before the upgrade rather than being bypassed by a successful handshake.
+                WebSocketUpgradeFilter.ensureFilter(servletContextHandler.getServletContext());
+                FilterHolder eventOriginFilter = new FilterHolder(new CBEventOriginFilter());
+                eventOriginFilter.setName("cb-event-origin");
+                FilterMapping eventOriginMapping = new FilterMapping();
+                eventOriginMapping.setFilterName(eventOriginFilter.getName());
+                eventOriginMapping.setPathSpecs(new String[] {
+                    serverConfiguration.getServicesURI() + "ws",
+                    serverConfiguration.getServicesURI() + "events/*"
+                });
+                eventOriginMapping.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST));
+                servletContextHandler.getServletHandler().prependFilter(eventOriginFilter);
+                servletContextHandler.getServletHandler().prependFilterMapping(eventOriginMapping);
+
                 FilterHolder hostsFilter = new FilterHolder(new RequestHostFilter(
                     application,
                     excludedFilterPaths,

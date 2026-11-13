@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import io.cloudbeaver.model.session.WebHttpRequestInfo;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -56,6 +57,10 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
 
     private class TestServlet extends CBEventsLongPollingServlet {
 
+        void options(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) {
+            doOptions(req, resp);
+        }
+
         @Nullable
         @Override
         protected BaseWebSession resolveSession(@NotNull HttpServletRequest req) {
@@ -81,6 +86,34 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
                 return null;
             }
         }
+    }
+
+    @Test
+    public void testCorsHeadersNotReflectedForForeignOrigin() {
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(request.getHeader("Origin")).thenReturn("http://other.example.com:8080");
+        Mockito.when(request.getScheme()).thenReturn("http");
+        Mockito.when(request.getServerName()).thenReturn("app.example.com");
+        Mockito.when(request.getServerPort()).thenReturn(8080);
+
+        new TestServlet().options(request, response);
+
+        Mockito.verify(response, Mockito.never()).setHeader(Mockito.eq("Access-Control-Allow-Origin"), Mockito.anyString());
+        Mockito.verify(response, Mockito.never()).setHeader(Mockito.eq("Access-Control-Allow-Credentials"), Mockito.anyString());
+    }
+
+    @Test
+    public void testCorsHeadersForSameOrigin() {
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(request.getHeader("Origin")).thenReturn("http://app.example.com:8080");
+        Mockito.when(request.getScheme()).thenReturn("http");
+        Mockito.when(request.getServerName()).thenReturn("app.example.com");
+        Mockito.when(request.getServerPort()).thenReturn(8080);
+
+        new TestServlet().options(request, response);
+
+        Mockito.verify(response).setHeader("Access-Control-Allow-Origin", "http://app.example.com:8080");
+        Mockito.verify(response).setHeader("Access-Control-Allow-Credentials", "true");
     }
 
     @Test
