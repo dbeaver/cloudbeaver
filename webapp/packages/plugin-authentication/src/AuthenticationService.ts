@@ -184,7 +184,7 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    this.authPromise = this.authDialogService
+    const authPromise = this.authDialogService
       .showLoginForm(persistent, options)
       .then(async ({ status }) => {
         if (status === DialogueStateResult.Rejected) {
@@ -196,10 +196,14 @@ export class AuthenticationService extends Bootstrap {
         return status;
       })
       .finally(() => {
-        this.authPromise = null;
+        if (this.authPromise === authPromise) {
+          this.authPromise = null;
+        }
       });
 
-    await this.authPromise;
+    this.authPromise = authPromise;
+
+    await authPromise;
   }
 
   private async requireAuthentication() {
@@ -245,16 +249,26 @@ export class AuthenticationService extends Bootstrap {
     const action = contexts.getContext(sessionActionContext);
 
     if (isAutoLoginSessionAction(data)) {
-      const user = await this.userInfoResource.autoLogin(data['auth-id'], false);
+      // Automatic and interactive login share the same gate so authentication checks
+      // wait for the session task instead of opening a login dialog while it is running.
+      const authPromise = Promise.resolve(this.userInfoResource.autoLogin(data['task-id'])).then(user => {
+        if (user) {
+          this.authDialogService.closeLoginForm();
+        }
 
-      if (user) {
-        //we request this method/request bc login form can be opened automatically.
-        //in case when authentication is required,
-        //loin form may be opened and we need to close it
-        this.authDialogService.closeLoginForm();
+        return DialogueStateResult.Resolved;
+      });
+
+      this.authPromise = authPromise;
+
+      try {
+        await authPromise;
+        action.process();
+      } finally {
+        if (this.authPromise === authPromise) {
+          this.authPromise = null;
+        }
       }
-
-      action.process();
     }
   }
 
