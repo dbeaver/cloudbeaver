@@ -242,7 +242,9 @@ public class WebAIUtils {
                             log.warn("Function is not found for function call " + fc.getFunctionName());
                         }
                     }
-                    WebAIMessage confirmationMessage = new WebAIMessage(message, conversation);
+                    WebAIMessage confirmationMessage = new WebAIMessage(
+                        message, conversation, aiChatSession.getAssistant().getToolboxManager()
+                    );
                     WSAiChatMessageEvent event = new WSAiChatMessageEvent(confirmationMessage);
                     webSession.addSessionEvent(event);
                 }
