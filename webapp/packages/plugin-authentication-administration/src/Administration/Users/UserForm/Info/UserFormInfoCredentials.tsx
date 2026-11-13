@@ -82,7 +82,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
   });
 
   return (
-    <Container gap vertical>
+    <Container gap vertical noWrap>
       <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
       <InputField
         ref={usernameValidationRef}
