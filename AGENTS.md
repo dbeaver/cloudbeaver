@@ -97,3 +97,9 @@ Before pushing CE or EE changes, read and follow `.agents/skills/pre-push-checks
 ### License header
 
 - Please use header from ../dbeaver/docs/license_header.txt for backend source files.
+
+### Deployment
+
+- CloudBeaver Community runs on embedded Jetty. The standalone Docker
+  image runs the application directly; cloud VM provisioning adds nginx
+  in front of it.
