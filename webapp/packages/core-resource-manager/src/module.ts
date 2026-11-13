@@ -6,22 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
+import { LocaleService } from './LocaleService.js';
+import { PluginBootstrap } from './PluginBootstrap.js';
 import { ResourceManagerEventHandler } from './ResourceManagerEventHandler.js';
 import { ResourceManagerResource } from './ResourceManagerResource.js';
-import { PluginBootstrap } from './PluginBootstrap.js';
-import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-resource-manager',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, proxy(PluginBootstrap))
-      .addSingleton(Dependency, proxy(ResourceManagerResource))
-      .addSingleton(ResourceManagerEventHandler)
-      .addSingleton(ResourceManagerResource)
-      .addSingleton(PluginBootstrap);
-  },
+  services: () => [ResourceManagerEventHandler, ResourceManagerResource, PluginBootstrap],
+  bootstraps: () => [LocaleService, PluginBootstrap],
 });

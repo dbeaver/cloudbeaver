@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { promptForFiles } from '@cloudbeaver/core-browser';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ACTION_DOWNLOAD, ACTION_UPLOAD, ActionService, MenuService } from '@cloudbeaver/core-view';
 import {
@@ -23,8 +23,7 @@ import {
   ResultSetDataContentAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-@injectable(() => [NotificationService, DataViewerService, ActionService, MenuService])
-export class DataGridContextMenuSaveContentService {
+export class DataGridContextMenuSaveContentServiceImpl {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly dataViewerService: DataViewerService,
@@ -121,3 +120,44 @@ export class DataGridContextMenuSaveContentService {
     });
   }
 }
+
+export type DataGridContextMenuSaveContentService = DataGridContextMenuSaveContentServiceImpl;
+
+export class DataGridContextMenuSaveContentServiceDI extends Context.Service<
+  DataGridContextMenuSaveContentServiceDI,
+  DataGridContextMenuSaveContentServiceImpl
+>()(
+  '@cloudbeaver/plugin-data-spreadsheet-new/DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService#DataGridContextMenuSaveContentService',
+) {
+  static readonly implementation = DataGridContextMenuSaveContentServiceImpl;
+
+  static readonly dependencies = () => [NotificationService, DataViewerService, ActionService, MenuService] as const;
+  static readonly make: Effect.Effect<
+    DataGridContextMenuSaveContentServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof DataViewerService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makeDataGridContextMenuSaveContentService() {
+    const notificationService = yield* NotificationService;
+    const dataViewerService = yield* DataViewerService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+
+    return new DataGridContextMenuSaveContentServiceImpl(notificationService, dataViewerService, actionService, menuService);
+  });
+  static readonly layer: Layer.Layer<
+    DataGridContextMenuSaveContentServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof DataViewerService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataGridContextMenuSaveContentService = DataGridContextMenuSaveContentServiceDI;

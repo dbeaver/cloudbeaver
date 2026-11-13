@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { type IWindowOptions, openCenteredPopup } from '@cloudbeaver/core-utils';
 
 interface IWindowInfo {
@@ -15,8 +15,7 @@ interface IWindowInfo {
   onClose?: () => void;
 }
 
-@injectable()
-export class WindowsService {
+export class WindowsServiceImpl {
   private readonly windows: Map<string, IWindowInfo>;
   private trackWindowClose?: ReturnType<typeof setTimeout>;
 
@@ -88,3 +87,20 @@ export class WindowsService {
     }
   }
 }
+
+export type WindowsService = WindowsServiceImpl;
+
+export class WindowsServiceDI extends Context.Service<WindowsServiceDI, WindowsServiceImpl>()(
+  '@cloudbeaver/core-routing/WindowsService#WindowsService',
+) {
+  static readonly implementation = WindowsServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<WindowsServiceImpl, never, never> = Effect.sync(() => new WindowsServiceImpl());
+  static readonly layer: Layer.Layer<WindowsServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const WindowsService = WindowsServiceDI;

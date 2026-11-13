@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
 
@@ -17,8 +17,7 @@ const settingsSchema = schema.object({
 export type EventsSettingsSchema = typeof settingsSchema;
 export type EventsSettings = schema.infer<EventsSettingsSchema>;
 
-@injectable(() => [SettingsProviderService, SettingsManagerService])
-export class EventsSettingsService {
+export class EventsSettingsServiceImpl {
   get maxPersistentAllow(): number {
     return this.settings.getValue('plugin.notifications.maxPersistentAllow');
   }
@@ -59,3 +58,33 @@ export class EventsSettingsService {
     ]);
   }
 }
+
+export type EventsSettingsService = EventsSettingsServiceImpl;
+
+export class EventsSettingsServiceDI extends Context.Service<EventsSettingsServiceDI, EventsSettingsServiceImpl>()(
+  '@cloudbeaver/core-events/EventsSettingsService#EventsSettingsService',
+) {
+  static readonly implementation = EventsSettingsServiceImpl;
+
+  static readonly dependencies = () => [SettingsProviderService, SettingsManagerService] as const;
+  static readonly make: Effect.Effect<
+    EventsSettingsServiceImpl,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Effect.gen(function* makeEventsSettingsService() {
+    const settingsProviderService = yield* SettingsProviderService;
+    const settingsManagerService = yield* SettingsManagerService;
+
+    return new EventsSettingsServiceImpl(settingsProviderService, settingsManagerService);
+  });
+  static readonly layer: Layer.Layer<
+    EventsSettingsServiceDI,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const EventsSettingsService = EventsSettingsServiceDI;

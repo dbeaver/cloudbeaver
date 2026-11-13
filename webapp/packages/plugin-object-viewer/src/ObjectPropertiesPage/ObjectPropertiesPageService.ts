@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService.js';
 import type { ObjectPage } from '../ObjectPage/ObjectPage.js';
@@ -18,8 +18,7 @@ import { ObjectViewerTabService } from '../ObjectViewerTabService.js';
 const ObjectPropertiesPagePanel = importLazyComponent(() => import('./ObjectPropertiesPagePanel.js').then(m => m.ObjectPropertiesPagePanel));
 const ObjectPropertiesPageTab = importLazyComponent(() => import('./ObjectPropertiesPageTab.js').then(m => m.ObjectPropertiesPageTab));
 
-@injectable(() => [NavNodeManagerService, NotificationService, ObjectViewerTabService, DBObjectPageService])
-export class ObjectPropertiesPageService {
+export class ObjectPropertiesPageServiceImpl {
   page?: ObjectPage;
 
   constructor(
@@ -57,3 +56,41 @@ export class ObjectPropertiesPageService {
     }
   }
 }
+
+export type ObjectPropertiesPageService = ObjectPropertiesPageServiceImpl;
+
+export class ObjectPropertiesPageServiceDI extends Context.Service<ObjectPropertiesPageServiceDI, ObjectPropertiesPageServiceImpl>()(
+  '@cloudbeaver/plugin-object-viewer/ObjectPropertiesPage/ObjectPropertiesPageService#ObjectPropertiesPageService',
+) {
+  static readonly implementation = ObjectPropertiesPageServiceImpl;
+
+  static readonly dependencies = () => [NavNodeManagerService, NotificationService, ObjectViewerTabService, DBObjectPageService] as const;
+  static readonly make: Effect.Effect<
+    ObjectPropertiesPageServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ObjectViewerTabService>
+    | Context.Service.Identifier<typeof DBObjectPageService>
+  > = Effect.gen(function* makeObjectPropertiesPageService() {
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const notificationService = yield* NotificationService;
+    const objectViewerTabService = yield* ObjectViewerTabService;
+    const dbObjectPageService = yield* DBObjectPageService;
+
+    return new ObjectPropertiesPageServiceImpl(navNodeManagerService, notificationService, objectViewerTabService, dbObjectPageService);
+  });
+  static readonly layer: Layer.Layer<
+    ObjectPropertiesPageServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ObjectViewerTabService>
+    | Context.Service.Identifier<typeof DBObjectPageService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ObjectPropertiesPageService = ObjectPropertiesPageServiceDI;

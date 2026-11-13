@@ -10,10 +10,10 @@ import { describe, expect, test } from 'vitest';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
-import { UserInfoResource } from './UserInfoResource.js';
+import { UserInfoResource, UserInfoResourceImpl } from './UserInfoResource.js';
 
 function createResource(authTokens: Array<{ authProvider: string; authConfiguration?: string }> | null): UserInfoResource {
-  const resource = Object.create(UserInfoResource.prototype) as UserInfoResource;
+  const resource = Object.create(UserInfoResourceImpl.prototype) as UserInfoResource;
   Object.defineProperty(resource, 'data', {
     value: authTokens === null ? null : ({ authTokens } as unknown as UserInfo),
   });

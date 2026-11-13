@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
-import { TabsContainer } from '@cloudbeaver/core-ui';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { TabsContainer } from '@cloudbeaver/core-ui';
 import { ExportScriptDialog } from './ExportScriptDialog/ExportScriptDialogLazy.js';
 
 export interface IScriptExportTabProps {
@@ -18,8 +18,7 @@ export interface IScriptExportTabProps {
   connectionId?: string;
 }
 
-@injectable(() => [CommonDialogService])
-export class ScriptExportService {
+export class ScriptExportServiceImpl {
   readonly tabsContainer: TabsContainer<IScriptExportTabProps>;
 
   constructor(private readonly commonDialogService: CommonDialogService) {
@@ -30,3 +29,26 @@ export class ScriptExportService {
     return this.commonDialogService.open(ExportScriptDialog, props);
   }
 }
+
+export type ScriptExportService = ScriptExportServiceImpl;
+
+export class ScriptExportServiceDI extends Context.Service<ScriptExportServiceDI, ScriptExportServiceImpl>()(
+  '@cloudbeaver/plugin-script-export/ScriptExportService#ScriptExportService',
+) {
+  static readonly implementation = ScriptExportServiceImpl;
+
+  static readonly dependencies = () => [CommonDialogService] as const;
+  static readonly make: Effect.Effect<ScriptExportServiceImpl, never, Context.Service.Identifier<typeof CommonDialogService>> = Effect.gen(
+    function* makeScriptExportService() {
+      const commonDialogService = yield* CommonDialogService;
+
+      return new ScriptExportServiceImpl(commonDialogService);
+    },
+  );
+  static readonly layer: Layer.Layer<ScriptExportServiceDI, never, Context.Service.Identifier<typeof CommonDialogService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ScriptExportService = ScriptExportServiceDI;

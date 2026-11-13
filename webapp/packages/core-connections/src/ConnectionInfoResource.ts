@@ -9,7 +9,7 @@
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { NavNodeInfoResource, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
@@ -70,23 +70,12 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   connecting?: boolean;
 }
 
-@injectable(() => [
-  GraphQLService,
-  ProjectsService,
-  ProjectInfoResource,
-  DataSynchronizationService,
-  WorkspaceConfigEventHandler,
-  NavNodeInfoResource,
-  DBDriverResource,
-  SessionDataResource,
-  AppAuthService,
-  ConnectionInfoEventHandler,
-  ConnectionStateEventHandler,
-  UserInfoResource,
-  NavTreeResource,
-  ObjectSettingsEventHandler,
-])
-export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes, IConnectionInfoMetadata> {
+export class ConnectionInfoResourceImpl extends CachedMapResource<
+  IConnectionInfoParams,
+  Connection,
+  ConnectionInfoIncludes,
+  IConnectionInfoMetadata
+> {
   readonly onConnectionCreate: Executor<Connection>;
   readonly onConnectionClose: ISyncExecutor<IConnectionInfoParams>;
 
@@ -715,6 +704,105 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return parse.success;
   }
 }
+
+export type ConnectionInfoResource = ConnectionInfoResourceImpl;
+
+export class ConnectionInfoResourceDI extends Context.Service<ConnectionInfoResourceDI, ConnectionInfoResourceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionInfoResource#ConnectionInfoResource',
+) {
+  static readonly implementation = ConnectionInfoResourceImpl;
+
+  static readonly dependencies = () =>
+    [
+      GraphQLService,
+      ProjectsService,
+      ProjectInfoResource,
+      DataSynchronizationService,
+      WorkspaceConfigEventHandler,
+      NavNodeInfoResource,
+      DBDriverResource,
+      SessionDataResource,
+      AppAuthService,
+      ConnectionInfoEventHandler,
+      ConnectionStateEventHandler,
+      UserInfoResource,
+      NavTreeResource,
+      ObjectSettingsEventHandler,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConnectionInfoResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+    | Context.Service.Identifier<typeof WorkspaceConfigEventHandler>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+    | Context.Service.Identifier<typeof ConnectionInfoEventHandler>
+    | Context.Service.Identifier<typeof ConnectionStateEventHandler>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ObjectSettingsEventHandler>
+  > = Effect.gen(function* makeConnectionInfoResource() {
+    const graphQLService = yield* GraphQLService;
+    const projectsService = yield* ProjectsService;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const dataSynchronizationService = yield* DataSynchronizationService;
+    const workspaceConfigEventHandler = yield* WorkspaceConfigEventHandler;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const dbDriverResource = yield* DBDriverResource;
+    const sessionDataResource = yield* SessionDataResource;
+    const appAuthService = yield* AppAuthService;
+    const connectionInfoEventHandler = yield* ConnectionInfoEventHandler;
+    const connectionStateEventHandler = yield* ConnectionStateEventHandler;
+    const userInfoResource = yield* UserInfoResource;
+    const navTreeResource = yield* NavTreeResource;
+    const objectSettingsEventHandler = yield* ObjectSettingsEventHandler;
+
+    return new ConnectionInfoResourceImpl(
+      graphQLService,
+      projectsService,
+      projectInfoResource,
+      dataSynchronizationService,
+      workspaceConfigEventHandler,
+      navNodeInfoResource,
+      dbDriverResource,
+      sessionDataResource,
+      appAuthService,
+      connectionInfoEventHandler,
+      connectionStateEventHandler,
+      userInfoResource,
+      navTreeResource,
+      objectSettingsEventHandler,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionInfoResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+    | Context.Service.Identifier<typeof WorkspaceConfigEventHandler>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+    | Context.Service.Identifier<typeof ConnectionInfoEventHandler>
+    | Context.Service.Identifier<typeof ConnectionStateEventHandler>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ObjectSettingsEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionInfoResource = ConnectionInfoResourceDI;
 
 export function isConnectionInfoParamEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
   return param.projectId === second.projectId && param.connectionId === second.connectionId;

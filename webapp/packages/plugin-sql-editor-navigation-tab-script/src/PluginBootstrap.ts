@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -39,27 +39,7 @@ import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from './KEY_BINDING_SQL_EDITOR_
 import { ResourceSqlDataSource } from './ResourceSqlDataSource.js';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService.js';
 
-@injectable(() => [
-  NavNodeManagerService,
-  NavNodeInfoResource,
-  NavigationTabsService,
-  NotificationService,
-  SqlEditorNavigatorService,
-  ResourceManagerService,
-  ProjectsService,
-  ProjectInfoResource,
-  SqlEditorTabResourceService,
-  CommonDialogService,
-  ActionService,
-  MenuService,
-  SqlDataSourceService,
-  SqlEditorSettingsService,
-  ResourceManagerResource,
-  ResourceManagerScriptsService,
-  KeyBindingService,
-  SqlEditorView,
-])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
@@ -342,3 +322,122 @@ export class PluginBootstrap extends Bootstrap {
     return true;
   }
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-editor-navigation-tab-script/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavNodeManagerService,
+      NavNodeInfoResource,
+      NavigationTabsService,
+      NotificationService,
+      SqlEditorNavigatorService,
+      ResourceManagerService,
+      ProjectsService,
+      ProjectInfoResource,
+      SqlEditorTabResourceService,
+      CommonDialogService,
+      ActionService,
+      MenuService,
+      SqlDataSourceService,
+      SqlEditorSettingsService,
+      ResourceManagerResource,
+      ResourceManagerScriptsService,
+      KeyBindingService,
+      SqlEditorView,
+    ] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof SqlEditorTabResourceService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof SqlEditorSettingsService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerScriptsService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof SqlEditorView>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const navigationTabsService = yield* NavigationTabsService;
+    const notificationService = yield* NotificationService;
+    const sqlEditorNavigatorService = yield* SqlEditorNavigatorService;
+    const resourceManagerService = yield* ResourceManagerService;
+    const projectsService = yield* ProjectsService;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const sqlEditorTabResourceService = yield* SqlEditorTabResourceService;
+    const commonDialogService = yield* CommonDialogService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const sqlEditorSettingsService = yield* SqlEditorSettingsService;
+    const resourceManagerResource = yield* ResourceManagerResource;
+    const resourceManagerScriptsService = yield* ResourceManagerScriptsService;
+    const keyBindingService = yield* KeyBindingService;
+    const sqlEditorView = yield* SqlEditorView;
+
+    return new PluginBootstrapImpl(
+      navNodeManagerService,
+      navNodeInfoResource,
+      navigationTabsService,
+      notificationService,
+      sqlEditorNavigatorService,
+      resourceManagerService,
+      projectsService,
+      projectInfoResource,
+      sqlEditorTabResourceService,
+      commonDialogService,
+      actionService,
+      menuService,
+      sqlDataSourceService,
+      sqlEditorSettingsService,
+      resourceManagerResource,
+      resourceManagerScriptsService,
+      keyBindingService,
+      sqlEditorView,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof SqlEditorTabResourceService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof SqlEditorSettingsService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerScriptsService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof SqlEditorView>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

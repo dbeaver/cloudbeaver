@@ -14,7 +14,7 @@ import {
   type IConnectionInfoParams,
   NavNodeExtensionsService,
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import {
@@ -39,15 +39,7 @@ interface INavigationNodeShowData {
   path: string[];
 }
 
-@injectable(() => [
-  NavNodeManagerService,
-  ConnectionsManagerService,
-  ConnectionInfoResource,
-  NavNodeExtensionsService,
-  NavNodeInfoResource,
-  NavTreeResource,
-])
-export class NavigationTreeService extends View<string> {
+export class NavigationTreeServiceImpl extends View<string> {
   readonly treeState: MetadataMap<string, ITreeNodeState>;
   readonly nodeSelectionTask: ISyncExecutor<INavigationNodeSelectionData>;
   readonly showNodeExecutor: IExecutor<INavigationNodeShowData>;
@@ -208,3 +200,62 @@ export class NavigationTreeService extends View<string> {
     return connection?.connected || false;
   }
 }
+
+export type NavigationTreeService = NavigationTreeServiceImpl;
+
+export class NavigationTreeServiceDI extends Context.Service<NavigationTreeServiceDI, NavigationTreeServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/NavigationTree/NavigationTreeService#NavigationTreeService',
+) {
+  static readonly implementation = NavigationTreeServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavNodeManagerService,
+      ConnectionsManagerService,
+      ConnectionInfoResource,
+      NavNodeExtensionsService,
+      NavNodeInfoResource,
+      NavTreeResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    NavigationTreeServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeExtensionsService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+  > = Effect.gen(function* makeNavigationTreeService() {
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const navNodeExtensionsService = yield* NavNodeExtensionsService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const navTreeResource = yield* NavTreeResource;
+
+    return new NavigationTreeServiceImpl(
+      navNodeManagerService,
+      connectionsManagerService,
+      connectionInfoResource,
+      navNodeExtensionsService,
+      navNodeInfoResource,
+      navTreeResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    NavigationTreeServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeExtensionsService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavigationTreeService = NavigationTreeServiceDI;

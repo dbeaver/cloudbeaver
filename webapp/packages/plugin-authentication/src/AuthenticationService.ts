@@ -18,7 +18,7 @@ import {
   UserInfoResource,
   type UserLogoutInfo,
 } from '@cloudbeaver/core-authentication';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -34,22 +34,7 @@ import { isAutoLoginSessionAction } from './isAutoLoginSessionAction.js';
 
 export type AuthEventType = 'before' | 'after';
 
-@injectable(() => [
-  ScreenService,
-  AppAuthService,
-  AuthDialogService,
-  UserInfoResource,
-  NotificationService,
-  AdministrationScreenService,
-  AuthProviderService,
-  AuthProvidersResource,
-  SessionDataResource,
-  ServerConfigResource,
-  WindowsService,
-  SessionActionService,
-  NavigationService,
-])
-export class AuthenticationService extends Bootstrap {
+export class AuthenticationServiceImpl extends Bootstrap {
   readonly onLogout: Executor<AuthEventType>;
   readonly onLogin: Executor<AuthEventType>;
 
@@ -291,3 +276,97 @@ export class AuthenticationService extends Bootstrap {
     } catch {}
   }
 }
+
+export type AuthenticationService = AuthenticationServiceImpl;
+
+export class AuthenticationServiceDI extends Context.Service<AuthenticationServiceDI, AuthenticationServiceImpl>()(
+  '@cloudbeaver/plugin-authentication/AuthenticationService#AuthenticationService',
+) {
+  static readonly implementation = AuthenticationServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      ScreenService,
+      AppAuthService,
+      AuthDialogService,
+      UserInfoResource,
+      NotificationService,
+      AdministrationScreenService,
+      AuthProviderService,
+      AuthProvidersResource,
+      SessionDataResource,
+      ServerConfigResource,
+      WindowsService,
+      SessionActionService,
+      NavigationService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    AuthenticationServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ScreenService>
+    | Context.Service.Identifier<typeof AppAuthService>
+    | Context.Service.Identifier<typeof AuthDialogService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof AuthProviderService>
+    | Context.Service.Identifier<typeof AuthProvidersResource>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof WindowsService>
+    | Context.Service.Identifier<typeof SessionActionService>
+    | Context.Service.Identifier<typeof NavigationService>
+  > = Effect.gen(function* makeAuthenticationService() {
+    const screenService = yield* ScreenService;
+    const appAuthService = yield* AppAuthService;
+    const authDialogService = yield* AuthDialogService;
+    const userInfoResource = yield* UserInfoResource;
+    const notificationService = yield* NotificationService;
+    const administrationScreenService = yield* AdministrationScreenService;
+    const authProviderService = yield* AuthProviderService;
+    const authProvidersResource = yield* AuthProvidersResource;
+    const sessionDataResource = yield* SessionDataResource;
+    const serverConfigResource = yield* ServerConfigResource;
+    const windowsService = yield* WindowsService;
+    const sessionActionService = yield* SessionActionService;
+    const navigationService = yield* NavigationService;
+
+    return new AuthenticationServiceImpl(
+      screenService,
+      appAuthService,
+      authDialogService,
+      userInfoResource,
+      notificationService,
+      administrationScreenService,
+      authProviderService,
+      authProvidersResource,
+      sessionDataResource,
+      serverConfigResource,
+      windowsService,
+      sessionActionService,
+      navigationService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AuthenticationServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ScreenService>
+    | Context.Service.Identifier<typeof AppAuthService>
+    | Context.Service.Identifier<typeof AuthDialogService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof AuthProviderService>
+    | Context.Service.Identifier<typeof AuthProvidersResource>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof WindowsService>
+    | Context.Service.Identifier<typeof SessionActionService>
+    | Context.Service.Identifier<typeof NavigationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AuthenticationService = AuthenticationServiceDI;

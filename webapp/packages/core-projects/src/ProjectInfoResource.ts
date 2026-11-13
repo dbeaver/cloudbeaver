@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import { GraphQLService, type RmResourceType, type ProjectInfo as SchemaProjectInfo } from '@cloudbeaver/core-sdk';
@@ -16,8 +16,7 @@ import { createResourceOfType } from './createResourceOfType.js';
 export type ProjectInfo = SchemaProjectInfo;
 export type ProjectInfoResourceType = RmResourceType;
 
-@injectable(() => [GraphQLService, UserInfoResource, PermissionsService, AppAuthService])
-export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> {
+export class ProjectInfoResourceImpl extends CachedMapResource<string, ProjectInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly userInfoResource: UserInfoResource,
@@ -107,6 +106,44 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     return typeof key === 'string';
   }
 }
+
+export type ProjectInfoResource = ProjectInfoResourceImpl;
+
+export class ProjectInfoResourceDI extends Context.Service<ProjectInfoResourceDI, ProjectInfoResourceImpl>()(
+  '@cloudbeaver/core-projects/ProjectInfoResource#ProjectInfoResource',
+) {
+  static readonly implementation = ProjectInfoResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, UserInfoResource, PermissionsService, AppAuthService] as const;
+  static readonly make: Effect.Effect<
+    ProjectInfoResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Effect.gen(function* makeProjectInfoResource() {
+    const graphQLService = yield* GraphQLService;
+    const userInfoResource = yield* UserInfoResource;
+    const permissionsService = yield* PermissionsService;
+    const appAuthService = yield* AppAuthService;
+
+    return new ProjectInfoResourceImpl(graphQLService, userInfoResource, permissionsService, appAuthService);
+  });
+  static readonly layer: Layer.Layer<
+    ProjectInfoResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ProjectInfoResource = ProjectInfoResourceDI;
 
 export function projectInfoSortByName(a: ProjectInfo, b: ProjectInfo) {
   if (a.id === b.id) {

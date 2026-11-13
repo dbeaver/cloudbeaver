@@ -5,11 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
+import { promptForFiles } from '@cloudbeaver/core-browser';
+import { ConnectionInfoResource, createConnectionParam, type Connection } from '@cloudbeaver/core-connections';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { WindowEventsService } from '@cloudbeaver/core-root';
 import { getTextFileReadingProcess, throttle } from '@cloudbeaver/core-utils';
-import { withTimestamp } from '@dbeaver/js-helpers';
 import {
   ACTION_DOWNLOAD,
   ACTION_REDO,
@@ -17,19 +21,15 @@ import {
   ACTION_UNDO,
   ACTION_UPLOAD,
   ActionService,
-  type IAction,
   KEY_BINDING_REDO,
   KEY_BINDING_SAVE,
   KEY_BINDING_UNDO,
   KeyBindingService,
   menuExtractItems,
   MenuService,
+  type IAction,
 } from '@cloudbeaver/core-view';
-import { ConnectionInfoResource, createConnectionParam, type Connection } from '@cloudbeaver/core-connections';
-import { promptForFiles } from '@cloudbeaver/core-browser';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
+import { withTimestamp } from '@dbeaver/js-helpers';
 
 import { ScriptExportService } from '@cloudbeaver/plugin-script-export';
 
@@ -42,16 +42,16 @@ import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from './actions/bindings/KEY_BINDI
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.js';
 import { KEY_BINDING_SQL_EDITOR_FORMAT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT.js';
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from './DATA_CONTEXT_SQL_EDITOR_STATE.js';
+import { downloadSql } from './downloadSql.js';
+import { getSqlEditorName } from './getSqlEditorName.js';
+import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures.js';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA.js';
+import { SQL_EDITOR_ACTIONS_MENU } from './SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
 import { SQL_EDITOR_TOOLS_MENU } from './SqlEditor/SQL_EDITOR_TOOLS_MENU.js';
 import { SQL_EDITOR_TOOLS_MORE_MENU } from './SqlEditor/SQL_EDITOR_TOOLS_MORE_MENU.js';
-import { SQL_EDITOR_ACTIONS_MENU } from './SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
-import { getSqlEditorName } from './getSqlEditorName.js';
-import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
-import { downloadSql } from './downloadSql.js';
 
 const SYNC_DELAY = 5 * 60 * 1000;
 
@@ -60,19 +60,7 @@ const EXECUTIONS_ACTIONS = [ACTION_SQL_EDITOR_EXECUTE, ACTION_SQL_EDITOR_EXECUTE
 const LOCAL_EXPORT_TAB_ID = 'sql-editor-local-export-tab';
 const LocalExportPanel = importLazyComponent(() => import('./LocalExport/LocalExportPanel.js').then(module => module.LocalExportPanel));
 
-@injectable(() => [
-  MenuService,
-  ActionService,
-  KeyBindingService,
-  SqlDataSourceService,
-  WindowEventsService,
-  ConnectionInfoResource,
-  SqlEditorSettingsService,
-  NotificationService,
-  CommonDialogService,
-  ScriptExportService,
-])
-export class MenuBootstrap extends Bootstrap {
+export class MenuBootstrapImpl extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
@@ -508,3 +496,82 @@ export class MenuBootstrap extends Bootstrap {
     }
   }
 }
+
+export type MenuBootstrap = MenuBootstrapImpl;
+
+export class MenuBootstrapDI extends Context.Service<MenuBootstrapDI, MenuBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-editor/MenuBootstrap#MenuBootstrap',
+) {
+  static readonly implementation = MenuBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      MenuService,
+      ActionService,
+      KeyBindingService,
+      SqlDataSourceService,
+      WindowEventsService,
+      ConnectionInfoResource,
+      SqlEditorSettingsService,
+      NotificationService,
+      CommonDialogService,
+      ScriptExportService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    MenuBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof WindowEventsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof SqlEditorSettingsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ScriptExportService>
+  > = Effect.gen(function* makeMenuBootstrap() {
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const keyBindingService = yield* KeyBindingService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const windowEventsService = yield* WindowEventsService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const sqlEditorSettingsService = yield* SqlEditorSettingsService;
+    const notificationService = yield* NotificationService;
+    const commonDialogService = yield* CommonDialogService;
+    const scriptExportService = yield* ScriptExportService;
+
+    return new MenuBootstrapImpl(
+      menuService,
+      actionService,
+      keyBindingService,
+      sqlDataSourceService,
+      windowEventsService,
+      connectionInfoResource,
+      sqlEditorSettingsService,
+      notificationService,
+      commonDialogService,
+      scriptExportService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    MenuBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof WindowEventsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof SqlEditorSettingsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ScriptExportService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const MenuBootstrap = MenuBootstrapDI;

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createService } from '@cloudbeaver/core-di';
+import { Context } from '@cloudbeaver/core-di';
 import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 
@@ -25,4 +25,6 @@ export interface IDatabaseDataCacheAction<TKey = unknown, TResult extends IDatab
   deleteShared(scope: symbol): void;
 }
 
-export const IDatabaseDataCacheAction = createService<IDatabaseDataCacheAction>('IDatabaseDataCacheAction');
+export const IDatabaseDataCacheAction = Context.Service<IDatabaseDataCacheAction>(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/IDatabaseDataCacheAction#IDatabaseDataCacheAction',
+);

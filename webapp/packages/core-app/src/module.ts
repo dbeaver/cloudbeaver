@@ -6,20 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
-import { AppScreenService } from './AppScreen/AppScreenService.js';
-import { AppScreenBootstrap } from './AppScreen/AppScreenBootstrap.js';
-import { SkipNavService } from './AppScreen/SkipNavService.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { AppLocaleService } from './AppLocaleService.js';
+import { AppScreenBootstrap } from './AppScreen/AppScreenBootstrap.js';
+import { AppScreenService } from './AppScreen/AppScreenService.js';
+import { SkipNavService } from './AppScreen/SkipNavService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-app',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, AppLocaleService)
-      .addSingleton(Bootstrap, AppScreenBootstrap)
-      .addSingleton(AppScreenService)
-      .addSingleton(SkipNavService);
-  },
+  services: () => [AppScreenService, SkipNavService],
+  bootstraps: () => [AppLocaleService, AppScreenBootstrap],
 });

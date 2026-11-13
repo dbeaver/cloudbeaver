@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { CONNECTIONS_SETTINGS_GROUP } from './CONNECTIONS_SETTINGS_GROUP.js';
@@ -16,8 +16,7 @@ const settingsSchema = schema.object({
 
 export type ConnectionsSettings = schema.infer<typeof settingsSchema>;
 
-@injectable(() => [SettingsProviderService, SettingsManagerService])
-export class ConnectionsSettingsService {
+export class ConnectionsSettingsServiceImpl {
   get disabled(): boolean {
     return this.settings.getValue('core.connections.disabled');
   }
@@ -46,3 +45,33 @@ export class ConnectionsSettingsService {
     ]);
   }
 }
+
+export type ConnectionsSettingsService = ConnectionsSettingsServiceImpl;
+
+export class ConnectionsSettingsServiceDI extends Context.Service<ConnectionsSettingsServiceDI, ConnectionsSettingsServiceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionsSettingsService#ConnectionsSettingsService',
+) {
+  static readonly implementation = ConnectionsSettingsServiceImpl;
+
+  static readonly dependencies = () => [SettingsProviderService, SettingsManagerService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionsSettingsServiceImpl,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Effect.gen(function* makeConnectionsSettingsService() {
+    const settingsProviderService = yield* SettingsProviderService;
+    const settingsManagerService = yield* SettingsManagerService;
+
+    return new ConnectionsSettingsServiceImpl(settingsProviderService, settingsManagerService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionsSettingsServiceDI,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionsSettingsService = ConnectionsSettingsServiceDI;

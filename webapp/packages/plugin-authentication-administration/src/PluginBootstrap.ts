@@ -7,7 +7,7 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ServerConfigurationAdministrationNavService, ServerConfigurationFormService } from '@cloudbeaver/plugin-administration';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
@@ -17,8 +17,7 @@ const ServerConfigurationAuthenticationPanel = importLazyComponent(() =>
   import('./Administration/ServerConfiguration/ServerConfigurationAuthenticationPanel.js').then(m => m.ServerConfigurationAuthenticationPanel),
 );
 
-@injectable(() => [ServerConfigurationAdministrationNavService, AuthenticationService, TeamsAdministrationService, ServerConfigurationFormService])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly serverConfigurationAdministrationNavService: ServerConfigurationAdministrationNavService,
     private readonly authenticationService: AuthenticationService,
@@ -40,3 +39,47 @@ export class PluginBootstrap extends Bootstrap {
     this.authenticationService.setConfigureAuthProvider(() => this.serverConfigurationAdministrationNavService.navToSettings());
   }
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-authentication-administration/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [ServerConfigurationAdministrationNavService, AuthenticationService, TeamsAdministrationService, ServerConfigurationFormService] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigurationAdministrationNavService>
+    | Context.Service.Identifier<typeof AuthenticationService>
+    | Context.Service.Identifier<typeof TeamsAdministrationService>
+    | Context.Service.Identifier<typeof ServerConfigurationFormService>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const serverConfigurationAdministrationNavService = yield* ServerConfigurationAdministrationNavService;
+    const authenticationService = yield* AuthenticationService;
+    const teamsAdministrationService = yield* TeamsAdministrationService;
+    const serverConfigurationFormService = yield* ServerConfigurationFormService;
+
+    return new PluginBootstrapImpl(
+      serverConfigurationAdministrationNavService,
+      authenticationService,
+      teamsAdministrationService,
+      serverConfigurationFormService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigurationAdministrationNavService>
+    | Context.Service.Identifier<typeof AuthenticationService>
+    | Context.Service.Identifier<typeof TeamsAdministrationService>
+    | Context.Service.Identifier<typeof ServerConfigurationFormService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

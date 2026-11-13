@@ -6,18 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
+import { IDatabaseDataEditAction } from './DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 import type { IRequestEventData } from './DatabaseDataModel/IDatabaseDataModel.js';
 import { DatabaseDataSourceOperation } from './DatabaseDataModel/IDatabaseDataSource.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
-import { IDatabaseDataEditAction } from './DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 
-@injectable(() => [CommonDialogService, TableViewerStorageService, NotificationService])
-export class DataViewerDataChangeConfirmationService {
+export class DataViewerDataChangeConfirmationServiceImpl {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly tableViewerStorageService: TableViewerStorageService,
@@ -80,6 +79,42 @@ export class DataViewerDataChangeConfirmationService {
     }
   }
 }
+
+export type DataViewerDataChangeConfirmationService = DataViewerDataChangeConfirmationServiceImpl;
+
+export class DataViewerDataChangeConfirmationServiceDI extends Context.Service<
+  DataViewerDataChangeConfirmationServiceDI,
+  DataViewerDataChangeConfirmationServiceImpl
+>()('@cloudbeaver/plugin-data-viewer/DataViewerDataChangeConfirmationService#DataViewerDataChangeConfirmationService') {
+  static readonly implementation = DataViewerDataChangeConfirmationServiceImpl;
+
+  static readonly dependencies = () => [CommonDialogService, TableViewerStorageService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    DataViewerDataChangeConfirmationServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof TableViewerStorageService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeDataViewerDataChangeConfirmationService() {
+    const commonDialogService = yield* CommonDialogService;
+    const tableViewerStorageService = yield* TableViewerStorageService;
+    const notificationService = yield* NotificationService;
+
+    return new DataViewerDataChangeConfirmationServiceImpl(commonDialogService, tableViewerStorageService, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    DataViewerDataChangeConfirmationServiceDI,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof TableViewerStorageService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataViewerDataChangeConfirmationService = DataViewerDataChangeConfirmationServiceDI;
 
 interface ISaveConfirmedContext {
   confirmed: boolean | null;

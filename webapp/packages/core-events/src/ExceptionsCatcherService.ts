@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { NotificationService } from './NotificationService.js';
 
-@injectable(() => [NotificationService])
-export class ExceptionsCatcherService extends Bootstrap {
+export class ExceptionsCatcherServiceImpl extends Bootstrap {
   baseCatcher: OnErrorEventHandler | null = null;
 
   private readonly ignored: string[] = [];
@@ -35,8 +34,7 @@ export class ExceptionsCatcherService extends Bootstrap {
 
   private readonly catcher = (event: Event | string, source?: string, lineno?: number, colno?: number, _error?: Error) => {
     if (_error) {
-      this.notificationService.logException(_error, 
-      _error.name || this.messageTitle);
+      this.notificationService.logException(_error, _error.name || this.messageTitle);
     } else {
       const message = String(event);
       this.notificationService.logError({
@@ -55,3 +53,26 @@ export class ExceptionsCatcherService extends Bootstrap {
     return true;
   };
 }
+
+export type ExceptionsCatcherService = ExceptionsCatcherServiceImpl;
+
+export class ExceptionsCatcherServiceDI extends Context.Service<ExceptionsCatcherServiceDI, ExceptionsCatcherServiceImpl>()(
+  '@cloudbeaver/core-events/ExceptionsCatcherService#ExceptionsCatcherService',
+) {
+  static readonly implementation = ExceptionsCatcherServiceImpl;
+
+  static readonly dependencies = () => [NotificationService] as const;
+  static readonly make: Effect.Effect<ExceptionsCatcherServiceImpl, never, Context.Service.Identifier<typeof NotificationService>> = Effect.gen(
+    function* makeExceptionsCatcherService() {
+      const notificationService = yield* NotificationService;
+
+      return new ExceptionsCatcherServiceImpl(notificationService);
+    },
+  );
+  static readonly layer: Layer.Layer<ExceptionsCatcherServiceDI, never, Context.Service.Identifier<typeof NotificationService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ExceptionsCatcherService = ExceptionsCatcherServiceDI;

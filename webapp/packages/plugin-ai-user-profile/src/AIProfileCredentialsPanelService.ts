@@ -9,7 +9,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, Effect, IServiceProvider, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -17,8 +17,8 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { FormBaseService, FormMode, FormState, OptionsPanelService, type OptionsPanelCloseEventData } from '@cloudbeaver/core-ui';
 import { UserProfileTabsService } from '@cloudbeaver/plugin-user-profile';
 
-import type { IAIProfileCredentialsFormState } from './AIProfileCredentialsForm/IAIProfileCredentialsFormState.js';
 import type { IAIProfileCredentialsFormProps } from './AIProfileCredentialsForm/IAIProfileCredentialsFormProps.js';
+import type { IAIProfileCredentialsFormState } from './AIProfileCredentialsForm/IAIProfileCredentialsFormState.js';
 import { AI_PROFILES_TAB_ID } from './AI_PROFILES_TAB_ID.js';
 
 const AIProfileCredentialsPanel = importLazyComponent(() =>
@@ -27,8 +27,7 @@ const AIProfileCredentialsPanel = importLazyComponent(() =>
 
 const panelGetter = () => AIProfileCredentialsPanel;
 
-@injectable(() => [LocalizationService, NotificationService, OptionsPanelService, UserProfileTabsService, IServiceProvider, CommonDialogService])
-export class AIProfileCredentialsPanelService extends FormBaseService<IAIProfileCredentialsFormState, IAIProfileCredentialsFormProps> {
+export class AIProfileCredentialsPanelServiceImpl extends FormBaseService<IAIProfileCredentialsFormState, IAIProfileCredentialsFormProps> {
   formState: FormState<IAIProfileCredentialsFormState> | null = null;
 
   constructor(
@@ -96,3 +95,55 @@ export class AIProfileCredentialsPanelService extends FormBaseService<IAIProfile
     }
   };
 }
+
+export type AIProfileCredentialsPanelService = AIProfileCredentialsPanelServiceImpl;
+
+export class AIProfileCredentialsPanelServiceDI extends Context.Service<AIProfileCredentialsPanelServiceDI, AIProfileCredentialsPanelServiceImpl>()(
+  '@cloudbeaver/plugin-ai-user-profile/AIProfileCredentialsPanelService#AIProfileCredentialsPanelService',
+) {
+  static readonly implementation = AIProfileCredentialsPanelServiceImpl;
+
+  static readonly dependencies = () =>
+    [LocalizationService, NotificationService, OptionsPanelService, UserProfileTabsService, IServiceProvider, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    AIProfileCredentialsPanelServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof UserProfileTabsService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeAIProfileCredentialsPanelService() {
+    const localizationService = yield* LocalizationService;
+    const notificationService = yield* NotificationService;
+    const optionsPanelService = yield* OptionsPanelService;
+    const userProfileTabsService = yield* UserProfileTabsService;
+    const serviceProvider = yield* IServiceProvider;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new AIProfileCredentialsPanelServiceImpl(
+      localizationService,
+      notificationService,
+      optionsPanelService,
+      userProfileTabsService,
+      serviceProvider,
+      commonDialogService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIProfileCredentialsPanelServiceDI,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof UserProfileTabsService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIProfileCredentialsPanelService = AIProfileCredentialsPanelServiceDI;

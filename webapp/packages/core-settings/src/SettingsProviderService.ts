@@ -7,16 +7,15 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { schema } from '@cloudbeaver/core-utils';
 
 import { SettingsProvider } from './SettingsProvider.js';
 import { SettingsResolverService } from './SettingsResolverService.js';
-import { UserSettingsResolverService } from './UserSettingsResolverService.js';
 import { SettingsResolverSource } from './SettingsResolverSource.js';
+import { UserSettingsResolverService } from './UserSettingsResolverService.js';
 
-@injectable(() => [SettingsResolverService, UserSettingsResolverService])
-export class SettingsProviderService {
+export class SettingsProviderServiceImpl {
   get schema(): schema.ZodObject {
     return this.mergedSchema;
   }
@@ -43,3 +42,33 @@ export class SettingsProviderService {
     return settings;
   }
 }
+
+export type SettingsProviderService = SettingsProviderServiceImpl;
+
+export class SettingsProviderServiceDI extends Context.Service<SettingsProviderServiceDI, SettingsProviderServiceImpl>()(
+  '@cloudbeaver/core-settings/SettingsProviderService#SettingsProviderService',
+) {
+  static readonly implementation = SettingsProviderServiceImpl;
+
+  static readonly dependencies = () => [SettingsResolverService, UserSettingsResolverService] as const;
+  static readonly make: Effect.Effect<
+    SettingsProviderServiceImpl,
+    never,
+    Context.Service.Identifier<typeof SettingsResolverService> | Context.Service.Identifier<typeof UserSettingsResolverService>
+  > = Effect.gen(function* makeSettingsProviderService() {
+    const settingsResolverService = yield* SettingsResolverService;
+    const userSettingsResolverService = yield* UserSettingsResolverService;
+
+    return new SettingsProviderServiceImpl(settingsResolverService, userSettingsResolverService);
+  });
+  static readonly layer: Layer.Layer<
+    SettingsProviderServiceDI,
+    never,
+    Context.Service.Identifier<typeof SettingsResolverService> | Context.Service.Identifier<typeof UserSettingsResolverService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SettingsProviderService = SettingsProviderServiceDI;

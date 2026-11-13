@@ -8,16 +8,21 @@
 
 import {
   ResultDataFormat,
-  type SqlResultRow,
   type AsyncUpdateResultsDataBatchMutationVariables,
   type SqlResultColumn,
+  type SqlResultRow,
   type SqlResultRowMetaData,
 } from '@cloudbeaver/core-sdk';
 import { isNull } from '@cloudbeaver/core-utils';
-import { isResultSetContentValue, isResultSetComplexValue } from '@dbeaver/result-set-api';
+import { isResultSetComplexValue, isResultSetContentValue } from '@dbeaver/result-set-api';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { GridEditActionImpl, type IGridEditActionData, type IGridUpdate } from '../Grid/GridEditAction.js';
+import { GridHistoryAction } from '../Grid/GridHistoryAction.js';
+import type { IGridDataKey } from '../Grid/IGridDataKey.js';
 import { DatabaseEditChangeType } from '../IDatabaseDataEditAction.js';
 import { createResultSetContentValue } from './createResultSetContentValue.js';
 import { createResultSetFileValue } from './createResultSetFileValue.js';
@@ -26,16 +31,16 @@ import { isResultSetBlobValue } from './isResultSetBlobValue.js';
 import { isResultSetFileValue } from './isResultSetFileValue.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
 import type { IResultSetValue } from './ResultSetFormatAction.js';
-import { GridEditAction, type IGridEditActionData, type IGridUpdate } from '../Grid/GridEditAction.js';
-import { GridHistoryAction } from '../Grid/GridHistoryAction.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import type { IGridDataKey } from '../Grid/IGridDataKey.js';
 
 export type IResultSetEditActionData = IGridEditActionData<IGridDataKey, IResultSetValue>;
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction, GridHistoryAction])
-export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResultRowMetaData, IGridDataKey, IResultSetValue, IDatabaseResultSet> {
+export class ResultSetEditActionImpl extends GridEditActionImpl<
+  SqlResultColumn,
+  SqlResultRowMetaData,
+  IGridDataKey,
+  IResultSetValue,
+  IDatabaseResultSet
+> {
   static override dataFormat = [ResultDataFormat.Resultset];
 
   constructor(
@@ -204,6 +209,44 @@ export class ResultSetEditAction extends GridEditAction<SqlResultColumn, SqlResu
     }
   }
 }
+
+export type ResultSetEditAction = ResultSetEditActionImpl;
+
+export class ResultSetEditActionDI extends Context.Service<ResultSetEditActionDI, ResultSetEditActionImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/ResultSet/ResultSetEditAction#ResultSetEditAction',
+) {
+  static readonly implementation = ResultSetEditActionImpl;
+  static readonly dataFormat = ResultSetEditActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult, ResultSetDataAction, GridHistoryAction] as const;
+  static readonly make: Effect.Effect<
+    ResultSetEditActionImpl,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof ResultSetDataAction>
+    | Context.Service.Identifier<typeof GridHistoryAction>
+  > = Effect.gen(function* makeResultSetEditAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const data = yield* ResultSetDataAction;
+    const history = yield* GridHistoryAction;
+
+    return new ResultSetEditActionImpl(source, result, data, history);
+  });
+  static readonly layer: Layer.Layer<
+    ResultSetEditActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof ResultSetDataAction>
+    | Context.Service.Identifier<typeof GridHistoryAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResultSetEditAction = ResultSetEditActionDI;
 
 function replaceBlobsWithNull(values: IResultSetValue[]) {
   return values.map(value => {

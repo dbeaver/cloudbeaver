@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { FormBaseService, type IFormState } from '@cloudbeaver/core-ui';
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import type { IConnectionFormProps, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 export type ConnectionFormAiContainerProps = {
@@ -18,8 +18,7 @@ export type ConnectionFormAiContainerProps = {
   metaTransferConfirmed?: boolean;
 };
 
-@injectable(() => [LocalizationService, NotificationService])
-export class ConnectionFormAiService extends FormBaseService<IConnectionFormState, IConnectionFormProps> {
+export class ConnectionFormAiServiceImpl extends FormBaseService<IConnectionFormState, IConnectionFormProps> {
   readonly optionsContainer: PlaceholderContainer<ConnectionFormAiContainerProps>;
 
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
@@ -27,3 +26,33 @@ export class ConnectionFormAiService extends FormBaseService<IConnectionFormStat
     this.optionsContainer = new PlaceholderContainer<ConnectionFormAiContainerProps>();
   }
 }
+
+export type ConnectionFormAiService = ConnectionFormAiServiceImpl;
+
+export class ConnectionFormAiServiceDI extends Context.Service<ConnectionFormAiServiceDI, ConnectionFormAiServiceImpl>()(
+  '@cloudbeaver/plugin-connection-ai/connection-ai-settings/ConnectionFormAiService#ConnectionFormAiService',
+) {
+  static readonly implementation = ConnectionFormAiServiceImpl;
+
+  static readonly dependencies = () => [LocalizationService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionFormAiServiceImpl,
+    never,
+    Context.Service.Identifier<typeof LocalizationService> | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeConnectionFormAiService() {
+    const localizationService = yield* LocalizationService;
+    const notificationService = yield* NotificationService;
+
+    return new ConnectionFormAiServiceImpl(localizationService, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionFormAiServiceDI,
+    never,
+    Context.Service.Identifier<typeof LocalizationService> | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionFormAiService = ConnectionFormAiServiceDI;

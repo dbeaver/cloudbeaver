@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ENotificationType, type INotification, NotificationService } from '@cloudbeaver/core-events';
 import { DataSynchronizationService, ServerConfigResource } from '@cloudbeaver/core-root';
 
@@ -15,8 +15,7 @@ const DataSynchronizationNotification = importLazyComponent(() =>
   import('./DataSynchronizationNotification.js').then(m => m.DataSynchronizationNotification),
 );
 
-@injectable(() => [NotificationService, ServerConfigResource, DataSynchronizationService])
-export class DataSynchronizationResolverBootstrap extends Bootstrap {
+export class DataSynchronizationResolverBootstrapImpl extends Bootstrap {
   private activeNotification: INotification | null;
 
   constructor(
@@ -52,3 +51,39 @@ export class DataSynchronizationResolverBootstrap extends Bootstrap {
     );
   }
 }
+
+export type DataSynchronizationResolverBootstrap = DataSynchronizationResolverBootstrapImpl;
+
+export class DataSynchronizationResolverBootstrapDI extends Context.Service<
+  DataSynchronizationResolverBootstrapDI,
+  DataSynchronizationResolverBootstrapImpl
+>()('@cloudbeaver/plugin-root/DataSynchronization/DataSynchronizationResolverBootstrap#DataSynchronizationResolverBootstrap') {
+  static readonly implementation = DataSynchronizationResolverBootstrapImpl;
+
+  static readonly dependencies = () => [NotificationService, ServerConfigResource, DataSynchronizationService] as const;
+  static readonly make: Effect.Effect<
+    DataSynchronizationResolverBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+  > = Effect.gen(function* makeDataSynchronizationResolverBootstrap() {
+    const notificationService = yield* NotificationService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const dataSynchronizationService = yield* DataSynchronizationService;
+
+    return new DataSynchronizationResolverBootstrapImpl(notificationService, serverConfigResource, dataSynchronizationService);
+  });
+  static readonly layer: Layer.Layer<
+    DataSynchronizationResolverBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataSynchronizationResolverBootstrap = DataSynchronizationResolverBootstrapDI;

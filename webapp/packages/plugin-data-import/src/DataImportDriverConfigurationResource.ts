@@ -14,15 +14,14 @@ import {
   type IConnectionInfoParams,
   isConnectionInfoParamEqual,
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { type DriverConfigurationFragment, type GetConnectionImportDriverConfigurationQuery, GraphQLService } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 export type IDataImportDriverConfiguration = DriverConfigurationFragment;
 
-@injectable(() => [GraphQLService, ConnectionInfoResource])
-export class DataImportDriverConfigurationResource extends CachedMapResource<IConnectionInfoParams, IDataImportDriverConfiguration> {
+export class DataImportDriverConfigurationResourceImpl extends CachedMapResource<IConnectionInfoParams, IDataImportDriverConfiguration> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -79,3 +78,34 @@ export class DataImportDriverConfigurationResource extends CachedMapResource<ICo
     return parse.success;
   }
 }
+
+export type DataImportDriverConfigurationResource = DataImportDriverConfigurationResourceImpl;
+
+export class DataImportDriverConfigurationResourceDI extends Context.Service<
+  DataImportDriverConfigurationResourceDI,
+  DataImportDriverConfigurationResourceImpl
+>()('@cloudbeaver/plugin-data-import/DataImportDriverConfigurationResource#DataImportDriverConfigurationResource') {
+  static readonly implementation = DataImportDriverConfigurationResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    DataImportDriverConfigurationResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeDataImportDriverConfigurationResource() {
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new DataImportDriverConfigurationResourceImpl(graphQLService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    DataImportDriverConfigurationResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataImportDriverConfigurationResource = DataImportDriverConfigurationResourceDI;

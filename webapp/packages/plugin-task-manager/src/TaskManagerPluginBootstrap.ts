@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { ProcessSnackbar, type ProcessSnackbarProps } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { type IProcessNotificationContainer, NotificationService } from '@cloudbeaver/core-events';
 import { type ITaskDescriptor, TaskManagerService } from '@cloudbeaver/core-task-manager';
 
-@injectable(() => [TaskManagerService, NotificationService])
-export class TaskManagerPluginBootstrap extends Bootstrap {
+export class TaskManagerPluginBootstrapImpl extends Bootstrap {
   private notification: IProcessNotificationContainer<ProcessSnackbarProps> | null;
   constructor(
     private readonly taskManagerService: TaskManagerService,
@@ -46,6 +45,36 @@ export class TaskManagerPluginBootstrap extends Bootstrap {
     this.notification.controller.setMessage(this.taskManagerService.pendingTasks.map(getMessage).join('\n'));
   }
 }
+
+export type TaskManagerPluginBootstrap = TaskManagerPluginBootstrapImpl;
+
+export class TaskManagerPluginBootstrapDI extends Context.Service<TaskManagerPluginBootstrapDI, TaskManagerPluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-task-manager/TaskManagerPluginBootstrap#TaskManagerPluginBootstrap',
+) {
+  static readonly implementation = TaskManagerPluginBootstrapImpl;
+
+  static readonly dependencies = () => [TaskManagerService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    TaskManagerPluginBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof TaskManagerService> | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeTaskManagerPluginBootstrap() {
+    const taskManagerService = yield* TaskManagerService;
+    const notificationService = yield* NotificationService;
+
+    return new TaskManagerPluginBootstrapImpl(taskManagerService, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    TaskManagerPluginBootstrapDI,
+    never,
+    Context.Service.Identifier<typeof TaskManagerService> | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TaskManagerPluginBootstrap = TaskManagerPluginBootstrapDI;
 
 function getMessage(task: ITaskDescriptor): string {
   if (task.exception) {

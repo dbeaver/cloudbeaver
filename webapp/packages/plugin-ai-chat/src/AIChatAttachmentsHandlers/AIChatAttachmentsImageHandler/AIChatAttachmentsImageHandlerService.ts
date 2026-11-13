@@ -7,10 +7,10 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
-import { blobToBase64, uuid } from '@cloudbeaver/core-utils';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DetailsError, type AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
+import { blobToBase64, uuid } from '@cloudbeaver/core-utils';
 
 import { AIChatAttachmentsService, type IAIChatAttachment } from '../../AIChatAttachments/AIChatAttachmentsService.js';
 
@@ -27,8 +27,7 @@ const IMAGE_MEDIA_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif', 'imag
 const MAX_IMAGES = 10;
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
 
-@injectable(() => [AIChatAttachmentsService, LocalizationService])
-export class AIChatAttachmentsImageHandlerService {
+export class AIChatAttachmentsImageHandlerServiceImpl {
   constructor(
     private readonly aiChatAttachmentsService: AIChatAttachmentsService,
     private readonly localizationService: LocalizationService,
@@ -74,3 +73,36 @@ export class AIChatAttachmentsImageHandlerService {
     };
   }
 }
+
+export type AIChatAttachmentsImageHandlerService = AIChatAttachmentsImageHandlerServiceImpl;
+
+export class AIChatAttachmentsImageHandlerServiceDI extends Context.Service<
+  AIChatAttachmentsImageHandlerServiceDI,
+  AIChatAttachmentsImageHandlerServiceImpl
+>()(
+  '@cloudbeaver/plugin-ai-chat/AIChatAttachmentsHandlers/AIChatAttachmentsImageHandler/AIChatAttachmentsImageHandlerService#AIChatAttachmentsImageHandlerService',
+) {
+  static readonly implementation = AIChatAttachmentsImageHandlerServiceImpl;
+
+  static readonly dependencies = () => [AIChatAttachmentsService, LocalizationService] as const;
+  static readonly make: Effect.Effect<
+    AIChatAttachmentsImageHandlerServiceImpl,
+    never,
+    Context.Service.Identifier<typeof AIChatAttachmentsService> | Context.Service.Identifier<typeof LocalizationService>
+  > = Effect.gen(function* makeAIChatAttachmentsImageHandlerService() {
+    const aiChatAttachmentsService = yield* AIChatAttachmentsService;
+    const localizationService = yield* LocalizationService;
+
+    return new AIChatAttachmentsImageHandlerServiceImpl(aiChatAttachmentsService, localizationService);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatAttachmentsImageHandlerServiceDI,
+    never,
+    Context.Service.Identifier<typeof AIChatAttachmentsService> | Context.Service.Identifier<typeof LocalizationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatAttachmentsImageHandlerService = AIChatAttachmentsImageHandlerServiceDI;

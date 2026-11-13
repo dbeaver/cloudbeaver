@@ -9,7 +9,7 @@ import { computed, makeObservable } from 'mobx';
 
 import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import { type IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -34,16 +34,7 @@ interface IResourceProperties {
 
 export const SCRIPTS_TAB_ID = 'resource-manager-scripts-tab';
 
-@injectable(() => [
-  UserDataService,
-  ServerConfigResource,
-  ResourceManagerService,
-  ResourceManagerResource,
-  ResourceManagerScriptsSettingsService,
-  SideBarPanelService,
-  UserConfigurationStorage,
-])
-export class ResourceManagerScriptsService {
+export class ResourceManagerScriptsServiceImpl {
   get active() {
     return this.enabled && this.settings.active;
   }
@@ -150,3 +141,66 @@ function getResourceManagerDefaultSettings(): ISettings {
     active: false,
   };
 }
+
+export type ResourceManagerScriptsService = ResourceManagerScriptsServiceImpl;
+
+export class ResourceManagerScriptsServiceDI extends Context.Service<ResourceManagerScriptsServiceDI, ResourceManagerScriptsServiceImpl>()(
+  '@cloudbeaver/plugin-resource-manager-scripts/ResourceManagerScriptsService#ResourceManagerScriptsService',
+) {
+  static readonly implementation = ResourceManagerScriptsServiceImpl;
+  static readonly dependencies = () =>
+    [
+      UserDataService,
+      ServerConfigResource,
+      ResourceManagerService,
+      ResourceManagerResource,
+      ResourceManagerScriptsSettingsService,
+      SideBarPanelService,
+      UserConfigurationStorage,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ResourceManagerScriptsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerScriptsSettingsService>
+    | Context.Service.Identifier<typeof SideBarPanelService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Effect.gen(function* makeResourceManagerScriptsService() {
+    const userDataService = yield* UserDataService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const resourceManagerService = yield* ResourceManagerService;
+    const resourceManagerResource = yield* ResourceManagerResource;
+    const resourceManagerScriptsSettingsService = yield* ResourceManagerScriptsSettingsService;
+    const sideBarPanelService = yield* SideBarPanelService;
+    const userConfigurationStorage = yield* UserConfigurationStorage;
+
+    return new ResourceManagerScriptsServiceImpl(
+      userDataService,
+      serverConfigResource,
+      resourceManagerService,
+      resourceManagerResource,
+      resourceManagerScriptsSettingsService,
+      sideBarPanelService,
+      userConfigurationStorage,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ResourceManagerScriptsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerScriptsSettingsService>
+    | Context.Service.Identifier<typeof SideBarPanelService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResourceManagerScriptsService = ResourceManagerScriptsServiceDI;

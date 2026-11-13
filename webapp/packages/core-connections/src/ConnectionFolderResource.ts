@@ -8,7 +8,8 @@
 import { action, makeObservable, runInAction } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import {
   CachedMapAllKey,
   CachedMapResource,
@@ -20,7 +21,6 @@ import {
 } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { type ConnectionFolderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
-import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
 import { createConnectionFolderParam } from './createConnectionFolderParam.js';
 import { getConnectionFolderIdFromNodeId } from './NavTree/getConnectionFolderIdFromNodeId.js';
@@ -36,8 +36,7 @@ export const CONNECTION_FOLDER_NAME_VALIDATION = /^(?!\.)[^\\/:\\"'<>|?*]+$/u;
 
 export const ConnectionFolderProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 
-@injectable(() => [GraphQLService, NavNodeInfoResource, SessionDataResource, AppAuthService])
-export class ConnectionFolderResource extends CachedMapResource<IConnectionFolderParam, ConnectionFolder> {
+export class ConnectionFolderResourceImpl extends CachedMapResource<IConnectionFolderParam, ConnectionFolder> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
@@ -149,3 +148,41 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     return typeof key === 'object' && typeof key.projectId === 'string' && ['string'].includes(typeof key.folderId);
   }
 }
+
+export type ConnectionFolderResource = ConnectionFolderResourceImpl;
+
+export class ConnectionFolderResourceDI extends Context.Service<ConnectionFolderResourceDI, ConnectionFolderResourceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionFolderResource#ConnectionFolderResource',
+) {
+  static readonly implementation = ConnectionFolderResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, NavNodeInfoResource, SessionDataResource, AppAuthService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionFolderResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Effect.gen(function* makeConnectionFolderResource() {
+    const graphQLService = yield* GraphQLService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const sessionDataResource = yield* SessionDataResource;
+    const appAuthService = yield* AppAuthService;
+
+    return new ConnectionFolderResourceImpl(graphQLService, navNodeInfoResource, sessionDataResource, appAuthService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionFolderResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionFolderResource = ConnectionFolderResourceDI;

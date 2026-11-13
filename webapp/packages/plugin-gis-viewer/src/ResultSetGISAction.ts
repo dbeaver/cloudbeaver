@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ import {
   isResultSetGeometryValue,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import type { IDatabaseDataGISAction } from './IDatabaseDataGISAction.js';
-import { injectable } from '@cloudbeaver/core-di';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataViewAction])
-export class ResultSetGISAction
+export class ResultSetGISActionImpl
   extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataGISAction<IGridDataKey, IDatabaseResultSet>
 {
@@ -55,3 +54,38 @@ export class ResultSetGISAction
     return cellHolder.value;
   }
 }
+
+export type ResultSetGISAction = ResultSetGISActionImpl;
+
+export class ResultSetGISActionDI extends Context.Service<ResultSetGISActionDI, ResultSetGISActionImpl>()(
+  '@cloudbeaver/plugin-gis-viewer/ResultSetGISAction#ResultSetGISAction',
+) {
+  static readonly implementation = ResultSetGISActionImpl;
+  static readonly dataFormat = ResultSetGISActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataViewAction] as const;
+  static readonly make: Effect.Effect<
+    ResultSetGISActionImpl,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataViewAction>
+  > = Effect.gen(function* makeResultSetGISAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const view = yield* IDatabaseDataViewAction;
+
+    return new ResultSetGISActionImpl(source, result, view);
+  });
+  static readonly layer: Layer.Layer<
+    ResultSetGISActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataViewAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResultSetGISAction = ResultSetGISActionDI;

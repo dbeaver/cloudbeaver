@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,7 +10,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, Effect, IServiceProvider, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -22,16 +22,7 @@ const SearchDatabase = importLazyComponent(() => import('./SearchDatabase.js').t
 
 const formGetter = () => SearchDatabase;
 
-@injectable(() => [
-  NotificationService,
-  ConnectionInfoResource,
-  IServiceProvider,
-  OptionsPanelService,
-  ConnectionFormService,
-  CommonDialogService,
-  ConnectionsManagerService,
-])
-export class ConnectionSearchService {
+export class ConnectionSearchServiceImpl {
   hosts = 'localhost';
   databases: AdminConnectionSearchInfo[];
 
@@ -187,3 +178,67 @@ export class ConnectionSearchService {
     this.formState = null;
   }
 }
+
+export type ConnectionSearchService = ConnectionSearchServiceImpl;
+
+export class ConnectionSearchServiceDI extends Context.Service<ConnectionSearchServiceDI, ConnectionSearchServiceImpl>()(
+  '@cloudbeaver/plugin-connection-search/Search/ConnectionSearchService#ConnectionSearchService',
+) {
+  static readonly implementation = ConnectionSearchServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NotificationService,
+      ConnectionInfoResource,
+      IServiceProvider,
+      OptionsPanelService,
+      ConnectionFormService,
+      CommonDialogService,
+      ConnectionsManagerService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConnectionSearchServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+  > = Effect.gen(function* makeConnectionSearchService() {
+    const notificationService = yield* NotificationService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const serviceProvider = yield* IServiceProvider;
+    const optionsPanelService = yield* OptionsPanelService;
+    const connectionFormService = yield* ConnectionFormService;
+    const commonDialogService = yield* CommonDialogService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+
+    return new ConnectionSearchServiceImpl(
+      notificationService,
+      connectionInfoResource,
+      serviceProvider,
+      optionsPanelService,
+      connectionFormService,
+      commonDialogService,
+      connectionsManagerService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionSearchServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionSearchService = ConnectionSearchServiceDI;

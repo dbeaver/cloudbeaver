@@ -8,13 +8,12 @@
 import { makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { EditableSettingsSource } from '@cloudbeaver/core-settings';
 import { StorageService } from '@cloudbeaver/core-storage';
 import { isNull } from '@cloudbeaver/core-utils';
 
-@injectable(() => [UserInfoResource, StorageService])
-export class UserSettingsService extends EditableSettingsSource {
+export class UserSettingsServiceImpl extends EditableSettingsSource {
   private readonly settings: Map<string, any>;
   private lastConfig: any;
   private localSettings: Map<string, any>;
@@ -135,3 +134,33 @@ export class UserSettingsService extends EditableSettingsSource {
     return this.localSettings;
   }
 }
+
+export type UserSettingsService = UserSettingsServiceImpl;
+
+export class UserSettingsServiceDI extends Context.Service<UserSettingsServiceDI, UserSettingsServiceImpl>()(
+  '@cloudbeaver/core-settings-user/UserSettingsService#UserSettingsService',
+) {
+  static readonly implementation = UserSettingsServiceImpl;
+
+  static readonly dependencies = () => [UserInfoResource, StorageService] as const;
+  static readonly make: Effect.Effect<
+    UserSettingsServiceImpl,
+    never,
+    Context.Service.Identifier<typeof UserInfoResource> | Context.Service.Identifier<typeof StorageService>
+  > = Effect.gen(function* makeUserSettingsService() {
+    const userInfoResource = yield* UserInfoResource;
+    const storageService = yield* StorageService;
+
+    return new UserSettingsServiceImpl(userInfoResource, storageService);
+  });
+  static readonly layer: Layer.Layer<
+    UserSettingsServiceDI,
+    never,
+    Context.Service.Identifier<typeof UserInfoResource> | Context.Service.Identifier<typeof StorageService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UserSettingsService = UserSettingsServiceDI;

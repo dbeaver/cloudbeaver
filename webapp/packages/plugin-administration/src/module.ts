@@ -6,39 +6,35 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { PluginBootstrap } from './PluginBootstrap.js';
-import { LocaleService } from './LocaleService.js';
-import { ServerConfigurationAdministrationNavService } from './ConfigurationWizard/ServerConfigurationAdministrationNavService.js';
-import { ServerConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
+import { AdministrationViewService } from './Administration/AdministrationViewService.js';
+import { AdministrationScreenServiceBootstrap } from './AdministrationScreen/AdministrationScreenServiceBootstrap.js';
+import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService.js';
+import { WizardTopAppBarService } from './AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService.js';
+import { ConfigurationWizardPagesBootstrapService } from './ConfigurationWizard/ConfigurationWizardPagesBootstrapService.js';
+import { ServerConfigurationConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationConfigurationService.js';
 import { ServerConfigurationFormService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationFormService.js';
 import { ServerConfigurationFormStateManager } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationFormStateManager.js';
-import { ServerConfigurationConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationConfigurationService.js';
-import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService.js';
-import { ConfigurationWizardPagesBootstrapService } from './ConfigurationWizard/ConfigurationWizardPagesBootstrapService.js';
-import { WizardTopAppBarService } from './AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService.js';
-import { AdministrationScreenServiceBootstrap } from './AdministrationScreen/AdministrationScreenServiceBootstrap.js';
-import { AdministrationViewService } from './Administration/AdministrationViewService.js';
+import { ServerConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService.js';
+import { ServerConfigurationAdministrationNavService } from './ConfigurationWizard/ServerConfigurationAdministrationNavService.js';
+import { LocaleService } from './LocaleService.js';
+import { PluginBootstrap } from './PluginBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-administration',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, proxy(AdministrationScreenServiceBootstrap))
-      .addSingleton(Bootstrap, proxy(ConfigurationWizardPagesBootstrapService))
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, proxy(PluginBootstrap))
-      .addSingleton(AdministrationViewService)
-      .addSingleton(PluginBootstrap)
-      .addSingleton(ServerConfigurationAdministrationNavService)
-      .addSingleton(ServerConfigurationService)
-      .addSingleton(ServerConfigurationFormService)
-      .addSingleton(ServerConfigurationFormStateManager)
-      .addSingleton(ServerConfigurationConfigurationService)
-      .addSingleton(AdministrationTopAppBarService)
-      .addSingleton(ConfigurationWizardPagesBootstrapService)
-      .addSingleton(WizardTopAppBarService)
-      .addSingleton(AdministrationScreenServiceBootstrap);
-  },
+  services: () => [
+    AdministrationViewService,
+    PluginBootstrap,
+    ServerConfigurationAdministrationNavService,
+    ServerConfigurationService,
+    ServerConfigurationFormService,
+    ServerConfigurationFormStateManager,
+    ServerConfigurationConfigurationService,
+    AdministrationTopAppBarService,
+    ConfigurationWizardPagesBootstrapService,
+    WizardTopAppBarService,
+    AdministrationScreenServiceBootstrap,
+  ],
+  bootstraps: () => [AdministrationScreenServiceBootstrap, ConfigurationWizardPagesBootstrapService, LocaleService, PluginBootstrap],
 });

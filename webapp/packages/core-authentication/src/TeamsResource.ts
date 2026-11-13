@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
   CachedMapResource,
@@ -32,8 +32,7 @@ export type UserTeamGrantInfo = UndefinedToNull<AdminUserTeamGrantInfo>;
 type TeamResourceIncludes = Omit<GetTeamsListQueryVariables, 'teamId'>;
 type NewTeam = TeamInfo & { [NEW_TEAM_SYMBOL]: boolean; timestamp: number };
 
-@injectable(() => [GraphQLService])
-export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResourceIncludes> {
+export class TeamsResourceImpl extends CachedMapResource<string, TeamInfo, TeamResourceIncludes> {
   constructor(private readonly graphQLService: GraphQLService) {
     super();
   }
@@ -166,6 +165,29 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     return typeof key === 'string';
   }
 }
+
+export type TeamsResource = TeamsResourceImpl;
+
+export class TeamsResourceDI extends Context.Service<TeamsResourceDI, TeamsResourceImpl>()(
+  '@cloudbeaver/core-authentication/TeamsResource#TeamsResource',
+) {
+  static readonly implementation = TeamsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService] as const;
+  static readonly make: Effect.Effect<TeamsResourceImpl, never, Context.Service.Identifier<typeof GraphQLService>> = Effect.gen(
+    function* makeTeamsResource() {
+      const graphQLService = yield* GraphQLService;
+
+      return new TeamsResourceImpl(graphQLService);
+    },
+  );
+  static readonly layer: Layer.Layer<TeamsResourceDI, never, Context.Service.Identifier<typeof GraphQLService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TeamsResource = TeamsResourceDI;
 
 function isNewTeam(team: TeamInfo | NewTeam): team is NewTeam {
   return (team as NewTeam)[NEW_TEAM_SYMBOL];

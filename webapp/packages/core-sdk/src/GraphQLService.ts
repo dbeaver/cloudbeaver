@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { CustomGraphQLClient } from './CustomGraphQLClient.js';
 import { EnvironmentService } from './EnvironmentService.js';
@@ -31,8 +31,7 @@ function extendedSDK(
   };
 }
 
-@injectable(() => [EnvironmentService])
-export class GraphQLService {
+export class GraphQLServiceImpl {
   sdk: ReturnType<typeof extendedSDK>;
 
   readonly client: CustomGraphQLClient;
@@ -55,3 +54,24 @@ export class GraphQLService {
     this.client.blockRequests(reason);
   }
 }
+
+export type GraphQLService = GraphQLServiceImpl;
+
+export class GraphQLServiceDI extends Context.Service<GraphQLServiceDI, GraphQLServiceImpl>()('@cloudbeaver/core-sdk/GraphQLService#GraphQLService') {
+  static readonly implementation = GraphQLServiceImpl;
+
+  static readonly dependencies = () => [EnvironmentService] as const;
+  static readonly make: Effect.Effect<GraphQLServiceImpl, never, Context.Service.Identifier<typeof EnvironmentService>> = Effect.gen(
+    function* makeGraphQLService() {
+      const environmentService = yield* EnvironmentService;
+
+      return new GraphQLServiceImpl(environmentService);
+    },
+  );
+  static readonly layer: Layer.Layer<GraphQLServiceDI, never, Context.Service.Identifier<typeof EnvironmentService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GraphQLService = GraphQLServiceDI;

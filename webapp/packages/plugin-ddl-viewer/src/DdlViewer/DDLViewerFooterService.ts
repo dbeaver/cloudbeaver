@@ -6,30 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { MetadataMap } from '@cloudbeaver/core-utils';
-import { download, withTimestamp } from '@dbeaver/js-helpers';
 import { ACTION_SAVE, ActionService, MenuService } from '@cloudbeaver/core-view';
-import { DDL_GENERATOR_ID, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
+import { DDL_GENERATOR_ID, SqlGeneratorsResource } from '@cloudbeaver/plugin-sql-generator';
+import { download, withTimestamp } from '@dbeaver/js-helpers';
 
 import { ACTION_DDL_VIEWER_FULL_DDL } from './ACTION_DDL_VIEWER_FULL_DDL.js';
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE.js';
 import { DATA_CONTEXT_DDL_VIEWER_QUERY } from './DATA_CONTEXT_DDL_VIEWER_QUERY.js';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER.js';
 
-@injectable(() => [
-  NavNodeManagerService,
-  ActionService,
-  MenuService,
-  SqlEditorNavigatorService,
-  ConnectionInfoResource,
-  NavNodeInfoResource,
-  SqlGeneratorsResource,
-])
-export class DDLViewerFooterService {
+export class DDLViewerFooterServiceImpl {
   private readonly fullDdlState = new MetadataMap<string, boolean>(() => false);
 
   constructor(
@@ -153,3 +144,67 @@ export class DDLViewerFooterService {
     return supportsFullDdl && !!ddlGenerator;
   }
 }
+
+export type DDLViewerFooterService = DDLViewerFooterServiceImpl;
+
+export class DDLViewerFooterServiceDI extends Context.Service<DDLViewerFooterServiceDI, DDLViewerFooterServiceImpl>()(
+  '@cloudbeaver/plugin-ddl-viewer/DdlViewer/DDLViewerFooterService#DDLViewerFooterService',
+) {
+  static readonly implementation = DDLViewerFooterServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavNodeManagerService,
+      ActionService,
+      MenuService,
+      SqlEditorNavigatorService,
+      ConnectionInfoResource,
+      NavNodeInfoResource,
+      SqlGeneratorsResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    DDLViewerFooterServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof SqlGeneratorsResource>
+  > = Effect.gen(function* makeDDLViewerFooterService() {
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const sqlEditorNavigatorService = yield* SqlEditorNavigatorService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const sqlGeneratorsResource = yield* SqlGeneratorsResource;
+
+    return new DDLViewerFooterServiceImpl(
+      navNodeManagerService,
+      actionService,
+      menuService,
+      sqlEditorNavigatorService,
+      connectionInfoResource,
+      navNodeInfoResource,
+      sqlGeneratorsResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    DDLViewerFooterServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof SqlGeneratorsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DDLViewerFooterService = DDLViewerFooterServiceDI;

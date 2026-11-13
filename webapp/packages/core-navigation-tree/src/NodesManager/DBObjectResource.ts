@@ -7,7 +7,7 @@
  */
 import { runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
@@ -30,8 +30,7 @@ import { NavTreeResource } from './NavTreeResource.js';
 
 export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
 
-@injectable(() => [GraphQLService, NavNodeInfoResource, NavTreeResource])
-export class DBObjectResource extends CachedMapResource<string, DBObject> {
+export class DBObjectResourceImpl extends CachedMapResource<string, DBObject> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
@@ -165,3 +164,38 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     return typeof key === 'string';
   }
 }
+
+export type DBObjectResource = DBObjectResourceImpl;
+
+export class DBObjectResourceDI extends Context.Service<DBObjectResourceDI, DBObjectResourceImpl>()(
+  '@cloudbeaver/core-navigation-tree/NodesManager/DBObjectResource#DBObjectResource',
+) {
+  static readonly implementation = DBObjectResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, NavNodeInfoResource, NavTreeResource] as const;
+  static readonly make: Effect.Effect<
+    DBObjectResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+  > = Effect.gen(function* makeDBObjectResource() {
+    const graphQLService = yield* GraphQLService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const navTreeResource = yield* NavTreeResource;
+
+    return new DBObjectResourceImpl(graphQLService, navNodeInfoResource, navTreeResource);
+  });
+  static readonly layer: Layer.Layer<
+    DBObjectResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DBObjectResource = DBObjectResourceDI;

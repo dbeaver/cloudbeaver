@@ -9,7 +9,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, type IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
@@ -31,25 +31,7 @@ import { SqlEditorTabResourceService } from './SqlEditorTabResourceService.js';
 
 const RESOURCE_TAB_STATE = 'sql_editor_resource_tab_state';
 
-@injectable(() => [
-  ConnectionInfoResource,
-  NetworkStateService,
-  SqlDataSourceService,
-  CommonDialogService,
-  NavResourceNodeService,
-  NotificationService,
-  ResourceManagerService,
-  SqlEditorTabService,
-  NavigationTabsService,
-  ResourceManagerResource,
-  ResourceManagerScriptsService,
-  ProjectInfoResource,
-  SqlEditorTabResourceService,
-  SqlEditorService,
-  ProjectsService,
-  StorageService,
-])
-export class ResourceSqlDataSourceBootstrap extends Bootstrap {
+export class ResourceSqlDataSourceBootstrapImpl extends Bootstrap {
   private readonly dataSourceStateState = new Map<string, IResourceSqlDataSourceState>();
 
   constructor(
@@ -309,6 +291,115 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     }
   }
 }
+
+export type ResourceSqlDataSourceBootstrap = ResourceSqlDataSourceBootstrapImpl;
+
+export class ResourceSqlDataSourceBootstrapDI extends Context.Service<ResourceSqlDataSourceBootstrapDI, ResourceSqlDataSourceBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-editor-navigation-tab-script/ResourceSqlDataSourceBootstrap#ResourceSqlDataSourceBootstrap',
+) {
+  static readonly implementation = ResourceSqlDataSourceBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      ConnectionInfoResource,
+      NetworkStateService,
+      SqlDataSourceService,
+      CommonDialogService,
+      NavResourceNodeService,
+      NotificationService,
+      ResourceManagerService,
+      SqlEditorTabService,
+      NavigationTabsService,
+      ResourceManagerResource,
+      ResourceManagerScriptsService,
+      ProjectInfoResource,
+      SqlEditorTabResourceService,
+      SqlEditorService,
+      ProjectsService,
+      StorageService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ResourceSqlDataSourceBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NetworkStateService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NavResourceNodeService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+    | Context.Service.Identifier<typeof SqlEditorTabService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerScriptsService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof SqlEditorTabResourceService>
+    | Context.Service.Identifier<typeof SqlEditorService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof StorageService>
+  > = Effect.gen(function* makeResourceSqlDataSourceBootstrap() {
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const networkStateService = yield* NetworkStateService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const commonDialogService = yield* CommonDialogService;
+    const navResourceNodeService = yield* NavResourceNodeService;
+    const notificationService = yield* NotificationService;
+    const resourceManagerService = yield* ResourceManagerService;
+    const sqlEditorTabService = yield* SqlEditorTabService;
+    const navigationTabsService = yield* NavigationTabsService;
+    const resourceManagerResource = yield* ResourceManagerResource;
+    const resourceManagerScriptsService = yield* ResourceManagerScriptsService;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const sqlEditorTabResourceService = yield* SqlEditorTabResourceService;
+    const sqlEditorService = yield* SqlEditorService;
+    const projectsService = yield* ProjectsService;
+    const storageService = yield* StorageService;
+
+    return new ResourceSqlDataSourceBootstrapImpl(
+      connectionInfoResource,
+      networkStateService,
+      sqlDataSourceService,
+      commonDialogService,
+      navResourceNodeService,
+      notificationService,
+      resourceManagerService,
+      sqlEditorTabService,
+      navigationTabsService,
+      resourceManagerResource,
+      resourceManagerScriptsService,
+      projectInfoResource,
+      sqlEditorTabResourceService,
+      sqlEditorService,
+      projectsService,
+      storageService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ResourceSqlDataSourceBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NetworkStateService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NavResourceNodeService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+    | Context.Service.Identifier<typeof SqlEditorTabService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerScriptsService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof SqlEditorTabResourceService>
+    | Context.Service.Identifier<typeof SqlEditorService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof StorageService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResourceSqlDataSourceBootstrap = ResourceSqlDataSourceBootstrapDI;
 
 function isExecutionContextInfoValid(executionContext: IConnectionExecutionContextInfo | undefined) {
   return (

@@ -6,17 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { schema } from '@cloudbeaver/core-utils';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
-import { AIChatFunctionRegistryService } from './AIChatFunctionRegistryService.js';
 import { AIChatContextService } from './AIChat/AIChatContext/AIChatContextService.js';
-import { AIChatConversationsService } from './AIChat/AIChatConversation/AIChatConversationsService.js';
 import { AIChatConversationsResource } from './AIChat/AIChatConversation/AIChatConversationsResource.js';
+import { AIChatConversationsService } from './AIChat/AIChatConversation/AIChatConversationsService.js';
+import { AIChatFunctionRegistryService } from './AIChatFunctionRegistryService.js';
 
 const FUNCTION_DB_OPEN_ENTITY_EDITOR_SCHEMA = schema.object({
   objectName: schema.string(),
@@ -28,16 +28,7 @@ const FUNCTION_DB_OPEN_SQL_EDITOR_SCHEMA = schema.object({
   newEditor: schema.boolean().optional(),
 });
 
-@injectable(() => [
-  NavNodeManagerService,
-  AIChatFunctionRegistryService,
-  AIChatContextService,
-  SqlEditorNavigatorService,
-  AIChatConversationsService,
-  LocalizationService,
-  AIChatConversationsResource,
-])
-export class AIChatFunctionsService {
+export class AIChatFunctionsServiceImpl {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly aiChatFunctionRegistryService: AIChatFunctionRegistryService,
@@ -97,3 +88,67 @@ export class AIChatFunctionsService {
     });
   }
 }
+
+export type AIChatFunctionsService = AIChatFunctionsServiceImpl;
+
+export class AIChatFunctionsServiceDI extends Context.Service<AIChatFunctionsServiceDI, AIChatFunctionsServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChatFunctionsService#AIChatFunctionsService',
+) {
+  static readonly implementation = AIChatFunctionsServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavNodeManagerService,
+      AIChatFunctionRegistryService,
+      AIChatContextService,
+      SqlEditorNavigatorService,
+      AIChatConversationsService,
+      LocalizationService,
+      AIChatConversationsResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    AIChatFunctionsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof AIChatFunctionRegistryService>
+    | Context.Service.Identifier<typeof AIChatContextService>
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof AIChatConversationsService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+  > = Effect.gen(function* makeAIChatFunctionsService() {
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const aiChatFunctionRegistryService = yield* AIChatFunctionRegistryService;
+    const aiChatContextService = yield* AIChatContextService;
+    const sqlEditorNavigatorService = yield* SqlEditorNavigatorService;
+    const aiChatConversationsService = yield* AIChatConversationsService;
+    const localizationService = yield* LocalizationService;
+    const aiChatConversationsResource = yield* AIChatConversationsResource;
+
+    return new AIChatFunctionsServiceImpl(
+      navNodeManagerService,
+      aiChatFunctionRegistryService,
+      aiChatContextService,
+      sqlEditorNavigatorService,
+      aiChatConversationsService,
+      localizationService,
+      aiChatConversationsResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIChatFunctionsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof AIChatFunctionRegistryService>
+    | Context.Service.Identifier<typeof AIChatContextService>
+    | Context.Service.Identifier<typeof SqlEditorNavigatorService>
+    | Context.Service.Identifier<typeof AIChatConversationsService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatFunctionsService = AIChatFunctionsServiceDI;

@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { type IServiceConstructor, useService } from '@cloudbeaver/core-di';
+import { type ServiceType, useService } from '@cloudbeaver/core-di';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
@@ -51,7 +51,7 @@ interface IOffsetPaginationPrivate<TKey extends ResourceKey<any>> extends IOffse
 }
 
 export function useOffsetPagination<TResource extends CachedMapResource<any, any, any, any>, TKey extends ResourceKey<any>>(
-  ctor: IServiceConstructor<TResource>,
+  ctor: ServiceType<TResource>,
   options?: IOptions<TKey>,
 ): IOffsetPagination<TKey> {
   const targetKey = options?.key;

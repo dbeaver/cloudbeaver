@@ -7,14 +7,13 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { ITaskDescriptor, ITaskDescriptorOptions } from './ITaskDescriptor.js';
 
-@injectable()
-export class TaskManagerService {
+export class TaskManagerServiceImpl {
   get pendingTasks(): ITaskDescriptor[] {
     return this.queue.filter(task => !task.fulfilled);
   }
@@ -73,3 +72,20 @@ export class TaskManagerService {
     }
   }
 }
+
+export type TaskManagerService = TaskManagerServiceImpl;
+
+export class TaskManagerServiceDI extends Context.Service<TaskManagerServiceDI, TaskManagerServiceImpl>()(
+  '@cloudbeaver/core-task-manager/TaskManagerService#TaskManagerService',
+) {
+  static readonly implementation = TaskManagerServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<TaskManagerServiceImpl, never, never> = Effect.sync(() => new TaskManagerServiceImpl());
+  static readonly layer: Layer.Layer<TaskManagerServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TaskManagerService = TaskManagerServiceDI;

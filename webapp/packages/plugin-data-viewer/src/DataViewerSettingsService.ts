@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { HIGHEST_SETTINGS_LAYER, ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
 import {
   createSettingsOverrideResolver,
@@ -34,14 +34,7 @@ const defaultSettings = schema.object({
 export type DataViewerSettingsSchema = typeof defaultSettings;
 export type DataViewerSettings = schema.infer<DataViewerSettingsSchema>;
 
-@injectable(() => [
-  SettingsProviderService,
-  SettingsManagerService,
-  SettingsResolverService,
-  SettingsTransformationService,
-  ServerSettingsManagerService,
-])
-export class DataViewerSettingsService {
+export class DataViewerSettingsServiceImpl {
   get disableEdit(): boolean {
     return this.settings.getValue('plugin.data-viewer.disableEdit');
   }
@@ -150,3 +143,51 @@ export class DataViewerSettingsService {
     });
   }
 }
+
+export type DataViewerSettingsService = DataViewerSettingsServiceImpl;
+
+export class DataViewerSettingsServiceDI extends Context.Service<DataViewerSettingsServiceDI, DataViewerSettingsServiceImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DataViewerSettingsService#DataViewerSettingsService',
+) {
+  static readonly implementation = DataViewerSettingsServiceImpl;
+
+  static readonly dependencies = () =>
+    [SettingsProviderService, SettingsManagerService, SettingsResolverService, SettingsTransformationService, ServerSettingsManagerService] as const;
+  static readonly make: Effect.Effect<
+    DataViewerSettingsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof SettingsProviderService>
+    | Context.Service.Identifier<typeof SettingsManagerService>
+    | Context.Service.Identifier<typeof SettingsResolverService>
+    | Context.Service.Identifier<typeof SettingsTransformationService>
+    | Context.Service.Identifier<typeof ServerSettingsManagerService>
+  > = Effect.gen(function* makeDataViewerSettingsService() {
+    const settingsProviderService = yield* SettingsProviderService;
+    const settingsManagerService = yield* SettingsManagerService;
+    const settingsResolverService = yield* SettingsResolverService;
+    const settingsTransformationService = yield* SettingsTransformationService;
+    const serverSettingsManagerService = yield* ServerSettingsManagerService;
+
+    return new DataViewerSettingsServiceImpl(
+      settingsProviderService,
+      settingsManagerService,
+      settingsResolverService,
+      settingsTransformationService,
+      serverSettingsManagerService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    DataViewerSettingsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof SettingsProviderService>
+    | Context.Service.Identifier<typeof SettingsManagerService>
+    | Context.Service.Identifier<typeof SettingsResolverService>
+    | Context.Service.Identifier<typeof SettingsTransformationService>
+    | Context.Service.Identifier<typeof ServerSettingsManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataViewerSettingsService = DataViewerSettingsServiceDI;

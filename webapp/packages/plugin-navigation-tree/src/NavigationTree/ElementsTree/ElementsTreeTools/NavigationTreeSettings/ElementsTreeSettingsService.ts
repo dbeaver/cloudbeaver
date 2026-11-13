@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import type { IElementsTree } from '../../useElementsTree.js';
 import { ElementsTreeBaseSettingsForm } from './ElementsTreeBaseSettingsForm.js';
@@ -15,11 +15,27 @@ export interface IElementsTreeSettingsProps {
   tree: IElementsTree;
 }
 
-@injectable()
-export class ElementsTreeSettingsService {
+export class ElementsTreeSettingsServiceImpl {
   readonly placeholder = new PlaceholderContainer<IElementsTreeSettingsProps>();
 
   constructor() {
     this.placeholder.add(ElementsTreeBaseSettingsForm, 0);
   }
 }
+
+export type ElementsTreeSettingsService = ElementsTreeSettingsServiceImpl;
+
+export class ElementsTreeSettingsServiceDI extends Context.Service<ElementsTreeSettingsServiceDI, ElementsTreeSettingsServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService#ElementsTreeSettingsService',
+) {
+  static readonly implementation = ElementsTreeSettingsServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<ElementsTreeSettingsServiceImpl, never, never> = Effect.sync(() => new ElementsTreeSettingsServiceImpl());
+  static readonly layer: Layer.Layer<ElementsTreeSettingsServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ElementsTreeSettingsService = ElementsTreeSettingsServiceDI;

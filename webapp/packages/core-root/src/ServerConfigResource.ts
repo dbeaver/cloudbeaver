@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, type ServerConfigFragment, type ServerConfigInput } from '@cloudbeaver/core-sdk';
 
@@ -18,8 +18,7 @@ export const FEATURE_AI_ID = 'ai';
 
 export type ServerConfig = ServerConfigFragment;
 
-@injectable(() => [GraphQLService, DataSynchronizationService, ServerConfigEventHandler])
-export class ServerConfigResource extends CachedDataResource<ServerConfig | null> {
+export class ServerConfigResourceImpl extends CachedDataResource<ServerConfig | null> {
   private readonly syncQueue: DataSynchronizationQueue;
 
   constructor(
@@ -145,3 +144,38 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return serverConfig;
   }
 }
+
+export type ServerConfigResource = ServerConfigResourceImpl;
+
+export class ServerConfigResourceDI extends Context.Service<ServerConfigResourceDI, ServerConfigResourceImpl>()(
+  '@cloudbeaver/core-root/ServerConfigResource#ServerConfigResource',
+) {
+  static readonly implementation = ServerConfigResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, DataSynchronizationService, ServerConfigEventHandler] as const;
+  static readonly make: Effect.Effect<
+    ServerConfigResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+    | Context.Service.Identifier<typeof ServerConfigEventHandler>
+  > = Effect.gen(function* makeServerConfigResource() {
+    const graphQLService = yield* GraphQLService;
+    const dataSynchronizationService = yield* DataSynchronizationService;
+    const serverConfigEventHandler = yield* ServerConfigEventHandler;
+
+    return new ServerConfigResourceImpl(graphQLService, dataSynchronizationService, serverConfigEventHandler);
+  });
+  static readonly layer: Layer.Layer<
+    ServerConfigResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+    | Context.Service.Identifier<typeof ServerConfigEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServerConfigResource = ServerConfigResourceDI;

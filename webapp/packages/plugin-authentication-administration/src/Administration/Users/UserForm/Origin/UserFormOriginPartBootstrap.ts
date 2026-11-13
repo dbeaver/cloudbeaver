@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import React from 'react';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { FormMode } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserFormService } from '../AdministrationUserFormService.js';
@@ -22,8 +22,7 @@ const UserFormOriginInfoTab = React.lazy(async () => {
   return { default: UserFormOriginInfoTab };
 });
 
-@injectable(() => [AdministrationUserFormService])
-export class UserFormOriginPartBootstrap extends Bootstrap {
+export class UserFormOriginPartBootstrapImpl extends Bootstrap {
   constructor(private readonly administrationUserFormService: AdministrationUserFormService) {
     super();
   }
@@ -38,3 +37,26 @@ export class UserFormOriginPartBootstrap extends Bootstrap {
     });
   }
 }
+
+export type UserFormOriginPartBootstrap = UserFormOriginPartBootstrapImpl;
+
+export class UserFormOriginPartBootstrapDI extends Context.Service<UserFormOriginPartBootstrapDI, UserFormOriginPartBootstrapImpl>()(
+  '@cloudbeaver/plugin-authentication-administration/Administration/Users/UserForm/Origin/UserFormOriginPartBootstrap#UserFormOriginPartBootstrap',
+) {
+  static readonly implementation = UserFormOriginPartBootstrapImpl;
+
+  static readonly dependencies = () => [AdministrationUserFormService] as const;
+  static readonly make: Effect.Effect<UserFormOriginPartBootstrapImpl, never, Context.Service.Identifier<typeof AdministrationUserFormService>> =
+    Effect.gen(function* makeUserFormOriginPartBootstrap() {
+      const administrationUserFormService = yield* AdministrationUserFormService;
+
+      return new UserFormOriginPartBootstrapImpl(administrationUserFormService);
+    });
+  static readonly layer: Layer.Layer<UserFormOriginPartBootstrapDI, never, Context.Service.Identifier<typeof AdministrationUserFormService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const UserFormOriginPartBootstrap = UserFormOriginPartBootstrapDI;

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
@@ -16,8 +16,7 @@ import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';
 import { ConnectionExecutionContext } from './ConnectionExecutionContext.js';
 import { ConnectionExecutionContextResource } from './ConnectionExecutionContextResource.js';
 
-@injectable(() => [ConnectionExecutionContextResource, AsyncTaskInfoService, GraphQLService])
-export class ConnectionExecutionContextService {
+export class ConnectionExecutionContextServiceImpl {
   private readonly contexts: MetadataMap<string, ConnectionExecutionContext>;
   protected scheduler: TaskScheduler<string>;
 
@@ -61,3 +60,39 @@ export class ConnectionExecutionContextService {
     return this.contexts.get(context.id);
   }
 }
+
+export type ConnectionExecutionContextService = ConnectionExecutionContextServiceImpl;
+
+export class ConnectionExecutionContextServiceDI extends Context.Service<
+  ConnectionExecutionContextServiceDI,
+  ConnectionExecutionContextServiceImpl
+>()('@cloudbeaver/core-connections/ConnectionExecutionContext/ConnectionExecutionContextService#ConnectionExecutionContextService') {
+  static readonly implementation = ConnectionExecutionContextServiceImpl;
+
+  static readonly dependencies = () => [ConnectionExecutionContextResource, AsyncTaskInfoService, GraphQLService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionExecutionContextServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof GraphQLService>
+  > = Effect.gen(function* makeConnectionExecutionContextService() {
+    const connectionExecutionContextResource = yield* ConnectionExecutionContextResource;
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+    const graphQLService = yield* GraphQLService;
+
+    return new ConnectionExecutionContextServiceImpl(connectionExecutionContextResource, asyncTaskInfoService, graphQLService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionExecutionContextServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof GraphQLService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionExecutionContextService = ConnectionExecutionContextServiceDI;

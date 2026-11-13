@@ -1,18 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { SettingsLocalizationService, type ILocalizationSettings } from '@cloudbeaver/core-settings-localization';
 import type { ISettingChangeData } from '@cloudbeaver/core-settings';
+import { SettingsLocalizationService, type ILocalizationSettings } from '@cloudbeaver/core-settings-localization';
 
-@injectable(() => [SessionResource, LocalizationService, SettingsLocalizationService])
-export class SessionLocalizationBootstrap extends Bootstrap {
+export class SessionLocalizationBootstrapImpl extends Bootstrap {
   constructor(
     private readonly sessionResource: SessionResource,
     private readonly localizationService: LocalizationService,
@@ -51,3 +50,38 @@ export class SessionLocalizationBootstrap extends Bootstrap {
     }
   }
 }
+
+export type SessionLocalizationBootstrap = SessionLocalizationBootstrapImpl;
+
+export class SessionLocalizationBootstrapDI extends Context.Service<SessionLocalizationBootstrapDI, SessionLocalizationBootstrapImpl>()(
+  '@cloudbeaver/core-session-localization/SessionLocalizationBootstrap#SessionLocalizationBootstrap',
+) {
+  static readonly implementation = SessionLocalizationBootstrapImpl;
+
+  static readonly dependencies = () => [SessionResource, LocalizationService, SettingsLocalizationService] as const;
+  static readonly make: Effect.Effect<
+    SessionLocalizationBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof SessionResource>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof SettingsLocalizationService>
+  > = Effect.gen(function* makeSessionLocalizationBootstrap() {
+    const sessionResource = yield* SessionResource;
+    const localizationService = yield* LocalizationService;
+    const settingsLocalizationService = yield* SettingsLocalizationService;
+
+    return new SessionLocalizationBootstrapImpl(sessionResource, localizationService, settingsLocalizationService);
+  });
+  static readonly layer: Layer.Layer<
+    SessionLocalizationBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof SessionResource>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof SettingsLocalizationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SessionLocalizationBootstrap = SessionLocalizationBootstrapDI;

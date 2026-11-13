@@ -1,19 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
-import { LocaleService } from './LocaleService.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { AsyncTaskConfirmationBootstrap } from './AsyncTaskConfirmationBootstrap.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-async-task-confirmation',
 
-  configure: serviceCollection => {
-    serviceCollection.addSingleton(Bootstrap, LocaleService).addSingleton(Bootstrap, AsyncTaskConfirmationBootstrap);
-  },
+  bootstraps: () => [LocaleService, AsyncTaskConfirmationBootstrap],
 });

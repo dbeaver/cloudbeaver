@@ -5,16 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { CachedMapAllKey, CachedMapResource, isResourceAlias, resourceKeyList, ResourceKeyUtils, type ResourceKey } from '@cloudbeaver/core-resource';
 import { GraphQLService, type GetUserGrantedTeamsQuery } from '@cloudbeaver/core-sdk';
 
 import { UsersResource } from './UsersResource.js';
 
 type UserGrantedTeams = GetUserGrantedTeamsQuery['user']['grantedTeamsInfo'];
 
-@injectable(() => [GraphQLService, UsersResource])
-export class UsersGrantedTeamsResource extends CachedMapResource<string, UserGrantedTeams> {
+export class UsersGrantedTeamsResourceImpl extends CachedMapResource<string, UserGrantedTeams> {
   constructor(
     private readonly graphQLService: GraphQLService,
     usersResource: UsersResource,
@@ -52,3 +51,33 @@ export class UsersGrantedTeamsResource extends CachedMapResource<string, UserGra
     return typeof key === 'string';
   }
 }
+
+export type UsersGrantedTeamsResource = UsersGrantedTeamsResourceImpl;
+
+export class UsersGrantedTeamsResourceDI extends Context.Service<UsersGrantedTeamsResourceDI, UsersGrantedTeamsResourceImpl>()(
+  '@cloudbeaver/core-authentication/UsersGrantedTeamsResource#UsersGrantedTeamsResource',
+) {
+  static readonly implementation = UsersGrantedTeamsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, UsersResource] as const;
+  static readonly make: Effect.Effect<
+    UsersGrantedTeamsResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof UsersResource>
+  > = Effect.gen(function* makeUsersGrantedTeamsResource() {
+    const graphQLService = yield* GraphQLService;
+    const usersResource = yield* UsersResource;
+
+    return new UsersGrantedTeamsResourceImpl(graphQLService, usersResource);
+  });
+  static readonly layer: Layer.Layer<
+    UsersGrantedTeamsResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof UsersResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UsersGrantedTeamsResource = UsersGrantedTeamsResourceDI;

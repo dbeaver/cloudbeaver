@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -15,8 +15,7 @@ import { VirtualFolderUtils } from './VirtualFolderUtils.js';
 const VirtualFolderTab = importLazyComponent(() => import('./VirtualFolderTab.js').then(m => m.VirtualFolderTab));
 const VirtualFolderPanel = importLazyComponent(() => import('./VirtualFolderPanel.js').then(m => m.VirtualFolderPanel));
 
-@injectable(() => [NavNodeViewService, NavNodeInfoResource])
-export class VirtualFolderViewBootstrap extends Bootstrap {
+export class VirtualFolderViewBootstrapImpl extends Bootstrap {
   constructor(
     private readonly navNodeViewService: NavNodeViewService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
@@ -70,3 +69,33 @@ export class VirtualFolderViewBootstrap extends Bootstrap {
     });
   }
 }
+
+export type VirtualFolderViewBootstrap = VirtualFolderViewBootstrapImpl;
+
+export class VirtualFolderViewBootstrapDI extends Context.Service<VirtualFolderViewBootstrapDI, VirtualFolderViewBootstrapImpl>()(
+  '@cloudbeaver/plugin-object-viewer/ObjectPropertiesPage/NavNodeView/VirtualFolder/VirtualFolderViewBootstrap#VirtualFolderViewBootstrap',
+) {
+  static readonly implementation = VirtualFolderViewBootstrapImpl;
+
+  static readonly dependencies = () => [NavNodeViewService, NavNodeInfoResource] as const;
+  static readonly make: Effect.Effect<
+    VirtualFolderViewBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof NavNodeViewService> | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Effect.gen(function* makeVirtualFolderViewBootstrap() {
+    const navNodeViewService = yield* NavNodeViewService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+
+    return new VirtualFolderViewBootstrapImpl(navNodeViewService, navNodeInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    VirtualFolderViewBootstrapDI,
+    never,
+    Context.Service.Identifier<typeof NavNodeViewService> | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const VirtualFolderViewBootstrap = VirtualFolderViewBootstrapDI;

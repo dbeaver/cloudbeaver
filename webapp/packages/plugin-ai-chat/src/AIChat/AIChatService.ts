@@ -8,7 +8,7 @@
 
 import { computed, makeObservable, runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 
@@ -22,8 +22,7 @@ interface ISettings {
   metrics: boolean;
 }
 
-@injectable(() => [ServerConfigResource, UserDataService, AIChatContextService, AIChatSettingsService, UserConfigurationStorage])
-export class AIChatService {
+export class AIChatServiceImpl {
   get settings(): ISettings {
     return this.userDataService.withStorage(this.userConfigurationStorage).getUserData(queryAiChatSettingsKey, getAiChatDefaultSettings);
   }
@@ -78,3 +77,43 @@ function getAiChatDefaultSettings(): ISettings {
     metrics: false,
   };
 }
+
+export type AIChatService = AIChatServiceImpl;
+
+export class AIChatServiceDI extends Context.Service<AIChatServiceDI, AIChatServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChat/AIChatService#AIChatService',
+) {
+  static readonly implementation = AIChatServiceImpl;
+  static readonly dependencies = () =>
+    [ServerConfigResource, UserDataService, AIChatContextService, AIChatSettingsService, UserConfigurationStorage] as const;
+  static readonly make: Effect.Effect<
+    AIChatServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof AIChatContextService>
+    | Context.Service.Identifier<typeof AIChatSettingsService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Effect.gen(function* makeAIChatService() {
+    const serverConfigResource = yield* ServerConfigResource;
+    const userDataService = yield* UserDataService;
+    const aiChatContextService = yield* AIChatContextService;
+    const aiChatSettingsService = yield* AIChatSettingsService;
+    const userConfigurationStorage = yield* UserConfigurationStorage;
+    return new AIChatServiceImpl(serverConfigResource, userDataService, aiChatContextService, aiChatSettingsService, userConfigurationStorage);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof AIChatContextService>
+    | Context.Service.Identifier<typeof AIChatSettingsService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatService = AIChatServiceDI;

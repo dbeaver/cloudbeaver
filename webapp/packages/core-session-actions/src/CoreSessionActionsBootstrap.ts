@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SessionResource } from '@cloudbeaver/core-root';
@@ -16,8 +16,7 @@ import { CbServerEventId, type WsOpenUrlEvent } from '@cloudbeaver/core-sdk';
 import { SessionActionsEventHandler } from './SessionActionsEventHandler.js';
 import { renderUrlConfirmationDetails } from './UrlConfirmationDetails.js';
 
-@injectable(() => [SessionActionsEventHandler, NotificationService, CommonDialogService, WindowsService, SessionResource])
-export class CoreSessionActionsBootstrap extends Bootstrap {
+export class CoreSessionActionsBootstrapImpl extends Bootstrap {
   constructor(
     private readonly sessionActionsEventHandler: SessionActionsEventHandler,
     private readonly notificationService: NotificationService,
@@ -67,3 +66,45 @@ export class CoreSessionActionsBootstrap extends Bootstrap {
     }
   }
 }
+
+export type CoreSessionActionsBootstrap = CoreSessionActionsBootstrapImpl;
+
+export class CoreSessionActionsBootstrapDI extends Context.Service<CoreSessionActionsBootstrapDI, CoreSessionActionsBootstrapImpl>()(
+  '@cloudbeaver/core-session-actions/CoreSessionActionsBootstrap#CoreSessionActionsBootstrap',
+) {
+  static readonly implementation = CoreSessionActionsBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [SessionActionsEventHandler, NotificationService, CommonDialogService, WindowsService, SessionResource] as const;
+  static readonly make: Effect.Effect<
+    CoreSessionActionsBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof SessionActionsEventHandler>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof WindowsService>
+    | Context.Service.Identifier<typeof SessionResource>
+  > = Effect.gen(function* makeCoreSessionActionsBootstrap() {
+    const sessionActionsEventHandler = yield* SessionActionsEventHandler;
+    const notificationService = yield* NotificationService;
+    const commonDialogService = yield* CommonDialogService;
+    const windowsService = yield* WindowsService;
+    const sessionResource = yield* SessionResource;
+
+    return new CoreSessionActionsBootstrapImpl(sessionActionsEventHandler, notificationService, commonDialogService, windowsService, sessionResource);
+  });
+  static readonly layer: Layer.Layer<
+    CoreSessionActionsBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof SessionActionsEventHandler>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof WindowsService>
+    | Context.Service.Identifier<typeof SessionResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const CoreSessionActionsBootstrap = CoreSessionActionsBootstrapDI;

@@ -7,7 +7,7 @@
  */
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource, ServerEventId, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
 import {
@@ -22,8 +22,7 @@ import { AISettingsResource } from '@cloudbeaver/plugin-ai';
 
 export type AIProfile = AiConfigurationProfileInfo;
 
-@injectable(() => [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler, UserInfoResource, AISettingsResource])
-export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
+export class AIProfilesResourceImpl extends CachedMapResource<string, AIProfile> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource,
@@ -116,6 +115,48 @@ export class AIProfilesResource extends CachedMapResource<string, AIProfile> {
     this.markOutdated(profileId);
   }
 }
+
+export type AIProfilesResource = AIProfilesResourceImpl;
+
+export class AIProfilesResourceDI extends Context.Service<AIProfilesResourceDI, AIProfilesResourceImpl>()(
+  '@cloudbeaver/plugin-ai-profiles/AIProfilesResource#AIProfilesResource',
+) {
+  static readonly implementation = AIProfilesResourceImpl;
+
+  static readonly dependencies = () =>
+    [GraphQLService, ServerConfigResource, WorkspaceConfigEventHandler, UserInfoResource, AISettingsResource] as const;
+  static readonly make: Effect.Effect<
+    AIProfilesResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof WorkspaceConfigEventHandler>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof AISettingsResource>
+  > = Effect.gen(function* makeAIProfilesResource() {
+    const graphQLService = yield* GraphQLService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const workspaceConfigEventHandler = yield* WorkspaceConfigEventHandler;
+    const userInfoResource = yield* UserInfoResource;
+    const aiSettingsResource = yield* AISettingsResource;
+
+    return new AIProfilesResourceImpl(graphQLService, serverConfigResource, workspaceConfigEventHandler, userInfoResource, aiSettingsResource);
+  });
+  static readonly layer: Layer.Layer<
+    AIProfilesResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof WorkspaceConfigEventHandler>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof AISettingsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIProfilesResource = AIProfilesResourceDI;
 
 export function compareAIProfiles(a: AIProfile, b: AIProfile): number {
   return a.name.localeCompare(b.name);

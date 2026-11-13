@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import {
   ClientEventId,
   type ISessionEvent,
@@ -19,8 +19,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type { IProjectInfoEvent };
 
-@injectable(() => [SessionEventSource])
-export class ProjectInfoEventHandler extends TopicEventHandler<IProjectInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
+export class ProjectInfoEventHandlerImpl extends TopicEventHandler<IProjectInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   private lastActiveProjects: string[];
 
   constructor(sessionEventSource: SessionEventSource) {
@@ -45,3 +44,26 @@ export class ProjectInfoEventHandler extends TopicEventHandler<IProjectInfoEvent
     return event;
   }
 }
+
+export type ProjectInfoEventHandler = ProjectInfoEventHandlerImpl;
+
+export class ProjectInfoEventHandlerDI extends Context.Service<ProjectInfoEventHandlerDI, ProjectInfoEventHandlerImpl>()(
+  '@cloudbeaver/core-projects/ProjectInfoEventHandler#ProjectInfoEventHandler',
+) {
+  static readonly implementation = ProjectInfoEventHandlerImpl;
+
+  static readonly dependencies = () => [SessionEventSource] as const;
+  static readonly make: Effect.Effect<ProjectInfoEventHandlerImpl, never, Context.Service.Identifier<typeof SessionEventSource>> = Effect.gen(
+    function* makeProjectInfoEventHandler() {
+      const sessionEventSource = yield* SessionEventSource;
+
+      return new ProjectInfoEventHandlerImpl(sessionEventSource);
+    },
+  );
+  static readonly layer: Layer.Layer<ProjectInfoEventHandlerDI, never, Context.Service.Identifier<typeof SessionEventSource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ProjectInfoEventHandler = ProjectInfoEventHandlerDI;

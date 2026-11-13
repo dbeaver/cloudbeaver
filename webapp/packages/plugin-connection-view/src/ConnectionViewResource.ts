@@ -18,17 +18,16 @@ import {
   isConnectionInfoParamEqual,
   parseConnectionKey,
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { schemaValidationError } from '@cloudbeaver/core-utils';
-import { GraphQLService, type DatabaseConnectionNavigatorViewSettingsFragment } from '@cloudbeaver/core-sdk';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { DEFAULT_NAVIGATOR_VIEW_SETTINGS, type NavigatorViewSettings } from '@cloudbeaver/core-root';
+import { type DatabaseConnectionNavigatorViewSettingsFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 type NavigatorViewSettingsInfo = DatabaseConnectionNavigatorViewSettingsFragment;
 
-@injectable(() => [GraphQLService, ConnectionInfoResource, ProjectsService])
-export class ConnectionViewResource extends CachedMapResource<IConnectionInfoParams, NavigatorViewSettingsInfo> {
+export class ConnectionViewResourceImpl extends CachedMapResource<IConnectionInfoParams, NavigatorViewSettingsInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -142,3 +141,38 @@ export class ConnectionViewResource extends CachedMapResource<IConnectionInfoPar
     return parse.success;
   }
 }
+
+export type ConnectionViewResource = ConnectionViewResourceImpl;
+
+export class ConnectionViewResourceDI extends Context.Service<ConnectionViewResourceDI, ConnectionViewResourceImpl>()(
+  '@cloudbeaver/plugin-connection-view/ConnectionViewResource#ConnectionViewResource',
+) {
+  static readonly implementation = ConnectionViewResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ConnectionInfoResource, ProjectsService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionViewResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ProjectsService>
+  > = Effect.gen(function* makeConnectionViewResource() {
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const projectsService = yield* ProjectsService;
+
+    return new ConnectionViewResourceImpl(graphQLService, connectionInfoResource, projectsService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionViewResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ProjectsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionViewResource = ConnectionViewResourceDI;

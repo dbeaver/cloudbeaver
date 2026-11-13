@@ -7,7 +7,7 @@
  */
 
 import { importLazyComponent, PlaceholderContainer, type PlaceholderComponent } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { AiChatAttachment, AiChatAttachmentInput } from '@cloudbeaver/core-sdk';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -62,8 +62,7 @@ function aiChatAttachmentsSubmissionContext(): { submission: IAIChatAttachmentsS
   return { submission: null };
 }
 
-@injectable(() => [NotificationService, AIChatInputService, AIChatMessageService])
-export class AIChatAttachmentsService {
+export class AIChatAttachmentsServiceImpl {
   readonly previews = new PlaceholderContainer<IAIChatAttachmentProps>();
   readonly messagePreviews = new PlaceholderContainer<IAIChatMessageAttachmentProps>();
 
@@ -242,3 +241,36 @@ export class AIChatAttachmentsService {
     return handler;
   }
 }
+
+export type AIChatAttachmentsService = AIChatAttachmentsServiceImpl;
+
+export class AIChatAttachmentsServiceDI extends Context.Service<AIChatAttachmentsServiceDI, AIChatAttachmentsServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChatAttachments/AIChatAttachmentsService#AIChatAttachmentsService',
+) {
+  static readonly implementation = AIChatAttachmentsServiceImpl;
+  static readonly dependencies = () => [NotificationService, AIChatInputService, AIChatMessageService] as const;
+  static readonly make: Effect.Effect<
+    AIChatAttachmentsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof AIChatInputService>
+    | Context.Service.Identifier<typeof AIChatMessageService>
+  > = Effect.gen(function* makeAIChatAttachmentsService() {
+    const notificationService = yield* NotificationService;
+    const aiChatInputService = yield* AIChatInputService;
+    const aiChatMessageService = yield* AIChatMessageService;
+    return new AIChatAttachmentsServiceImpl(notificationService, aiChatInputService, aiChatMessageService);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatAttachmentsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof AIChatInputService>
+    | Context.Service.Identifier<typeof AIChatMessageService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatAttachmentsService = AIChatAttachmentsServiceDI;

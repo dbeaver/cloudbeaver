@@ -7,7 +7,7 @@
  */
 import { toJS } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { type DatabaseConnectionToolsFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
@@ -17,8 +17,7 @@ import { ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqu
 
 export type ConnectionTools = DatabaseConnectionToolsFragment;
 
-@injectable(() => [GraphQLService, ConnectionInfoResource])
-export class ConnectionToolsResource extends CachedMapResource<IConnectionInfoParams, ConnectionTools> {
+export class ConnectionToolsResourceImpl extends CachedMapResource<IConnectionInfoParams, ConnectionTools> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -75,3 +74,33 @@ export class ConnectionToolsResource extends CachedMapResource<IConnectionInfoPa
     return parse.success;
   }
 }
+
+export type ConnectionToolsResource = ConnectionToolsResourceImpl;
+
+export class ConnectionToolsResourceDI extends Context.Service<ConnectionToolsResourceDI, ConnectionToolsResourceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionToolsResource#ConnectionToolsResource',
+) {
+  static readonly implementation = ConnectionToolsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionToolsResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeConnectionToolsResource() {
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new ConnectionToolsResourceImpl(graphQLService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionToolsResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionToolsResource = ConnectionToolsResourceDI;

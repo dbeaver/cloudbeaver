@@ -7,7 +7,7 @@
  */
 import { useContext, useEffect, useMemo, useState } from 'react';
 
-import { type IServiceConstructor, useService } from '@cloudbeaver/core-di';
+import { type ServiceType, useService } from '@cloudbeaver/core-di';
 import {
   CachedDataResource,
   type CachedDataResourceGetter,
@@ -26,15 +26,15 @@ import {
   ResourceKeyList,
   ResourceKeyListAlias,
 } from '@cloudbeaver/core-resource';
+import { SessionExpireService } from '@cloudbeaver/core-root';
 import { type ILoadableState, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
 import { mutex } from '@dbeaver/js-helpers';
-import { SessionExpireService } from '@cloudbeaver/core-root';
 
 import { ErrorContext } from '../ErrorContext.js';
-import { useObjectRef } from '../useObjectRef.js';
-import { useResourceTracker } from './useResourceTracker.js';
-import { useResourceStableKey, type ResourceKeyWithIncludes } from './useResourceStableKey.js';
 import { getComputed } from '../getComputed.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { type ResourceKeyWithIncludes, useResourceStableKey } from './useResourceStableKey.js';
+import { useResourceTracker } from './useResourceTracker.js';
 
 interface IActions {
   active?: boolean;
@@ -96,7 +96,7 @@ export function useResource<
   TIncludes extends Readonly<CachedResourceContext<TResource>>,
 >(
   component: { name: string },
-  ctor: IServiceConstructor<TResource> | TResource,
+  ctor: ServiceType<TResource> | TResource,
   keyObj: TResource extends any ? TKeyArg | null | ResourceKeyWithIncludes<TKeyArg, TIncludes> : never,
   actions?: IActions,
 ): TResult<TResource, TKeyArg, TIncludes>;
@@ -107,7 +107,7 @@ export function useResource<
   TIncludes extends CachedResourceContext<TResource>,
 >(
   component: { name: string },
-  ctor: IServiceConstructor<TResource> | TResource,
+  ctor: ServiceType<TResource> | TResource,
   keyObj: TResource extends any ? TKeyArg | null | ResourceKeyWithIncludes<TKeyArg, TIncludes> : never,
   actions?: IActions,
 ): IMapResourceResult<TResource, TIncludes> | IMapResourceListResult<TResource, TIncludes> | IDataResourceResult<TResource, TIncludes> {

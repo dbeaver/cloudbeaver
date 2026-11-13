@@ -6,18 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Disposable, injectable, IServiceProvider } from '@cloudbeaver/core-di';
-import type { ISqlEditorModel } from './ISqlEditorModel.js';
+import { Context, Disposable, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { makeObservable, observable } from 'mobx';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
-import { SqlEditorModel } from './SqlEditorModel.js';
 import type { QueryDataSource } from '../QueryDataSource.js';
+import type { ISqlEditorModel } from './ISqlEditorModel.js';
+import { SqlEditorModelFactory } from './SqlEditorModelFactory.js';
 
-@injectable(() => [IServiceProvider])
-export class SqlEditorModelService extends Disposable {
+export class SqlEditorModelServiceImpl extends Disposable {
   private readonly models: Map<string, ISqlEditorModel<any>>;
 
-  constructor(private readonly serviceProvider: IServiceProvider) {
+  constructor(private readonly modelFactory: Context.Service.Shape<typeof SqlEditorModelFactory>) {
     super();
     this.models = new Map();
 
@@ -30,7 +29,7 @@ export class SqlEditorModelService extends Disposable {
     let model = this.models.get(state.editorId);
 
     if (!model) {
-      model = this.serviceProvider.getService(SqlEditorModel);
+      model = this.modelFactory.create<TDataSource>();
 
       model.setState(state);
       this.models.set(state.editorId, model);
@@ -69,3 +68,24 @@ export class SqlEditorModelService extends Disposable {
     this.models.clear();
   }
 }
+
+export type SqlEditorModelService = SqlEditorModelServiceImpl;
+
+export class SqlEditorModelServiceDI extends Context.Service<SqlEditorModelServiceDI, SqlEditorModelServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlEditorModel/SqlEditorModelService#SqlEditorModelService',
+) {
+  static readonly implementation = SqlEditorModelServiceImpl;
+
+  static readonly dependencies = () => [SqlEditorModelFactory] as const;
+  static readonly make: Effect.Effect<SqlEditorModelServiceImpl, never, SqlEditorModelFactory> = Effect.gen(function* makeSqlEditorModelService() {
+    const modelFactory = yield* SqlEditorModelFactory;
+
+    return new SqlEditorModelServiceImpl(modelFactory);
+  });
+  static readonly layer: Layer.Layer<SqlEditorModelServiceDI, never, SqlEditorModelFactory> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlEditorModelService = SqlEditorModelServiceDI;

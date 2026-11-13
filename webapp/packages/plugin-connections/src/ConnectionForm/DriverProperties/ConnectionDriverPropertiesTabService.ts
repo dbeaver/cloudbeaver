@@ -5,16 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 const DriverProperties = importLazyComponent(() => import('./DriverProperties.js').then(m => m.DriverProperties));
 
-@injectable(() => [ConnectionFormService])
-export class ConnectionDriverPropertiesTabService extends Bootstrap {
+export class ConnectionDriverPropertiesTabServiceImpl extends Bootstrap {
   constructor(private readonly connectionFormService: ConnectionFormService) {
     super();
   }
@@ -39,3 +38,27 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     });
   }
 }
+
+export type ConnectionDriverPropertiesTabService = ConnectionDriverPropertiesTabServiceImpl;
+
+export class ConnectionDriverPropertiesTabServiceDI extends Context.Service<
+  ConnectionDriverPropertiesTabServiceDI,
+  ConnectionDriverPropertiesTabServiceImpl
+>()('@cloudbeaver/plugin-connections/ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService#ConnectionDriverPropertiesTabService') {
+  static readonly implementation = ConnectionDriverPropertiesTabServiceImpl;
+
+  static readonly dependencies = () => [ConnectionFormService] as const;
+  static readonly make: Effect.Effect<ConnectionDriverPropertiesTabServiceImpl, never, Context.Service.Identifier<typeof ConnectionFormService>> =
+    Effect.gen(function* makeConnectionDriverPropertiesTabService() {
+      const connectionFormService = yield* ConnectionFormService;
+
+      return new ConnectionDriverPropertiesTabServiceImpl(connectionFormService);
+    });
+  static readonly layer: Layer.Layer<ConnectionDriverPropertiesTabServiceDI, never, Context.Service.Identifier<typeof ConnectionFormService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const ConnectionDriverPropertiesTabService = ConnectionDriverPropertiesTabServiceDI;

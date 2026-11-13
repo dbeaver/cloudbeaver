@@ -19,7 +19,7 @@ import {
   type IConnectionInfoParams,
   type IRequireConnectionExecutorData,
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
@@ -29,19 +29,7 @@ import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
 
 const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialog/DatabaseAuthDialog.js').then(m => m.DatabaseAuthDialog));
 
-@injectable(() => [
-  ConnectionInfoResource,
-  ConnectionInfoNetworkHandlersResource,
-  ConnectionInfoAuthPropertiesResource,
-  ConnectionInfoExternalNetworkHandlersService,
-  CommonDialogService,
-  AuthProviderService,
-  UserInfoResource,
-  ConnectionsManagerService,
-  AuthenticationService,
-  NetworkHandlerResource,
-])
-export class ConnectionAuthService {
+export class ConnectionAuthServiceImpl {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
@@ -150,3 +138,82 @@ export class ConnectionAuthService {
     return this.connectionInfoResource.get(key)!;
   }
 }
+
+export type ConnectionAuthService = ConnectionAuthServiceImpl;
+
+export class ConnectionAuthServiceDI extends Context.Service<ConnectionAuthServiceDI, ConnectionAuthServiceImpl>()(
+  '@cloudbeaver/plugin-connections/ConnectionAuthService#ConnectionAuthService',
+) {
+  static readonly implementation = ConnectionAuthServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      ConnectionInfoResource,
+      ConnectionInfoNetworkHandlersResource,
+      ConnectionInfoAuthPropertiesResource,
+      ConnectionInfoExternalNetworkHandlersService,
+      CommonDialogService,
+      AuthProviderService,
+      UserInfoResource,
+      ConnectionsManagerService,
+      AuthenticationService,
+      NetworkHandlerResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConnectionAuthServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionInfoNetworkHandlersResource>
+    | Context.Service.Identifier<typeof ConnectionInfoAuthPropertiesResource>
+    | Context.Service.Identifier<typeof ConnectionInfoExternalNetworkHandlersService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof AuthProviderService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof AuthenticationService>
+    | Context.Service.Identifier<typeof NetworkHandlerResource>
+  > = Effect.gen(function* makeConnectionAuthService() {
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const connectionInfoNetworkHandlersResource = yield* ConnectionInfoNetworkHandlersResource;
+    const connectionInfoAuthPropertiesResource = yield* ConnectionInfoAuthPropertiesResource;
+    const connectionInfoExternalNetworkHandlersService = yield* ConnectionInfoExternalNetworkHandlersService;
+    const commonDialogService = yield* CommonDialogService;
+    const authProviderService = yield* AuthProviderService;
+    const userInfoResource = yield* UserInfoResource;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const authenticationService = yield* AuthenticationService;
+    const networkHandlerResource = yield* NetworkHandlerResource;
+
+    return new ConnectionAuthServiceImpl(
+      connectionInfoResource,
+      connectionInfoNetworkHandlersResource,
+      connectionInfoAuthPropertiesResource,
+      connectionInfoExternalNetworkHandlersService,
+      commonDialogService,
+      authProviderService,
+      userInfoResource,
+      connectionsManagerService,
+      authenticationService,
+      networkHandlerResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionAuthServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionInfoNetworkHandlersResource>
+    | Context.Service.Identifier<typeof ConnectionInfoAuthPropertiesResource>
+    | Context.Service.Identifier<typeof ConnectionInfoExternalNetworkHandlersService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof AuthProviderService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof AuthenticationService>
+    | Context.Service.Identifier<typeof NetworkHandlerResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionAuthService = ConnectionAuthServiceDI;

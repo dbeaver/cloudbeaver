@@ -7,16 +7,15 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { createConnectionParam, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, ResultDataFormat, type UpdateResultsDataBatchScriptMutationVariables } from '@cloudbeaver/core-sdk';
-import { DocumentEditAction, type IDatabaseDataModel, ResultSetDataSource, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
+import { DocumentEditAction, ResultSetDataSource, ResultSetEditAction, type IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 const ScriptPreviewDialog = importLazyComponent(() => import('./ScriptPreviewDialog.js').then(m => m.ScriptPreviewDialog));
 
-@injectable(() => [GraphQLService, CommonDialogService, NotificationService])
-export class ScriptPreviewService {
+export class ScriptPreviewServiceImpl {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly commonDialogService: CommonDialogService,
@@ -82,3 +81,38 @@ export class ScriptPreviewService {
     return response.result;
   }
 }
+
+export type ScriptPreviewService = ScriptPreviewServiceImpl;
+
+export class ScriptPreviewServiceDI extends Context.Service<ScriptPreviewServiceDI, ScriptPreviewServiceImpl>()(
+  '@cloudbeaver/plugin-sql-generator/ScriptPreview/ScriptPreviewService#ScriptPreviewService',
+) {
+  static readonly implementation = ScriptPreviewServiceImpl;
+
+  static readonly dependencies = () => [GraphQLService, CommonDialogService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    ScriptPreviewServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeScriptPreviewService() {
+    const graphQLService = yield* GraphQLService;
+    const commonDialogService = yield* CommonDialogService;
+    const notificationService = yield* NotificationService;
+
+    return new ScriptPreviewServiceImpl(graphQLService, commonDialogService, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    ScriptPreviewServiceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ScriptPreviewService = ScriptPreviewServiceDI;

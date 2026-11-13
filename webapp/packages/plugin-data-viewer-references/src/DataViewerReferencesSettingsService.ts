@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
@@ -17,8 +17,7 @@ const defaultSettings = schema.object({
 export type DataViewerReferencesSettingsSchema = typeof defaultSettings;
 export type DataViewerReferencesSettings = schema.infer<typeof defaultSettings>;
 
-@injectable(() => [SettingsProviderService])
-export class DataViewerReferencesSettingsService {
+export class DataViewerReferencesSettingsServiceImpl {
   get disabled(): boolean {
     return this.settings.getValue('plugin.data-viewer-references.disabled');
   }
@@ -29,3 +28,27 @@ export class DataViewerReferencesSettingsService {
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
   }
 }
+
+export type DataViewerReferencesSettingsService = DataViewerReferencesSettingsServiceImpl;
+
+export class DataViewerReferencesSettingsServiceDI extends Context.Service<
+  DataViewerReferencesSettingsServiceDI,
+  DataViewerReferencesSettingsServiceImpl
+>()('@cloudbeaver/plugin-data-viewer-references/DataViewerReferencesSettingsService#DataViewerReferencesSettingsService') {
+  static readonly implementation = DataViewerReferencesSettingsServiceImpl;
+
+  static readonly dependencies = () => [SettingsProviderService] as const;
+  static readonly make: Effect.Effect<DataViewerReferencesSettingsServiceImpl, never, Context.Service.Identifier<typeof SettingsProviderService>> =
+    Effect.gen(function* makeDataViewerReferencesSettingsService() {
+      const settingsProviderService = yield* SettingsProviderService;
+
+      return new DataViewerReferencesSettingsServiceImpl(settingsProviderService);
+    });
+  static readonly layer: Layer.Layer<DataViewerReferencesSettingsServiceDI, never, Context.Service.Identifier<typeof SettingsProviderService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const DataViewerReferencesSettingsService = DataViewerReferencesSettingsServiceDI;

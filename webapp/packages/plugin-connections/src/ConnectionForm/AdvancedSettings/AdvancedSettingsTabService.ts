@@ -8,7 +8,7 @@
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
@@ -17,8 +17,7 @@ import { isProviderPropertySupported } from './isProviderPropertySupported.js';
 
 const AdvancedSettings = importLazyComponent(() => import('./AdvancedSettings.js').then(m => m.AdvancedSettings));
 
-@injectable(() => [ConnectionFormService, DBDriverResource])
-export class AdvancedSettingsTabService extends Bootstrap {
+export class AdvancedSettingsTabServiceImpl extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
@@ -65,3 +64,33 @@ export class AdvancedSettingsTabService extends Bootstrap {
     });
   }
 }
+
+export type AdvancedSettingsTabService = AdvancedSettingsTabServiceImpl;
+
+export class AdvancedSettingsTabServiceDI extends Context.Service<AdvancedSettingsTabServiceDI, AdvancedSettingsTabServiceImpl>()(
+  '@cloudbeaver/plugin-connections/ConnectionForm/AdvancedSettings/AdvancedSettingsTabService#AdvancedSettingsTabService',
+) {
+  static readonly implementation = AdvancedSettingsTabServiceImpl;
+
+  static readonly dependencies = () => [ConnectionFormService, DBDriverResource] as const;
+  static readonly make: Effect.Effect<
+    AdvancedSettingsTabServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ConnectionFormService> | Context.Service.Identifier<typeof DBDriverResource>
+  > = Effect.gen(function* makeAdvancedSettingsTabService() {
+    const connectionFormService = yield* ConnectionFormService;
+    const dbDriverResource = yield* DBDriverResource;
+
+    return new AdvancedSettingsTabServiceImpl(connectionFormService, dbDriverResource);
+  });
+  static readonly layer: Layer.Layer<
+    AdvancedSettingsTabServiceDI,
+    never,
+    Context.Service.Identifier<typeof ConnectionFormService> | Context.Service.Identifier<typeof DBDriverResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AdvancedSettingsTabService = AdvancedSettingsTabServiceDI;

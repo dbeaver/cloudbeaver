@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 
 import { getResourceNodeId } from './NavNodes/getResourceNodeId.js';
 
-@injectable(() => [ResourceManagerResource])
-export class NavResourceNodeService {
+export class NavResourceNodeServiceImpl {
   constructor(private readonly resourceManagerResource: ResourceManagerResource) {}
 
   async move(key: string, newKey: string): Promise<string> {
@@ -32,3 +31,26 @@ export class NavResourceNodeService {
     return await this.resourceManagerResource.setProperties(key, diff);
   }
 }
+
+export type NavResourceNodeService = NavResourceNodeServiceImpl;
+
+export class NavResourceNodeServiceDI extends Context.Service<NavResourceNodeServiceDI, NavResourceNodeServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree-rm/NavResourceNodeService#NavResourceNodeService',
+) {
+  static readonly implementation = NavResourceNodeServiceImpl;
+
+  static readonly dependencies = () => [ResourceManagerResource] as const;
+  static readonly make: Effect.Effect<NavResourceNodeServiceImpl, never, Context.Service.Identifier<typeof ResourceManagerResource>> = Effect.gen(
+    function* makeNavResourceNodeService() {
+      const resourceManagerResource = yield* ResourceManagerResource;
+
+      return new NavResourceNodeServiceImpl(resourceManagerResource);
+    },
+  );
+  static readonly layer: Layer.Layer<NavResourceNodeServiceDI, never, Context.Service.Identifier<typeof ResourceManagerResource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavResourceNodeService = NavResourceNodeServiceDI;

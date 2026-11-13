@@ -6,36 +6,30 @@
  * you may not use this file except in compliance with the License.
  */
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { isResultSetContentValue, isResultSetComplexValue, type IResultSetComplexValue } from '@dbeaver/result-set-api';
+import { isResultSetComplexValue, isResultSetContentValue, type IResultSetComplexValue } from '@dbeaver/result-set-api';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { isNumber } from '@cloudbeaver/core-utils';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import type { IGridColumnKey, IGridDataKey } from '../Grid/IGridDataKey.js';
 import { DatabaseEditChangeType, IDatabaseDataEditAction } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
+import { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 import { isResultSetFileValue } from './isResultSetFileValue.js';
 import { isResultSetGeometryValue } from './isResultSetGeometryValue.js';
 import { ResultSetEditAction } from './ResultSetEditAction.js';
 import { ResultSetViewAction } from './ResultSetViewAction.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import { IDatabaseDataViewAction } from '../IDatabaseDataViewAction.js';
-import type { IGridColumnKey, IGridDataKey } from '../Grid/IGridDataKey.js';
-import { isNumber } from '@cloudbeaver/core-utils';
-import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 
 export type IResultSetValue =
-  | string
-  | number
-  | boolean
-  | Record<string, string | number | Record<string, any> | null>
-  | IResultSetComplexValue
-  | null;
+  string | number | boolean | Record<string, string | number | Record<string, any> | null> | IResultSetComplexValue | null;
 
 const DISPLAY_STRING_LENGTH = 200;
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataViewAction, IDatabaseDataEditAction])
-export class ResultSetFormatAction
+export class ResultSetFormatActionImpl
   extends DatabaseDataAction<any, IDatabaseResultSet>
   implements IDatabaseDataFormatAction<IGridDataKey, IResultSetValue, IDatabaseResultSet>
 {
@@ -345,3 +339,41 @@ export class ResultSetFormatAction
     });
   }
 }
+
+export type ResultSetFormatAction = ResultSetFormatActionImpl;
+
+export class ResultSetFormatActionDI extends Context.Service<ResultSetFormatActionDI, ResultSetFormatActionImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction#ResultSetFormatAction',
+) {
+  static readonly implementation = ResultSetFormatActionImpl;
+  static readonly dataFormat = ResultSetFormatActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataViewAction, IDatabaseDataEditAction] as const;
+  static readonly make: Effect.Effect<
+    ResultSetFormatActionImpl,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataViewAction>
+    | Context.Service.Identifier<typeof IDatabaseDataEditAction>
+  > = Effect.gen(function* makeResultSetFormatAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const view = yield* IDatabaseDataViewAction;
+    const edit = yield* IDatabaseDataEditAction;
+
+    return new ResultSetFormatActionImpl(source, result, view, edit);
+  });
+  static readonly layer: Layer.Layer<
+    ResultSetFormatActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataViewAction>
+    | Context.Service.Identifier<typeof IDatabaseDataEditAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResultSetFormatAction = ResultSetFormatActionDI;

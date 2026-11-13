@@ -1,26 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { ResourceManagerScriptsSettingsService } from './ResourceManagerScriptsSettingsService.js';
-import { PluginBootstrap } from './PluginBootstrap.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
+import { PluginBootstrap } from './PluginBootstrap.js';
 import { ResourceManagerScriptsService } from './ResourceManagerScriptsService.js';
+import { ResourceManagerScriptsSettingsService } from './ResourceManagerScriptsSettingsService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-resource-manager-scripts',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Dependency, proxy(ResourceManagerScriptsSettingsService))
-      .addSingleton(Bootstrap, PluginBootstrap)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(ResourceManagerScriptsService)
-      .addSingleton(ResourceManagerScriptsSettingsService);
-  },
+  services: () => [ResourceManagerScriptsService, ResourceManagerScriptsSettingsService],
+  bootstraps: () => [PluginBootstrap, LocaleService],
 });

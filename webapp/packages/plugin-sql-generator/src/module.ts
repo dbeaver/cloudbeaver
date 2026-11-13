@@ -6,25 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
+import { GeneratorMenuBootstrap } from './GeneratorMenuBootstrap.js';
+import { LocaleService } from './LocaleService.js';
+import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService.js';
+import { SqlGenerationService } from './SqlGenerators/SqlGenerationService.js';
 import { SqlGeneratorsBootstrap } from './SqlGenerators/SqlGeneratorsBootstrap.js';
 import { SqlGeneratorsResource } from './SqlGenerators/SqlGeneratorsResource.js';
-import { SqlGenerationService } from './SqlGenerators/SqlGenerationService.js';
-import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService.js';
-import { LocaleService } from './LocaleService.js';
-import { GeneratorMenuBootstrap } from './GeneratorMenuBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-generator',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Dependency, proxy(SqlGeneratorsResource))
-      .addSingleton(Bootstrap, GeneratorMenuBootstrap)
-      .addSingleton(Bootstrap, SqlGeneratorsBootstrap)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(SqlGeneratorsResource)
-      .addSingleton(SqlGenerationService)
-      .addSingleton(ScriptPreviewService);
-  },
+  services: () => [SqlGeneratorsResource, SqlGenerationService, ScriptPreviewService],
+  bootstraps: () => [GeneratorMenuBootstrap, SqlGeneratorsBootstrap, LocaleService],
 });

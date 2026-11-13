@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, resourceKeyList, ResourceKeyUtils, type ResourceKey } from '@cloudbeaver/core-resource';
-import { type AiDatabaseScope, GraphQLService } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type AiDatabaseScope } from '@cloudbeaver/core-sdk';
 
 import { AIChatConversationsResource } from '@cloudbeaver/plugin-ai-chat';
 
@@ -17,8 +17,7 @@ export interface IAIChatConversationScope {
   scope: AiDatabaseScope | null;
 }
 
-@injectable(() => [GraphQLService, AIChatConversationsResource])
-export class AIChatConversationScopeResource extends CachedMapResource<string, IAIChatConversationScope> {
+export class AIChatConversationScopeResourceImpl extends CachedMapResource<string, IAIChatConversationScope> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
@@ -65,3 +64,33 @@ export class AIChatConversationScopeResource extends CachedMapResource<string, I
     return typeof key === 'string';
   }
 }
+
+export type AIChatConversationScopeResource = AIChatConversationScopeResourceImpl;
+
+export class AIChatConversationScopeResourceDI extends Context.Service<AIChatConversationScopeResourceDI, AIChatConversationScopeResourceImpl>()(
+  '@cloudbeaver/plugin-connection-ai/connection-custom-scope/ai-chat/AIChatConversationScopeResource#AIChatConversationScopeResource',
+) {
+  static readonly implementation = AIChatConversationScopeResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, AIChatConversationsResource] as const;
+  static readonly make: Effect.Effect<
+    AIChatConversationScopeResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof AIChatConversationsResource>
+  > = Effect.gen(function* makeAIChatConversationScopeResource() {
+    const graphQLService = yield* GraphQLService;
+    const aiChatConversationsResource = yield* AIChatConversationsResource;
+
+    return new AIChatConversationScopeResourceImpl(graphQLService, aiChatConversationsResource);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatConversationScopeResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof AIChatConversationsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatConversationScopeResource = AIChatConversationScopeResourceDI;

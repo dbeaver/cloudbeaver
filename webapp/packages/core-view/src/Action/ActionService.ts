@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { DATA_CONTEXT_MENU } from '../Menu/DATA_CONTEXT_MENU.js';
@@ -16,8 +16,7 @@ import type { IActionHandler, IActionHandlerOptions } from './IActionHandler.js'
 import type { IActionItem } from './IActionItem.js';
 import { KeyBindingService } from './KeyBinding/KeyBindingService.js';
 
-@injectable(() => [KeyBindingService])
-export class ActionService {
+export class ActionServiceImpl {
   private readonly handlers: Map<string, IActionHandler>;
 
   constructor(private readonly keyBindingService: KeyBindingService) {
@@ -85,3 +84,26 @@ export class ActionService {
     return null;
   }
 }
+
+export type ActionService = ActionServiceImpl;
+
+export class ActionServiceDI extends Context.Service<ActionServiceDI, ActionServiceImpl>()(
+  '@cloudbeaver/core-view/Action/ActionService#ActionService',
+) {
+  static readonly implementation = ActionServiceImpl;
+
+  static readonly dependencies = () => [KeyBindingService] as const;
+  static readonly make: Effect.Effect<ActionServiceImpl, never, Context.Service.Identifier<typeof KeyBindingService>> = Effect.gen(
+    function* makeActionService() {
+      const keyBindingService = yield* KeyBindingService;
+
+      return new ActionServiceImpl(keyBindingService);
+    },
+  );
+  static readonly layer: Layer.Layer<ActionServiceDI, never, Context.Service.Identifier<typeof KeyBindingService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ActionService = ActionServiceDI;

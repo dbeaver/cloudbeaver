@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry, proxy, Dependency } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { UsersResource } from './UsersResource.js';
 import { UsersGrantedTeamsResource } from './UsersGrantedTeamsResource.js';
 import { UsersOriginDetailsResource } from './UsersOriginDetailsResource.js';
@@ -39,52 +39,33 @@ import { AppAuthService } from './AppAuthService.js';
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-authentication',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, UserConfigurationBootstrap)
-      .addSingleton(Dependency, proxy(AppAuthService))
-      .addSingleton(Dependency, proxy(UsersResource))
-      .addSingleton(Dependency, proxy(UsersGrantedTeamsResource))
-      .addSingleton(Dependency, proxy(UsersOriginDetailsResource))
-      .addSingleton(Dependency, proxy(UsersMetaParametersResource))
-      .addSingleton(Dependency, proxy(UserInfoResource))
-      .addSingleton(Dependency, proxy(UserConfigurationResource))
-      .addSingleton(Dependency, proxy(UserMetaParametersResource))
-      .addSingleton(Dependency, proxy(UserInfoMetaParametersResource))
-      .addSingleton(Dependency, proxy(TeamsResource))
-      .addSingleton(Dependency, proxy(TeamRolesResource))
-      .addSingleton(Dependency, proxy(TeamInfoMetaParametersResource))
-      .addSingleton(Dependency, proxy(TeamMetaParametersResource))
-      .addSingleton(Dependency, proxy(AuthRolesResource))
-      .addSingleton(Dependency, proxy(AuthProvidersResource))
-      .addSingleton(Dependency, proxy(AuthConfigurationsResource))
-      .addSingleton(Dependency, proxy(AuthConfigurationParametersResource))
-      .addSingleton(AppAuthService)
-      .addSingleton(UsersResource)
-      .addSingleton(UsersGrantedTeamsResource)
-      .addSingleton(UsersOriginDetailsResource)
-      .addSingleton(UsersMetaParametersResource)
-      .addSingleton(UserInfoResource)
-      .addSingleton(UserConfigurationResource)
-      .addSingleton(UserMetaParametersResource)
-      .addSingleton(UserInfoMetaParametersResource)
-      .addSingleton(UserDataService)
-      .addSingleton(UserConfigurationService)
-      .addSingleton(LocalUserDataStorage)
-      .addSingleton(UserConfigurationStorage)
-      .addSingleton(TeamsResource)
-      .addSingleton(TeamsManagerService)
-      .addSingleton(TeamRolesResource)
-      .addSingleton(TeamInfoMetaParametersResource)
-      .addSingleton(TeamMetaParametersResource)
-      .addSingleton(PasswordPolicyService)
-      .addSingleton(AuthRolesResource)
-      .addSingleton(AuthSettingsService)
-      .addSingleton(AuthProvidersResource)
-      .addSingleton(AuthProviderService)
-      .addSingleton(AuthInfoService)
-      .addSingleton(AuthConfigurationsResource)
-      .addSingleton(AuthConfigurationParametersResource);
-  },
+  services: () => [
+    AppAuthService,
+    UsersResource,
+    UsersGrantedTeamsResource,
+    UsersOriginDetailsResource,
+    UsersMetaParametersResource,
+    UserInfoResource,
+    UserConfigurationResource,
+    UserMetaParametersResource,
+    UserInfoMetaParametersResource,
+    UserDataService,
+    UserConfigurationService,
+    LocalUserDataStorage,
+    UserConfigurationStorage,
+    TeamsResource,
+    TeamsManagerService,
+    TeamRolesResource,
+    TeamInfoMetaParametersResource,
+    TeamMetaParametersResource,
+    PasswordPolicyService,
+    AuthRolesResource,
+    AuthSettingsService,
+    AuthProvidersResource,
+    AuthProviderService,
+    AuthInfoService,
+    AuthConfigurationsResource,
+    AuthConfigurationParametersResource,
+  ],
+  bootstraps: () => [LocaleService, UserConfigurationBootstrap],
 });

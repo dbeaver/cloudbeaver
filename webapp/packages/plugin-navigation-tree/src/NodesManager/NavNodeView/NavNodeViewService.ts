@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { untracked } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import type { INavNodeFolderTransform, NavNodeFolderTransformFn, NavNodeTransformView } from './IFolderTransform.js';
@@ -22,8 +22,7 @@ export interface INodeLimitedList {
   truncated: number;
 }
 
-@injectable(() => [NotificationService])
-export class NavNodeViewService {
+export class NavNodeViewServiceImpl {
   get tabs(): NavNodeTransformView[] {
     return this.transformers
       .filter(transform => transform.tab)
@@ -113,6 +112,29 @@ export class NavNodeViewService {
     }
   }
 }
+
+export type NavNodeViewService = NavNodeViewServiceImpl;
+
+export class NavNodeViewServiceDI extends Context.Service<NavNodeViewServiceDI, NavNodeViewServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/NodesManager/NavNodeView/NavNodeViewService#NavNodeViewService',
+) {
+  static readonly implementation = NavNodeViewServiceImpl;
+
+  static readonly dependencies = () => [NotificationService] as const;
+  static readonly make: Effect.Effect<NavNodeViewServiceImpl, never, Context.Service.Identifier<typeof NotificationService>> = Effect.gen(
+    function* makeNavNodeViewService() {
+      const notificationService = yield* NotificationService;
+
+      return new NavNodeViewServiceImpl(notificationService);
+    },
+  );
+  static readonly layer: Layer.Layer<NavNodeViewServiceDI, never, Context.Service.Identifier<typeof NotificationService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavNodeViewService = NavNodeViewServiceDI;
 
 function sortTransformations({ order: orderA }: INavNodeFolderTransform, { order: orderB }: INavNodeFolderTransform): number {
   if (orderA === orderB) {

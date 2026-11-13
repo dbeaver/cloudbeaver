@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,7 +9,7 @@ import { expect, test } from 'vitest';
 
 import { App } from '../../App.js';
 import { TestBootstrap } from './TestBootstrap.js';
-import { TestService } from './TestService.js';
+import { TestService, TestServiceImpl } from './TestService.js';
 import testModule from './module.js';
 
 test('App Initialization', async () => {
@@ -21,7 +21,7 @@ test('App Initialization', async () => {
   const service = serviceProvider.getService(TestService);
   const bootstrap = serviceProvider.getService(TestBootstrap);
 
-  expect(service).toBeInstanceOf(TestService);
+  expect(service).toBeInstanceOf(TestServiceImpl);
   expect(service.sum(1, 2)).toBe(3);
 
   expect(bootstrap.loaded).toBe(false);
@@ -35,4 +35,5 @@ test('App Initialization', async () => {
   await (app as any).loadServices();
   expect(bootstrap.loaded).toBe(true);
   expect(bootstrap.sum).toBe(3);
+  await app.unload();
 });

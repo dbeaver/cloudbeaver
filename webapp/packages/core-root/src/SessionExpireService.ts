@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { EServerErrorCode, GQLError, GraphQLService, SessionError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
@@ -13,8 +13,7 @@ import { makeObservable, observable } from 'mobx';
 
 export const SESSION_EXPIRE_MIN_TIME = 5 * 1000 * 60;
 
-@injectable(() => [GraphQLService])
-export class SessionExpireService extends Bootstrap {
+export class SessionExpireServiceImpl extends Bootstrap {
   private isExpired = false;
 
   onSessionExpire: IExecutor;
@@ -63,3 +62,26 @@ export class SessionExpireService extends Bootstrap {
     }
   }
 }
+
+export type SessionExpireService = SessionExpireServiceImpl;
+
+export class SessionExpireServiceDI extends Context.Service<SessionExpireServiceDI, SessionExpireServiceImpl>()(
+  '@cloudbeaver/core-root/SessionExpireService#SessionExpireService',
+) {
+  static readonly implementation = SessionExpireServiceImpl;
+
+  static readonly dependencies = () => [GraphQLService] as const;
+  static readonly make: Effect.Effect<SessionExpireServiceImpl, never, Context.Service.Identifier<typeof GraphQLService>> = Effect.gen(
+    function* makeSessionExpireService() {
+      const graphQLService = yield* GraphQLService;
+
+      return new SessionExpireServiceImpl(graphQLService);
+    },
+  );
+  static readonly layer: Layer.Layer<SessionExpireServiceDI, never, Context.Service.Identifier<typeof GraphQLService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SessionExpireService = SessionExpireServiceDI;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList, type ResourceKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, type ConnectionType as ConnectionTypeFragment } from '@cloudbeaver/core-sdk';
@@ -19,8 +19,7 @@ export type ConnectionType = ConnectionTypeFragment;
 export const NEW_CONNECTION_TYPE_SYMBOL = Symbol('new-connection-type');
 export type NewConnectionType = ConnectionType & { [NEW_CONNECTION_TYPE_SYMBOL]: boolean; timestamp: number };
 
-@injectable(() => [GraphQLService, ConnectionInfoResource, ServerConfigResource])
-export class ConnectionTypeResource extends CachedMapResource<string, ConnectionType> {
+export class ConnectionTypeResourceImpl extends CachedMapResource<string, ConnectionType> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -103,6 +102,41 @@ export class ConnectionTypeResource extends CachedMapResource<string, Connection
     this.connectionInfoResource.markOutdated(result);
   }
 }
+
+export type ConnectionTypeResource = ConnectionTypeResourceImpl;
+
+export class ConnectionTypeResourceDI extends Context.Service<ConnectionTypeResourceDI, ConnectionTypeResourceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionType/ConnectionTypeResource#ConnectionTypeResource',
+) {
+  static readonly implementation = ConnectionTypeResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ConnectionInfoResource, ServerConfigResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionTypeResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+  > = Effect.gen(function* makeConnectionTypeResource() {
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const serverConfigResource = yield* ServerConfigResource;
+
+    return new ConnectionTypeResourceImpl(graphQLService, connectionInfoResource, serverConfigResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionTypeResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionTypeResource = ConnectionTypeResourceDI;
 
 function isNewConnectionType(connection: ConnectionType | NewConnectionType): connection is NewConnectionType {
   return (connection as NewConnectionType)[NEW_CONNECTION_TYPE_SYMBOL];

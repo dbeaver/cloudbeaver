@@ -6,19 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 
 import { AIChatConversationProfileService } from './AIChatConversationProfileService.js';
-import { PluginBootstrap } from './PluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
+import { PluginBootstrap } from './PluginBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-chat-profiles',
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Dependency, proxy(AIChatConversationProfileService))
-      .addSingleton(AIChatConversationProfileService)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, PluginBootstrap);
-  },
+  services: () => [AIChatConversationProfileService],
+  bootstraps: () => [LocaleService, PluginBootstrap],
 });
