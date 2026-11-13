@@ -159,7 +159,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Подключения'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Поиск по названию подключения...'],
   ['administration_teams_team_granted_connections_empty', 'Нет доступных подключений'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Команда по умолчанию. Не может быть отозвана'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Команда по умолчанию. Нельзя исключить пользователя'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Команда по умолчанию. Содержит всех пользователей'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Супервайзер'],
   [

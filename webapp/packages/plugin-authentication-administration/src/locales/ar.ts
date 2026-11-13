@@ -150,7 +150,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'الاتصالات'],
   ['administration_teams_team_granted_connections_search_placeholder', 'البحث عن اسم الاتصال...'],
   ['administration_teams_team_granted_connections_empty', 'لا توجد اتصالات متاحة'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'فريق افتراضي. لا يمكن سحب عضويته'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'الفريق الافتراضي. لا يمكن إزالة المستخدم منه'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'فريق افتراضي. يضم جميع المستخدمين'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'مشرف'],
   ['plugin_authentication_administration_team_user_team_role_supervisor_description', 'يمكن للمشرفين عرض الاستعلامات التي نفذها فريقهم'],
