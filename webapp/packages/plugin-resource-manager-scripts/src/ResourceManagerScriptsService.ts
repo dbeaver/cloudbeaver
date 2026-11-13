@@ -80,7 +80,28 @@ export class ResourceManagerScriptsService {
     this.settings.active = !this.settings.active;
   }
 
-  selectTab() {
+  toggleTab(): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.togglePanel();
+
+    if (this.active) {
+      this.selectTab();
+    }
+  }
+
+  openPanel(): void {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.settings.active = true;
+    this.selectTab();
+  }
+
+  selectTab(): void {
     this.sideBarPanelService.tabsContainer.select(SCRIPTS_TAB_ID);
   }
 

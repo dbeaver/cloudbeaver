@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, Pane, Placeholder, ResizerControls, s, SlideDialog, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, Placeholder, ResizerControls, s, SlideDialog, Split, useS, type useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
@@ -16,17 +16,17 @@ import style from './RightArea.module.css';
 
 interface Props {
   className?: string;
+  splitState: ReturnType<typeof useSplitUserState>;
+  bottomPanelDisabled: boolean;
+  bottomPanelSlot: React.ReactNode;
 }
 
-export const RightArea = observer<Props>(function RightArea({ className }) {
+export const RightArea = observer<Props>(function RightArea({ className, splitState, bottomPanelDisabled, bottomPanelSlot }) {
   const styles = useS(style);
   const appScreenService = useService(AppScreenService);
   const optionsPanelService = useService(OptionsPanelService);
-  const splitState = useSplitUserState('right-area');
 
   const OptionsPanel = optionsPanelService.getPanelComponent();
-
-  const toolsDisabled = appScreenService.rightAreaBottom.getDisplayed({}).length === 0;
 
   function close() {
     optionsPanelService.close();
@@ -34,7 +34,14 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
 
   return (
     <div data-panel-id={PANEL_ID_MAIN_CONTENT} tabIndex={-1} className={s(styles, { container: true }, className)}>
-      <Split {...splitState} sticky={30} split="horizontal" mode={toolsDisabled ? 'minimize' : splitState.mode} disable={toolsDisabled} keepRatio>
+      <Split
+        {...splitState}
+        sticky={30}
+        split="horizontal"
+        mode={bottomPanelDisabled ? 'minimize' : splitState.mode}
+        disable={bottomPanelDisabled}
+        keepRatio
+      >
         <Pane className={s(styles, { pane: true })}>
           <Loader className={s(styles, { loader: true })} suspense>
             <Placeholder container={appScreenService.rightAreaTop} />
@@ -43,7 +50,7 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
         <ResizerControls />
         <Pane className={s(styles, { pane: true })} basis="30%" main>
           <Loader className={s(styles, { loader: true })} suspense>
-            <Placeholder container={appScreenService.rightAreaBottom} />
+            {bottomPanelSlot}
           </Loader>
         </Pane>
       </Split>

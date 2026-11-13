@@ -9,17 +9,20 @@ import { computed, makeObservable } from 'mobx';
 
 import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { BottomPanelService } from '@cloudbeaver/core-ui';
 import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
 import { LogViewerSettingsService } from './LogViewerSettingsService.js';
 
 const logViewerSettingsKey = 'log-viewer';
 
+export const LOG_VIEWER_TAB_ID = 'log-viewer-tab';
+
 interface ISettings {
   active: boolean;
 }
 
-@injectable(() => [UserDataService, ToolsPanelService, LogViewerSettingsService, UserConfigurationStorage])
+@injectable(() => [UserDataService, ToolsPanelService, LogViewerSettingsService, BottomPanelService, UserConfigurationStorage])
 export class LogViewerService {
   get settings() {
     return this.userDataService.withStorage(this.userConfigurationStorage).getUserData(logViewerSettingsKey, getLogViewerDefaultSettings);
@@ -37,6 +40,7 @@ export class LogViewerService {
     private readonly userDataService: UserDataService,
     private readonly toolsPanelService: ToolsPanelService,
     private readonly logViewerSettingsService: LogViewerSettingsService,
+    private readonly bottomPanelService: BottomPanelService,
     private readonly userConfigurationStorage: UserConfigurationStorage,
   ) {
     makeObservable<LogViewerService>(this, {
@@ -51,6 +55,22 @@ export class LogViewerService {
     } else {
       this.settings.active = true;
     }
+  }
+
+  toggleTab(): void {
+    if (this.disabled) {
+      return;
+    }
+
+    this.toggle();
+
+    if (this.isActive) {
+      this.selectTab();
+    }
+  }
+
+  selectTab(): void {
+    this.bottomPanelService.tabsContainer.select(LOG_VIEWER_TAB_ID);
   }
 }
 

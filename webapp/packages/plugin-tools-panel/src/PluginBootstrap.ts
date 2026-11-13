@@ -6,33 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { AppScreenService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { BottomPanelService } from '@cloudbeaver/core-ui';
 import { MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 import { MENU_TOOLS } from './Menu/MENU_TOOLS.js';
 import { ToolsPanelService } from './ToolsPanel/ToolsPanelService.js';
 
-const ToolsPanel = importLazyComponent(() => import('./ToolsPanel/ToolsPanel.js').then(module => module.ToolsPanel));
-
-@injectable(() => [AppScreenService, MenuService, ToolsPanelService])
+@injectable(() => [MenuService, ToolsPanelService, BottomPanelService])
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly appScreenService: AppScreenService,
     private readonly menuService: MenuService,
     private readonly toolsPanelService: ToolsPanelService,
+    private readonly bottomPanelService: BottomPanelService,
   ) {
     super();
   }
 
   override register(): void {
-    this.appScreenService.rightAreaBottom.add(
-      ToolsPanel,
-      undefined,
-      () => this.toolsPanelService.disabled || this.toolsPanelService.tabsContainer.getDisplayed().length === 0,
-    );
+    this.bottomPanelService.isDisabled = () => this.toolsPanelService.disabled;
 
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],

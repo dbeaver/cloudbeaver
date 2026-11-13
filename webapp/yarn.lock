@@ -3910,6 +3910,7 @@ __metadata:
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-tools-panel": "workspace:*"
@@ -5059,8 +5060,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-tools-panel@workspace:packages/plugin-tools-panel"
   dependencies:
-    "@cloudbeaver/core-app": "workspace:*"
-    "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
@@ -5070,15 +5069,10 @@ __metadata:
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
-    "@types/react": "npm:^19"
     mobx: "npm:^6"
-    mobx-react-lite: "npm:^4"
-    react: "npm:^19"
-    react-dom: "npm:^19"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 

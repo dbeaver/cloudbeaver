@@ -8,12 +8,6 @@
   },
   "references": [
     {
-      "path": "../core-app"
-    },
-    {
-      "path": "../core-blocks"
-    },
-    {
       "path": "../core-cli"
     },
     {
@@ -38,14 +32,6 @@
       "path": "../plugin-top-app-bar"
     }
   ],
-  "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
-    "src/**/*.json",
-    "src/**/*.css"
-  ],
-  "exclude": [
-    "**/node_modules",
-    "lib/**/*"
-  ]
+  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css"],
+  "exclude": ["**/node_modules", "lib/**/*"]
 }
