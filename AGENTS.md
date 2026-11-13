@@ -55,6 +55,8 @@ Before pushing CE or EE changes, read and follow `.agents/skills/pre-push-checks
 
 Before creating a pull request or writing/updating its description, read and follow `.agents/skills/file-pr/SKILL.md` in this repository.
 
+When writing or reviewing user-facing text, read and follow `.agents/skills/clean-copy/SKILL.md` in this repository.
+
 ### Working conventions
 
 - Put changes in the smallest package that owns the behavior. Prefer existing `core-*` abstractions and UI primitives before adding cross-package helpers.
