@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { Select, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { type IVersion, VersionResource } from '@cloudbeaver/core-version';
+import { type IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 import { VersionInfo } from './VersionInfo.js';
@@ -24,6 +24,7 @@ interface Props {
 export const VersionSelector = observer<Props>(function VersionSelector({ versions }) {
   const versionUpdateService = useService(VersionUpdateService);
   const versionResource = useService(VersionResource);
+  const versionService = useService(VersionService);
   const serverConfigResource = useService(ServerConfigResource);
   const translate = useTranslate();
   const style = useS(styles);
@@ -46,7 +47,11 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         <Select
           items={versions}
           keySelector={value => value.number}
-          valueSelector={value => value.number}
+          valueSelector={value =>
+            versionService.isHotfix(value.number)
+              ? `${value.number} · ${translate('plugin_version_update_administration_hotfix_label')}`
+              : value.number
+          }
           value={selected}
           tiny
           onSelect={value => setSelected(value)}
