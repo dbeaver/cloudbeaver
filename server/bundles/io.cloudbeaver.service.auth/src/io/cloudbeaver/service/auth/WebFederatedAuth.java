@@ -20,13 +20,20 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.auth.impl.WebServiceAuthImpl;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.registry.WebAuthProviderRegistry;
+import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
+import org.jkiss.utils.CommonUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public final class WebFederatedAuth {
@@ -39,15 +46,46 @@ public final class WebFederatedAuth {
     @NotNull
     public static WebAsyncAuthStatus login(
         @NotNull HttpServletRequest request,
-        @NotNull WebSession webSession,
+        @NotNull WebSession inputWebSession,
         @NotNull String providerId,
         @Nullable String configurationId,
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
-        return new WebServiceAuthImpl().federatedLogin(
-            request, webSession, providerId, configurationId, linkWithActiveUser, forceSessionsLogout
-        );
+        WebSession webSession = inputWebSession;
+        if (inputWebSession.getUser() == null) {
+            // Rotate anonymous web sessions during login attempts to prevent session fixation attacks.
+            webSession = CBApplication.getInstance().getSessionManager()
+                .rotateSession(request, inputWebSession);
+        }
+
+        WebAuthProviderDescriptor providerDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
+        if (providerDescriptor == null) {
+            throw new DBWebException("Provider '" + providerId + "' not found");
+        }
+        if (!providerDescriptor.isFederated()) {
+            throw new DBWebException("Provider '" + providerId + "' is not federated");
+        }
+        try {
+            Map<String, Object> authParameters = new HashMap<>();
+            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getHostOriginFromRequest(request));
+
+            var authInfo = WebAuthUtils.initiateAuthentication(
+                webSession, providerId, configurationId, authParameters, forceSessionsLogout
+            );
+            if (authInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
+                throw new DBWebException("Unexpected auth status: " + authInfo.getAuthStatus());
+            }
+            if (CommonUtils.isEmpty(authInfo.getRedirectUrl())) {
+                throw new DBWebException("Missing redirect URL");
+            }
+            WebAsyncTaskInfo task = createTask(webSession, authInfo, linkWithActiveUser);
+            return new WebAsyncAuthStatus(authInfo.getRedirectUrl(), task);
+        } catch (SMTooManySessionsException e) {
+            throw new DBWebException("User authentication failed", e.getErrorType(), e);
+        } catch (Exception e) {
+            throw new DBWebException("User authentication failed", e);
+        }
     }
 
     @NotNull

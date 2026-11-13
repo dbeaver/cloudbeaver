@@ -21,6 +21,7 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.auth.WebAsyncAuthJob;
+import io.cloudbeaver.service.auth.WebAuthUtils;
 import io.cloudbeaver.service.auth.WebFederatedAuth;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
@@ -35,6 +36,16 @@ import java.util.Map;
 public class WebFederatedAuthTest {
     private static final String OWNER_SESSION_ID = "owner-session";
     private static final String AUTH_ID = "test-auth-attempt";
+
+    @Test
+    public void authenticationWithoutProviderIsRejectedBeforeAccessingSession() {
+        WebSession session = Mockito.mock(WebSession.class);
+
+        Assertions.assertThrows(DBWebException.class, () -> WebAuthUtils.initiateAuthentication(
+            session, "", null, Map.of(), false
+        ));
+        Mockito.verifyNoInteractions(session);
+    }
 
     @Test
     public void cannotAttachForeignAuthAttempt() {
