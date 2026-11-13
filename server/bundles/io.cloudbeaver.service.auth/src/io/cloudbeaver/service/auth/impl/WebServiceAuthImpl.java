@@ -113,7 +113,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
-        return WebFederatedAuth.login(
+        return WebAuthUtils.federatedLogin(
             httpRequest, inputWebSession, providerId, providerConfigurationId, linkWithActiveUser, forceSessionsLogout
         );
     }

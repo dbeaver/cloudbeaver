@@ -22,7 +22,6 @@ import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.auth.WebAsyncAuthJob;
 import io.cloudbeaver.service.auth.WebAuthUtils;
-import io.cloudbeaver.service.auth.WebFederatedAuth;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +32,7 @@ import org.mockito.Mockito;
 import java.util.List;
 import java.util.Map;
 
-public class WebFederatedAuthTest {
+public class WebAuthUtilsTest {
     private static final String OWNER_SESSION_ID = "owner-session";
     private static final String AUTH_ID = "test-auth-attempt";
 
@@ -52,7 +51,7 @@ public class WebFederatedAuthTest {
         WebSession session = Mockito.mock(WebSession.class);
         Mockito.when(session.getSessionId()).thenReturn("other-session");
 
-        Assertions.assertThrows(DBWebException.class, () -> WebFederatedAuth.createTask(session, pendingAuth(), false));
+        Assertions.assertThrows(DBWebException.class, () -> WebAuthUtils.createTask(session, pendingAuth(), false));
         Mockito.verify(session, Mockito.never()).createAsyncTask(Mockito.anyString());
         Mockito.verify(session, Mockito.never()).getSecurityController();
     }
@@ -62,7 +61,7 @@ public class WebFederatedAuthTest {
         WebSession session = Mockito.mock(WebSession.class);
         Mockito.when(session.getSessionId()).thenReturn(OWNER_SESSION_ID);
 
-        Assertions.assertThrows(DBWebException.class, () -> WebFederatedAuth.createTask(
+        Assertions.assertThrows(DBWebException.class, () -> WebAuthUtils.createTask(
             session, SMAuthInfo.expired(AUTH_ID, Map.of(), true, OWNER_SESSION_ID), false
         ));
         Mockito.verify(session, Mockito.never()).createAsyncTask(Mockito.anyString());
@@ -77,7 +76,7 @@ public class WebFederatedAuthTest {
         task.setRunning(true);
         Mockito.when(session.findTasksByJob(WebAsyncAuthJob.class)).thenReturn(List.of(task));
 
-        Assertions.assertSame(task, WebFederatedAuth.createTask(session, pendingAuth(), false));
+        Assertions.assertSame(task, WebAuthUtils.createTask(session, pendingAuth(), false));
         Mockito.verify(session, Mockito.never()).createAsyncTask(Mockito.anyString());
     }
 
@@ -86,7 +85,7 @@ public class WebFederatedAuthTest {
         WebSession session = Mockito.mock(WebSession.class);
         WebAsyncTaskInfo task = new WebAsyncTaskInfo("task-1", "Federated authentication");
 
-        WebFederatedAuth.saveAutoLoginAction(session, task);
+        WebAuthUtils.saveAutoLoginAction(session, task);
 
         ArgumentCaptor<WebActionParameters> action = ArgumentCaptor.forClass(WebActionParameters.class);
         Mockito.verify(session).setAttribute(Mockito.eq("action-parameters"), action.capture());
