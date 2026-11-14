@@ -221,6 +221,9 @@
       "path": "../plugin-datasource-transaction-manager"
     },
     {
+      "path": "../plugin-dbadmin"
+    },
+    {
       "path": "../plugin-ddl-viewer"
     },
     {
