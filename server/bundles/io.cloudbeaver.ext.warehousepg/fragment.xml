@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<!--
+    EDB WarehousePG support.
+    This is a fragment of org.jkiss.dbeaver.ext.greenplum: WarehousePG is a Greenplum fork,
+    so it reuses the Greenplum model (external tables, distribution policy, DDL, dialect).
+    Icon paths are resolved through the host bundle, which also searches attached fragments.
+    Java classes must stay in an org.jkiss.dbeaver.* package: navigator visibleIf expressions
+    (e.g. dataSource.serverType.supportsEncodings()) are evaluated by JEXL, and
+    AbstractDescriptor.DBeaverJexlPermissions only allows introspection of org.jkiss.dbeaver.*,
+    org.jkiss.utils.* and com.dbeaver.* classes. Other packages make those nodes disappear.
+-->
+<fragment>
+    <extension point="org.jkiss.dbeaver.postgresql.serverType">
+        <serverType id="warehousepg"
+                    name="WarehousePG"
+                    class="org.jkiss.dbeaver.ext.warehousepg.model.PostgreServerWarehousePG"
+                    logo="icons/warehousepg_logo.png"
+                    customURL="true"
+                    turnOffPreparedStatements="true"/>
+    </extension>
+
+    <extension point="org.jkiss.dbeaver.dataSourceProvider">
+        <dataSourceType
+            id="warehousepg"
+            label="WarehousePG"
+            description="EDB WarehousePG database"
+            dataSourceInformation="High-performance analytical database platform"
+            icon="icons/warehousepg_icon.png"
+            iconBig="icons/warehousepg_icon_big.png"
+            logoImage="icons/warehousepg_logo.png"/>
+        <datasource
+                class="org.jkiss.dbeaver.ext.warehousepg.WarehousePGDataSourceProvider"
+                description="EDB WarehousePG datasource"
+                id="warehousepg"
+                dataSourceType="warehousepg"
+                parent="greenplum"
+                label="WarehousePG"
+                icon="icons/warehousepg_icon.png"
+                dialect="greenplum"
+                inheritClients="true"
+                inheritProviderProperties="true">
+
+            <drivers managable="true">
+                <driver
+                        id="warehousepg-jdbc"
+                        label="WarehousePG"
+                        class="org.postgresql.Driver"
+                        sampleURL="jdbc:postgresql://{host}[:{port}]/[{database}]"
+                        defaultPort="5432"
+                        webURL="https://warehouse-pg.io/"
+                        propertiesURL="https://jdbc.postgresql.org/documentation/head/connect.html#connection-parameters"
+                        databaseDocumentationSuffixURL=""
+                        description="EDB WarehousePG JDBC driver"
+                        categories="sql,analytic">
+
+                    <file type="jar" path="maven:/org.postgresql:postgresql:RELEASE[42.7.14]"
+                          bundle="!drivers.postgresql"/>
+                    <file type="jar" path="maven:/net.postgis:postgis-jdbc:RELEASE[2.5.0]" ignore-dependencies="true"
+                          optional="true" bundle="!drivers.postgresql"/>
+                    <file type="jar" path="maven:/net.postgis:postgis-jdbc-jtsparser:RELEASE[2.5.0]"
+                          ignore-dependencies="true" optional="true" bundle="!drivers.postgresql"/>
+                    <file type="jar" path="maven:/net.postgis:postgis-geometry:RELEASE[2.5.0]"
+                          ignore-dependencies="true" optional="true" bundle="!drivers.postgresql"/>
+                    <file type="license" path="licenses/external/pg.txt"/>
+                    <file type="jar" path="drivers/postgresql" bundle="drivers.postgresql"/>
+                    <file type="jar" path="drivers/postgis" bundle="drivers.postgresql"/>
+                    <parameter name="serverType" value="warehousepg"/>
+                    <property name="loginTimeout" value="20"/>
+                    <property name="connectTimeout" value="20"/>
+                    <property name="prepareThreshold" value="0"/>
+                </driver>
+            </drivers>
+        </datasource>
+    </extension>
+</fragment>
