@@ -1,0 +1,11 @@
+fragment DBAdminLockItemList on DBAdminLockItemList {
+  sessionId
+  columns {
+    id
+    displayName
+    description
+  }
+  items {
+    values
+  }
+}

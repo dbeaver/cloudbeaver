@@ -1,0 +1,10 @@
+query dbAdminGetLockDetails($projectId: ID!, $connectionId: ID!, $lockId: ID!) {
+  details: dbAdminGetLockDetails(projectId: $projectId, connectionId: $connectionId, lockId: $lockId) {
+    waiting {
+      ...DBAdminLockItemList
+    }
+    holding {
+      ...DBAdminLockItemList
+    }
+  }
+}

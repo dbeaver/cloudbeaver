@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: Cloudbeaver Web Service - Database Administration
+Bundle-SymbolicName: io.cloudbeaver.service.dbadmin;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Release-Date: 20261130
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Bundle-ActivationPolicy: lazy
+Require-Bundle: io.cloudbeaver.server,
+ org.jkiss.dbeaver.ext.postgresql
+Automatic-Module-Name: io.cloudbeaver.service.dbadmin
