@@ -9,7 +9,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, Effect, IServiceProvider, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -23,8 +23,7 @@ const AIProfileForm = importLazyComponent(() => import('./AIProfileForm.js').the
 
 const formGetter = () => AIProfileForm;
 
-@injectable(() => [LocalizationService, NotificationService, OptionsPanelService, IServiceProvider, CommonDialogService])
-export class AIProfileFormService extends FormBaseService<IAIProfileFormState> {
+export class AIProfileFormServiceImpl extends FormBaseService<IAIProfileFormState> {
   formState: FormState<IAIProfileFormState> | null;
 
   constructor(
@@ -105,3 +104,45 @@ export class AIProfileFormService extends FormBaseService<IAIProfileFormState> {
     this.formState = null;
   }
 }
+
+export type AIProfileFormService = AIProfileFormServiceImpl;
+
+export class AIProfileFormServiceDI extends Context.Service<AIProfileFormServiceDI, AIProfileFormServiceImpl>()(
+  '@cloudbeaver/plugin-ai-profiles-administration/AIProfiles/AIProfileForm/AIProfileFormService#AIProfileFormService',
+) {
+  static readonly implementation = AIProfileFormServiceImpl;
+
+  static readonly dependencies = () =>
+    [LocalizationService, NotificationService, OptionsPanelService, IServiceProvider, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    AIProfileFormServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeAIProfileFormService() {
+    const localizationService = yield* LocalizationService;
+    const notificationService = yield* NotificationService;
+    const optionsPanelService = yield* OptionsPanelService;
+    const serviceProvider = yield* IServiceProvider;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new AIProfileFormServiceImpl(localizationService, notificationService, optionsPanelService, serviceProvider, commonDialogService);
+  });
+  static readonly layer: Layer.Layer<
+    AIProfileFormServiceDI,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIProfileFormService = AIProfileFormServiceDI;

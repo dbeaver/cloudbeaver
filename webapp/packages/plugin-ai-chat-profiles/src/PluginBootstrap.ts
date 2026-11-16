@@ -7,25 +7,18 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { AIChatConversationsService, AIChatMessageService, type MessageSendExecutorData } from '@cloudbeaver/plugin-ai-chat';
 import { AIProfileCredentialsService, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
-import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { AIChatConversationProfileService } from './AIChatConversationProfileService.js';
 
 const AIChatConversationProfile = importLazyComponent(() => import('./AIChatConversationProfile.js').then(m => m.AIChatConversationProfile));
 
-@injectable(() => [
-  AIChatConversationsService,
-  AIChatConversationProfileService,
-  AIChatMessageService,
-  AIProfileCredentialsService,
-  AIProfilesResource,
-])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   private readonly checkCredentials = new Executor<MessageSendExecutorData>();
 
   constructor(
@@ -69,3 +62,51 @@ export class PluginBootstrap extends Bootstrap {
     }
   }
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-ai-chat-profiles/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [AIChatConversationsService, AIChatConversationProfileService, AIChatMessageService, AIProfileCredentialsService, AIProfilesResource] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof AIChatConversationsService>
+    | Context.Service.Identifier<typeof AIChatConversationProfileService>
+    | Context.Service.Identifier<typeof AIChatMessageService>
+    | Context.Service.Identifier<typeof AIProfileCredentialsService>
+    | Context.Service.Identifier<typeof AIProfilesResource>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const aiChatConversationsService = yield* AIChatConversationsService;
+    const aiChatConversationProfileService = yield* AIChatConversationProfileService;
+    const aiChatMessageService = yield* AIChatMessageService;
+    const aiProfileCredentialsService = yield* AIProfileCredentialsService;
+    const aiProfilesResource = yield* AIProfilesResource;
+
+    return new PluginBootstrapImpl(
+      aiChatConversationsService,
+      aiChatConversationProfileService,
+      aiChatMessageService,
+      aiProfileCredentialsService,
+      aiProfilesResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof AIChatConversationsService>
+    | Context.Service.Identifier<typeof AIChatConversationProfileService>
+    | Context.Service.Identifier<typeof AIChatMessageService>
+    | Context.Service.Identifier<typeof AIProfileCredentialsService>
+    | Context.Service.Identifier<typeof AIProfilesResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

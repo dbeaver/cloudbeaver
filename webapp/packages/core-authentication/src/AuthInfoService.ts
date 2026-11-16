@@ -1,16 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { WindowsService } from '@cloudbeaver/core-routing';
 import { type UserInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
-import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 
 import { type AuthProviderConfiguration } from './AuthProvidersResource.js';
 import { type IFederatedLoginOptions, type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
@@ -20,8 +20,7 @@ export interface IUserAuthConfiguration {
   configuration: AuthProviderConfiguration;
 }
 
-@injectable(() => [UserInfoResource, WindowsService, AsyncTaskInfoService])
-export class AuthInfoService {
+export class AuthInfoServiceImpl {
   get userInfo(): UserInfo | null {
     return this.userInfoResource.data;
   }
@@ -75,3 +74,38 @@ export class AuthInfoService {
     );
   }
 }
+
+export type AuthInfoService = AuthInfoServiceImpl;
+
+export class AuthInfoServiceDI extends Context.Service<AuthInfoServiceDI, AuthInfoServiceImpl>()(
+  '@cloudbeaver/core-authentication/AuthInfoService#AuthInfoService',
+) {
+  static readonly implementation = AuthInfoServiceImpl;
+
+  static readonly dependencies = () => [UserInfoResource, WindowsService, AsyncTaskInfoService] as const;
+  static readonly make: Effect.Effect<
+    AuthInfoServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof WindowsService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+  > = Effect.gen(function* makeAuthInfoService() {
+    const userInfoResource = yield* UserInfoResource;
+    const windowsService = yield* WindowsService;
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+
+    return new AuthInfoServiceImpl(userInfoResource, windowsService, asyncTaskInfoService);
+  });
+  static readonly layer: Layer.Layer<
+    AuthInfoServiceDI,
+    never,
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof WindowsService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AuthInfoService = AuthInfoServiceDI;

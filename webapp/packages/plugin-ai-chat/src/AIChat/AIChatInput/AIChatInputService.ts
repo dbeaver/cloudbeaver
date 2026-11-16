@@ -12,7 +12,7 @@ import { makeObservable, observable, runInAction } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ExecutionContext, ExecutorInterrupter, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { AiSendChatMessageInfoFragment } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
@@ -50,8 +50,7 @@ export interface IAIChatInputSubmission extends IAIChatInputProps {
   prompt: string;
 }
 
-@injectable(() => [AIChatConversationsService, AIChatMessageService, UserInfoResource, AIChatConversationsResource])
-export class AIChatInputService {
+export class AIChatInputServiceImpl {
   readonly onDrag = new SyncExecutor<IAIChatInputDragEvent>();
   readonly onPaste = new SyncExecutor<IAIChatInputPasteEvent>();
   readonly onValidate = new SyncExecutor<IAIChatInputValidation>();
@@ -153,3 +152,39 @@ export class AIChatInputService {
     return JSON.stringify([conversationId, input.connectionKey?.projectId, input.connectionKey?.connectionId]);
   }
 }
+
+export type AIChatInputService = AIChatInputServiceImpl;
+
+export class AIChatInputServiceDI extends Context.Service<AIChatInputServiceDI, AIChatInputServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChat/AIChatInput/AIChatInputService#AIChatInputService',
+) {
+  static readonly implementation = AIChatInputServiceImpl;
+  static readonly dependencies = () => [AIChatConversationsService, AIChatMessageService, UserInfoResource, AIChatConversationsResource] as const;
+  static readonly make: Effect.Effect<
+    AIChatInputServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof AIChatConversationsService>
+    | Context.Service.Identifier<typeof AIChatMessageService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+  > = Effect.gen(function* makeAIChatInputService() {
+    const aiChatConversationsService = yield* AIChatConversationsService;
+    const aiChatMessageService = yield* AIChatMessageService;
+    const userInfoResource = yield* UserInfoResource;
+    const aiChatConversationsResource = yield* AIChatConversationsResource;
+    return new AIChatInputServiceImpl(aiChatConversationsService, aiChatMessageService, userInfoResource, aiChatConversationsResource);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatInputServiceDI,
+    never,
+    | Context.Service.Identifier<typeof AIChatConversationsService>
+    | Context.Service.Identifier<typeof AIChatMessageService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatInputService = AIChatInputServiceDI;

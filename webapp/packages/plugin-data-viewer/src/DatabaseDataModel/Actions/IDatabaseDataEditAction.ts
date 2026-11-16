@@ -7,9 +7,9 @@
  */
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
+import { Context } from '@cloudbeaver/core-di';
 import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
-import { createService } from '@cloudbeaver/core-di';
 
 // order is matter, used for sorting and changes diff
 export enum DatabaseEditChangeType {
@@ -65,4 +65,6 @@ export interface IDatabaseDataEditAction<
   clear: () => void;
 }
 
-export const IDatabaseDataEditAction = createService<IDatabaseDataEditAction>('IDatabaseDataEditAction');
+export const IDatabaseDataEditAction = Context.Service<IDatabaseDataEditAction>(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/IDatabaseDataEditAction#IDatabaseDataEditAction',
+);

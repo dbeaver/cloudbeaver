@@ -7,14 +7,13 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { SqlExecutionPlanViewService } from './SqlExecutionPlanViewService.js';
 
 const ExecutionPlanTreeView = importLazyComponent(() => import('./ExecutionPlanTreeView.js').then(m => m.ExecutionPlanTreeView));
 
-@injectable(() => [SqlExecutionPlanViewService])
-export class SqlExecutionPlanViewBootstrap extends Bootstrap {
+export class SqlExecutionPlanViewBootstrapImpl extends Bootstrap {
   constructor(private readonly sqlExecutionPlanViewService: SqlExecutionPlanViewService) {
     super();
   }
@@ -29,3 +28,26 @@ export class SqlExecutionPlanViewBootstrap extends Bootstrap {
     });
   }
 }
+
+export type SqlExecutionPlanViewBootstrap = SqlExecutionPlanViewBootstrapImpl;
+
+export class SqlExecutionPlanViewBootstrapDI extends Context.Service<SqlExecutionPlanViewBootstrapDI, SqlExecutionPlanViewBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-editor-execution-plan/SqlExecutionPlanViewBootstrap#SqlExecutionPlanViewBootstrap',
+) {
+  static readonly implementation = SqlExecutionPlanViewBootstrapImpl;
+
+  static readonly dependencies = () => [SqlExecutionPlanViewService] as const;
+  static readonly make: Effect.Effect<SqlExecutionPlanViewBootstrapImpl, never, Context.Service.Identifier<typeof SqlExecutionPlanViewService>> =
+    Effect.gen(function* makeSqlExecutionPlanViewBootstrap() {
+      const sqlExecutionPlanViewService = yield* SqlExecutionPlanViewService;
+
+      return new SqlExecutionPlanViewBootstrapImpl(sqlExecutionPlanViewService);
+    });
+  static readonly layer: Layer.Layer<SqlExecutionPlanViewBootstrapDI, never, Context.Service.Identifier<typeof SqlExecutionPlanViewService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const SqlExecutionPlanViewBootstrap = SqlExecutionPlanViewBootstrapDI;

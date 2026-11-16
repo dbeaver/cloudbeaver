@@ -8,7 +8,7 @@
 
 import { ServerConfigurationFeatureGroupsService } from '@cloudbeaver/core-administration';
 import { DBDriverResource, FEATURE_GROUP_CONNECTIONS_ID } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
@@ -21,8 +21,7 @@ import { FEATURE_SSH_ID } from '../FEATURE_SSH_ID.js';
 const SSHTab = importLazyComponent(() => import('./SSHTab.js').then(m => m.SSHTab));
 const SSHPanel = importLazyComponent(() => import('./SSHPanel.js').then(m => m.SSHPanel));
 
-@injectable(() => [DBDriverResource, ConnectionFormService, ServerConfigurationFeatureGroupsService])
-export class ConnectionSSHTabService extends Bootstrap {
+export class ConnectionSSHTabServiceImpl extends Bootstrap {
   constructor(
     private readonly dbDriverResource: DBDriverResource,
     private readonly connectionFormService: ConnectionFormService,
@@ -60,3 +59,36 @@ export class ConnectionSSHTabService extends Bootstrap {
     });
   }
 }
+
+export type ConnectionSSHTabService = ConnectionSSHTabServiceImpl;
+
+export class ConnectionSSHTabServiceDI extends Context.Service<ConnectionSSHTabServiceDI, ConnectionSSHTabServiceImpl>()(
+  '@cloudbeaver/plugin-connection-network-handlers/SSH/ConnectionSSHTabService#ConnectionSSHTabService',
+) {
+  static readonly implementation = ConnectionSSHTabServiceImpl;
+  static readonly dependencies = () => [DBDriverResource, ConnectionFormService, ServerConfigurationFeatureGroupsService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionSSHTabServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof ServerConfigurationFeatureGroupsService>
+  > = Effect.gen(function* makeConnectionSSHTabService() {
+    const dbDriverResource = yield* DBDriverResource;
+    const connectionFormService = yield* ConnectionFormService;
+    const serverConfigurationFeatureGroupsService = yield* ServerConfigurationFeatureGroupsService;
+    return new ConnectionSSHTabServiceImpl(dbDriverResource, connectionFormService, serverConfigurationFeatureGroupsService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionSSHTabServiceDI,
+    never,
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof ServerConfigurationFeatureGroupsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionSSHTabService = ConnectionSSHTabServiceDI;

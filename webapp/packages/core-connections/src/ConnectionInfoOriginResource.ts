@@ -7,7 +7,7 @@
  */
 import { runInAction, toJS } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { type DatabaseConnectionOriginFragment, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -25,8 +25,7 @@ import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type ConnectionInfoOrigin = DatabaseConnectionOriginFragment;
 
-@injectable(() => [ProjectsService, GraphQLService, ConnectionInfoResource])
-export class ConnectionInfoOriginResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoOrigin> {
+export class ConnectionInfoOriginResourceImpl extends CachedMapResource<IConnectionInfoParams, ConnectionInfoOrigin> {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly graphQLService: GraphQLService,
@@ -112,3 +111,38 @@ export class ConnectionInfoOriginResource extends CachedMapResource<IConnectionI
     return parse.success;
   }
 }
+
+export type ConnectionInfoOriginResource = ConnectionInfoOriginResourceImpl;
+
+export class ConnectionInfoOriginResourceDI extends Context.Service<ConnectionInfoOriginResourceDI, ConnectionInfoOriginResourceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionInfoOriginResource#ConnectionInfoOriginResource',
+) {
+  static readonly implementation = ConnectionInfoOriginResourceImpl;
+
+  static readonly dependencies = () => [ProjectsService, GraphQLService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionInfoOriginResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeConnectionInfoOriginResource() {
+    const projectsService = yield* ProjectsService;
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new ConnectionInfoOriginResourceImpl(projectsService, graphQLService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionInfoOriginResourceDI,
+    never,
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionInfoOriginResource = ConnectionInfoOriginResourceDI;

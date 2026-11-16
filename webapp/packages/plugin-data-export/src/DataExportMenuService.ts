@@ -7,11 +7,10 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { withTimestamp } from '@dbeaver/js-helpers';
 import { ACTION_EXPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -24,11 +23,11 @@ import {
   isResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
+import { withTimestamp } from '@dbeaver/js-helpers';
 
 const DataExportDialog = importLazyComponent(() => import('./Dialog/DataExportDialog.js').then(module => module.DataExportDialog));
 
-@injectable(() => [CommonDialogService, ActionService, MenuService, LocalizationService, DataViewerService, ConnectionInfoResource])
-export class DataExportMenuService {
+export class DataExportMenuServiceImpl {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
@@ -148,3 +147,55 @@ export class DataExportMenuService {
     });
   }
 }
+
+export type DataExportMenuService = DataExportMenuServiceImpl;
+
+export class DataExportMenuServiceDI extends Context.Service<DataExportMenuServiceDI, DataExportMenuServiceImpl>()(
+  '@cloudbeaver/plugin-data-export/DataExportMenuService#DataExportMenuService',
+) {
+  static readonly implementation = DataExportMenuServiceImpl;
+
+  static readonly dependencies = () =>
+    [CommonDialogService, ActionService, MenuService, LocalizationService, DataViewerService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    DataExportMenuServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof DataViewerService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeDataExportMenuService() {
+    const commonDialogService = yield* CommonDialogService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const localizationService = yield* LocalizationService;
+    const dataViewerService = yield* DataViewerService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new DataExportMenuServiceImpl(
+      commonDialogService,
+      actionService,
+      menuService,
+      localizationService,
+      dataViewerService,
+      connectionInfoResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    DataExportMenuServiceDI,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof DataViewerService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataExportMenuService = DataExportMenuServiceDI;

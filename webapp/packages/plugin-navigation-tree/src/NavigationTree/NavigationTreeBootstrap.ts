@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService } from '@cloudbeaver/core-ui';
 
 import { NavigationTreeSettingsService } from '../NavigationTreeSettingsService.js';
@@ -16,8 +16,7 @@ import { ElementsTreeToolsMenuService } from './ElementsTree/ElementsTreeTools/E
 
 const NavigationTreePanel = importLazyComponent(() => import('./NavigationTreePanel.js').then(m => m.NavigationTreePanel));
 
-@injectable(() => [NavigationTreeSettingsService, ElementsTreeToolsMenuService, TreeToolbarMenuService, TreeSettingsMenuService, LeftBarPanelService])
-export class NavigationTreeBootstrap extends Bootstrap {
+export class NavigationTreeBootstrapImpl extends Bootstrap {
   constructor(
     private readonly navigationTreeSettingsService: NavigationTreeSettingsService,
     private readonly elementsTreeToolsMenuService: ElementsTreeToolsMenuService,
@@ -41,3 +40,51 @@ export class NavigationTreeBootstrap extends Bootstrap {
     });
   }
 }
+
+export type NavigationTreeBootstrap = NavigationTreeBootstrapImpl;
+
+export class NavigationTreeBootstrapDI extends Context.Service<NavigationTreeBootstrapDI, NavigationTreeBootstrapImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/NavigationTree/NavigationTreeBootstrap#NavigationTreeBootstrap',
+) {
+  static readonly implementation = NavigationTreeBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [NavigationTreeSettingsService, ElementsTreeToolsMenuService, TreeToolbarMenuService, TreeSettingsMenuService, LeftBarPanelService] as const;
+  static readonly make: Effect.Effect<
+    NavigationTreeBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof NavigationTreeSettingsService>
+    | Context.Service.Identifier<typeof ElementsTreeToolsMenuService>
+    | Context.Service.Identifier<typeof TreeToolbarMenuService>
+    | Context.Service.Identifier<typeof TreeSettingsMenuService>
+    | Context.Service.Identifier<typeof LeftBarPanelService>
+  > = Effect.gen(function* makeNavigationTreeBootstrap() {
+    const navigationTreeSettingsService = yield* NavigationTreeSettingsService;
+    const elementsTreeToolsMenuService = yield* ElementsTreeToolsMenuService;
+    const treeToolbarMenuService = yield* TreeToolbarMenuService;
+    const treeSettingsMenuService = yield* TreeSettingsMenuService;
+    const leftBarPanelService = yield* LeftBarPanelService;
+
+    return new NavigationTreeBootstrapImpl(
+      navigationTreeSettingsService,
+      elementsTreeToolsMenuService,
+      treeToolbarMenuService,
+      treeSettingsMenuService,
+      leftBarPanelService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    NavigationTreeBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof NavigationTreeSettingsService>
+    | Context.Service.Identifier<typeof ElementsTreeToolsMenuService>
+    | Context.Service.Identifier<typeof TreeToolbarMenuService>
+    | Context.Service.Identifier<typeof TreeSettingsMenuService>
+    | Context.Service.Identifier<typeof LeftBarPanelService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavigationTreeBootstrap = NavigationTreeBootstrapDI;

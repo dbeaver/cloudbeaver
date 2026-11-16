@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
@@ -17,8 +17,7 @@ import { isBooleanValuePresentationAvailable } from './isBooleanValuePresentatio
 
 const BooleanValuePresentation = importLazyComponent(() => import('./BooleanValuePresentation.js').then(module => module.BooleanValuePresentation));
 
-@injectable(() => [DataValuePanelService])
-export class BooleanValuePresentationBootstrap extends Bootstrap {
+export class BooleanValuePresentationBootstrapImpl extends Bootstrap {
   constructor(private readonly dataValuePanelService: DataValuePanelService) {
     super();
   }
@@ -57,3 +56,27 @@ export class BooleanValuePresentationBootstrap extends Bootstrap {
     });
   }
 }
+
+export type BooleanValuePresentationBootstrap = BooleanValuePresentationBootstrapImpl;
+
+export class BooleanValuePresentationBootstrapDI extends Context.Service<
+  BooleanValuePresentationBootstrapDI,
+  BooleanValuePresentationBootstrapImpl
+>()('@cloudbeaver/plugin-data-viewer/ValuePanelPresentation/BooleanValue/BooleanValuePresentationBootstrap#BooleanValuePresentationBootstrap') {
+  static readonly implementation = BooleanValuePresentationBootstrapImpl;
+
+  static readonly dependencies = () => [DataValuePanelService] as const;
+  static readonly make: Effect.Effect<BooleanValuePresentationBootstrapImpl, never, Context.Service.Identifier<typeof DataValuePanelService>> =
+    Effect.gen(function* makeBooleanValuePresentationBootstrap() {
+      const dataValuePanelService = yield* DataValuePanelService;
+
+      return new BooleanValuePresentationBootstrapImpl(dataValuePanelService);
+    });
+  static readonly layer: Layer.Layer<BooleanValuePresentationBootstrapDI, never, Context.Service.Identifier<typeof DataValuePanelService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const BooleanValuePresentationBootstrap = BooleanValuePresentationBootstrapDI;

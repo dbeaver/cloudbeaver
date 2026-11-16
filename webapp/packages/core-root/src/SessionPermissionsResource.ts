@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { CachedDataResource, CachedResource } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
@@ -16,8 +16,7 @@ import { ServerEventId } from './SessionEventSource.js';
 import { type ISessionPermissionEvent, SessionPermissionEventHandler } from './SessionPermissionEventHandler.js';
 import { SessionResource } from './SessionResource.js';
 
-@injectable(() => [GraphQLService, DataSynchronizationService, SessionDataResource, SessionResource, SessionPermissionEventHandler])
-export class SessionPermissionsResource extends CachedDataResource<Set<string>> {
+export class SessionPermissionsResourceImpl extends CachedDataResource<Set<string>> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly dataSynchronizationService: DataSynchronizationService,
@@ -74,3 +73,51 @@ export class SessionPermissionsResource extends CachedDataResource<Set<string>> 
     return this.data;
   }
 }
+
+export type SessionPermissionsResource = SessionPermissionsResourceImpl;
+
+export class SessionPermissionsResourceDI extends Context.Service<SessionPermissionsResourceDI, SessionPermissionsResourceImpl>()(
+  '@cloudbeaver/core-root/SessionPermissionsResource#SessionPermissionsResource',
+) {
+  static readonly implementation = SessionPermissionsResourceImpl;
+
+  static readonly dependencies = () =>
+    [GraphQLService, DataSynchronizationService, SessionDataResource, SessionResource, SessionPermissionEventHandler] as const;
+  static readonly make: Effect.Effect<
+    SessionPermissionsResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof SessionResource>
+    | Context.Service.Identifier<typeof SessionPermissionEventHandler>
+  > = Effect.gen(function* makeSessionPermissionsResource() {
+    const graphQLService = yield* GraphQLService;
+    const dataSynchronizationService = yield* DataSynchronizationService;
+    const sessionDataResource = yield* SessionDataResource;
+    const sessionResource = yield* SessionResource;
+    const sessionPermissionEventHandler = yield* SessionPermissionEventHandler;
+
+    return new SessionPermissionsResourceImpl(
+      graphQLService,
+      dataSynchronizationService,
+      sessionDataResource,
+      sessionResource,
+      sessionPermissionEventHandler,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SessionPermissionsResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof DataSynchronizationService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof SessionResource>
+    | Context.Service.Identifier<typeof SessionPermissionEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SessionPermissionsResource = SessionPermissionsResourceDI;

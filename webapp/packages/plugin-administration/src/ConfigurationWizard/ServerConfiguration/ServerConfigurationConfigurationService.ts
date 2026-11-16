@@ -7,7 +7,7 @@
  */
 
 import { importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
 import type { IConfigurationPlaceholderProps } from './ServerConfigurationService.js';
@@ -16,8 +16,7 @@ const ServerConfigurationConfigurationPanel = importLazyComponent(() =>
   import('./ServerConfigurationConfigurationPanel.js').then(m => m.ServerConfigurationConfigurationPanel),
 );
 
-@injectable(() => [ServerConfigurationFormService])
-export class ServerConfigurationConfigurationService {
+export class ServerConfigurationConfigurationServiceImpl {
   readonly settingsContainer = new PlaceholderContainer<IConfigurationPlaceholderProps>();
   readonly connectionsContainer = new PlaceholderContainer<IConfigurationPlaceholderProps>();
   readonly workspaceContainer = new PlaceholderContainer<IConfigurationPlaceholderProps>();
@@ -33,3 +32,33 @@ export class ServerConfigurationConfigurationService {
     });
   }
 }
+
+export type ServerConfigurationConfigurationService = ServerConfigurationConfigurationServiceImpl;
+
+export class ServerConfigurationConfigurationServiceDI extends Context.Service<
+  ServerConfigurationConfigurationServiceDI,
+  ServerConfigurationConfigurationServiceImpl
+>()(
+  '@cloudbeaver/plugin-administration/ConfigurationWizard/ServerConfiguration/ServerConfigurationConfigurationService#ServerConfigurationConfigurationService',
+) {
+  static readonly implementation = ServerConfigurationConfigurationServiceImpl;
+  static readonly dependencies = () => [ServerConfigurationFormService] as const;
+  static readonly make: Effect.Effect<
+    ServerConfigurationConfigurationServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ServerConfigurationFormService>
+  > = Effect.gen(function* makeServerConfigurationConfigurationService() {
+    const serverConfigurationFormService = yield* ServerConfigurationFormService;
+    return new ServerConfigurationConfigurationServiceImpl(serverConfigurationFormService);
+  });
+  static readonly layer: Layer.Layer<
+    ServerConfigurationConfigurationServiceDI,
+    never,
+    Context.Service.Identifier<typeof ServerConfigurationFormService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServerConfigurationConfigurationService = ServerConfigurationConfigurationServiceDI;

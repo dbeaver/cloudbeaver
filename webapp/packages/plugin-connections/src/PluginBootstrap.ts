@@ -8,12 +8,11 @@
 
 import { ServerConfigurationFeatureGroupsService } from '@cloudbeaver/core-administration';
 import { ConnectionTypeResource, FEATURE_GROUP_CONNECTIONS_ID } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID } from './FEATURE_RESET_CREDENTIALS_ON_TARGET_CHANGE_ID.js';
 
-@injectable(() => [ServerConfigurationFeatureGroupsService, ConnectionTypeResource])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   constructor(private readonly serverConfigurationFeatureGroupsService: ServerConfigurationFeatureGroupsService) {
     super();
   }
@@ -24,3 +23,31 @@ export class PluginBootstrap extends Bootstrap {
 
   override async load(): Promise<void> {}
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-connections/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+  static readonly dependencies = () => [ServerConfigurationFeatureGroupsService, ConnectionTypeResource] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof ServerConfigurationFeatureGroupsService> | Context.Service.Identifier<typeof ConnectionTypeResource>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const serverConfigurationFeatureGroupsService = yield* ServerConfigurationFeatureGroupsService;
+    yield* ConnectionTypeResource;
+    return new PluginBootstrapImpl(serverConfigurationFeatureGroupsService);
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    Context.Service.Identifier<typeof ServerConfigurationFeatureGroupsService> | Context.Service.Identifier<typeof ConnectionTypeResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

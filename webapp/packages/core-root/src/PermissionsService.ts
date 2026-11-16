@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { CachedResource } from '@cloudbeaver/core-resource';
 
@@ -15,8 +15,7 @@ import { SessionPermissionsResource } from './SessionPermissionsResource.js';
 
 export enum EPermission {}
 
-@injectable(() => [SessionPermissionsResource, ServerConfigResource, ServerLicenseStatusResource])
-export class PermissionsService {
+export class PermissionsServiceImpl {
   get publicDisabled(): boolean {
     return (
       this.serverConfigResource.configurationMode ||
@@ -50,3 +49,38 @@ export class PermissionsService {
     await this.sessionPermissionsResource.refresh();
   }
 }
+
+export type PermissionsService = PermissionsServiceImpl;
+
+export class PermissionsServiceDI extends Context.Service<PermissionsServiceDI, PermissionsServiceImpl>()(
+  '@cloudbeaver/core-root/PermissionsService#PermissionsService',
+) {
+  static readonly implementation = PermissionsServiceImpl;
+
+  static readonly dependencies = () => [SessionPermissionsResource, ServerConfigResource, ServerLicenseStatusResource] as const;
+  static readonly make: Effect.Effect<
+    PermissionsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof ServerLicenseStatusResource>
+  > = Effect.gen(function* makePermissionsService() {
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+    const serverConfigResource = yield* ServerConfigResource;
+    const serverLicenseStatusResource = yield* ServerLicenseStatusResource;
+
+    return new PermissionsServiceImpl(sessionPermissionsResource, serverConfigResource, serverLicenseStatusResource);
+  });
+  static readonly layer: Layer.Layer<
+    PermissionsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof ServerLicenseStatusResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PermissionsService = PermissionsServiceDI;

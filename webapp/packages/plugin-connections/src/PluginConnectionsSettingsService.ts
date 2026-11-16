@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { CONNECTIONS_SETTINGS_GROUP } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
@@ -16,8 +16,7 @@ const defaultSettings = schema.object({
 
 export type PluginConnectionsSettings = schema.infer<typeof defaultSettings>;
 
-@injectable(() => [SettingsProviderService, SettingsManagerService])
-export class PluginConnectionsSettingsService {
+export class PluginConnectionsSettingsServiceImpl {
   get hideConnectionViewForUsers(): boolean {
     return this.settings.getValue('plugin.connections.hideConnectionViewForUsers');
   }
@@ -48,3 +47,33 @@ export class PluginConnectionsSettingsService {
     ]);
   }
 }
+
+export type PluginConnectionsSettingsService = PluginConnectionsSettingsServiceImpl;
+
+export class PluginConnectionsSettingsServiceDI extends Context.Service<PluginConnectionsSettingsServiceDI, PluginConnectionsSettingsServiceImpl>()(
+  '@cloudbeaver/plugin-connections/PluginConnectionsSettingsService#PluginConnectionsSettingsService',
+) {
+  static readonly implementation = PluginConnectionsSettingsServiceImpl;
+
+  static readonly dependencies = () => [SettingsProviderService, SettingsManagerService] as const;
+  static readonly make: Effect.Effect<
+    PluginConnectionsSettingsServiceImpl,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Effect.gen(function* makePluginConnectionsSettingsService() {
+    const settingsProviderService = yield* SettingsProviderService;
+    const settingsManagerService = yield* SettingsManagerService;
+
+    return new PluginConnectionsSettingsServiceImpl(settingsProviderService, settingsManagerService);
+  });
+  static readonly layer: Layer.Layer<
+    PluginConnectionsSettingsServiceDI,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginConnectionsSettingsService = PluginConnectionsSettingsServiceDI;

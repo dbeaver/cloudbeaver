@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 
 import { AiEnginesResource } from './AiEnginesResource.js';
 import { AISettingsResource } from './AISettingsResource.js';
@@ -14,11 +14,5 @@ import { AISettingsResource } from './AISettingsResource.js';
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Dependency, proxy(AiEnginesResource))
-      .addSingleton(Dependency, proxy(AISettingsResource))
-      .addSingleton(AiEnginesResource)
-      .addSingleton(AISettingsResource);
-  },
+  services: () => [AiEnginesResource, AISettingsResource],
 });

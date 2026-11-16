@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { DATA_CONTEXT_CONNECTION, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ACTION_OPEN, ActionService, menuItemsPlaceAfter, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_CONNECTION, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import {
   CONNECTION_NAVIGATOR_VIEW_SETTINGS,
   EAdminPermission,
@@ -18,31 +19,20 @@ import {
   PermissionsService,
   type NavigatorViewSettings,
 } from '@cloudbeaver/core-root';
-import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ACTION_OPEN, ActionService, menuItemsPlaceAfter, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionFormService, PluginConnectionsSettingsService } from '@cloudbeaver/plugin-connections';
 
-import { ACTION_CONNECTION_VIEW_SIMPLE } from './Actions/ACTION_CONNECTION_VIEW_SIMPLE.js';
 import { ACTION_CONNECTION_VIEW_ADVANCED } from './Actions/ACTION_CONNECTION_VIEW_ADVANCED.js';
-import { ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS } from './Actions/ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS.js';
-import { MENU_CONNECTION_VIEW } from './MENU_CONNECTION_VIEW.js';
 import { ACTION_CONNECTION_VIEW_RESET } from './Actions/ACTION_CONNECTION_VIEW_RESET.js';
-import { ConnectionViewService } from './ConnectionViewService.js';
+import { ACTION_CONNECTION_VIEW_SIMPLE } from './Actions/ACTION_CONNECTION_VIEW_SIMPLE.js';
+import { ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS } from './Actions/ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS.js';
 import { ConnectionViewResource } from './ConnectionViewResource.js';
+import { ConnectionViewService } from './ConnectionViewService.js';
+import { MENU_CONNECTION_VIEW } from './MENU_CONNECTION_VIEW.js';
 
 const ConnectionViewForm = importLazyComponent(() => import('./ConnectionViewForm.js').then(m => m.ConnectionViewForm));
 
-@injectable(() => [
-  ActionService,
-  MenuService,
-  PluginConnectionsSettingsService,
-  PermissionsService,
-  ConnectionFormService,
-  ProjectInfoResource,
-  ConnectionViewService,
-  ConnectionViewResource,
-])
-export class ConnectionViewPluginBootstrap extends Bootstrap {
+export class ConnectionViewPluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -173,3 +163,72 @@ export class ConnectionViewPluginBootstrap extends Bootstrap {
     await this.connectionViewService.changeConnectionView(connectionKey, { ...settings, userSettings: true });
   }
 }
+
+export type ConnectionViewPluginBootstrap = ConnectionViewPluginBootstrapImpl;
+
+export class ConnectionViewPluginBootstrapDI extends Context.Service<ConnectionViewPluginBootstrapDI, ConnectionViewPluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-connection-view/ConnectionViewPluginBootstrap#ConnectionViewPluginBootstrap',
+) {
+  static readonly implementation = ConnectionViewPluginBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      ActionService,
+      MenuService,
+      PluginConnectionsSettingsService,
+      PermissionsService,
+      ConnectionFormService,
+      ProjectInfoResource,
+      ConnectionViewService,
+      ConnectionViewResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConnectionViewPluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof PluginConnectionsSettingsService>
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof ConnectionViewService>
+    | Context.Service.Identifier<typeof ConnectionViewResource>
+  > = Effect.gen(function* makeConnectionViewPluginBootstrap() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const pluginConnectionsSettingsService = yield* PluginConnectionsSettingsService;
+    const permissionsService = yield* PermissionsService;
+    const connectionFormService = yield* ConnectionFormService;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const connectionViewService = yield* ConnectionViewService;
+    const connectionViewResource = yield* ConnectionViewResource;
+
+    return new ConnectionViewPluginBootstrapImpl(
+      actionService,
+      menuService,
+      pluginConnectionsSettingsService,
+      permissionsService,
+      connectionFormService,
+      projectInfoResource,
+      connectionViewService,
+      connectionViewResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionViewPluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof PluginConnectionsSettingsService>
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof ConnectionViewService>
+    | Context.Service.Identifier<typeof ConnectionViewResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionViewPluginBootstrap = ConnectionViewPluginBootstrapDI;

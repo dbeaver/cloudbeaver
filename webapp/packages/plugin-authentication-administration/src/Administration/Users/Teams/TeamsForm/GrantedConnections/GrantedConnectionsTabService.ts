@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
@@ -16,8 +16,7 @@ import { getGrantedConnectionsFormPart } from './getGrantedConnectionsFormPart.j
 
 const GrantedConnectionsTable = importLazyComponent(() => import('./GrantedConnectionsTable.js').then(module => module.GrantedConnectionsTable));
 
-@injectable(() => [ProjectInfoResource, TeamsAdministrationFormService])
-export class GrantedConnectionsTabService extends Bootstrap {
+export class GrantedConnectionsTabServiceImpl extends Bootstrap {
   private readonly key: string;
 
   constructor(
@@ -45,3 +44,33 @@ export class GrantedConnectionsTabService extends Bootstrap {
     return this.projectInfoResource.values.some(isGlobalProject);
   }
 }
+
+export type GrantedConnectionsTabService = GrantedConnectionsTabServiceImpl;
+
+export class GrantedConnectionsTabServiceDI extends Context.Service<GrantedConnectionsTabServiceDI, GrantedConnectionsTabServiceImpl>()(
+  '@cloudbeaver/plugin-authentication-administration/Administration/Users/Teams/TeamsForm/GrantedConnections/GrantedConnectionsTabService#GrantedConnectionsTabService',
+) {
+  static readonly implementation = GrantedConnectionsTabServiceImpl;
+
+  static readonly dependencies = () => [ProjectInfoResource, TeamsAdministrationFormService] as const;
+  static readonly make: Effect.Effect<
+    GrantedConnectionsTabServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ProjectInfoResource> | Context.Service.Identifier<typeof TeamsAdministrationFormService>
+  > = Effect.gen(function* makeGrantedConnectionsTabService() {
+    const projectInfoResource = yield* ProjectInfoResource;
+    const teamsAdministrationFormService = yield* TeamsAdministrationFormService;
+
+    return new GrantedConnectionsTabServiceImpl(projectInfoResource, teamsAdministrationFormService);
+  });
+  static readonly layer: Layer.Layer<
+    GrantedConnectionsTabServiceDI,
+    never,
+    Context.Service.Identifier<typeof ProjectInfoResource> | Context.Service.Identifier<typeof TeamsAdministrationFormService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GrantedConnectionsTabService = GrantedConnectionsTabServiceDI;

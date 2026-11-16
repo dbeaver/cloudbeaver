@@ -6,17 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
+import { ROOT_SETTINGS_LAYER, SettingsResolverService } from '@cloudbeaver/core-settings';
 import { makeObservable, observable } from 'mobx';
 import { ThemeService, type ITheme } from './ThemeService.js';
-import { ROOT_SETTINGS_LAYER, SettingsResolverService } from '@cloudbeaver/core-settings';
-import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { IThemeSettingsKey } from './ThemeSettingsService.js';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-@injectable(() => [ThemeService, SettingsResolverService])
-export class SystemThemeService extends Bootstrap {
+export class SystemThemeServiceImpl extends Bootstrap {
   private dynamicTheme: ITheme | null;
   private readonly mediaQueryList: MediaQueryList;
 
@@ -112,3 +111,33 @@ export class SystemThemeService extends Bootstrap {
     return this.themeService.themes.find(theme => theme.type === 'light') || this.themeService.themes[0] || null;
   }
 }
+
+export type SystemThemeService = SystemThemeServiceImpl;
+
+export class SystemThemeServiceDI extends Context.Service<SystemThemeServiceDI, SystemThemeServiceImpl>()(
+  '@cloudbeaver/core-theming/SystemThemeService#SystemThemeService',
+) {
+  static readonly implementation = SystemThemeServiceImpl;
+
+  static readonly dependencies = () => [ThemeService, SettingsResolverService] as const;
+  static readonly make: Effect.Effect<
+    SystemThemeServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ThemeService> | Context.Service.Identifier<typeof SettingsResolverService>
+  > = Effect.gen(function* makeSystemThemeService() {
+    const themeService = yield* ThemeService;
+    const settingsResolverService = yield* SettingsResolverService;
+
+    return new SystemThemeServiceImpl(themeService, settingsResolverService);
+  });
+  static readonly layer: Layer.Layer<
+    SystemThemeServiceDI,
+    never,
+    Context.Service.Identifier<typeof ThemeService> | Context.Service.Identifier<typeof SettingsResolverService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SystemThemeService = SystemThemeServiceDI;

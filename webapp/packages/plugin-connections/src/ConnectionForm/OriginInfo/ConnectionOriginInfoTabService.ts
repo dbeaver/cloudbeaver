@@ -7,11 +7,11 @@
  */
 
 import { ConnectionInfoOriginResource, isLocalConnection } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
-import { ConnectionFormService } from '../ConnectionFormService.js';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 export const ConnectionFormAuthenticationAction = importLazyComponent(() =>
   import('./ConnectionFormAuthenticationAction.js').then(m => m.ConnectionFormAuthenticationAction),
@@ -20,8 +20,7 @@ export const ConnectionFormAuthenticationAction = importLazyComponent(() =>
 const OriginInfo = importLazyComponent(() => import('./OriginInfo.js').then(m => m.OriginInfo));
 const OriginInfoTab = importLazyComponent(() => import('./OriginInfoTab.js').then(m => m.OriginInfoTab));
 
-@injectable(() => [ConnectionFormService, ConnectionInfoOriginResource])
-export class ConnectionOriginInfoTabService extends Bootstrap {
+export class ConnectionOriginInfoTabServiceImpl extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
@@ -62,3 +61,33 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
     this.connectionFormService.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
   }
 }
+
+export type ConnectionOriginInfoTabService = ConnectionOriginInfoTabServiceImpl;
+
+export class ConnectionOriginInfoTabServiceDI extends Context.Service<ConnectionOriginInfoTabServiceDI, ConnectionOriginInfoTabServiceImpl>()(
+  '@cloudbeaver/plugin-connections/ConnectionForm/OriginInfo/ConnectionOriginInfoTabService#ConnectionOriginInfoTabService',
+) {
+  static readonly implementation = ConnectionOriginInfoTabServiceImpl;
+
+  static readonly dependencies = () => [ConnectionFormService, ConnectionInfoOriginResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionOriginInfoTabServiceImpl,
+    never,
+    Context.Service.Identifier<typeof ConnectionFormService> | Context.Service.Identifier<typeof ConnectionInfoOriginResource>
+  > = Effect.gen(function* makeConnectionOriginInfoTabService() {
+    const connectionFormService = yield* ConnectionFormService;
+    const connectionInfoOriginResource = yield* ConnectionInfoOriginResource;
+
+    return new ConnectionOriginInfoTabServiceImpl(connectionFormService, connectionInfoOriginResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionOriginInfoTabServiceDI,
+    never,
+    Context.Service.Identifier<typeof ConnectionFormService> | Context.Service.Identifier<typeof ConnectionInfoOriginResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionOriginInfoTabService = ConnectionOriginInfoTabServiceDI;

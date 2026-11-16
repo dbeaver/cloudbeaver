@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import {
   ESettingsValueType,
   INTERFACE_SETTINGS_GROUP,
@@ -22,8 +22,7 @@ const settings = schema.object({
 
 type Settings = typeof settings;
 
-@injectable(() => [SettingsProviderService, SettingsManagerService])
-export class NavigationTabsSettingsService {
+export class NavigationTabsSettingsServiceImpl {
   readonly settings: SettingsProvider<Settings>;
 
   get hasMultipleRows(): boolean {
@@ -52,3 +51,33 @@ export class NavigationTabsSettingsService {
     ]);
   }
 }
+
+export type NavigationTabsSettingsService = NavigationTabsSettingsServiceImpl;
+
+export class NavigationTabsSettingsServiceDI extends Context.Service<NavigationTabsSettingsServiceDI, NavigationTabsSettingsServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tabs/NavigationTabs/NavigationTabsSettingsService#NavigationTabsSettingsService',
+) {
+  static readonly implementation = NavigationTabsSettingsServiceImpl;
+
+  static readonly dependencies = () => [SettingsProviderService, SettingsManagerService] as const;
+  static readonly make: Effect.Effect<
+    NavigationTabsSettingsServiceImpl,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Effect.gen(function* makeNavigationTabsSettingsService() {
+    const settingsProviderService = yield* SettingsProviderService;
+    const settingsManagerService = yield* SettingsManagerService;
+
+    return new NavigationTabsSettingsServiceImpl(settingsProviderService, settingsManagerService);
+  });
+  static readonly layer: Layer.Layer<
+    NavigationTabsSettingsServiceDI,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavigationTabsSettingsService = NavigationTabsSettingsServiceDI;

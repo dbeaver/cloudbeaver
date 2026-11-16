@@ -8,29 +8,29 @@
 import { observable } from 'mobx';
 
 import {
-  type Connection,
   ConnectionExecutionContextProjectKey,
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
   ConnectionInfoResource,
   ConnectionsManagerService,
   createConnectionParam,
+  type Connection,
   type IConnectionExecutionContext,
   type IConnectionExecutionContextInfo,
   type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { FEATURE_GIT_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, type SqlCompletionProposal, type SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { getSqlEditorName } from './getSqlEditorName.js';
 import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures.js';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
-import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { SqlQueryService } from './SqlResultTabs/SqlQueryService.js';
 
 export type SQLProposal = SqlCompletionProposal;
@@ -43,19 +43,7 @@ export interface ISqlEditorActiveQueryUpdateData {
   };
 }
 
-@injectable(() => [
-  GraphQLService,
-  ConnectionsManagerService,
-  NotificationService,
-  ConnectionExecutionContextService,
-  ConnectionExecutionContextResource,
-  ConnectionInfoResource,
-  SqlDataSourceService,
-  SqlEditorSettingsService,
-  ServerConfigResource,
-  SqlQueryService,
-])
-export class SqlEditorService {
+export class SqlEditorServiceImpl {
   get autoSave(): boolean {
     return this.sqlEditorSettingsService.autoSave && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
   }
@@ -295,3 +283,82 @@ export class SqlEditorService {
     }
   }
 }
+
+export type SqlEditorService = SqlEditorServiceImpl;
+
+export class SqlEditorServiceDI extends Context.Service<SqlEditorServiceDI, SqlEditorServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlEditorService#SqlEditorService',
+) {
+  static readonly implementation = SqlEditorServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      GraphQLService,
+      ConnectionsManagerService,
+      NotificationService,
+      ConnectionExecutionContextService,
+      ConnectionExecutionContextResource,
+      ConnectionInfoResource,
+      SqlDataSourceService,
+      SqlEditorSettingsService,
+      ServerConfigResource,
+      SqlQueryService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    SqlEditorServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof SqlEditorSettingsService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof SqlQueryService>
+  > = Effect.gen(function* makeSqlEditorService() {
+    const graphQLService = yield* GraphQLService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const notificationService = yield* NotificationService;
+    const connectionExecutionContextService = yield* ConnectionExecutionContextService;
+    const connectionExecutionContextResource = yield* ConnectionExecutionContextResource;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const sqlEditorSettingsService = yield* SqlEditorSettingsService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const sqlQueryService = yield* SqlQueryService;
+
+    return new SqlEditorServiceImpl(
+      graphQLService,
+      connectionsManagerService,
+      notificationService,
+      connectionExecutionContextService,
+      connectionExecutionContextResource,
+      connectionInfoResource,
+      sqlDataSourceService,
+      sqlEditorSettingsService,
+      serverConfigResource,
+      sqlQueryService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SqlEditorServiceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof SqlEditorSettingsService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof SqlQueryService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlEditorService = SqlEditorServiceDI;

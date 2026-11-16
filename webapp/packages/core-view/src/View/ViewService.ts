@@ -1,19 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import type { IActiveView } from './IActiveView.js';
 import type { IView } from './IView.js';
 
-@injectable()
-export class ViewService {
+export class ViewServiceImpl {
   /** Current view in focus */
   get primaryView(): IActiveView<any> | null {
     return this.view?.getView() || null;
@@ -80,3 +79,18 @@ export class ViewService {
     }
   }
 }
+
+export type ViewService = ViewServiceImpl;
+
+export class ViewServiceDI extends Context.Service<ViewServiceDI, ViewServiceImpl>()('@cloudbeaver/core-view/View/ViewService#ViewService') {
+  static readonly implementation = ViewServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<ViewServiceImpl, never, never> = Effect.sync(() => new ViewServiceImpl());
+  static readonly layer: Layer.Layer<ViewServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ViewService = ViewServiceDI;

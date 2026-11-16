@@ -8,7 +8,7 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
   CachedMapResource,
   type ICachedResourceMetadata,
@@ -32,8 +32,7 @@ interface INodeMetadata extends ICachedResourceMetadata {
   withDetails: boolean;
 }
 
-@injectable(() => [GraphQLService, AppAuthService])
-export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Record<string, unknown>, INodeMetadata> {
+export class NavNodeInfoResourceImpl extends CachedMapResource<string, NavNode, Record<string, unknown>, INodeMetadata> {
   constructor(
     private readonly graphQLService: GraphQLService,
     appAuthService: AppAuthService,
@@ -212,6 +211,36 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     return typeof key === 'string';
   }
 }
+
+export type NavNodeInfoResource = NavNodeInfoResourceImpl;
+
+export class NavNodeInfoResourceDI extends Context.Service<NavNodeInfoResourceDI, NavNodeInfoResourceImpl>()(
+  '@cloudbeaver/core-navigation-tree/NodesManager/NavNodeInfoResource#NavNodeInfoResource',
+) {
+  static readonly implementation = NavNodeInfoResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, AppAuthService] as const;
+  static readonly make: Effect.Effect<
+    NavNodeInfoResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof AppAuthService>
+  > = Effect.gen(function* makeNavNodeInfoResource() {
+    const graphQLService = yield* GraphQLService;
+    const appAuthService = yield* AppAuthService;
+
+    return new NavNodeInfoResourceImpl(graphQLService, appAuthService);
+  });
+  static readonly layer: Layer.Layer<
+    NavNodeInfoResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof AppAuthService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavNodeInfoResource = NavNodeInfoResourceDI;
 
 export function getNodeDisplayName(node: NavNode): string {
   return node.name ?? node.uri;

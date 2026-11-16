@@ -8,7 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
 import { LogViewerSettingsService } from './LogViewerSettingsService.js';
@@ -19,8 +19,7 @@ interface ISettings {
   active: boolean;
 }
 
-@injectable(() => [UserDataService, ToolsPanelService, LogViewerSettingsService, UserConfigurationStorage])
-export class LogViewerService {
+export class LogViewerServiceImpl {
   get settings() {
     return this.userDataService.withStorage(this.userConfigurationStorage).getUserData(logViewerSettingsKey, getLogViewerDefaultSettings);
   }
@@ -39,7 +38,7 @@ export class LogViewerService {
     private readonly logViewerSettingsService: LogViewerSettingsService,
     private readonly userConfigurationStorage: UserConfigurationStorage,
   ) {
-    makeObservable<LogViewerService>(this, {
+    makeObservable<LogViewerServiceImpl>(this, {
       settings: computed,
       disabled: computed,
     });
@@ -59,3 +58,40 @@ function getLogViewerDefaultSettings(): ISettings {
     active: false,
   };
 }
+
+export type LogViewerService = LogViewerServiceImpl;
+
+export class LogViewerServiceDI extends Context.Service<LogViewerServiceDI, LogViewerServiceImpl>()(
+  '@cloudbeaver/plugin-log-viewer/LogViewer/LogViewerService#LogViewerService',
+) {
+  static readonly implementation = LogViewerServiceImpl;
+  static readonly dependencies = () => [UserDataService, ToolsPanelService, LogViewerSettingsService, UserConfigurationStorage] as const;
+  static readonly make: Effect.Effect<
+    LogViewerServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof ToolsPanelService>
+    | Context.Service.Identifier<typeof LogViewerSettingsService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Effect.gen(function* makeLogViewerService() {
+    const userDataService = yield* UserDataService;
+    const toolsPanelService = yield* ToolsPanelService;
+    const logViewerSettingsService = yield* LogViewerSettingsService;
+    const userConfigurationStorage = yield* UserConfigurationStorage;
+
+    return new LogViewerServiceImpl(userDataService, toolsPanelService, logViewerSettingsService, userConfigurationStorage);
+  });
+  static readonly layer: Layer.Layer<
+    LogViewerServiceDI,
+    never,
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof ToolsPanelService>
+    | Context.Service.Identifier<typeof LogViewerSettingsService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const LogViewerService = LogViewerServiceDI;

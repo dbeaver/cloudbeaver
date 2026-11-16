@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { ConnectionInfoResource, EConnectionFeature } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODES, ENodeFeature, type NavNode, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
 import { ACTION_DELETE, ActionService, MenuService } from '@cloudbeaver/core-view';
 import { NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { MENU_OBJECT_VIEWER_FOOTER } from './MENU_OBJECT_VIEWER_FOOTER.js';
 
-@injectable(() => [NavTreeResource, NodeDeletionService, NavTreeSettingsService, MenuService, ActionService, ConnectionInfoResource])
-export class ObjectPropertyTableFooterService {
+export class ObjectPropertyTableFooterServiceImpl {
   constructor(
     private readonly navTreeResource: NavTreeResource,
     private readonly nodeDeletionService: NodeDeletionService,
@@ -74,3 +73,55 @@ export class ObjectPropertyTableFooterService {
     );
   }
 }
+
+export type ObjectPropertyTableFooterService = ObjectPropertyTableFooterServiceImpl;
+
+export class ObjectPropertyTableFooterServiceDI extends Context.Service<ObjectPropertyTableFooterServiceDI, ObjectPropertyTableFooterServiceImpl>()(
+  '@cloudbeaver/plugin-object-viewer/ObjectPropertiesPage/ObjectPropertyTable/ObjectPropertyTableFooterService#ObjectPropertyTableFooterService',
+) {
+  static readonly implementation = ObjectPropertyTableFooterServiceImpl;
+
+  static readonly dependencies = () =>
+    [NavTreeResource, NodeDeletionService, NavTreeSettingsService, MenuService, ActionService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ObjectPropertyTableFooterServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof NodeDeletionService>
+    | Context.Service.Identifier<typeof NavTreeSettingsService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeObjectPropertyTableFooterService() {
+    const navTreeResource = yield* NavTreeResource;
+    const nodeDeletionService = yield* NodeDeletionService;
+    const navTreeSettingsService = yield* NavTreeSettingsService;
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new ObjectPropertyTableFooterServiceImpl(
+      navTreeResource,
+      nodeDeletionService,
+      navTreeSettingsService,
+      menuService,
+      actionService,
+      connectionInfoResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ObjectPropertyTableFooterServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof NodeDeletionService>
+    | Context.Service.Identifier<typeof NavTreeSettingsService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ObjectPropertyTableFooterService = ObjectPropertyTableFooterServiceDI;

@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
@@ -44,8 +44,7 @@ const PRESENTATIONS = [
   },
 ];
 
-@injectable(() => [DataValuePanelService])
-export class TextValuePresentationBootstrap extends Bootstrap {
+export class TextValuePresentationBootstrapImpl extends Bootstrap {
   constructor(private readonly dataValuePanelService: DataValuePanelService) {
     super();
   }
@@ -80,3 +79,26 @@ export class TextValuePresentationBootstrap extends Bootstrap {
     }
   }
 }
+
+export type TextValuePresentationBootstrap = TextValuePresentationBootstrapImpl;
+
+export class TextValuePresentationBootstrapDI extends Context.Service<TextValuePresentationBootstrapDI, TextValuePresentationBootstrapImpl>()(
+  '@cloudbeaver/plugin-data-viewer/ValuePanelPresentation/TextValue/TextValuePresentationBootstrap#TextValuePresentationBootstrap',
+) {
+  static readonly implementation = TextValuePresentationBootstrapImpl;
+
+  static readonly dependencies = () => [DataValuePanelService] as const;
+  static readonly make: Effect.Effect<TextValuePresentationBootstrapImpl, never, Context.Service.Identifier<typeof DataValuePanelService>> =
+    Effect.gen(function* makeTextValuePresentationBootstrap() {
+      const dataValuePanelService = yield* DataValuePanelService;
+
+      return new TextValuePresentationBootstrapImpl(dataValuePanelService);
+    });
+  static readonly layer: Layer.Layer<TextValuePresentationBootstrapDI, never, Context.Service.Identifier<typeof DataValuePanelService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const TextValuePresentationBootstrap = TextValuePresentationBootstrapDI;

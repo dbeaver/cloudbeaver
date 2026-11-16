@@ -6,16 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { AIChatConversationsService, EAIConversationPromptGeneratorId } from '@cloudbeaver/plugin-ai-chat';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 export const LazyAIChatConversationScope = importLazyComponent(() => import('./AIChatConversationScope.js').then(m => m.AIChatConversationScope));
 
-@injectable(() => [AIChatConversationsService, ConnectionInfoResource])
-export class AIChatScopeService {
+export class AIChatScopeServiceImpl {
   constructor(
     private readonly aiChatConversationsService: AIChatConversationsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -33,3 +32,33 @@ export class AIChatScopeService {
     );
   }
 }
+
+export type AIChatScopeService = AIChatScopeServiceImpl;
+
+export class AIChatScopeServiceDI extends Context.Service<AIChatScopeServiceDI, AIChatScopeServiceImpl>()(
+  '@cloudbeaver/plugin-connection-ai/connection-custom-scope/ai-chat/AIChatScopeService#AIChatScopeService',
+) {
+  static readonly implementation = AIChatScopeServiceImpl;
+
+  static readonly dependencies = () => [AIChatConversationsService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    AIChatScopeServiceImpl,
+    never,
+    Context.Service.Identifier<typeof AIChatConversationsService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeAIChatScopeService() {
+    const aiChatConversationsService = yield* AIChatConversationsService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new AIChatScopeServiceImpl(aiChatConversationsService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatScopeServiceDI,
+    never,
+    Context.Service.Identifier<typeof AIChatConversationsService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatScopeService = AIChatScopeServiceDI;

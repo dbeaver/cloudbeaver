@@ -14,19 +14,19 @@ import type { AsyncTask, AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   ResultDataFormat,
+  type AsyncUpdateResultsDataBatchMutationVariables,
   type SqlExecuteInfo,
   type SqlQueryResults,
-  type AsyncUpdateResultsDataBatchMutationVariables,
 } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction.js';
 import type { IResultSetBlobValue } from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue.js';
-import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
+import { ResultSetEditAction, ResultSetEditActionImpl } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions.js';
+import { DatabaseDataFeature } from './DatabaseDataModel/IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet.js';
 import { ResultSetDataSource } from './ResultSet/ResultSetDataSource.js';
-import { DatabaseDataFeature } from './DatabaseDataModel/IDatabaseDataSource.js';
 
 export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
@@ -140,7 +140,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
 
         let blobs: IResultSetBlobValue[] = [];
 
-        if (editor instanceof ResultSetEditAction) {
+        if (editor instanceof ResultSetEditActionImpl) {
           blobs = editor.getBlobsToUpload();
         }
 

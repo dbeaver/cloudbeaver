@@ -17,10 +17,10 @@ import {
   EConnectionFeature,
   isConnectionNode,
 } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   DATA_CONTEXT_NAV_NODE,
   ENodeFeature,
@@ -36,6 +36,7 @@ import { getUniqueName } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ActionService, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
+import { MENU_NAVIGATION_TREE_MANAGE, nodeDeletionPlanContext, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService.js';
 import { ACTION_CONNECTION_CHANGE_CREDENTIALS } from './Actions/ACTION_CONNECTION_CHANGE_CREDENTIALS.js';
 import { ACTION_CONNECTION_CHANGE_DB_PASSWORD } from './Actions/ACTION_CONNECTION_CHANGE_DB_PASSWORD.js';
@@ -46,25 +47,8 @@ import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
 import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
 import { MENU_CONNECTION_SECURITY } from './MENU_CONNECTION_SECURITY.js';
-import { MENU_NAVIGATION_TREE_MANAGE, nodeDeletionPlanContext, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
 
-@injectable(() => [
-  NotificationService,
-  ConnectionInfoResource,
-  DBDriverResource,
-  ConnectionInfoAuthPropertiesResource,
-  ConnectionsManagerService,
-  ActionService,
-  MenuService,
-  PublicConnectionFormService,
-  ConnectionsSettingsService,
-  ServerConfigResource,
-  LocalizationService,
-  CommonDialogService,
-  NodeDeletionService,
-  NavTreeResource,
-])
-export class ConnectionMenuBootstrap extends Bootstrap {
+export class ConnectionMenuBootstrapImpl extends Bootstrap {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -410,3 +394,102 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     });
   }
 }
+
+export type ConnectionMenuBootstrap = ConnectionMenuBootstrapImpl;
+
+export class ConnectionMenuBootstrapDI extends Context.Service<ConnectionMenuBootstrapDI, ConnectionMenuBootstrapImpl>()(
+  '@cloudbeaver/plugin-connections/ContextMenu/ConnectionMenuBootstrap#ConnectionMenuBootstrap',
+) {
+  static readonly implementation = ConnectionMenuBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      NotificationService,
+      ConnectionInfoResource,
+      DBDriverResource,
+      ConnectionInfoAuthPropertiesResource,
+      ConnectionsManagerService,
+      ActionService,
+      MenuService,
+      PublicConnectionFormService,
+      ConnectionsSettingsService,
+      ServerConfigResource,
+      LocalizationService,
+      CommonDialogService,
+      NodeDeletionService,
+      NavTreeResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConnectionMenuBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof ConnectionInfoAuthPropertiesResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof PublicConnectionFormService>
+    | Context.Service.Identifier<typeof ConnectionsSettingsService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NodeDeletionService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+  > = Effect.gen(function* makeConnectionMenuBootstrap() {
+    const notificationService = yield* NotificationService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const dbDriverResource = yield* DBDriverResource;
+    const connectionInfoAuthPropertiesResource = yield* ConnectionInfoAuthPropertiesResource;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const publicConnectionFormService = yield* PublicConnectionFormService;
+    const connectionsSettingsService = yield* ConnectionsSettingsService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const localizationService = yield* LocalizationService;
+    const commonDialogService = yield* CommonDialogService;
+    const nodeDeletionService = yield* NodeDeletionService;
+    const navTreeResource = yield* NavTreeResource;
+
+    return new ConnectionMenuBootstrapImpl(
+      notificationService,
+      connectionInfoResource,
+      dbDriverResource,
+      connectionInfoAuthPropertiesResource,
+      connectionsManagerService,
+      actionService,
+      menuService,
+      publicConnectionFormService,
+      connectionsSettingsService,
+      serverConfigResource,
+      localizationService,
+      commonDialogService,
+      nodeDeletionService,
+      navTreeResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionMenuBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof ConnectionInfoAuthPropertiesResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof PublicConnectionFormService>
+    | Context.Service.Identifier<typeof ConnectionsSettingsService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NodeDeletionService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionMenuBootstrap = ConnectionMenuBootstrapDI;

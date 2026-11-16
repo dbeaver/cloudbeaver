@@ -7,7 +7,19 @@
  */
 import { action, makeObservable, runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import {
+  type Connection,
+  ConnectionFolderEventHandler,
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  ContainerResource,
+  createConnectionParam,
+  getConnectionParentId,
+  type IConnectionFolderEvent,
+  type IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, type IAsyncContextLoader, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   type INodeNavigationData,
@@ -20,32 +32,10 @@ import {
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { isResourceAlias, type ResourceKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import {
-  ConnectionInfoResource,
-  ContainerResource,
-  ConnectionsManagerService,
-  type Connection,
-  ConnectionInfoActiveProjectKey,
-  type IConnectionInfoParams,
-  getConnectionParentId,
-  createConnectionParam,
-  ConnectionFolderEventHandler,
-  type IConnectionFolderEvent,
-} from '@cloudbeaver/core-connections';
-import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
 import { getPathParent, getPathParts } from '@cloudbeaver/core-utils';
+import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
 
-@injectable(() => [
-  ConnectionInfoResource,
-  NavTreeResource,
-  ContainerResource,
-  NavNodeInfoResource,
-  NavNodeManagerService,
-  NavigationTreeService,
-  ConnectionsManagerService,
-  ConnectionFolderEventHandler,
-])
-export class ConnectionNavNodeService {
+export class ConnectionNavNodeServiceImpl {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navTreeResource: NavTreeResource,
@@ -328,3 +318,72 @@ export class ConnectionNavNodeService {
     return parent;
   }
 }
+
+export type ConnectionNavNodeService = ConnectionNavNodeServiceImpl;
+
+export class ConnectionNavNodeServiceDI extends Context.Service<ConnectionNavNodeServiceDI, ConnectionNavNodeServiceImpl>()(
+  '@cloudbeaver/plugin-connections/NavNodes/ConnectionNavNodeService#ConnectionNavNodeService',
+) {
+  static readonly implementation = ConnectionNavNodeServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      ConnectionInfoResource,
+      NavTreeResource,
+      ContainerResource,
+      NavNodeInfoResource,
+      NavNodeManagerService,
+      NavigationTreeService,
+      ConnectionsManagerService,
+      ConnectionFolderEventHandler,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConnectionNavNodeServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ContainerResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof NavigationTreeService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof ConnectionFolderEventHandler>
+  > = Effect.gen(function* makeConnectionNavNodeService() {
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const navTreeResource = yield* NavTreeResource;
+    const containerResource = yield* ContainerResource;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const navigationTreeService = yield* NavigationTreeService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const connectionFolderEventHandler = yield* ConnectionFolderEventHandler;
+
+    return new ConnectionNavNodeServiceImpl(
+      connectionInfoResource,
+      navTreeResource,
+      containerResource,
+      navNodeInfoResource,
+      navNodeManagerService,
+      navigationTreeService,
+      connectionsManagerService,
+      connectionFolderEventHandler,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionNavNodeServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ContainerResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof NavigationTreeService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof ConnectionFolderEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionNavNodeService = ConnectionNavNodeServiceDI;

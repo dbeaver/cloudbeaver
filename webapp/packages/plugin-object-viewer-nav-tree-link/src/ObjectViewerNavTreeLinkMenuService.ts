@@ -6,16 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { NavigationTreeService, DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ActionService, type IAction, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
+import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ACTION_LINK_OBJECT } from './ACTION_LINK_OBJECT.js';
 import { KEY_BINDING_LINK_OBJECT } from './KEY_BINDING_LINK_OBJECT.js';
 
-@injectable(() => [ActionService, KeyBindingService, NavigationTreeService, ConnectionSchemaManagerService, MenuService])
-export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
+export class ObjectViewerNavTreeLinkMenuServiceImpl extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
@@ -91,3 +90,52 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
     }
   }
 }
+
+export type ObjectViewerNavTreeLinkMenuService = ObjectViewerNavTreeLinkMenuServiceImpl;
+
+export class ObjectViewerNavTreeLinkMenuServiceDI extends Context.Service<
+  ObjectViewerNavTreeLinkMenuServiceDI,
+  ObjectViewerNavTreeLinkMenuServiceImpl
+>()('@cloudbeaver/plugin-object-viewer-nav-tree-link/ObjectViewerNavTreeLinkMenuService#ObjectViewerNavTreeLinkMenuService') {
+  static readonly implementation = ObjectViewerNavTreeLinkMenuServiceImpl;
+
+  static readonly dependencies = () =>
+    [ActionService, KeyBindingService, NavigationTreeService, ConnectionSchemaManagerService, MenuService] as const;
+  static readonly make: Effect.Effect<
+    ObjectViewerNavTreeLinkMenuServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof NavigationTreeService>
+    | Context.Service.Identifier<typeof ConnectionSchemaManagerService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makeObjectViewerNavTreeLinkMenuService() {
+    const actionService = yield* ActionService;
+    const keyBindingService = yield* KeyBindingService;
+    const navigationTreeService = yield* NavigationTreeService;
+    const connectionSchemaManagerService = yield* ConnectionSchemaManagerService;
+    const menuService = yield* MenuService;
+
+    return new ObjectViewerNavTreeLinkMenuServiceImpl(
+      actionService,
+      keyBindingService,
+      navigationTreeService,
+      connectionSchemaManagerService,
+      menuService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ObjectViewerNavTreeLinkMenuServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof NavigationTreeService>
+    | Context.Service.Identifier<typeof ConnectionSchemaManagerService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ObjectViewerNavTreeLinkMenuService = ObjectViewerNavTreeLinkMenuServiceDI;

@@ -8,7 +8,7 @@
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IEditableSettingsSource } from '@cloudbeaver/core-settings';
 
@@ -17,8 +17,7 @@ import { SettingsAdministrationService } from './SettingsAdministrationService.j
 const SettingsAdministration = importLazyComponent(() => import('./SettingsAdministration.js').then(module => module.SettingsAdministration));
 const SettingsDrawerItem = importLazyComponent(() => import('./SettingsDrawerItem.js').then(module => module.SettingsDrawerItem));
 
-@injectable(() => [AdministrationItemService, SettingsAdministrationService, CommonDialogService])
-export class SettingsAdministrationPluginBootstrap extends Bootstrap {
+export class SettingsAdministrationPluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly administrationItemService: AdministrationItemService,
     private readonly settingsAdministrationService: SettingsAdministrationService,
@@ -74,3 +73,39 @@ export class SettingsAdministrationPluginBootstrap extends Bootstrap {
     });
   }
 }
+
+export type SettingsAdministrationPluginBootstrap = SettingsAdministrationPluginBootstrapImpl;
+
+export class SettingsAdministrationPluginBootstrapDI extends Context.Service<
+  SettingsAdministrationPluginBootstrapDI,
+  SettingsAdministrationPluginBootstrapImpl
+>()('@cloudbeaver/plugin-settings-administration/SettingsAdministrationPluginBootstrap#SettingsAdministrationPluginBootstrap') {
+  static readonly implementation = SettingsAdministrationPluginBootstrapImpl;
+
+  static readonly dependencies = () => [AdministrationItemService, SettingsAdministrationService, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    SettingsAdministrationPluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof SettingsAdministrationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeSettingsAdministrationPluginBootstrap() {
+    const administrationItemService = yield* AdministrationItemService;
+    const settingsAdministrationService = yield* SettingsAdministrationService;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new SettingsAdministrationPluginBootstrapImpl(administrationItemService, settingsAdministrationService, commonDialogService);
+  });
+  static readonly layer: Layer.Layer<
+    SettingsAdministrationPluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof SettingsAdministrationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SettingsAdministrationPluginBootstrap = SettingsAdministrationPluginBootstrapDI;

@@ -9,7 +9,7 @@ import { computed, makeObservable } from 'mobx';
 
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { type DataTransferImportSettings, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -17,8 +17,7 @@ import { getProgressPercent } from '@cloudbeaver/core-utils';
 
 import { DataImportSettingsService } from './DataImportSettingsService.js';
 
-@injectable(() => [DataImportSettingsService, NotificationService, GraphQLService, AsyncTaskInfoService, SessionPermissionsResource])
-export class DataImportService {
+export class DataImportServiceImpl {
   get disabled(): boolean {
     if (this.sessionPermissionsResource.has(EAdminPermission.admin)) {
       return false;
@@ -123,3 +122,51 @@ export class DataImportService {
     }
   }
 }
+
+export type DataImportService = DataImportServiceImpl;
+
+export class DataImportServiceDI extends Context.Service<DataImportServiceDI, DataImportServiceImpl>()(
+  '@cloudbeaver/plugin-data-import/DataImportService#DataImportService',
+) {
+  static readonly implementation = DataImportServiceImpl;
+
+  static readonly dependencies = () =>
+    [DataImportSettingsService, NotificationService, GraphQLService, AsyncTaskInfoService, SessionPermissionsResource] as const;
+  static readonly make: Effect.Effect<
+    DataImportServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof DataImportSettingsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Effect.gen(function* makeDataImportService() {
+    const dataImportSettingsService = yield* DataImportSettingsService;
+    const notificationService = yield* NotificationService;
+    const graphQLService = yield* GraphQLService;
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+
+    return new DataImportServiceImpl(
+      dataImportSettingsService,
+      notificationService,
+      graphQLService,
+      asyncTaskInfoService,
+      sessionPermissionsResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    DataImportServiceDI,
+    never,
+    | Context.Service.Identifier<typeof DataImportSettingsService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataImportService = DataImportServiceDI;

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, IServiceProvider, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedResource } from '@cloudbeaver/core-resource';
 import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
@@ -22,8 +22,7 @@ import { MENU_PLUGINS } from './menu/MENU_PLUGINS.js';
 import { MENU_RESOURCE } from './menu/MENU_RESOURCE.js';
 import { ResourceSubMenuItem } from './menu/ResourceSubMenuItem.js';
 
-@injectable(() => [IServiceProvider, MenuService, ActionService, DevToolsService, PermissionsService])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly serviceProvider: IServiceProvider,
     private readonly menuService: MenuService,
@@ -201,10 +200,51 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  // private getResources(providers: IServiceConstructor<any>[]): ResourceSubMenuItem[] {
+  // private getResources(providers: ServiceType<any>[]): ResourceSubMenuItem[] {
   //   return providers
   //     .filter(service => service.prototype instanceof CachedResource)
   //     .sort((a, b) => a.name.localeCompare(b.name))
   //     .map(resource => new ResourceSubMenuItem(resource));
   // }
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-devtools/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+
+  static readonly dependencies = () => [IServiceProvider, MenuService, ActionService, DevToolsService, PermissionsService] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof DevToolsService>
+    | Context.Service.Identifier<typeof PermissionsService>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const serviceProvider = yield* IServiceProvider;
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const devToolsService = yield* DevToolsService;
+    const permissionsService = yield* PermissionsService;
+
+    return new PluginBootstrapImpl(serviceProvider, menuService, actionService, devToolsService, permissionsService);
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof DevToolsService>
+    | Context.Service.Identifier<typeof PermissionsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

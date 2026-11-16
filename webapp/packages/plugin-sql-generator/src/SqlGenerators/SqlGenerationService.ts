@@ -6,20 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, type DialogResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 import type { SqlQueryGenerator } from '@cloudbeaver/core-sdk';
 
+import type { GeneratedSqlPayload } from './GeneratedSqlDialog.js';
 import { getDefaultQueryGeneratorOptions } from './SqlGeneratorsResource.js';
 import { isSqlGenerationNode } from './sqlGenerationSelection.js';
-import type { GeneratedSqlPayload } from './GeneratedSqlDialog.js';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
 
-@injectable(() => [CommonDialogService, NotificationService])
-export class SqlGenerationService {
+export class SqlGenerationServiceImpl {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
@@ -58,3 +57,33 @@ export class SqlGenerationService {
     return dialog;
   }
 }
+
+export type SqlGenerationService = SqlGenerationServiceImpl;
+
+export class SqlGenerationServiceDI extends Context.Service<SqlGenerationServiceDI, SqlGenerationServiceImpl>()(
+  '@cloudbeaver/plugin-sql-generator/SqlGenerators/SqlGenerationService#SqlGenerationService',
+) {
+  static readonly implementation = SqlGenerationServiceImpl;
+
+  static readonly dependencies = () => [CommonDialogService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    SqlGenerationServiceImpl,
+    never,
+    Context.Service.Identifier<typeof CommonDialogService> | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeSqlGenerationService() {
+    const commonDialogService = yield* CommonDialogService;
+    const notificationService = yield* NotificationService;
+
+    return new SqlGenerationServiceImpl(commonDialogService, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    SqlGenerationServiceDI,
+    never,
+    Context.Service.Identifier<typeof CommonDialogService> | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlGenerationService = SqlGenerationServiceDI;

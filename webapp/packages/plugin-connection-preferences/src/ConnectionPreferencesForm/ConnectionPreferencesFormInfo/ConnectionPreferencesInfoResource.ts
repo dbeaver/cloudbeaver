@@ -8,26 +8,25 @@
 
 import { runInAction, toJS } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
-import { ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { type DatabaseConnectionPreferencesInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
-import { schemaValidationError } from '@cloudbeaver/core-utils';
 import {
   CONNECTION_INFO_PARAM_SCHEMA,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
+  type IConnectionInfoParams,
   isConnectionInfoParamEqual,
   parseConnectionKey,
-  type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { type DatabaseConnectionPreferencesInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 export type ConnectionPreferencesInfo = DatabaseConnectionPreferencesInfoFragment;
 
-@injectable(() => [ProjectsService, GraphQLService, ConnectionInfoResource])
-export class ConnectionPreferencesInfoResource extends CachedMapResource<IConnectionInfoParams, ConnectionPreferencesInfo> {
+export class ConnectionPreferencesInfoResourceImpl extends CachedMapResource<IConnectionInfoParams, ConnectionPreferencesInfo> {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly graphQLService: GraphQLService,
@@ -113,3 +112,41 @@ export class ConnectionPreferencesInfoResource extends CachedMapResource<IConnec
     return parse.success;
   }
 }
+
+export type ConnectionPreferencesInfoResource = ConnectionPreferencesInfoResourceImpl;
+
+export class ConnectionPreferencesInfoResourceDI extends Context.Service<
+  ConnectionPreferencesInfoResourceDI,
+  ConnectionPreferencesInfoResourceImpl
+>()(
+  '@cloudbeaver/plugin-connection-preferences/ConnectionPreferencesForm/ConnectionPreferencesFormInfo/ConnectionPreferencesInfoResource#ConnectionPreferencesInfoResource',
+) {
+  static readonly implementation = ConnectionPreferencesInfoResourceImpl;
+
+  static readonly dependencies = () => [ProjectsService, GraphQLService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionPreferencesInfoResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeConnectionPreferencesInfoResource() {
+    const projectsService = yield* ProjectsService;
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new ConnectionPreferencesInfoResourceImpl(projectsService, graphQLService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionPreferencesInfoResourceDI,
+    never,
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionPreferencesInfoResource = ConnectionPreferencesInfoResourceDI;

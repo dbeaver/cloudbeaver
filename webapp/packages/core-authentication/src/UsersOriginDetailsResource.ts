@@ -1,18 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { type AdminOriginDetailsFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { UsersResource } from './UsersResource.js';
 
-@injectable(() => [GraphQLService, UsersResource])
-export class UsersOriginDetailsResource extends CachedMapResource<string, AdminOriginDetailsFragment> {
+export class UsersOriginDetailsResourceImpl extends CachedMapResource<string, AdminOriginDetailsFragment> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly usersResource: UsersResource,
@@ -59,3 +58,33 @@ export class UsersOriginDetailsResource extends CachedMapResource<string, AdminO
     return typeof key === 'string';
   }
 }
+
+export type UsersOriginDetailsResource = UsersOriginDetailsResourceImpl;
+
+export class UsersOriginDetailsResourceDI extends Context.Service<UsersOriginDetailsResourceDI, UsersOriginDetailsResourceImpl>()(
+  '@cloudbeaver/core-authentication/UsersOriginDetailsResource#UsersOriginDetailsResource',
+) {
+  static readonly implementation = UsersOriginDetailsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, UsersResource] as const;
+  static readonly make: Effect.Effect<
+    UsersOriginDetailsResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof UsersResource>
+  > = Effect.gen(function* makeUsersOriginDetailsResource() {
+    const graphQLService = yield* GraphQLService;
+    const usersResource = yield* UsersResource;
+
+    return new UsersOriginDetailsResourceImpl(graphQLService, usersResource);
+  });
+  static readonly layer: Layer.Layer<
+    UsersOriginDetailsResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof UsersResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UsersOriginDetailsResource = UsersOriginDetailsResourceDI;

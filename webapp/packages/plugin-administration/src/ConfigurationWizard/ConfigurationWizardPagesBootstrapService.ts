@@ -7,7 +7,7 @@
  */
 import { AdministrationItemService, AdministrationItemType, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { formValidationContext } from '@cloudbeaver/core-ui';
@@ -32,15 +32,7 @@ const WelcomePage = importLazyComponent(() => import('./Welcome/WelcomePage.js')
 
 export const WELCOME_WIZARD_PAGE_NAME = 'welcome';
 
-@injectable(() => [
-  AdministrationItemService,
-  ConfigurationWizardService,
-  ServerConfigurationFormStateManager,
-  CommonDialogService,
-  ServerConfigurationService,
-  SessionDataResource,
-])
-export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
+export class ConfigurationWizardPagesBootstrapServiceImpl extends Bootstrap {
   constructor(
     private readonly administrationItemService: AdministrationItemService,
     private readonly configurationWizardService: ConfigurationWizardService,
@@ -155,3 +147,63 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
     });
   }
 }
+
+export type ConfigurationWizardPagesBootstrapService = ConfigurationWizardPagesBootstrapServiceImpl;
+
+export class ConfigurationWizardPagesBootstrapServiceDI extends Context.Service<
+  ConfigurationWizardPagesBootstrapServiceDI,
+  ConfigurationWizardPagesBootstrapServiceImpl
+>()('@cloudbeaver/plugin-administration/ConfigurationWizard/ConfigurationWizardPagesBootstrapService#ConfigurationWizardPagesBootstrapService') {
+  static readonly implementation = ConfigurationWizardPagesBootstrapServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      AdministrationItemService,
+      ConfigurationWizardService,
+      ServerConfigurationFormStateManager,
+      CommonDialogService,
+      ServerConfigurationService,
+      SessionDataResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConfigurationWizardPagesBootstrapServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof ConfigurationWizardService>
+    | Context.Service.Identifier<typeof ServerConfigurationFormStateManager>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ServerConfigurationService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+  > = Effect.gen(function* makeConfigurationWizardPagesBootstrapService() {
+    const administrationItemService = yield* AdministrationItemService;
+    const configurationWizardService = yield* ConfigurationWizardService;
+    const serverConfigurationFormStateManager = yield* ServerConfigurationFormStateManager;
+    const commonDialogService = yield* CommonDialogService;
+    const serverConfigurationService = yield* ServerConfigurationService;
+    const sessionDataResource = yield* SessionDataResource;
+
+    return new ConfigurationWizardPagesBootstrapServiceImpl(
+      administrationItemService,
+      configurationWizardService,
+      serverConfigurationFormStateManager,
+      commonDialogService,
+      serverConfigurationService,
+      sessionDataResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConfigurationWizardPagesBootstrapServiceDI,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof ConfigurationWizardService>
+    | Context.Service.Identifier<typeof ServerConfigurationFormStateManager>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ServerConfigurationService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConfigurationWizardPagesBootstrapService = ConfigurationWizardPagesBootstrapServiceDI;

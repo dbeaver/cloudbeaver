@@ -9,18 +9,19 @@ import { action, makeObservable, observable, untracked } from 'mobx';
 
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction.js';
+import { Context, Disposable, Effect, IServiceProvider, Layer, disposeService, type IServiceScope, type ServiceType } from '@cloudbeaver/core-di';
+import { DatabaseMetadataAction } from './Actions/General/DatabaseMetadataAction.js';
+import { IDatabaseDataMetadataAction } from './Actions/IDatabaseDataMetadataAction.js';
+import type { DatabaseActionImplementation, IDatabaseDataAction } from './IDatabaseDataAction.js';
 import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import { IDatabaseDataSource } from './IDatabaseDataSource.js';
-import { Disposable, injectable, IServiceProvider, withExternal, type IServiceScope, type SingleServiceType } from '@cloudbeaver/core-di';
 
-@injectable(() => [IDatabaseDataSource, IServiceProvider])
-export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
+export class DatabaseDataActionsImpl<TOptions, TResult extends IDatabaseDataResult>
   extends Disposable
   implements IDatabaseDataActions<TOptions, TResult>
 {
-  readonly registeredActions: Map<SingleServiceType<unknown>, SingleServiceType<unknown>[]>;
+  readonly registeredActions: Map<ServiceType<unknown>, ServiceType<unknown>[]>;
   private resultScopes: Map<string, IServiceScope>;
 
   constructor(
@@ -37,7 +38,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
     });
   }
 
-  registerAction<T>(service: SingleServiceType<any>, implementation: SingleServiceType<T>): this {
+  registerAction<T>(service: ServiceType<any>, implementation: ServiceType<T>): this {
     let implementations = this.registeredActions.get(service);
 
     if (!implementations) {
@@ -51,7 +52,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
 
     return this;
   }
-  unregisterAction<T>(service: SingleServiceType<any>, implementation: SingleServiceType<T>): this {
+  unregisterAction<T>(service: ServiceType<any>, implementation: ServiceType<T>): this {
     const implementations = this.registeredActions.get(service);
 
     if (implementations) {
@@ -65,7 +66,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
     return this;
   }
 
-  getConstructor<T extends IDatabaseDataAction<TOptions, TResult>>(service: SingleServiceType<T>): SingleServiceType<T> {
+  getConstructor<T extends IDatabaseDataAction<TOptions, TResult>>(service: ServiceType<T>): ServiceType<T> {
     const possibleImplementations = this.registeredActions
       .get(service)
       ?.filter(action => isActionSupportsFormat(action as any, this.source.dataFormat));
@@ -76,12 +77,12 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
       throw new Error(`Action ${service.name} not found for format ${this.source.dataFormat}`);
     }
 
-    return impl as SingleServiceType<T>;
+    return impl as ServiceType<T>;
   }
 
-  tryGet<T>(result: TResult, Action: SingleServiceType<T, any[]>): T | undefined;
-  tryGet<T>(result: TResult, Action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T | undefined;
-  tryGet<T>(result: TResult, Action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T | undefined {
+  tryGet<T>(result: TResult, Action: ServiceType<T>): T | undefined;
+  tryGet<T>(result: TResult, Action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T | undefined;
+  tryGet<T>(result: TResult, Action: ServiceType<T>, implementation?: DatabaseActionImplementation<unknown>): T | undefined {
     try {
       return this.get(result, Action, implementation!) as T;
     } catch {
@@ -89,25 +90,26 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
     }
   }
 
-  get<T>(result: TResult, Action: SingleServiceType<T, any[]>): T;
-  get<T>(result: TResult, Action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T;
-  get<T>(result: TResult, Action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T {
+  get<T>(result: TResult, Action: ServiceType<T>): T;
+  get<T>(result: TResult, Action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T;
+  get<T>(result: TResult, Action: ServiceType<T>, implementation?: DatabaseActionImplementation<unknown>): T {
     const scope = this.resultScopes.get(result.uniqueResultId);
 
     if (!scope) {
       throw new Error(`Result ${result.uniqueResultId} not found in the source`);
     }
 
-    const value = untracked(() =>
-      scope.serviceProvider.getService(
-        withExternal(Action)
-          .set(IDatabaseDataResult, result)
-          .set(IDatabaseDataSource, this.source as unknown),
-      ),
-    );
+    const value = untracked(() => scope.serviceProvider.acquireService(Action, Context.make(IDatabaseDataResult, result)));
 
-    if (implementation && !(value instanceof implementation)) {
-      throw new Error(`Action ${Action.name} not found for format ${this.source.dataFormat}`);
+    if (implementation) {
+      const constructor =
+        typeof implementation === 'function' && !('implementation' in implementation)
+          ? implementation
+          : (implementation as { implementation?: abstract new (...args: any[]) => unknown }).implementation;
+
+      if (!constructor || !(value instanceof constructor)) {
+        throw new Error(`Action ${Action.name} not found for format ${this.source.dataFormat}`);
+      }
     }
 
     return value;
@@ -123,31 +125,64 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
 
     for (const result of results) {
       if (!this.resultScopes.has(result.uniqueResultId)) {
-        this.resultScopes.set(result.uniqueResultId, this.serviceProvider.createScope());
+        this.resultScopes.set(result.uniqueResultId, this.serviceProvider.createScope({ aliases: () => this.getAliases() }));
       }
     }
 
     return this;
   }
 
-  protected override dispose(): Promise<void> | void {
-    for (const scope of this.resultScopes.values()) {
-      scope[Symbol.dispose]?.();
+  protected override async dispose(): Promise<void> {
+    await Promise.all([...this.resultScopes.values()].map(scope => scope[Symbol.asyncDispose]()));
+    this.resultScopes.clear();
+  }
+
+  private getAliases(): ReadonlyMap<string, ServiceType> {
+    const aliases = new Map<string, ServiceType>([[IDatabaseDataMetadataAction.key, DatabaseMetadataAction]]);
+
+    for (const [key, implementations] of this.registeredActions) {
+      const implementation = implementations.filter(action => isActionSupportsFormat(action, this.source.dataFormat)).at(-1);
+
+      if (implementation) {
+        aliases.set(key.key, implementation);
+      }
     }
 
-    this.resultScopes.clear();
+    return aliases;
   }
 }
 
-function isActionSupportsFormat<TOptions, TResult extends IDatabaseDataResult>(
-  action: IDatabaseDataActionClass<TOptions, TResult, IDatabaseDataAction<TOptions, TResult>> | IDatabaseDataAction<TOptions, TResult>,
-  format: ResultDataFormat,
-): boolean {
-  if ('dataFormat' in action) {
-    return !action.dataFormat || action.dataFormat.includes(format);
-  }
+export type DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> = DatabaseDataActionsImpl<TOptions, TResult>;
 
-  const constructor = action.constructor as IDatabaseDataActionClass<TOptions, TResult, IDatabaseDataAction<TOptions, TResult>>;
+export class DatabaseDataActionsDI extends Context.Service<DatabaseDataActionsDI, DatabaseDataActionsImpl<any, any>>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/DatabaseDataActions#DatabaseDataActions',
+) {
+  static readonly implementation = DatabaseDataActionsImpl;
 
-  return !constructor.dataFormat || constructor.dataFormat.includes(format);
+  static readonly dependencies = () => [IDatabaseDataSource, IServiceProvider] as const;
+  static readonly make: Effect.Effect<
+    DatabaseDataActionsImpl<any, any>,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IServiceProvider>
+  > = Effect.gen(function* makeDatabaseDataActions() {
+    const source = yield* IDatabaseDataSource;
+    const serviceProvider = yield* IServiceProvider;
+
+    return new DatabaseDataActionsImpl(source, serviceProvider);
+  });
+  static readonly layer: Layer.Layer<
+    DatabaseDataActionsDI,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IServiceProvider>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DatabaseDataActions = DatabaseDataActionsDI;
+
+function isActionSupportsFormat(action: ServiceType, format: ResultDataFormat): boolean {
+  const dataFormat = (action as { dataFormat?: ResultDataFormat[] | null }).dataFormat;
+  return !dataFormat || dataFormat.includes(format);
 }

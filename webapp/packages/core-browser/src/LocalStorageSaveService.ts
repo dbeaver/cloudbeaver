@@ -7,7 +7,7 @@
  */
 import { entries, type IReactionDisposer, keys, observable, ObservableMap, reaction, remove, runInAction, set, toJS } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import { IndexedDB, type IndexedDBTable } from './IndexedDB/IndexedDB.js';
@@ -28,8 +28,7 @@ interface IMessage {
   type: 'init' | 'respond';
 }
 
-@injectable(() => [IndexedDBService])
-export class LocalStorageSaveService {
+export class LocalStorageSaveServiceImpl {
   get storage(): LocalStorageType {
     return this.storageType;
   }
@@ -138,6 +137,29 @@ export class LocalStorageSaveService {
     this.broadcastChannel.postMessage(message);
   }
 }
+
+export type LocalStorageSaveService = LocalStorageSaveServiceImpl;
+
+export class LocalStorageSaveServiceDI extends Context.Service<LocalStorageSaveServiceDI, LocalStorageSaveServiceImpl>()(
+  '@cloudbeaver/core-browser/LocalStorageSaveService#LocalStorageSaveService',
+) {
+  static readonly implementation = LocalStorageSaveServiceImpl;
+
+  static readonly dependencies = () => [IndexedDBService] as const;
+  static readonly make: Effect.Effect<LocalStorageSaveServiceImpl, never, Context.Service.Identifier<typeof IndexedDBService>> = Effect.gen(
+    function* makeLocalStorageSaveService() {
+      const indexedDBService = yield* IndexedDBService;
+
+      return new LocalStorageSaveServiceImpl(indexedDBService);
+    },
+  );
+  static readonly layer: Layer.Layer<LocalStorageSaveServiceDI, never, Context.Service.Identifier<typeof IndexedDBService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const LocalStorageSaveService = LocalStorageSaveServiceDI;
 
 interface ILocalStorageIndexedRecord {
   key: string;

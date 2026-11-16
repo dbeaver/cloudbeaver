@@ -8,7 +8,7 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, Effect, IServiceProvider, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { FormBaseService, FormMode, FormState } from '@cloudbeaver/core-ui';
@@ -16,8 +16,7 @@ import { FormBaseService, FormMode, FormState } from '@cloudbeaver/core-ui';
 import type { IProjectInfoFormState } from './IProjectInfoFormState.js';
 import { ProjectInfoOptionsPanelService } from './ProjectInfoOptionsPanelService.js';
 
-@injectable(() => [LocalizationService, NotificationService, ProjectInfoOptionsPanelService, IServiceProvider])
-export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormState> {
+export class ProjectInfoFormServiceImpl extends FormBaseService<IProjectInfoFormState> {
   formState: FormState<IProjectInfoFormState> | null;
 
   constructor(
@@ -65,3 +64,41 @@ export class ProjectInfoFormService extends FormBaseService<IProjectInfoFormStat
     await this.projectInfoOptionsPanelService.close();
   }
 }
+
+export type ProjectInfoFormService = ProjectInfoFormServiceImpl;
+
+export class ProjectInfoFormServiceDI extends Context.Service<ProjectInfoFormServiceDI, ProjectInfoFormServiceImpl>()(
+  '@cloudbeaver/plugin-project-info/ProjectInfoForm/ProjectInfoFormService#ProjectInfoFormService',
+) {
+  static readonly implementation = ProjectInfoFormServiceImpl;
+
+  static readonly dependencies = () => [LocalizationService, NotificationService, ProjectInfoOptionsPanelService, IServiceProvider] as const;
+  static readonly make: Effect.Effect<
+    ProjectInfoFormServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ProjectInfoOptionsPanelService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+  > = Effect.gen(function* makeProjectInfoFormService() {
+    const localizationService = yield* LocalizationService;
+    const notificationService = yield* NotificationService;
+    const projectInfoOptionsPanelService = yield* ProjectInfoOptionsPanelService;
+    const serviceProvider = yield* IServiceProvider;
+
+    return new ProjectInfoFormServiceImpl(localizationService, notificationService, projectInfoOptionsPanelService, serviceProvider);
+  });
+  static readonly layer: Layer.Layer<
+    ProjectInfoFormServiceDI,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ProjectInfoOptionsPanelService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ProjectInfoFormService = ProjectInfoFormServiceDI;

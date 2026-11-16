@@ -1,19 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ENotificationType, type INotificationOptions } from '@cloudbeaver/core-events';
 import {
-  type IBaseServerEvent,
-  type ISessionEvent,
-  type SessionEventId,
   SessionEventSource,
   SessionEventTopic,
   TopicEventHandler,
+  type IBaseServerEvent,
+  type ISessionEvent,
+  type SessionEventId,
 } from '@cloudbeaver/core-root';
 import { CbEventTopic, WsServerNotificationEventType, type WsServerNotificationEvent } from '@cloudbeaver/core-sdk';
 
@@ -29,8 +29,7 @@ interface ServerNotificationEventMapped extends IBaseServerEvent<SessionEventId,
   type: ENotificationType;
 }
 
-@injectable(() => [SessionEventSource])
-export class ServerNotificationsEventHandler extends TopicEventHandler<
+export class ServerNotificationsEventHandlerImpl extends TopicEventHandler<
   ServerNotificationEventMapped,
   ISessionEvent,
   SessionEventId,
@@ -52,3 +51,26 @@ export class ServerNotificationsEventHandler extends TopicEventHandler<
     };
   }
 }
+
+export type ServerNotificationsEventHandler = ServerNotificationsEventHandlerImpl;
+
+export class ServerNotificationsEventHandlerDI extends Context.Service<ServerNotificationsEventHandlerDI, ServerNotificationsEventHandlerImpl>()(
+  '@cloudbeaver/core-server-notifications/ServerNotificationsEventHandler#ServerNotificationsEventHandler',
+) {
+  static readonly implementation = ServerNotificationsEventHandlerImpl;
+
+  static readonly dependencies = () => [SessionEventSource] as const;
+  static readonly make: Effect.Effect<ServerNotificationsEventHandlerImpl, never, Context.Service.Identifier<typeof SessionEventSource>> = Effect.gen(
+    function* makeServerNotificationsEventHandler() {
+      const sessionEventSource = yield* SessionEventSource;
+
+      return new ServerNotificationsEventHandlerImpl(sessionEventSource);
+    },
+  );
+  static readonly layer: Layer.Layer<ServerNotificationsEventHandlerDI, never, Context.Service.Identifier<typeof SessionEventSource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServerNotificationsEventHandler = ServerNotificationsEventHandlerDI;

@@ -9,7 +9,8 @@ import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
@@ -17,7 +18,6 @@ import { resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@clou
 import { StorageService } from '@cloudbeaver/core-storage';
 import { isArraysEqual, MetadataMap, TempMap } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, type IActiveView, View } from '@cloudbeaver/core-view';
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { reorderArray } from '@dbeaver/js-helpers';
 
 import type { ITab, ITabMetadata } from './ITab.js';
@@ -37,8 +37,7 @@ const MULTI_PROJECTS = '@://multi_projects//';
 
 const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 
-@injectable(() => [NotificationService, StorageService, UserInfoResource, ProjectsService, AdministrationScreenService, AppAuthService])
-export class NavigationTabsService extends View<ITab> {
+export class NavigationTabsServiceImpl extends View<ITab> {
   get currentTab(): ITab | undefined {
     if (this.currentTabId) {
       return this.getTab(this.currentTabId);
@@ -518,3 +517,55 @@ export class NavigationTabsService extends View<ITab> {
     }
   }
 }
+
+export type NavigationTabsService = NavigationTabsServiceImpl;
+
+export class NavigationTabsServiceDI extends Context.Service<NavigationTabsServiceDI, NavigationTabsServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tabs/NavigationTabs/NavigationTabsService#NavigationTabsService',
+) {
+  static readonly implementation = NavigationTabsServiceImpl;
+
+  static readonly dependencies = () =>
+    [NotificationService, StorageService, UserInfoResource, ProjectsService, AdministrationScreenService, AppAuthService] as const;
+  static readonly make: Effect.Effect<
+    NavigationTabsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof StorageService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Effect.gen(function* makeNavigationTabsService() {
+    const notificationService = yield* NotificationService;
+    const storageService = yield* StorageService;
+    const userInfoResource = yield* UserInfoResource;
+    const projectsService = yield* ProjectsService;
+    const administrationScreenService = yield* AdministrationScreenService;
+    const appAuthService = yield* AppAuthService;
+
+    return new NavigationTabsServiceImpl(
+      notificationService,
+      storageService,
+      userInfoResource,
+      projectsService,
+      administrationScreenService,
+      appAuthService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    NavigationTabsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof StorageService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavigationTabsService = NavigationTabsServiceDI;

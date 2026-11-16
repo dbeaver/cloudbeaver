@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, IServiceProvider, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoEventHandler, AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
@@ -22,13 +22,13 @@ import {
   TableViewerStorageService,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import { QueryDataSource } from '../QueryDataSource.js';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
-import { SqlQueryResultService } from './SqlQueryResultService.js';
-import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { SqlEditorPermissionService } from '../SqlEditorPermissionService.js';
+import { SqlQueryResultService } from './SqlQueryResultService.js';
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -66,24 +66,7 @@ export function SqlScriptErrorContext(): ISqlScriptErrorContext {
   };
 }
 
-@injectable(() => [
-  IServiceProvider,
-  TableViewerStorageService,
-  GraphQLService,
-  NotificationService,
-  ConnectionInfoResource,
-  ConnectionExecutionContextService,
-  SqlQueryResultService,
-  AsyncTaskInfoService,
-  DataViewerDataChangeConfirmationService,
-  DataViewerService,
-  SqlDataSourceService,
-  DataViewerSettingsService,
-  CommonDialogService,
-  AsyncTaskInfoEventHandler,
-  SqlEditorPermissionService,
-])
-export class SqlQueryService {
+export class SqlQueryServiceImpl {
   private readonly statisticsMap: Map<string, IQueryExecutionStatistics>;
   readonly onQueryExecution: IExecutor<ISqlEditorTabState>;
   readonly onScriptQueryError: IExecutor<ISqlScriptQueryError>;
@@ -419,3 +402,107 @@ export class SqlQueryService {
     });
   }
 }
+
+export type SqlQueryService = SqlQueryServiceImpl;
+
+export class SqlQueryServiceDI extends Context.Service<SqlQueryServiceDI, SqlQueryServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlResultTabs/SqlQueryService#SqlQueryService',
+) {
+  static readonly implementation = SqlQueryServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      IServiceProvider,
+      TableViewerStorageService,
+      GraphQLService,
+      NotificationService,
+      ConnectionInfoResource,
+      ConnectionExecutionContextService,
+      SqlQueryResultService,
+      AsyncTaskInfoService,
+      DataViewerDataChangeConfirmationService,
+      DataViewerService,
+      SqlDataSourceService,
+      DataViewerSettingsService,
+      CommonDialogService,
+      AsyncTaskInfoEventHandler,
+      SqlEditorPermissionService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    SqlQueryServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof TableViewerStorageService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof SqlQueryResultService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof DataViewerDataChangeConfirmationService>
+    | Context.Service.Identifier<typeof DataViewerService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof DataViewerSettingsService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoEventHandler>
+    | Context.Service.Identifier<typeof SqlEditorPermissionService>
+  > = Effect.gen(function* makeSqlQueryService() {
+    const serviceProvider = yield* IServiceProvider;
+    const tableViewerStorageService = yield* TableViewerStorageService;
+    const graphQLService = yield* GraphQLService;
+    const notificationService = yield* NotificationService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const connectionExecutionContextService = yield* ConnectionExecutionContextService;
+    const sqlQueryResultService = yield* SqlQueryResultService;
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+    const dataViewerDataChangeConfirmationService = yield* DataViewerDataChangeConfirmationService;
+    const dataViewerService = yield* DataViewerService;
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const dataViewerSettingsService = yield* DataViewerSettingsService;
+    const commonDialogService = yield* CommonDialogService;
+    const asyncTaskInfoEventHandler = yield* AsyncTaskInfoEventHandler;
+    const sqlEditorPermissionService = yield* SqlEditorPermissionService;
+
+    return new SqlQueryServiceImpl(
+      serviceProvider,
+      tableViewerStorageService,
+      graphQLService,
+      notificationService,
+      connectionInfoResource,
+      connectionExecutionContextService,
+      sqlQueryResultService,
+      asyncTaskInfoService,
+      dataViewerDataChangeConfirmationService,
+      dataViewerService,
+      sqlDataSourceService,
+      dataViewerSettingsService,
+      commonDialogService,
+      asyncTaskInfoEventHandler,
+      sqlEditorPermissionService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SqlQueryServiceDI,
+    never,
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof TableViewerStorageService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof SqlQueryResultService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof DataViewerDataChangeConfirmationService>
+    | Context.Service.Identifier<typeof DataViewerService>
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof DataViewerSettingsService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoEventHandler>
+    | Context.Service.Identifier<typeof SqlEditorPermissionService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlQueryService = SqlQueryServiceDI;

@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
   CachedMapResource,
@@ -26,8 +26,7 @@ import { AuthConfigurationsResource } from './AuthConfigurationsResource.js';
 export type AuthProvider = NonNullable<AuthProviderInfoFragment>;
 export type AuthProviderConfiguration = NonNullable<AuthProviderConfigurationInfoFragment>;
 
-@injectable(() => [GraphQLService, ServerConfigResource, AuthConfigurationsResource])
-export class AuthProvidersResource extends CachedMapResource<string, AuthProvider> {
+export class AuthProvidersResourceImpl extends CachedMapResource<string, AuthProvider> {
   get configurable(): AuthProvider[] {
     return this.values.filter(provider => provider.configurable);
   }
@@ -137,6 +136,41 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     return typeof key === 'string';
   }
 }
+
+export type AuthProvidersResource = AuthProvidersResourceImpl;
+
+export class AuthProvidersResourceDI extends Context.Service<AuthProvidersResourceDI, AuthProvidersResourceImpl>()(
+  '@cloudbeaver/core-authentication/AuthProvidersResource#AuthProvidersResource',
+) {
+  static readonly implementation = AuthProvidersResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ServerConfigResource, AuthConfigurationsResource] as const;
+  static readonly make: Effect.Effect<
+    AuthProvidersResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof AuthConfigurationsResource>
+  > = Effect.gen(function* makeAuthProvidersResource() {
+    const graphQLService = yield* GraphQLService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const authConfigurationsResource = yield* AuthConfigurationsResource;
+
+    return new AuthProvidersResourceImpl(graphQLService, serverConfigResource, authConfigurationsResource);
+  });
+  static readonly layer: Layer.Layer<
+    AuthProvidersResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof AuthConfigurationsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AuthProvidersResource = AuthProvidersResourceDI;
 
 export function sortProvider(a: AuthProvider, b: AuthProvider): number {
   if (a.id === AUTH_PROVIDER_LOCAL_ID) {

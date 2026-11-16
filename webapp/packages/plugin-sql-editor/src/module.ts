@@ -6,60 +6,53 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { SqlQueryService } from './SqlResultTabs/SqlQueryService.js';
-import { SqlScriptErrorService } from './SqlResultTabs/SqlScriptErrorService.js';
-import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService.js';
-import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService.js';
-import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootstrap.js';
-import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService.js';
-import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource.js';
-import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler.js';
-import { SqlEditorView } from './SqlEditorView.js';
-import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
-import { SqlEditorService } from './SqlEditorService.js';
-import { SqlEditorModeService } from './SqlEditorModeService.js';
-import { SqlEditorGroupTabsBootstrap } from './SqlEditorGroupTabsBootstrap.js';
-import { SqlDialectInfoService } from './SqlDialectInfoService.js';
-import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
-import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap.js';
-import { MenuBootstrap } from './MenuBootstrap.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { LocaleService } from './LocaleService.js';
-import { SqlEditorModel } from './SqlEditorModel/SqlEditorModel.js';
+import { MenuBootstrap } from './MenuBootstrap.js';
+import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap.js';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
+import { SqlDialectInfoService } from './SqlDialectInfoService.js';
+import { SqlEditorGroupTabsBootstrap } from './SqlEditorGroupTabsBootstrap.js';
+import { SqlEditorModelFactory } from './SqlEditorModel/SqlEditorModelFactory.js';
 import { SqlEditorModelService } from './SqlEditorModel/SqlEditorModelService.js';
+import { SqlEditorModeService } from './SqlEditorModeService.js';
 import { SqlEditorPermissionService } from './SqlEditorPermissionService.js';
+import { SqlEditorService } from './SqlEditorService.js';
+import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
+import { SqlEditorView } from './SqlEditorView.js';
+import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler.js';
+import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource.js';
+import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService.js';
+import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootstrap.js';
+import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService.js';
+import { SqlQueryService } from './SqlResultTabs/SqlQueryService.js';
+import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService.js';
+import { SqlScriptErrorService } from './SqlResultTabs/SqlScriptErrorService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-sql-editor',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addTransient(SqlEditorModel)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, proxy(LocalStorageSqlDataSourceBootstrap))
-      .addSingleton(Bootstrap, proxy(MenuBootstrap))
-      .addSingleton(Bootstrap, proxy(OutputMenuBootstrap))
-      .addSingleton(Bootstrap, proxy(SqlEditorGroupTabsBootstrap))
-      .addSingleton(Dependency, proxy(SqlEditorSettingsService))
-      .addSingleton(Dependency, proxy(OutputLogsResource))
-      .addSingleton(SqlQueryService)
-      .addSingleton(SqlScriptErrorService)
-      .addSingleton(SqlResultTabsService)
-      .addSingleton(SqlQueryResultService)
-      .addSingleton(OutputMenuBootstrap)
-      .addSingleton(OutputLogsService)
-      .addSingleton(OutputLogsResource)
-      .addSingleton(OutputLogsEventHandler)
-      .addSingleton(SqlEditorView)
-      .addSingleton(SqlEditorSettingsService)
-      .addSingleton(SqlEditorService)
-      .addSingleton(SqlEditorModeService)
-      .addSingleton(SqlEditorGroupTabsBootstrap)
-      .addSingleton(SqlDialectInfoService)
-      .addSingleton(SqlDataSourceService)
-      .addSingleton(LocalStorageSqlDataSourceBootstrap)
-      .addSingleton(SqlEditorModelService)
-      .addSingleton(MenuBootstrap)
-      .addSingleton(SqlEditorPermissionService);
-  },
+  services: () => [
+    SqlQueryService,
+    SqlScriptErrorService,
+    SqlResultTabsService,
+    SqlQueryResultService,
+    OutputMenuBootstrap,
+    OutputLogsService,
+    OutputLogsResource,
+    OutputLogsEventHandler,
+    SqlEditorView,
+    SqlEditorSettingsService,
+    SqlEditorService,
+    SqlEditorModeService,
+    SqlEditorGroupTabsBootstrap,
+    SqlDialectInfoService,
+    SqlDataSourceService,
+    LocalStorageSqlDataSourceBootstrap,
+    SqlEditorModelService,
+    SqlEditorModelFactory,
+    MenuBootstrap,
+    SqlEditorPermissionService,
+  ],
+  bootstraps: () => [LocaleService, LocalStorageSqlDataSourceBootstrap, MenuBootstrap, OutputMenuBootstrap, SqlEditorGroupTabsBootstrap],
 });

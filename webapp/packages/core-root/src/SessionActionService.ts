@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor, type ISyncContextLoader } from '@cloudbeaver/core-executor';
 
 import { type ISessionAction, SessionResource } from './SessionResource.js';
@@ -15,8 +15,7 @@ interface ISessionActionContext {
   process(): void;
 }
 
-@injectable(() => [SessionResource])
-export class SessionActionService {
+export class SessionActionServiceImpl {
   private actionToProcess: ISessionAction | null;
   readonly onAction: IExecutor<ISessionAction | null>;
 
@@ -44,6 +43,29 @@ export class SessionActionService {
     });
   }
 }
+
+export type SessionActionService = SessionActionServiceImpl;
+
+export class SessionActionServiceDI extends Context.Service<SessionActionServiceDI, SessionActionServiceImpl>()(
+  '@cloudbeaver/core-root/SessionActionService#SessionActionService',
+) {
+  static readonly implementation = SessionActionServiceImpl;
+
+  static readonly dependencies = () => [SessionResource] as const;
+  static readonly make: Effect.Effect<SessionActionServiceImpl, never, Context.Service.Identifier<typeof SessionResource>> = Effect.gen(
+    function* makeSessionActionService() {
+      const sessionResource = yield* SessionResource;
+
+      return new SessionActionServiceImpl(sessionResource);
+    },
+  );
+  static readonly layer: Layer.Layer<SessionActionServiceDI, never, Context.Service.Identifier<typeof SessionResource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SessionActionService = SessionActionServiceDI;
 
 export const sessionActionContext: ISyncContextLoader<ISessionActionContext, ISessionAction | null> = function sessionActionContext(contexts, data) {
   return {

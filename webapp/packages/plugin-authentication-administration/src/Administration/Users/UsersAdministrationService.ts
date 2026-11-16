@@ -10,10 +10,10 @@ import React from 'react';
 import { AdministrationItemService, type IAdministrationItem } from '@cloudbeaver/core-administration';
 import { type AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
-import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
+import { EUsersAdministrationSub, UsersAdministrationNavigationServiceImpl } from './UsersAdministrationNavigationService.js';
 import type { IUserFilters } from './UsersTable/Filters/useUsersTableFilters.js';
 
 const UserCredentialsList = React.lazy(async () => {
@@ -39,8 +39,7 @@ export interface IUsersActionButtonProps {
   filters: IUserFilters;
 }
 
-@injectable(() => [AdministrationItemService, TeamsResource, UsersResource])
-export class UsersAdministrationService extends Bootstrap {
+export class UsersAdministrationServiceImpl extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
   readonly informationPlaceholder: PlaceholderContainer;
@@ -62,7 +61,7 @@ export class UsersAdministrationService extends Bootstrap {
 
   override register(): void {
     this.administrationItem = this.administrationItemService.create({
-      name: UsersAdministrationNavigationService.ItemName,
+      name: UsersAdministrationNavigationServiceImpl.ItemName,
       order: 4,
       sub: [
         {
@@ -97,3 +96,38 @@ export class UsersAdministrationService extends Bootstrap {
     }
   }
 }
+
+export type UsersAdministrationService = UsersAdministrationServiceImpl;
+
+export class UsersAdministrationServiceDI extends Context.Service<UsersAdministrationServiceDI, UsersAdministrationServiceImpl>()(
+  '@cloudbeaver/plugin-authentication-administration/Administration/Users/UsersAdministrationService#UsersAdministrationService',
+) {
+  static readonly implementation = UsersAdministrationServiceImpl;
+
+  static readonly dependencies = () => [AdministrationItemService, TeamsResource, UsersResource] as const;
+  static readonly make: Effect.Effect<
+    UsersAdministrationServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof TeamsResource>
+    | Context.Service.Identifier<typeof UsersResource>
+  > = Effect.gen(function* makeUsersAdministrationService() {
+    const administrationItemService = yield* AdministrationItemService;
+    const teamsResource = yield* TeamsResource;
+    const usersResource = yield* UsersResource;
+
+    return new UsersAdministrationServiceImpl(administrationItemService, teamsResource, usersResource);
+  });
+  static readonly layer: Layer.Layer<
+    UsersAdministrationServiceDI,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof TeamsResource>
+    | Context.Service.Identifier<typeof UsersResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UsersAdministrationService = UsersAdministrationServiceDI;

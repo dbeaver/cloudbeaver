@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { flat, type ILoadableState } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
@@ -23,8 +23,7 @@ import type { IMenuItem } from './MenuItem/IMenuItem.js';
 import { MenuActionItem } from './MenuItem/MenuActionItem.js';
 import { MenuSubMenuItem } from './MenuItem/MenuSubMenuItem.js';
 
-@injectable(() => [ActionService])
-export class MenuService {
+export class MenuServiceImpl {
   private readonly handlers: Map<string, IMenuHandler<any>>;
   private readonly creators: IMenuItemsCreator[];
 
@@ -148,6 +147,27 @@ export class MenuService {
       .filter(Boolean);
   }
 }
+
+export type MenuService = MenuServiceImpl;
+
+export class MenuServiceDI extends Context.Service<MenuServiceDI, MenuServiceImpl>()('@cloudbeaver/core-view/Menu/MenuService#MenuService') {
+  static readonly implementation = MenuServiceImpl;
+
+  static readonly dependencies = () => [ActionService] as const;
+  static readonly make: Effect.Effect<MenuServiceImpl, never, Context.Service.Identifier<typeof ActionService>> = Effect.gen(
+    function* makeMenuService() {
+      const actionService = yield* ActionService;
+
+      return new MenuServiceImpl(actionService);
+    },
+  );
+  static readonly layer: Layer.Layer<MenuServiceDI, never, Context.Service.Identifier<typeof ActionService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const MenuService = MenuServiceDI;
 
 function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsCreator) => boolean {
   const menu = contexts.getOwn(DATA_CONTEXT_MENU);

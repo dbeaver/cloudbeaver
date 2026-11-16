@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IServerConfigurationFormPartState } from './IServerConfigurationFormPartState.js';
@@ -23,8 +23,7 @@ export interface IServerInfoPlaceholderProps extends IConfigurationPlaceholderPr
   formState: IFormState<null>;
 }
 
-@injectable(() => [ServerConfigurationFormService])
-export class ServerConfigurationService {
+export class ServerConfigurationServiceImpl {
   isDone: boolean;
 
   readonly securitySettingsContainer: PlaceholderContainer<IConfigurationPlaceholderProps>;
@@ -49,3 +48,26 @@ export class ServerConfigurationService {
     this.isDone = value;
   }
 }
+
+export type ServerConfigurationService = ServerConfigurationServiceImpl;
+
+export class ServerConfigurationServiceDI extends Context.Service<ServerConfigurationServiceDI, ServerConfigurationServiceImpl>()(
+  '@cloudbeaver/plugin-administration/ConfigurationWizard/ServerConfiguration/ServerConfigurationService#ServerConfigurationService',
+) {
+  static readonly implementation = ServerConfigurationServiceImpl;
+
+  static readonly dependencies = () => [ServerConfigurationFormService] as const;
+  static readonly make: Effect.Effect<ServerConfigurationServiceImpl, never, Context.Service.Identifier<typeof ServerConfigurationFormService>> =
+    Effect.gen(function* makeServerConfigurationService() {
+      const serverConfigurationFormService = yield* ServerConfigurationFormService;
+
+      return new ServerConfigurationServiceImpl(serverConfigurationFormService);
+    });
+  static readonly layer: Layer.Layer<ServerConfigurationServiceDI, never, Context.Service.Identifier<typeof ServerConfigurationFormService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const ServerConfigurationService = ServerConfigurationServiceDI;

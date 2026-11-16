@@ -9,7 +9,7 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { SettingsProviderService, type SettingsProvider } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
@@ -21,8 +21,7 @@ const settingsSchema = schema.object({
   [DEFAULT_PROFILE_KEY]: schema.string().nullable().default(null),
 });
 
-@injectable(() => [AIProfilesResource, UserInfoResource, SettingsProviderService])
-export class AIDefaultProfileService {
+export class AIDefaultProfileServiceImpl {
   private readonly settings: SettingsProvider<typeof settingsSchema>;
   private savingPromise: Promise<void> | null = null;
 
@@ -96,3 +95,38 @@ export class AIDefaultProfileService {
     }
   }
 }
+
+export type AIDefaultProfileService = AIDefaultProfileServiceImpl;
+
+export class AIDefaultProfileServiceDI extends Context.Service<AIDefaultProfileServiceDI, AIDefaultProfileServiceImpl>()(
+  '@cloudbeaver/plugin-ai-profiles/AIDefaultProfileService#AIDefaultProfileService',
+) {
+  static readonly implementation = AIDefaultProfileServiceImpl;
+
+  static readonly dependencies = () => [AIProfilesResource, UserInfoResource, SettingsProviderService] as const;
+  static readonly make: Effect.Effect<
+    AIDefaultProfileServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof AIProfilesResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof SettingsProviderService>
+  > = Effect.gen(function* makeAIDefaultProfileService() {
+    const aiProfilesResource = yield* AIProfilesResource;
+    const userInfoResource = yield* UserInfoResource;
+    const settingsProviderService = yield* SettingsProviderService;
+
+    return new AIDefaultProfileServiceImpl(aiProfilesResource, userInfoResource, settingsProviderService);
+  });
+  static readonly layer: Layer.Layer<
+    AIDefaultProfileServiceDI,
+    never,
+    | Context.Service.Identifier<typeof AIProfilesResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof SettingsProviderService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIDefaultProfileService = AIDefaultProfileServiceDI;

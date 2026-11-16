@@ -7,7 +7,7 @@
  */
 import { observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
 import { errorOf, OrderedMap } from '@cloudbeaver/core-utils';
@@ -27,8 +27,7 @@ import { ProcessNotificationController } from './ProcessNotificationController.j
 export const DELAY_DELETING = 1000;
 const TIMESTAMP_DIFFERENCE_THRESHOLD = 100;
 
-@injectable(() => [EventsSettingsService])
-export class NotificationService {
+export class NotificationServiceImpl {
   // todo change to common new Map()
 
   readonly notificationList: OrderedMap<number, INotification<any>>;
@@ -245,3 +244,26 @@ export class NotificationService {
     // TODO: emit event or something
   }
 }
+
+export type NotificationService = NotificationServiceImpl;
+
+export class NotificationServiceDI extends Context.Service<NotificationServiceDI, NotificationServiceImpl>()(
+  '@cloudbeaver/core-events/NotificationService#NotificationService',
+) {
+  static readonly implementation = NotificationServiceImpl;
+
+  static readonly dependencies = () => [EventsSettingsService] as const;
+  static readonly make: Effect.Effect<NotificationServiceImpl, never, Context.Service.Identifier<typeof EventsSettingsService>> = Effect.gen(
+    function* makeNotificationService() {
+      const eventsSettingsService = yield* EventsSettingsService;
+
+      return new NotificationServiceImpl(eventsSettingsService);
+    },
+  );
+  static readonly layer: Layer.Layer<NotificationServiceDI, never, Context.Service.Identifier<typeof EventsSettingsService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NotificationService = NotificationServiceDI;

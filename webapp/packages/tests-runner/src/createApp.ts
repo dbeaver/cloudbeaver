@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterAll, beforeAll } from 'vitest';
 import { configure } from 'mobx';
+import { afterAll, beforeAll } from 'vitest';
 
 import { App, IServiceProvider } from '@cloudbeaver/core-di';
 
@@ -16,7 +16,7 @@ export interface IApplication {
   app: App;
   serviceProvider: IServiceProvider;
   init(): Promise<void>;
-  dispose(): void;
+  dispose(): Promise<void>;
 }
 
 export function createApp(): IApplication {
@@ -30,8 +30,8 @@ export function createApp(): IApplication {
     await app.start();
   });
 
-  afterAll(() => {
-    app.unload();
+  afterAll(async () => {
+    await app.unload();
   });
 
   return {
@@ -42,8 +42,8 @@ export function createApp(): IApplication {
     async init() {
       await app.start();
     },
-    dispose() {
-      app.unload();
+    async dispose() {
+      await app.unload();
     },
   };
 }

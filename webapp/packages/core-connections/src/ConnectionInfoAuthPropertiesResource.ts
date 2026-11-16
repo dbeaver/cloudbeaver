@@ -7,7 +7,7 @@
  */
 import { runInAction, toJS } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { type DatabaseConnectionAuthPropertiesFragment, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -25,8 +25,7 @@ import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type ConnectionInfoAuthProperties = DatabaseConnectionAuthPropertiesFragment;
 
-@injectable(() => [ProjectsService, GraphQLService, ConnectionInfoResource])
-export class ConnectionInfoAuthPropertiesResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoAuthProperties> {
+export class ConnectionInfoAuthPropertiesResourceImpl extends CachedMapResource<IConnectionInfoParams, ConnectionInfoAuthProperties> {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly graphQLService: GraphQLService,
@@ -112,3 +111,39 @@ export class ConnectionInfoAuthPropertiesResource extends CachedMapResource<ICon
     return parse.success;
   }
 }
+
+export type ConnectionInfoAuthPropertiesResource = ConnectionInfoAuthPropertiesResourceImpl;
+
+export class ConnectionInfoAuthPropertiesResourceDI extends Context.Service<
+  ConnectionInfoAuthPropertiesResourceDI,
+  ConnectionInfoAuthPropertiesResourceImpl
+>()('@cloudbeaver/core-connections/ConnectionInfoAuthPropertiesResource#ConnectionInfoAuthPropertiesResource') {
+  static readonly implementation = ConnectionInfoAuthPropertiesResourceImpl;
+
+  static readonly dependencies = () => [ProjectsService, GraphQLService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionInfoAuthPropertiesResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeConnectionInfoAuthPropertiesResource() {
+    const projectsService = yield* ProjectsService;
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new ConnectionInfoAuthPropertiesResourceImpl(projectsService, graphQLService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionInfoAuthPropertiesResourceDI,
+    never,
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionInfoAuthPropertiesResource = ConnectionInfoAuthPropertiesResourceDI;

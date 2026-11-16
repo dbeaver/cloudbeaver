@@ -5,8 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { injectable } from '@cloudbeaver/core-di';
+import { ThemeService } from '@cloudbeaver/core-theming';
+import { uuid } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataAction,
   GridDataKeysUtils,
@@ -18,30 +20,20 @@ import {
   IDatabaseDataViewAction,
   type IGridDataKey,
 } from '@cloudbeaver/plugin-data-viewer';
-import type { IFormatRuleState } from './formatting/IFormatRuleState.js';
 import { makeObservable, observable } from 'mobx';
+import { ALL_COLUMNS } from './formatting/ALL_COLUMNS.js';
 import { COLOR_SCALE_RULE, DEFAULT_FORMAT_RULES } from './formatting/DEFAULT_FORMAT_RULES.js';
 import type { ICellFormatting } from './formatting/ICellFormatting.js';
-import { getValueForRuleParameter } from './formatting/getValueForRuleParameter.js';
-import { ALL_COLUMNS } from './formatting/ALL_COLUMNS.js';
 import type { IFormatRuleMatchValueGetter } from './formatting/IFormatRule.js';
-import { getColorMix } from './utils/getColorMix.js';
-import { uuid } from '@cloudbeaver/core-utils';
+import type { IFormatRuleState } from './formatting/IFormatRuleState.js';
+import { getValueForRuleParameter } from './formatting/getValueForRuleParameter.js';
 import { getSurfaceColor } from './getSurfaceColor.js';
-import { ThemeService } from '@cloudbeaver/core-theming';
+import { clamp } from './utils/clamp.js';
+import { getColorMix } from './utils/getColorMix.js';
 import { normalize } from './utils/normalize.js';
 import { resolveStopValue } from './utils/resolveStopValue.js';
-import { clamp } from './utils/clamp.js';
 
-@injectable(() => [
-  IDatabaseDataSource,
-  IDatabaseDataResult,
-  IDatabaseDataViewAction,
-  IDatabaseDataFormatAction,
-  IDatabaseDataMetadataAction,
-  ThemeService,
-])
-export class GridConditionalFormattingAction<
+export class GridConditionalFormattingActionImpl<
   TColumn = unknown,
   TRow = unknown,
   TKey extends IGridDataKey = IGridDataKey,
@@ -210,3 +202,62 @@ export class GridConditionalFormattingAction<
     this.sortedValueCache.clear();
   }
 }
+
+export type GridConditionalFormattingAction<
+  TColumn = unknown,
+  TRow = unknown,
+  TKey extends IGridDataKey = IGridDataKey,
+  TCell = unknown,
+  TResult extends IDatabaseDataResult = IDatabaseDataResult,
+> = GridConditionalFormattingActionImpl<TColumn, TRow, TKey, TCell, TResult>;
+
+export class GridConditionalFormattingActionDI extends Context.Service<
+  GridConditionalFormattingActionDI,
+  GridConditionalFormattingActionImpl<any, any, any, any, any>
+>()('@cloudbeaver/plugin-data-viewer-conditional-formatting/GridConditionalFormattingAction#GridConditionalFormattingAction') {
+  static readonly implementation = GridConditionalFormattingActionImpl;
+  static readonly dataFormat = GridConditionalFormattingActionImpl.dataFormat;
+  static readonly dependencies = () =>
+    [
+      IDatabaseDataSource,
+      IDatabaseDataResult,
+      IDatabaseDataViewAction,
+      IDatabaseDataFormatAction,
+      IDatabaseDataMetadataAction,
+      ThemeService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    GridConditionalFormattingActionImpl<any, any, any, any, any>,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataViewAction>
+    | Context.Service.Identifier<typeof IDatabaseDataFormatAction>
+    | Context.Service.Identifier<typeof IDatabaseDataMetadataAction>
+    | Context.Service.Identifier<typeof ThemeService>
+  > = Effect.gen(function* makeGridConditionalFormattingAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const view = yield* IDatabaseDataViewAction;
+    const format = yield* IDatabaseDataFormatAction;
+    const metadata = yield* IDatabaseDataMetadataAction;
+    const themeService = yield* ThemeService;
+
+    return new GridConditionalFormattingActionImpl(source, result, view, format, metadata, themeService);
+  });
+  static readonly layer: Layer.Layer<
+    GridConditionalFormattingActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataViewAction>
+    | Context.Service.Identifier<typeof IDatabaseDataFormatAction>
+    | Context.Service.Identifier<typeof IDatabaseDataMetadataAction>
+    | Context.Service.Identifier<typeof ThemeService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GridConditionalFormattingAction = GridConditionalFormattingActionDI;

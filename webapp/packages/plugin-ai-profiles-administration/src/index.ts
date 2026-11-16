@@ -8,4 +8,4 @@
 
 import './module.js';
 
-export { AIProfilesAdministrationBootstrap } from './AIProfilesAdministrationBootstrap.js';
+export { AIProfilesAdministrationBootstrap, AIProfilesAdministrationBootstrapImpl } from './AIProfilesAdministrationBootstrap.js';

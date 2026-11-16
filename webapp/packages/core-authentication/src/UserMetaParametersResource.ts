@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
@@ -22,8 +22,7 @@ export interface IUserMetaParameterOptions {
   required: boolean;
 }
 
-@injectable(() => [GraphQLService, SessionResource, UserInfoResource])
-export class UserMetaParametersResource extends CachedDataResource<UserMetaParameter[]> {
+export class UserMetaParametersResourceImpl extends CachedDataResource<UserMetaParameter[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionResource: SessionResource,
@@ -68,3 +67,38 @@ export class UserMetaParametersResource extends CachedDataResource<UserMetaParam
     return properties;
   }
 }
+
+export type UserMetaParametersResource = UserMetaParametersResourceImpl;
+
+export class UserMetaParametersResourceDI extends Context.Service<UserMetaParametersResourceDI, UserMetaParametersResourceImpl>()(
+  '@cloudbeaver/core-authentication/UserMetaParametersResource#UserMetaParametersResource',
+) {
+  static readonly implementation = UserMetaParametersResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, SessionResource, UserInfoResource] as const;
+  static readonly make: Effect.Effect<
+    UserMetaParametersResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof SessionResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+  > = Effect.gen(function* makeUserMetaParametersResource() {
+    const graphQLService = yield* GraphQLService;
+    const sessionResource = yield* SessionResource;
+    const userInfoResource = yield* UserInfoResource;
+
+    return new UserMetaParametersResourceImpl(graphQLService, sessionResource, userInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    UserMetaParametersResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof SessionResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UserMetaParametersResource = UserMetaParametersResourceDI;

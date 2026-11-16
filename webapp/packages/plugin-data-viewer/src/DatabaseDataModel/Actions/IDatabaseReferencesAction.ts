@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createService } from '@cloudbeaver/core-di';
+import { Context } from '@cloudbeaver/core-di';
 
 import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 
 export interface IDatabaseReferencesAction<TResult extends IDatabaseDataResult = IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {}
 
-export const IDatabaseReferencesAction = createService<IDatabaseReferencesAction>('IDatabaseReferencesAction');
+export const IDatabaseReferencesAction = Context.Service<IDatabaseReferencesAction>(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/IDatabaseReferencesAction#IDatabaseReferencesAction',
+);

@@ -8,17 +8,17 @@
 
 import { makeObservable, observable, reaction, type IReactionDisposer } from 'mobx';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ProjectsService } from '@cloudbeaver/core-projects';
-import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   createConnectionParam,
   isConnectionInfoParamEqual,
   type IConnectionExecutionContextInfo,
   type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 
 export interface IAIChatContextInfo {
   connectionKey: IConnectionInfoParams;
@@ -28,8 +28,7 @@ export interface IAIChatContextInfo {
 
 const SYNC_CONTEXT_DELAY = 500;
 
-@injectable(() => [ConnectionSchemaManagerService, UserInfoResource, ProjectsService])
-export class AIChatContextService extends Bootstrap {
+export class AIChatContextServiceImpl extends Bootstrap {
   onContextChange: SyncExecutor<IAIChatContextInfo | null>;
 
   get currentContext(): IAIChatContextInfo | null {
@@ -133,3 +132,38 @@ export class AIChatContextService extends Bootstrap {
     }
   }
 }
+
+export type AIChatContextService = AIChatContextServiceImpl;
+
+export class AIChatContextServiceDI extends Context.Service<AIChatContextServiceDI, AIChatContextServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChat/AIChatContext/AIChatContextService#AIChatContextService',
+) {
+  static readonly implementation = AIChatContextServiceImpl;
+
+  static readonly dependencies = () => [ConnectionSchemaManagerService, UserInfoResource, ProjectsService] as const;
+  static readonly make: Effect.Effect<
+    AIChatContextServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionSchemaManagerService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof ProjectsService>
+  > = Effect.gen(function* makeAIChatContextService() {
+    const connectionSchemaManagerService = yield* ConnectionSchemaManagerService;
+    const userInfoResource = yield* UserInfoResource;
+    const projectsService = yield* ProjectsService;
+
+    return new AIChatContextServiceImpl(connectionSchemaManagerService, userInfoResource, projectsService);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatContextServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionSchemaManagerService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof ProjectsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatContextService = AIChatContextServiceDI;

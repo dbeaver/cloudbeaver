@@ -7,7 +7,7 @@
  */
 import React from 'react';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
 
@@ -16,8 +16,7 @@ export const Options = React.lazy(async () => {
   return { default: OptionsPanel };
 });
 
-@injectable(() => [ConnectionFormService])
-export class ConnectionOptionsTabService extends Bootstrap {
+export class ConnectionOptionsTabServiceImpl extends Bootstrap {
   constructor(private readonly connectionFormService: ConnectionFormService) {
     super();
   }
@@ -33,3 +32,26 @@ export class ConnectionOptionsTabService extends Bootstrap {
     });
   }
 }
+
+export type ConnectionOptionsTabService = ConnectionOptionsTabServiceImpl;
+
+export class ConnectionOptionsTabServiceDI extends Context.Service<ConnectionOptionsTabServiceDI, ConnectionOptionsTabServiceImpl>()(
+  '@cloudbeaver/plugin-connections/ConnectionForm/Options/ConnectionOptionsTabService#ConnectionOptionsTabService',
+) {
+  static readonly implementation = ConnectionOptionsTabServiceImpl;
+
+  static readonly dependencies = () => [ConnectionFormService] as const;
+  static readonly make: Effect.Effect<ConnectionOptionsTabServiceImpl, never, Context.Service.Identifier<typeof ConnectionFormService>> = Effect.gen(
+    function* makeConnectionOptionsTabService() {
+      const connectionFormService = yield* ConnectionFormService;
+
+      return new ConnectionOptionsTabServiceImpl(connectionFormService);
+    },
+  );
+  static readonly layer: Layer.Layer<ConnectionOptionsTabServiceDI, never, Context.Service.Identifier<typeof ConnectionFormService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionOptionsTabService = ConnectionOptionsTabServiceDI;

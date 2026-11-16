@@ -7,11 +7,13 @@
  */
 import { action, makeObservable, observable, toJS } from 'mobx';
 
-import { withExternal, type IServiceProvider, type IServiceScope, type SingleServiceType } from '@cloudbeaver/core-di';
+import { Context, type IServiceProvider, type IServiceScope, type ServiceType } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, type ITask, SyncExecutor, Task } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { DatabaseDataActions } from './DatabaseDataActions.js';
 import { DatabasePersistedStateStore } from './DatabasePersistedStateStore.js';
+import type { DatabaseActionImplementation } from './IDatabaseDataAction.js';
 import { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import {
@@ -74,10 +76,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   constructor(serviceProvider: IServiceProvider) {
     this.serviceProvider = serviceProvider;
-    this.dataSourceScope = this.serviceProvider.createScope();
-    this.actions = this.dataSourceScope.serviceProvider.getService(
-      withExternal(IDatabaseDataActions).set(IDatabaseDataSource, this as unknown),
-    ) as unknown as IDatabaseDataActions<TOptions, TResult>;
+    this.dataSourceScope = this.serviceProvider.createScope({
+      context: Context.make(IDatabaseDataSource, this as unknown as IDatabaseDataSource),
+    });
+
+    this.actions = this.dataSourceScope.serviceProvider.acquireService(DatabaseDataActions) as IDatabaseDataActions<TOptions, TResult>;
 
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
@@ -130,11 +133,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     });
   }
 
-  tryGetAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T | undefined;
-  tryGetAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T | undefined;
-  tryGetAction<T>(resultIndex: number, action: SingleServiceType<unknown, unknown[]>, implementation: SingleServiceType<T, any[]>): T;
-  tryGetAction<T>(result: TResult, action: SingleServiceType<unknown, unknown[]>, implementation: SingleServiceType<T, any[]>): T;
-  tryGetAction<T>(resultIndex: number | TResult, action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T | undefined {
+  tryGetAction<T>(resultIndex: number, action: ServiceType<T>): T | undefined;
+  tryGetAction<T>(result: TResult, action: ServiceType<T>): T | undefined;
+  tryGetAction<T>(resultIndex: number, action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T;
+  tryGetAction<T>(result: TResult, action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T;
+  tryGetAction<T>(resultIndex: number | TResult, action: ServiceType<T>, implementation?: DatabaseActionImplementation<unknown>): T | undefined {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
         return undefined;
@@ -146,11 +149,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this.actions.tryGet(resultIndex, action, implementation!) as T;
   }
 
-  getAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T;
-  getAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T;
-  getAction<T>(resultIndex: number, action: SingleServiceType<unknown, unknown[]>, implementation: SingleServiceType<T, any[]>): T;
-  getAction<T>(result: TResult, action: SingleServiceType<unknown, unknown[]>, implementation: SingleServiceType<T, any[]>): T;
-  getAction<T>(resultIndex: number | TResult, action: SingleServiceType<T, any[]>, implementation?: SingleServiceType<unknown>): T {
+  getAction<T>(resultIndex: number, action: ServiceType<T>): T;
+  getAction<T>(result: TResult, action: ServiceType<T>): T;
+  getAction<T>(resultIndex: number, action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T;
+  getAction<T>(result: TResult, action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T;
+  getAction<T>(resultIndex: number | TResult, action: ServiceType<T>, implementation?: DatabaseActionImplementation<unknown>): T {
     if (typeof resultIndex === 'number') {
       if (!this.hasResult(resultIndex)) {
         throw new Error('Result index out of range');

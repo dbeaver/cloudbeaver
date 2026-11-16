@@ -7,15 +7,14 @@
  */
 import { makeObservable, observable, runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutor, type IExecutorHandler } from '@cloudbeaver/core-executor';
 
 import { NavigationService } from './NavigationService.js';
 
 export type OptionsPanelCloseEventData = 'before' | 'after';
 
-@injectable(() => [NavigationService])
-export class OptionsPanelService {
+export class OptionsPanelServiceImpl {
   active: boolean;
   readonly closeTask: IExecutor<OptionsPanelCloseEventData>;
 
@@ -92,3 +91,26 @@ export class OptionsPanelService {
     }
   };
 }
+
+export type OptionsPanelService = OptionsPanelServiceImpl;
+
+export class OptionsPanelServiceDI extends Context.Service<OptionsPanelServiceDI, OptionsPanelServiceImpl>()(
+  '@cloudbeaver/core-ui/Screens/AppScreen/OptionsPanelService#OptionsPanelService',
+) {
+  static readonly implementation = OptionsPanelServiceImpl;
+
+  static readonly dependencies = () => [NavigationService] as const;
+  static readonly make: Effect.Effect<OptionsPanelServiceImpl, never, Context.Service.Identifier<typeof NavigationService>> = Effect.gen(
+    function* makeOptionsPanelService() {
+      const navigationService = yield* NavigationService;
+
+      return new OptionsPanelServiceImpl(navigationService);
+    },
+  );
+  static readonly layer: Layer.Layer<OptionsPanelServiceDI, never, Context.Service.Identifier<typeof NavigationService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const OptionsPanelService = OptionsPanelServiceDI;

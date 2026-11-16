@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { toJS } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapResource } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
@@ -16,8 +16,7 @@ import { schemaValidationError } from '@cloudbeaver/core-utils';
 import { createTransactionInfoParam, type ITransactionInfoParam, TRANSACTION_INFO_PARAM_SCHEMA } from './TRANSACTION_INFO_PARAM_SCHEMA.js';
 import { type IWsTransactionCountEvent, TransactionLogCountEventHandler } from './TransactionLogCountEventHandler.js';
 
-@injectable(() => [GraphQLService, TransactionLogCountEventHandler])
-export class TransactionLogCountResource extends CachedMapResource<ITransactionInfoParam, number> {
+export class TransactionLogCountResourceImpl extends CachedMapResource<ITransactionInfoParam, number> {
   constructor(
     private readonly graphQLService: GraphQLService,
     transactionLogCountEventHandler: TransactionLogCountEventHandler,
@@ -61,3 +60,33 @@ export class TransactionLogCountResource extends CachedMapResource<ITransactionI
     return parse.success;
   }
 }
+
+export type TransactionLogCountResource = TransactionLogCountResourceImpl;
+
+export class TransactionLogCountResourceDI extends Context.Service<TransactionLogCountResourceDI, TransactionLogCountResourceImpl>()(
+  '@cloudbeaver/plugin-datasource-transaction-manager/TransactionLog/TransactionLogCountResource#TransactionLogCountResource',
+) {
+  static readonly implementation = TransactionLogCountResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, TransactionLogCountEventHandler] as const;
+  static readonly make: Effect.Effect<
+    TransactionLogCountResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof TransactionLogCountEventHandler>
+  > = Effect.gen(function* makeTransactionLogCountResource() {
+    const graphQLService = yield* GraphQLService;
+    const transactionLogCountEventHandler = yield* TransactionLogCountEventHandler;
+
+    return new TransactionLogCountResourceImpl(graphQLService, transactionLogCountEventHandler);
+  });
+  static readonly layer: Layer.Layer<
+    TransactionLogCountResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof TransactionLogCountEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TransactionLogCountResource = TransactionLogCountResourceDI;

@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { type IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { declensionOfNumber } from '@cloudbeaver/core-utils';
@@ -28,8 +28,7 @@ const AutoRefreshSettingsDialog = importLazyComponent(() =>
 
 const AUTO_REFRESH_INTERVALS = [5, 10, 15, 30, 60];
 
-@injectable(() => [ActionService, MenuService, LocalizationService, CommonDialogService])
-export class TableRefreshActionBootstrap extends Bootstrap {
+export class TableRefreshActionBootstrapImpl extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -208,3 +207,41 @@ export class TableRefreshActionBootstrap extends Bootstrap {
     return this.localizationService.translate(declensionOfNumber(interval, message), undefined, { interval });
   }
 }
+
+export type TableRefreshActionBootstrap = TableRefreshActionBootstrapImpl;
+
+export class TableRefreshActionBootstrapDI extends Context.Service<TableRefreshActionBootstrapDI, TableRefreshActionBootstrapImpl>()(
+  '@cloudbeaver/plugin-data-viewer/TableViewer/TableFooter/TableFooterMenu/RefreshAction/TableRefreshActionBootstrap#TableRefreshActionBootstrap',
+) {
+  static readonly implementation = TableRefreshActionBootstrapImpl;
+
+  static readonly dependencies = () => [ActionService, MenuService, LocalizationService, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    TableRefreshActionBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeTableRefreshActionBootstrap() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const localizationService = yield* LocalizationService;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new TableRefreshActionBootstrapImpl(actionService, menuService, localizationService, commonDialogService);
+  });
+  static readonly layer: Layer.Layer<
+    TableRefreshActionBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TableRefreshActionBootstrap = TableRefreshActionBootstrapDI;

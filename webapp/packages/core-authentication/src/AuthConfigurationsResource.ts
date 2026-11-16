@@ -7,7 +7,7 @@
  */
 import { runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
   CachedMapResource,
@@ -28,8 +28,7 @@ export type AuthConfiguration = AdminAuthProviderConfiguration;
 
 type NewConfiguration = AuthConfiguration & { [NEW_CONFIGURATION_SYMBOL]: boolean; timestamp: number };
 
-@injectable(() => [GraphQLService, SessionPermissionsResource])
-export class AuthConfigurationsResource extends CachedMapResource<string, AuthConfiguration, GetAuthProviderConfigurationsQueryVariables> {
+export class AuthConfigurationsResourceImpl extends CachedMapResource<string, AuthConfiguration, GetAuthProviderConfigurationsQueryVariables> {
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionPermissionsResource: SessionPermissionsResource,
@@ -116,6 +115,36 @@ export class AuthConfigurationsResource extends CachedMapResource<string, AuthCo
     return typeof key === 'string';
   }
 }
+
+export type AuthConfigurationsResource = AuthConfigurationsResourceImpl;
+
+export class AuthConfigurationsResourceDI extends Context.Service<AuthConfigurationsResourceDI, AuthConfigurationsResourceImpl>()(
+  '@cloudbeaver/core-authentication/AuthConfigurationsResource#AuthConfigurationsResource',
+) {
+  static readonly implementation = AuthConfigurationsResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, SessionPermissionsResource] as const;
+  static readonly make: Effect.Effect<
+    AuthConfigurationsResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Effect.gen(function* makeAuthConfigurationsResource() {
+    const graphQLService = yield* GraphQLService;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+
+    return new AuthConfigurationsResourceImpl(graphQLService, sessionPermissionsResource);
+  });
+  static readonly layer: Layer.Layer<
+    AuthConfigurationsResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AuthConfigurationsResource = AuthConfigurationsResourceDI;
 
 function isNewConfiguration(configuration: AuthConfiguration | NewConfiguration): configuration is NewConfiguration {
   return (configuration as NewConfiguration)[NEW_CONFIGURATION_SYMBOL];

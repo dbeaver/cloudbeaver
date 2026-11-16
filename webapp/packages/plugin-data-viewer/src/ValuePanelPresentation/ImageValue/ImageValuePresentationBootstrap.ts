@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
@@ -17,8 +17,7 @@ import { isImageValuePresentationAvailable } from './isImageValuePresentationAva
 
 const ImageValuePresentation = importLazyComponent(() => import('./ImageValuePresentation.js').then(module => module.ImageValuePresentation));
 
-@injectable(() => [DataValuePanelService])
-export class ImageValuePresentationBootstrap extends Bootstrap {
+export class ImageValuePresentationBootstrapImpl extends Bootstrap {
   constructor(private readonly dataValuePanelService: DataValuePanelService) {
     super();
   }
@@ -58,3 +57,26 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
     });
   }
 }
+
+export type ImageValuePresentationBootstrap = ImageValuePresentationBootstrapImpl;
+
+export class ImageValuePresentationBootstrapDI extends Context.Service<ImageValuePresentationBootstrapDI, ImageValuePresentationBootstrapImpl>()(
+  '@cloudbeaver/plugin-data-viewer/ValuePanelPresentation/ImageValue/ImageValuePresentationBootstrap#ImageValuePresentationBootstrap',
+) {
+  static readonly implementation = ImageValuePresentationBootstrapImpl;
+
+  static readonly dependencies = () => [DataValuePanelService] as const;
+  static readonly make: Effect.Effect<ImageValuePresentationBootstrapImpl, never, Context.Service.Identifier<typeof DataValuePanelService>> =
+    Effect.gen(function* makeImageValuePresentationBootstrap() {
+      const dataValuePanelService = yield* DataValuePanelService;
+
+      return new ImageValuePresentationBootstrapImpl(dataValuePanelService);
+    });
+  static readonly layer: Layer.Layer<ImageValuePresentationBootstrapDI, never, Context.Service.Identifier<typeof DataValuePanelService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const ImageValuePresentationBootstrap = ImageValuePresentationBootstrapDI;

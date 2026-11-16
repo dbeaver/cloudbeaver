@@ -7,10 +7,10 @@
  */
 import { reaction } from 'mobx';
 
-import { ConnectionInfoResource, EConnectionFeature, type Connection } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
-import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource, EConnectionFeature, type Connection } from '@cloudbeaver/core-connections';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 
 import { DataViewerSettingsService } from './DataViewerSettingsService.js';
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
@@ -21,8 +21,7 @@ export interface IErrorActionsContainerData {
   model: IDatabaseDataModel<any>;
 }
 
-@injectable(() => [DataViewerSettingsService, SessionPermissionsResource, ConnectionInfoResource])
-export class DataViewerService {
+export class DataViewerServiceImpl {
   readonly errorActionsContainer: PlaceholderContainer<IErrorActionsContainerData>;
 
   get canCopyData() {
@@ -67,3 +66,38 @@ export class DataViewerService {
     return isAdmin || !disabled;
   }
 }
+
+export type DataViewerService = DataViewerServiceImpl;
+
+export class DataViewerServiceDI extends Context.Service<DataViewerServiceDI, DataViewerServiceImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DataViewerService#DataViewerService',
+) {
+  static readonly implementation = DataViewerServiceImpl;
+
+  static readonly dependencies = () => [DataViewerSettingsService, SessionPermissionsResource, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    DataViewerServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof DataViewerSettingsService>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeDataViewerService() {
+    const dataViewerSettingsService = yield* DataViewerSettingsService;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new DataViewerServiceImpl(dataViewerSettingsService, sessionPermissionsResource, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    DataViewerServiceDI,
+    never,
+    | Context.Service.Identifier<typeof DataViewerSettingsService>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataViewerService = DataViewerServiceDI;

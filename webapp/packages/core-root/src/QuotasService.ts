@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { isNumber } from '@dbeaver/js-helpers';
 
 import { ServerResourceQuotasResource } from './ServerResourceQuotasResource.js';
@@ -29,8 +29,7 @@ const DEFAULT_QUOTAS: IQuotas = {
   sqlBinaryPreviewMaxLength: 261120,
 };
 
-@injectable(() => [ServerResourceQuotasResource])
-export class QuotasService {
+export class QuotasServiceImpl {
   get quotas(): IQuotas {
     return {
       sqlMaxRunningQueries: this.getQuota('sqlMaxRunningQueries'),
@@ -56,3 +55,24 @@ export class QuotasService {
     return DEFAULT_QUOTAS[key];
   }
 }
+
+export type QuotasService = QuotasServiceImpl;
+
+export class QuotasServiceDI extends Context.Service<QuotasServiceDI, QuotasServiceImpl>()('@cloudbeaver/core-root/QuotasService#QuotasService') {
+  static readonly implementation = QuotasServiceImpl;
+
+  static readonly dependencies = () => [ServerResourceQuotasResource] as const;
+  static readonly make: Effect.Effect<QuotasServiceImpl, never, Context.Service.Identifier<typeof ServerResourceQuotasResource>> = Effect.gen(
+    function* makeQuotasService() {
+      const serverResourceQuotasResource = yield* ServerResourceQuotasResource;
+
+      return new QuotasServiceImpl(serverResourceQuotasResource);
+    },
+  );
+  static readonly layer: Layer.Layer<QuotasServiceDI, never, Context.Service.Identifier<typeof ServerResourceQuotasResource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const QuotasService = QuotasServiceDI;

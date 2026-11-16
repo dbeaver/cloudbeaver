@@ -7,15 +7,14 @@
  */
 
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ActionService, MenuService } from '@cloudbeaver/core-view';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { ActionService, MenuService } from '@cloudbeaver/core-view';
 
 import { ACTION_CONNECTION_PREFERENCES } from './actions/ACTION_CONNECTION_PREFERENCES.js';
 import { ConnectionPreferencesPanelService } from './ConnectionPreferencesPanelService.js';
 
-@injectable(() => [ActionService, MenuService, ConnectionPreferencesPanelService])
-export class ConnectionPreferencesBootstrap extends Bootstrap {
+export class ConnectionPreferencesBootstrapImpl extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -46,3 +45,38 @@ export class ConnectionPreferencesBootstrap extends Bootstrap {
     });
   }
 }
+
+export type ConnectionPreferencesBootstrap = ConnectionPreferencesBootstrapImpl;
+
+export class ConnectionPreferencesBootstrapDI extends Context.Service<ConnectionPreferencesBootstrapDI, ConnectionPreferencesBootstrapImpl>()(
+  '@cloudbeaver/plugin-connection-preferences/ConnectionPreferencesBootstrap#ConnectionPreferencesBootstrap',
+) {
+  static readonly implementation = ConnectionPreferencesBootstrapImpl;
+
+  static readonly dependencies = () => [ActionService, MenuService, ConnectionPreferencesPanelService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionPreferencesBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ConnectionPreferencesPanelService>
+  > = Effect.gen(function* makeConnectionPreferencesBootstrap() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const connectionPreferencesPanelService = yield* ConnectionPreferencesPanelService;
+
+    return new ConnectionPreferencesBootstrapImpl(actionService, menuService, connectionPreferencesPanelService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionPreferencesBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ConnectionPreferencesPanelService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionPreferencesBootstrap = ConnectionPreferencesBootstrapDI;

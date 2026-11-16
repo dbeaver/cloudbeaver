@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import {
@@ -24,8 +24,7 @@ import {
 import { ACTION_SQL_GENERATE } from './actions/ACTION_SQL_GENERATE.js';
 import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService.js';
 
-@injectable(() => [ScriptPreviewService, ActionService, MenuService])
-export class GeneratorMenuBootstrap extends Bootstrap {
+export class GeneratorMenuBootstrapImpl extends Bootstrap {
   constructor(
     private readonly scriptPreviewService: ScriptPreviewService,
     private readonly actionService: ActionService,
@@ -87,3 +86,38 @@ export class GeneratorMenuBootstrap extends Bootstrap {
     });
   }
 }
+
+export type GeneratorMenuBootstrap = GeneratorMenuBootstrapImpl;
+
+export class GeneratorMenuBootstrapDI extends Context.Service<GeneratorMenuBootstrapDI, GeneratorMenuBootstrapImpl>()(
+  '@cloudbeaver/plugin-sql-generator/GeneratorMenuBootstrap#GeneratorMenuBootstrap',
+) {
+  static readonly implementation = GeneratorMenuBootstrapImpl;
+
+  static readonly dependencies = () => [ScriptPreviewService, ActionService, MenuService] as const;
+  static readonly make: Effect.Effect<
+    GeneratorMenuBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ScriptPreviewService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makeGeneratorMenuBootstrap() {
+    const scriptPreviewService = yield* ScriptPreviewService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+
+    return new GeneratorMenuBootstrapImpl(scriptPreviewService, actionService, menuService);
+  });
+  static readonly layer: Layer.Layer<
+    GeneratorMenuBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ScriptPreviewService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GeneratorMenuBootstrap = GeneratorMenuBootstrapDI;

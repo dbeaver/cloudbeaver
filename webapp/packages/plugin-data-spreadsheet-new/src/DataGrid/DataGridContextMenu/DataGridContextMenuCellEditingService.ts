@@ -5,7 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   ACTION_EDIT,
   ActionService,
@@ -36,19 +38,16 @@ import {
   type IGridDataKey,
   type IResultSetValue,
 } from '@cloudbeaver/plugin-data-viewer';
-import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { ACTION_DATA_GRID_EDITING_ADD_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_ADD_ROW.js';
 import { ACTION_DATA_GRID_EDITING_DELETE_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DELETE_ROW.js';
 import { ACTION_DATA_GRID_EDITING_DUPLICATE_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DUPLICATE_ROW.js';
 import { ACTION_DATA_GRID_EDITING_REVERT_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_REVERT_ROW.js';
 import { ACTION_DATA_GRID_EDITING_SET_TO_NULL } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_SET_TO_NULL.js';
 import { MENU_DATA_GRID_EDITING } from './MENU_DATA_GRID_EDITING.js';
-import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
-@injectable(() => [ActionService, LocalizationService, MenuService])
-export class DataGridContextMenuCellEditingService {
+export class DataGridContextMenuCellEditingServiceImpl {
   constructor(
     private readonly actionService: ActionService,
     private readonly localizationService: LocalizationService,
@@ -234,3 +233,41 @@ export class DataGridContextMenuCellEditingService {
     return action.info;
   }
 }
+
+export type DataGridContextMenuCellEditingService = DataGridContextMenuCellEditingServiceImpl;
+
+export class DataGridContextMenuCellEditingServiceDI extends Context.Service<
+  DataGridContextMenuCellEditingServiceDI,
+  DataGridContextMenuCellEditingServiceImpl
+>()(
+  '@cloudbeaver/plugin-data-spreadsheet-new/DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService#DataGridContextMenuCellEditingService',
+) {
+  static readonly implementation = DataGridContextMenuCellEditingServiceImpl;
+
+  static readonly dependencies = () => [ActionService, LocalizationService, MenuService] as const;
+  static readonly make: Effect.Effect<
+    DataGridContextMenuCellEditingServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makeDataGridContextMenuCellEditingService() {
+    const actionService = yield* ActionService;
+    const localizationService = yield* LocalizationService;
+    const menuService = yield* MenuService;
+
+    return new DataGridContextMenuCellEditingServiceImpl(actionService, localizationService, menuService);
+  });
+  static readonly layer: Layer.Layer<
+    DataGridContextMenuCellEditingServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataGridContextMenuCellEditingService = DataGridContextMenuCellEditingServiceDI;

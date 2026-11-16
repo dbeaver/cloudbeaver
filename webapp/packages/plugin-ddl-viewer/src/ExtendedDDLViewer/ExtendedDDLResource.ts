@@ -5,13 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { CachedMapResource, isResourceAlias, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { CachedMapResource, ResourceKeyUtils, isResourceAlias, type ResourceKey } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-@injectable(() => [GraphQLService, NavNodeInfoResource])
-export class ExtendedDDLResource extends CachedMapResource<string, string> {
+export class ExtendedDDLResourceImpl extends CachedMapResource<string, string> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
@@ -46,3 +45,33 @@ export class ExtendedDDLResource extends CachedMapResource<string, string> {
     return typeof key === 'string';
   }
 }
+
+export type ExtendedDDLResource = ExtendedDDLResourceImpl;
+
+export class ExtendedDDLResourceDI extends Context.Service<ExtendedDDLResourceDI, ExtendedDDLResourceImpl>()(
+  '@cloudbeaver/plugin-ddl-viewer/ExtendedDDLViewer/ExtendedDDLResource#ExtendedDDLResource',
+) {
+  static readonly implementation = ExtendedDDLResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, NavNodeInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ExtendedDDLResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Effect.gen(function* makeExtendedDDLResource() {
+    const graphQLService = yield* GraphQLService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+
+    return new ExtendedDDLResourceImpl(graphQLService, navNodeInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ExtendedDDLResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ExtendedDDLResource = ExtendedDDLResourceDI;

@@ -7,8 +7,10 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { ResultDataFormat, type SqlResultRow, type AsyncUpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { ResultDataFormat, type AsyncUpdateResultsDataBatchMutationVariables, type SqlResultRow } from '@cloudbeaver/core-sdk';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
 import { DatabaseEditAction } from '../DatabaseEditAction.js';
@@ -16,11 +18,8 @@ import { DatabaseEditChangeType, type IDatabaseDataEditApplyActionData } from '.
 import { DocumentDataAction } from './DocumentDataAction.js';
 import type { IDatabaseDataDocument } from './IDatabaseDataDocument.js';
 import type { IDocumentElementKey } from './IDocumentElementKey.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, DocumentDataAction])
-export class DocumentEditAction<
+export class DocumentEditActionImpl<
   TKey extends IDocumentElementKey = IDocumentElementKey,
   TValue extends IDatabaseDataDocument = IDatabaseDataDocument,
   TResult extends IDatabaseResultSet = IDatabaseResultSet,
@@ -211,3 +210,42 @@ export class DocumentEditAction<
     return documentA?.data === documentB?.data;
   }
 }
+
+export type DocumentEditAction<
+  TKey extends IDocumentElementKey = IDocumentElementKey,
+  TValue extends IDatabaseDataDocument = IDatabaseDataDocument,
+  TResult extends IDatabaseResultSet = IDatabaseResultSet,
+> = DocumentEditActionImpl<TKey, TValue, TResult>;
+
+export class DocumentEditActionDI extends Context.Service<DocumentEditActionDI, DocumentEditActionImpl<any, any, any>>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/Document/DocumentEditAction#DocumentEditAction',
+) {
+  static readonly implementation = DocumentEditActionImpl;
+  static readonly dataFormat = DocumentEditActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult, DocumentDataAction] as const;
+  static readonly make: Effect.Effect<
+    DocumentEditActionImpl<any, any, any>,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof DocumentDataAction>
+  > = Effect.gen(function* makeDocumentEditAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const data = yield* DocumentDataAction;
+
+    return new DocumentEditActionImpl(source, result, data);
+  });
+  static readonly layer: Layer.Layer<
+    DocumentEditActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof DocumentDataAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DocumentEditAction = DocumentEditActionDI;

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -19,8 +19,7 @@ const NavigationTreeFiltersDialog = importLazyComponent(() =>
   import('./NavigationTreeFiltersDialog/NavigationTreeFiltersDialog.js').then(m => m.NavigationTreeFiltersDialog),
 );
 
-@injectable(() => [CommonDialogService, MenuService, LocalizationService, NavTreeResource, NotificationService])
-export class NavigationTreeFiltersBootstrap extends Bootstrap {
+export class NavigationTreeFiltersBootstrapImpl extends Bootstrap {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly menuService: MenuService,
@@ -97,3 +96,44 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
     });
   }
 }
+
+export type NavigationTreeFiltersBootstrap = NavigationTreeFiltersBootstrapImpl;
+
+export class NavigationTreeFiltersBootstrapDI extends Context.Service<NavigationTreeFiltersBootstrapDI, NavigationTreeFiltersBootstrapImpl>()(
+  '@cloudbeaver/plugin-navigation-tree-filters/NavigationTreeFiltersBootstrap#NavigationTreeFiltersBootstrap',
+) {
+  static readonly implementation = NavigationTreeFiltersBootstrapImpl;
+
+  static readonly dependencies = () => [CommonDialogService, MenuService, LocalizationService, NavTreeResource, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    NavigationTreeFiltersBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeNavigationTreeFiltersBootstrap() {
+    const commonDialogService = yield* CommonDialogService;
+    const menuService = yield* MenuService;
+    const localizationService = yield* LocalizationService;
+    const navTreeResource = yield* NavTreeResource;
+    const notificationService = yield* NotificationService;
+
+    return new NavigationTreeFiltersBootstrapImpl(commonDialogService, menuService, localizationService, navTreeResource, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    NavigationTreeFiltersBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavigationTreeFiltersBootstrap = NavigationTreeFiltersBootstrapDI;

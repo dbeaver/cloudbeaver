@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { RenameDialog } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, EConnectionFeature, isConnectionNode } from '@cloudbeaver/core-connections';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
@@ -23,7 +24,6 @@ import {
   NavTreeSettingsService,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
-import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION, EConnectionFeature, isConnectionNode } from '@cloudbeaver/core-connections';
 import {
   ACTION_DELETE,
   ACTION_OPEN,
@@ -45,18 +45,7 @@ export interface INodeMenuData {
   actions?: INodeActions;
 }
 
-@injectable(() => [
-  NavNodeManagerService,
-  NotificationService,
-  CommonDialogService,
-  NavTreeResource,
-  ActionService,
-  MenuService,
-  NavNodeInfoResource,
-  NavTreeSettingsService,
-  ConnectionInfoResource,
-])
-export class NavNodeContextMenuService extends Bootstrap {
+export class NavNodeContextMenuServiceImpl extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly notificationService: NotificationService,
@@ -236,3 +225,77 @@ export class NavNodeContextMenuService extends Bootstrap {
     });
   }
 }
+
+export type NavNodeContextMenuService = NavNodeContextMenuServiceImpl;
+
+export class NavNodeContextMenuServiceDI extends Context.Service<NavNodeContextMenuServiceDI, NavNodeContextMenuServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/NodesManager/NavNodeContextMenuService#NavNodeContextMenuService',
+) {
+  static readonly implementation = NavNodeContextMenuServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavNodeManagerService,
+      NotificationService,
+      CommonDialogService,
+      NavTreeResource,
+      ActionService,
+      MenuService,
+      NavNodeInfoResource,
+      NavTreeSettingsService,
+      ConnectionInfoResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    NavNodeContextMenuServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavTreeSettingsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeNavNodeContextMenuService() {
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const notificationService = yield* NotificationService;
+    const commonDialogService = yield* CommonDialogService;
+    const navTreeResource = yield* NavTreeResource;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const navTreeSettingsService = yield* NavTreeSettingsService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new NavNodeContextMenuServiceImpl(
+      navNodeManagerService,
+      notificationService,
+      commonDialogService,
+      navTreeResource,
+      actionService,
+      menuService,
+      navNodeInfoResource,
+      navTreeSettingsService,
+      connectionInfoResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    NavNodeContextMenuServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavTreeSettingsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavNodeContextMenuService = NavNodeContextMenuServiceDI;

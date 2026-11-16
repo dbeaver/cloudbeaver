@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { ACTION_OPEN, ActionService, MenuService } from '@cloudbeaver/core-view';
@@ -26,35 +26,23 @@ import {
   MENU_DV_CONTEXT_MENU,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING } from './DataGrid/Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING.js';
+import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
+import { ACTION_DATA_GRID_UNPIN_ALL_COLUMNS } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_ALL_COLUMNS.js';
+import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
+import { DataGridContextMenuGenerateSqlService } from './DataGrid/DataGridContextMenu/DataGridContextMenuGenerateSqlService.js';
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
-import { DataGridContextMenuGenerateSqlService } from './DataGrid/DataGridContextMenu/DataGridContextMenuGenerateSqlService.js';
 import { DataGridSettingsService } from './DataGridSettingsService.js';
-import { ACTION_DATA_GRID_PIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_PIN_COLUMN.js';
-import { ACTION_DATA_GRID_UNPIN_COLUMN } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_COLUMN.js';
-import { ACTION_DATA_GRID_UNPIN_ALL_COLUMNS } from './DataGrid/Actions/Pin/ACTION_DATA_GRID_UNPIN_ALL_COLUMNS.js';
-import { ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING } from './DataGrid/Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_OR_SORTING.js';
-import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
 const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
 
 const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid.js').then(m => m.SpreadsheetGrid));
 
-@injectable(() => [
-  DataPresentationService,
-  DataGridSettingsService,
-  DataGridContextMenuOrderService,
-  DataGridContextMenuFilterService,
-  DataGridContextMenuCellEditingService,
-  DataGridContextMenuSaveContentService,
-  DataGridContextMenuGenerateSqlService,
-  ActionService,
-  MenuService,
-  ExceptionsCatcherService,
-])
-export class SpreadsheetBootstrap extends Bootstrap {
+export class SpreadsheetBootstrapImpl extends Bootstrap {
   constructor(
     private readonly dataPresentationService: DataPresentationService,
     private readonly dataGridSettingsService: DataGridSettingsService,
@@ -226,6 +214,85 @@ export class SpreadsheetBootstrap extends Bootstrap {
     });
   }
 }
+
+export type SpreadsheetBootstrap = SpreadsheetBootstrapImpl;
+
+export class SpreadsheetBootstrapDI extends Context.Service<SpreadsheetBootstrapDI, SpreadsheetBootstrapImpl>()(
+  '@cloudbeaver/plugin-data-spreadsheet-new/SpreadsheetBootstrap#SpreadsheetBootstrap',
+) {
+  static readonly implementation = SpreadsheetBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      DataPresentationService,
+      DataGridSettingsService,
+      DataGridContextMenuOrderService,
+      DataGridContextMenuFilterService,
+      DataGridContextMenuCellEditingService,
+      DataGridContextMenuSaveContentService,
+      DataGridContextMenuGenerateSqlService,
+      ActionService,
+      MenuService,
+      ExceptionsCatcherService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    SpreadsheetBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof DataPresentationService>
+    | Context.Service.Identifier<typeof DataGridSettingsService>
+    | Context.Service.Identifier<typeof DataGridContextMenuOrderService>
+    | Context.Service.Identifier<typeof DataGridContextMenuFilterService>
+    | Context.Service.Identifier<typeof DataGridContextMenuCellEditingService>
+    | Context.Service.Identifier<typeof DataGridContextMenuSaveContentService>
+    | Context.Service.Identifier<typeof DataGridContextMenuGenerateSqlService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ExceptionsCatcherService>
+  > = Effect.gen(function* makeSpreadsheetBootstrap() {
+    const dataPresentationService = yield* DataPresentationService;
+    const dataGridSettingsService = yield* DataGridSettingsService;
+    const dataGridContextMenuOrderService = yield* DataGridContextMenuOrderService;
+    const dataGridContextMenuFilterService = yield* DataGridContextMenuFilterService;
+    const dataGridContextMenuCellEditingService = yield* DataGridContextMenuCellEditingService;
+    const dataGridContextMenuSaveContentService = yield* DataGridContextMenuSaveContentService;
+    const dataGridContextMenuGenerateSqlService = yield* DataGridContextMenuGenerateSqlService;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const exceptionsCatcherService = yield* ExceptionsCatcherService;
+
+    return new SpreadsheetBootstrapImpl(
+      dataPresentationService,
+      dataGridSettingsService,
+      dataGridContextMenuOrderService,
+      dataGridContextMenuFilterService,
+      dataGridContextMenuCellEditingService,
+      dataGridContextMenuSaveContentService,
+      dataGridContextMenuGenerateSqlService,
+      actionService,
+      menuService,
+      exceptionsCatcherService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    SpreadsheetBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof DataPresentationService>
+    | Context.Service.Identifier<typeof DataGridSettingsService>
+    | Context.Service.Identifier<typeof DataGridContextMenuOrderService>
+    | Context.Service.Identifier<typeof DataGridContextMenuFilterService>
+    | Context.Service.Identifier<typeof DataGridContextMenuCellEditingService>
+    | Context.Service.Identifier<typeof DataGridContextMenuSaveContentService>
+    | Context.Service.Identifier<typeof DataGridContextMenuGenerateSqlService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ExceptionsCatcherService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SpreadsheetBootstrap = SpreadsheetBootstrapDI;
 
 function handleColumnPinAction(context: IDataContextProvider, action: (columns: IGridDataKey[]) => void) {
   const dataContextResultKey = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;

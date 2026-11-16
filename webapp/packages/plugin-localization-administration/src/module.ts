@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService.js';
 import { LocalizationAdministrationPluginBootstrap } from './PluginBootstrap.js';
@@ -14,7 +14,5 @@ import { LocalizationAdministrationPluginBootstrap } from './PluginBootstrap.js'
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-localization-administration',
 
-  configure: serviceCollection => {
-    serviceCollection.addSingleton(Bootstrap, LocaleService).addSingleton(Bootstrap, LocalizationAdministrationPluginBootstrap);
-  },
+  bootstraps: () => [LocaleService, LocalizationAdministrationPluginBootstrap],
 });

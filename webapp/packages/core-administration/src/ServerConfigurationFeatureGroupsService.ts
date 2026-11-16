@@ -8,10 +8,9 @@
 
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
-@injectable(() => [])
-export class ServerConfigurationFeatureGroupsService {
+export class ServerConfigurationFeatureGroupsServiceImpl {
   readonly featureGroups = new Map<string, string>();
 
   constructor() {
@@ -26,3 +25,22 @@ export class ServerConfigurationFeatureGroupsService {
     }
   }
 }
+
+export type ServerConfigurationFeatureGroupsService = ServerConfigurationFeatureGroupsServiceImpl;
+
+export class ServerConfigurationFeatureGroupsServiceDI extends Context.Service<
+  ServerConfigurationFeatureGroupsServiceDI,
+  ServerConfigurationFeatureGroupsServiceImpl
+>()('@cloudbeaver/core-administration/ServerConfigurationFeatureGroupsService#ServerConfigurationFeatureGroupsService') {
+  static readonly implementation = ServerConfigurationFeatureGroupsServiceImpl;
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<ServerConfigurationFeatureGroupsServiceImpl, never, never> = Effect.sync(
+    () => new ServerConfigurationFeatureGroupsServiceImpl(),
+  );
+  static readonly layer: Layer.Layer<ServerConfigurationFeatureGroupsServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServerConfigurationFeatureGroupsService = ServerConfigurationFeatureGroupsServiceDI;

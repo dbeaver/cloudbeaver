@@ -6,19 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AIDefaultProfileService, AIProfilesResource, type AIProfile } from '@cloudbeaver/plugin-ai-profiles';
 
 import {
-  AIChatConversationsService,
   AIChatConversationsResource,
+  AIChatConversationsService,
   conversationConfigContext,
   type AIChatConversationInfo,
 } from '@cloudbeaver/plugin-ai-chat';
 
-@injectable(() => [AIChatConversationsService, AIChatConversationsResource, AIDefaultProfileService, AIProfilesResource])
-export class AIChatConversationProfileService {
+export class AIChatConversationProfileServiceImpl {
   constructor(
     aiChatConversationsService: AIChatConversationsService,
     private readonly aiChatConversationsResource: AIChatConversationsResource,
@@ -92,3 +91,47 @@ export class AIChatConversationProfileService {
     return conversation;
   }
 }
+
+export type AIChatConversationProfileService = AIChatConversationProfileServiceImpl;
+
+export class AIChatConversationProfileServiceDI extends Context.Service<AIChatConversationProfileServiceDI, AIChatConversationProfileServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat-profiles/AIChatConversationProfileService#AIChatConversationProfileService',
+) {
+  static readonly implementation = AIChatConversationProfileServiceImpl;
+
+  static readonly dependencies = () =>
+    [AIChatConversationsService, AIChatConversationsResource, AIDefaultProfileService, AIProfilesResource] as const;
+  static readonly make: Effect.Effect<
+    AIChatConversationProfileServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof AIChatConversationsService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof AIDefaultProfileService>
+    | Context.Service.Identifier<typeof AIProfilesResource>
+  > = Effect.gen(function* makeAIChatConversationProfileService() {
+    const aiChatConversationsService = yield* AIChatConversationsService;
+    const aiChatConversationsResource = yield* AIChatConversationsResource;
+    const aiDefaultProfileService = yield* AIDefaultProfileService;
+    const aiProfilesResource = yield* AIProfilesResource;
+
+    return new AIChatConversationProfileServiceImpl(
+      aiChatConversationsService,
+      aiChatConversationsResource,
+      aiDefaultProfileService,
+      aiProfilesResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIChatConversationProfileServiceDI,
+    never,
+    | Context.Service.Identifier<typeof AIChatConversationsService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof AIDefaultProfileService>
+    | Context.Service.Identifier<typeof AIProfilesResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatConversationProfileService = AIChatConversationProfileServiceDI;

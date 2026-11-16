@@ -7,7 +7,7 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService, DataPresentationType, IDatabaseDataResultAction, isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
@@ -17,8 +17,7 @@ const DataViewerReferencesPresentation = importLazyComponent(() =>
   import('./DataViewerReferencesPresentation.js').then(module => module.DataViewerReferencesPresentation),
 );
 
-@injectable(() => [DataPresentationService, DataViewerReferencesSettingsService])
-export class DataViewerReferencesBootstrap extends Bootstrap {
+export class DataViewerReferencesBootstrapImpl extends Bootstrap {
   constructor(
     private readonly dataPresentationService: DataPresentationService,
     private readonly dataViewerReferencesSettingsService: DataViewerReferencesSettingsService,
@@ -48,3 +47,33 @@ export class DataViewerReferencesBootstrap extends Bootstrap {
     });
   }
 }
+
+export type DataViewerReferencesBootstrap = DataViewerReferencesBootstrapImpl;
+
+export class DataViewerReferencesBootstrapDI extends Context.Service<DataViewerReferencesBootstrapDI, DataViewerReferencesBootstrapImpl>()(
+  '@cloudbeaver/plugin-data-viewer-references/DataViewerReferencesBootstrap#DataViewerReferencesBootstrap',
+) {
+  static readonly implementation = DataViewerReferencesBootstrapImpl;
+
+  static readonly dependencies = () => [DataPresentationService, DataViewerReferencesSettingsService] as const;
+  static readonly make: Effect.Effect<
+    DataViewerReferencesBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof DataPresentationService> | Context.Service.Identifier<typeof DataViewerReferencesSettingsService>
+  > = Effect.gen(function* makeDataViewerReferencesBootstrap() {
+    const dataPresentationService = yield* DataPresentationService;
+    const dataViewerReferencesSettingsService = yield* DataViewerReferencesSettingsService;
+
+    return new DataViewerReferencesBootstrapImpl(dataPresentationService, dataViewerReferencesSettingsService);
+  });
+  static readonly layer: Layer.Layer<
+    DataViewerReferencesBootstrapDI,
+    never,
+    Context.Service.Identifier<typeof DataPresentationService> | Context.Service.Identifier<typeof DataViewerReferencesSettingsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataViewerReferencesBootstrap = DataViewerReferencesBootstrapDI;

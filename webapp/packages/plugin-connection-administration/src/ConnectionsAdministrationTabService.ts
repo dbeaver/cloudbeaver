@@ -8,13 +8,13 @@
 
 import {
   AdministrationItemService,
+  type AdministrationItemContentProps,
   type AdministrationItemSubCanActivateEvent,
   type AdministrationItemSubEvent,
-  type AdministrationItemContentProps,
   type IAdministrationItem,
 } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { TabsContainer, type ITabInfoOptions } from '@cloudbeaver/core-ui';
 
 import { ADMINISTRATION_CONNECTIONS_ITEM } from './ADMINISTRATION_CONNECTIONS_ITEM.js';
@@ -30,8 +30,7 @@ export interface IConnectionsTabOptions extends ITabInfoOptions<AdministrationIt
   canDeActivate?: AdministrationItemSubCanActivateEvent;
 }
 
-@injectable(() => [AdministrationItemService])
-export class ConnectionsAdministrationTabService {
+export class ConnectionsAdministrationTabServiceImpl {
   readonly tabsContainer: TabsContainer<AdministrationItemContentProps>;
 
   private item!: IAdministrationItem;
@@ -60,3 +59,27 @@ export class ConnectionsAdministrationTabService {
     });
   }
 }
+
+export type ConnectionsAdministrationTabService = ConnectionsAdministrationTabServiceImpl;
+
+export class ConnectionsAdministrationTabServiceDI extends Context.Service<
+  ConnectionsAdministrationTabServiceDI,
+  ConnectionsAdministrationTabServiceImpl
+>()('@cloudbeaver/plugin-connection-administration/ConnectionsAdministrationTabService#ConnectionsAdministrationTabService') {
+  static readonly implementation = ConnectionsAdministrationTabServiceImpl;
+
+  static readonly dependencies = () => [AdministrationItemService] as const;
+  static readonly make: Effect.Effect<ConnectionsAdministrationTabServiceImpl, never, Context.Service.Identifier<typeof AdministrationItemService>> =
+    Effect.gen(function* makeConnectionsAdministrationTabService() {
+      const administrationItemService = yield* AdministrationItemService;
+
+      return new ConnectionsAdministrationTabServiceImpl(administrationItemService);
+    });
+  static readonly layer: Layer.Layer<ConnectionsAdministrationTabServiceDI, never, Context.Service.Identifier<typeof AdministrationItemService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const ConnectionsAdministrationTabService = ConnectionsAdministrationTabServiceDI;

@@ -6,26 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { LocaleService } from './LocaleService.js';
-import { AISettingsService } from './AISettingsService.js';
-import { AdministrationAISettingsFormService } from './AISettingsForm/AdministrationAISettingsFormService.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { AIAdministrationBootstrap } from './AIAdministrationBootstrap.js';
-import { AIAdministrationTabsService } from './AIAdministrationTabsService.js';
 import { AIAdministrationNavigationService } from './AIAdministrationNavigationService.js';
+import { AIAdministrationTabsService } from './AIAdministrationTabsService.js';
+import { AdministrationAISettingsFormService } from './AISettingsForm/AdministrationAISettingsFormService.js';
+import { AISettingsService } from './AISettingsService.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-administration',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, proxy(AIAdministrationBootstrap))
-      .addSingleton(AIAdministrationBootstrap)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, proxy(AIAdministrationTabsService))
-      .addSingleton(AISettingsService)
-      .addSingleton(AIAdministrationTabsService)
-      .addSingleton(AdministrationAISettingsFormService)
-      .addSingleton(AIAdministrationNavigationService);
-  },
+  services: () => [
+    AIAdministrationBootstrap,
+    AISettingsService,
+    AIAdministrationTabsService,
+    AdministrationAISettingsFormService,
+    AIAdministrationNavigationService,
+  ],
+  bootstraps: () => [AIAdministrationBootstrap, LocaleService, AIAdministrationTabsService],
 });

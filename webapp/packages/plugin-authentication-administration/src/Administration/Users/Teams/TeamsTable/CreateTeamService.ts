@@ -8,7 +8,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, Effect, IServiceProvider, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { OptionsPanelService, type OptionsPanelCloseEventData } from '@cloudbeaver/core-ui';
@@ -19,8 +19,7 @@ import { TeamsAdministrationFormState } from '../TeamsForm/TeamsAdministrationFo
 const CreateTeam = importLazyComponent(() => import('./CreateTeam.js').then(m => m.CreateTeam));
 const panelGetter = () => CreateTeam;
 
-@injectable(() => [IServiceProvider, TeamsAdministrationFormService, OptionsPanelService, CommonDialogService])
-export class CreateTeamService {
+export class CreateTeamServiceImpl {
   formState: TeamsAdministrationFormState | null;
 
   constructor(
@@ -86,3 +85,41 @@ export class CreateTeamService {
     await this.dispose();
   };
 }
+
+export type CreateTeamService = CreateTeamServiceImpl;
+
+export class CreateTeamServiceDI extends Context.Service<CreateTeamServiceDI, CreateTeamServiceImpl>()(
+  '@cloudbeaver/plugin-authentication-administration/Administration/Users/Teams/TeamsTable/CreateTeamService#CreateTeamService',
+) {
+  static readonly implementation = CreateTeamServiceImpl;
+
+  static readonly dependencies = () => [IServiceProvider, TeamsAdministrationFormService, OptionsPanelService, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    CreateTeamServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof TeamsAdministrationFormService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeCreateTeamService() {
+    const serviceProvider = yield* IServiceProvider;
+    const teamsAdministrationFormService = yield* TeamsAdministrationFormService;
+    const optionsPanelService = yield* OptionsPanelService;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new CreateTeamServiceImpl(serviceProvider, teamsAdministrationFormService, optionsPanelService, commonDialogService);
+  });
+  static readonly layer: Layer.Layer<
+    CreateTeamServiceDI,
+    never,
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof TeamsAdministrationFormService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const CreateTeamService = CreateTeamServiceDI;

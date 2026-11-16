@@ -9,24 +9,24 @@ import { makeObservable, observable } from 'mobx';
 
 import { QuotasService, ServerResourceQuotasResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { isResultSetContentValue } from '@dbeaver/result-set-api';
 import { bytesToSize, downloadFromURL, GlobalConstants } from '@cloudbeaver/core-utils';
 import { download, isNotNullDefined } from '@dbeaver/js-helpers';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import type { IGridDataKey } from '../Grid/IGridDataKey.js';
+import { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction.js';
+import { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
+import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
+import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 import type { IResultSetDataContentAction } from './IResultSetDataContentAction.js';
 import { ResultSetCacheAction } from './ResultSetCacheAction.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { type IResultSetValue, ResultSetFormatAction } from './ResultSetFormatAction.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction.js';
-import { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
-import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
-import type { IGridDataKey } from '../Grid/IGridDataKey.js';
-import type { IDatabaseValueHolder } from '../IDatabaseValueHolder.js';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
 const CONTENT_CACHE_KEY = Symbol('content-cache-key');
@@ -37,17 +37,7 @@ interface ICacheEntry {
   loading?: boolean;
 }
 
-@injectable(() => [
-  IDatabaseDataSource,
-  IDatabaseDataResult,
-  IDatabaseDataResultAction,
-  IDatabaseDataFormatAction,
-  GraphQLService,
-  ServerResourceQuotasResource,
-  QuotasService,
-  IDatabaseDataCacheAction,
-])
-export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
+export class ResultSetDataContentActionImpl extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
   private subscriptionDispose?: () => void;
   private readonly data: ResultSetDataAction;
@@ -283,3 +273,63 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return `${GlobalConstants.serviceURI}/${RESULT_VALUE_PATH}/${url}`;
   }
 }
+
+export type ResultSetDataContentAction = ResultSetDataContentActionImpl;
+
+export class ResultSetDataContentActionDI extends Context.Service<ResultSetDataContentActionDI, ResultSetDataContentActionImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction#ResultSetDataContentAction',
+) {
+  static readonly implementation = ResultSetDataContentActionImpl;
+  static readonly dataFormat = ResultSetDataContentActionImpl.dataFormat;
+  static readonly dependencies = () =>
+    [
+      IDatabaseDataSource,
+      IDatabaseDataResult,
+      IDatabaseDataResultAction,
+      IDatabaseDataFormatAction,
+      GraphQLService,
+      ServerResourceQuotasResource,
+      QuotasService,
+      IDatabaseDataCacheAction,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ResultSetDataContentActionImpl,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataResultAction>
+    | Context.Service.Identifier<typeof IDatabaseDataFormatAction>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerResourceQuotasResource>
+    | Context.Service.Identifier<typeof QuotasService>
+    | Context.Service.Identifier<typeof IDatabaseDataCacheAction>
+  > = Effect.gen(function* makeResultSetDataContentAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const data = yield* IDatabaseDataResultAction;
+    const format = yield* IDatabaseDataFormatAction;
+    const graphQLService = yield* GraphQLService;
+    const serverResourceQuotasResource = yield* ServerResourceQuotasResource;
+    const quotasService = yield* QuotasService;
+    const cache = yield* IDatabaseDataCacheAction;
+
+    return new ResultSetDataContentActionImpl(source, result, data, format, graphQLService, serverResourceQuotasResource, quotasService, cache);
+  });
+  static readonly layer: Layer.Layer<
+    ResultSetDataContentActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataResultAction>
+    | Context.Service.Identifier<typeof IDatabaseDataFormatAction>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ServerResourceQuotasResource>
+    | Context.Service.Identifier<typeof QuotasService>
+    | Context.Service.Identifier<typeof IDatabaseDataCacheAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResultSetDataContentAction = ResultSetDataContentActionDI;

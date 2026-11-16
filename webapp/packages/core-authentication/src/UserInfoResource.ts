@@ -7,11 +7,11 @@
  */
 import { computed, makeObservable, runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ISyncExecutor, type ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { type FederatedAuthInfo, type AuthInfo, type AuthLogoutQuery, AuthStatus, GraphQLService, type UserInfo } from '@cloudbeaver/core-sdk';
+import { type AuthInfo, type AuthLogoutQuery, AuthStatus, type FederatedAuthInfo, GraphQLService, type UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthProviderService } from './AuthProviderService.js';
@@ -32,8 +32,7 @@ export type IFederatedLoginOptions = Omit<ILoginOptions, 'credentials'>;
 export const ANONYMOUS_USER_ID = 'anonymous';
 export const UNAUTHORIZED_ID = 'unauthorized';
 
-@injectable(() => [GraphQLService, AuthProviderService, SessionResource])
-export class UserInfoResource extends CachedDataResource<UserInfo | null, void> {
+export class UserInfoResourceImpl extends CachedDataResource<UserInfo | null, void> {
   readonly onUserChange: ISyncExecutor<string>;
   readonly onException: ISyncExecutor<Error>;
 
@@ -310,3 +309,38 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     }
   }
 }
+
+export type UserInfoResource = UserInfoResourceImpl;
+
+export class UserInfoResourceDI extends Context.Service<UserInfoResourceDI, UserInfoResourceImpl>()(
+  '@cloudbeaver/core-authentication/UserInfoResource#UserInfoResource',
+) {
+  static readonly implementation = UserInfoResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, AuthProviderService, SessionResource] as const;
+  static readonly make: Effect.Effect<
+    UserInfoResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof AuthProviderService>
+    | Context.Service.Identifier<typeof SessionResource>
+  > = Effect.gen(function* makeUserInfoResource() {
+    const graphQLService = yield* GraphQLService;
+    const authProviderService = yield* AuthProviderService;
+    const sessionResource = yield* SessionResource;
+
+    return new UserInfoResourceImpl(graphQLService, authProviderService, sessionResource);
+  });
+  static readonly layer: Layer.Layer<
+    UserInfoResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof AuthProviderService>
+    | Context.Service.Identifier<typeof SessionResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UserInfoResource = UserInfoResourceDI;

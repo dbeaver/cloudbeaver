@@ -6,19 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { type DataTypeLogicalOperation, ResultDataFormat, type SqlResultColumn, type SqlResultRowMetaData } from '@cloudbeaver/core-sdk';
+import { ResultDataFormat, type DataTypeLogicalOperation, type SqlResultColumn, type SqlResultRowMetaData } from '@cloudbeaver/core-sdk';
 import { isResultSetContentValue, type IResultSetContentValue } from '@dbeaver/result-set-api';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
-import type { IResultSetValue } from './ResultSetFormatAction.js';
 import { GridDataResultAction } from '../Grid/GridDataResultAction.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import type { IGridColumnKey, IGridDataKey, IGridRowKey } from '../Grid/IGridDataKey.js';
+import type { IResultSetValue } from './ResultSetFormatAction.js';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
-export class ResultSetDataAction extends GridDataResultAction<
+export class ResultSetDataActionImpl extends GridDataResultAction<
   SqlResultColumn,
   SqlResultRowMetaData,
   IGridDataKey,
@@ -108,3 +107,33 @@ export class ResultSetDataAction extends GridDataResultAction<
     return column.supportedOperations.filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
   }
 }
+
+export type ResultSetDataAction = ResultSetDataActionImpl;
+
+export class ResultSetDataActionDI extends Context.Service<ResultSetDataActionDI, ResultSetDataActionImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/ResultSet/ResultSetDataAction#ResultSetDataAction',
+) {
+  static readonly implementation = ResultSetDataActionImpl;
+  static readonly dataFormat = ResultSetDataActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult] as const;
+  static readonly make: Effect.Effect<
+    ResultSetDataActionImpl,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Effect.gen(function* makeResultSetDataAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+
+    return new ResultSetDataActionImpl(source, result);
+  });
+  static readonly layer: Layer.Layer<
+    ResultSetDataActionDI,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResultSetDataAction = ResultSetDataActionDI;

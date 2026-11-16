@@ -8,7 +8,7 @@
 import { action, makeObservable, runInAction } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
   CachedMapResource,
@@ -33,8 +33,7 @@ export type IConnectionExecutionContextInfo = SqlContextInfo & {
   defaultSchema?: string | null;
 };
 
-@injectable(() => [GraphQLService, ConnectionInfoResource, UserInfoResource, AppAuthService])
-export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
+export class ConnectionExecutionContextResourceImpl extends CachedMapResource<string, IConnectionExecutionContextInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -225,6 +224,45 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     return typeof key === 'string';
   }
 }
+
+export type ConnectionExecutionContextResource = ConnectionExecutionContextResourceImpl;
+
+export class ConnectionExecutionContextResourceDI extends Context.Service<
+  ConnectionExecutionContextResourceDI,
+  ConnectionExecutionContextResourceImpl
+>()('@cloudbeaver/core-connections/ConnectionExecutionContext/ConnectionExecutionContextResource#ConnectionExecutionContextResource') {
+  static readonly implementation = ConnectionExecutionContextResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ConnectionInfoResource, UserInfoResource, AppAuthService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionExecutionContextResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Effect.gen(function* makeConnectionExecutionContextResource() {
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const userInfoResource = yield* UserInfoResource;
+    const appAuthService = yield* AppAuthService;
+
+    return new ConnectionExecutionContextResourceImpl(graphQLService, connectionInfoResource, userInfoResource, appAuthService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionExecutionContextResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionExecutionContextResource = ConnectionExecutionContextResourceDI;
 
 function getBaseContext(context: IConnectionExecutionContextInfo): IConnectionExecutionContextInfo {
   return {

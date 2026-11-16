@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import { AdministrationItemService, filterHiddenAdministrationItem } from '../../AdministrationItem/AdministrationItemService.js';
@@ -16,8 +16,7 @@ import type { IAdministrationItem } from '../../AdministrationItem/IAdministrati
 import { orderAdministrationItems } from '../../AdministrationItem/orderAdministrationItems.js';
 import { AdministrationScreenService } from '../AdministrationScreenService.js';
 
-@injectable(() => [AdministrationItemService, AdministrationScreenService, NotificationService])
-export class ConfigurationWizardService {
+export class ConfigurationWizardServiceImpl {
   get steps(): IAdministrationItem[] {
     return this.administrationItemService
       .getUniqueItems(true)
@@ -177,3 +176,38 @@ export class ConfigurationWizardService {
     }
   }
 }
+
+export type ConfigurationWizardService = ConfigurationWizardServiceImpl;
+
+export class ConfigurationWizardServiceDI extends Context.Service<ConfigurationWizardServiceDI, ConfigurationWizardServiceImpl>()(
+  '@cloudbeaver/core-administration/AdministrationScreen/ConfigurationWizard/ConfigurationWizardService#ConfigurationWizardService',
+) {
+  static readonly implementation = ConfigurationWizardServiceImpl;
+
+  static readonly dependencies = () => [AdministrationItemService, AdministrationScreenService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    ConfigurationWizardServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeConfigurationWizardService() {
+    const administrationItemService = yield* AdministrationItemService;
+    const administrationScreenService = yield* AdministrationScreenService;
+    const notificationService = yield* NotificationService;
+
+    return new ConfigurationWizardServiceImpl(administrationItemService, administrationScreenService, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    ConfigurationWizardServiceDI,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConfigurationWizardService = ConfigurationWizardServiceDI;

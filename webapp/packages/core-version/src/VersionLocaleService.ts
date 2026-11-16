@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
-@injectable(() => [LocalizationService])
-export class VersionLocaleService extends Bootstrap {
+export class VersionLocaleServiceImpl extends Bootstrap {
   constructor(private readonly localizationService: LocalizationService) {
     super();
   }
@@ -57,3 +56,26 @@ export class VersionLocaleService extends Bootstrap {
     }
   }
 }
+
+export type VersionLocaleService = VersionLocaleServiceImpl;
+
+export class VersionLocaleServiceDI extends Context.Service<VersionLocaleServiceDI, VersionLocaleServiceImpl>()(
+  '@cloudbeaver/core-version/VersionLocaleService#VersionLocaleService',
+) {
+  static readonly implementation = VersionLocaleServiceImpl;
+
+  static readonly dependencies = () => [LocalizationService] as const;
+  static readonly make: Effect.Effect<VersionLocaleServiceImpl, never, Context.Service.Identifier<typeof LocalizationService>> = Effect.gen(
+    function* makeVersionLocaleService() {
+      const localizationService = yield* LocalizationService;
+
+      return new VersionLocaleServiceImpl(localizationService);
+    },
+  );
+  static readonly layer: Layer.Layer<VersionLocaleServiceDI, never, Context.Service.Identifier<typeof LocalizationService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const VersionLocaleService = VersionLocaleServiceDI;

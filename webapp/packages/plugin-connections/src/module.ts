@@ -6,56 +6,54 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { PluginConnectionsSettingsService } from './PluginConnectionsSettingsService.js';
-import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService.js';
-import { ConnectionsExplorerBootstrap } from './NavNodes/ConnectionsExplorerBootstrap.js';
-import { PluginBootstrap } from './PluginBootstrap.js';
-import { ConnectionNavNodeService } from './NavNodes/ConnectionNavNodeService.js';
-import { ConnectionFoldersBootstrap } from './NavNodes/ConnectionFoldersBootstrap.js';
-import { LocaleService } from './LocaleService.js';
-import { ConnectionMenuBootstrap } from './ContextMenu/ConnectionMenuBootstrap.js';
-import { ConnectionOriginInfoTabService } from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService.js';
-import { ConnectionOptionsTabService } from './ConnectionForm/Options/ConnectionOptionsTabService.js';
-import { ConnectionDriverPropertiesTabService } from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';
-import { ConnectionFormService } from './ConnectionForm/ConnectionFormService.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { ConnectionAuthService } from './ConnectionAuthService.js';
 import { AdvancedSettingsTabService } from './ConnectionForm/AdvancedSettings/AdvancedSettingsTabService.js';
 import { ConnectionDetailsTabService } from './ConnectionForm/ConnectionDetails/ConnectionDetailsTabService.js';
+import { ConnectionFormService } from './ConnectionForm/ConnectionFormService.js';
+import { ConnectionDriverPropertiesTabService } from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';
 import { InitializationSettingsTabService } from './ConnectionForm/InitializationSettings/InitializationSettingsTabService.js';
+import { ConnectionOptionsTabService } from './ConnectionForm/Options/ConnectionOptionsTabService.js';
+import { ConnectionOriginInfoTabService } from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService.js';
+import { ConnectionMenuBootstrap } from './ContextMenu/ConnectionMenuBootstrap.js';
+import { LocaleService } from './LocaleService.js';
+import { ConnectionFoldersBootstrap } from './NavNodes/ConnectionFoldersBootstrap.js';
+import { ConnectionNavNodeService } from './NavNodes/ConnectionNavNodeService.js';
+import { ConnectionsExplorerBootstrap } from './NavNodes/ConnectionsExplorerBootstrap.js';
+import { PluginBootstrap } from './PluginBootstrap.js';
+import { PluginConnectionsSettingsService } from './PluginConnectionsSettingsService.js';
+import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connections',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, proxy(ConnectionDriverPropertiesTabService))
-      .addSingleton(Bootstrap, proxy(ConnectionFoldersBootstrap))
-      .addSingleton(Bootstrap, proxy(ConnectionMenuBootstrap))
-      .addSingleton(Bootstrap, proxy(ConnectionOptionsTabService))
-      .addSingleton(Bootstrap, proxy(ConnectionDetailsTabService))
-      .addSingleton(Bootstrap, proxy(AdvancedSettingsTabService))
-      .addSingleton(Bootstrap, proxy(InitializationSettingsTabService))
-      .addSingleton(Bootstrap, proxy(ConnectionOriginInfoTabService))
-      .addSingleton(Bootstrap, proxy(ConnectionsExplorerBootstrap))
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, PluginBootstrap)
-      .addSingleton(Dependency, proxy(ConnectionAuthService))
-      .addSingleton(Dependency, proxy(PluginConnectionsSettingsService))
-      .addSingleton(Dependency, proxy(ConnectionNavNodeService))
-      .addSingleton(ConnectionAuthService)
-      .addSingleton(PluginConnectionsSettingsService)
-      .addSingleton(PublicConnectionFormService)
-      .addSingleton(ConnectionsExplorerBootstrap)
-      .addSingleton(ConnectionNavNodeService)
-      .addSingleton(ConnectionFoldersBootstrap)
-      .addSingleton(ConnectionMenuBootstrap)
-      .addSingleton(ConnectionOriginInfoTabService)
-      .addSingleton(ConnectionOptionsTabService)
-      .addSingleton(ConnectionDetailsTabService)
-      .addSingleton(AdvancedSettingsTabService)
-      .addSingleton(InitializationSettingsTabService)
-      .addSingleton(ConnectionDriverPropertiesTabService)
-      .addSingleton(ConnectionFormService);
-  },
+  services: () => [
+    ConnectionAuthService,
+    PluginConnectionsSettingsService,
+    PublicConnectionFormService,
+    ConnectionsExplorerBootstrap,
+    ConnectionNavNodeService,
+    ConnectionFoldersBootstrap,
+    ConnectionMenuBootstrap,
+    ConnectionOriginInfoTabService,
+    ConnectionOptionsTabService,
+    ConnectionDetailsTabService,
+    AdvancedSettingsTabService,
+    InitializationSettingsTabService,
+    ConnectionDriverPropertiesTabService,
+    ConnectionFormService,
+  ],
+  bootstraps: () => [
+    ConnectionDriverPropertiesTabService,
+    ConnectionFoldersBootstrap,
+    ConnectionMenuBootstrap,
+    ConnectionOptionsTabService,
+    ConnectionDetailsTabService,
+    AdvancedSettingsTabService,
+    InitializationSettingsTabService,
+    ConnectionOriginInfoTabService,
+    ConnectionsExplorerBootstrap,
+    LocaleService,
+    PluginBootstrap,
+  ],
 });

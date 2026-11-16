@@ -21,7 +21,7 @@ import {
   isConnectionNode,
 } from '@cloudbeaver/core-connections';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -58,33 +58,15 @@ import {
   MENU_NAVIGATION_TREE_CREATE,
   MENU_NAVIGATION_TREE_MANAGE,
   NavigationTreeService,
-  NodeDeletionService,
   nodeDeletionPlanContext,
+  NodeDeletionService,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { ACTION_TREE_CREATE_FOLDER } from '../Actions/ACTION_TREE_CREATE_FOLDER.js';
 
-@injectable(() => [
-  LocalizationService,
-  UserInfoResource,
-  NavTreeResource,
-  ActionService,
-  MenuService,
-  ConnectionInfoResource,
-  NavNodeManagerService,
-  ConnectionFolderResource,
-  CommonDialogService,
-  NotificationService,
-  NavNodeInfoResource,
-  ProjectInfoResource,
-  ProjectsNavNodeService,
-  NavigationTreeService,
-  TreeSelectionService,
-  NodeDeletionService,
-])
-export class ConnectionFoldersBootstrap extends Bootstrap {
+export class ConnectionFoldersBootstrapImpl extends Bootstrap {
   constructor(
     private readonly localizationService: LocalizationService,
     private readonly userInfoResource: UserInfoResource,
@@ -398,3 +380,112 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     }
   }
 }
+
+export type ConnectionFoldersBootstrap = ConnectionFoldersBootstrapImpl;
+
+export class ConnectionFoldersBootstrapDI extends Context.Service<ConnectionFoldersBootstrapDI, ConnectionFoldersBootstrapImpl>()(
+  '@cloudbeaver/plugin-connections/NavNodes/ConnectionFoldersBootstrap#ConnectionFoldersBootstrap',
+) {
+  static readonly implementation = ConnectionFoldersBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      LocalizationService,
+      UserInfoResource,
+      NavTreeResource,
+      ActionService,
+      MenuService,
+      ConnectionInfoResource,
+      NavNodeManagerService,
+      ConnectionFolderResource,
+      CommonDialogService,
+      NotificationService,
+      NavNodeInfoResource,
+      ProjectInfoResource,
+      ProjectsNavNodeService,
+      NavigationTreeService,
+      TreeSelectionService,
+      NodeDeletionService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConnectionFoldersBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ConnectionFolderResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof ProjectsNavNodeService>
+    | Context.Service.Identifier<typeof NavigationTreeService>
+    | Context.Service.Identifier<typeof TreeSelectionService>
+    | Context.Service.Identifier<typeof NodeDeletionService>
+  > = Effect.gen(function* makeConnectionFoldersBootstrap() {
+    const localizationService = yield* LocalizationService;
+    const userInfoResource = yield* UserInfoResource;
+    const navTreeResource = yield* NavTreeResource;
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const connectionFolderResource = yield* ConnectionFolderResource;
+    const commonDialogService = yield* CommonDialogService;
+    const notificationService = yield* NotificationService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const projectsNavNodeService = yield* ProjectsNavNodeService;
+    const navigationTreeService = yield* NavigationTreeService;
+    const treeSelectionService = yield* TreeSelectionService;
+    const nodeDeletionService = yield* NodeDeletionService;
+
+    return new ConnectionFoldersBootstrapImpl(
+      localizationService,
+      userInfoResource,
+      navTreeResource,
+      actionService,
+      menuService,
+      connectionInfoResource,
+      navNodeManagerService,
+      connectionFolderResource,
+      commonDialogService,
+      notificationService,
+      navNodeInfoResource,
+      projectInfoResource,
+      projectsNavNodeService,
+      navigationTreeService,
+      treeSelectionService,
+      nodeDeletionService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionFoldersBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof ConnectionFolderResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof ProjectsNavNodeService>
+    | Context.Service.Identifier<typeof NavigationTreeService>
+    | Context.Service.Identifier<typeof TreeSelectionService>
+    | Context.Service.Identifier<typeof NodeDeletionService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionFoldersBootstrap = ConnectionFoldersBootstrapDI;

@@ -6,13 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import type { IAction } from '../../Action/IAction.js';
 import type { IKeyBindingHandler, IKeyBindingHandlerOptions } from './IKeyBindingHandler.js';
 
-@injectable()
-export class KeyBindingService {
+export class KeyBindingServiceImpl {
   private readonly handlers: Map<string, IKeyBindingHandler>;
 
   constructor() {
@@ -53,3 +52,20 @@ export class KeyBindingService {
     return null;
   }
 }
+
+export type KeyBindingService = KeyBindingServiceImpl;
+
+export class KeyBindingServiceDI extends Context.Service<KeyBindingServiceDI, KeyBindingServiceImpl>()(
+  '@cloudbeaver/core-view/Action/KeyBinding/KeyBindingService#KeyBindingService',
+) {
+  static readonly implementation = KeyBindingServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<KeyBindingServiceImpl, never, never> = Effect.sync(() => new KeyBindingServiceImpl());
+  static readonly layer: Layer.Layer<KeyBindingServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const KeyBindingService = KeyBindingServiceDI;

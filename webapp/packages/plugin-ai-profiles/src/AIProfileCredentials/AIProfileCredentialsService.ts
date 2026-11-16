@@ -6,16 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, type DialogResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
 import { AIProfileCredentialsDialog } from './AIProfileCredentialsDialogLazy.js';
 import { AIProfileCredentialsFormService } from './AIProfileCredentialsFormService.js';
-import { AIProfilesResource, type AIProfile } from '../AIProfilesResource.js';
 
-@injectable(() => [CommonDialogService, NotificationService, AIProfilesResource, AIProfileCredentialsFormService])
-export class AIProfileCredentialsService {
+export class AIProfileCredentialsServiceImpl {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
@@ -52,3 +51,41 @@ export class AIProfileCredentialsService {
     return !profile.global && !profile.credentialsSaved;
   }
 }
+
+export type AIProfileCredentialsService = AIProfileCredentialsServiceImpl;
+
+export class AIProfileCredentialsServiceDI extends Context.Service<AIProfileCredentialsServiceDI, AIProfileCredentialsServiceImpl>()(
+  '@cloudbeaver/plugin-ai-profiles/AIProfileCredentials/AIProfileCredentialsService#AIProfileCredentialsService',
+) {
+  static readonly implementation = AIProfileCredentialsServiceImpl;
+
+  static readonly dependencies = () => [CommonDialogService, NotificationService, AIProfilesResource, AIProfileCredentialsFormService] as const;
+  static readonly make: Effect.Effect<
+    AIProfileCredentialsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof AIProfilesResource>
+    | Context.Service.Identifier<typeof AIProfileCredentialsFormService>
+  > = Effect.gen(function* makeAIProfileCredentialsService() {
+    const commonDialogService = yield* CommonDialogService;
+    const notificationService = yield* NotificationService;
+    const aiProfilesResource = yield* AIProfilesResource;
+    const aiProfileCredentialsFormService = yield* AIProfileCredentialsFormService;
+
+    return new AIProfileCredentialsServiceImpl(commonDialogService, notificationService, aiProfilesResource, aiProfileCredentialsFormService);
+  });
+  static readonly layer: Layer.Layer<
+    AIProfileCredentialsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof AIProfilesResource>
+    | Context.Service.Identifier<typeof AIProfileCredentialsFormService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIProfileCredentialsService = AIProfileCredentialsServiceDI;

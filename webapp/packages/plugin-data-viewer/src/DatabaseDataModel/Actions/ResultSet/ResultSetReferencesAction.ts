@@ -8,21 +8,23 @@
 
 import { makeObservable, observable } from 'mobx';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { GraphQLService, ResultDataFormat, type SqlResultAssociation } from '@cloudbeaver/core-sdk';
-import { injectable } from '@cloudbeaver/core-di';
 
+import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import type { IDatabaseReferencesAction } from '../IDatabaseReferencesAction.js';
 
 export interface ISqlResultAssociation extends SqlResultAssociation {
   id: string;
 }
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, GraphQLService])
-export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseReferencesAction<IDatabaseResultSet> {
+export class ResultSetReferencesActionImpl
+  extends DatabaseDataAction<any, IDatabaseResultSet>
+  implements IDatabaseReferencesAction<IDatabaseResultSet>
+{
   static dataFormat = [ResultDataFormat.Resultset];
 
   associations: ISqlResultAssociation[];
@@ -68,3 +70,38 @@ export class ResultSetReferencesAction extends DatabaseDataAction<any, IDatabase
     return this.associations;
   }
 }
+
+export type ResultSetReferencesAction = ResultSetReferencesActionImpl;
+
+export class ResultSetReferencesActionDI extends Context.Service<ResultSetReferencesActionDI, ResultSetReferencesActionImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/ResultSet/ResultSetReferencesAction#ResultSetReferencesAction',
+) {
+  static readonly implementation = ResultSetReferencesActionImpl;
+  static readonly dataFormat = ResultSetReferencesActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult, GraphQLService] as const;
+  static readonly make: Effect.Effect<
+    ResultSetReferencesActionImpl,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof GraphQLService>
+  > = Effect.gen(function* makeResultSetReferencesAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const graphQLService = yield* GraphQLService;
+
+    return new ResultSetReferencesActionImpl(source, result, graphQLService);
+  });
+  static readonly layer: Layer.Layer<
+    ResultSetReferencesActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof GraphQLService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ResultSetReferencesAction = ResultSetReferencesActionDI;

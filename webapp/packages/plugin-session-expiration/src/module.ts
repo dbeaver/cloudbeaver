@@ -1,25 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
-import { SessionExpireWarningDialogBootstrap } from './SessionExpireWarningDialog/SessionExpireWarningDialogBootstrap.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
+import { LocaleService } from './LocaleService.js';
 import { PluginBootstrap } from './PluginBootstrap.js';
 import { SessionExpiredDialogBootstrap } from './SessionExpireDialog/SessionExpiredDialogBootstrap.js';
-import { LocaleService } from './LocaleService.js';
+import { SessionExpireWarningDialogBootstrap } from './SessionExpireWarningDialog/SessionExpireWarningDialogBootstrap.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-session-expiration',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, SessionExpireWarningDialogBootstrap)
-      .addSingleton(Bootstrap, PluginBootstrap)
-      .addSingleton(Bootstrap, SessionExpiredDialogBootstrap);
-  },
+  bootstraps: () => [LocaleService, SessionExpireWarningDialogBootstrap, PluginBootstrap, SessionExpiredDialogBootstrap],
 });

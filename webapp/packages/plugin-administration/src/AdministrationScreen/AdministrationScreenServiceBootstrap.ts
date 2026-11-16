@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { AdministrationScreenService, AdministrationScreenServiceImpl } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
@@ -16,8 +16,7 @@ const ConfigurationWizardScreen = importLazyComponent(() =>
   import('./ConfigurationWizard/ConfigurationWizardScreen.js').then(m => m.ConfigurationWizardScreen),
 );
 
-@injectable(() => [ScreenService, AdministrationScreenService, ServerConfigResource])
-export class AdministrationScreenServiceBootstrap extends Bootstrap {
+export class AdministrationScreenServiceBootstrapImpl extends Bootstrap {
   constructor(
     private readonly screenService: ScreenService,
     private readonly administrationScreenService: AdministrationScreenService,
@@ -30,25 +29,25 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     const canActivate = () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService);
 
     this.screenService.create({
-      name: AdministrationScreenService.screenName,
+      name: AdministrationScreenServiceImpl.screenName,
       routes: [
         {
-          name: AdministrationScreenService.screenName,
+          name: AdministrationScreenServiceImpl.screenName,
           path: '/admin',
           canActivate,
         },
         {
-          name: AdministrationScreenService.itemRouteName,
+          name: AdministrationScreenServiceImpl.itemRouteName,
           path: '/:item',
           canActivate,
         },
         {
-          name: AdministrationScreenService.itemSubRouteName,
+          name: AdministrationScreenServiceImpl.itemSubRouteName,
           path: '/:sub',
           canActivate,
         },
         {
-          name: AdministrationScreenService.itemSubParamRouteName,
+          name: AdministrationScreenServiceImpl.itemSubParamRouteName,
           path: '/:param',
           canActivate,
         },
@@ -60,25 +59,25 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     });
 
     this.screenService.create({
-      name: AdministrationScreenService.setupName,
+      name: AdministrationScreenServiceImpl.setupName,
       routes: [
         {
-          name: AdministrationScreenService.setupName,
+          name: AdministrationScreenServiceImpl.setupName,
           path: '/setup',
           canActivate,
         },
         {
-          name: AdministrationScreenService.setupItemRouteName,
+          name: AdministrationScreenServiceImpl.setupItemRouteName,
           path: '/:item',
           canActivate,
         },
         {
-          name: AdministrationScreenService.setupItemSubRouteName,
+          name: AdministrationScreenServiceImpl.setupItemSubRouteName,
           path: '/:sub',
           canActivate,
         },
         {
-          name: AdministrationScreenService.setupItemSubParamRouteName,
+          name: AdministrationScreenServiceImpl.setupItemSubParamRouteName,
           path: '/:param',
           canActivate,
         },
@@ -95,9 +94,45 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
 
     if (
       this.administrationScreenService.isConfigurationMode &&
-      !this.screenService.isActive(this.screenService.routerService.route, AdministrationScreenService.setupName)
+      !this.screenService.isActive(this.screenService.routerService.route, AdministrationScreenServiceImpl.setupName)
     ) {
       this.administrationScreenService.navigateToRoot();
     }
   }
 }
+
+export type AdministrationScreenServiceBootstrap = AdministrationScreenServiceBootstrapImpl;
+
+export class AdministrationScreenServiceBootstrapDI extends Context.Service<
+  AdministrationScreenServiceBootstrapDI,
+  AdministrationScreenServiceBootstrapImpl
+>()('@cloudbeaver/plugin-administration/AdministrationScreen/AdministrationScreenServiceBootstrap#AdministrationScreenServiceBootstrap') {
+  static readonly implementation = AdministrationScreenServiceBootstrapImpl;
+
+  static readonly dependencies = () => [ScreenService, AdministrationScreenService, ServerConfigResource] as const;
+  static readonly make: Effect.Effect<
+    AdministrationScreenServiceBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ScreenService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+  > = Effect.gen(function* makeAdministrationScreenServiceBootstrap() {
+    const screenService = yield* ScreenService;
+    const administrationScreenService = yield* AdministrationScreenService;
+    const serverConfigResource = yield* ServerConfigResource;
+
+    return new AdministrationScreenServiceBootstrapImpl(screenService, administrationScreenService, serverConfigResource);
+  });
+  static readonly layer: Layer.Layer<
+    AdministrationScreenServiceBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ScreenService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AdministrationScreenServiceBootstrap = AdministrationScreenServiceBootstrapDI;

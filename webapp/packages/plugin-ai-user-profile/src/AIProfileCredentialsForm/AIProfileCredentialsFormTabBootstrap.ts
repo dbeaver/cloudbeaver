@@ -7,7 +7,7 @@
  */
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { AIProfileCredentialsPanelService } from '../AIProfileCredentialsPanelService.js';
 
@@ -15,8 +15,7 @@ const AIProfileCredentialsTab = importLazyComponent(() =>
   import('../components/AIProfileCredentialsTab.js').then(module => module.AIProfileCredentialsTab),
 );
 
-@injectable(() => [AIProfileCredentialsPanelService])
-export class AIProfileCredentialsFormTabBootstrap extends Bootstrap {
+export class AIProfileCredentialsFormTabBootstrapImpl extends Bootstrap {
   constructor(private readonly aiProfileCredentialsPanelService: AIProfileCredentialsPanelService) {
     super();
   }
@@ -29,3 +28,33 @@ export class AIProfileCredentialsFormTabBootstrap extends Bootstrap {
     });
   }
 }
+
+export type AIProfileCredentialsFormTabBootstrap = AIProfileCredentialsFormTabBootstrapImpl;
+
+export class AIProfileCredentialsFormTabBootstrapDI extends Context.Service<
+  AIProfileCredentialsFormTabBootstrapDI,
+  AIProfileCredentialsFormTabBootstrapImpl
+>()('@cloudbeaver/plugin-ai-user-profile/AIProfileCredentialsForm/AIProfileCredentialsFormTabBootstrap#AIProfileCredentialsFormTabBootstrap') {
+  static readonly implementation = AIProfileCredentialsFormTabBootstrapImpl;
+
+  static readonly dependencies = () => [AIProfileCredentialsPanelService] as const;
+  static readonly make: Effect.Effect<
+    AIProfileCredentialsFormTabBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof AIProfileCredentialsPanelService>
+  > = Effect.gen(function* makeAIProfileCredentialsFormTabBootstrap() {
+    const aiProfileCredentialsPanelService = yield* AIProfileCredentialsPanelService;
+
+    return new AIProfileCredentialsFormTabBootstrapImpl(aiProfileCredentialsPanelService);
+  });
+  static readonly layer: Layer.Layer<
+    AIProfileCredentialsFormTabBootstrapDI,
+    never,
+    Context.Service.Identifier<typeof AIProfileCredentialsPanelService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIProfileCredentialsFormTabBootstrap = AIProfileCredentialsFormTabBootstrapDI;

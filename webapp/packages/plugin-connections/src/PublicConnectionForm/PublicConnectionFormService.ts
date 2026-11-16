@@ -11,7 +11,7 @@ import { action, makeObservable, observable } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, IServiceProvider, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -20,26 +20,15 @@ import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { FormMode, OptionsPanelService, type OptionsPanelCloseEventData } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState.js';
 import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService.js';
+import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../ConnectionForm/Options/getConnectionFormOptionsPart.js';
 
 const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm.js').then(m => m.PublicConnectionForm));
 
 const formGetter = () => PublicConnectionForm;
 
-@injectable(() => [
-  CommonDialogService,
-  NotificationService,
-  OptionsPanelService,
-  IServiceProvider,
-  ConnectionFormService,
-  ConnectionInfoResource,
-  ConnectionsManagerService,
-  UserInfoResource,
-  AuthenticationService,
-])
-export class PublicConnectionFormService {
+export class PublicConnectionFormServiceImpl {
   formState: ConnectionFormState | null;
 
   constructor(
@@ -220,3 +209,77 @@ export class PublicConnectionFormService {
     this.formState = null;
   }
 }
+
+export type PublicConnectionFormService = PublicConnectionFormServiceImpl;
+
+export class PublicConnectionFormServiceDI extends Context.Service<PublicConnectionFormServiceDI, PublicConnectionFormServiceImpl>()(
+  '@cloudbeaver/plugin-connections/PublicConnectionForm/PublicConnectionFormService#PublicConnectionFormService',
+) {
+  static readonly implementation = PublicConnectionFormServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      CommonDialogService,
+      NotificationService,
+      OptionsPanelService,
+      IServiceProvider,
+      ConnectionFormService,
+      ConnectionInfoResource,
+      ConnectionsManagerService,
+      UserInfoResource,
+      AuthenticationService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    PublicConnectionFormServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof AuthenticationService>
+  > = Effect.gen(function* makePublicConnectionFormService() {
+    const commonDialogService = yield* CommonDialogService;
+    const notificationService = yield* NotificationService;
+    const optionsPanelService = yield* OptionsPanelService;
+    const serviceProvider = yield* IServiceProvider;
+    const connectionFormService = yield* ConnectionFormService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const userInfoResource = yield* UserInfoResource;
+    const authenticationService = yield* AuthenticationService;
+
+    return new PublicConnectionFormServiceImpl(
+      commonDialogService,
+      notificationService,
+      optionsPanelService,
+      serviceProvider,
+      connectionFormService,
+      connectionInfoResource,
+      connectionsManagerService,
+      userInfoResource,
+      authenticationService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    PublicConnectionFormServiceDI,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof AuthenticationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PublicConnectionFormService = PublicConnectionFormServiceDI;

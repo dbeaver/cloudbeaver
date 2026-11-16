@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { UserDataService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';
 import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.js';
@@ -20,8 +20,7 @@ interface ISettings {
   wrapMode: boolean;
 }
 
-@injectable(() => [SqlDataSourceService, UserDataService, OutputLogsResource])
-export class OutputLogsService {
+export class OutputLogsServiceImpl {
   get settings(): ISettings {
     return this.userDataService.getUserData(OUTPUT_LOGS_KEY, getOutputLogsDefaultSettings);
   }
@@ -82,6 +81,41 @@ export class OutputLogsService {
     this.outputLogsResource.deleteLogsByContextId(contextId);
   }
 }
+
+export type OutputLogsService = OutputLogsServiceImpl;
+
+export class OutputLogsServiceDI extends Context.Service<OutputLogsServiceDI, OutputLogsServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlResultTabs/OutputLogs/OutputLogsService#OutputLogsService',
+) {
+  static readonly implementation = OutputLogsServiceImpl;
+
+  static readonly dependencies = () => [SqlDataSourceService, UserDataService, OutputLogsResource] as const;
+  static readonly make: Effect.Effect<
+    OutputLogsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof OutputLogsResource>
+  > = Effect.gen(function* makeOutputLogsService() {
+    const sqlDataSourceService = yield* SqlDataSourceService;
+    const userDataService = yield* UserDataService;
+    const outputLogsResource = yield* OutputLogsResource;
+
+    return new OutputLogsServiceImpl(sqlDataSourceService, userDataService, outputLogsResource);
+  });
+  static readonly layer: Layer.Layer<
+    OutputLogsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof SqlDataSourceService>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof OutputLogsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const OutputLogsService = OutputLogsServiceDI;
 
 function getOutputLogsDefaultSettings(): ISettings {
   return {

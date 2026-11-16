@@ -10,7 +10,7 @@ import { createRouter, type Router, type State, type SubscribeFn, type Subscribe
 import browserPlugin from 'router5-plugin-browser';
 import type { DoneFn } from 'router5/dist/types/base.js';
 
-import { App, Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { App, AppService, Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
@@ -22,8 +22,7 @@ export interface RouterTransitionData {
   done: DoneFn;
 }
 
-@injectable(() => [App])
-export class RouterService extends Bootstrap {
+export class RouterServiceImpl extends Bootstrap {
   get state(): RouterState {
     return this.currentState;
   }
@@ -116,3 +115,24 @@ export class RouterService extends Bootstrap {
     });
   }
 }
+
+export type RouterService = RouterServiceImpl;
+
+export class RouterServiceDI extends Context.Service<RouterServiceDI, RouterServiceImpl>()('@cloudbeaver/core-routing/RouterService#RouterService') {
+  static readonly implementation = RouterServiceImpl;
+
+  static readonly dependencies = () => [AppService] as const;
+  static readonly make: Effect.Effect<RouterServiceImpl, never, Context.Service.Identifier<typeof AppService>> = Effect.gen(
+    function* makeRouterService() {
+      const app = yield* AppService;
+
+      return new RouterServiceImpl(app);
+    },
+  );
+  static readonly layer: Layer.Layer<RouterServiceDI, never, Context.Service.Identifier<typeof AppService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const RouterService = RouterServiceDI;

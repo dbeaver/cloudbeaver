@@ -5,12 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
-import { COMMON_LOCALES } from './commonLocales.js';
 import { getLocalizedDisplayName } from '@dbeaver/js-helpers';
+import { COMMON_LOCALES } from './commonLocales.js';
 
 const NO_FORMAT = 'default';
 const OS_FORMAT = '_OS';
@@ -35,8 +35,7 @@ const defaultSettings = schema.object({
 export type DataGridSettingsSchema = typeof defaultSettings;
 export type DataGridSettings = schema.infer<DataGridSettingsSchema>;
 
-@injectable(() => [SettingsProviderService, SettingsManagerService])
-export class DataGridSettingsService {
+export class DataGridSettingsServiceImpl {
   get hidden(): boolean {
     return this.settings.getValue('plugin.data-spreadsheet.hidden');
   }
@@ -129,3 +128,33 @@ export class DataGridSettingsService {
     ]);
   }
 }
+
+export type DataGridSettingsService = DataGridSettingsServiceImpl;
+
+export class DataGridSettingsServiceDI extends Context.Service<DataGridSettingsServiceDI, DataGridSettingsServiceImpl>()(
+  '@cloudbeaver/plugin-data-spreadsheet-new/DataGridSettingsService#DataGridSettingsService',
+) {
+  static readonly implementation = DataGridSettingsServiceImpl;
+
+  static readonly dependencies = () => [SettingsProviderService, SettingsManagerService] as const;
+  static readonly make: Effect.Effect<
+    DataGridSettingsServiceImpl,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Effect.gen(function* makeDataGridSettingsService() {
+    const settingsProviderService = yield* SettingsProviderService;
+    const settingsManagerService = yield* SettingsManagerService;
+
+    return new DataGridSettingsServiceImpl(settingsProviderService, settingsManagerService);
+  });
+  static readonly layer: Layer.Layer<
+    DataGridSettingsServiceDI,
+    never,
+    Context.Service.Identifier<typeof SettingsProviderService> | Context.Service.Identifier<typeof SettingsManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataGridSettingsService = DataGridSettingsServiceDI;

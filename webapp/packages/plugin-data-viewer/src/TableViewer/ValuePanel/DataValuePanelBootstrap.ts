@@ -7,19 +7,18 @@
  */
 import React from 'react';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
+import { IDatabaseDataResultAction } from '../../DatabaseDataModel/Actions/IDatabaseDataResultAction.js';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService.js';
 import { DataValuePanelService } from './DataValuePanelService.js';
-import { IDatabaseDataResultAction } from '../../DatabaseDataModel/Actions/IDatabaseDataResultAction.js';
 
 export const ValuePanel = React.lazy(async () => {
   const { ValuePanel } = await import('./ValuePanel.js');
   return { default: ValuePanel };
 });
 
-@injectable(() => [DataPresentationService, DataValuePanelService])
-export class DataValuePanelBootstrap extends Bootstrap {
+export class DataValuePanelBootstrapImpl extends Bootstrap {
   constructor(
     private readonly dataPresentationService: DataPresentationService,
     private readonly dataValuePanelService: DataValuePanelService,
@@ -46,3 +45,33 @@ export class DataValuePanelBootstrap extends Bootstrap {
     });
   }
 }
+
+export type DataValuePanelBootstrap = DataValuePanelBootstrapImpl;
+
+export class DataValuePanelBootstrapDI extends Context.Service<DataValuePanelBootstrapDI, DataValuePanelBootstrapImpl>()(
+  '@cloudbeaver/plugin-data-viewer/TableViewer/ValuePanel/DataValuePanelBootstrap#DataValuePanelBootstrap',
+) {
+  static readonly implementation = DataValuePanelBootstrapImpl;
+
+  static readonly dependencies = () => [DataPresentationService, DataValuePanelService] as const;
+  static readonly make: Effect.Effect<
+    DataValuePanelBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof DataPresentationService> | Context.Service.Identifier<typeof DataValuePanelService>
+  > = Effect.gen(function* makeDataValuePanelBootstrap() {
+    const dataPresentationService = yield* DataPresentationService;
+    const dataValuePanelService = yield* DataValuePanelService;
+
+    return new DataValuePanelBootstrapImpl(dataPresentationService, dataValuePanelService);
+  });
+  static readonly layer: Layer.Layer<
+    DataValuePanelBootstrapDI,
+    never,
+    Context.Service.Identifier<typeof DataPresentationService> | Context.Service.Identifier<typeof DataValuePanelService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataValuePanelBootstrap = DataValuePanelBootstrapDI;

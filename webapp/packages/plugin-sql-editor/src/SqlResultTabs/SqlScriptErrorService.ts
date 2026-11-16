@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Disposable, injectable } from '@cloudbeaver/core-di';
+import { Context, Disposable, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
@@ -14,8 +14,7 @@ import { SqlQueryService, SqlScriptErrorContext, type ISqlScriptQueryError } fro
 
 const SqlScriptErrorDialog = importLazyComponent(() => import('./SqlScriptErrorDialog.js').then(module => module.SqlScriptErrorDialog));
 
-@injectable(() => [SqlQueryService, CommonDialogService])
-export class SqlScriptErrorService extends Disposable {
+export class SqlScriptErrorServiceImpl extends Disposable {
   constructor(
     private readonly sqlQueryService: SqlQueryService,
     private readonly commonDialogService: CommonDialogService,
@@ -68,3 +67,33 @@ export class SqlScriptErrorService extends Disposable {
     this.sqlQueryService.onScriptQueryError.removeHandler(this.handleError);
   }
 }
+
+export type SqlScriptErrorService = SqlScriptErrorServiceImpl;
+
+export class SqlScriptErrorServiceDI extends Context.Service<SqlScriptErrorServiceDI, SqlScriptErrorServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlResultTabs/SqlScriptErrorService#SqlScriptErrorService',
+) {
+  static readonly implementation = SqlScriptErrorServiceImpl;
+
+  static readonly dependencies = () => [SqlQueryService, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    SqlScriptErrorServiceImpl,
+    never,
+    Context.Service.Identifier<typeof SqlQueryService> | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeSqlScriptErrorService() {
+    const sqlQueryService = yield* SqlQueryService;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new SqlScriptErrorServiceImpl(sqlQueryService, commonDialogService);
+  });
+  static readonly layer: Layer.Layer<
+    SqlScriptErrorServiceDI,
+    never,
+    Context.Service.Identifier<typeof SqlQueryService> | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlScriptErrorService = SqlScriptErrorServiceDI;

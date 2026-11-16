@@ -7,27 +7,27 @@
  */
 
 import { importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import {
+  ACTION_REDO,
+  ACTION_UNDO,
   ActionService,
   DATA_CONTEXT_MENU,
-  MenuService,
-  KeyBindingService,
-  ACTION_UNDO,
-  ACTION_REDO,
   KEY_BINDING_REDO,
   KEY_BINDING_UNDO,
+  KeyBindingService,
+  MenuService,
 } from '@cloudbeaver/core-view';
 
+import { GridHistoryAction } from '../../DatabaseDataModel/Actions/Grid/GridHistoryAction.js';
+import { IDatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
 import { DATA_VIEWER_CONSTRAINTS_DELETE_ACTION } from '../../DatabaseDataModel/Actions/ResultSet/Actions/DATA_VIEWER_CONSTRAINTS_DELETE_ACTION.js';
 import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
-import { DatabaseDataFeature } from '../../DatabaseDataModel/IDatabaseDataSource.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
+import { DatabaseDataFeature } from '../../DatabaseDataModel/IDatabaseDataSource.js';
 import { isResultSetDataSource, ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU.js';
-import { IDatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/IDatabaseDataConstraintAction.js';
-import { GridHistoryAction } from '../../DatabaseDataModel/Actions/Grid/GridHistoryAction.js';
 
 export const TableWhereFilter = importLazyComponent(() => import('./TableWhereFilter.js').then(module => module.TableWhereFilter));
 export const TableHeaderMenu = importLazyComponent(() => import('./TableHeaderMenu.js').then(module => module.TableHeaderMenu));
@@ -38,8 +38,7 @@ export interface ITableHeaderPlaceholderProps {
   simple: boolean;
 }
 
-@injectable(() => [MenuService, ActionService, KeyBindingService])
-export class TableHeaderService extends Bootstrap {
+export class TableHeaderServiceImpl extends Bootstrap {
   readonly tableHeaderPlaceholder = new PlaceholderContainer<ITableHeaderPlaceholderProps>();
 
   constructor(
@@ -200,3 +199,38 @@ export class TableHeaderService extends Bootstrap {
     });
   }
 }
+
+export type TableHeaderService = TableHeaderServiceImpl;
+
+export class TableHeaderServiceDI extends Context.Service<TableHeaderServiceDI, TableHeaderServiceImpl>()(
+  '@cloudbeaver/plugin-data-viewer/TableViewer/TableHeader/TableHeaderService#TableHeaderService',
+) {
+  static readonly implementation = TableHeaderServiceImpl;
+
+  static readonly dependencies = () => [MenuService, ActionService, KeyBindingService] as const;
+  static readonly make: Effect.Effect<
+    TableHeaderServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+  > = Effect.gen(function* makeTableHeaderService() {
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const keyBindingService = yield* KeyBindingService;
+
+    return new TableHeaderServiceImpl(menuService, actionService, keyBindingService);
+  });
+  static readonly layer: Layer.Layer<
+    TableHeaderServiceDI,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TableHeaderService = TableHeaderServiceDI;

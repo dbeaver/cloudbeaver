@@ -9,14 +9,14 @@ import { action, computed, makeObservable, runInAction } from 'mobx';
 
 import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DatabaseDataAction } from '../DatabaseDataAction.js';
 import type { IDatabaseDataOptions } from '../IDatabaseDataOptions.js';
+import { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../IDatabaseResultSet.js';
 import { EOrder, type Order } from '../Order.js';
 import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
@@ -24,9 +24,7 @@ export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 const CONSTRAINTS_KEY = 'constraints';
 const WHERE_FILTER_KEY = 'whereFilter';
 
-export function persistDataFilterConstraints<TOptions extends IDatabaseDataOptions>(
-  source: IDatabaseDataSource<TOptions, IDatabaseResultSet>,
-): void {
+export function persistDataFilterConstraints<TOptions extends IDatabaseDataOptions>(source: IDatabaseDataSource<TOptions, IDatabaseResultSet>): void {
   const options = source.options;
 
   if (!options) {
@@ -59,8 +57,7 @@ export function applyPersistedDataFilterConstraints<TOptions extends IDatabaseDa
   });
 }
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
-export class DatabaseDataConstraintAction
+export class DatabaseDataConstraintActionImpl
   extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
   implements IDatabaseDataConstraintAction<IDatabaseResultSet>
 {
@@ -323,6 +320,36 @@ export class DatabaseDataConstraintAction
   }
 }
 
+export type DatabaseDataConstraintAction = DatabaseDataConstraintActionImpl;
+
+export class DatabaseDataConstraintActionDI extends Context.Service<DatabaseDataConstraintActionDI, DatabaseDataConstraintActionImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/DatabaseDataConstraintAction#DatabaseDataConstraintAction',
+) {
+  static readonly implementation = DatabaseDataConstraintActionImpl;
+  static readonly dataFormat = DatabaseDataConstraintActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult] as const;
+  static readonly make: Effect.Effect<
+    DatabaseDataConstraintActionImpl,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Effect.gen(function* makeDatabaseDataConstraintAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+
+    return new DatabaseDataConstraintActionImpl(source, result);
+  });
+  static readonly layer: Layer.Layer<
+    DatabaseDataConstraintActionDI,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DatabaseDataConstraintAction = DatabaseDataConstraintActionDI;
+
 function updateConstraintsForResult(source: IDatabaseDataSource<IDatabaseDataOptions, IDatabaseResultSet>, result: IDatabaseResultSet) {
   if (!source.options) {
     return;
@@ -380,7 +407,10 @@ function resolveConstraintColumn(
 ): (SqlResultColumn & { name: string; position: number }) | undefined {
   return columns.find(
     (column): column is SqlResultColumn & { name: string; position: number } =>
-      typeof column.name === 'string' && typeof column.position === 'number' && column.position === attributePosition && column.name === attributeName,
+      typeof column.name === 'string' &&
+      typeof column.position === 'number' &&
+      column.position === attributePosition &&
+      column.name === attributeName,
   );
 }
 

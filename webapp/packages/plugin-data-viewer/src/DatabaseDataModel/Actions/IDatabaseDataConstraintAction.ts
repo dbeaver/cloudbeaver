@@ -1,16 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import type { SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
+import { Context } from '@cloudbeaver/core-di';
 import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 import type { Order } from '../Order.js';
-import { createService } from '@cloudbeaver/core-di';
 
 export interface IDatabaseDataConstraintAction<TResult extends IDatabaseDataResult = IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
   readonly filterConstraints: SqlDataFilterConstraint[];
@@ -29,4 +29,6 @@ export interface IDatabaseDataConstraintAction<TResult extends IDatabaseDataResu
   getOrder: (attributePosition: number) => Order;
 }
 
-export const IDatabaseDataConstraintAction = createService<IDatabaseDataConstraintAction>('IDatabaseDataConstraintAction');
+export const IDatabaseDataConstraintAction = Context.Service<IDatabaseDataConstraintAction>(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/IDatabaseDataConstraintAction#IDatabaseDataConstraintAction',
+);

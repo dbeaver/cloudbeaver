@@ -7,7 +7,7 @@
  */
 import { observable, runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
 
 export interface DialogOptions {
@@ -44,8 +44,7 @@ export interface DialogResult<TResult = void> {
   result?: TResult;
 }
 
-@injectable()
-export class CommonDialogService {
+export class CommonDialogServiceImpl {
   dialogs: Array<DialogInternal<any>> = observable([], { deep: false });
 
   // note that if dialog is closed by user it will be resolved with DialogueStateResult.Rejected
@@ -109,3 +108,20 @@ export class CommonDialogService {
     }
   }
 }
+
+export type CommonDialogService = CommonDialogServiceImpl;
+
+export class CommonDialogServiceDI extends Context.Service<CommonDialogServiceDI, CommonDialogServiceImpl>()(
+  '@cloudbeaver/core-dialogs/CommonDialog/CommonDialogService#CommonDialogService',
+) {
+  static readonly implementation = CommonDialogServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<CommonDialogServiceImpl, never, never> = Effect.sync(() => new CommonDialogServiceImpl());
+  static readonly layer: Layer.Layer<CommonDialogServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const CommonDialogService = CommonDialogServiceDI;

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, type SessionStateFragment } from '@cloudbeaver/core-sdk';
@@ -21,8 +21,7 @@ export interface ISessionAction {
   [key: string]: any;
 }
 
-@injectable(() => [GraphQLService, SessionEventSource, SessionInfoEventHandler, ServerConfigResource, LocalizationService])
-export class SessionResource extends CachedDataResource<SessionState | null> {
+export class SessionResourceImpl extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
 
   constructor(
@@ -115,3 +114,45 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     super.setData(data);
   }
 }
+
+export type SessionResource = SessionResourceImpl;
+
+export class SessionResourceDI extends Context.Service<SessionResourceDI, SessionResourceImpl>()(
+  '@cloudbeaver/core-root/SessionResource#SessionResource',
+) {
+  static readonly implementation = SessionResourceImpl;
+
+  static readonly dependencies = () =>
+    [GraphQLService, SessionEventSource, SessionInfoEventHandler, ServerConfigResource, LocalizationService] as const;
+  static readonly make: Effect.Effect<
+    SessionResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof SessionEventSource>
+    | Context.Service.Identifier<typeof SessionInfoEventHandler>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof LocalizationService>
+  > = Effect.gen(function* makeSessionResource() {
+    const graphQLService = yield* GraphQLService;
+    const sessionEventSource = yield* SessionEventSource;
+    const sessionInfoEventHandler = yield* SessionInfoEventHandler;
+    const serverConfigResource = yield* ServerConfigResource;
+    const localizationService = yield* LocalizationService;
+
+    return new SessionResourceImpl(graphQLService, sessionEventSource, sessionInfoEventHandler, serverConfigResource, localizationService);
+  });
+  static readonly layer: Layer.Layer<
+    SessionResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof SessionEventSource>
+    | Context.Service.Identifier<typeof SessionInfoEventHandler>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof LocalizationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SessionResource = SessionResourceDI;

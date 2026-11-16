@@ -7,7 +7,7 @@
  */
 import { lazy } from 'react';
 
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataValuePanelService, isResultSetDataSource, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
@@ -19,8 +19,7 @@ const GISViewer = lazy(async () => {
   return { default: GISViewer };
 });
 
-@injectable(() => [DataValuePanelService])
-export class GISViewerBootstrap extends Bootstrap {
+export class GISViewerBootstrapImpl extends Bootstrap {
   constructor(private readonly dataValuePanelService: DataValuePanelService) {
     super();
   }
@@ -55,3 +54,26 @@ export class GISViewerBootstrap extends Bootstrap {
     });
   }
 }
+
+export type GISViewerBootstrap = GISViewerBootstrapImpl;
+
+export class GISViewerBootstrapDI extends Context.Service<GISViewerBootstrapDI, GISViewerBootstrapImpl>()(
+  '@cloudbeaver/plugin-gis-viewer/GISViewerBootstrap#GISViewerBootstrap',
+) {
+  static readonly implementation = GISViewerBootstrapImpl;
+
+  static readonly dependencies = () => [DataValuePanelService] as const;
+  static readonly make: Effect.Effect<GISViewerBootstrapImpl, never, Context.Service.Identifier<typeof DataValuePanelService>> = Effect.gen(
+    function* makeGISViewerBootstrap() {
+      const dataValuePanelService = yield* DataValuePanelService;
+
+      return new GISViewerBootstrapImpl(dataValuePanelService);
+    },
+  );
+  static readonly layer: Layer.Layer<GISViewerBootstrapDI, never, Context.Service.Identifier<typeof DataValuePanelService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GISViewerBootstrap = GISViewerBootstrapDI;

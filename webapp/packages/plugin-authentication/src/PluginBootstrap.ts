@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { MenuBaseItem, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 import { AuthenticationService } from './AuthenticationService.js';
 
-@injectable(() => [ServerConfigResource, AuthenticationService, UserInfoResource, MenuService])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authenticationService: AuthenticationService,
@@ -63,3 +62,41 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-authentication/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+
+  static readonly dependencies = () => [ServerConfigResource, AuthenticationService, UserInfoResource, MenuService] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof AuthenticationService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const serverConfigResource = yield* ServerConfigResource;
+    const authenticationService = yield* AuthenticationService;
+    const userInfoResource = yield* UserInfoResource;
+    const menuService = yield* MenuService;
+
+    return new PluginBootstrapImpl(serverConfigResource, authenticationService, userInfoResource, menuService);
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof AuthenticationService>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

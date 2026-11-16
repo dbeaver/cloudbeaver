@@ -5,7 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
   ACTION_ADD,
   ACTION_CANCEL,
@@ -19,8 +21,6 @@ import {
   MenuService,
   type IAction,
 } from '@cloudbeaver/core-view';
-import { LocalizationService } from '@cloudbeaver/core-localization';
-import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
 import {
   KEY_BINDING_ADD_NEW_ROW,
@@ -32,18 +32,17 @@ import {
 } from '../../../DATA_VIEWER_KEY_BINDINGS.js';
 
 import { DatabaseEditChangeType, IDatabaseDataEditAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
+import { IDatabaseDataSelectAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
 import { DATA_CONTEXT_DV_PRESENTATION, DataViewerPresentationType } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION.js';
-import { DatabaseDataFeature } from '../../../DatabaseDataModel/IDatabaseDataSource.js';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel.js';
-import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
-import { DataViewerViewService } from '../../DataViewerViewService.js';
-import { IDatabaseDataSelectAction } from '../../../DatabaseDataModel/Actions/IDatabaseDataSelectAction.js';
+import { DatabaseDataFeature } from '../../../DatabaseDataModel/IDatabaseDataSource.js';
 import { isResultSetDataSource } from '../../../ResultSet/ResultSetDataSource.js';
+import { DataViewerViewService } from '../../DataViewerViewService.js';
+import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 
-@injectable(() => [ActionService, KeyBindingService, DataViewerViewService, LocalizationService, MenuService])
-export class TableFooterMenuService {
+export class TableFooterMenuServiceImpl {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
@@ -310,6 +309,47 @@ export class TableFooterMenuService {
     return action.info;
   }
 }
+
+export type TableFooterMenuService = TableFooterMenuServiceImpl;
+
+export class TableFooterMenuServiceDI extends Context.Service<TableFooterMenuServiceDI, TableFooterMenuServiceImpl>()(
+  '@cloudbeaver/plugin-data-viewer/TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService#TableFooterMenuService',
+) {
+  static readonly implementation = TableFooterMenuServiceImpl;
+
+  static readonly dependencies = () => [ActionService, KeyBindingService, DataViewerViewService, LocalizationService, MenuService] as const;
+  static readonly make: Effect.Effect<
+    TableFooterMenuServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof DataViewerViewService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makeTableFooterMenuService() {
+    const actionService = yield* ActionService;
+    const keyBindingService = yield* KeyBindingService;
+    const dataViewerViewService = yield* DataViewerViewService;
+    const localizationService = yield* LocalizationService;
+    const menuService = yield* MenuService;
+
+    return new TableFooterMenuServiceImpl(actionService, keyBindingService, dataViewerViewService, localizationService, menuService);
+  });
+  static readonly layer: Layer.Layer<
+    TableFooterMenuServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+    | Context.Service.Identifier<typeof DataViewerViewService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TableFooterMenuService = TableFooterMenuServiceDI;
 
 function getActiveElements(model: IDatabaseDataModel, resultIndex: number): unknown[] {
   const select = model.source.tryGetAction(resultIndex, IDatabaseDataSelectAction);

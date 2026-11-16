@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { RenameDialog } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, ENodeFeature, type NavNode } from '@cloudbeaver/core-navigation-tree';
@@ -17,8 +17,8 @@ import {
   isRMResourceNode,
   NAV_NODE_TYPE_RM_FOLDER,
   NAV_NODE_TYPE_RM_RESOURCE,
-  RESOURCES_NODE_PATH,
   ResourceManagerResource,
+  RESOURCES_NODE_PATH,
 } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
@@ -33,17 +33,7 @@ import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId.js';
 import { NavResourceNodeService } from './NavResourceNodeService.js';
 
-@injectable(() => [
-  ActionService,
-  ProjectInfoResource,
-  CommonDialogService,
-  NotificationService,
-  NavResourceNodeService,
-  NodeDeletionService,
-  ResourceManagerResource,
-  ResourceManagerService,
-])
-export class NavTreeRMContextMenuBootstrap extends Bootstrap {
+export class NavTreeRMContextMenuBootstrapImpl extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly projectInfoResource: ProjectInfoResource,
@@ -199,3 +189,72 @@ export class NavTreeRMContextMenuBootstrap extends Bootstrap {
     return !root && !!node.features?.includes(ENodeFeature.canDelete) && !!getResourceKeyFromNodeId(node.uri);
   }
 }
+
+export type NavTreeRMContextMenuBootstrap = NavTreeRMContextMenuBootstrapImpl;
+
+export class NavTreeRMContextMenuBootstrapDI extends Context.Service<NavTreeRMContextMenuBootstrapDI, NavTreeRMContextMenuBootstrapImpl>()(
+  '@cloudbeaver/plugin-navigation-tree-rm/NavTreeRMContextMenuBootstrap#NavTreeRMContextMenuBootstrap',
+) {
+  static readonly implementation = NavTreeRMContextMenuBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      ActionService,
+      ProjectInfoResource,
+      CommonDialogService,
+      NotificationService,
+      NavResourceNodeService,
+      NodeDeletionService,
+      ResourceManagerResource,
+      ResourceManagerService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    NavTreeRMContextMenuBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof NavResourceNodeService>
+    | Context.Service.Identifier<typeof NodeDeletionService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+  > = Effect.gen(function* makeNavTreeRMContextMenuBootstrap() {
+    const actionService = yield* ActionService;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const commonDialogService = yield* CommonDialogService;
+    const notificationService = yield* NotificationService;
+    const navResourceNodeService = yield* NavResourceNodeService;
+    const nodeDeletionService = yield* NodeDeletionService;
+    const resourceManagerResource = yield* ResourceManagerResource;
+    const resourceManagerService = yield* ResourceManagerService;
+
+    return new NavTreeRMContextMenuBootstrapImpl(
+      actionService,
+      projectInfoResource,
+      commonDialogService,
+      notificationService,
+      navResourceNodeService,
+      nodeDeletionService,
+      resourceManagerResource,
+      resourceManagerService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    NavTreeRMContextMenuBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof NavResourceNodeService>
+    | Context.Service.Identifier<typeof NodeDeletionService>
+    | Context.Service.Identifier<typeof ResourceManagerResource>
+    | Context.Service.Identifier<typeof ResourceManagerService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavTreeRMContextMenuBootstrap = NavTreeRMContextMenuBootstrapDI;

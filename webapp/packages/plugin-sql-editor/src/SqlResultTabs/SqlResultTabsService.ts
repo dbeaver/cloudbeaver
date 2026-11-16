@@ -8,7 +8,7 @@
 import { action, makeObservable } from 'mobx';
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { ISqlEditorResultTab, ISqlEditorTabState } from '../ISqlEditorTabState.js';
@@ -21,8 +21,7 @@ export interface ISqlResultPanelProps {
   tabId: string;
 }
 
-@injectable(() => [SqlQueryService, SqlQueryResultService, OutputLogsService])
-export class SqlResultTabsService {
+export class SqlResultTabsServiceImpl {
   readonly onResultTabClose: SyncExecutor<{ state: ISqlEditorTabState; tabId: string }>;
   readonly resultPanels: PlaceholderContainer<ISqlResultPanelProps>;
 
@@ -108,3 +107,38 @@ export class SqlResultTabsService {
     }
   }
 }
+
+export type SqlResultTabsService = SqlResultTabsServiceImpl;
+
+export class SqlResultTabsServiceDI extends Context.Service<SqlResultTabsServiceDI, SqlResultTabsServiceImpl>()(
+  '@cloudbeaver/plugin-sql-editor/SqlResultTabs/SqlResultTabsService#SqlResultTabsService',
+) {
+  static readonly implementation = SqlResultTabsServiceImpl;
+
+  static readonly dependencies = () => [SqlQueryService, SqlQueryResultService, OutputLogsService] as const;
+  static readonly make: Effect.Effect<
+    SqlResultTabsServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof SqlQueryService>
+    | Context.Service.Identifier<typeof SqlQueryResultService>
+    | Context.Service.Identifier<typeof OutputLogsService>
+  > = Effect.gen(function* makeSqlResultTabsService() {
+    const sqlQueryService = yield* SqlQueryService;
+    const sqlQueryResultService = yield* SqlQueryResultService;
+    const outputLogsService = yield* OutputLogsService;
+
+    return new SqlResultTabsServiceImpl(sqlQueryService, sqlQueryResultService, outputLogsService);
+  });
+  static readonly layer: Layer.Layer<
+    SqlResultTabsServiceDI,
+    never,
+    | Context.Service.Identifier<typeof SqlQueryService>
+    | Context.Service.Identifier<typeof SqlQueryResultService>
+    | Context.Service.Identifier<typeof OutputLogsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SqlResultTabsService = SqlResultTabsServiceDI;

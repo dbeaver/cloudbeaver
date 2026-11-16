@@ -1,14 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
+import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
@@ -18,8 +18,7 @@ import { ResourceManagerScriptsService, SCRIPTS_TAB_ID } from './ResourceManager
 
 const ResourceManagerScripts = importLazyComponent(() => import('./ResourceManagerScripts.js').then(m => m.ResourceManagerScripts));
 
-@injectable(() => [UserInfoResource, SideBarPanelService, ResourceManagerScriptsService, MenuService, ActionService])
-export class PluginBootstrap extends Bootstrap {
+export class PluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly sideBarPanelService: SideBarPanelService,
@@ -70,3 +69,44 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 }
+
+export type PluginBootstrap = PluginBootstrapImpl;
+
+export class PluginBootstrapDI extends Context.Service<PluginBootstrapDI, PluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-resource-manager-scripts/PluginBootstrap#PluginBootstrap',
+) {
+  static readonly implementation = PluginBootstrapImpl;
+
+  static readonly dependencies = () => [UserInfoResource, SideBarPanelService, ResourceManagerScriptsService, MenuService, ActionService] as const;
+  static readonly make: Effect.Effect<
+    PluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof SideBarPanelService>
+    | Context.Service.Identifier<typeof ResourceManagerScriptsService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+  > = Effect.gen(function* makePluginBootstrap() {
+    const userInfoResource = yield* UserInfoResource;
+    const sideBarPanelService = yield* SideBarPanelService;
+    const resourceManagerScriptsService = yield* ResourceManagerScriptsService;
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+
+    return new PluginBootstrapImpl(userInfoResource, sideBarPanelService, resourceManagerScriptsService, menuService, actionService);
+  });
+  static readonly layer: Layer.Layer<
+    PluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof SideBarPanelService>
+    | Context.Service.Identifier<typeof ResourceManagerScriptsService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const PluginBootstrap = PluginBootstrapDI;

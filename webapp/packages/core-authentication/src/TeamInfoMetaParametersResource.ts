@@ -1,19 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { TeamMetaParameter } from './TeamMetaParametersResource.js';
 import { TeamsResource } from './TeamsResource.js';
 
-@injectable(() => [GraphQLService, TeamsResource])
-export class TeamInfoMetaParametersResource extends CachedMapResource<string, TeamMetaParameter> {
+export class TeamInfoMetaParametersResourceImpl extends CachedMapResource<string, TeamMetaParameter> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly teamsResource: TeamsResource,
@@ -76,3 +75,33 @@ export class TeamInfoMetaParametersResource extends CachedMapResource<string, Te
     return typeof key === 'string';
   }
 }
+
+export type TeamInfoMetaParametersResource = TeamInfoMetaParametersResourceImpl;
+
+export class TeamInfoMetaParametersResourceDI extends Context.Service<TeamInfoMetaParametersResourceDI, TeamInfoMetaParametersResourceImpl>()(
+  '@cloudbeaver/core-authentication/TeamInfoMetaParametersResource#TeamInfoMetaParametersResource',
+) {
+  static readonly implementation = TeamInfoMetaParametersResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, TeamsResource] as const;
+  static readonly make: Effect.Effect<
+    TeamInfoMetaParametersResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof TeamsResource>
+  > = Effect.gen(function* makeTeamInfoMetaParametersResource() {
+    const graphQLService = yield* GraphQLService;
+    const teamsResource = yield* TeamsResource;
+
+    return new TeamInfoMetaParametersResourceImpl(graphQLService, teamsResource);
+  });
+  static readonly layer: Layer.Layer<
+    TeamInfoMetaParametersResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof TeamsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TeamInfoMetaParametersResource = TeamInfoMetaParametersResourceDI;

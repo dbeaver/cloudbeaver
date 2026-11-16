@@ -5,14 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createService, type IServiceProvider, type SingleServiceType } from '@cloudbeaver/core-di';
+import { type IServiceProvider, type ServiceType, Context } from '@cloudbeaver/core-di';
 import type { IExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
 import { type TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabasePersistedStateStore } from './IDatabasePersistedStateStore.js';
+import type { DatabaseActionImplementation } from './IDatabaseDataAction.js';
 import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
+import type { IDatabasePersistedStateStore } from './IDatabasePersistedStateStore.js';
 
 export enum DatabaseDataSourceOperation {
   /** Abstract operation with data, should not lead to data lost */
@@ -104,14 +105,14 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   hasResult: (resultIndex: number) => boolean;
   hasFeature: (feature: DatabaseDataFeature | string) => boolean;
 
-  tryGetAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T | undefined;
-  tryGetAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T | undefined;
-  tryGetAction<T>(resultIndex: number, action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T | undefined;
-  tryGetAction<T>(result: TResult, action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T | undefined;
-  getAction<T>(resultIndex: number, action: SingleServiceType<T, any[]>): T;
-  getAction<T>(result: TResult, action: SingleServiceType<T, any[]>): T;
-  getAction<T>(resultIndex: number, action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T;
-  getAction<T>(result: TResult, action: SingleServiceType<unknown>, implementation: SingleServiceType<T, any[]>): T;
+  tryGetAction<T>(resultIndex: number, action: ServiceType<T>): T | undefined;
+  tryGetAction<T>(result: TResult, action: ServiceType<T>): T | undefined;
+  tryGetAction<T>(resultIndex: number, action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T | undefined;
+  tryGetAction<T>(result: TResult, action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T | undefined;
+  getAction<T>(resultIndex: number, action: ServiceType<T>): T;
+  getAction<T>(result: TResult, action: ServiceType<T>): T;
+  getAction<T>(resultIndex: number, action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T;
+  getAction<T>(result: TResult, action: ServiceType<unknown>, implementation: DatabaseActionImplementation<T>): T;
 
   getResult: (index: number) => TResult | null;
   getResults: () => TResult[];
@@ -145,4 +146,6 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   dispose: () => Promise<void>;
 }
 
-export const IDatabaseDataSource = createService<IDatabaseDataSource>('IDatabaseDataSource');
+export const IDatabaseDataSource = Context.Service<IDatabaseDataSource>(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/IDatabaseDataSource#IDatabaseDataSource',
+);

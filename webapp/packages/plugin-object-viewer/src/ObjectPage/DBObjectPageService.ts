@@ -7,14 +7,13 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState.js';
 import { ObjectPage, type ObjectPageCallback, type ObjectPageOptions } from './ObjectPage.js';
 
-@injectable()
-export class DBObjectPageService {
+export class DBObjectPageServiceImpl {
   pages = new Map<string, ObjectPage<any>>();
 
   constructor() {
@@ -123,3 +122,20 @@ export class DBObjectPageService {
     return page.order || Number.MAX_SAFE_INTEGER;
   }
 }
+
+export type DBObjectPageService = DBObjectPageServiceImpl;
+
+export class DBObjectPageServiceDI extends Context.Service<DBObjectPageServiceDI, DBObjectPageServiceImpl>()(
+  '@cloudbeaver/plugin-object-viewer/ObjectPage/DBObjectPageService#DBObjectPageService',
+) {
+  static readonly implementation = DBObjectPageServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<DBObjectPageServiceImpl, never, never> = Effect.sync(() => new DBObjectPageServiceImpl());
+  static readonly layer: Layer.Layer<DBObjectPageServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DBObjectPageService = DBObjectPageServiceDI;

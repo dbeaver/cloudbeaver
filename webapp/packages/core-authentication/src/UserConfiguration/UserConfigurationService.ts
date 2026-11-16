@@ -5,15 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { UserDataService } from '../UserDataService.js';
 import { UserInfoResource } from '../UserInfoResource.js';
 import { UserConfigurationStorage } from './UserConfigurationStorage.js';
 import type { UserConfigurationStore } from './UserConfigurationStore.js';
 
-@injectable(() => [UserInfoResource, UserDataService, UserConfigurationStorage])
-export class UserConfigurationService {
+export class UserConfigurationServiceImpl {
   private store: UserConfigurationStore | undefined;
 
   constructor(
@@ -35,3 +34,37 @@ export class UserConfigurationService {
     }
   }
 }
+
+export type UserConfigurationService = UserConfigurationServiceImpl;
+
+export class UserConfigurationServiceDI extends Context.Service<UserConfigurationServiceDI, UserConfigurationServiceImpl>()(
+  '@cloudbeaver/core-authentication/UserConfiguration/UserConfigurationService#UserConfigurationService',
+) {
+  static readonly implementation = UserConfigurationServiceImpl;
+  static readonly dependencies = () => [UserInfoResource, UserDataService, UserConfigurationStorage] as const;
+  static readonly make: Effect.Effect<
+    UserConfigurationServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Effect.gen(function* makeUserConfigurationService() {
+    const userInfoResource = yield* UserInfoResource;
+    const userDataService = yield* UserDataService;
+    const userConfigurationStorage = yield* UserConfigurationStorage;
+
+    return new UserConfigurationServiceImpl(userInfoResource, userDataService, userConfigurationStorage);
+  });
+  static readonly layer: Layer.Layer<
+    UserConfigurationServiceDI,
+    never,
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof UserDataService>
+    | Context.Service.Identifier<typeof UserConfigurationStorage>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UserConfigurationService = UserConfigurationServiceDI;

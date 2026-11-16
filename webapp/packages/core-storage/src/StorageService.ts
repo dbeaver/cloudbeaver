@@ -1,16 +1,15 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { LocalStorageSaveService, type LocalStorageType } from '@cloudbeaver/core-browser';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
-@injectable(() => [LocalStorageSaveService])
-export class StorageService {
+export class StorageServiceImpl {
   readonly onStorageChange: ISyncExecutor<LocalStorageType>;
   constructor(private readonly localStorageSaveService: LocalStorageSaveService) {
     this.onStorageChange = this.localStorageSaveService.onStorageChange;
@@ -32,3 +31,26 @@ export class StorageService {
     this.localStorageSaveService.withAutoSave(storeId, store, defaultValue, remap, onUpdate, storageType);
   }
 }
+
+export type StorageService = StorageServiceImpl;
+
+export class StorageServiceDI extends Context.Service<StorageServiceDI, StorageServiceImpl>()(
+  '@cloudbeaver/core-storage/StorageService#StorageService',
+) {
+  static readonly implementation = StorageServiceImpl;
+
+  static readonly dependencies = () => [LocalStorageSaveService] as const;
+  static readonly make: Effect.Effect<StorageServiceImpl, never, Context.Service.Identifier<typeof LocalStorageSaveService>> = Effect.gen(
+    function* makeStorageService() {
+      const localStorageSaveService = yield* LocalStorageSaveService;
+
+      return new StorageServiceImpl(localStorageSaveService);
+    },
+  );
+  static readonly layer: Layer.Layer<StorageServiceDI, never, Context.Service.Identifier<typeof LocalStorageSaveService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const StorageService = StorageServiceDI;

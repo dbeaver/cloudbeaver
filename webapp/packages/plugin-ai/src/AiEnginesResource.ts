@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, type AiEngineConfig, type AiEngineInfo } from '@cloudbeaver/core-sdk';
@@ -14,8 +14,7 @@ import { GraphQLService, type AiEngineConfig, type AiEngineInfo } from '@cloudbe
 export type EngineInfo = AiEngineInfo;
 export type EngineConfig = AiEngineConfig;
 
-@injectable(() => [GraphQLService, ServerConfigResource])
-export class AiEnginesResource extends CachedDataResource<EngineInfo[]> {
+export class AiEnginesResourceImpl extends CachedDataResource<EngineInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     serverConfigResource: ServerConfigResource,
@@ -30,3 +29,33 @@ export class AiEnginesResource extends CachedDataResource<EngineInfo[]> {
     return engines ?? [];
   }
 }
+
+export type AiEnginesResource = AiEnginesResourceImpl;
+
+export class AiEnginesResourceDI extends Context.Service<AiEnginesResourceDI, AiEnginesResourceImpl>()(
+  '@cloudbeaver/plugin-ai/AiEnginesResource#AiEnginesResource',
+) {
+  static readonly implementation = AiEnginesResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ServerConfigResource] as const;
+  static readonly make: Effect.Effect<
+    AiEnginesResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ServerConfigResource>
+  > = Effect.gen(function* makeAiEnginesResource() {
+    const graphQLService = yield* GraphQLService;
+    const serverConfigResource = yield* ServerConfigResource;
+
+    return new AiEnginesResourceImpl(graphQLService, serverConfigResource);
+  });
+  static readonly layer: Layer.Layer<
+    AiEnginesResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ServerConfigResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AiEnginesResource = AiEnginesResourceDI;

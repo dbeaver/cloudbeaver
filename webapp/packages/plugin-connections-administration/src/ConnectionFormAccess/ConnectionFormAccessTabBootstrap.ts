@@ -7,18 +7,17 @@
  */
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { EAdminPermission, PermissionsService, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
-import { getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 const ConnectionAccessTable = importLazyComponent(() => import('./ConnectionAccessTable.js').then(m => m.ConnectionAccessTable));
 
-@injectable(() => [ConnectionFormService, AdministrationScreenService, SessionPermissionsResource, PermissionsService, ProjectInfoResource])
-export class ConnectionFormAccessTabBootstrap extends Bootstrap {
+export class ConnectionFormAccessTabBootstrapImpl extends Bootstrap {
   private readonly key: string;
 
   constructor(
@@ -58,3 +57,51 @@ export class ConnectionFormAccessTabBootstrap extends Bootstrap {
     return projectId !== null && isGlobalProject(this.projectInfoResource.get(projectId)) && this.permissionsService.has(EAdminPermission.admin);
   }
 }
+
+export type ConnectionFormAccessTabBootstrap = ConnectionFormAccessTabBootstrapImpl;
+
+export class ConnectionFormAccessTabBootstrapDI extends Context.Service<ConnectionFormAccessTabBootstrapDI, ConnectionFormAccessTabBootstrapImpl>()(
+  '@cloudbeaver/plugin-connections-administration/ConnectionFormAccess/ConnectionFormAccessTabBootstrap#ConnectionFormAccessTabBootstrap',
+) {
+  static readonly implementation = ConnectionFormAccessTabBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [ConnectionFormService, AdministrationScreenService, SessionPermissionsResource, PermissionsService, ProjectInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionFormAccessTabBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+  > = Effect.gen(function* makeConnectionFormAccessTabBootstrap() {
+    const connectionFormService = yield* ConnectionFormService;
+    const administrationScreenService = yield* AdministrationScreenService;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+    const permissionsService = yield* PermissionsService;
+    const projectInfoResource = yield* ProjectInfoResource;
+
+    return new ConnectionFormAccessTabBootstrapImpl(
+      connectionFormService,
+      administrationScreenService,
+      sessionPermissionsResource,
+      permissionsService,
+      projectInfoResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionFormAccessTabBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionFormService>
+    | Context.Service.Identifier<typeof AdministrationScreenService>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+    | Context.Service.Identifier<typeof PermissionsService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionFormAccessTabBootstrap = ConnectionFormAccessTabBootstrapDI;

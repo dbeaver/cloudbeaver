@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
@@ -22,8 +22,7 @@ import {
 
 export type ConnectionDialect = SqlDialectInfo;
 
-@injectable(() => [GraphQLService, ProjectsService, ConnectionInfoResource])
-export class ConnectionDialectResource extends CachedMapResource<IConnectionInfoParams, ConnectionDialect> {
+export class ConnectionDialectResourceImpl extends CachedMapResource<IConnectionInfoParams, ConnectionDialect> {
   constructor(
     private readonly graphQLService: GraphQLService,
     projectsService: ProjectsService,
@@ -87,3 +86,38 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
     return typeof key === 'object' && typeof key.projectId === 'string' && ['string'].includes(typeof key.connectionId);
   }
 }
+
+export type ConnectionDialectResource = ConnectionDialectResourceImpl;
+
+export class ConnectionDialectResourceDI extends Context.Service<ConnectionDialectResourceDI, ConnectionDialectResourceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionDialectResource#ConnectionDialectResource',
+) {
+  static readonly implementation = ConnectionDialectResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ProjectsService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionDialectResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeConnectionDialectResource() {
+    const graphQLService = yield* GraphQLService;
+    const projectsService = yield* ProjectsService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new ConnectionDialectResourceImpl(graphQLService, projectsService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionDialectResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof ProjectsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionDialectResource = ConnectionDialectResourceDI;

@@ -20,7 +20,7 @@ import {
   objectCatalogProvider,
   objectSchemaProvider,
 } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
 import {
@@ -36,8 +36,8 @@ import {
 } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
 import { type ResourceKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { type ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 import { ConnectionNavNodeService } from '@cloudbeaver/plugin-connections';
+import { type ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext.js';
 import type { IObjectViewerTabState } from './IObjectViewerTabState.js';
@@ -48,18 +48,7 @@ import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey.js';
 const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel.js').then(m => m.ObjectViewerPanel));
 const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab.js').then(m => m.ObjectViewerTab));
 
-@injectable(() => [
-  NavNodeManagerService,
-  DBObjectPageService,
-  NotificationService,
-  NavigationTabsService,
-  ConnectionInfoResource,
-  ConnectionNavNodeService,
-  NavTreeResource,
-  ConnectionExecutionContextResource,
-  NavNodeInfoResource,
-])
-export class ObjectViewerTabService {
+export class ObjectViewerTabServiceImpl {
   readonly tabHandler: TabHandler<IObjectViewerTabState>;
 
   constructor(
@@ -461,6 +450,80 @@ export class ObjectViewerTabService {
     }
   }
 }
+
+export type ObjectViewerTabService = ObjectViewerTabServiceImpl;
+
+export class ObjectViewerTabServiceDI extends Context.Service<ObjectViewerTabServiceDI, ObjectViewerTabServiceImpl>()(
+  '@cloudbeaver/plugin-object-viewer/ObjectViewerTabService#ObjectViewerTabService',
+) {
+  static readonly implementation = ObjectViewerTabServiceImpl;
+
+  static readonly dependencies = () =>
+    [
+      NavNodeManagerService,
+      DBObjectPageService,
+      NotificationService,
+      NavigationTabsService,
+      ConnectionInfoResource,
+      ConnectionNavNodeService,
+      NavTreeResource,
+      ConnectionExecutionContextResource,
+      NavNodeInfoResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ObjectViewerTabServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof DBObjectPageService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionNavNodeService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Effect.gen(function* makeObjectViewerTabService() {
+    const navNodeManagerService = yield* NavNodeManagerService;
+    const dbObjectPageService = yield* DBObjectPageService;
+    const notificationService = yield* NotificationService;
+    const navigationTabsService = yield* NavigationTabsService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const connectionNavNodeService = yield* ConnectionNavNodeService;
+    const navTreeResource = yield* NavTreeResource;
+    const connectionExecutionContextResource = yield* ConnectionExecutionContextResource;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+
+    return new ObjectViewerTabServiceImpl(
+      navNodeManagerService,
+      dbObjectPageService,
+      notificationService,
+      navigationTabsService,
+      connectionInfoResource,
+      connectionNavNodeService,
+      navTreeResource,
+      connectionExecutionContextResource,
+      navNodeInfoResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ObjectViewerTabServiceDI,
+    never,
+    | Context.Service.Identifier<typeof NavNodeManagerService>
+    | Context.Service.Identifier<typeof DBObjectPageService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionNavNodeService>
+    | Context.Service.Identifier<typeof NavTreeResource>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ObjectViewerTabService = ObjectViewerTabServiceDI;
 
 export function isObjectViewerTab(tab: ITab): tab is ITab<IObjectViewerTabState>;
 export function isObjectViewerTab(predicate: (tab: ITab<IObjectViewerTabState>) => boolean): (tab: ITab) => tab is ITab<IObjectViewerTabState>;

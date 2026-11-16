@@ -7,7 +7,7 @@
  */
 import type { HTMLAttributes } from 'react';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { TabProps } from '@cloudbeaver/core-ui';
 
@@ -55,8 +55,7 @@ export interface IDataPresentation extends IDataPresentationOptions {
   order: number;
 }
 
-@injectable()
-export class DataPresentationService {
+export class DataPresentationServiceImpl {
   private get orderedPresentations(): IDataPresentation[] {
     return Array.from(this.dataPresentations.values()).sort((a, b) => b.order - a.order);
   }
@@ -130,3 +129,20 @@ export class DataPresentationService {
     });
   }
 }
+
+export type DataPresentationService = DataPresentationServiceImpl;
+
+export class DataPresentationServiceDI extends Context.Service<DataPresentationServiceDI, DataPresentationServiceImpl>()(
+  '@cloudbeaver/plugin-data-viewer/DataPresentationService#DataPresentationService',
+) {
+  static readonly implementation = DataPresentationServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<DataPresentationServiceImpl, never, never> = Effect.sync(() => new DataPresentationServiceImpl());
+  static readonly layer: Layer.Layer<DataPresentationServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataPresentationService = DataPresentationServiceDI;

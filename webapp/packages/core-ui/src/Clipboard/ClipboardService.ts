@@ -7,12 +7,11 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
 
-@injectable(() => [NotificationService])
-export class ClipboardService {
+export class ClipboardServiceImpl {
   private readPermission: PermissionStatus | null;
   private permissionUpdate: number;
   clipboardAvailable: boolean;
@@ -93,3 +92,26 @@ export class ClipboardService {
     }
   }
 }
+
+export type ClipboardService = ClipboardServiceImpl;
+
+export class ClipboardServiceDI extends Context.Service<ClipboardServiceDI, ClipboardServiceImpl>()(
+  '@cloudbeaver/core-ui/Clipboard/ClipboardService#ClipboardService',
+) {
+  static readonly implementation = ClipboardServiceImpl;
+
+  static readonly dependencies = () => [NotificationService] as const;
+  static readonly make: Effect.Effect<ClipboardServiceImpl, never, Context.Service.Identifier<typeof NotificationService>> = Effect.gen(
+    function* makeClipboardService() {
+      const notificationService = yield* NotificationService;
+
+      return new ClipboardServiceImpl(notificationService);
+    },
+  );
+  static readonly layer: Layer.Layer<ClipboardServiceDI, never, Context.Service.Identifier<typeof NotificationService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ClipboardService = ClipboardServiceDI;

@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { DataPresentationService, DataPresentationType, GridDataResultAction, IDatabaseDataResultAction } from '@cloudbeaver/plugin-data-viewer';
 
 const ConditionalFormattingPresentation = importLazyComponent(() =>
   import('./presentation/ConditionalFormattingPresentation.js').then(module => module.ConditionalFormattingPresentation),
 );
 
-@injectable(() => [DataPresentationService])
-export class DVConditionalFormattingPluginBootstrap extends Bootstrap {
+export class DVConditionalFormattingPluginBootstrapImpl extends Bootstrap {
   constructor(private readonly dataPresentationService: DataPresentationService) {
     super();
   }
@@ -43,3 +42,27 @@ export class DVConditionalFormattingPluginBootstrap extends Bootstrap {
     });
   }
 }
+
+export type DVConditionalFormattingPluginBootstrap = DVConditionalFormattingPluginBootstrapImpl;
+
+export class DVConditionalFormattingPluginBootstrapDI extends Context.Service<
+  DVConditionalFormattingPluginBootstrapDI,
+  DVConditionalFormattingPluginBootstrapImpl
+>()('@cloudbeaver/plugin-data-viewer-conditional-formatting/DVConditionalFormattingPluginBootstrap#DVConditionalFormattingPluginBootstrap') {
+  static readonly implementation = DVConditionalFormattingPluginBootstrapImpl;
+
+  static readonly dependencies = () => [DataPresentationService] as const;
+  static readonly make: Effect.Effect<DVConditionalFormattingPluginBootstrapImpl, never, Context.Service.Identifier<typeof DataPresentationService>> =
+    Effect.gen(function* makeDVConditionalFormattingPluginBootstrap() {
+      const dataPresentationService = yield* DataPresentationService;
+
+      return new DVConditionalFormattingPluginBootstrapImpl(dataPresentationService);
+    });
+  static readonly layer: Layer.Layer<DVConditionalFormattingPluginBootstrapDI, never, Context.Service.Identifier<typeof DataPresentationService>> =
+    Layer.effect(
+      this,
+      Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+    );
+}
+
+export const DVConditionalFormattingPluginBootstrap = DVConditionalFormattingPluginBootstrapDI;

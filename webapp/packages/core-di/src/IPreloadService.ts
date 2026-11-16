@@ -6,11 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { createService } from '@wroud/di';
+import type { IServiceLifecycle } from './ModuleRegistry.js';
 
-export interface IPreloadService {
-  register?(): void | Promise<void>;
-  load?(): void | Promise<void>;
-}
-
-export const IPreloadService = createService<IPreloadService>('IPreloadService');
+export interface IPreloadService extends IServiceLifecycle {}

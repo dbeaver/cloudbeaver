@@ -8,7 +8,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog, importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, IServiceProvider, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { OptionsPanelService, type OptionsPanelCloseEventData } from '@cloudbeaver/core-ui';
@@ -23,8 +23,7 @@ export interface IToolsContainerProps {
   param: string | null | undefined;
 }
 
-@injectable(() => [IServiceProvider, AdministrationUserFormService, OptionsPanelService, CommonDialogService])
-export class CreateUserService {
+export class CreateUserServiceImpl {
   formState: AdministrationUserFormState | null;
   readonly toolsContainer: PlaceholderContainer<IToolsContainerProps>;
 
@@ -90,3 +89,41 @@ export class CreateUserService {
     await this.dispose();
   };
 }
+
+export type CreateUserService = CreateUserServiceImpl;
+
+export class CreateUserServiceDI extends Context.Service<CreateUserServiceDI, CreateUserServiceImpl>()(
+  '@cloudbeaver/plugin-authentication-administration/Administration/Users/UsersTable/CreateUserService#CreateUserService',
+) {
+  static readonly implementation = CreateUserServiceImpl;
+
+  static readonly dependencies = () => [IServiceProvider, AdministrationUserFormService, OptionsPanelService, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    CreateUserServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof AdministrationUserFormService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeCreateUserService() {
+    const serviceProvider = yield* IServiceProvider;
+    const administrationUserFormService = yield* AdministrationUserFormService;
+    const optionsPanelService = yield* OptionsPanelService;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new CreateUserServiceImpl(serviceProvider, administrationUserFormService, optionsPanelService, commonDialogService);
+  });
+  static readonly layer: Layer.Layer<
+    CreateUserServiceDI,
+    never,
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof AdministrationUserFormService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const CreateUserService = CreateUserServiceDI;

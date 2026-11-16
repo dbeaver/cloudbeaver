@@ -6,24 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Disposable, injectable } from '@cloudbeaver/core-di';
-import type { ISqlEditorModel } from './ISqlEditorModel.js';
-import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
-import type { QueryDataSource } from '../QueryDataSource.js';
-import type { ISetScriptData, ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource.js';
-import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
-import { SQLParser, type IQueryInfo, type ISQLScriptSegment } from '../SQLParser.js';
-import { SyncExecutor } from '@cloudbeaver/core-executor';
-import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
-import { SqlEditorService } from '../SqlEditorService.js';
+import { Disposable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { computed, makeObservable, observable, reaction } from 'mobx';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { debouncePromise, memoizeLast } from '@dbeaver/js-helpers';
+import { computed, makeObservable, observable, reaction } from 'mobx';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import type { QueryDataSource } from '../QueryDataSource.js';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
+import type { ISetScriptData, ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource.js';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
+import { SqlEditorService } from '../SqlEditorService.js';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
+import { SQLParser, type IQueryInfo, type ISQLScriptSegment } from '../SQLParser.js';
+import type { ISqlEditorModel } from './ISqlEditorModel.js';
 
 const ZERO_CURSOR: ISqlEditorCursor = { anchor: 0, head: 0 };
 
-@injectable(() => [SqlDataSourceService, SqlEditorService, NotificationService, SqlEditorSettingsService])
 export class SqlEditorModel<TDataSource extends QueryDataSource> extends Disposable implements ISqlEditorModel<TDataSource> {
   state: ISqlEditorTabState | null;
   get cursor(): ISqlEditorCursor {

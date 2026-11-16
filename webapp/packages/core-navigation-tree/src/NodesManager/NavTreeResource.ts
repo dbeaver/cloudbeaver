@@ -9,7 +9,7 @@
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import {
@@ -19,8 +19,8 @@ import {
   CachedResourceOffsetPageListKey,
   CachedResourceOffsetPageTargetKey,
   getOffsetPageKeyInfo,
-  type ICachedResourceMetadata,
   hasMorePagesForResourceKey,
+  type ICachedResourceMetadata,
   isResourceAlias,
   isResourceKeyList,
   ResourceError,
@@ -61,16 +61,7 @@ export interface INavNodeRenameData {
   newNodeId: string;
 }
 
-@injectable(() => [
-  GraphQLService,
-  NavNodeInfoResource,
-  NavTreeSettingsService,
-  SessionDataResource,
-  UserInfoResource,
-  ProjectInfoResource,
-  AppAuthService,
-])
-export class NavTreeResource extends CachedMapResource<string, string[], Record<string, unknown>, INodeMetadata> {
+export class NavTreeResourceImpl extends CachedMapResource<string, string[], Record<string, unknown>, INodeMetadata> {
   readonly onNodeRefresh: IExecutor<string>;
   readonly onNodeRename: IExecutor<INavNodeRenameData>;
   readonly onNodeMove: IExecutor<INavNodeMoveData>;
@@ -631,3 +622,67 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     return typeof key === 'string';
   }
 }
+
+export type NavTreeResource = NavTreeResourceImpl;
+
+export class NavTreeResourceDI extends Context.Service<NavTreeResourceDI, NavTreeResourceImpl>()(
+  '@cloudbeaver/core-navigation-tree/NodesManager/NavTreeResource#NavTreeResource',
+) {
+  static readonly implementation = NavTreeResourceImpl;
+
+  static readonly dependencies = () =>
+    [
+      GraphQLService,
+      NavNodeInfoResource,
+      NavTreeSettingsService,
+      SessionDataResource,
+      UserInfoResource,
+      ProjectInfoResource,
+      AppAuthService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    NavTreeResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavTreeSettingsService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Effect.gen(function* makeNavTreeResource() {
+    const graphQLService = yield* GraphQLService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+    const navTreeSettingsService = yield* NavTreeSettingsService;
+    const sessionDataResource = yield* SessionDataResource;
+    const userInfoResource = yield* UserInfoResource;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const appAuthService = yield* AppAuthService;
+
+    return new NavTreeResourceImpl(
+      graphQLService,
+      navNodeInfoResource,
+      navTreeSettingsService,
+      sessionDataResource,
+      userInfoResource,
+      projectInfoResource,
+      appAuthService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    NavTreeResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+    | Context.Service.Identifier<typeof NavTreeSettingsService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const NavTreeResource = NavTreeResourceDI;

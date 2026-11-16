@@ -8,19 +8,19 @@
 
 import { runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   type AiFunctionCall,
   type AiFunctionConfirmation,
   type AiFunctionResult,
   AiFunctionType,
   type AiMessage,
-  type AiSendChatMessageInfoFragment,
   AiMessageType,
+  type AiSendChatMessageInfoFragment,
   CbClientEventId,
   CbServerEventId,
   GraphQLService,
@@ -28,9 +28,9 @@ import {
   type WsaiFunctionCallConfirmationEvent,
 } from '@cloudbeaver/core-sdk';
 
-import { AIChatMessageEventHandler, type IAiChatMessageChunkEvent, type IAiChatMessageEvent } from './AIChatMessageEventHandler.js';
-import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
 import { AIChatFunctionRegistryService } from '../../AIChatFunctionRegistryService.js';
+import { AIChatConversationsResource } from '../AIChatConversation/AIChatConversationsResource.js';
+import { AIChatMessageEventHandler, type IAiChatMessageChunkEvent, type IAiChatMessageEvent } from './AIChatMessageEventHandler.js';
 import type { AIChatMessageRequestConfig } from './aiChatMessageRequestContext.js';
 
 export interface IAIFunctionMessage extends AiMessage {
@@ -58,15 +58,7 @@ interface IMessageStreamData {
 
 const BLOCKING_ROLES = [AiMessageType.Assistant, AiMessageType.Confirmation];
 
-@injectable(() => [
-  GraphQLService,
-  LocalizationService,
-  AIChatMessageEventHandler,
-  AIChatFunctionRegistryService,
-  AIChatConversationsResource,
-  UserInfoResource,
-])
-export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[]> {
+export class AIChatMessagesResourceImpl extends CachedMapResource<string, AiMessage[]> {
   onMessageStream: SyncExecutor<IMessageStreamData>;
 
   constructor(
@@ -324,6 +316,65 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
     }
   }
 }
+
+export type AIChatMessagesResource = AIChatMessagesResourceImpl;
+
+export class AIChatMessagesResourceDI extends Context.Service<AIChatMessagesResourceDI, AIChatMessagesResourceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChat/AIChatMessage/AIChatMessagesResource#AIChatMessagesResource',
+) {
+  static readonly implementation = AIChatMessagesResourceImpl;
+
+  static readonly dependencies = () =>
+    [
+      GraphQLService,
+      LocalizationService,
+      AIChatMessageEventHandler,
+      AIChatFunctionRegistryService,
+      AIChatConversationsResource,
+      UserInfoResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    AIChatMessagesResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof AIChatMessageEventHandler>
+    | Context.Service.Identifier<typeof AIChatFunctionRegistryService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+  > = Effect.gen(function* makeAIChatMessagesResource() {
+    const graphQLService = yield* GraphQLService;
+    const localizationService = yield* LocalizationService;
+    const aiChatMessageEventHandler = yield* AIChatMessageEventHandler;
+    const aiChatFunctionRegistryService = yield* AIChatFunctionRegistryService;
+    const aiChatConversationsResource = yield* AIChatConversationsResource;
+    const userInfoResource = yield* UserInfoResource;
+
+    return new AIChatMessagesResourceImpl(
+      graphQLService,
+      localizationService,
+      aiChatMessageEventHandler,
+      aiChatFunctionRegistryService,
+      aiChatConversationsResource,
+      userInfoResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIChatMessagesResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof AIChatMessageEventHandler>
+    | Context.Service.Identifier<typeof AIChatFunctionRegistryService>
+    | Context.Service.Identifier<typeof AIChatConversationsResource>
+    | Context.Service.Identifier<typeof UserInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatMessagesResource = AIChatMessagesResourceDI;
 
 export function createMessageParam(id: string, conversationId: string): IMessageParam {
   return { id, conversationId };

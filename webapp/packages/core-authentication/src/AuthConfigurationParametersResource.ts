@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { EAdminPermission, SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
@@ -14,8 +14,7 @@ import {
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
 
-@injectable(() => [GraphQLService, SessionDataResource, SessionPermissionsResource])
-export class AuthConfigurationParametersResource extends CachedMapResource<
+export class AuthConfigurationParametersResourceImpl extends CachedMapResource<
   string,
   AuthProviderConfigurationParametersFragment[],
   GetAuthProviderConfigurationParametersQueryVariables
@@ -52,3 +51,39 @@ export class AuthConfigurationParametersResource extends CachedMapResource<
     return typeof key === 'string';
   }
 }
+
+export type AuthConfigurationParametersResource = AuthConfigurationParametersResourceImpl;
+
+export class AuthConfigurationParametersResourceDI extends Context.Service<
+  AuthConfigurationParametersResourceDI,
+  AuthConfigurationParametersResourceImpl
+>()('@cloudbeaver/core-authentication/AuthConfigurationParametersResource#AuthConfigurationParametersResource') {
+  static readonly implementation = AuthConfigurationParametersResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, SessionDataResource, SessionPermissionsResource] as const;
+  static readonly make: Effect.Effect<
+    AuthConfigurationParametersResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Effect.gen(function* makeAuthConfigurationParametersResource() {
+    const graphQLService = yield* GraphQLService;
+    const sessionDataResource = yield* SessionDataResource;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+
+    return new AuthConfigurationParametersResourceImpl(graphQLService, sessionDataResource, sessionPermissionsResource);
+  });
+  static readonly layer: Layer.Layer<
+    AuthConfigurationParametersResourceDI,
+    never,
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof SessionDataResource>
+    | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AuthConfigurationParametersResource = AuthConfigurationParametersResourceDI;

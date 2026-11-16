@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ResultDataFormat, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
@@ -40,8 +40,7 @@ const DVResultSetGroupingPresentation = importLazyComponent(() =>
   import('./DVResultSetGroupingPresentation.js').then(module => module.DVResultSetGroupingPresentation),
 );
 
-@injectable(() => [DataPresentationService, MenuService, ActionService, CommonDialogService])
-export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
+export class DVResultSetGroupingPluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly dataPresentationService: DataPresentationService,
     private readonly menuService: MenuService,
@@ -213,3 +212,42 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
     });
   }
 }
+
+export type DVResultSetGroupingPluginBootstrap = DVResultSetGroupingPluginBootstrapImpl;
+
+export class DVResultSetGroupingPluginBootstrapDI extends Context.Service<
+  DVResultSetGroupingPluginBootstrapDI,
+  DVResultSetGroupingPluginBootstrapImpl
+>()('@cloudbeaver/plugin-data-viewer-result-set-grouping/DVResultSetGroupingPluginBootstrap#DVResultSetGroupingPluginBootstrap') {
+  static readonly implementation = DVResultSetGroupingPluginBootstrapImpl;
+
+  static readonly dependencies = () => [DataPresentationService, MenuService, ActionService, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    DVResultSetGroupingPluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof DataPresentationService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeDVResultSetGroupingPluginBootstrap() {
+    const dataPresentationService = yield* DataPresentationService;
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new DVResultSetGroupingPluginBootstrapImpl(dataPresentationService, menuService, actionService, commonDialogService);
+  });
+  static readonly layer: Layer.Layer<
+    DVResultSetGroupingPluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof DataPresentationService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DVResultSetGroupingPluginBootstrap = DVResultSetGroupingPluginBootstrapDI;

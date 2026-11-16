@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 import { compare, gte, parse } from 'semver';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
@@ -19,8 +19,7 @@ export interface IProductVersion {
   backendVersion: string;
 }
 
-@injectable(() => [ServerConfigResource])
-export class VersionService {
+export class VersionServiceImpl {
   get current(): string {
     return this.getProductVersion(true).frontendVersion;
   }
@@ -58,3 +57,26 @@ export class VersionService {
     return compare(v1, v2);
   }
 }
+
+export type VersionService = VersionServiceImpl;
+
+export class VersionServiceDI extends Context.Service<VersionServiceDI, VersionServiceImpl>()(
+  '@cloudbeaver/core-version/VersionService#VersionService',
+) {
+  static readonly implementation = VersionServiceImpl;
+
+  static readonly dependencies = () => [ServerConfigResource] as const;
+  static readonly make: Effect.Effect<VersionServiceImpl, never, Context.Service.Identifier<typeof ServerConfigResource>> = Effect.gen(
+    function* makeVersionService() {
+      const serverConfigResource = yield* ServerConfigResource;
+
+      return new VersionServiceImpl(serverConfigResource);
+    },
+  );
+  static readonly layer: Layer.Layer<VersionServiceDI, never, Context.Service.Identifier<typeof ServerConfigResource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const VersionService = VersionServiceDI;

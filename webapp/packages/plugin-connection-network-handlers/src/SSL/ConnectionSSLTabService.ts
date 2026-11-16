@@ -8,11 +8,11 @@
 import React from 'react';
 
 import { DBDriverResource } from '@cloudbeaver/core-connections';
-import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { getSSLDriverHandler } from './getSSLDriverHandler.js';
-import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
+import { NetworkHandlerResource } from '@cloudbeaver/plugin-network-handlers';
+import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 
 const SSLTab = React.lazy(async () => {
   const { SSLTab } = await import('./SSLTab.js');
@@ -24,8 +24,7 @@ const SSLPanel = React.lazy(async () => {
   return { default: SSLPanel };
 });
 
-@injectable(() => [DBDriverResource, NetworkHandlerResource, ConnectionFormService])
-export class ConnectionSSLTabService extends Bootstrap {
+export class ConnectionSSLTabServiceImpl extends Bootstrap {
   constructor(
     private readonly dbDriverResource: DBDriverResource,
     private readonly networkHandlerResource: NetworkHandlerResource,
@@ -59,3 +58,38 @@ export class ConnectionSSLTabService extends Bootstrap {
     });
   }
 }
+
+export type ConnectionSSLTabService = ConnectionSSLTabServiceImpl;
+
+export class ConnectionSSLTabServiceDI extends Context.Service<ConnectionSSLTabServiceDI, ConnectionSSLTabServiceImpl>()(
+  '@cloudbeaver/plugin-connection-network-handlers/SSL/ConnectionSSLTabService#ConnectionSSLTabService',
+) {
+  static readonly implementation = ConnectionSSLTabServiceImpl;
+
+  static readonly dependencies = () => [DBDriverResource, NetworkHandlerResource, ConnectionFormService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionSSLTabServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof NetworkHandlerResource>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+  > = Effect.gen(function* makeConnectionSSLTabService() {
+    const dbDriverResource = yield* DBDriverResource;
+    const networkHandlerResource = yield* NetworkHandlerResource;
+    const connectionFormService = yield* ConnectionFormService;
+
+    return new ConnectionSSLTabServiceImpl(dbDriverResource, networkHandlerResource, connectionFormService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionSSLTabServiceDI,
+    never,
+    | Context.Service.Identifier<typeof DBDriverResource>
+    | Context.Service.Identifier<typeof NetworkHandlerResource>
+    | Context.Service.Identifier<typeof ConnectionFormService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionSSLTabService = ConnectionSSLTabServiceDI;

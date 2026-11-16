@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import type { AiDeviceAuthorizationInfo } from '@cloudbeaver/core-sdk';
 
 import { AIProfilesResource } from '../AIProfilesResource.js';
 
-@injectable(() => [AIProfilesResource, AsyncTaskInfoService])
-export class AIProfileAuthorizationService {
+export class AIProfileAuthorizationServiceImpl {
   constructor(
     private readonly aiProfilesResource: AIProfilesResource,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
@@ -65,3 +64,33 @@ export class AIProfileAuthorizationService {
     return operation;
   }
 }
+
+export type AIProfileAuthorizationService = AIProfileAuthorizationServiceImpl;
+
+export class AIProfileAuthorizationServiceDI extends Context.Service<AIProfileAuthorizationServiceDI, AIProfileAuthorizationServiceImpl>()(
+  '@cloudbeaver/plugin-ai-profiles/AIProfileCredentials/AIProfileAuthorizationService#AIProfileAuthorizationService',
+) {
+  static readonly implementation = AIProfileAuthorizationServiceImpl;
+
+  static readonly dependencies = () => [AIProfilesResource, AsyncTaskInfoService] as const;
+  static readonly make: Effect.Effect<
+    AIProfileAuthorizationServiceImpl,
+    never,
+    Context.Service.Identifier<typeof AIProfilesResource> | Context.Service.Identifier<typeof AsyncTaskInfoService>
+  > = Effect.gen(function* makeAIProfileAuthorizationService() {
+    const aiProfilesResource = yield* AIProfilesResource;
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+
+    return new AIProfileAuthorizationServiceImpl(aiProfilesResource, asyncTaskInfoService);
+  });
+  static readonly layer: Layer.Layer<
+    AIProfileAuthorizationServiceDI,
+    never,
+    Context.Service.Identifier<typeof AIProfilesResource> | Context.Service.Identifier<typeof AsyncTaskInfoService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIProfileAuthorizationService = AIProfileAuthorizationServiceDI;

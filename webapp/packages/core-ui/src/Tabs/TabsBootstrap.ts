@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { ACTION_TAB_CLOSE } from './Actions/ACTION_TAB_CLOSE.js';
@@ -17,8 +17,7 @@ import { DATA_CONTEXT_TAB_ID } from './Tab/DATA_CONTEXT_TAB_ID.js';
 import { DATA_CONTEXT_TABS_CONTEXT } from './Tab/DATA_CONTEXT_TABS_CONTEXT.js';
 import { MENU_TAB } from './Tab/MENU_TAB.js';
 
-@injectable(() => [ActionService, MenuService])
-export class TabsBootstrap extends Bootstrap {
+export class TabsBootstrapImpl extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -123,3 +122,31 @@ export class TabsBootstrap extends Bootstrap {
     });
   }
 }
+
+export type TabsBootstrap = TabsBootstrapImpl;
+
+export class TabsBootstrapDI extends Context.Service<TabsBootstrapDI, TabsBootstrapImpl>()('@cloudbeaver/core-ui/Tabs/TabsBootstrap#TabsBootstrap') {
+  static readonly implementation = TabsBootstrapImpl;
+
+  static readonly dependencies = () => [ActionService, MenuService] as const;
+  static readonly make: Effect.Effect<
+    TabsBootstrapImpl,
+    never,
+    Context.Service.Identifier<typeof ActionService> | Context.Service.Identifier<typeof MenuService>
+  > = Effect.gen(function* makeTabsBootstrap() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+
+    return new TabsBootstrapImpl(actionService, menuService);
+  });
+  static readonly layer: Layer.Layer<
+    TabsBootstrapDI,
+    never,
+    Context.Service.Identifier<typeof ActionService> | Context.Service.Identifier<typeof MenuService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TabsBootstrap = TabsBootstrapDI;

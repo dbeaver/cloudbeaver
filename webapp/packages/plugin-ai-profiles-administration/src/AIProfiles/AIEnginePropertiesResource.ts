@@ -8,8 +8,8 @@
 
 import { runInAction } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { CachedMapResource, ResourceKeyUtils, type ResourceKeySimple } from '@cloudbeaver/core-resource';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, type AiEngineConfig, type AiModelInfo, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
@@ -17,8 +17,7 @@ export const MODEL_PROPERTY_ID = 'model';
 export const CONTEXT_WINDOW_SIZE_PROPERTY_ID = 'contextWindowSize';
 export const TEMPERATURE_PROPERTY_ID = 'temperature';
 
-@injectable(() => [GraphQLService, SessionPermissionsResource])
-export class AIEnginePropertiesResource extends CachedMapResource<string, IObjectPropertyInfo[]> {
+export class AIEnginePropertiesResourceImpl extends CachedMapResource<string, IObjectPropertyInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionPermissionsResource: SessionPermissionsResource,
@@ -54,3 +53,33 @@ export class AIEnginePropertiesResource extends CachedMapResource<string, IObjec
     return typeof key === 'string';
   }
 }
+
+export type AIEnginePropertiesResource = AIEnginePropertiesResourceImpl;
+
+export class AIEnginePropertiesResourceDI extends Context.Service<AIEnginePropertiesResourceDI, AIEnginePropertiesResourceImpl>()(
+  '@cloudbeaver/plugin-ai-profiles-administration/AIProfiles/AIEnginePropertiesResource#AIEnginePropertiesResource',
+) {
+  static readonly implementation = AIEnginePropertiesResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, SessionPermissionsResource] as const;
+  static readonly make: Effect.Effect<
+    AIEnginePropertiesResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Effect.gen(function* makeAIEnginePropertiesResource() {
+    const graphQLService = yield* GraphQLService;
+    const sessionPermissionsResource = yield* SessionPermissionsResource;
+
+    return new AIEnginePropertiesResourceImpl(graphQLService, sessionPermissionsResource);
+  });
+  static readonly layer: Layer.Layer<
+    AIEnginePropertiesResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof SessionPermissionsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIEnginePropertiesResource = AIEnginePropertiesResourceDI;

@@ -7,12 +7,11 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import type { IUserProfileFormAuthenticationState } from './IUserProfileFormAuthenticationState.js';
 
-@injectable()
-export class UserProfileFormAuthenticationService {
+export class UserProfileFormAuthenticationServiceImpl {
   readonly state: IUserProfileFormAuthenticationState;
 
   constructor() {
@@ -38,3 +37,25 @@ export class UserProfileFormAuthenticationService {
     this.state.repeatedPassword = '';
   }
 }
+
+export type UserProfileFormAuthenticationService = UserProfileFormAuthenticationServiceImpl;
+
+export class UserProfileFormAuthenticationServiceDI extends Context.Service<
+  UserProfileFormAuthenticationServiceDI,
+  UserProfileFormAuthenticationServiceImpl
+>()(
+  '@cloudbeaver/plugin-user-profile/UserProfileForm/UserAuthenticationPart/UserProfileFormAuthenticationService#UserProfileFormAuthenticationService',
+) {
+  static readonly implementation = UserProfileFormAuthenticationServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<UserProfileFormAuthenticationServiceImpl, never, never> = Effect.sync(
+    () => new UserProfileFormAuthenticationServiceImpl(),
+  );
+  static readonly layer: Layer.Layer<UserProfileFormAuthenticationServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UserProfileFormAuthenticationService = UserProfileFormAuthenticationServiceDI;

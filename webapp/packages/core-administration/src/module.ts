@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { PermissionsResource } from './PermissionsResource.js';
 import { ConfigurationWizardService } from './AdministrationScreen/ConfigurationWizard/ConfigurationWizardService.js';
 import { ConfigurationWizardScreenService } from './AdministrationScreen/ConfigurationWizard/ConfigurationWizardScreenService.js';
@@ -18,16 +18,13 @@ import { ServerConfigurationFeatureGroupsService } from './ServerConfigurationFe
 export default ModuleRegistry.add({
   name: '@cloudbeaver/core-administration',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, AdministrationLocaleService)
-      .addSingleton(Dependency, proxy(ConfigurationWizardScreenService))
-      .addSingleton(Dependency, proxy(PermissionsResource))
-      .addSingleton(AdministrationItemService)
-      .addSingleton(ServerConfigurationFeatureGroupsService)
-      .addSingleton(PermissionsResource)
-      .addSingleton(ConfigurationWizardService)
-      .addSingleton(ConfigurationWizardScreenService)
-      .addSingleton(AdministrationScreenService);
-  },
+  services: () => [
+    AdministrationItemService,
+    ServerConfigurationFeatureGroupsService,
+    PermissionsResource,
+    ConfigurationWizardService,
+    ConfigurationWizardScreenService,
+    AdministrationScreenService,
+  ],
+  bootstraps: () => [AdministrationLocaleService],
 });

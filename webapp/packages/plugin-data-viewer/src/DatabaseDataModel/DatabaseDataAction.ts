@@ -7,10 +7,10 @@
  */
 import { makeObservable, observable } from 'mobx';
 
+import { Disposable } from '@cloudbeaver/core-di';
 import type { IDatabaseDataAction, IDatabaseDataActionClass } from './IDatabaseDataAction.js';
 import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import type { IDatabaseDataSource } from './IDatabaseDataSource.js';
-import { Disposable } from '@cloudbeaver/core-di';
 
 export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseDataResult>
   extends Disposable

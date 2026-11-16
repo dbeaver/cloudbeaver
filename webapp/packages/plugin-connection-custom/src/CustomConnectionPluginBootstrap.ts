@@ -8,20 +8,20 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionsManagerService, getFolderPath } from '@cloudbeaver/core-connections';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, DATA_CONTEXT_MENU, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_TREE_CREATE_CONNECTION, MENU_CONNECTIONS, MENU_TREE_CREATE_CONNECTION } from '@cloudbeaver/plugin-connections';
+import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
   DATA_CONTEXT_ELEMENTS_TREE,
   MENU_ELEMENTS_TREE_TOOLS,
   MENU_NAVIGATION_TREE_CREATE,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
-import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService.js';
@@ -29,18 +29,7 @@ import { CustomConnectionSettingsService } from './CustomConnectionSettingsServi
 const DriverSelectorDialog = importLazyComponent(() => import('./DriverSelector/DriverSelectorDialog.js').then(m => m.DriverSelectorDialog));
 const WelcomeNewConnection = importLazyComponent(() => import('./WelcomeNewConnection.js').then(m => m.WelcomeNewConnection));
 
-@injectable(() => [
-  CommonDialogService,
-  ProjectInfoResource,
-  MenuService,
-  ActionService,
-  ConnectionsManagerService,
-  CustomConnectionSettingsService,
-  TreeSelectionService,
-  NavigationTabsService,
-  NavNodeInfoResource,
-])
-export class CustomConnectionPluginBootstrap extends Bootstrap {
+export class CustomConnectionPluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly projectInfoResource: ProjectInfoResource,
@@ -159,3 +148,77 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     });
   }
 }
+
+export type CustomConnectionPluginBootstrap = CustomConnectionPluginBootstrapImpl;
+
+export class CustomConnectionPluginBootstrapDI extends Context.Service<CustomConnectionPluginBootstrapDI, CustomConnectionPluginBootstrapImpl>()(
+  '@cloudbeaver/plugin-connection-custom/CustomConnectionPluginBootstrap#CustomConnectionPluginBootstrap',
+) {
+  static readonly implementation = CustomConnectionPluginBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      CommonDialogService,
+      ProjectInfoResource,
+      MenuService,
+      ActionService,
+      ConnectionsManagerService,
+      CustomConnectionSettingsService,
+      TreeSelectionService,
+      NavigationTabsService,
+      NavNodeInfoResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    CustomConnectionPluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof CustomConnectionSettingsService>
+    | Context.Service.Identifier<typeof TreeSelectionService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Effect.gen(function* makeCustomConnectionPluginBootstrap() {
+    const commonDialogService = yield* CommonDialogService;
+    const projectInfoResource = yield* ProjectInfoResource;
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const customConnectionSettingsService = yield* CustomConnectionSettingsService;
+    const treeSelectionService = yield* TreeSelectionService;
+    const navigationTabsService = yield* NavigationTabsService;
+    const navNodeInfoResource = yield* NavNodeInfoResource;
+
+    return new CustomConnectionPluginBootstrapImpl(
+      commonDialogService,
+      projectInfoResource,
+      menuService,
+      actionService,
+      connectionsManagerService,
+      customConnectionSettingsService,
+      treeSelectionService,
+      navigationTabsService,
+      navNodeInfoResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    CustomConnectionPluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ProjectInfoResource>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof CustomConnectionSettingsService>
+    | Context.Service.Identifier<typeof TreeSelectionService>
+    | Context.Service.Identifier<typeof NavigationTabsService>
+    | Context.Service.Identifier<typeof NavNodeInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const CustomConnectionPluginBootstrap = CustomConnectionPluginBootstrapDI;

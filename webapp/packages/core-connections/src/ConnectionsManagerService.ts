@@ -8,7 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
 import { type ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
@@ -28,8 +28,7 @@ export interface IConnectionExecutorData {
   state: 'before' | 'after';
 }
 
-@injectable(() => [ConnectionInfoResource, ContainerResource, NotificationService, ProjectsService])
-export class ConnectionsManagerService {
+export class ConnectionsManagerServiceImpl {
   get projectConnections(): Connection[] {
     return this.connectionInfoResource.values.filter(connection =>
       this.projectsService.activeProjects.some(project => project.id === connection.projectId),
@@ -213,3 +212,41 @@ export class ConnectionsManagerService {
     return this.containerResource.get({ projectId: key.projectId, connectionId: key.connectionId, catalogId })!;
   }
 }
+
+export type ConnectionsManagerService = ConnectionsManagerServiceImpl;
+
+export class ConnectionsManagerServiceDI extends Context.Service<ConnectionsManagerServiceDI, ConnectionsManagerServiceImpl>()(
+  '@cloudbeaver/core-connections/ConnectionsManagerService#ConnectionsManagerService',
+) {
+  static readonly implementation = ConnectionsManagerServiceImpl;
+
+  static readonly dependencies = () => [ConnectionInfoResource, ContainerResource, NotificationService, ProjectsService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionsManagerServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ContainerResource>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ProjectsService>
+  > = Effect.gen(function* makeConnectionsManagerService() {
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const containerResource = yield* ContainerResource;
+    const notificationService = yield* NotificationService;
+    const projectsService = yield* ProjectsService;
+
+    return new ConnectionsManagerServiceImpl(connectionInfoResource, containerResource, notificationService, projectsService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionsManagerServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ContainerResource>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof ProjectsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionsManagerService = ConnectionsManagerServiceDI;

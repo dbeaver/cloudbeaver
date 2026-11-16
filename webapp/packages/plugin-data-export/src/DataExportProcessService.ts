@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type DataTransferParameters, GraphQLService } from '@cloudbeaver/core-sdk';
 import { Deferred, GlobalConstants, OrderedMap } from '@cloudbeaver/core-utils';
@@ -27,8 +27,7 @@ export interface ExportProcess {
   process: Deferred<string>;
 }
 
-@injectable(() => [GraphQLService, NotificationService])
-export class DataExportProcessService {
+export class DataExportProcessServiceImpl {
   readonly exportProcesses = new OrderedMap<string, ExportProcess>(value => value.taskId);
 
   constructor(
@@ -133,3 +132,33 @@ export class DataExportProcessService {
     return { taskId, process };
   }
 }
+
+export type DataExportProcessService = DataExportProcessServiceImpl;
+
+export class DataExportProcessServiceDI extends Context.Service<DataExportProcessServiceDI, DataExportProcessServiceImpl>()(
+  '@cloudbeaver/plugin-data-export/DataExportProcessService#DataExportProcessService',
+) {
+  static readonly implementation = DataExportProcessServiceImpl;
+
+  static readonly dependencies = () => [GraphQLService, NotificationService] as const;
+  static readonly make: Effect.Effect<
+    DataExportProcessServiceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof NotificationService>
+  > = Effect.gen(function* makeDataExportProcessService() {
+    const graphQLService = yield* GraphQLService;
+    const notificationService = yield* NotificationService;
+
+    return new DataExportProcessServiceImpl(graphQLService, notificationService);
+  });
+  static readonly layer: Layer.Layer<
+    DataExportProcessServiceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof NotificationService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DataExportProcessService = DataExportProcessServiceDI;

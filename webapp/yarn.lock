@@ -1758,10 +1758,13 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
+    "@testing-library/dom": "npm:^10"
+    "@testing-library/react": "npm:^16"
     "@types/react": "npm:^19"
-    "@wroud/di": "npm:^0"
-    "@wroud/di-react": "npm:^0"
+    "@types/react-dom": "npm:^19"
+    effect: "npm:^4.1.2"
     react: "npm:^19"
+    react-dom: "npm:^19"
     rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -10082,25 +10085,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wroud/di-react@npm:^0":
-  version: 0.6.1
-  resolution: "@wroud/di-react@npm:0.6.1"
-  dependencies:
-    "@wroud/di": "npm:^0"
-  peerDependencies:
-    react: ">=18.0.0 || >=19.0.0"
-    react-dom: ">=18.0.0 || >=19.0.0"
-  checksum: 10c0/ef38a71e4715a87e4fad5498c7f2eb65d18f6e3fdb4a711c073307f18c6e85e7c2197580a25e2945828352efdbbc036c32b1d1ca6b44f1c7ac08554aaf9c23b7
-  languageName: node
-  linkType: hard
-
-"@wroud/di@npm:^0":
-  version: 0.20.1
-  resolution: "@wroud/di@npm:0.20.1"
-  checksum: 10c0/fe75c6bbdb96f1954a6ae2936f6084d0a70f28497ee82f365c6b440dc28e6cac55e647d4234e3968ed7ffc29dbd1a753dc52aa6539fdbd7548f17f2cfd4d6787
-  languageName: node
-  linkType: hard
-
 "@wroud/ts-template@npm:^0":
   version: 0.5.5
   resolution: "@wroud/ts-template@npm:0.5.5"
@@ -12274,6 +12258,13 @@ __metadata:
   version: 1.1.1
   resolution: "ee-first@npm:1.1.1"
   checksum: 10c0/b5bb125ee93161bc16bfe6e56c6b04de5ad2aa44234d8f644813cc95d861a6910903132b05093706de2b706599367c4130eb6d170f6b46895686b95f87d017b7
+  languageName: node
+  linkType: hard
+
+"effect@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "effect@npm:4.1.2"
+  checksum: 10c0/9e043ced01a0c889699086be0c70fb85df7431b6da267d7ff09e8058843c8d13f2333766d112740e2e4d540d2517fc79101ce46f20e322f086a57aa1cbc1a3d5
   languageName: node
   linkType: hard
 

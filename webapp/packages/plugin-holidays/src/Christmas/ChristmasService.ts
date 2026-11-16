@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { HolidaysService } from '../HolidaysService.js';
 import type { IHoliday } from '../IHoliday.js';
 import { Christmas } from './Christmas.js';
 
-@injectable(() => [HolidaysService])
-export class ChristmasService extends Bootstrap implements IHoliday {
+export class ChristmasServiceImpl extends Bootstrap implements IHoliday {
   private readonly christmas: Christmas;
   public name = 'Merry Christmas';
   public logoSrc = '/icons/christmas_logo.svg';
@@ -47,3 +46,26 @@ export class ChristmasService extends Bootstrap implements IHoliday {
     this.christmas.stop();
   }
 }
+
+export type ChristmasService = ChristmasServiceImpl;
+
+export class ChristmasServiceDI extends Context.Service<ChristmasServiceDI, ChristmasServiceImpl>()(
+  '@cloudbeaver/plugin-holidays/Christmas/ChristmasService#ChristmasService',
+) {
+  static readonly implementation = ChristmasServiceImpl;
+
+  static readonly dependencies = () => [HolidaysService] as const;
+  static readonly make: Effect.Effect<ChristmasServiceImpl, never, Context.Service.Identifier<typeof HolidaysService>> = Effect.gen(
+    function* makeChristmasService() {
+      const holidaysService = yield* HolidaysService;
+
+      return new ChristmasServiceImpl(holidaysService);
+    },
+  );
+  static readonly layer: Layer.Layer<ChristmasServiceDI, never, Context.Service.Identifier<typeof HolidaysService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ChristmasService = ChristmasServiceDI;

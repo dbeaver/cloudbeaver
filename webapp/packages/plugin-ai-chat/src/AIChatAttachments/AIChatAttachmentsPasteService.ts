@@ -6,13 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
 import { AIChatInputService, type IAIChatInputPasteEvent } from '../AIChat/AIChatInput/AIChatInputService.js';
 import { AIChatAttachmentsService } from './AIChatAttachmentsService.js';
 
-@injectable(() => [AIChatInputService, AIChatAttachmentsService])
-export class AIChatAttachmentsPasteService {
+export class AIChatAttachmentsPasteServiceImpl {
   constructor(
     private readonly aiChatInputService: AIChatInputService,
     private readonly aiChatAttachmentsService: AIChatAttachmentsService,
@@ -40,3 +39,33 @@ export class AIChatAttachmentsPasteService {
     void this.aiChatAttachmentsService.attachFiles(input, files);
   }
 }
+
+export type AIChatAttachmentsPasteService = AIChatAttachmentsPasteServiceImpl;
+
+export class AIChatAttachmentsPasteServiceDI extends Context.Service<AIChatAttachmentsPasteServiceDI, AIChatAttachmentsPasteServiceImpl>()(
+  '@cloudbeaver/plugin-ai-chat/AIChatAttachments/AIChatAttachmentsPasteService#AIChatAttachmentsPasteService',
+) {
+  static readonly implementation = AIChatAttachmentsPasteServiceImpl;
+
+  static readonly dependencies = () => [AIChatInputService, AIChatAttachmentsService] as const;
+  static readonly make: Effect.Effect<
+    AIChatAttachmentsPasteServiceImpl,
+    never,
+    Context.Service.Identifier<typeof AIChatInputService> | Context.Service.Identifier<typeof AIChatAttachmentsService>
+  > = Effect.gen(function* makeAIChatAttachmentsPasteService() {
+    const aiChatInputService = yield* AIChatInputService;
+    const aiChatAttachmentsService = yield* AIChatAttachmentsService;
+
+    return new AIChatAttachmentsPasteServiceImpl(aiChatInputService, aiChatAttachmentsService);
+  });
+  static readonly layer: Layer.Layer<
+    AIChatAttachmentsPasteServiceDI,
+    never,
+    Context.Service.Identifier<typeof AIChatInputService> | Context.Service.Identifier<typeof AIChatAttachmentsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIChatAttachmentsPasteService = AIChatAttachmentsPasteServiceDI;

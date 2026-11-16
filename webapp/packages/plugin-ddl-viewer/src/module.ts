@@ -6,21 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { ExtendedDDLResource } from './ExtendedDDLViewer/ExtendedDDLResource.js';
-import { DdlViewerBootstrap } from './DdlViewerBootstrap.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService.js';
+import { DdlViewerBootstrap } from './DdlViewerBootstrap.js';
+import { ExtendedDDLResource } from './ExtendedDDLViewer/ExtendedDDLResource.js';
 import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ddl-viewer',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, DdlViewerBootstrap)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Dependency, proxy(ExtendedDDLResource))
-      .addSingleton(DDLViewerFooterService)
-      .addSingleton(ExtendedDDLResource);
-  },
+  services: () => [DDLViewerFooterService, ExtendedDDLResource],
+  bootstraps: () => [DdlViewerBootstrap, LocaleService],
 });

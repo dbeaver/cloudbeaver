@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ProductInfoResource } from '@cloudbeaver/core-root';
 
@@ -22,8 +22,7 @@ interface IVersions {
   versions?: IVersion[];
 }
 
-@injectable(() => [ProductInfoResource])
-export class VersionResource extends CachedMapResource<string, IVersion> {
+export class VersionResourceImpl extends CachedMapResource<string, IVersion> {
   private latestVersionNumber: string | null;
 
   get latest() {
@@ -76,3 +75,26 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
     return typeof key === 'string';
   }
 }
+
+export type VersionResource = VersionResourceImpl;
+
+export class VersionResourceDI extends Context.Service<VersionResourceDI, VersionResourceImpl>()(
+  '@cloudbeaver/core-version/VersionResource#VersionResource',
+) {
+  static readonly implementation = VersionResourceImpl;
+
+  static readonly dependencies = () => [ProductInfoResource] as const;
+  static readonly make: Effect.Effect<VersionResourceImpl, never, Context.Service.Identifier<typeof ProductInfoResource>> = Effect.gen(
+    function* makeVersionResource() {
+      const productInfoResource = yield* ProductInfoResource;
+
+      return new VersionResourceImpl(productInfoResource);
+    },
+  );
+  static readonly layer: Layer.Layer<VersionResourceDI, never, Context.Service.Identifier<typeof ProductInfoResource>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const VersionResource = VersionResourceDI;

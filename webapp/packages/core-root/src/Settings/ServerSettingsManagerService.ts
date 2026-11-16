@@ -1,22 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
-import { type ISettingDescription, ROOT_SETTINGS_GROUP, type SettingsDescriptionGetter, type SettingsGroup } from '@cloudbeaver/core-settings';
+import { ROOT_SETTINGS_GROUP, type ISettingDescription, type SettingsDescriptionGetter, type SettingsGroup } from '@cloudbeaver/core-settings';
 import { getPathParent, type ILoadableState } from '@cloudbeaver/core-utils';
 
 import { ServerSettingsResource } from './ServerSettingsResource.js';
 import { SettingsTransformationService } from './SettingsTransformationService.js';
 
-@injectable(() => [SettingsTransformationService, ServerSettingsResource])
-export class ServerSettingsManagerService {
+export class ServerSettingsManagerServiceImpl {
   readonly loaders: ReadonlyArray<ILoadableState>;
 
   get providedSettings(): Set<string> {
@@ -69,3 +68,33 @@ export class ServerSettingsManagerService {
     }
   }
 }
+
+export type ServerSettingsManagerService = ServerSettingsManagerServiceImpl;
+
+export class ServerSettingsManagerServiceDI extends Context.Service<ServerSettingsManagerServiceDI, ServerSettingsManagerServiceImpl>()(
+  '@cloudbeaver/core-root/Settings/ServerSettingsManagerService#ServerSettingsManagerService',
+) {
+  static readonly implementation = ServerSettingsManagerServiceImpl;
+
+  static readonly dependencies = () => [SettingsTransformationService, ServerSettingsResource] as const;
+  static readonly make: Effect.Effect<
+    ServerSettingsManagerServiceImpl,
+    never,
+    Context.Service.Identifier<typeof SettingsTransformationService> | Context.Service.Identifier<typeof ServerSettingsResource>
+  > = Effect.gen(function* makeServerSettingsManagerService() {
+    const settingsTransformationService = yield* SettingsTransformationService;
+    const serverSettingsResource = yield* ServerSettingsResource;
+
+    return new ServerSettingsManagerServiceImpl(settingsTransformationService, serverSettingsResource);
+  });
+  static readonly layer: Layer.Layer<
+    ServerSettingsManagerServiceDI,
+    never,
+    Context.Service.Identifier<typeof SettingsTransformationService> | Context.Service.Identifier<typeof ServerSettingsResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ServerSettingsManagerService = ServerSettingsManagerServiceDI;

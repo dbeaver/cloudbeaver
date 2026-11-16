@@ -1,15 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
-@injectable(() => [LocalizationService])
-export class LocaleService extends Bootstrap {
+export class LocaleServiceImpl extends Bootstrap {
   constructor(private readonly localizationService: LocalizationService) {
     super();
   }
@@ -35,3 +34,26 @@ export class LocaleService extends Bootstrap {
     }
   }
 }
+
+export type LocaleService = LocaleServiceImpl;
+
+export class LocaleServiceDI extends Context.Service<LocaleServiceDI, LocaleServiceImpl>()(
+  '@cloudbeaver/plugin-session-expiration/LocaleService#LocaleService',
+) {
+  static readonly implementation = LocaleServiceImpl;
+
+  static readonly dependencies = () => [LocalizationService] as const;
+  static readonly make: Effect.Effect<LocaleServiceImpl, never, Context.Service.Identifier<typeof LocalizationService>> = Effect.gen(
+    function* makeLocaleService() {
+      const localizationService = yield* LocalizationService;
+
+      return new LocaleServiceImpl(localizationService);
+    },
+  );
+  static readonly layer: Layer.Layer<LocaleServiceDI, never, Context.Service.Identifier<typeof LocalizationService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const LocaleService = LocaleServiceDI;

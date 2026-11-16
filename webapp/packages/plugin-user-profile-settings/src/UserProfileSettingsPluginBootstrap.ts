@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { UserSettingsService } from '@cloudbeaver/core-settings-user';
@@ -18,8 +18,7 @@ const UserProfileSettings = importLazyComponent(() => import('./UserProfileSetti
 
 const SETTINGS_TAB_ID = 'settings';
 
-@injectable(() => [UserProfileTabsService, MenuService, ActionService, UserProfileOptionsPanelService, UserSettingsService, CommonDialogService])
-export class UserProfileSettingsPluginBootstrap extends Bootstrap {
+export class UserProfileSettingsPluginBootstrapImpl extends Bootstrap {
   constructor(
     private readonly userProfileTabsService: UserProfileTabsService,
     private readonly menuService: MenuService,
@@ -88,3 +87,56 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
     this.userSettingsService.resetChanges();
   }
 }
+
+export type UserProfileSettingsPluginBootstrap = UserProfileSettingsPluginBootstrapImpl;
+
+export class UserProfileSettingsPluginBootstrapDI extends Context.Service<
+  UserProfileSettingsPluginBootstrapDI,
+  UserProfileSettingsPluginBootstrapImpl
+>()('@cloudbeaver/plugin-user-profile-settings/UserProfileSettingsPluginBootstrap#UserProfileSettingsPluginBootstrap') {
+  static readonly implementation = UserProfileSettingsPluginBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [UserProfileTabsService, MenuService, ActionService, UserProfileOptionsPanelService, UserSettingsService, CommonDialogService] as const;
+  static readonly make: Effect.Effect<
+    UserProfileSettingsPluginBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof UserProfileTabsService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof UserProfileOptionsPanelService>
+    | Context.Service.Identifier<typeof UserSettingsService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Effect.gen(function* makeUserProfileSettingsPluginBootstrap() {
+    const userProfileTabsService = yield* UserProfileTabsService;
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const userProfileOptionsPanelService = yield* UserProfileOptionsPanelService;
+    const userSettingsService = yield* UserSettingsService;
+    const commonDialogService = yield* CommonDialogService;
+
+    return new UserProfileSettingsPluginBootstrapImpl(
+      userProfileTabsService,
+      menuService,
+      actionService,
+      userProfileOptionsPanelService,
+      userSettingsService,
+      commonDialogService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    UserProfileSettingsPluginBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof UserProfileTabsService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof UserProfileOptionsPanelService>
+    | Context.Service.Identifier<typeof UserSettingsService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const UserProfileSettingsPluginBootstrap = UserProfileSettingsPluginBootstrapDI;

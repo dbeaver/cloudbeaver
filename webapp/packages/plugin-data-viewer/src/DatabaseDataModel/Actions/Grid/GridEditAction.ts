@@ -7,8 +7,9 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import { DatabaseEditAction } from '../DatabaseEditAction.js';
 import {
@@ -18,15 +19,14 @@ import {
   type IDatabaseDataEditApplyActionData,
   type IDatabaseDataEditApplyActionUpdate,
 } from '../IDatabaseDataEditAction.js';
-import { GridDataResultAction } from './GridDataResultAction.js';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
-import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
-import { GridDataKeysUtils } from './GridDataKeysUtils.js';
-import { compareGridRowKeys } from './compareGridRowKeys.js';
 import { IDatabaseDataResultAction } from '../IDatabaseDataResultAction.js';
-import { GridHistoryAction } from './GridHistoryAction.js';
+import { GridDataKeysUtils } from './GridDataKeysUtils.js';
+import { GridDataResultAction } from './GridDataResultAction.js';
 import { GridEditHistoryManager } from './GridEditHistoryManager.js';
+import { GridHistoryAction } from './GridHistoryAction.js';
 import type { IGridHistoryData, IGridHistoryRevertData, IGridHistoryRow } from './GridHistoryTypes.js';
+import type { IGridColumnKey, IGridDataKey, IGridRowKey } from './IGridDataKey.js';
+import { compareGridRowKeys } from './compareGridRowKeys.js';
 
 export interface IGridUpdate<TCell> {
   row: IGridRowKey;
@@ -48,8 +48,7 @@ export interface IGridEditApplyActionData extends IDatabaseDataEditApplyActionDa
 
 export type IGridEditActionData<TKey extends IGridDataKey = IGridDataKey, TCell = unknown> = IDatabaseDataEditActionData<TKey, TCell>;
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, GridHistoryAction])
-export class GridEditAction<
+export class GridEditActionImpl<
   TColumn = unknown,
   TRow = unknown,
   TKey extends IGridDataKey = IGridDataKey,
@@ -770,3 +769,47 @@ export class GridEditAction<
     }
   }
 }
+
+export type GridEditAction<
+  TColumn = unknown,
+  TRow = unknown,
+  TKey extends IGridDataKey = IGridDataKey,
+  TCell = unknown,
+  TResult extends IDatabaseDataResult = IDatabaseDataResult,
+> = GridEditActionImpl<TColumn, TRow, TKey, TCell, TResult>;
+
+export class GridEditActionDI extends Context.Service<GridEditActionDI, GridEditActionImpl<any, any, any, any, any>>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/Grid/GridEditAction#GridEditAction',
+) {
+  static readonly implementation = GridEditActionImpl;
+  static readonly dataFormat = GridEditActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult, IDatabaseDataResultAction, GridHistoryAction] as const;
+  static readonly make: Effect.Effect<
+    GridEditActionImpl<any, any, any, any, any>,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataResultAction>
+    | Context.Service.Identifier<typeof GridHistoryAction>
+  > = Effect.gen(function* makeGridEditAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+    const data = yield* IDatabaseDataResultAction;
+    const history = yield* GridHistoryAction;
+
+    return new GridEditActionImpl(source, result, data, history);
+  });
+  static readonly layer: Layer.Layer<
+    GridEditActionDI,
+    never,
+    | Context.Service.Identifier<typeof IDatabaseDataSource>
+    | Context.Service.Identifier<typeof IDatabaseDataResult>
+    | Context.Service.Identifier<typeof IDatabaseDataResultAction>
+    | Context.Service.Identifier<typeof GridHistoryAction>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const GridEditAction = GridEditActionDI;

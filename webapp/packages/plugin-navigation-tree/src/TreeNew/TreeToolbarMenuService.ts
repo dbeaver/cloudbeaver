@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { ACTION_COLLAPSE_ALL, ActionService, type IAction, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 
 import { KEY_BINDING_COLLAPSE_ALL } from '../NavigationTree/ElementsTree/KEY_BINDING_COLLAPSE_ALL.js';
@@ -15,8 +15,7 @@ import { MENU_TREE_SETTINGS } from './MENU_TREE_SETTINGS.js';
 import { MENU_TREE_TOOLBAR } from './MENU_TREE_TOOLBAR.js';
 import { ACTION_TREE_REFRESH } from './actions/ACTION_TREE_REFRESH.js';
 
-@injectable(() => [ActionService, MenuService, KeyBindingService])
-export class TreeToolbarMenuService {
+export class TreeToolbarMenuServiceImpl {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
@@ -90,3 +89,38 @@ export class TreeToolbarMenuService {
     }
   }
 }
+
+export type TreeToolbarMenuService = TreeToolbarMenuServiceImpl;
+
+export class TreeToolbarMenuServiceDI extends Context.Service<TreeToolbarMenuServiceDI, TreeToolbarMenuServiceImpl>()(
+  '@cloudbeaver/plugin-navigation-tree/TreeNew/TreeToolbarMenuService#TreeToolbarMenuService',
+) {
+  static readonly implementation = TreeToolbarMenuServiceImpl;
+
+  static readonly dependencies = () => [ActionService, MenuService, KeyBindingService] as const;
+  static readonly make: Effect.Effect<
+    TreeToolbarMenuServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+  > = Effect.gen(function* makeTreeToolbarMenuService() {
+    const actionService = yield* ActionService;
+    const menuService = yield* MenuService;
+    const keyBindingService = yield* KeyBindingService;
+
+    return new TreeToolbarMenuServiceImpl(actionService, menuService, keyBindingService);
+  });
+  static readonly layer: Layer.Layer<
+    TreeToolbarMenuServiceDI,
+    never,
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof KeyBindingService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TreeToolbarMenuService = TreeToolbarMenuServiceDI;

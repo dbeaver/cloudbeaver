@@ -6,14 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 
 import { AppScreenService } from './AppScreenService.js';
 
 const SkipNavLinks = importLazyComponent(() => import('./SkipNavLinks.js').then(m => m.SkipNavLinks));
 
-@injectable(() => [AppScreenService])
-export class SkipNavService {
+export class SkipNavServiceImpl {
   readonly extraLinks: PlaceholderContainer;
 
   constructor(private readonly appScreenService: AppScreenService) {
@@ -24,3 +23,26 @@ export class SkipNavService {
     this.appScreenService.placeholder.add(SkipNavLinks, 0);
   }
 }
+
+export type SkipNavService = SkipNavServiceImpl;
+
+export class SkipNavServiceDI extends Context.Service<SkipNavServiceDI, SkipNavServiceImpl>()(
+  '@cloudbeaver/core-app/AppScreen/SkipNavService#SkipNavService',
+) {
+  static readonly implementation = SkipNavServiceImpl;
+
+  static readonly dependencies = () => [AppScreenService] as const;
+  static readonly make: Effect.Effect<SkipNavServiceImpl, never, Context.Service.Identifier<typeof AppScreenService>> = Effect.gen(
+    function* makeSkipNavService() {
+      const appScreenService = yield* AppScreenService;
+
+      return new SkipNavServiceImpl(appScreenService);
+    },
+  );
+  static readonly layer: Layer.Layer<SkipNavServiceDI, never, Context.Service.Identifier<typeof AppScreenService>> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SkipNavService = SkipNavServiceDI;

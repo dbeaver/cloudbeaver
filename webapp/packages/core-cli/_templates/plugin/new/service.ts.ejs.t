@@ -1,15 +1,13 @@
 ---
 to: <%= name %>/src/<%= h.changeCase.pascal(name) %>Bootstrap.ts
 ---
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Context, Layer } from '@cloudbeaver/core-di';
 
-@injectable()
-export class <%= h.changeCase.pascal(name) %>Bootstrap extends Bootstrap {
-  constructor() {
-    super();
-  }
-
-  override register() {
-    console.log('<%= h.changeCase.no(name) %> is registered');
-  }
+export class <%= h.changeCase.pascal(name) %>Bootstrap extends Context.Service<
+  <%= h.changeCase.pascal(name) %>Bootstrap,
+  { register(): void }
+>()('@cloudbeaver/<%= name %>/<%= h.changeCase.pascal(name) %>Bootstrap') {
+  static readonly layer = Layer.succeed(this, {
+    register() {},
+  });
 }

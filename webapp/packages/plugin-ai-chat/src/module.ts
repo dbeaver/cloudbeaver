@@ -6,56 +6,50 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
-import { LocaleService } from './LocaleService.js';
-import { AIChatTabService } from './AIChatTabService.js';
-import { AIChatSettingsService } from './AIChatSettingsService.js';
-import { AIChatService } from './AIChat/AIChatService.js';
-import { AIChatServiceBootstrap } from './AIChatServiceBootstrap.js';
-import { AIChatMessageActionsService } from './AIChat/AIChatMessage/AIChatMessageActionsService.js';
-import { AIChatMessageEventHandler } from './AIChat/AIChatMessage/AIChatMessageEventHandler.js';
-import { AIChatMessagesResource } from './AIChat/AIChatMessage/AIChatMessagesResource.js';
-import { AIChatMessageService } from './AIChat/AIChatMessage/AIChatMessageService.js';
-import { AIChatConversationsService } from './AIChat/AIChatConversation/AIChatConversationsService.js';
-import { AIChatConversationsResource } from './AIChat/AIChatConversation/AIChatConversationsResource.js';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 import { AIChatContextService } from './AIChat/AIChatContext/AIChatContextService.js';
 import { AIChatConversationMetricsResource } from './AIChat/AIChatConversation/AIChatConversationMetricsResource.js';
-import { AIChatFunctionsService } from './AIChatFunctionsService.js';
-import { AIChatFunctionRegistryService } from './AIChatFunctionRegistryService.js';
-import { AIFunctionsResource } from './AIFunctionsResource.js';
-import { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
-import { AIChatAttachmentsPasteService } from './AIChatAttachments/AIChatAttachmentsPasteService.js';
-import { AIChatAttachmentsImageHandlerService } from './AIChatAttachmentsHandlers/AIChatAttachmentsImageHandler/AIChatAttachmentsImageHandlerService.js';
+import { AIChatConversationsResource } from './AIChat/AIChatConversation/AIChatConversationsResource.js';
+import { AIChatConversationsService } from './AIChat/AIChatConversation/AIChatConversationsService.js';
 import { AIChatInputService } from './AIChat/AIChatInput/AIChatInputService.js';
+import { AIChatMessageActionsService } from './AIChat/AIChatMessage/AIChatMessageActionsService.js';
+import { AIChatMessageEventHandler } from './AIChat/AIChatMessage/AIChatMessageEventHandler.js';
+import { AIChatMessageService } from './AIChat/AIChatMessage/AIChatMessageService.js';
+import { AIChatMessagesResource } from './AIChat/AIChatMessage/AIChatMessagesResource.js';
+import { AIChatService } from './AIChat/AIChatService.js';
+import { AIChatAttachmentsPasteService } from './AIChatAttachments/AIChatAttachmentsPasteService.js';
+import { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
+import { AIChatAttachmentsImageHandlerService } from './AIChatAttachmentsHandlers/AIChatAttachmentsImageHandler/AIChatAttachmentsImageHandlerService.js';
+import { AIChatFunctionRegistryService } from './AIChatFunctionRegistryService.js';
+import { AIChatFunctionsService } from './AIChatFunctionsService.js';
+import { AIChatServiceBootstrap } from './AIChatServiceBootstrap.js';
+import { AIChatSettingsService } from './AIChatSettingsService.js';
+import { AIChatTabService } from './AIChatTabService.js';
+import { AIFunctionsResource } from './AIFunctionsResource.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-ai-chat',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Bootstrap, AIChatServiceBootstrap)
-      .addSingleton(Bootstrap, proxy(AIChatContextService))
-      .addSingleton(Dependency, proxy(AIChatSettingsService))
-      .addSingleton(Dependency, proxy(AIChatMessagesResource))
-      .addSingleton(Dependency, proxy(AIChatConversationsResource))
-      .addSingleton(AIChatContextService)
-      .addSingleton(AIChatTabService)
-      .addSingleton(AIChatSettingsService)
-      .addSingleton(AIChatService)
-      .addSingleton(AIChatMessageActionsService)
-      .addSingleton(AIChatMessageEventHandler)
-      .addSingleton(AIChatMessagesResource)
-      .addSingleton(AIChatMessageService)
-      .addSingleton(AIChatConversationsService)
-      .addSingleton(AIChatConversationsResource)
-      .addSingleton(AIChatConversationMetricsResource)
-      .addSingleton(AIChatFunctionsService)
-      .addSingleton(AIChatFunctionRegistryService)
-      .addSingleton(AIChatAttachmentsService)
-      .addSingleton(AIChatAttachmentsPasteService)
-      .addSingleton(AIChatInputService)
-      .addSingleton(AIChatAttachmentsImageHandlerService)
-      .addSingleton(AIFunctionsResource);
-  },
+  services: () => [
+    AIChatContextService,
+    AIChatTabService,
+    AIChatSettingsService,
+    AIChatService,
+    AIChatMessageActionsService,
+    AIChatMessageEventHandler,
+    AIChatMessagesResource,
+    AIChatMessageService,
+    AIChatConversationsService,
+    AIChatConversationsResource,
+    AIChatConversationMetricsResource,
+    AIChatFunctionsService,
+    AIChatFunctionRegistryService,
+    AIChatAttachmentsService,
+    AIChatAttachmentsPasteService,
+    AIChatInputService,
+    AIChatAttachmentsImageHandlerService,
+    AIFunctionsResource,
+  ],
+  bootstraps: () => [LocaleService, AIChatServiceBootstrap, AIChatContextService],
 });

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,16 +9,15 @@ import { computed, makeObservable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 import { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
 import { DatabaseDataResultAction } from '../DatabaseDataResultAction.js';
 import type { IDatabaseDataDocument } from './IDatabaseDataDocument.js';
 import type { IDocumentElementKey } from './IDocumentElementKey.js';
-import { injectable } from '@cloudbeaver/core-di';
-import { IDatabaseDataResult } from '../../IDatabaseDataResult.js';
 
-@injectable(() => [IDatabaseDataSource, IDatabaseDataResult])
-export class DocumentDataAction<
+export class DocumentDataActionImpl<
   TKey extends IDocumentElementKey = IDocumentElementKey,
   TValue extends IDatabaseDataDocument = IDatabaseDataDocument,
   TResult extends IDatabaseResultSet = IDatabaseResultSet,
@@ -73,3 +72,37 @@ export class DocumentDataAction<
     }
   }
 }
+
+export type DocumentDataAction<
+  TKey extends IDocumentElementKey = IDocumentElementKey,
+  TValue extends IDatabaseDataDocument = IDatabaseDataDocument,
+  TResult extends IDatabaseResultSet = IDatabaseResultSet,
+> = DocumentDataActionImpl<TKey, TValue, TResult>;
+
+export class DocumentDataActionDI extends Context.Service<DocumentDataActionDI, DocumentDataActionImpl<any, any, any>>()(
+  '@cloudbeaver/plugin-data-viewer/DatabaseDataModel/Actions/Document/DocumentDataAction#DocumentDataAction',
+) {
+  static readonly implementation = DocumentDataActionImpl;
+  static readonly dataFormat = DocumentDataActionImpl.dataFormat;
+  static readonly dependencies = () => [IDatabaseDataSource, IDatabaseDataResult] as const;
+  static readonly make: Effect.Effect<
+    DocumentDataActionImpl<any, any, any>,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Effect.gen(function* makeDocumentDataAction() {
+    const source = yield* IDatabaseDataSource;
+    const result = yield* IDatabaseDataResult;
+
+    return new DocumentDataActionImpl(source, result);
+  });
+  static readonly layer: Layer.Layer<
+    DocumentDataActionDI,
+    never,
+    Context.Service.Identifier<typeof IDatabaseDataSource> | Context.Service.Identifier<typeof IDatabaseDataResult>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DocumentDataAction = DocumentDataActionDI;

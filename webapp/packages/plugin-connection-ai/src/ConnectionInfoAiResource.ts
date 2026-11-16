@@ -8,28 +8,27 @@
 
 import { runInAction, toJS } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
-import {
-  CachedMapResource,
-  isResourceAlias,
-  type ResourceKey,
-  resourceKeyList,
-  type ResourceKeySimple,
-  ResourceKeyUtils,
-} from '@cloudbeaver/core-resource';
-import { schemaValidationError } from '@cloudbeaver/core-utils';
 import {
   CONNECTION_INFO_PARAM_SCHEMA,
-  isConnectionInfoParamEqual,
   ConnectionInfoResource,
+  isConnectionInfoParamEqual,
   type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
+import {
+  CachedMapResource,
+  ResourceKeyUtils,
+  isResourceAlias,
+  resourceKeyList,
+  type ResourceKey,
+  type ResourceKeySimple,
+} from '@cloudbeaver/core-resource';
 import { GraphQLService, type AiDataSourceSettingsInput, type ConnectionInfoAiSettingsFragment } from '@cloudbeaver/core-sdk';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 export type ConnectionInfoAiSettings = ConnectionInfoAiSettingsFragment;
 
-@injectable(() => [GraphQLService, ConnectionInfoResource])
-export class ConnectionInfoAiResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoAiSettings> {
+export class ConnectionInfoAiResourceImpl extends CachedMapResource<IConnectionInfoParams, ConnectionInfoAiSettings> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -93,3 +92,33 @@ export class ConnectionInfoAiResource extends CachedMapResource<IConnectionInfoP
     return parse.success;
   }
 }
+
+export type ConnectionInfoAiResource = ConnectionInfoAiResourceImpl;
+
+export class ConnectionInfoAiResourceDI extends Context.Service<ConnectionInfoAiResourceDI, ConnectionInfoAiResourceImpl>()(
+  '@cloudbeaver/plugin-connection-ai/ConnectionInfoAiResource#ConnectionInfoAiResource',
+) {
+  static readonly implementation = ConnectionInfoAiResourceImpl;
+
+  static readonly dependencies = () => [GraphQLService, ConnectionInfoResource] as const;
+  static readonly make: Effect.Effect<
+    ConnectionInfoAiResourceImpl,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Effect.gen(function* makeConnectionInfoAiResource() {
+    const graphQLService = yield* GraphQLService;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+
+    return new ConnectionInfoAiResourceImpl(graphQLService, connectionInfoResource);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionInfoAiResourceDI,
+    never,
+    Context.Service.Identifier<typeof GraphQLService> | Context.Service.Identifier<typeof ConnectionInfoResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionInfoAiResource = ConnectionInfoAiResourceDI;

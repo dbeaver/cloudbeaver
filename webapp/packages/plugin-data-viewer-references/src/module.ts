@@ -6,20 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ModuleRegistry, Bootstrap, proxy, Dependency } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService.js';
 import { DataViewerReferencesBootstrap } from './DataViewerReferencesBootstrap.js';
 import { DataViewerReferencesSettingsService } from './DataViewerReferencesSettingsService.js';
+import { LocaleService } from './LocaleService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-viewer-references',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Bootstrap, DataViewerReferencesBootstrap)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(Dependency, proxy(DataViewerReferencesSettingsService))
-      .addSingleton(DataViewerReferencesSettingsService);
-  },
+  services: () => [DataViewerReferencesSettingsService],
+  bootstraps: () => [DataViewerReferencesBootstrap, LocaleService],
 });

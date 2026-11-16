@@ -7,18 +7,17 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { getObjectPropertyOptionName, getObjectPropertyOptionValue, getObjectPropertyType, type IObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import {
   ESettingsValueType,
-  type ISettingDescription,
   ROOT_SETTINGS_GROUP,
+  type ISettingDescription,
   type SettingDescriptionTransformer,
   type SettingsGroup,
 } from '@cloudbeaver/core-settings';
 
-@injectable()
-export class SettingsTransformationService {
+export class SettingsTransformationServiceImpl {
   private overrideGroups: Map<string, SettingsGroup>;
   private settingTransformers: Map<string, SettingDescriptionTransformer>;
 
@@ -100,6 +99,23 @@ export class SettingsTransformationService {
     });
   }
 }
+
+export type SettingsTransformationService = SettingsTransformationServiceImpl;
+
+export class SettingsTransformationServiceDI extends Context.Service<SettingsTransformationServiceDI, SettingsTransformationServiceImpl>()(
+  '@cloudbeaver/core-root/Settings/SettingsTransformationService#SettingsTransformationService',
+) {
+  static readonly implementation = SettingsTransformationServiceImpl;
+
+  static readonly dependencies = () => [] as const;
+  static readonly make: Effect.Effect<SettingsTransformationServiceImpl, never, never> = Effect.sync(() => new SettingsTransformationServiceImpl());
+  static readonly layer: Layer.Layer<SettingsTransformationServiceDI, never, never> = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const SettingsTransformationService = SettingsTransformationServiceDI;
 
 function convertObjectPropertyInfoType(property: IObjectPropertyInfo): ESettingsValueType {
   switch (getObjectPropertyType(property)) {

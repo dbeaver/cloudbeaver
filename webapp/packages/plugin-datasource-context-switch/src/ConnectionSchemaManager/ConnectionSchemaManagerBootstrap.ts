@@ -17,7 +17,7 @@ import {
   createConnectionParam,
   serializeConnectionParam,
 } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
@@ -36,19 +36,7 @@ const ConnectionIconSmall = importLazyComponent(() =>
   import('./ConnectionSelector/ConnectionIconSmall.js').then(module => module.ConnectionIconSmall),
 );
 
-@injectable(() => [
-  ConnectionInfoResource,
-  ConnectionSchemaManagerService,
-  ConnectionsManagerService,
-  OptionsPanelService,
-  AppAuthService,
-  ContainerResource,
-  MenuService,
-  ConnectionsSettingsService,
-  LocalizationService,
-  ProjectsService,
-])
-export class ConnectionSchemaManagerBootstrap extends Bootstrap {
+export class ConnectionSchemaManagerBootstrapImpl extends Bootstrap {
   get connectionSelectorLoading(): boolean {
     return this.connectionSchemaManagerService.isChangingConnection || this.connectionsManagerService.containerResource.isLoading();
   }
@@ -464,3 +452,82 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     });
   }
 }
+
+export type ConnectionSchemaManagerBootstrap = ConnectionSchemaManagerBootstrapImpl;
+
+export class ConnectionSchemaManagerBootstrapDI extends Context.Service<ConnectionSchemaManagerBootstrapDI, ConnectionSchemaManagerBootstrapImpl>()(
+  '@cloudbeaver/plugin-datasource-context-switch/ConnectionSchemaManager/ConnectionSchemaManagerBootstrap#ConnectionSchemaManagerBootstrap',
+) {
+  static readonly implementation = ConnectionSchemaManagerBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      ConnectionInfoResource,
+      ConnectionSchemaManagerService,
+      ConnectionsManagerService,
+      OptionsPanelService,
+      AppAuthService,
+      ContainerResource,
+      MenuService,
+      ConnectionsSettingsService,
+      LocalizationService,
+      ProjectsService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    ConnectionSchemaManagerBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionSchemaManagerService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof AppAuthService>
+    | Context.Service.Identifier<typeof ContainerResource>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ConnectionsSettingsService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof ProjectsService>
+  > = Effect.gen(function* makeConnectionSchemaManagerBootstrap() {
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const connectionSchemaManagerService = yield* ConnectionSchemaManagerService;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const optionsPanelService = yield* OptionsPanelService;
+    const appAuthService = yield* AppAuthService;
+    const containerResource = yield* ContainerResource;
+    const menuService = yield* MenuService;
+    const connectionsSettingsService = yield* ConnectionsSettingsService;
+    const localizationService = yield* LocalizationService;
+    const projectsService = yield* ProjectsService;
+
+    return new ConnectionSchemaManagerBootstrapImpl(
+      connectionInfoResource,
+      connectionSchemaManagerService,
+      connectionsManagerService,
+      optionsPanelService,
+      appAuthService,
+      containerResource,
+      menuService,
+      connectionsSettingsService,
+      localizationService,
+      projectsService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionSchemaManagerBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionSchemaManagerService>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof AppAuthService>
+    | Context.Service.Identifier<typeof ContainerResource>
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ConnectionsSettingsService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof ProjectsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionSchemaManagerBootstrap = ConnectionSchemaManagerBootstrapDI;

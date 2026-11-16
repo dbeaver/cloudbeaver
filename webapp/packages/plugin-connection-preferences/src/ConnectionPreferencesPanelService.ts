@@ -8,20 +8,19 @@
 
 import { action, makeObservable, observable } from 'mobx';
 
-import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
-import { FormMode, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { Context, Effect, IServiceProvider, Layer, disposeService } from '@cloudbeaver/core-di';
+import { FormMode, OptionsPanelService } from '@cloudbeaver/core-ui';
 
-import { ConnectionPreferencesFormState } from './ConnectionPreferencesForm/ConnectionPreferencesFormState.js';
 import { ConnectionPreferencesFormService } from './ConnectionPreferencesForm/ConnectionPreferencesFormService.js';
+import { ConnectionPreferencesFormState } from './ConnectionPreferencesForm/ConnectionPreferencesFormState.js';
 
 const ConnectionPreferencesPanel = importLazyComponent(() => import('./ConnectionPreferencesPanel.js').then(m => m.ConnectionPreferencesPanel));
 
 const formGetter = () => ConnectionPreferencesPanel;
 
-@injectable(() => [OptionsPanelService, IServiceProvider, ConnectionPreferencesFormService])
-export class ConnectionPreferencesPanelService {
+export class ConnectionPreferencesPanelServiceImpl {
   formState: ConnectionPreferencesFormState | null;
 
   constructor(
@@ -59,3 +58,39 @@ export class ConnectionPreferencesPanelService {
     this.formState = null;
   }
 }
+
+export type ConnectionPreferencesPanelService = ConnectionPreferencesPanelServiceImpl;
+
+export class ConnectionPreferencesPanelServiceDI extends Context.Service<
+  ConnectionPreferencesPanelServiceDI,
+  ConnectionPreferencesPanelServiceImpl
+>()('@cloudbeaver/plugin-connection-preferences/ConnectionPreferencesPanelService#ConnectionPreferencesPanelService') {
+  static readonly implementation = ConnectionPreferencesPanelServiceImpl;
+
+  static readonly dependencies = () => [OptionsPanelService, IServiceProvider, ConnectionPreferencesFormService] as const;
+  static readonly make: Effect.Effect<
+    ConnectionPreferencesPanelServiceImpl,
+    never,
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof ConnectionPreferencesFormService>
+  > = Effect.gen(function* makeConnectionPreferencesPanelService() {
+    const optionsPanelService = yield* OptionsPanelService;
+    const serviceProvider = yield* IServiceProvider;
+    const connectionPreferencesFormService = yield* ConnectionPreferencesFormService;
+
+    return new ConnectionPreferencesPanelServiceImpl(optionsPanelService, serviceProvider, connectionPreferencesFormService);
+  });
+  static readonly layer: Layer.Layer<
+    ConnectionPreferencesPanelServiceDI,
+    never,
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof IServiceProvider>
+    | Context.Service.Identifier<typeof ConnectionPreferencesFormService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const ConnectionPreferencesPanelService = ConnectionPreferencesPanelServiceDI;

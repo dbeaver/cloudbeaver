@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { ConfirmationDialog, type ConfirmationDialogResult } from '@cloudbeaver/core-blocks';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult, type DialogResult } from '@cloudbeaver/core-dialogs';
 import { executorHandlerFilter } from '@cloudbeaver/core-executor';
 import { AsyncTask, AsyncTaskInfoService, ClientEventId, ServerEventId, type IBaseAsyncTaskEvent } from '@cloudbeaver/core-root';
 import { AsyncTaskInfoEventHandler } from '@cloudbeaver/core-root/AsyncTask/AsyncTaskInfoEventHandler.js';
 import type { WsSessionTaskConfirmationEvent, WsSessionTaskConfirmationRequestEvent } from '@cloudbeaver/core-sdk';
 
-@injectable(() => [AsyncTaskInfoService, CommonDialogService, AsyncTaskInfoEventHandler])
-export class AsyncTaskConfirmationBootstrap extends Bootstrap {
+export class AsyncTaskConfirmationBootstrapImpl extends Bootstrap {
   private pendingConfirmations: Map<string, Promise<DialogResult<ConfirmationDialogResult>>> = new Map();
   constructor(
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
@@ -74,3 +73,38 @@ export class AsyncTaskConfirmationBootstrap extends Bootstrap {
     this.asyncTaskInfoService.onExecuteEvent.removeHandler(this.handleEvent);
   }
 }
+
+export type AsyncTaskConfirmationBootstrap = AsyncTaskConfirmationBootstrapImpl;
+
+export class AsyncTaskConfirmationBootstrapDI extends Context.Service<AsyncTaskConfirmationBootstrapDI, AsyncTaskConfirmationBootstrapImpl>()(
+  '@cloudbeaver/plugin-async-task-confirmation/AsyncTaskConfirmationBootstrap#AsyncTaskConfirmationBootstrap',
+) {
+  static readonly implementation = AsyncTaskConfirmationBootstrapImpl;
+
+  static readonly dependencies = () => [AsyncTaskInfoService, CommonDialogService, AsyncTaskInfoEventHandler] as const;
+  static readonly make: Effect.Effect<
+    AsyncTaskConfirmationBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoEventHandler>
+  > = Effect.gen(function* makeAsyncTaskConfirmationBootstrap() {
+    const asyncTaskInfoService = yield* AsyncTaskInfoService;
+    const commonDialogService = yield* CommonDialogService;
+    const asyncTaskInfoEventHandler = yield* AsyncTaskInfoEventHandler;
+
+    return new AsyncTaskConfirmationBootstrapImpl(asyncTaskInfoService, commonDialogService, asyncTaskInfoEventHandler);
+  });
+  static readonly layer: Layer.Layer<
+    AsyncTaskConfirmationBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof AsyncTaskInfoService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof AsyncTaskInfoEventHandler>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AsyncTaskConfirmationBootstrap = AsyncTaskConfirmationBootstrapDI;

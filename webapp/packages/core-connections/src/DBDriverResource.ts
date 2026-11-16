@@ -8,7 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerConfigResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
 import {
@@ -30,8 +30,7 @@ export type DBDriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'
 
 export type DriverPropertyInfo = DriverPropertyInfoFragment;
 
-@injectable(() => [ServerConfigResource, GraphQLService, WorkspaceConfigEventHandler, AppAuthService])
-export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriverResourceIncludes> {
+export class DBDriverResourceImpl extends CachedMapResource<string, DBDriver, DBDriverResourceIncludes> {
   get enabledDrivers() {
     return this.values.filter(driver => driver.enabled).sort(this.compare);
   }
@@ -142,6 +141,44 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
     return typeof key === 'string';
   }
 }
+
+export type DBDriverResource = DBDriverResourceImpl;
+
+export class DBDriverResourceDI extends Context.Service<DBDriverResourceDI, DBDriverResourceImpl>()(
+  '@cloudbeaver/core-connections/DBDriverResource#DBDriverResource',
+) {
+  static readonly implementation = DBDriverResourceImpl;
+
+  static readonly dependencies = () => [ServerConfigResource, GraphQLService, WorkspaceConfigEventHandler, AppAuthService] as const;
+  static readonly make: Effect.Effect<
+    DBDriverResourceImpl,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof WorkspaceConfigEventHandler>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Effect.gen(function* makeDBDriverResource() {
+    const serverConfigResource = yield* ServerConfigResource;
+    const graphQLService = yield* GraphQLService;
+    const workspaceConfigEventHandler = yield* WorkspaceConfigEventHandler;
+    const appAuthService = yield* AppAuthService;
+
+    return new DBDriverResourceImpl(serverConfigResource, graphQLService, workspaceConfigEventHandler, appAuthService);
+  });
+  static readonly layer: Layer.Layer<
+    DBDriverResourceDI,
+    never,
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof GraphQLService>
+    | Context.Service.Identifier<typeof WorkspaceConfigEventHandler>
+    | Context.Service.Identifier<typeof AppAuthService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const DBDriverResource = DBDriverResourceDI;
 
 function isNewDriver(driver: DBDriver | NewDBDriver): driver is NewDBDriver {
   return (driver as NewDBDriver)[NEW_DRIVER_SYMBOL];

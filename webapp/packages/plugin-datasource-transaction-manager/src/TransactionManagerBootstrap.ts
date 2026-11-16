@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,17 @@ import {
   type IConnectionExecutorData,
   isConnectionInfoParamEqual,
 } from '@cloudbeaver/core-connections';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, disposeService, Effect, Layer } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { ActionService, MenuCustomItem, menuItemsPlaceAfter, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
-import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
+import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT.js';
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE.js';
@@ -44,22 +44,7 @@ const TransactionLogDialog = importLazyComponent(() =>
   import('./TransactionLog/TransactionLogDialog.js').then(module => module.TransactionLogDialog),
 );
 
-@injectable(() => [
-  MenuService,
-  ActionService,
-  ConnectionSchemaManagerService,
-  ConnectionExecutionContextService,
-  ConnectionExecutionContextResource,
-  ConnectionInfoResource,
-  ConnectionsManagerService,
-  OptionsPanelService,
-  NotificationService,
-  CommonDialogService,
-  LocalizationService,
-  TransactionManagerSettingsService,
-  TransactionLogCountResource,
-])
-export class TransactionManagerBootstrap extends Bootstrap {
+export class TransactionManagerBootstrapImpl extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
@@ -301,3 +286,97 @@ export class TransactionManagerBootstrap extends Bootstrap {
     }
   }
 }
+
+export type TransactionManagerBootstrap = TransactionManagerBootstrapImpl;
+
+export class TransactionManagerBootstrapDI extends Context.Service<TransactionManagerBootstrapDI, TransactionManagerBootstrapImpl>()(
+  '@cloudbeaver/plugin-datasource-transaction-manager/TransactionManagerBootstrap#TransactionManagerBootstrap',
+) {
+  static readonly implementation = TransactionManagerBootstrapImpl;
+
+  static readonly dependencies = () =>
+    [
+      MenuService,
+      ActionService,
+      ConnectionSchemaManagerService,
+      ConnectionExecutionContextService,
+      ConnectionExecutionContextResource,
+      ConnectionInfoResource,
+      ConnectionsManagerService,
+      OptionsPanelService,
+      NotificationService,
+      CommonDialogService,
+      LocalizationService,
+      TransactionManagerSettingsService,
+      TransactionLogCountResource,
+    ] as const;
+  static readonly make: Effect.Effect<
+    TransactionManagerBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof ConnectionSchemaManagerService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof TransactionManagerSettingsService>
+    | Context.Service.Identifier<typeof TransactionLogCountResource>
+  > = Effect.gen(function* makeTransactionManagerBootstrap() {
+    const menuService = yield* MenuService;
+    const actionService = yield* ActionService;
+    const connectionSchemaManagerService = yield* ConnectionSchemaManagerService;
+    const connectionExecutionContextService = yield* ConnectionExecutionContextService;
+    const connectionExecutionContextResource = yield* ConnectionExecutionContextResource;
+    const connectionInfoResource = yield* ConnectionInfoResource;
+    const connectionsManagerService = yield* ConnectionsManagerService;
+    const optionsPanelService = yield* OptionsPanelService;
+    const notificationService = yield* NotificationService;
+    const commonDialogService = yield* CommonDialogService;
+    const localizationService = yield* LocalizationService;
+    const transactionManagerSettingsService = yield* TransactionManagerSettingsService;
+    const transactionLogCountResource = yield* TransactionLogCountResource;
+
+    return new TransactionManagerBootstrapImpl(
+      menuService,
+      actionService,
+      connectionSchemaManagerService,
+      connectionExecutionContextService,
+      connectionExecutionContextResource,
+      connectionInfoResource,
+      connectionsManagerService,
+      optionsPanelService,
+      notificationService,
+      commonDialogService,
+      localizationService,
+      transactionManagerSettingsService,
+      transactionLogCountResource,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    TransactionManagerBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof MenuService>
+    | Context.Service.Identifier<typeof ActionService>
+    | Context.Service.Identifier<typeof ConnectionSchemaManagerService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextService>
+    | Context.Service.Identifier<typeof ConnectionExecutionContextResource>
+    | Context.Service.Identifier<typeof ConnectionInfoResource>
+    | Context.Service.Identifier<typeof ConnectionsManagerService>
+    | Context.Service.Identifier<typeof OptionsPanelService>
+    | Context.Service.Identifier<typeof NotificationService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof LocalizationService>
+    | Context.Service.Identifier<typeof TransactionManagerSettingsService>
+    | Context.Service.Identifier<typeof TransactionLogCountResource>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const TransactionManagerBootstrap = TransactionManagerBootstrapDI;

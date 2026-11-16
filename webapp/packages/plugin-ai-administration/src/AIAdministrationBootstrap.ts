@@ -13,7 +13,7 @@ import {
   type IAdministrationItem,
   ServerConfigurationFeatureGroupsService,
 } from '@cloudbeaver/core-administration';
-import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, Context, Effect, Layer, disposeService } from '@cloudbeaver/core-di';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
@@ -39,15 +39,7 @@ const AIDrawerItem = React.lazy(async () => {
   return { default: AIDrawerItem };
 });
 
-@injectable(() => [
-  AdministrationItemService,
-  ServerConfigResource,
-  AISettingsService,
-  CommonDialogService,
-  ServerConfigurationConfigurationService,
-  ServerConfigurationFeatureGroupsService,
-])
-export class AIAdministrationBootstrap extends Bootstrap {
+export class AIAdministrationBootstrapImpl extends Bootstrap {
   administrationItem!: IAdministrationItem;
 
   constructor(
@@ -99,3 +91,60 @@ export class AIAdministrationBootstrap extends Bootstrap {
 
   override async load(): Promise<void> {}
 }
+
+export type AIAdministrationBootstrap = AIAdministrationBootstrapImpl;
+
+export class AIAdministrationBootstrapDI extends Context.Service<AIAdministrationBootstrapDI, AIAdministrationBootstrapImpl>()(
+  '@cloudbeaver/plugin-ai-administration/AIAdministrationBootstrap#AIAdministrationBootstrap',
+) {
+  static readonly implementation = AIAdministrationBootstrapImpl;
+  static readonly dependencies = () =>
+    [
+      AdministrationItemService,
+      ServerConfigResource,
+      AISettingsService,
+      CommonDialogService,
+      ServerConfigurationConfigurationService,
+      ServerConfigurationFeatureGroupsService,
+    ] as const;
+  static readonly make: Effect.Effect<
+    AIAdministrationBootstrapImpl,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof AISettingsService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ServerConfigurationConfigurationService>
+    | Context.Service.Identifier<typeof ServerConfigurationFeatureGroupsService>
+  > = Effect.gen(function* makeAIAdministrationBootstrap() {
+    const administrationItemService = yield* AdministrationItemService;
+    const serverConfigResource = yield* ServerConfigResource;
+    const aiSettingsService = yield* AISettingsService;
+    const commonDialogService = yield* CommonDialogService;
+    const serverConfigurationConfigurationService = yield* ServerConfigurationConfigurationService;
+    const serverConfigurationFeatureGroupsService = yield* ServerConfigurationFeatureGroupsService;
+    return new AIAdministrationBootstrapImpl(
+      administrationItemService,
+      serverConfigResource,
+      aiSettingsService,
+      commonDialogService,
+      serverConfigurationConfigurationService,
+      serverConfigurationFeatureGroupsService,
+    );
+  });
+  static readonly layer: Layer.Layer<
+    AIAdministrationBootstrapDI,
+    never,
+    | Context.Service.Identifier<typeof AdministrationItemService>
+    | Context.Service.Identifier<typeof ServerConfigResource>
+    | Context.Service.Identifier<typeof AISettingsService>
+    | Context.Service.Identifier<typeof CommonDialogService>
+    | Context.Service.Identifier<typeof ServerConfigurationConfigurationService>
+    | Context.Service.Identifier<typeof ServerConfigurationFeatureGroupsService>
+  > = Layer.effect(
+    this,
+    Effect.acquireRelease(this.make, value => Effect.promise(() => disposeService(value))),
+  );
+}
+
+export const AIAdministrationBootstrap = AIAdministrationBootstrapDI;

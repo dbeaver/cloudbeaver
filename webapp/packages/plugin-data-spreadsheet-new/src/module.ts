@@ -6,29 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Bootstrap, Dependency, ModuleRegistry, proxy } from '@cloudbeaver/core-di';
+import { ModuleRegistry } from '@cloudbeaver/core-di';
+import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
+import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
+import { DataGridContextMenuGenerateSqlService } from './DataGrid/DataGridContextMenu/DataGridContextMenuGenerateSqlService.js';
+import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
+import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
+import { DataGridSettingsService } from './DataGridSettingsService.js';
 import { LocaleService } from './LocaleService.js';
 import { SpreadsheetBootstrap } from './SpreadsheetBootstrap.js';
-import { DataGridSettingsService } from './DataGridSettingsService.js';
-import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
-import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
-import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
-import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
-import { DataGridContextMenuGenerateSqlService } from './DataGrid/DataGridContextMenu/DataGridContextMenuGenerateSqlService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-data-spreadsheet-new',
 
-  configure: serviceCollection => {
-    serviceCollection
-      .addSingleton(Dependency, proxy(DataGridSettingsService))
-      .addSingleton(Bootstrap, SpreadsheetBootstrap)
-      .addSingleton(Bootstrap, LocaleService)
-      .addSingleton(DataGridContextMenuCellEditingService)
-      .addSingleton(DataGridSettingsService)
-      .addSingleton(DataGridContextMenuSaveContentService)
-      .addSingleton(DataGridContextMenuGenerateSqlService)
-      .addSingleton(DataGridContextMenuOrderService)
-      .addSingleton(DataGridContextMenuFilterService);
-  },
+  services: () => [
+    DataGridContextMenuCellEditingService,
+    DataGridSettingsService,
+    DataGridContextMenuSaveContentService,
+    DataGridContextMenuGenerateSqlService,
+    DataGridContextMenuOrderService,
+    DataGridContextMenuFilterService,
+  ],
+  bootstraps: () => [SpreadsheetBootstrap, LocaleService],
 });
