@@ -46,6 +46,7 @@ import {
   SqlDataSourceService,
   SqlEditorModelService,
   SqlEditorService,
+  SqlQueryService,
   SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 
@@ -69,6 +70,7 @@ const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(
   ContainerResource,
   CommonDialogService,
   SqlEditorModelService,
+  SqlQueryService,
 ])
 export class SqlEditorTabService extends Bootstrap {
   get sqlEditorTabs(): ITab<ISqlEditorTabState>[] {
@@ -92,6 +94,7 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly containerResource: ContainerResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly sqlEditorModelService: SqlEditorModelService,
+    private readonly sqlQueryService: SqlQueryService,
   ) {
     super();
 
@@ -536,7 +539,7 @@ export class SqlEditorTabService extends Bootstrap {
       );
 
       try {
-        await executionContext.cancel();
+        await this.sqlQueryService.cancelQueries(editorTab.handlerState);
         canCloseTabs = await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
       } finally {
         notification.close(false);
