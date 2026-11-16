@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent, ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
@@ -505,7 +505,37 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleCanTabClose(editorTab: ITab<ISqlEditorTabState>) {
-    const canCloseTabs = await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
+    const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
+    const executionContext = dataSource?.executionContext && this.connectionExecutionContextService.get(dataSource.executionContext.id);
+    let canCloseTabs: boolean;
+
+    if (executionContext?.executing) {
+      const { status } = await this.commonDialogService.open(ConfirmationDialog, {
+        title: 'plugin_sql_editor_navigation_tab_query_cancel_confirmation_title',
+        subTitle: this.sqlEditorService.getName(editorTab.handlerState),
+        message: 'plugin_sql_editor_navigation_tab_query_cancel_confirmation_message',
+        confirmActionText: 'ui_close',
+      });
+
+      if (status !== DialogueStateResult.Resolved) {
+        return false;
+      }
+
+      const { notification } = this.notificationService.processNotification(
+        () => ProcessSnackbar,
+        {},
+        { title: 'plugin_sql_editor_navigation_tab_closing_scripts' },
+      );
+
+      try {
+        await executionContext.cancel();
+        canCloseTabs = await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
+      } finally {
+        notification.close(false);
+      }
+    } else {
+      canCloseTabs = await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
+    }
 
     if (!canCloseTabs) {
       return false;
@@ -516,8 +546,6 @@ export class SqlEditorTabService extends Bootstrap {
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return false;
     }
-
-    const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
 
     if (dataSource?.isSaved === false && !dataSource?.isReadonly()) {
       const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
