@@ -165,7 +165,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Conexões'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Pesquisar por nome da conexão...'],
   ['administration_teams_team_granted_connections_empty', 'Nenhuma conexão disponível'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Equipe padrão. Não pode ser revogada'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Equipe padrão. O usuário não pode ser removido'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Equipe padrão. Contém todos os usuários'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Supervisor'],
   [
