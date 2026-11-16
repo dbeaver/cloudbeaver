@@ -1,4 +1,10 @@
 export default [
+  ['plugin_sql_editor_navigation_tab_disconnect_confirmation_title', 'Отключить соединение'],
+  [
+    'plugin_sql_editor_navigation_tab_disconnect_confirmation_message',
+    'Запрос ещё выполняется. Отключение соединения отменит его выполнение. Отключить соединение?',
+  ],
+  ['plugin_sql_editor_navigation_tab_disconnecting', 'Отключение соединения'],
   ['plugin_sql_editor_navigation_tab_closing_scripts', 'Закрытие SQL-скриптов'],
   ['plugin_sql_editor_navigation_tab_query_cancel_confirmation_title', 'Закрыть SQL-редактор'],
   [

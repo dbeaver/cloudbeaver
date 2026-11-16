@@ -494,7 +494,7 @@ export class SqlEditorTabService extends Bootstrap {
           continue;
         }
 
-        const canDisconnect = await this.handleCanTabClose(tab);
+        const canDisconnect = await this.handleCanTabClose(tab, 'disconnect');
 
         if (!canDisconnect) {
           ExecutorInterrupter.interrupt(contexts);
@@ -504,17 +504,23 @@ export class SqlEditorTabService extends Bootstrap {
     }
   }
 
-  private async handleCanTabClose(editorTab: ITab<ISqlEditorTabState>) {
+  private async handleCanTabClose(editorTab: ITab<ISqlEditorTabState>, action: 'close' | 'disconnect' = 'close') {
     const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
     const executionContext = dataSource?.executionContext && this.connectionExecutionContextService.get(dataSource.executionContext.id);
     let canCloseTabs: boolean;
 
     if (executionContext?.executing) {
       const { status } = await this.commonDialogService.open(ConfirmationDialog, {
-        title: 'plugin_sql_editor_navigation_tab_query_cancel_confirmation_title',
+        title:
+          action === 'close'
+            ? 'plugin_sql_editor_navigation_tab_query_cancel_confirmation_title'
+            : 'plugin_sql_editor_navigation_tab_disconnect_confirmation_title',
         subTitle: this.sqlEditorService.getName(editorTab.handlerState),
-        message: 'plugin_sql_editor_navigation_tab_query_cancel_confirmation_message',
-        confirmActionText: 'ui_close',
+        message:
+          action === 'close'
+            ? 'plugin_sql_editor_navigation_tab_query_cancel_confirmation_message'
+            : 'plugin_sql_editor_navigation_tab_disconnect_confirmation_message',
+        confirmActionText: action === 'close' ? 'ui_close' : 'ui_yes',
       });
 
       if (status !== DialogueStateResult.Resolved) {
@@ -524,7 +530,9 @@ export class SqlEditorTabService extends Bootstrap {
       const { notification } = this.notificationService.processNotification(
         () => ProcessSnackbar,
         {},
-        { title: 'plugin_sql_editor_navigation_tab_closing_scripts' },
+        {
+          title: action === 'close' ? 'plugin_sql_editor_navigation_tab_closing_scripts' : 'plugin_sql_editor_navigation_tab_disconnecting',
+        },
       );
 
       try {

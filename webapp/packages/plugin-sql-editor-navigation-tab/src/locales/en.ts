@@ -1,4 +1,10 @@
 export default [
+  ['plugin_sql_editor_navigation_tab_disconnect_confirmation_title', 'Disconnect'],
+  [
+    'plugin_sql_editor_navigation_tab_disconnect_confirmation_message',
+    'A query is still running. Disconnecting will cancel it. Do you want to disconnect?',
+  ],
+  ['plugin_sql_editor_navigation_tab_disconnecting', 'Disconnecting'],
   ['plugin_sql_editor_navigation_tab_closing_scripts', 'Closing SQL script(s)'],
   ['plugin_sql_editor_navigation_tab_action_sql_editor_new', 'SQL'],
   ['plugin_sql_editor_navigation_tab_action_sql_editor_new_tooltip', 'Open SQL Editor'],
