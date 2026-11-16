@@ -1,24 +1,25 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { BottomPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
-import { MENU_TOOLS, ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
+import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_LOG_VIEWER_ENABLE } from '../Actions/ACTION_LOG_VIEWER_ENABLE.js';
-import { LogViewerService } from './LogViewerService.js';
+import { LOG_VIEWER_TAB_ID, LogViewerService } from './LogViewerService.js';
 
 const LogViewer = importLazyComponent(() => import('./LogViewer.js').then(m => m.LogViewer));
 
-@injectable(() => [ToolsPanelService, MenuService, ActionService, LogViewerService])
+@injectable(() => [BottomPanelService, MenuService, ActionService, LogViewerService])
 export class LogViewerBootstrap extends Bootstrap {
   constructor(
-    private readonly toolsPanelService: ToolsPanelService,
+    private readonly bottomPanelService: BottomPanelService,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
     private readonly logViewerService: LogViewerService,
@@ -44,15 +45,15 @@ export class LogViewerBootstrap extends Bootstrap {
       handler: (context, action) => {
         switch (action) {
           case ACTION_LOG_VIEWER_ENABLE: {
-            this.logViewerService.toggle();
+            this.logViewerService.toggleTab();
             break;
           }
         }
       },
     });
 
-    this.toolsPanelService.tabsContainer.add({
-      key: 'log-viewer-tab',
+    this.bottomPanelService.tabsContainer.add({
+      key: LOG_VIEWER_TAB_ID,
       order: 0,
       name: 'plugin_log_viewer_action_enable_label',
       isHidden: () => this.logViewerService.disabled || !this.logViewerService.isActive,
