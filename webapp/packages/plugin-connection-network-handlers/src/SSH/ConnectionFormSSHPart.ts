@@ -24,9 +24,11 @@ import {
 import { toJS } from 'mobx';
 import type { ConnectionFormOptionsPart, IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
+import type { IConnectionFormNetworkHandlerPart } from '../IConnectionFormNetworkHandlerPart.js';
+
 const getDefaultState = (): INetworkHandlerConfig => SSH_DEFAULT_HANDLER_CONFIG() as INetworkHandlerConfig;
 
-export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
+export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> implements IConnectionFormNetworkHandlerPart {
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly networkHandlerResource: NetworkHandlerResource,
@@ -46,6 +48,17 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
 
   getConfig(): NetworkHandlerConfigInput {
     return getSSHHandlerConfig(this.state, this.initialState, this.optionsPart.state.sharedCredentials);
+  }
+
+  resetToDefaults(): void {
+    const state = getDefaultState();
+    const handler = this.networkHandlerResource.get(SSH_TUNNEL_ID);
+
+    if (handler) {
+      this.copyInitialHandlerProperties(handler, state);
+    }
+
+    this.setState(state);
   }
 
   override isOutdated(): boolean {

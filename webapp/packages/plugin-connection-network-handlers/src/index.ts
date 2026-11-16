@@ -8,4 +8,5 @@
 
 import './module.js';
 export * from './FEATURE_SSH_ID.js';
+export * from './IConnectionFormNetworkHandlerPart.js';
 export * from './SSH/getConnectionFormSSHPart.js';

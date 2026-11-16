@@ -153,7 +153,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', '接続'],
   ['administration_teams_team_granted_connections_search_placeholder', '接続名を検索...'],
   ['administration_teams_team_granted_connections_empty', '利用可能な接続がありません'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', '既定のチーム。取り消しできません'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', '既定のチーム。ユーザーをチームから削除できません'],
   ['plugin_authentication_administration_team_default_users_tooltip', '既定のチーム。すべてのユーザーを含みます'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'スーパーバイザー'],
   ['plugin_authentication_administration_team_user_team_role_supervisor_description', 'スーパーバイザーは、チームが実行したクエリを閲覧できます'],
