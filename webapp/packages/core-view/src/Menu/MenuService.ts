@@ -21,6 +21,7 @@ import type { IMenuItemsCreator, IMenuItemsCreatorOptions, MenuCreatorItem } fro
 import type { IMenuActionItem } from './MenuItem/IMenuActionItem.js';
 import type { IMenuItem } from './MenuItem/IMenuItem.js';
 import { MenuActionItem } from './MenuItem/MenuActionItem.js';
+import { MenuSeparatorItem } from './MenuItem/MenuSeparatorItem.js';
 import { MenuSubMenuItem } from './MenuItem/MenuSubMenuItem.js';
 
 @injectable(() => [ActionService])
@@ -128,6 +129,25 @@ export class MenuService {
           return true;
         }),
     );
+  }
+
+  /** Returns true only when menu and item loaders are ready and there are no visible items. */
+  isEmpty(context: IDataContextProvider): boolean {
+    const creators = this.getMenuItemCreators(context);
+    const loaders = this.getMenuItemLoaders(context, creators);
+    const menu = context.getOwn(DATA_CONTEXT_MENU);
+
+    if (menu) {
+      loaders.push(...flat([this.getHandler(context)?.getLoader?.(context, menu)]).filter(isNotNullDefined));
+    }
+
+    if (loaders.some(loader => !loader.isLoaded() || loader.isLoading() || loader.isOutdated?.() || loader.isError() || loader.isCancelled?.())) {
+      return false;
+    }
+
+    const hasVisibleItems = this.getMenu(context, creators).some(item => !(item instanceof MenuSeparatorItem) && !item.hidden);
+
+    return !hasVisibleItems;
   }
 
   getMenu(context: IDataContextProvider, itemCreators: MenuCreatorItem[]): IMenuItem[] {
