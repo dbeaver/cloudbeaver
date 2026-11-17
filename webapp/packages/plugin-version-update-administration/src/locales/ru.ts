@@ -1,17 +1,17 @@
 export default [
   ['plugin_version_update_administration_release_notes', 'Описание изменений'],
-  ['plugin_version_update_administration_release_notes_description', 'Включает изменения хотфиксов до выбранной версии и изменения базового релиза.'],
+  ['plugin_version_update_administration_release_notes_description', 'Включает изменения патчей до выбранной версии и изменения базового релиза.'],
   ['plugin_version_update_administration_base_release', 'Базовый релиз'],
   // Badge identifying the version selected in the update selector.
   ['plugin_version_update_administration_selected_version', 'Выбранная версия'],
-  ['plugin_version_update_administration_hotfix_title', 'Доступны hotfix-исправления'],
+  ['plugin_version_update_administration_hotfix_title', 'Доступны важные патчи — требуется обновление'],
   [
     'plugin_version_update_administration_hotfix_description',
-    'Установите hotfix или более новую версию приложения, чтобы получить последние исправления.',
+    'В вашей версии отсутствуют важные исправления. Установите последний патч или более новую версию приложения как можно скорее.',
   ],
-  ['plugin_version_update_administration_hotfix_details', 'Подробнее'],
-  ['plugin_version_update_administration_hotfix_dismiss', 'Скрыть уведомление о hotfix'],
-  ['plugin_version_update_administration_hotfix_label', 'Hotfix'],
+  ['plugin_version_update_administration_hotfix_details', 'Подробнее об обновлении'],
+  ['plugin_version_update_administration_hotfix_dismiss', 'Скрыть уведомление о патче'],
+  ['plugin_version_update_administration_hotfix_label', 'Патч'],
   ['plugin_version_update_administration_version_selector_label', 'Версия'],
   ['plugin_version_update_administration_recommendations_label', 'Рекомендации'],
   [
