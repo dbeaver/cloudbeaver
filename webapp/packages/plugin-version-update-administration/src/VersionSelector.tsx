@@ -35,7 +35,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   const instructionLink = versionUpdateService.instructionLink;
 
   return (
-    <Container gap>
+    <Container gap large>
       <Group className={s(style, { group: true })} gap large>
         <Select
           items={versions}

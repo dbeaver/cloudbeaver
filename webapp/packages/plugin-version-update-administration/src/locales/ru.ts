@@ -1,4 +1,9 @@
 export default [
+  ['plugin_version_update_administration_release_notes', 'Описание изменений'],
+  ['plugin_version_update_administration_release_notes_description', 'Включает изменения хотфиксов до выбранной версии и изменения базового релиза.'],
+  ['plugin_version_update_administration_base_release', 'Базовый релиз'],
+  // Badge identifying the version selected in the update selector.
+  ['plugin_version_update_administration_selected_version', 'Выбранная версия'],
   ['plugin_version_update_administration_hotfix_title', 'Доступны hotfix-исправления'],
   [
     'plugin_version_update_administration_hotfix_description',

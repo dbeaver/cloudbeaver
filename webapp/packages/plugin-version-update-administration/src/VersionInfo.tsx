@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useId } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import { Container, Group, GroupItem, GroupTitle, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { VersionResource } from '@cloudbeaver/core-version';
+import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 
 import styles from './VersionInfo.module.css';
 
@@ -21,17 +22,42 @@ interface Props {
 export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
   const translate = useTranslate();
   const style = useS(styles);
+  const titleId = useId();
+  const versionService = useService(VersionService);
   const versionResource = useService(VersionResource);
   useResource(VersionInfo, VersionResource, item);
   const versions = versionResource.getReleaseNotes(item);
+  const hasHotfixes = versions.some(version => versionService.isHotfix(version.number));
 
   return (
-    <Container wrap gap overflow large>
-      {versions.length === 0 && <GroupTitle>{translate('version_update_version_no_info')}</GroupTitle>}
+    <Group className={s(style, { group: true })} aria-labelledby={titleId} large>
+      <GroupTitle id={titleId} className={s(style, { title: true })}>
+        {versions.length > 0
+          ? `${translate('plugin_version_update_administration_release_notes')} · ${item}`
+          : translate('version_update_version_no_info')}
+      </GroupTitle>
+      {hasHotfixes && (
+        <p className={s(style, { description: true })}>{translate('plugin_version_update_administration_release_notes_description')}</p>
+      )}
       {versions.map(version => (
-        <Group key={version.number} className={s(style, { group: true })} gap overflow>
-          <GroupTitle>{`Release notes ${version.number}${version.date ? ` - ${version.date}` : ''}`}</GroupTitle>
-          <GroupItem>
+        <section key={version.number} className={s(style, { section: true })} aria-labelledby={`${titleId}-${version.number}`}>
+          <header className={s(style, { heading: true })}>
+            <h3 id={`${titleId}-${version.number}`}>{version.number}</h3>
+            {hasHotfixes && (
+              <span className={s(style, { badge: true })}>
+                {translate(
+                  versionService.isHotfix(version.number)
+                    ? 'plugin_version_update_administration_hotfix_label'
+                    : 'plugin_version_update_administration_base_release',
+                )}
+              </span>
+            )}
+            {hasHotfixes && version.number === item && (
+              <span className={s(style, { badge: true, selected: true })}>{translate('plugin_version_update_administration_selected_version')}</span>
+            )}
+            {version.date && <span>{version.date}</span>}
+          </header>
+          <div className={s(style, { notes: true })}>
             <ReactMarkdown
               components={{
                 p: ({ node, ...props }) => <p className="tw:mb-4" {...props} />,
@@ -42,9 +68,9 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
             >
               {version.releaseNotes}
             </ReactMarkdown>
-          </GroupItem>
-        </Group>
+          </div>
+        </section>
       ))}
-    </Container>
+    </Group>
   );
 });
