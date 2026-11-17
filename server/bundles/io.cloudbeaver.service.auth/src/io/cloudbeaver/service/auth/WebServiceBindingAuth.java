@@ -21,6 +21,7 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.auth.impl.WebServiceAuthImpl;
+import org.jkiss.code.NotNull;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Map;
@@ -37,7 +38,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
     }
 
     @Override
-    public void bindWiring(DBWBindingContext model) {
+    public void bindWiring(@NotNull DBWBindingContext model) {
         model.getQueryType()
             .dataFetcher("authLogin", env -> getService(env).authLogin(
                 GraphQLEndpoint.getServletRequestOrThrow(env),
@@ -66,11 +67,6 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                     getArgument(env, "configuration"));
                 return true;
             })
-            .dataFetcher("authUpdateStatus", env -> getService(env).authUpdateStatus(
-                getWebSession(env, false),
-                getArgumentVal(env, "authId"),
-                CommonUtils.toBoolean(getArgument(env, "linkUser"))
-            ))
             .dataFetcher("activeUser", env -> getService(env).activeUser(getWebSession(env, false)))
             .dataFetcher("authProviders", env -> getService(env).getAuthProviders(GraphQLEndpoint.getServletRequestOrThrow(env)))
             .dataFetcher("authChangeLocalPassword", env -> getService(env).changeLocalPassword(

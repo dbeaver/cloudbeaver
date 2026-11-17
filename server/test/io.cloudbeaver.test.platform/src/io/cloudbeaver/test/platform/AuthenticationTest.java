@@ -20,6 +20,9 @@ import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.auth.WebAsyncAuthJob;
 import io.cloudbeaver.test.WebGQLClient;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -78,6 +81,54 @@ public class AuthenticationTest extends CloudbeaverMockTest {
         query setUserCredentials($userId: ID!, $providerId: ID!, $credentials: Object!) {
           result: setUserCredentials(userId: $userId, providerId: $providerId, credentials: $credentials)
         }""";
+
+    @Test
+    public void testLegacyAuthUpdateStatusIsUnavailable() throws Exception {
+        WebGQLClient client = CEAppStarter.createClient();
+        client.sendQuery(GQL_OPEN_SESSION, null);
+        Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
+
+        DBException error = Assertions.assertThrows(DBException.class, () -> client.sendQuery(
+            "query { result: authUpdateStatus(authId: \"foreign-auth-attempt\") { authStatus } }", null
+        ));
+
+        Assertions.assertTrue(error.getMessage().contains("authUpdateStatus"));
+        Assertions.assertTrue(error.getMessage().contains("FieldUndefined"));
+        Assertions.assertEquals(activeUser, client.sendQuery(GQL_ACTIVE_USER, null));
+    }
+
+    @Test
+    public void testFederatedAuthTaskCannotBeReadFromAnotherSession() throws Exception {
+        WebGQLClient ownerClient = CEAppStarter.createClient();
+        ownerClient.sendQuery(GQL_OPEN_SESSION, null);
+        WebSession ownerSession = (WebSession) CEAppStarter.getTestApp().getSessionManager()
+            .getSession(ownerClient.getSessionIdCookie());
+        WebAsyncTaskInfo task = ownerSession.createAsyncTask("Federated authentication test");
+        WebAsyncAuthJob job = new WebAsyncAuthJob("SSO", "test-auth-attempt", false);
+        job.setAuthResult(List.of());
+        task.setJob(job);
+
+        WebGQLClient otherClient = CEAppStarter.createClient();
+        otherClient.sendQuery(GQL_OPEN_SESSION, null);
+        Map<String, Object> activeUser = otherClient.sendQuery(GQL_ACTIVE_USER, null);
+        String query = """
+            query federatedAuthTaskResult($taskId: String!) {
+              result: federatedAuthTaskResult(taskId: $taskId) {
+                userTokens { authProvider }
+              }
+            }""";
+        Map<String, Object> variables = Map.of("taskId", task.getId());
+
+        Assertions.assertThrows(DBException.class, () -> otherClient.sendQuery("""
+            mutation asyncTaskInfo($taskId: String!) {
+              result: asyncTaskInfo(id: $taskId, removeOnFinish: true) { id running }
+            }""", variables));
+        Assertions.assertThrows(DBException.class, () -> otherClient.sendQuery(query, variables));
+        Assertions.assertEquals(activeUser, otherClient.sendQuery(GQL_ACTIVE_USER, null));
+        Assertions.assertSame(task, ownerSession.asyncTaskStatus(task.getId(), false));
+        Map<String, Object> result = ownerClient.sendQuery(query, variables);
+        Assertions.assertEquals(List.of(), result.get("userTokens"));
+    }
 
     @Test
     public void testLoginUser() throws Exception {

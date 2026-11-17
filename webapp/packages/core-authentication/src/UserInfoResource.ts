@@ -11,7 +11,16 @@ import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ISyncExecutor, type ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { type FederatedAuthInfo, type AuthInfo, type AuthLogoutQuery, AuthStatus, GraphQLService, type UserInfo } from '@cloudbeaver/core-sdk';
+import {
+  type AsyncTaskInfo,
+  type FederatedAuthInfo,
+  type AuthInfo,
+  type AuthLogoutQuery,
+  AuthStatus,
+  GraphQLService,
+  ServerInternalError,
+  type UserInfo,
+} from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthProviderService } from './AuthProviderService.js';
@@ -142,39 +151,34 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     return result;
   }
 
-  autoLogin(authId: string, linkUser?: boolean): ITask<UserInfo | null> {
-    let activeTask: ITask<AuthInfo> | undefined;
+  autoLogin(taskId: string): ITask<UserInfo | null> {
+    let activeTask: ITask<AsyncTaskInfo> | undefined;
 
     return new AutoRunningTask<UserInfo | null>(
       async () => {
-        activeTask = whileTask<AuthInfo>(
-          authInfo => {
-            if (authInfo.authStatus === AuthStatus.Success) {
-              return true;
-            } else if (authInfo.authStatus === AuthStatus.Error) {
-              throw new Error('Authentication error');
+        activeTask = whileTask<AsyncTaskInfo>(
+          taskInfo => {
+            if (taskInfo.error) {
+              throw new ServerInternalError(taskInfo.error);
             }
 
-            return false;
+            return !taskInfo.running;
           },
           async () => {
-            const { authInfo } = await this.graphQLService.sdk.getAuthStatus({
-              authId,
-              linkUser,
+            const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({
+              taskId,
+              removeOnFinish: true,
             });
 
-            return authInfo as AuthInfo;
+            return taskInfo;
           },
           1000,
           undefined,
           5 * 60 * 1000,
         );
 
-        const authInfo = await activeTask;
-
-        if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-          await this.syncData();
-        }
+        await activeTask;
+        await this.syncData();
 
         return this.data;
       },
