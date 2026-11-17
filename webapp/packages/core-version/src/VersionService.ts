@@ -52,7 +52,7 @@ export class VersionService {
   }
 
   parseVersion(version: string) {
-    return parseProductVersion(version)?.base ?? null;
+    return parseProductVersion(version);
   }
 
   isHotfix(version: string): boolean {

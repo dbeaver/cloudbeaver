@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Select, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { type IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
+import { type IVersion, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
+import { ProductInfoService } from '@cloudbeaver/plugin-product-information-administration';
 
 import { VersionInfo } from './VersionInfo.js';
 import styles from './VersionSelector.module.css';
@@ -23,21 +24,13 @@ interface Props {
 
 export const VersionSelector = observer<Props>(function VersionSelector({ versions }) {
   const versionUpdateService = useService(VersionUpdateService);
-  const versionResource = useService(VersionResource);
+  const administrationScreenService = useService(AdministrationScreenService);
   const versionService = useService(VersionService);
   const serverConfigResource = useService(ServerConfigResource);
   const translate = useTranslate();
   const style = useS(styles);
 
-  const [selected, setSelected] = useState('');
-
-  useEffect(() => {
-    if (versionResource.latest?.number) {
-      setSelected(versionResource.latest.number);
-    }
-  }, [versionResource.latest?.number]);
-
-  const version = versions.find(v => v.number === selected);
+  const version = versions.find(v => v.number === administrationScreenService.activeScreen?.param) ?? versions[0];
   const Instruction = versionUpdateService.versionInstructionGetter?.();
   const instructionLink = versionUpdateService.instructionLink;
 
@@ -52,9 +45,9 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
               ? `${value.number} · ${translate('plugin_version_update_administration_hotfix_label')}`
               : value.number
           }
-          value={selected}
+          value={version?.number ?? ''}
           tiny
-          onSelect={value => setSelected(value)}
+          onSelect={value => administrationScreenService.navigateToItemSub(ProductInfoService.PAGE_NAME, 'version-update', value)}
         >
           {translate('plugin_version_update_administration_version_selector_label')}
         </Select>

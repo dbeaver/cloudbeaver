@@ -53,7 +53,7 @@ export const HotfixBanner = observer(function HotfixBanner() {
         size="small"
         variant="secondary"
         aria-describedby={titleId}
-        onClick={() => administrationScreenService.navigateToItemSub(ProductInfoService.PAGE_NAME, 'version-update')}
+        onClick={() => administrationScreenService.navigateToItemSub(ProductInfoService.PAGE_NAME, 'version-update', version)}
       >
         {translate('plugin_version_update_administration_hotfix_details')}
       </Button>

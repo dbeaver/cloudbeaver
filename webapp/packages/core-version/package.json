@@ -27,9 +27,9 @@
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "compare-versions": "^6.1.1",
     "mobx": "^6",
     "react": "^19",
-    "semver": "^7",
     "tslib": "^2"
   },
   "devDependencies": {
@@ -38,7 +38,6 @@
     "@dbeaver/cli": "workspace:*",
     "@dbeaver/react-tests": "workspace:*",
     "@types/react": "^19",
-    "@types/semver": "^7",
     "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^4"

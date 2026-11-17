@@ -15,11 +15,15 @@ describe('parseProductVersion', () => {
     { version: '26.2.0.0', release: '26.2.0', hotfixVersion: 0 },
     { version: '26.2.0.10', release: '26.2.0.10', hotfixVersion: 10 },
     { version: ' v26.2.0.1 ', release: '26.2.0.1', hotfixVersion: 1 },
+    { version: '26.2.0.1.202611131559', release: '26.2.0.1', hotfixVersion: 1 },
+    { version: '26.2.0.10.20261113155930', release: '26.2.0.10', hotfixVersion: 10 },
   ])('parses the release and hotfix number from "$version"', ({ version, release, hotfixVersion }) => {
     expect(parseProductVersion(version)).toMatchObject({
       release,
       hotfixVersion,
-      base: { major: 26, minor: 2, patch: 0 },
+      major: 26,
+      minor: 2,
+      patch: 0,
     });
   });
 
@@ -27,7 +31,7 @@ describe('parseProductVersion', () => {
     expect(parseProductVersion('26.2.0.1-beta.2+build.7')).toMatchObject({
       release: '26.2.0.1',
       hotfixVersion: 1,
-      base: { prerelease: ['beta', 2], build: ['build', '7'] },
+      version: '26.2.0.1-beta.2+build.7',
     });
   });
 
@@ -64,6 +68,7 @@ describe('compareProductVersions', () => {
     ['26.2.0.1+build.1', '26.2.0.1+build.2'],
     ['26.2.0.202610091857', '26.2.0'],
     ['26.2.0.20261009185730', '26.2.0'],
+    ['26.2.0.1.202611131559', '26.2.0.1'],
   ])('treats %s and %s as the same release', (first, second) => {
     expect(compareProductVersions(first, second)).toBe(0);
     expect(compareProductVersions(second, first)).toBe(0);

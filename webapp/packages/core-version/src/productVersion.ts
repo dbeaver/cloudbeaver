@@ -5,10 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { parse, type SemVer } from 'semver';
+import { compareVersions, validateStrict } from 'compare-versions';
 
-export function parseProductVersion(version: string): { base: SemVer; hotfixVersion: number; release: string } | null {
-  const match = /^v?(\d+\.\d+\.\d+)(?:\.(0|[1-9]\d*))?((?:[-+].*)?)$/.exec(version.trim());
+export interface IParsedProductVersion {
+  major: number;
+  minor: number;
+  patch: number;
+  hotfixVersion: number;
+  release: string;
+  version: string;
+}
+
+export function parseProductVersion(version: string): IParsedProductVersion | null {
+  const match = /^v?(\d+\.\d+\.\d+)(?:\.(0|[1-9]\d*))?(?:\.\d{12}(?:\d{2})?)?((?:[-+].*)?)$/.exec(version.trim());
 
   if (!match) {
     return null;
@@ -17,16 +26,21 @@ export function parseProductVersion(version: string): { base: SemVer; hotfixVers
   // OSGi build timestamps are qualifiers, not hotfix numbers.
   const buildQualifier = /^\d{12}(?:\d{2})?$/.test(match[2] ?? '');
   const hotfixVersion = buildQualifier ? 0 : Number(match[2] ?? 0);
-  const base = parse(`${match[1]}${match[3]}`);
+  const [major, minor, patch] = match[1]!.split('.').map(Number);
 
-  if (!base || !Number.isSafeInteger(hotfixVersion)) {
+  if (!validateStrict(`${match[1]}${match[3]}`) || ![major, minor, patch, hotfixVersion].every(Number.isSafeInteger)) {
     return null;
   }
 
+  const release = `${match[1]}${hotfixVersion > 0 ? `.${hotfixVersion}` : ''}`;
+
   return {
-    base,
+    major: major!,
+    minor: minor!,
+    patch: patch!,
     hotfixVersion,
-    release: `${match[1]}${hotfixVersion > 0 ? `.${hotfixVersion}` : ''}`,
+    release,
+    version: `${release}${match[3]}`,
   };
 }
 
@@ -38,5 +52,5 @@ export function compareProductVersions(first: string, second: string): number {
     return NaN;
   }
 
-  return a.base.compareMain(b.base) || Math.sign(a.hotfixVersion - b.hotfixVersion) || a.base.comparePre(b.base);
+  return compareVersions(a.version, b.version);
 }

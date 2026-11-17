@@ -5,16 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, observable } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ProductInfoResource } from '@cloudbeaver/core-root';
 
+import { compareProductVersions } from './productVersion.js';
+import { getVersionReleaseNotes, normalizeVersions } from './versionMetadata.js';
+
 export interface IVersion {
   number: string;
   date: string;
   releaseNotes: string;
+  patches?: { patchNumber: number; releaseNotes: string }[];
 }
 
 interface IVersions {
@@ -24,22 +28,22 @@ interface IVersions {
 
 @injectable(() => [ProductInfoResource])
 export class VersionResource extends CachedMapResource<string, IVersion> {
-  private latestVersionNumber: string | null;
-
-  get latest() {
-    return this.values.find(v => v.number === this.latestVersionNumber);
+  get latest(): IVersion | undefined {
+    return this.values.slice().sort((a, b) => compareProductVersions(b.number, a.number))[0];
   }
 
   constructor(private readonly productInfoResource: ProductInfoResource) {
     super();
 
-    this.latestVersionNumber = null;
     this.preloadResource(this.productInfoResource, () => {});
 
-    makeObservable<this, 'latestVersionNumber'>(this, {
-      latestVersionNumber: observable.ref,
+    makeObservable(this, {
       latest: computed,
     });
+  }
+
+  getReleaseNotes(number: string): IVersion[] {
+    return getVersionReleaseNotes(this.values, number);
   }
 
   protected async loader(): Promise<Map<string, IVersion>> {
@@ -54,17 +58,14 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
         cache: 'no-cache',
       });
 
-      const json = (await response.json()) as IVersions;
+      const json = (await response.json()) as IVersions | null;
 
-      if (json.latestVersion) {
-        this.latestVersionNumber = json.latestVersion;
-      }
-
-      if (!json.versions) {
+      if (!Array.isArray(json?.versions)) {
         return this.data;
       }
 
-      this.replace(resourceKeyList(json.versions.map(version => version.number)), json.versions);
+      const versions = normalizeVersions(json.versions);
+      this.replace(resourceKeyList(versions.map(version => version.number)), versions);
     } catch (exception: any) {
       throw new Error('versions_load_fail', { cause: exception });
     }
