@@ -28,6 +28,65 @@ You can see a live demo of CloudBeaver server here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 26.2.5 2026-11-16
+
+- AI Assistant:
+  - Added image attachments to AI Chat, with drag-and-drop, clipboard paste, image previews, and support for PNG, JPEG, GIF, and WebP files.
+  - Added Ollama support for running local AI models.
+  - Unsent AI Chat messages and attachments are now preserved when switching tabs or conversations.
+  - AI Chat now initializes a conversation when opened, allowing an AI profile to be selected before sending the first message.
+  - Restored automatic selection of the AI Chat context scope after connecting to a database.
+  - Fixed an issue that caused AI Chat to stop responding when no database connection was selected.
+  - The AI Profiles section of the user profile now shows only personal profiles.
+- Administration:
+  - Redesigned the server configuration page with separate panels for settings, security, authentication, server information, and drivers.
+  - Redesigned the Users & Teams administration page with updated layouts, icons, and controls.
+  - Added an Unknown source for legacy team memberships, preserving unconfirmed memberships during provider synchronization and protecting manually assigned memberships.
+- Authorization:
+  - Added configurable LDAP attribute mappings to populate users' first and last names on first login.
+  - Added synchronization of mapped team memberships with authentication-provider groups at login and membership-source labels in Users & Teams.
+- SQL Editor:
+  - Added the ability to continue SQL script execution after an error.
+  - Fixed an issue that prevented the selected connection from being saved with a SQL script.
+  - Fixed duplicate error markers when retrying failed SQL statements and improved the display of long error messages.
+  - Added right-click access to context menus for editor and SQL result tabs.
+  - Added SQL generation for multiple objects selected in the Database Navigator.
+- Data Editor:
+  - Fixed incorrect cell rendering when a new query returned different data types in the same column positions.
+  - Fixed an error when dragging a table from the Database Navigator while the Grouping panel was open.
+- Accessibility:
+  - Improved AI Chat accessibility by adding descriptive names for action buttons used by screen readers.
+  - Added descriptive accessible names to search and clear buttons in filter controls.
+  - Improved screen reader support in connection settings.
+  - Authentication requirement messages in connection settings are now announced by screen readers.
+  - Added the collapse-all keyboard shortcut “shift + ctrl/cmd + /” to Cloud Explorer.
+- Connectivity:
+  - Fixed validation of required fields on hidden connection-settings tabs when submitting the form with the keyboard.
+  - Moved "Change current database password" to the Security submenu in the connection context menu.
+  - Fixed driver reinstallation after resetting driver settings to defaults.
+- Data transfer:
+  - Added more CSV header quoting options: always, when necessary, and never.
+- General:
+  - Added server-side storage of user preferences for open tool panels and selected panel and Database Navigator settings, preserving them between sessions even when browser storage is cleared.
+  - Newly opened or selected editor tabs now scroll into view when the tab bar overflows.
+  - Fixed unreadable error-dialog text when the application and system used different themes.
+- Security:
+  - Fixed LDAP access-filter validation to check the authenticating user's own entry rather than matching entries beneath it.
+  - Disabled external SQL formatters in server mode to prevent command execution through formatter preferences.
+  - Restricted shared-project management to Team Edition.
+  - Strengthened authorization checks and prevented refresh-token reuse during session renewal.
+  - Fixed a high-severity vulnerability in the Google Guava library (CVE-2026-102554). The library was updated to version 33.8.0-jre.
+  - Fixed a high-severity vulnerability in the Logback Core library (CVE-2026-13006). The library was updated to version 1.5.38.
+  - Fixed a high-severity vulnerability in the Jetty Security library (CVE-2026-19863). The library was updated to version 12.1.13.
+  - Fixed a high-severity vulnerability in the decode-uri-component library (CVE-2026-118664). The library was updated to version 0.5.1.
+  - Fixed a high-severity vulnerability in the happy-dom library (CVE-2026-115895). The library was updated to version 21.0.4.
+- Databases and drivers:
+  - MariaDB: Updated Connector/J to version 3.5.11 to address CVE-2026-119276, CVE-2026-119281, CVE-2026-119210, and CVE-2026-119277.
+  - PostgreSQL: Updated the JDBC driver to version 42.7.14 to address CVE-2026-107314.
+- Localization:
+  - Expanded more of the application's translations across all supported languages.
+  - Added automatic interface language selection based on browser preferences on first launch in Easy configuration, with English as the fallback.
+
 ### 26.2.4 2026-11-02
 
 - AI Assistant:

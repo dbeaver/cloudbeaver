@@ -34,6 +34,7 @@ import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
 import io.cloudbeaver.test.platform.admin.AdminUserTeamGrantTest;
 import io.cloudbeaver.test.platform.admin.UserTeamGrantMigrationTest;
+import io.cloudbeaver.test.platform.fs.FileSystemMutationTest;
 import io.cloudbeaver.test.platform.fs.FileSystemSecurityTest;
 import io.cloudbeaver.test.platform.sql.*;
 import io.cloudbeaver.utils.WebDataSourceUtilsTest;
@@ -49,6 +50,7 @@ import org.junit.platform.suite.api.Suite;
 //        ConnectionsTest.class,
         SQLQueryTranslatorTest.class,
         AuthenticationTest.class,
+        WebAuthUtilsTest.class,
         LdapAuthenticationTest.class,
         LdapProfileFillTest.class,
         ResourceManagerTest.class,
@@ -57,6 +59,7 @@ import org.junit.platform.suite.api.Suite;
         LocalResourceControllerTest.class,
         NoSessionTest.class,
         ConfigurationModeAccessTest.class,
+        FileSystemMutationTest.class,
         FileSystemSecurityTest.class,
         CBSecretControllerEmbeddedTest.class,
         WebSessionTest.class,
@@ -78,6 +81,7 @@ import org.junit.platform.suite.api.Suite;
         WebSQLDataUpdateTest.class,
         WebSQLQueryDataContainerTest.class,
         WebSQLResultsInfoTest.class,
+        WebSQLResultServletTest.class,
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,
         ForeignKeyNavigationEndpointTest.class,
