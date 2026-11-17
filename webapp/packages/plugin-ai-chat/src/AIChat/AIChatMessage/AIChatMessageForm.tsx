@@ -104,6 +104,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
             placeholder={getPlaceholder()}
             value={state.prompt}
             readOnly={aiChatConversationsService.processing}
+            {...{ writingsuggestions: 'false' }}
             autoFocus
             onChange={value => state.setPrompt(value)}
             onPaste={context.disabled ? undefined : onPaste}
