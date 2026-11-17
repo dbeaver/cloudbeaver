@@ -46,9 +46,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
           items={versions}
           keySelector={value => value.number}
           valueSelector={value =>
-            versionService.isHotfix(value.number)
-              ? `${value.number} · ${translate('plugin_version_update_administration_hotfix_label')}`
-              : value.number
+            versionService.isPatch(value.number) ? `${value.number} · ${translate('plugin_version_update_administration_patch_label')}` : value.number
           }
           value={version?.number ?? ''}
           tiny

@@ -16,9 +16,9 @@ const release = {
 };
 
 const patches = [
-  { patchNumber: 2, releaseNotes: 'Second hotfix' },
-  { patchNumber: 10, releaseNotes: 'Tenth hotfix' },
-  { patchNumber: 1, releaseNotes: 'First hotfix' },
+  { patchNumber: 2, releaseNotes: 'Second patch' },
+  { patchNumber: 10, releaseNotes: 'Tenth patch' },
+  { patchNumber: 1, releaseNotes: 'First patch' },
 ];
 
 describe('normalizeVersions', () => {
@@ -27,7 +27,7 @@ describe('normalizeVersions', () => {
     const versions = normalizeVersions(feed);
 
     expect(versions.map(version => version.number)).toEqual(['26.2.0', '26.2.0.2', '26.2.0.10', '26.2.0.1']);
-    expect(versions[2]).toEqual({ number: '26.2.0.10', date: '', releaseNotes: 'Tenth hotfix' });
+    expect(versions[2]).toEqual({ number: '26.2.0.10', date: '', releaseNotes: 'Tenth patch' });
     expect(feed[0]?.patches).toEqual(patches);
     expect(feed[0]?.number).toBe('26.2.0');
   });
@@ -54,17 +54,17 @@ describe('normalizeVersions', () => {
 });
 
 describe('getLatestVersion', () => {
-  test('uses the advertised release and its highest hotfix rather than a newer unadvertised release', () => {
+  test('uses the advertised release and its highest patch rather than a newer unadvertised release', () => {
     const versions = normalizeVersions([
       { ...release, patches },
-      { ...release, number: '26.3.0', patches: [{ patchNumber: 1, releaseNotes: 'Newer release hotfix' }] },
+      { ...release, number: '26.3.0', patches: [{ patchNumber: 1, releaseNotes: 'Newer release patch' }] },
     ]);
 
     expect(getLatestVersion(versions, '26.2.0')?.number).toBe('26.2.0.10');
     expect(getLatestVersion(versions, '26.3.0')?.number).toBe('26.3.0.1');
   });
 
-  test('preserves the advertised release when there are no hotfixes', () => {
+  test('preserves the advertised release when there are no patches', () => {
     expect(getLatestVersion([release, { ...release, number: '26.3.0' }], '26.2.0')).toEqual(release);
   });
 
@@ -80,16 +80,16 @@ describe('getVersionReleaseNotes', () => {
     { ...release, number: '26.1.0' },
   ]);
 
-  test('includes all preceding hotfix notes and the base release, newest first', () => {
+  test('includes all preceding patch notes and the base release, newest first', () => {
     expect(getVersionReleaseNotes(versions, '26.2.0.10').map(version => version.releaseNotes)).toEqual([
-      'Tenth hotfix',
-      'Second hotfix',
-      'First hotfix',
+      'Tenth patch',
+      'Second patch',
+      'First patch',
       'Base release',
     ]);
   });
 
-  test('excludes later hotfixes and other releases when an older hotfix is selected', () => {
+  test('excludes later patches and other releases when an older patch is selected', () => {
     expect(getVersionReleaseNotes(versions, '26.2.0.1').map(version => version.number)).toEqual(['26.2.0.1', '26.2.0']);
     expect(getVersionReleaseNotes(versions, '26.2.0').map(version => version.number)).toEqual(['26.2.0']);
   });

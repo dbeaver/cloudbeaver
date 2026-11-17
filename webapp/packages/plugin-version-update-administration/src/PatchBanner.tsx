@@ -17,23 +17,23 @@ import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 import { ProductInfoService } from '@cloudbeaver/plugin-product-information-administration';
 import { IconButton } from '@dbeaver/ui-kit';
 
-import { HotfixBannerService } from './HotfixBannerService.js';
-import styles from './HotfixBanner.module.css';
+import { PatchBannerService } from './PatchBannerService.js';
+import styles from './PatchBanner.module.css';
 
-export const HotfixBanner = observer(function HotfixBanner() {
+export const PatchBanner = observer(function PatchBanner() {
   const translate = useTranslate();
   const style = useS(styles);
   const titleId = useId();
-  const hotfixBannerService = useService(HotfixBannerService);
+  const patchBannerService = useService(PatchBannerService);
   const versionUpdateService = useService(VersionUpdateService);
   const administrationScreenService = useService(AdministrationScreenService);
-  useResource(HotfixBanner, VersionResource, CachedMapAllKey, { silent: true });
+  useResource(PatchBanner, VersionResource, CachedMapAllKey, { silent: true });
 
-  const title = translate('plugin_version_update_administration_hotfix_title');
-  const description = translate('plugin_version_update_administration_hotfix_description');
-  const version = versionUpdateService.latestHotfix?.number;
+  const title = translate('plugin_version_update_administration_patch_title');
+  const description = translate('plugin_version_update_administration_patch_description');
+  const version = versionUpdateService.latestPatch?.number;
 
-  if (!hotfixBannerService.visible) {
+  if (!patchBannerService.visible) {
     return null;
   }
 
@@ -55,13 +55,13 @@ export const HotfixBanner = observer(function HotfixBanner() {
         aria-describedby={titleId}
         onClick={() => administrationScreenService.navigateToItemSub(ProductInfoService.PAGE_NAME, 'version-update', version)}
       >
-        {translate('plugin_version_update_administration_hotfix_details')}
+        {translate('plugin_version_update_administration_patch_details')}
       </Button>
       <IconButton
         size="medium"
-        aria-label={translate('plugin_version_update_administration_hotfix_dismiss')}
-        title={translate('plugin_version_update_administration_hotfix_dismiss')}
-        onClick={hotfixBannerService.dismiss}
+        aria-label={translate('plugin_version_update_administration_patch_dismiss')}
+        title={translate('plugin_version_update_administration_patch_dismiss')}
+        onClick={patchBannerService.dismiss}
       >
         <span aria-hidden="true">
           <Icon name="cross" className="tw:size-4" />

@@ -25,7 +25,7 @@ export function normalizeVersions(versions: readonly IVersion[]): IVersion[] {
       const number = `${version.number}.${patch.patchNumber}`;
       const parsed = parseProductVersion(number);
 
-      if (!parsed || parsed.hotfixVersion !== patch.patchNumber) {
+      if (!parsed || parsed.patch !== patch.patchNumber) {
         continue;
       }
 
@@ -56,7 +56,7 @@ export function getVersionReleaseNotes(versions: readonly IVersion[], number: st
       return (
         parsed?.major === selected.major &&
         parsed.minor === selected.minor &&
-        parsed.patch === selected.patch &&
+        parsed.micro === selected.micro &&
         compareProductVersions(version.number, number) <= 0
       );
     })

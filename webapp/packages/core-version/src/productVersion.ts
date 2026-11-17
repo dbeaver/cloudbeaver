@@ -10,38 +10,38 @@ import { compareVersions, validateStrict } from 'compare-versions';
 export interface IParsedProductVersion {
   major: number;
   minor: number;
+  micro: number;
   patch: number;
-  hotfixVersion: number;
   release: string;
   version: string;
 }
 
 export function parseProductVersion(version: string): IParsedProductVersion | null {
-  // Match major.minor.patch, an optional hotfix, an optional 12/14-digit build timestamp,
+  // Match major.minor.micro, an optional patch, an optional 12/14-digit build timestamp,
   // and a prerelease/build suffix (-beta.2/+build.7); also accept a leading "v".
-  // Captures: [1] base release, [2] hotfix (or a legacy build timestamp), [3] suffix.
+  // Captures: [1] base release, [2] patch (or a legacy build timestamp), [3] suffix.
   const match = /^v?(\d+\.\d+\.\d+)(?:\.(0|[1-9]\d*))?(?:\.\d{12}(?:\d{2})?)?((?:[-+].*)?)$/.exec(version.trim());
 
   if (!match) {
     return null;
   }
 
-  // OSGi build timestamps are qualifiers, not hotfix numbers.
+  // OSGi build timestamps are qualifiers, not patch numbers.
   const buildQualifier = /^\d{12}(?:\d{2})?$/.test(match[2] ?? '');
-  const hotfixVersion = buildQualifier ? 0 : Number(match[2] ?? 0);
-  const [major, minor, patch] = match[1]!.split('.').map(Number);
+  const patch = buildQualifier ? 0 : Number(match[2] ?? 0);
+  const [major, minor, micro] = match[1]!.split('.').map(Number);
 
-  if (!validateStrict(`${match[1]}${match[3]}`) || ![major, minor, patch, hotfixVersion].every(Number.isSafeInteger)) {
+  if (!validateStrict(`${match[1]}${match[3]}`) || ![major, minor, micro, patch].every(Number.isSafeInteger)) {
     return null;
   }
 
-  const release = `${match[1]}${hotfixVersion > 0 ? `.${hotfixVersion}` : ''}`;
+  const release = `${match[1]}${patch > 0 ? `.${patch}` : ''}`;
 
   return {
     major: major!,
     minor: minor!,
-    patch: patch!,
-    hotfixVersion,
+    micro: micro!,
+    patch,
     release,
     version: `${release}${match[3]}`,
   };

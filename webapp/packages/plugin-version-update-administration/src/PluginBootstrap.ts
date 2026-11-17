@@ -15,7 +15,7 @@ import { ProductInfoService } from '@cloudbeaver/plugin-product-information-admi
 const DockerUpdateInstructions = importLazyComponent(() => import('./DockerUpdateInstructions.js').then(m => m.DockerUpdateInstructions));
 const VersionUpdate = importLazyComponent(() => import('./VersionUpdate.js').then(m => m.VersionUpdate));
 const VersionUpdateTab = importLazyComponent(() => import('./VersionUpdateTab.js').then(m => m.VersionUpdateTab));
-const HotfixBanner = importLazyComponent(() => import('./HotfixBanner.js').then(m => m.HotfixBanner));
+const PatchBanner = importLazyComponent(() => import('./PatchBanner.js').then(m => m.PatchBanner));
 
 @injectable(() => [VersionUpdateService, ProductInfoService, AdministrationTopAppBarService, PermissionsService])
 export class PluginBootstrap extends Bootstrap {
@@ -33,7 +33,7 @@ export class PluginBootstrap extends Bootstrap {
       key: 'version-update',
       name: 'plugin_version_update_administration_tab_title',
       panel: () => VersionUpdate,
-      // The custom tab adds an update indicator independent of hotfix banner dismissal.
+      // The custom tab adds an update indicator independent of patch banner dismissal.
       tab: () => VersionUpdateTab,
       order: 3,
     });
@@ -43,6 +43,6 @@ export class PluginBootstrap extends Bootstrap {
 
   override load(): void {
     // Append after the navigation contributions have been registered.
-    this.administrationTopAppBarService.navBarPlaceholder.add(HotfixBanner, undefined, () => !this.permissionsService.has(EAdminPermission.admin));
+    this.administrationTopAppBarService.navBarPlaceholder.add(PatchBanner, undefined, () => !this.permissionsService.has(EAdminPermission.admin));
   }
 }

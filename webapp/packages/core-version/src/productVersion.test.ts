@@ -11,32 +11,32 @@ import { compareProductVersions, parseProductVersion } from './productVersion.js
 
 describe('parseProductVersion', () => {
   test.each([
-    { version: '26.2.0', release: '26.2.0', hotfixVersion: 0 },
-    { version: '26.2.0.0', release: '26.2.0', hotfixVersion: 0 },
-    { version: '26.2.0.10', release: '26.2.0.10', hotfixVersion: 10 },
-    { version: ' v26.2.0.1 ', release: '26.2.0.1', hotfixVersion: 1 },
-    { version: '26.2.0.1.202611131559', release: '26.2.0.1', hotfixVersion: 1 },
-    { version: '26.2.0.10.20261113155930', release: '26.2.0.10', hotfixVersion: 10 },
-  ])('parses the release and hotfix number from "$version"', ({ version, release, hotfixVersion }) => {
+    { version: '26.2.0', release: '26.2.0', patch: 0 },
+    { version: '26.2.0.0', release: '26.2.0', patch: 0 },
+    { version: '26.2.0.10', release: '26.2.0.10', patch: 10 },
+    { version: ' v26.2.0.1 ', release: '26.2.0.1', patch: 1 },
+    { version: '26.2.0.1.202611131559', release: '26.2.0.1', patch: 1 },
+    { version: '26.2.0.10.20261113155930', release: '26.2.0.10', patch: 10 },
+  ])('parses the release and patch number from "$version"', ({ version, release, patch }) => {
     expect(parseProductVersion(version)).toMatchObject({
       release,
-      hotfixVersion,
+      patch,
       major: 26,
       minor: 2,
-      patch: 0,
+      micro: 0,
     });
   });
 
   test('keeps prerelease and build information separate from the display release', () => {
     expect(parseProductVersion('26.2.0.1-beta.2+build.7')).toMatchObject({
       release: '26.2.0.1',
-      hotfixVersion: 1,
+      patch: 1,
       version: '26.2.0.1-beta.2+build.7',
     });
   });
 
-  test.each(['26.2.0.202610091857', '26.2.0.20261009185730'])('does not mistake the OSGi timestamp in %s for a hotfix', version => {
-    expect(parseProductVersion(version)).toMatchObject({ release: '26.2.0', hotfixVersion: 0 });
+  test.each(['26.2.0.202610091857', '26.2.0.20261009185730'])('does not mistake the OSGi timestamp in %s for a patch', version => {
+    expect(parseProductVersion(version)).toMatchObject({ release: '26.2.0', patch: 0 });
   });
 
   test.each(['', 'invalid', '26.2', '26.2.0.1.2', '26.2.0.-1', '26.2.0.01', '26.02.0', '26.2.0.9007199254740992', '26.2.0-'])(

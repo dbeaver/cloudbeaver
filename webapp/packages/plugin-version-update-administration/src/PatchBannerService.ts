@@ -12,18 +12,18 @@ import { injectable } from '@cloudbeaver/core-di';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 @injectable(() => [UserDataService, UserConfigurationStorage, VersionUpdateService])
-export class HotfixBannerService {
+export class PatchBannerService {
   private get settings() {
     return this.userDataService.withStorage(this.userConfigurationStorage).getUserData(
-      'version-update-hotfix',
+      'version-update-hotfix', // Preserve the persisted dismissal setting.
       () => ({ dismissedVersion: '' }),
       data => typeof data.dismissedVersion === 'string',
     );
   }
 
   get visible(): boolean {
-    const hotfix = this.versionUpdateService.latestHotfix;
-    return !!hotfix && this.settings.dismissedVersion !== hotfix.number;
+    const patch = this.versionUpdateService.latestPatch;
+    return !!patch && this.settings.dismissedVersion !== patch.number;
   }
 
   constructor(
@@ -39,10 +39,10 @@ export class HotfixBannerService {
   }
 
   dismiss(): void {
-    const hotfix = this.versionUpdateService.latestHotfix;
+    const patch = this.versionUpdateService.latestPatch;
 
-    if (hotfix) {
-      this.settings.dismissedVersion = hotfix.number;
+    if (patch) {
+      this.settings.dismissedVersion = patch.number;
     }
   }
 }

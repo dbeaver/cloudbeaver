@@ -9,12 +9,12 @@
 import { Bootstrap, ModuleRegistry } from '@cloudbeaver/core-di';
 import { PluginBootstrap } from './PluginBootstrap.js';
 import { LocaleService } from './LocaleService.js';
-import { HotfixBannerService } from './HotfixBannerService.js';
+import { PatchBannerService } from './PatchBannerService.js';
 
 export default ModuleRegistry.add({
   name: '@cloudbeaver/plugin-version-update-administration',
 
   configure: serviceCollection => {
-    serviceCollection.addSingleton(Bootstrap, PluginBootstrap).addSingleton(Bootstrap, LocaleService).addSingleton(HotfixBannerService);
+    serviceCollection.addSingleton(Bootstrap, PluginBootstrap).addSingleton(Bootstrap, LocaleService).addSingleton(PatchBannerService);
   },
 });

@@ -55,8 +55,8 @@ export class VersionService {
     return parseProductVersion(version);
   }
 
-  isHotfix(version: string): boolean {
-    return (parseProductVersion(version)?.hotfixVersion ?? 0) > 0;
+  isPatch(version: string): boolean {
+    return (parseProductVersion(version)?.patch ?? 0) > 0;
   }
 
   compareVersions(v1: string, v2: string): number {

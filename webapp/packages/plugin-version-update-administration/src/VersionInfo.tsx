@@ -27,7 +27,7 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
   const versionResource = useService(VersionResource);
   useResource(VersionInfo, VersionResource, item);
   const versions = versionResource.getReleaseNotes(item);
-  const hasHotfixes = versions.some(version => versionService.isHotfix(version.number));
+  const hasPatches = versions.some(version => versionService.isPatch(version.number));
 
   return (
     <Group className={s(style, { group: true })} aria-labelledby={titleId} large>
@@ -36,23 +36,21 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
           ? `${translate('plugin_version_update_administration_release_notes')} · ${item}`
           : translate('version_update_version_no_info')}
       </GroupTitle>
-      {hasHotfixes && (
-        <p className={s(style, { description: true })}>{translate('plugin_version_update_administration_release_notes_description')}</p>
-      )}
+      {hasPatches && <p className={s(style, { description: true })}>{translate('plugin_version_update_administration_release_notes_description')}</p>}
       {versions.map(version => (
         <section key={version.number} className={s(style, { section: true })} aria-labelledby={`${titleId}-${version.number}`}>
           <header className={s(style, { heading: true })}>
             <h3 id={`${titleId}-${version.number}`}>{version.number}</h3>
-            {hasHotfixes && (
+            {hasPatches && (
               <span className={s(style, { badge: true })}>
                 {translate(
-                  versionService.isHotfix(version.number)
-                    ? 'plugin_version_update_administration_hotfix_label'
+                  versionService.isPatch(version.number)
+                    ? 'plugin_version_update_administration_patch_label'
                     : 'plugin_version_update_administration_base_release',
                 )}
               </span>
             )}
-            {hasHotfixes && version.number === item && (
+            {hasPatches && version.number === item && (
               <span className={s(style, { badge: true, selected: true })}>{translate('plugin_version_update_administration_selected_version')}</span>
             )}
             {version.date && <span>{version.date}</span>}
