@@ -19,23 +19,24 @@ export interface IParsedProductVersion {
 export function parseProductVersion(version: string): IParsedProductVersion | null {
   // Match major.minor.micro, an optional patch, an optional 12/14-digit build timestamp,
   // and a prerelease/build suffix (-beta.2/+build.7); also accept a leading "v".
-  // Captures: [1] base release, [2] patch (or a legacy build timestamp), [3] suffix.
   const match = /^v?(\d+\.\d+\.\d+)(?:\.(0|[1-9]\d*))?(?:\.\d{12}(?:\d{2})?)?((?:[-+].*)?)$/.exec(version.trim());
 
   if (!match) {
     return null;
   }
 
-  // OSGi build timestamps are qualifiers, not patch numbers.
-  const buildQualifier = /^\d{12}(?:\d{2})?$/.test(match[2] ?? '');
-  const patch = buildQualifier ? 0 : Number(match[2] ?? 0);
-  const [major, minor, micro] = match[1]!.split('.').map(Number);
+  const [, baseRelease = '', patchOrBuildTimestamp = '', prereleaseOrBuildSuffix = ''] = match;
 
-  if (!validateStrict(`${match[1]}${match[3]}`) || ![major, minor, micro, patch].every(Number.isSafeInteger)) {
+  // OSGi build timestamps are qualifiers, not patch numbers.
+  const buildQualifier = /^\d{12}(?:\d{2})?$/.test(patchOrBuildTimestamp);
+  const patch = buildQualifier ? 0 : Number(patchOrBuildTimestamp);
+  const [major, minor, micro] = baseRelease.split('.').map(Number);
+
+  if (!validateStrict(`${baseRelease}${prereleaseOrBuildSuffix}`) || ![major, minor, micro, patch].every(Number.isSafeInteger)) {
     return null;
   }
 
-  const release = `${match[1]}${patch > 0 ? `.${patch}` : ''}`;
+  const release = `${baseRelease}${patch > 0 ? `.${patch}` : ''}`;
 
   return {
     major: major!,
@@ -43,7 +44,7 @@ export function parseProductVersion(version: string): IParsedProductVersion | nu
     micro: micro!,
     patch,
     release,
-    version: `${release}${match[3]}`,
+    version: `${release}${prereleaseOrBuildSuffix}`,
   };
 }
 
