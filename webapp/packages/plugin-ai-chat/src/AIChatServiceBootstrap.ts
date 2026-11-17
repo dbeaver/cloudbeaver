@@ -16,6 +16,7 @@ import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { AIChatService } from './AIChat/AIChatService.js';
+import { ACTION_OPEN_AI_CHAT } from './actions/ACTION_OPEN_AI_CHAT.js';
 import { ACTION_TOGGLE_AI_CHAT } from './actions/ACTION_TOGGLE_AI_CHAT.js';
 import { AIChatTabService } from './AIChatTabService.js';
 import { AIChatFunctionsService } from './AIChatFunctionsService.js';
@@ -68,9 +69,9 @@ export class AIChatServiceBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'ai-chat-base',
-      actions: [ACTION_TOGGLE_AI_CHAT],
+      actions: [ACTION_TOGGLE_AI_CHAT, ACTION_OPEN_AI_CHAT],
       isHidden: () => !this.aiChatService.isEnabled,
-      isChecked: () => this.aiChatService.isActive,
+      isChecked: (context, action) => action === ACTION_TOGGLE_AI_CHAT && this.aiChatService.isActive,
       getLoader: () => [getCachedDataResourceLoaderState(this.userInfoResource, () => undefined)],
       getActionInfo: (context, action) => {
         if (action === ACTION_TOGGLE_AI_CHAT) {
@@ -87,8 +88,12 @@ export class AIChatServiceBootstrap extends Bootstrap {
       },
       handler: (context, action) => {
         switch (action) {
+          case ACTION_OPEN_AI_CHAT: {
+            this.aiChatTabService.open();
+            break;
+          }
           case ACTION_TOGGLE_AI_CHAT: {
-            this.aiChatService.togglePanel();
+            this.aiChatTabService.toggleTab();
             break;
           }
         }
@@ -98,7 +103,7 @@ export class AIChatServiceBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [SQL_EDITOR_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
-      getItems: (context, items) => [...items, ACTION_TOGGLE_AI_CHAT],
+      getItems: (context, items) => [...items, ACTION_OPEN_AI_CHAT],
       isApplicable: context => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
         const dataSource = this.sqlDataSourceService.get(state.editorId);

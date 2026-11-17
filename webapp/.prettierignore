@@ -1,0 +1,22 @@
+node_modules
+dist
+lib
+out
+coverage
+npm-debug.log
+debug.log
+yarn-error.log
+
+# Yarn
+**/.yarn/*
+!**/.yarn/patches
+!**/.yarn/plugins
+!**/.yarn/releases
+!**/.yarn/sdks
+!**/.yarn/versions
+!**/.yarn/sdks/**
+.pnp.*
+
+# ts-project-linker owns TypeScript config formatting during yarn install.
+**/tsconfig.json
+**/tsconfig.*.json
