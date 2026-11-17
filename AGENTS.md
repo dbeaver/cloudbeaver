@@ -53,6 +53,10 @@ For a focused check, use a package's existing script, for example `yarn workspac
 
 Before pushing CE or EE changes, read and follow `.agents/skills/pre-push-checks/SKILL.md` in this repository to run ESLint and Prettier on all changed files.
 
+Before creating a pull request or writing/updating its description, read and follow `.agents/skills/file-pr/SKILL.md` in this repository.
+
+When writing or reviewing user-facing text, read and follow `.agents/skills/clean-copy/SKILL.md` in this repository.
+
 ### Working conventions
 
 - Put changes in the smallest package that owns the behavior. Prefer existing `core-*` abstractions and UI primitives before adding cross-package helpers.

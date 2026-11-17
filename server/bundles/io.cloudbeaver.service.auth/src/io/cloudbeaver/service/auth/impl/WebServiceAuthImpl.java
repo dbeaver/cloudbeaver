@@ -41,13 +41,10 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.qm.QMConstants;
-import org.jkiss.dbeaver.model.security.SMConstants;
-import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
 import org.jkiss.dbeaver.model.security.user.SMUser;
@@ -64,9 +61,9 @@ import java.util.Map;
 public class WebServiceAuthImpl implements DBWServiceAuth {
 
     private static final Log log = Log.getLog(WebServiceAuthImpl.class);
-    private static final long DEFAULT_TIMEOUT_MILLISECONDS = 5 * 60 * 1000;
 
     @Override
+    @NotNull
     public WebAuthStatus authLogin(
         @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession inputWebSession,
@@ -77,6 +74,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean forceSessionsLogout
     ) throws DBWebException {
         try {
+            WebAuthProviderDescriptor provider = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
+            if (provider != null && provider.isFederated()) {
+                throw new DBWebException("Use federatedLogin for federated authentication");
+            }
             WebSession webSession = inputWebSession;
             if (inputWebSession.getUser() == null) {
                 // Rotate anonymous web sessions during login attempts to prevent session fixation attacks.
@@ -84,19 +85,17 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     .rotateSession(httpRequest, inputWebSession);
             }
 
-            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
-            //TODO deprecated, use asyncAuthLogin for federated auth, exits for backward compatibility
+            var smAuthInfo = WebAuthUtils.initiateAuthentication(
+                webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout
+            );
             linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration()
                 .isLinkExternalCredentialsWithUser();
             if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
-                //run async auth process
-                return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
-            } else {
-                //run it sync
-                var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
-                List<WebAuthInfo> authInfos = authProcessor.authenticateSession();
-                return new WebAuthStatus(smAuthInfo.getAuthStatus(), authInfos);
+                throw new DBWebException("Use federatedLogin for asynchronous authentication");
             }
+            var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
+            List<WebAuthInfo> authInfos = authProcessor.authenticateSession();
+            return new WebAuthStatus(smAuthInfo.getAuthStatus(), authInfos);
         } catch (SMTooManySessionsException e) {
             throw new DBWebException("User authentication failed", e.getErrorType(), e);
         } catch (Exception e) {
@@ -114,46 +113,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
-        WebSession webSession = inputWebSession;
-        if (inputWebSession.getUser() == null) {
-            // Rotate anonymous web sessions during login attempts to prevent session fixation attacks.
-            webSession = CBApplication.getInstance().getSessionManager()
-                .rotateSession(httpRequest, inputWebSession);
-        }
-
-        WebAuthProviderDescriptor providerDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
-        if (providerDescriptor == null) {
-            throw new DBWebException("Provider '" + providerId + "' not found");
-        }
-        if (!providerDescriptor.isFederated()) {
-            throw new DBWebException("Provider '" + providerId + "' is not federated");
-        }
-        try {
-            Map<String, Object> authParameters = new HashMap<>();
-            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getHostOriginFromRequest(httpRequest));
-
-            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
-            if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
-                throw new DBWebException("Unexpected auth status: " + smAuthInfo.getAuthStatus());
-            }
-            if (CommonUtils.isEmpty(smAuthInfo.getRedirectUrl())) {
-                throw new DBWebException("Missing redirect URL");
-            }
-            WebAsyncAuthJob job = new WebAsyncAuthJob(
-                providerId + " authentication job",
-                smAuthInfo.getAuthAttemptId(),
-                linkWithActiveUser
-            );
-            WebAsyncTaskInfo authTask = webSession.createAsyncTask(providerId + " authentication");
-            authTask.setRunning(true);
-            authTask.setJob(job);
-            new WebAsyncAuthTimeoutJob(webSession, authTask, job).schedule(DEFAULT_TIMEOUT_MILLISECONDS);
-            return new WebAsyncAuthStatus(smAuthInfo.getRedirectUrl(), authTask);
-        } catch (SMTooManySessionsException e) {
-            throw new DBWebException("User authentication failed", e.getErrorType(), e);
-        } catch (Exception e) {
-            throw new DBWebException("User authentication failed", e);
-        }
+        return WebAuthUtils.federatedLogin(
+            httpRequest, inputWebSession, providerId, providerConfigurationId, linkWithActiveUser, forceSessionsLogout
+        );
     }
 
     @Override
@@ -174,66 +136,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             userTokens = List.of();
         }
         return new WebAsyncAuthTaskResult(userTokens);
-    }
-
-    private static SMAuthInfo initiateAuthentication(
-        @NotNull WebSession webSession,
-        @NotNull String providerId,
-        @Nullable String providerConfigurationId,
-        @Nullable Map<String, Object> authParameters,
-        boolean forceSessionsLogout
-    ) throws DBException {
-        if (CommonUtils.isEmpty(providerId)) {
-            throw new DBWebException("Missing auth provider parameter");
-        }
-        WebAuthProviderDescriptor authProviderDescriptor = WebAuthProviderRegistry.getInstance()
-            .getAuthProvider(providerId);
-        if (authProviderDescriptor.isTrusted()) {
-            throw new DBWebException(authProviderDescriptor.getLabel() + " not allowed for authorization via GQL API");
-        }
-
-        SMController securityController = webSession.getSecurityController();
-        String currentSmSessionId = (webSession.getUser() == null || CBApplication.getInstance().isConfigurationMode())
-            ? null
-            : webSession.getUserContext().getSmSessionId();
-        var smAuthInfo = securityController.authenticate(
-            webSession.getSessionId(),
-            currentSmSessionId,
-            webSession.getSessionParameters(),
-            WebSession.CB_SESSION_TYPE,
-            providerId,
-            providerConfigurationId,
-            authParameters,
-            forceSessionsLogout
-        );
-        return smAuthInfo;
-    }
-
-    @Override
-    public WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException {
-        try {
-            linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
-            SMAuthInfo smAuthInfo = webSession.getSecurityController().getAuthStatus(authId);
-            switch (smAuthInfo.getAuthStatus()) {
-                case SUCCESS:
-                    List<WebAuthInfo> newInfos = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser).authenticateSession();
-                    return new WebAuthStatus(smAuthInfo.getAuthStatus(), newInfos);
-                case IN_PROGRESS:
-                    return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
-                case ERROR:
-                    throw new DBWebException(smAuthInfo.getError(), smAuthInfo.getErrorCode());
-                case EXPIRED:
-                    throw new DBException("Authorization has already been processed");
-                default:
-                    throw new DBWebException("Unknown auth status:" + smAuthInfo.getAuthStatus());
-            }
-        } catch (DBWebException e) {
-            throw e;
-        } catch (SMTooManySessionsException e) {
-            throw new DBWebException(e.getMessage(), e.getErrorType());
-        } catch (DBException e) {
-            throw new DBWebException(e.getMessage(), e);
-        }
     }
 
     @Override

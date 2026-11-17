@@ -12,6 +12,7 @@ import { Container } from '@cloudbeaver/core-blocks';
 
 import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm.js';
 import { getServerConfigurationFormPart } from './getServerConfigurationFormPart.js';
+import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm.js';
 import type { ServerConfigurationFormProps } from './ServerConfigurationFormService.js';
 
 export const ServerConfigurationSecurityPanel = observer<ServerConfigurationFormProps>(function ServerConfigurationSecurityPanel({
@@ -23,6 +24,7 @@ export const ServerConfigurationSecurityPanel = observer<ServerConfigurationForm
   return (
     <Container wrap gap grid medium keepSize>
       <ServerConfigurationSecurityForm state={part.state} configurationWizard={configurationWizard} />
+      <ServerConfigurationDriversForm initialServerConfig={part.initialState.serverConfig} serverConfig={part.state.serverConfig} />
     </Container>
   );
 });
