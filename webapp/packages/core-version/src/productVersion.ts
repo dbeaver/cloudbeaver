@@ -17,6 +17,9 @@ export interface IParsedProductVersion {
 }
 
 export function parseProductVersion(version: string): IParsedProductVersion | null {
+  // Match major.minor.patch, an optional hotfix, an optional 12/14-digit build timestamp,
+  // and a prerelease/build suffix (-beta.2/+build.7); also accept a leading "v".
+  // Captures: [1] base release, [2] hotfix (or a legacy build timestamp), [3] suffix.
   const match = /^v?(\d+\.\d+\.\d+)(?:\.(0|[1-9]\d*))?(?:\.\d{12}(?:\d{2})?)?((?:[-+].*)?)$/.exec(version.trim());
 
   if (!match) {

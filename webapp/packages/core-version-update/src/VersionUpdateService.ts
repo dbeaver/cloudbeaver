@@ -40,8 +40,18 @@ export class VersionUpdateService {
   }
 
   get latestHotfix(): IVersion | undefined {
+    const latest = this.versionResource.latest;
+
+    if (!latest) {
+      return undefined;
+    }
+
+    // Keep older outstanding hotfixes, but never advertise releases beyond the feed's latest version.
     return this.availableVersions.find(
-      version => this.versionService.isHotfix(version.number) && this.versionService.compareVersions(version.number, this.versionService.current) > 0,
+      version =>
+        this.versionService.isHotfix(version.number) &&
+        this.versionService.compareVersions(version.number, this.versionService.current) > 0 &&
+        this.versionService.greaterOrEqual(latest.number, version.number),
     );
   }
 

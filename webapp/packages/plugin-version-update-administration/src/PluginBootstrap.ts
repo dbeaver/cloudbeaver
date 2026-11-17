@@ -33,6 +33,7 @@ export class PluginBootstrap extends Bootstrap {
       key: 'version-update',
       name: 'plugin_version_update_administration_tab_title',
       panel: () => VersionUpdate,
+      // The custom tab adds an update indicator independent of hotfix banner dismissal.
       tab: () => VersionUpdateTab,
       order: 3,
     });

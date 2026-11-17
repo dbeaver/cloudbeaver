@@ -61,13 +61,13 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
         cache: 'no-cache',
       });
 
-      const json = (await response.json()) as IVersions | null;
+      const json = (await response.json()) as IVersions;
 
-      if (typeof json?.latestVersion === 'string' && json.latestVersion) {
+      if (json.latestVersion) {
         this.latestVersionNumber = json.latestVersion;
       }
 
-      if (!Array.isArray(json?.versions)) {
+      if (!json.versions) {
         return this.data;
       }
 
