@@ -59,6 +59,8 @@ import org.junit.platform.suite.api.Suite;
         NoSessionTest.class,
         ConfigurationModeAccessTest.class,
         FileSystemSecurityTest.class,
+        CBEventOriginFilterTest.class,
+        CBEventsLongPollingServletTest.class,
         CBSecretControllerEmbeddedTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
