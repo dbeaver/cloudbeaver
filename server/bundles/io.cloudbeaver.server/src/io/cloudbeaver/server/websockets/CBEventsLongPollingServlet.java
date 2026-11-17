@@ -180,11 +180,6 @@ public class CBEventsLongPollingServlet extends HttpServlet {
             return;
         }
 
-        resp.addHeader("Vary", "Origin");
-        if (!CBEventOriginFilter.isAllowedOrigin(req)) {
-            return;
-        }
-
         resp.setHeader("Access-Control-Allow-Origin", origin);
         resp.setHeader("Access-Control-Allow-Credentials", "true");
 
