@@ -100,11 +100,11 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
           </Suspense>
           <AutoResizeTextarea
             ref={textareaRef}
+            writingSuggestions={false}
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
             value={state.prompt}
             readOnly={aiChatConversationsService.processing}
-            {...{ writingsuggestions: 'false' }}
             autoFocus
             onChange={value => state.setPrompt(value)}
             onPaste={context.disabled ? undefined : onPaste}

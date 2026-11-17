@@ -33,6 +33,7 @@ type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChan
     embedded?: boolean;
     cursorInitiallyAtEnd?: boolean;
     uploadable?: boolean;
+    writingSuggestions?: boolean;
   };
 
 export type TextareaControlledProps = BaseProps & {
@@ -67,6 +68,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   embedded,
   cursorInitiallyAtEnd,
   uploadable,
+  writingSuggestions,
   onKeyDown,
   onChange = () => {},
   ...rest
@@ -77,6 +79,8 @@ export const Textarea: TextareaType = observer(function Textarea({
   const mergedRef = useMergeRefs(...[textareaRef, ref!].filter(Boolean));
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
+  // React does not yet recognize writingSuggestions as an enumerated HTML attribute.
+  const nativeProps = { ...rest, writingsuggestions: writingSuggestions?.toString() };
   const styles = useS(textareaStyle);
   const context = useContext(FormContext);
   const handleKeyDown = useCombinedHandler(onKeyDown, context?.keyDown);
@@ -113,7 +117,7 @@ export const Textarea: TextareaType = observer(function Textarea({
         {children}
       </FieldLabel>
       <textarea
-        {...rest}
+        {...nativeProps}
         ref={mergedRef}
         id={inputId}
         required={required}
