@@ -17,11 +17,12 @@ import { TabsState } from '../Tabs/TabsState.js';
 import styles from './shared/SideBarPanel.module.css';
 import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.module.css';
 import { useTabOrderPersistence } from '../Tabs/useTabOrderPersistence.js';
-import { useTabPersistence } from '../Tabs/useTabPersistence.js';
 
-export interface SideBarPanelProps {
+export interface ISideBarPanelProps {
   container: TabsContainer;
   panelId: string;
+  selectedTabId: string | undefined;
+  onSelectTab: (tabId: string) => void;
 }
 
 const sideBarPanelRegistry: StyleRegistry = [
@@ -34,11 +35,10 @@ const sideBarPanelRegistry: StyleRegistry = [
   ],
 ];
 
-export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container, panelId }) {
+export const SideBarPanel = observer<ISideBarPanelProps>(function SideBarPanel({ container, panelId, selectedTabId, onSelectTab }) {
   const style = useS(styles);
 
   const { onReorder, sortTabs, persistenceKey } = useTabOrderPersistence(panelId, () => container.getIdList());
-  const { selectedTabId, selectTab } = useTabPersistence(panelId, container);
 
   return (
     <SContext registry={sideBarPanelRegistry}>
@@ -48,7 +48,7 @@ export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ 
         reorderStateKey={persistenceKey}
         sortFunction={sortTabs}
         lazy
-        onChange={tab => selectTab(tab.tabId)}
+        onChange={tab => onSelectTab(tab.tabId)}
         onReorder={onReorder}
       >
         <div tabIndex={-1} className={s(style, { box: true })} data-panel-id={panelId} data-dialog-persistent-element>

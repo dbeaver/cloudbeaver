@@ -709,7 +709,8 @@ public class WebSQLProcessor implements WebSessionProvider {
             checkRowIdentifier(resultsInfo, rowIdentifier);
             tableName = rowIdentifier.getEntity().getName();
         }
-        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(tableName, resultsInfo.getDataContainer(), lobColumnIndex);
+        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(
+            webSession, tableName, resultsInfo.getDataContainer(), lobColumnIndex);
         readCellDataValue(monitor, resultsInfo, row, dataReceiver);
         try {
             return dataReceiver.createLobFile(monitor);
