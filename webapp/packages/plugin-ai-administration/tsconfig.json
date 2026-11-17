@@ -6,7 +6,10 @@
     "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true
   },
-  "exclude": ["lib/**/*", "**/node_modules"],
+  "exclude": [
+    "lib/**/*",
+    "**/node_modules"
+  ],
   "references": [
     {
       "path": "../../common-typescript/@dbeaver/js-helpers"
@@ -63,5 +66,10 @@
       "path": "../plugin-ai-profiles"
     }
   ],
-  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css"]
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css"
+  ]
 }
