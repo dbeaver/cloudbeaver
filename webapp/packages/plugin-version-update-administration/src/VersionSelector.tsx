@@ -11,7 +11,7 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Select, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { type IVersion, VersionService } from '@cloudbeaver/core-version';
+import { type IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 import { ProductInfoService } from '@cloudbeaver/plugin-product-information-administration';
 
@@ -26,11 +26,16 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   const versionUpdateService = useService(VersionUpdateService);
   const administrationScreenService = useService(AdministrationScreenService);
   const versionService = useService(VersionService);
+  const versionResource = useService(VersionResource);
   const serverConfigResource = useService(ServerConfigResource);
   const translate = useTranslate();
   const style = useS(styles);
 
-  const version = versions.find(v => v.number === administrationScreenService.activeScreen?.param) ?? versions[0];
+  const version =
+    versions.find(v => v.number === administrationScreenService.activeScreen?.param) ??
+    versions.find(v => v.number === versionResource.latest?.number) ??
+    versions[0];
+
   const Instruction = versionUpdateService.versionInstructionGetter?.();
   const instructionLink = versionUpdateService.instructionLink;
 

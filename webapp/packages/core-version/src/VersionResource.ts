@@ -5,14 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ProductInfoResource } from '@cloudbeaver/core-root';
 
-import { compareProductVersions } from './productVersion.js';
-import { getVersionReleaseNotes, normalizeVersions } from './versionMetadata.js';
+import { getLatestVersion, getVersionReleaseNotes, normalizeVersions } from './versionMetadata.js';
 
 export interface IVersion {
   number: string;
@@ -28,16 +27,20 @@ interface IVersions {
 
 @injectable(() => [ProductInfoResource])
 export class VersionResource extends CachedMapResource<string, IVersion> {
+  private latestVersionNumber: string | null;
+
   get latest(): IVersion | undefined {
-    return this.values.slice().sort((a, b) => compareProductVersions(b.number, a.number))[0];
+    return getLatestVersion(this.values, this.latestVersionNumber);
   }
 
   constructor(private readonly productInfoResource: ProductInfoResource) {
     super();
 
+    this.latestVersionNumber = null;
     this.preloadResource(this.productInfoResource, () => {});
 
-    makeObservable(this, {
+    makeObservable<this, 'latestVersionNumber'>(this, {
+      latestVersionNumber: observable.ref,
       latest: computed,
     });
   }
@@ -59,6 +62,10 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
       });
 
       const json = (await response.json()) as IVersions | null;
+
+      if (typeof json?.latestVersion === 'string' && json.latestVersion) {
+        this.latestVersionNumber = json.latestVersion;
+      }
 
       if (!Array.isArray(json?.versions)) {
         return this.data;

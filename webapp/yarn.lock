@@ -2382,7 +2382,7 @@ __metadata:
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
-    compare-versions: "npm:^6.1.1"
+    compare-versions: "npm:^6"
     mobx: "npm:^6"
     react: "npm:^19"
     rimraf: "npm:^6"
@@ -11323,7 +11323,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"compare-versions@npm:^6.1.1":
+"compare-versions@npm:^6":
   version: 6.1.1
   resolution: "compare-versions@npm:6.1.1"
   checksum: 10c0/415205c7627f9e4f358f571266422980c9fe2d99086be0c9a48008ef7c771f32b0fbe8e97a441ffedc3910872f917a0675fe0fe3c3b6d331cda6d8690be06338

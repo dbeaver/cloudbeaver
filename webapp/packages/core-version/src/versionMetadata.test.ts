@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from 'vitest';
 
-import { getVersionReleaseNotes, normalizeVersions } from './versionMetadata.js';
+import { getLatestVersion, getVersionReleaseNotes, normalizeVersions } from './versionMetadata.js';
 
 const release = {
   number: '26.2.0',
@@ -50,6 +50,27 @@ describe('normalizeVersions', () => {
     ]);
 
     expect(versions.map(version => version.number)).toEqual(['26.2.0', '26.2.0.2', '26.2.0.10', '26.2.0.1']);
+  });
+});
+
+describe('getLatestVersion', () => {
+  test('uses the advertised release and its highest hotfix rather than a newer unadvertised release', () => {
+    const versions = normalizeVersions([
+      { ...release, patches },
+      { ...release, number: '26.3.0', patches: [{ patchNumber: 1, releaseNotes: 'Newer release hotfix' }] },
+    ]);
+
+    expect(getLatestVersion(versions, '26.2.0')?.number).toBe('26.2.0.10');
+    expect(getLatestVersion(versions, '26.3.0')?.number).toBe('26.3.0.1');
+  });
+
+  test('preserves the advertised release when there are no hotfixes', () => {
+    expect(getLatestVersion([release, { ...release, number: '26.3.0' }], '26.2.0')).toEqual(release);
+  });
+
+  test('does not infer a latest release when the advertised version is absent', () => {
+    expect(getLatestVersion([release], null)).toBeUndefined();
+    expect(getLatestVersion([release], '26.3.0')).toBeUndefined();
   });
 });
 

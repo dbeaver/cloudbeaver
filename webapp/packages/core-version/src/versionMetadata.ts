@@ -36,6 +36,12 @@ export function normalizeVersions(versions: readonly IVersion[]): IVersion[] {
   });
 }
 
+export function getLatestVersion(versions: readonly IVersion[], latestVersionNumber: string | null): IVersion | undefined {
+  const latest = versions.find(version => version.number === latestVersionNumber);
+
+  return latest ? normalizeVersions([latest]).sort((a, b) => compareProductVersions(b.number, a.number))[0] : undefined;
+}
+
 export function getVersionReleaseNotes(versions: readonly IVersion[], number: string): IVersion[] {
   const selected = parseProductVersion(number);
 
