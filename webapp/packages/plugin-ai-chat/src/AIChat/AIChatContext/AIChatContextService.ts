@@ -12,6 +12,8 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import {
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoResource,
   createConnectionParam,
   isConnectionInfoParamEqual,
   type IConnectionExecutionContextInfo,
@@ -28,12 +30,14 @@ export interface IAIChatContextInfo {
 
 const SYNC_CONTEXT_DELAY = 500;
 
-@injectable(() => [ConnectionSchemaManagerService, UserInfoResource, ProjectsService, UserDataService])
+@injectable(() => [ConnectionSchemaManagerService, UserInfoResource, ProjectsService, UserDataService, ConnectionInfoResource])
 export class AIChatContextService extends Bootstrap {
   onContextChange: SyncExecutor<IAIChatContextInfo | null>;
 
   get currentContext(): IAIChatContextInfo | null {
-    return this.settings.context;
+    const context = this.settings.context;
+
+    return context && this.connectionInfoResource.has(context.connectionKey) ? context : null;
   }
 
   private get settings(): { context: IAIChatContextInfo | null } {
@@ -47,6 +51,7 @@ export class AIChatContextService extends Bootstrap {
     userInfoResource: UserInfoResource,
     projectsService: ProjectsService,
     private readonly userDataService: UserDataService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
 
@@ -55,6 +60,19 @@ export class AIChatContextService extends Bootstrap {
 
     userInfoResource.onUserChange.addHandler(() => {
       this.onContextChange.execute(this.currentContext);
+    });
+
+    connectionInfoResource.onDataUpdate.addHandler(() => {
+      const context = this.settings.context;
+
+      if (
+        context &&
+        connectionInfoResource.isLoaded(ConnectionInfoActiveProjectKey) &&
+        !connectionInfoResource.isOutdated(ConnectionInfoActiveProjectKey) &&
+        !connectionInfoResource.has(context.connectionKey)
+      ) {
+        this.setContext(null);
+      }
     });
 
     projectsService.onActiveProjectChange.addHandler(data => {
