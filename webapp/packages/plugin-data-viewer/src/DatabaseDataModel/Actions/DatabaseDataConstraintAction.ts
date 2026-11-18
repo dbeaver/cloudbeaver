@@ -24,9 +24,7 @@ export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 const CONSTRAINTS_KEY = 'constraints';
 const WHERE_FILTER_KEY = 'whereFilter';
 
-export function persistDataFilterConstraints<TOptions extends IDatabaseDataOptions>(
-  source: IDatabaseDataSource<TOptions, IDatabaseResultSet>,
-): void {
+export function persistDataFilterConstraints<TOptions extends IDatabaseDataOptions>(source: IDatabaseDataSource<TOptions, IDatabaseResultSet>): void {
   const options = source.options;
 
   if (!options) {
@@ -314,7 +312,8 @@ export class DatabaseDataConstraintAction
     return currentConstraint.orderAsc ? EOrder.asc : EOrder.desc;
   }
 
-  override updateResult(result: IDatabaseResultSet): void {
+  override updateResult(result: IDatabaseResultSet, index: number): void {
+    super.updateResult(result, index);
     updateConstraintsForResult(this.source, result);
   }
 
@@ -378,9 +377,14 @@ function resolveConstraintColumn(
   attributeName: string,
   attributePosition: number,
 ): (SqlResultColumn & { name: string; position: number }) | undefined {
-  return columns.find(
+  const columnsWithMatchingName = columns.filter(
     (column): column is SqlResultColumn & { name: string; position: number } =>
-      typeof column.name === 'string' && typeof column.position === 'number' && column.position === attributePosition && column.name === attributeName,
+      typeof column.name === 'string' && typeof column.position === 'number' && column.name === attributeName,
+  );
+
+  return (
+    columnsWithMatchingName.find(column => column.position === attributePosition) ??
+    (columnsWithMatchingName.length === 1 ? columnsWithMatchingName[0] : undefined)
   );
 }
 
