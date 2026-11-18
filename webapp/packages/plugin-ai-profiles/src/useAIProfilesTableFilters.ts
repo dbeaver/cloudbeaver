@@ -25,7 +25,7 @@ export function useAIProfilesTableFilters(profiles: AIProfile[]): IAIProfileFilt
       get filteredProfiles() {
         const search = this.search.trim().toLowerCase();
 
-        return this.profiles.filter(profile => [profile.id, profile.name, profile.engineId].some(value => value.toLowerCase().includes(search)));
+        return this.profiles.filter(profile => [profile.name, profile.engineId].some(value => value.toLowerCase().includes(search)));
       },
       setSearch(value: string) {
         this.search = value;
