@@ -81,7 +81,7 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
       profiles={profiles}
       nameLabel="plugin_ai_user_profile_column_profile"
       engineLabel="plugin_ai_user_profile_column_engine"
-      emptyPlaceholder="plugin_ai_user_profile_empty"
+      emptyPlaceholder="ui_not_found"
       additionalColumns={columns}
       processing={aiDefaultProfileService.saving}
       getProfileBadge={profile =>
