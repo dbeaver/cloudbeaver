@@ -91,18 +91,7 @@ export class NavigationTreeService extends View<string> {
 
   async showNode(id: string): Promise<void> {
     const path = await this.navNodeInfoResource.resolveParents(id);
-    const nodePath = [...path, id];
-    const nonNavigableNodeIndex = nodePath.findIndex(nodeId => this.navNodeInfoResource.get(nodeId)?.navigable === false);
-
-    if (nonNavigableNodeIndex === 0) {
-      return;
-    }
-
-    const targetIndex = nonNavigableNodeIndex === -1 ? nodePath.length - 1 : nonNavigableNodeIndex - 1;
-    await this.showNodeExecutor.execute({
-      id: nodePath[targetIndex]!,
-      path: nodePath.slice(0, targetIndex),
-    });
+    await this.showNodeExecutor.execute({ id, path });
   }
 
   async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean): Promise<boolean> {

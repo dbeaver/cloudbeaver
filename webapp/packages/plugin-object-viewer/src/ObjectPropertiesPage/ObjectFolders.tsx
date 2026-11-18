@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 
 import { SContext, type StyleRegistry, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import {
   type ITabData,
   TabList,
@@ -24,7 +24,7 @@ import {
 } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
-import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
+import { filterNavigableNodes, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState.js';
 import { FolderPanelRenderer } from './FolderPanelRenderer.js';
@@ -81,6 +81,7 @@ const objectFoldersRegistry: StyleRegistry = [
 export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const translate = useTranslate();
   const navNodeManagerService = useService(NavNodeManagerService);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
   const navNodeViewService = useService(NavNodeViewService);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
 
@@ -91,7 +92,8 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
 
   const children = useResource(ObjectFolders, NavTreeResource, nodeId);
 
-  const folders = navNodeViewService.getFolders(nodeId, children.data) || [];
+  const folders = filterNavigableNodes(navNodeInfoResource, navNodeViewService.getFolders(nodeId, children.data) || []);
+
   const wrongFolder = !folders.includes(folderId) && folders.length > 0 && children.isLoaded() && !children.isLoading() && !children.isOutdated();
 
   if (wrongFolder) {

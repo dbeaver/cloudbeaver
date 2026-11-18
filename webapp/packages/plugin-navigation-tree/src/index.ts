@@ -85,6 +85,7 @@ export * from './TreeNew/actions/ACTION_TREE_SAVE_STATE.js';
 export * from './TreeNew/TreeSettingsMenuService.js';
 
 export * from './NavigationTree/getNavigationTreeUserSettingsId.js';
+export { filterNavigableNodes } from './NavigationTree/navigationTreeNavigableFilter.js';
 export * from './NodesManager/NavNodeView/IFolderTransform.js';
 export * from './NodesManager/NavNodeView/NavNodeViewService.js';
 export * from './NodesManager/NavNodeContextMenuService.js';
