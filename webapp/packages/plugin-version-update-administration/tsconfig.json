@@ -8,7 +8,13 @@
   },
   "references": [
     {
+      "path": "../../common-react/@dbeaver/ui-kit"
+    },
+    {
       "path": "../core-administration"
+    },
+    {
+      "path": "../core-authentication"
     },
     {
       "path": "../core-blocks"
@@ -36,6 +42,9 @@
     },
     {
       "path": "../core-version-update"
+    },
+    {
+      "path": "../plugin-administration"
     },
     {
       "path": "../plugin-product-information-administration"

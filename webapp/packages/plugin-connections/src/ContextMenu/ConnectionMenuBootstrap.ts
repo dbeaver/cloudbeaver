@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import React from 'react';
+
 import {
   ConnectionInfoAuthPropertiesResource,
   ConnectionInfoProjectKey,
@@ -43,10 +45,14 @@ import { ACTION_CONNECTION_CLONE } from './Actions/ACTION_CONNECTION_CLONE.js';
 import { ACTION_CONNECTION_DISCONNECT } from './Actions/ACTION_CONNECTION_DISCONNECT.js';
 import { ACTION_CONNECTION_DISCONNECT_ALL } from './Actions/ACTION_CONNECTION_DISCONNECT_ALL.js';
 import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT.js';
-import { ChangeDatabasePasswordDialog } from './ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
 import { MENU_CONNECTION_SECURITY } from './MENU_CONNECTION_SECURITY.js';
 import { MENU_NAVIGATION_TREE_MANAGE, nodeDeletionPlanContext, NodeDeletionService } from '@cloudbeaver/plugin-navigation-tree';
+
+const ChangeDatabasePasswordDialog = React.lazy(async () => {
+  const { ChangeDatabasePasswordDialog } = await import('./ChangeDatabasePasswordDialog/ChangeDatabasePasswordDialog.js');
+  return { default: ChangeDatabasePasswordDialog };
+});
 
 @injectable(() => [
   NotificationService,
@@ -205,7 +211,13 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         const driver = this.dbDriverResource.get(connection.driverId);
 
-        return !!driver?.anonymousAccess || !this.serverConfigResource.dbUserPasswordChangeEnabled || !connection.canEdit || !connection.connected;
+        return (
+          !!driver?.anonymousAccess ||
+          !this.serverConfigResource.dbUserPasswordChangeEnabled ||
+          !connection.canEdit ||
+          !connection.connected ||
+          !connection.features.includes(EConnectionFeature.userPasswordChange)
+        );
       },
     });
 
