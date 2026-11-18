@@ -48,7 +48,7 @@ export class AIChatContextService extends Bootstrap {
     return !this.settings.context || this.currentContext !== null;
   }
 
-  private get settings(): { context?: IAIChatContextInfo | null; editorContext?: IAIChatContextInfo | null } {
+  private get settings(): { context?: IAIChatContextInfo | null; editorContext?: IAIChatContextInfo | null; editorContextPending?: boolean } {
     return this.userDataService.getUserData('ai-chat-context', () => ({}));
   }
 
@@ -98,6 +98,9 @@ export class AIChatContextService extends Bootstrap {
     const connectionKey = this.connectionSchemaManagerService.currentConnectionKey;
 
     // Include a pending editor selection so its asynchronous completion cannot undo this choice.
+    this.settings.editorContextPending =
+      this.connectionSchemaManagerService.isChangingConnection || this.connectionSchemaManagerService.isChangingConnectionContainer;
+
     this.settings.editorContext = connectionKey
       ? {
           connectionKey,
@@ -126,7 +129,9 @@ export class AIChatContextService extends Bootstrap {
         if (context) {
           const newContext = this.transformContext(context);
           const previousEditorContext = this.settings.editorContext;
+          const editorContextPending = this.settings.editorContextPending;
           this.settings.editorContext = newContext;
+          this.settings.editorContextPending = false;
 
           // Restoring the same editor context must not replace the saved chat selection.
           if (
@@ -134,8 +139,8 @@ export class AIChatContextService extends Bootstrap {
             (previousEditorContext !== undefined &&
               (!previousEditorContext ||
                 !isConnectionInfoParamEqual(previousEditorContext.connectionKey, newContext.connectionKey) ||
-                (previousEditorContext.catalog !== undefined && previousEditorContext.catalog !== newContext.catalog) ||
-                (previousEditorContext.schema !== undefined && previousEditorContext.schema !== newContext.schema)) &&
+                ((!editorContextPending || previousEditorContext.catalog !== undefined) && previousEditorContext.catalog !== newContext.catalog) ||
+                ((!editorContextPending || previousEditorContext.schema !== undefined) && previousEditorContext.schema !== newContext.schema)) &&
               (!this.currentContext || !this.isContextsEqual(this.currentContext, newContext)))
           ) {
             this.updateContext(newContext);
