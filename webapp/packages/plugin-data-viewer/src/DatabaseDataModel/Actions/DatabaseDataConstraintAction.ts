@@ -312,7 +312,8 @@ export class DatabaseDataConstraintAction
     return currentConstraint.orderAsc ? EOrder.asc : EOrder.desc;
   }
 
-  override updateResult(result: IDatabaseResultSet): void {
+  override updateResult(result: IDatabaseResultSet, index: number): void {
+    super.updateResult(result, index);
     updateConstraintsForResult(this.source, result);
   }
 
