@@ -9,7 +9,9 @@
 import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
 import type { AIProfile } from './AIProfilesResource.js';
 
 export interface IAIProfileFilters {
@@ -19,13 +21,19 @@ export interface IAIProfileFilters {
 }
 
 export function useAIProfilesTableFilters(profiles: AIProfile[]): IAIProfileFilters {
+  const aiEnginesResource = useService(AiEnginesResource);
+
   return useObservableRef(
     () => ({
       search: '',
       get filteredProfiles() {
         const search = this.search.trim().toLowerCase();
 
-        return this.profiles.filter(profile => [profile.name, profile.engineId].some(value => value.toLowerCase().includes(search)));
+        return this.profiles.filter(profile =>
+          [profile.name, profile.engineId, this.aiEnginesResource.data.find(engine => engine.id === profile.engineId)?.name ?? ''].some(value =>
+            value.toLowerCase().includes(search),
+          ),
+        );
       },
       setSearch(value: string) {
         this.search = value;
@@ -37,6 +45,6 @@ export function useAIProfilesTableFilters(profiles: AIProfile[]): IAIProfileFilt
       filteredProfiles: computed<AIProfile[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
       setSearch: action.bound,
     },
-    { profiles },
+    { profiles, aiEnginesResource },
   );
 }
