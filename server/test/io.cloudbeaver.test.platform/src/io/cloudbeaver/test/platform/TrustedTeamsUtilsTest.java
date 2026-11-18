@@ -17,14 +17,14 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.service.security.TrustedTeamsUtils;
-import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 public class TrustedTeamsUtilsTest {
-    private static final SMTeam[] TEAMS = {team("admin"), team("user")};
+    private static final Set<String> TEAMS = Set.of("admin", "user");
 
     @Test
     public void valuesMatchingTeamIdsAreKept() {
@@ -63,9 +63,5 @@ public class TrustedTeamsUtilsTest {
 
         Assertions.assertTrue(result.teamIds().isEmpty());
         Assertions.assertTrue(result.unknownValues().isEmpty());
-    }
-
-    private static SMTeam team(String id) {
-        return new SMTeam(id, id, id, false);
     }
 }

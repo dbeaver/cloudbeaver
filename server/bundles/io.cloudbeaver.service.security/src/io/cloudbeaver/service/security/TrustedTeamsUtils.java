@@ -17,7 +17,6 @@
 package io.cloudbeaver.service.security;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.security.user.SMTeam;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,11 +44,7 @@ public final class TrustedTeamsUtils {
      * on a foreign key error when the teams of the user are saved.
      */
     @NotNull
-    public static TrustedTeams filterExistingTeams(@NotNull Collection<String> values, @NotNull SMTeam[] allTeams) {
-        Set<String> existingTeamIds = new LinkedHashSet<>();
-        for (SMTeam team : allTeams) {
-            existingTeamIds.add(team.getTeamId());
-        }
+    public static TrustedTeams filterExistingTeams(@NotNull Collection<String> values, @NotNull Set<String> existingTeamIds) {
         Set<String> teamIds = new LinkedHashSet<>();
         List<String> unknownValues = new ArrayList<>();
         for (String value : values) {

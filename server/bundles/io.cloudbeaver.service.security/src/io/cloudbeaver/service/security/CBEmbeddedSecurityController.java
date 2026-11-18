@@ -1843,6 +1843,35 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    /**
+     * Returns the ids among the given ones that belong to an existing team, without loading the teams themselves.
+     */
+    @NotNull
+    private Set<String> findExistingTeamIds(@NotNull Collection<String> teamIds) throws DBCException {
+        if (teamIds.isEmpty()) {
+            return Set.of();
+        }
+        List<String> ids = teamIds.stream().distinct().toList();
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement(
+                 "SELECT TEAM_ID FROM {table_prefix}CB_TEAM WHERE TEAM_ID IN (" + SQLUtils.generateParamList(ids.size()) + ")"
+             )
+        ) {
+            for (int i = 0; i < ids.size(); i++) {
+                dbStat.setString(i + 1, ids.get(i));
+            }
+            Set<String> result = new LinkedHashSet<>();
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    result.add(dbResult.getString(1));
+                }
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new DBCException("Error reading teams from database", e);
+        }
+    }
+
     @Override
     public SMTeam findTeam(@NotNull String teamId) throws DBCException {
         return Arrays.stream(readAllTeams())
@@ -3449,9 +3478,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
                 // A value that is not a team is ignored instead of failing the whole login on a foreign key error
+                List<String> submittedTeams = ((List<?>) reverseProxyUserTeams).stream().map(String::valueOf).toList();
                 var trustedTeams = TrustedTeamsUtils.filterExistingTeams(
-                    ((List<?>) reverseProxyUserTeams).stream().map(String::valueOf).toList(),
-                    readAllTeams()
+                    submittedTeams,
+                    findExistingTeamIds(submittedTeams)
                 );
                 if (!trustedTeams.unknownValues().isEmpty()) {
                     log.debug("Ignored values of the trusted teams header that match no team: " + trustedTeams.unknownValues());
