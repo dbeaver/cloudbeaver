@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@cloudbeaver/core-administration": "workspace:*",
+    "@cloudbeaver/core-authentication": "workspace:*",
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
@@ -30,7 +31,9 @@
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-version": "workspace:*",
     "@cloudbeaver/core-version-update": "workspace:*",
+    "@cloudbeaver/plugin-administration": "workspace:*",
     "@cloudbeaver/plugin-product-information-administration": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

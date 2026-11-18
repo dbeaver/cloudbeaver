@@ -11,10 +11,13 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ProductInfoResource } from '@cloudbeaver/core-root';
 
+import { getLatestVersion, getVersionReleaseNotes, normalizeVersions } from './versionMetadata.js';
+
 export interface IVersion {
   number: string;
   date: string;
   releaseNotes: string;
+  patches?: { patchNumber: number; releaseNotes: string }[];
 }
 
 interface IVersions {
@@ -26,8 +29,8 @@ interface IVersions {
 export class VersionResource extends CachedMapResource<string, IVersion> {
   private latestVersionNumber: string | null;
 
-  get latest() {
-    return this.values.find(v => v.number === this.latestVersionNumber);
+  get latest(): IVersion | undefined {
+    return getLatestVersion(this.values, this.latestVersionNumber);
   }
 
   constructor(private readonly productInfoResource: ProductInfoResource) {
@@ -40,6 +43,10 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
       latestVersionNumber: observable.ref,
       latest: computed,
     });
+  }
+
+  getReleaseNotes(number: string): IVersion[] {
+    return getVersionReleaseNotes(this.values, number);
   }
 
   protected async loader(): Promise<Map<string, IVersion>> {
@@ -64,7 +71,8 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
         return this.data;
       }
 
-      this.replace(resourceKeyList(json.versions.map(version => version.number)), json.versions);
+      const versions = normalizeVersions(json.versions);
+      this.replace(resourceKeyList(versions.map(version => version.number)), versions);
     } catch (exception: any) {
       throw new Error('versions_load_fail', { cause: exception });
     }
