@@ -7,12 +7,22 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Container, Group, TextPlaceholder, ToolsAction, ToolsPanel, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ColoredContainer,
+  Container,
+  Filter,
+  Group,
+  TextPlaceholder,
+  ToolsAction,
+  ToolsPanel,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AiEnginesResource } from '@cloudbeaver/plugin-ai';
-import { type AIProfile, AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { type AIProfile, AIProfilesResource, useAIProfilesTableFilters } from '@cloudbeaver/plugin-ai-profiles';
 
 import { AIUserProfilesTable } from './AIUserProfilesTable.js';
 
@@ -22,6 +32,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   const profilesLoader = useResource(AIProfilesPanel, AIProfilesResource, CachedMapAllKey);
   const enginesLoader = useResource(AIProfilesPanel, AiEnginesResource, undefined);
   const profiles = profilesLoader.data.filter((profile): profile is AIProfile => profile !== undefined && !profile.global);
+  const filters = useAIProfilesTableFilters(profiles);
 
   async function refresh(): Promise<void> {
     try {
@@ -34,6 +45,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   return (
     <ColoredContainer parent overflow compact vertical noWrap gap>
       <Group box keepSize>
+        <Filter value={filters.search} placeholder={translate('ui_search')} onChange={filters.setSearch} />
         <ToolsPanel size="large" rounded>
           <ToolsAction
             title={translate('plugin_ai_user_profile_refresh_tooltip')}
@@ -48,7 +60,7 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
       </Group>
       <Container overflow gap maximum>
         {profiles.length ? (
-          <AIUserProfilesTable profiles={profiles} />
+          <AIUserProfilesTable profiles={filters.filteredProfiles} />
         ) : (
           <TextPlaceholder>{translate('plugin_ai_user_profile_empty')}</TextPlaceholder>
         )}

@@ -10,7 +10,7 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
-import type { AIProfile } from '@cloudbeaver/plugin-ai-profiles';
+import type { AIProfile } from './AIProfilesResource.js';
 
 export interface IAIProfileFilters {
   search: string;

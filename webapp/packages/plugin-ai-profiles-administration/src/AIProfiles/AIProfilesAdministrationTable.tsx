@@ -45,6 +45,10 @@ export const AIProfilesAdministrationTable = observer<Props>(function AIProfiles
           key: 'scope',
           minWidth: 120,
           label: 'plugin_ai_profiles_scope',
+          compare: (a, b) =>
+            translate(a.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user').localeCompare(
+              translate(b.global ? 'plugin_ai_profiles_scope_global' : 'plugin_ai_profiles_scope_user'),
+            ),
           render: profile => (
             <div className="tw:flex tw:items-center tw:gap-2">
               {profile.global && <IconOrImage icon="document-global" width={16} />}
