@@ -8,7 +8,7 @@
 
 import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { IconOrImage, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import {
@@ -25,7 +25,6 @@ import { DataGrid, TableRowSelect, useCellCopy, useCreateGridReactiveValue } fro
 
 import type { AIProfile } from './AIProfilesResource.js';
 import { AIProfileNameCell } from './AIProfileNameCell.js';
-import { useAIProfilesTableSort } from './useAIProfilesTableSort.js';
 
 export interface IAIProfilesTableColumn extends IAdministrationTableColumn {
   render: (profile: AIProfile) => ReactNode;
@@ -94,7 +93,9 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     ...additionalColumns,
   ];
 
-  const sorting = useAIProfilesTableSort(profiles, columns);
+  const [sort, setSort] = useState<{ key: string; order: 'asc' | 'desc' } | null>(null);
+  const compare = columns.find(column => column.key === sort?.key)?.compare;
+  const sortedProfiles = sort && compare ? profiles.toSorted((a, b) => (sort.order === 'asc' ? compare(a, b) : compare(b, a))) : profiles;
 
   const columnCount = useCreateGridReactiveValue(() => columns.length, null, [columns]);
   const rowCount = useCreateGridReactiveValue(
@@ -104,7 +105,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   );
 
   function getCell(rowIdx: number, colIdx: number) {
-    const profile = sorting.sortedProfiles[rowIdx];
+    const profile = sortedProfiles[rowIdx];
     const column = columns[colIdx];
 
     if (!profile || !column) {
@@ -147,8 +148,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   }
 
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
-    profiles,
-    sorting,
+    sortedProfiles,
     columns,
     enginesLoader.data,
     additionalColumns,
@@ -191,14 +191,19 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   const columnSortable = useCreateGridReactiveValue((colIdx: number) => !!columns[colIdx]?.compare, null, [columns]);
 
   function getColumnSortingState(colIdx: number) {
-    return sorting.sort?.key === columns[colIdx]?.key ? (sorting.sort?.order ?? null) : null;
+    return sort?.key === columns[colIdx]?.key ? (sort?.order ?? null) : null;
   }
 
   const columnSortingState = useCreateGridReactiveValue(
     getColumnSortingState,
     (onValueChange, colIdx) => reaction(() => getColumnSortingState(colIdx), onValueChange),
-    [sorting, columns],
+    [sort, columns],
   );
+
+  function handleSort(colIdx: number, order: 'asc' | 'desc' | null) {
+    const column = columns[colIdx];
+    setSort(order && column?.compare ? { key: column.key, order } : null);
+  }
 
   if (!profiles.length) {
     return <TextPlaceholder>{translate(emptyPlaceholder)}</TextPlaceholder>;
@@ -229,7 +234,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
         columnSortable={columnSortable}
         columnSortingState={columnSortingState}
         className={s(styles, { table: true })}
-        onColumnSort={sorting.setSort}
+        onColumnSort={handleSort}
         onCellKeyDown={cellCopy.handleKeyDown}
       />
     </AdministrationTable>

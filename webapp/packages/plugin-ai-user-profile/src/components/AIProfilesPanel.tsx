@@ -45,7 +45,6 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   return (
     <ColoredContainer parent overflow compact vertical noWrap gap>
       <Group box keepSize>
-        <Filter value={filters.search} placeholder={translate('ui_search')} onChange={filters.setSearch} />
         <ToolsPanel size="large" rounded>
           <ToolsAction
             title={translate('plugin_ai_user_profile_refresh_tooltip')}
@@ -58,6 +57,9 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
           </ToolsAction>
         </ToolsPanel>
       </Group>
+      <Container keepSize>
+        <Filter className="tw:w-full tw:max-w-sm" value={filters.search} placeholder={translate('ui_search')} onChange={filters.setSearch} />
+      </Container>
       <Container overflow gap maximum>
         {profiles.length ? (
           <AIUserProfilesTable profiles={filters.filteredProfiles} />
