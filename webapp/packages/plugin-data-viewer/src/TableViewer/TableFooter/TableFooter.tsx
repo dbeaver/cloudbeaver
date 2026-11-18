@@ -13,7 +13,6 @@ import { Container, Fill, s, ToolsPanel, useS, useTranslate } from '@cloudbeaver
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import styles from './TableFooter.module.css';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu.js';
-import { FetchSizeAction } from './TableFooterMenu/FetchSizeAction/FetchSizeAction.js';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   resultIndex: number;
@@ -27,7 +26,6 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
 
   return (
     <ToolsPanel type="secondary" role="toolbar" center minHeight {...rest}>
-      {!model.isDisabled(resultIndex) && <FetchSizeAction model={model} />}
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} />
       {model.source.requestInfo.requestMessage && (
         <>

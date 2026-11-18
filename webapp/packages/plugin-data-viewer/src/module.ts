@@ -16,6 +16,7 @@ import { DataValuePanelBootstrap } from './TableViewer/ValuePanel/DataValuePanel
 import { TableHeaderService } from './TableViewer/TableHeader/TableHeaderService.js';
 import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService.js';
 import { TableRefreshActionBootstrap } from './TableViewer/TableFooter/TableFooterMenu/RefreshAction/TableRefreshActionBootstrap.js';
+import { TableFetchSizeActionBootstrap } from './TableViewer/TableFooter/TableFooterMenu/FetchSizeAction/TableFetchSizeActionBootstrap.js';
 import { DataViewerViewService } from './TableViewer/DataViewerViewService.js';
 import { ResultSetTableFooterMenuService } from './ResultSet/ResultSetTableFooterMenuService.js';
 import { LocaleService } from './LocaleService.js';
@@ -66,6 +67,7 @@ export default ModuleRegistry.add({
       .addSingleton(Bootstrap, proxy(DataViewerBootstrap))
       .addSingleton(Bootstrap, proxy(ImageValuePresentationBootstrap))
       .addSingleton(Bootstrap, LocaleService)
+      .addSingleton(Bootstrap, proxy(TableFetchSizeActionBootstrap))
       .addSingleton(Bootstrap, proxy(TableHeaderService))
       .addSingleton(Bootstrap, proxy(TableRefreshActionBootstrap))
       .addSingleton(Bootstrap, proxy(TextValuePresentationBootstrap))
@@ -80,6 +82,7 @@ export default ModuleRegistry.add({
       .addSingleton(TableHeaderService)
       .addSingleton(TableFooterMenuService)
       .addSingleton(TableRefreshActionBootstrap)
+      .addSingleton(TableFetchSizeActionBootstrap)
       .addSingleton(DataViewerViewService)
       .addSingleton(ResultSetTableFooterMenuService)
       .addSingleton(DataViewerTabService)
