@@ -62,9 +62,6 @@ public interface DBWServiceAuth extends DBWService {
     ) throws DBWebException;
 
     @WebAction(authRequired = false)
-    WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException;
-
-    @WebAction(authRequired = false)
     WebLogoutInfo authLogout(
         @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
