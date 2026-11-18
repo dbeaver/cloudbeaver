@@ -61,7 +61,7 @@ export class AIChatService {
     runInAction(() => {
       this.settings.active = !this.settings.active;
 
-      if (!wasActive && !this.aiChatContextService.currentContext) {
+      if (!wasActive && !this.aiChatContextService.isContextInitialized) {
         this.aiChatContextService.setContext(this.aiChatContextService.getContext());
       }
     });

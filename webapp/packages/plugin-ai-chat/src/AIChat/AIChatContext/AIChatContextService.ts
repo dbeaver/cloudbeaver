@@ -40,8 +40,16 @@ export class AIChatContextService extends Bootstrap {
     return context && this.connectionInfoResource.has(context.connectionKey) ? context : null;
   }
 
-  private get settings(): { context: IAIChatContextInfo | null } {
-    return this.userDataService.getUserData('ai-chat-context', () => ({ context: null }));
+  get isContextInitialized(): boolean {
+    return this.settings.context !== undefined;
+  }
+
+  get isContextReady(): boolean {
+    return !this.settings.context || this.currentContext !== null;
+  }
+
+  private get settings(): { context?: IAIChatContextInfo | null } {
+    return this.userDataService.getUserData('ai-chat-context', () => ({}));
   }
 
   private reactionDisposer: IReactionDisposer | null;
