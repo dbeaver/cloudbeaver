@@ -21,6 +21,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
 
 export interface IAIChatContextInfo {
   connectionKey: IConnectionInfoParams;
@@ -68,6 +69,14 @@ export class AIChatContextService extends Bootstrap {
 
     userInfoResource.onUserChange.addHandler(() => {
       this.onContextChange.execute(this.currentContext);
+    });
+
+    connectionInfoResource.onItemDelete.addHandler(key => {
+      const context = this.settings.context;
+
+      if (context && ResourceKeyUtils.some(key, key => isConnectionInfoParamEqual(key, context.connectionKey))) {
+        this.setContext(null);
+      }
     });
 
     connectionInfoResource.onDataUpdate.addHandler(() => {
