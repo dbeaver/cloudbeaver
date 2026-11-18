@@ -34,6 +34,7 @@ import elementsTreeToolsStyles from './ElementsTreeTools.module.css';
 import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId.js';
 import style from './NavigationTree.module.css';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter.js';
+import { navigationTreeVirtualChildrenFilter } from './navigationTreeVirtualChildrenFilter.js';
 import { NavigationTreeService } from './NavigationTreeService.js';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter.js';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare.js';
@@ -80,6 +81,7 @@ export const NavigationTree = observer(function NavigationTree() {
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
+  const virtualChildrenFilter = useMemo(() => navigationTreeVirtualChildrenFilter(navigationTreeService), [navigationTreeService]);
   const connectionRenderer = useMemo(() => navTreeConnectionRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsRendererRenderer = useMemo(() => navigationTreeProjectsRendererRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsExpandStateGetter = useMemo(
@@ -117,8 +119,13 @@ export const NavigationTree = observer(function NavigationTree() {
           ref={tree}
           root={root}
           localState={navigationTreeService.treeState}
-          filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
-          renderers={[projectsRendererRenderer, ...navigationTreeConnectionGroupRenderers, connectionRenderer]}
+          filters={[duplicateFilter, connectionGroupFilter, projectFilter, virtualChildrenFilter]}
+          renderers={[
+            projectsRendererRenderer,
+            ...navigationTreeConnectionGroupRenderers,
+            connectionRenderer,
+            ...navigationTreeService.virtualChildrenRenderers,
+          ]}
           navNodeFilterCompare={navigationTreeProjectSearchCompare}
           nodeInfoTransformers={[transformFilteredNode, transformDescriptionNode]}
           expandStateGetters={[projectsExpandStateGetter]}
@@ -135,6 +142,7 @@ export const NavigationTree = observer(function NavigationTree() {
           customSelectReset={handleSelectReset}
           settings={settings}
           getChildren={navigationTreeService.getChildren}
+          hasVirtualChildren={navigationTreeService.hasVirtualChildren}
           loadChildren={navigationTreeService.loadNestedNodes}
           onOpen={handleOpen}
         />

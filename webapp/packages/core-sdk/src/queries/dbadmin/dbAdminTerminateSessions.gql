@@ -1,0 +1,3 @@
+mutation dbAdminTerminateSessions($projectId: ID!, $connectionId: ID!, $sessionIds: [ID!]!, $cancelQueryOnly: Boolean) {
+  result: dbAdminTerminateSessions(projectId: $projectId, connectionId: $connectionId, sessionIds: $sessionIds, cancelQueryOnly: $cancelQueryOnly)
+}

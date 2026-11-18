@@ -16,7 +16,14 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import {
+  EObjectFeature,
+  type NavNode,
+  NavNodeInfoResource,
+  NavNodeManagerService,
+  NavTreeResource,
+  ROOT_NODE_PATH,
+} from '@cloudbeaver/core-navigation-tree';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedResourceOffsetPageKey,
@@ -27,11 +34,21 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, type IActiveView, View } from '@cloudbeaver/core-view';
 
-import type { ITreeNodeState } from './ElementsTree/useElementsTree.js';
+import type { IElementsTreeCustomRenderer, ITreeNodeState } from './ElementsTree/useElementsTree.js';
 
 export interface INavigationNodeSelectionData {
   id: ResourceKey<string>;
   selected: boolean[];
+}
+
+/**
+ * Children that a plugin shows in the navigation tree in addition to the nodes reported by the server,
+ * for example, links to tools of a folder.
+ */
+export interface INavigationTreeVirtualChildren {
+  /** Returns IDs of virtual children of the node. IDs must be unique in the tree and match the renderer. */
+  getChildren: (node: NavNode) => string[];
+  renderer: IElementsTreeCustomRenderer;
 }
 
 interface INavigationNodeShowData {
@@ -51,6 +68,7 @@ export class NavigationTreeService extends View<string> {
   readonly treeState: MetadataMap<string, ITreeNodeState>;
   readonly nodeSelectionTask: ISyncExecutor<INavigationNodeSelectionData>;
   readonly showNodeExecutor: IExecutor<INavigationNodeShowData>;
+  private readonly virtualChildren: INavigationTreeVirtualChildren[];
 
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
@@ -70,15 +88,34 @@ export class NavigationTreeService extends View<string> {
 
     this.nodeSelectionTask = new SyncExecutor();
     this.showNodeExecutor = new Executor();
+    this.virtualChildren = [];
     this.getView = this.getView.bind(this);
     this.getChildren = this.getChildren.bind(this);
     this.loadNestedNodes = this.loadNestedNodes.bind(this);
+    this.hasVirtualChildren = this.hasVirtualChildren.bind(this);
     this.registerAction(ACTION_FILTER, ACTION_COLLAPSE_ALL);
 
     makeObservable<NavigationTreeService, 'unselectAll'>(this, {
       selectNode: action,
       unselectAll: action,
     });
+  }
+
+  /** Registers virtual children. Call it during bootstrap registration, before the tree renders. */
+  addVirtualChildren(virtualChildren: INavigationTreeVirtualChildren): void {
+    this.virtualChildren.push(virtualChildren);
+  }
+
+  get virtualChildrenRenderers(): IElementsTreeCustomRenderer[] {
+    return this.virtualChildren.map(virtualChildren => virtualChildren.renderer);
+  }
+
+  getVirtualChildren(node: NavNode): string[] {
+    return this.virtualChildren.flatMap(virtualChildren => virtualChildren.getChildren(node));
+  }
+
+  hasVirtualChildren(node: NavNode): boolean {
+    return this.virtualChildren.some(virtualChildren => virtualChildren.getChildren(node).length > 0);
   }
 
   getChildren(id: string): string[] | undefined {

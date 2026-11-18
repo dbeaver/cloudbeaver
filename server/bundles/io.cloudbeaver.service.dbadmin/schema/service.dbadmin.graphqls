@@ -1,0 +1,103 @@
+####################################################
+# Database server administration: sessions and locks
+####################################################
+
+"Server administration features supported by a connection"
+type DBAdminInfo @since(version: "26.3.0") {
+    "Whether the connection can list and terminate server sessions"
+    sessionsSupported: Boolean!
+    "Whether the connection can list lock waits and terminate waiting sessions"
+    locksSupported: Boolean!
+}
+
+"Column of a server administration table"
+type DBAdminColumn @since(version: "26.3.0") {
+    "Property ID"
+    id: ID!
+    "Human-readable column name"
+    displayName: String!
+    "Column description"
+    description: String
+}
+
+"Generic table row. Values follow the order of the table columns."
+type DBAdminRow @since(version: "26.3.0") {
+    "Formatted values. Null means the value is empty."
+    values: [String]!
+}
+
+"Server session"
+type DBAdminSession @since(version: "26.3.0") {
+    "Server session ID (for example, a PostgreSQL backend PID)"
+    sessionId: ID!
+    "Query that the session is running, if any"
+    activeQuery: String
+    "Formatted values. Values follow the order of the list columns."
+    values: [String]!
+}
+
+"Server session list"
+type DBAdminSessionList @since(version: "26.3.0") {
+    columns: [DBAdminColumn!]!
+    sessions: [DBAdminSession!]!
+}
+
+"Lock wait: a session that waits for a lock, or the session that holds it"
+type DBAdminLock @since(version: "26.3.0") {
+    "Lock ID"
+    lockId: ID!
+    "ID of the lock that blocks this one, if any"
+    holdLockId: ID
+    "Short lock description"
+    title: String
+    "Formatted values. Values follow the order of the list columns."
+    values: [String]!
+}
+
+"Lock wait list"
+type DBAdminLockList @since(version: "26.3.0") {
+    columns: [DBAdminColumn!]!
+    locks: [DBAdminLock!]!
+}
+
+"Locks requested or held by one session"
+type DBAdminLockItemList @since(version: "26.3.0") {
+    "Server session ID the locks belong to. Null if there is no such session."
+    sessionId: ID
+    columns: [DBAdminColumn!]!
+    items: [DBAdminRow!]!
+}
+
+"Lock details"
+type DBAdminLockDetails @since(version: "26.3.0") {
+    "Locks of the waiting session"
+    waiting: DBAdminLockItemList!
+    "Locks of the holding (blocking) session"
+    holding: DBAdminLockItemList!
+}
+
+extend type Query {
+
+    "Returns server administration features supported by the connection"
+    dbAdminGetInfo(projectId: ID!, connectionId: ID!): DBAdminInfo! @since(version: "26.3.0")
+
+    "Returns server sessions. Idle sessions are skipped unless showIdle is true."
+    dbAdminListSessions(projectId: ID!, connectionId: ID!, showIdle: Boolean): DBAdminSessionList! @since(version: "26.3.0")
+
+    "Returns lock waits and the sessions that block them"
+    dbAdminListLocks(projectId: ID!, connectionId: ID!): DBAdminLockList! @since(version: "26.3.0")
+
+    "Returns locks of the waiting and the holding session of a lock wait"
+    dbAdminGetLockDetails(projectId: ID!, connectionId: ID!, lockId: ID!): DBAdminLockDetails! @since(version: "26.3.0")
+
+}
+
+extend type Mutation {
+
+    "Terminates server sessions. If cancelQueryOnly is true, cancels their running queries instead."
+    dbAdminTerminateSessions(projectId: ID!, connectionId: ID!, sessionIds: [ID!]!, cancelQueryOnly: Boolean): Boolean! @since(version: "26.3.0")
+
+    "Terminates the waiting session of a lock wait"
+    dbAdminTerminateLock(projectId: ID!, connectionId: ID!, lockId: ID!): Boolean! @since(version: "26.3.0")
+
+}

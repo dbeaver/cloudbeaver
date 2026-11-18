@@ -91,6 +91,7 @@
     "@cloudbeaver/plugin-data-viewer-result-trace-details": "workspace:*",
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*",
     "@cloudbeaver/plugin-datasource-transaction-manager": "workspace:*",
+    "@cloudbeaver/plugin-dbadmin": "workspace:*",
     "@cloudbeaver/plugin-ddl-viewer": "workspace:*",
     "@cloudbeaver/plugin-devtools": "workspace:*",
     "@cloudbeaver/plugin-gis-viewer": "workspace:*",

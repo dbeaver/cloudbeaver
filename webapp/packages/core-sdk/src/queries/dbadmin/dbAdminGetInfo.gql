@@ -1,0 +1,6 @@
+query dbAdminGetInfo($projectId: ID!, $connectionId: ID!) {
+  info: dbAdminGetInfo(projectId: $projectId, connectionId: $connectionId) {
+    sessionsSupported
+    locksSupported
+  }
+}

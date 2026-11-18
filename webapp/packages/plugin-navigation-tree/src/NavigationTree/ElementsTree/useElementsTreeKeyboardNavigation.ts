@@ -108,7 +108,7 @@ export function useElementsTreeKeyboardNavigation(tree: IElementsTree): React.Re
 
           break;
         case 'ArrowRight':
-          if (node.hasChildren) {
+          if (!tree.isNodeLeaf(node)) {
             await expandNode(nodeId, true);
           }
 

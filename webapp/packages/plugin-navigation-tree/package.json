@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/core-navigation-tree": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "@dbeaver/react-tests": "workspace:*",

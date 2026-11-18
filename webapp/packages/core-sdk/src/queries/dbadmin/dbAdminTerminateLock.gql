@@ -1,0 +1,3 @@
+mutation dbAdminTerminateLock($projectId: ID!, $connectionId: ID!, $lockId: ID!) {
+  result: dbAdminTerminateLock(projectId: $projectId, connectionId: $connectionId, lockId: $lockId)
+}

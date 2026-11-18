@@ -1,0 +1,15 @@
+query dbAdminListLocks($projectId: ID!, $connectionId: ID!) {
+  list: dbAdminListLocks(projectId: $projectId, connectionId: $connectionId) {
+    columns {
+      id
+      displayName
+      description
+    }
+    locks {
+      lockId
+      holdLockId
+      title
+      values
+    }
+  }
+}

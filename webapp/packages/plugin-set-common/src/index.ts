@@ -66,6 +66,7 @@ import pluginDatasourceContextSwitch from '@cloudbeaver/plugin-datasource-contex
 import pluginDatasourceTransactionManager from '@cloudbeaver/plugin-datasource-transaction-manager/module';
 import pluginDataViewerRequestQueryViewer from '@cloudbeaver/plugin-data-viewer-request-query-viewer/module';
 import pluginDdlViewer from '@cloudbeaver/plugin-ddl-viewer/module';
+import pluginDbAdmin from '@cloudbeaver/plugin-dbadmin/module';
 import pluginDevTools from '@cloudbeaver/plugin-devtools/module';
 import pluginGisViewer from '@cloudbeaver/plugin-gis-viewer/module';
 import pluginHelp from '@cloudbeaver/plugin-help/module';
@@ -188,6 +189,7 @@ export const commonSet = [
   pluginDataViewerRequestQueryViewer,
   pluginGisViewer,
   pluginDdlViewer,
+  pluginDbAdmin,
   pluginObjectViewer,
   pluginScriptExport,
   pluginSqlEditor,

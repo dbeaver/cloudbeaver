@@ -87,6 +87,8 @@ export interface IElementsTreeOptions {
   /** Allows to pass external state. It can be used to manipulate a tree state from the outside or to store it in an external state */
   localState?: MetadataMap<string, ITreeNodeState>;
   getChildren: (id: string) => string[] | undefined;
+  /** Returns true if filters add children that the server doesn't report, so the node must stay expandable */
+  hasVirtualChildren?: (node: NavNode) => boolean;
   loadChildren: (id: string, manual: boolean) => Promise<boolean>;
   onFilter?: (value: string) => Promise<void> | void;
   onSelect?: (node: NavNode, state: boolean) => Promise<void> | void;
@@ -468,6 +470,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
         return true;
       },
       isNodeLeaf(node: NavNode): boolean {
+        if (options.hasVirtualChildren?.(node)) {
+          return false;
+        }
+
         const children = navTreeResource.get(node.uri);
         const outdated = navNodeInfoResource.isOutdated(node.uri) || navTreeResource.isOutdated(node.uri);
 

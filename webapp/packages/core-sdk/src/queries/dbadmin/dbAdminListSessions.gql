@@ -1,0 +1,14 @@
+query dbAdminListSessions($projectId: ID!, $connectionId: ID!, $showIdle: Boolean) {
+  list: dbAdminListSessions(projectId: $projectId, connectionId: $connectionId, showIdle: $showIdle) {
+    columns {
+      id
+      displayName
+      description
+    }
+    sessions {
+      sessionId
+      activeQuery
+      values
+    }
+  }
+}
