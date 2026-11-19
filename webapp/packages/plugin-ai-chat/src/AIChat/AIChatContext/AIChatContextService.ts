@@ -19,7 +19,7 @@ import {
   type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import { UserConfigurationResource, UserConfigurationStorage, UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { UserConfigurationStorage, UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 
 export interface IAIChatContextInfo {
   connectionKey: IConnectionInfoParams;
@@ -37,7 +37,6 @@ interface ISettings {
   ProjectsService,
   UserDataService,
   UserConfigurationStorage,
-  UserConfigurationResource,
   ConnectionInfoResource,
 ])
 export class AIChatContextService extends Bootstrap {
@@ -65,7 +64,7 @@ export class AIChatContextService extends Bootstrap {
   get isContextReady(): boolean {
     return (
       this.userInfoResource.hasAccess() &&
-      (!this.userInfoResource.isAuthenticated() || this.userConfigurationResource.isLoaded()) &&
+      (!this.userConfigurationStorage.isAvailable() || this.userConfigurationStorage.isLoaded()) &&
       this.connectionInfoResource.isLoaded(ConnectionInfoActiveProjectKey)
     );
   }
@@ -82,7 +81,6 @@ export class AIChatContextService extends Bootstrap {
     private readonly projectsService: ProjectsService,
     private readonly userDataService: UserDataService,
     private readonly userConfigurationStorage: UserConfigurationStorage,
-    private readonly userConfigurationResource: UserConfigurationResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
