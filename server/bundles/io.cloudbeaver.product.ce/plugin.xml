@@ -25,8 +25,7 @@
     </extension>
 
     <extension point="org.jkiss.dbeaver.product.bundles">
-        <bundle id="drivers.cloudflare.d1" label="Bundled Cloudflare D1 driver"/>
-        <bundle id="drivers.cloudflare.d1.files" label="Cloudflare D1 driver files"/>
+        <bundle id="drivers.cloudflare.d1" label="Cloudflare D1 driver files"/>
     </extension>
 
     <extension point="io.cloudbeaver.driver">
