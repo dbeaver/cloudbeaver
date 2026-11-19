@@ -20,18 +20,6 @@
         <feature id="ai" label="%feature.ai.label" description="%feature.ai.description" enabledByDefault="true"/>
     </extension>
 
-    <extension point="org.jkiss.dbeaver.resources">
-        <resource name="drivers/cloudflare/d1"/>
-    </extension>
-
-    <extension point="org.jkiss.dbeaver.product.bundles">
-        <bundle id="drivers.cloudflare.d1" label="Cloudflare D1 driver files"/>
-    </extension>
-
-    <extension point="io.cloudbeaver.driver">
-        <driver id="cloudflare_d1:cloudflare_d1_jdbc"/>
-    </extension>
-
     <extension point="org.jkiss.dbeaver.application">
         <application
                 id="cloudbeaver-ce"
