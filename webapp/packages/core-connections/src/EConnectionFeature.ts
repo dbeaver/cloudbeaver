@@ -8,6 +8,7 @@
 
 export enum EConnectionFeature {
   connected = 'connected',
+  userPasswordChange = 'userPasswordChange',
   virtual = 'virtual',
   temporary = 'temporary',
   readOnly = 'readOnly',

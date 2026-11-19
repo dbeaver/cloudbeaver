@@ -7,7 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
-import { Suspense, useContext, useRef, type PropsWithChildren } from 'react';
+import { Suspense, useContext, useRef, useState, type PropsWithChildren } from 'react';
 
 import { ActionIconButton, AutoResizeTextarea, Form, Placeholder, s, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -35,6 +35,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   const aiChatInputService = useService(AIChatInputService);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [cancelling, setCancelling] = useState(false);
   const { input, dragHandlers, onPaste } = useAIChatInput({
     conversationId: currentConversationId,
     connectionKey: context.connectionKey,
@@ -69,10 +70,14 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
 
   async function cancel() {
     if (currentConversationId) {
+      setCancelling(true);
+
       try {
         await aiChatConversationsService.cancelConversation(currentConversationId);
       } catch (exception: any) {
         notificationService.logException(exception, 'plugin_ai_chat_conversation_cancel_failed');
+      } finally {
+        setCancelling(false);
       }
     }
   }
@@ -85,12 +90,13 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
   }
 
   const disabled = context.disabled || !aiChatInputService.canSubmit(input, state.prompt);
+  const stopLabel = translate(cancelling ? 'plugin_ai_chat_conversation_cancelling' : 'ui_processing_stop');
 
   return (
     <div className={s(styles, { container: true })}>
       <Form
         className="tw:flex tw:items-end tw:gap-2"
-        disableEnterSubmit={disabled}
+        disableEnterSubmit={disabled || cancelling}
         contents
         onSubmit={aiChatConversationsService.processing ? cancel : sendMessage}
       >
@@ -100,6 +106,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
           </Suspense>
           <AutoResizeTextarea
             ref={textareaRef}
+            writingsuggestions="false"
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
             value={state.prompt}
@@ -123,8 +130,11 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
               />
             ) : (
               <Command
-                className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity"
-                aria-label={translate('ui_processing_stop')}
+                className="tw:cursor-pointer tw:w-10 tw:h-10 tw:bg-[var(--theme-primary)] tw:rounded-md tw:flex tw:items-center tw:justify-center tw:focus:opacity-80 tw:hover:opacity-80 tw:transition-opacity tw:aria-disabled:cursor-default tw:aria-disabled:opacity-50"
+                aria-label={stopLabel}
+                title={stopLabel}
+                disabled={cancelling}
+                accessibleWhenDisabled
                 onClick={cancel}
               >
                 <div className="tw:w-3 tw:h-3 tw:bg-[var(--theme-surface)] tw:rounded-xs" />
