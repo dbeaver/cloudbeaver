@@ -33,6 +33,7 @@ import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
+import io.cloudbeaver.test.platform.admin.AdminTeamPermissionsTest;
 import io.cloudbeaver.test.platform.admin.AdminUserTeamGrantTest;
 import io.cloudbeaver.test.platform.admin.UserTeamGrantMigrationTest;
 import io.cloudbeaver.test.platform.fs.FileSystemMutationTest;
@@ -76,6 +77,7 @@ import org.junit.platform.suite.api.Suite;
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
+        AdminTeamPermissionsTest.class,
         AdminUserTeamGrantTest.class,
         UserTeamGrantMigrationTest.class,
         BlankLineDelimiterTest.class,

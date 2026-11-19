@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBAPermissionRealm;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMAuthConfiguration;
@@ -343,7 +344,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @NotNull
     @Override
     public List<AdminPermissionInfo> setSubjectPermissions(@NotNull WebSession webSession, @NotNull String subjectID, @NotNull List<String> permissions) throws DBWebException {
-        validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, permissions);
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot change permissions in anonymous mode");
@@ -351,7 +351,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (CommonUtils.equalObjects(subjectID, CBConstants.DEFAULT_ADMIN_TEAM)) {
             throw new DBWebException("Cannot change permissions for team '" + subjectID + "'");
         }
-        if (!permissions.contains(DBWConstants.PERMISSION_ADMIN)
+        // Clients can send the obsolete public permission back when editing a team with legacy grants.
+        List<String> effectivePermissions = permissions.stream()
+            .filter(permission -> !DBAPermissionRealm.PERMISSION_PUBLIC.equals(permission))
+            .toList();
+        validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, effectivePermissions);
+        if (!effectivePermissions.contains(DBWConstants.PERMISSION_ADMIN)
             && isOwnSubject(webSession, grantor.getUserId(), subjectID)
         ) {
             checkAdminPermissionsRetained(webSession, grantor.getUserId(), subjectID);
@@ -359,7 +364,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         webSession.addInfoMessage("Set permissions to subject - " + subjectID);
 
         try {
-            webSession.getAdminSecurityController().setSubjectPermissions(subjectID, permissions, grantor.getUserId());
+            webSession.getAdminSecurityController().setSubjectPermissions(subjectID, effectivePermissions, grantor.getUserId());
             Set<String> subjectPermissions = webSession.getAdminSecurityController().getSubjectPermissions(subjectID);
             webSession.refreshUserData();
             return listPermissions(webSession).stream()
@@ -961,7 +966,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             }
             if (!expectedScope.equals(permissionDescriptor.getScope())) {
                 throw new DBWebException(MessageFormat.format(
-                    "Unexpected permission scope, expected [{}] but was [{}]",
+                    "Unexpected permission scope, expected [{0}] but was [{1}]",
                     expectedScope, permissionDescriptor.getScope()
                 ));
             }
