@@ -22,6 +22,7 @@ import io.cloudbeaver.service.ai.model.WebAIChatConversation;
 import io.cloudbeaver.service.ai.model.WebAIMessage;
 import io.cloudbeaver.service.ai.model.WebAISendChatMessageInfo;
 import io.cloudbeaver.service.ai.model.WebAiChatResponseConsumer;
+import io.cloudbeaver.service.ai.model.events.WSAiChatMessageChunkEvent;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.eclipse.core.runtime.IStatus;
@@ -54,6 +55,7 @@ import java.util.concurrent.CompletableFuture;
 public class WebAIUtils {
     private static final Log log = Log.getLog(WebAIUtils.class);
     private static final String AI_WAITING_ATTR = "ai.waiting.";
+    private static final String AI_RESPONSE_ATTR = "ai.response.";
     public static final String AI_CHAT_ATTR = "ai_chat";
     public static final String AI_CHAT_USER_ATTR = "ai_chat_user";
 
@@ -144,11 +146,26 @@ public class WebAIUtils {
         @NotNull String jobName
     ) {
         CompletableFuture<AIChatConversation> result = new CompletableFuture<>();
+        WebAiChatResponseConsumer subscriber;
+        synchronized (conversation) {
+            if (conversation.getState() == AIChatConversation.State.CANCELED) {
+                result.cancel(false);
+                return result;
+            }
+            subscriber = new WebAiChatResponseConsumer(conversation, webSession, aiChatSession);
+            webSession.setAttribute(getResponseAttr(conversation), subscriber);
+        }
         AbstractJob job = new AbstractJob(jobName) {
             @NotNull
             @Override
             protected IStatus run(@NotNull DBRProgressMonitor monitor) {
                 try {
+                    synchronized (conversation) {
+                        if (monitor.isCanceled() || webSession.getAttribute(getResponseAttr(conversation)) != subscriber) {
+                            result.cancel(false);
+                            return Status.CANCEL_STATUS;
+                        }
+                    }
                     AIConfigurationProfile selectedProfile = conversation.getProfile();
                     if (selectedProfile == null) {
                         selectedProfile = AISettingsManager.getStaticSettings().getDefaultConfiguration();
@@ -161,7 +178,6 @@ public class WebAIUtils {
                         throw new DBWebException("Invalid AI configuration");
                     }
                     conversation.setProfile(effectiveProfile);
-                    AIChatResponseConsumer subscriber = new WebAiChatResponseConsumer(conversation, webSession, aiChatSession);
                     aiChatSession.processAICompletion(
                         monitor,
                         conversation,
@@ -180,10 +196,10 @@ public class WebAIUtils {
                         log.debug("AI completion cancelled", e);
                     } else {
                         log.error("Error processing AI completion", e);
-                        var errorMessage = conversation.addMessage(AIMessage.errorMessage(e));
-                        webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(errorMessage, conversation)));
-                        aiChatSession.notifyMessageAdd(conversation, errorMessage);
+                        subscriber.error(e);
+                        subscriber.complete(List.of(), true, false);
                     }
+                    result.completeExceptionally(e);
                 } finally {
                     // Only clear the flag if it still points to this job
                     if (webSession.getAttribute(getWaitingAttr(conversation)) == this) {
@@ -201,6 +217,11 @@ public class WebAIUtils {
     @NotNull
     public static String getWaitingAttr(@NotNull AIChatConversation conversation) {
         return AI_WAITING_ATTR + conversation.getId();
+    }
+
+    @NotNull
+    public static String getResponseAttr(@NotNull AIChatConversation conversation) {
+        return AI_RESPONSE_ATTR + conversation.getId();
     }
 
     @NotNull
@@ -246,6 +267,20 @@ public class WebAIUtils {
                     WSAiChatMessageEvent event = new WSAiChatMessageEvent(confirmationMessage);
                     webSession.addSessionEvent(event);
                 }
+            }
+
+            @Override
+            public void conversationCanceled(@NotNull AIChatConversation conversation) {
+                if (webSession.getAttribute(getResponseAttr(conversation)) instanceof WebAiChatResponseConsumer subscriber) {
+                    subscriber.complete(List.of(), true, true);
+                    return;
+                }
+                webSession.addSessionEvent(new WSAiChatMessageChunkEvent(
+                    conversation.getId(),
+                    conversation.getNextMessageId(),
+                    null,
+                    true
+                ));
             }
         });
         webSession.setAttribute(AI_CHAT_ATTR, aiChatSession);
@@ -307,6 +342,7 @@ public class WebAIUtils {
                 throw new DBWebException("Conversation is already waiting for response");
             }
             result = new AIChatMessage(conversation.getNextMessageId(), AIMessage.assistantMessage("", null));
+            conversation.startConversation();
             WebAIUtils.scheduleConversationSubmission(webSession, aiChatSession, conversation, null, "AI completion");
         }
         return new WebAISendChatMessageInfo(
