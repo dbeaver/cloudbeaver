@@ -58,7 +58,7 @@ public class CBEventOriginFilter implements Filter {
         try {
             Origin browserOrigin = parseOrigin(origin);
             Origin requestOrigin = getRequestOrigin(request);
-            return browserOrigin != null && browserOrigin.equals(requestOrigin);
+            return browserOrigin != null && requestOrigin != null && browserOrigin.matches(requestOrigin);
         } catch (IllegalArgumentException e) {
             return false;
         }
@@ -75,7 +75,7 @@ public class CBEventOriginFilter implements Filter {
         }
 
         Origin forwardedOrigin = getForwardedOrigin(request);
-        if (parsedProxyOrigin != null && forwardedOrigin != null && !parsedProxyOrigin.equals(forwardedOrigin)) {
+        if (parsedProxyOrigin != null && forwardedOrigin != null && !parsedProxyOrigin.matches(forwardedOrigin)) {
             return null;
         }
         if (parsedProxyOrigin != null) {
@@ -110,7 +110,7 @@ public class CBEventOriginFilter implements Filter {
         if (!isValidPort(parsedPort)) {
             return null;
         }
-        return new Origin(origin.scheme(), origin.host(), parsedPort);
+        return new Origin(origin.host(), parsedPort);
     }
 
     private static boolean hasForwardedOrigin(@Nullable String scheme, @Nullable String host) {
@@ -153,12 +153,18 @@ public class CBEventOriginFilter implements Filter {
             return null;
         }
         return new Origin(
-            httpScheme.asString(),
             host.toLowerCase(Locale.ENGLISH),
             port == -1 ? httpScheme.getDefaultPort() : port
         );
     }
 
-    private record Origin(@NotNull String scheme, @NotNull String host, int port) {
+    private record Origin(@NotNull String host, int port) {
+        private boolean matches(@NotNull Origin other) {
+            return host.equals(other.host) && normalizePort(port) == normalizePort(other.port);
+        }
+
+        private static int normalizePort(int port) {
+            return port == HttpScheme.HTTP.getDefaultPort() || port == HttpScheme.HTTPS.getDefaultPort() ? -1 : port;
+        }
     }
 }

@@ -57,9 +57,17 @@ public class CBEventOriginFilterTest {
     }
 
     @Test
-    public void testDifferentScheme() {
+    public void testSameAuthorityWithDifferentScheme() {
         Mockito.when(request.getHeader("Origin")).thenReturn("https://app.example.com:8080");
-        assertFalse(CBEventOriginFilter.isAllowedOrigin(request));
+        assertTrue(CBEventOriginFilter.isAllowedOrigin(request));
+    }
+
+    @Test
+    public void testSameAuthorityWithDifferentSchemesAndDefaultPorts() {
+        Mockito.when(request.getServerPort()).thenReturn(80);
+        Mockito.when(request.getHeader("Origin")).thenReturn("https://app.example.com");
+
+        assertTrue(CBEventOriginFilter.isAllowedOrigin(request));
     }
 
     @Test

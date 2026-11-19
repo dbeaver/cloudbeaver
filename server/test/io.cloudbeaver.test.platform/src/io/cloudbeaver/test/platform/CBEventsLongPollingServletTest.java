@@ -131,6 +131,20 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
     }
 
     @Test
+    public void testCorsHeadersForHttpsOriginBehindHttpProxy() {
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(request.getHeader("Origin")).thenReturn("https://app.example.com");
+        Mockito.when(request.getScheme()).thenReturn("http");
+        Mockito.when(request.getServerName()).thenReturn("app.example.com");
+        Mockito.when(request.getServerPort()).thenReturn(80);
+
+        new TestServlet().options(request, response);
+
+        Mockito.verify(response).setHeader("Access-Control-Allow-Origin", "https://app.example.com");
+        Mockito.verify(response).setHeader("Access-Control-Allow-Credentials", "true");
+    }
+
+    @Test
     public void testResolveSessionReturnsHeadless() throws DBException {
 
         Mockito.when(request.getHeader(WSConstants.WS_AUTH_HEADER)).thenReturn("token-123");
