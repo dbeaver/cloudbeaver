@@ -10,6 +10,7 @@ echo "Starting Cloudbeaver Server"
   && cp conf/initial-data-sources.conf workspace/GlobalConfiguration/.dbeaver/data-sources.json
 
 exec java ${JAVA_OPTS} \
+  -XX:-UseBASE64Intrinsics \
   -Dfile.encoding=UTF-8 \
   --enable-native-access=ALL-UNNAMED \
   --add-modules=ALL-DEFAULT \
