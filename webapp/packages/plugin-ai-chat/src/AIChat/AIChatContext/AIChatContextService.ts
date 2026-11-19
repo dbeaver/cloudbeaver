@@ -47,8 +47,7 @@ export class AIChatContextService extends Bootstrap {
       return null;
     }
 
-    // No connection or no saved choice allows the chat to follow the editor.
-    const context = this.settings.context ?? this.getContext();
+    const context = this.settings.context;
 
     if (
       context &&

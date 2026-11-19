@@ -12,6 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { UserConfigurationStorage, UserDataService } from '@cloudbeaver/core-authentication';
 import { FEATURE_AI_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 
+import { AIChatContextService } from './AIChatContext/AIChatContextService.js';
 import { AIChatSettingsService } from '../AIChatSettingsService.js';
 
 const queryAiChatSettingsKey = 'ai-chat';
@@ -21,7 +22,7 @@ interface ISettings {
   metrics: boolean;
 }
 
-@injectable(() => [ServerConfigResource, UserDataService, AIChatSettingsService, UserConfigurationStorage])
+@injectable(() => [ServerConfigResource, UserDataService, AIChatContextService, AIChatSettingsService, UserConfigurationStorage])
 export class AIChatService {
   get settings(): ISettings {
     return this.userDataService.withStorage(this.userConfigurationStorage).getUserData(queryAiChatSettingsKey, getAiChatDefaultSettings);
@@ -42,6 +43,7 @@ export class AIChatService {
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
     private readonly userDataService: UserDataService,
+    private readonly aiChatContextService: AIChatContextService,
     private readonly aiChatSettingsService: AIChatSettingsService,
     private readonly userConfigurationStorage: UserConfigurationStorage,
   ) {
@@ -56,6 +58,10 @@ export class AIChatService {
   togglePanel(): void {
     runInAction(() => {
       this.settings.active = !this.settings.active;
+
+      if (this.settings.active && this.aiChatContextService.isContextReady && !this.aiChatContextService.currentContext) {
+        this.aiChatContextService.setContext(this.aiChatContextService.getContext());
+      }
     });
   }
 
