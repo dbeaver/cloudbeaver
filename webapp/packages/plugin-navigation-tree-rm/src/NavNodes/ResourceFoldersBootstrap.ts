@@ -110,7 +110,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         return true;
       },
       getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
-      isDisabled: context => {
+      isHidden: context => {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
         return (

@@ -165,7 +165,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Połączenia'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Szukaj nazwy połączenia...'],
   ['administration_teams_team_granted_connections_empty', 'Brak dostępnych połączeń'],
-  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Zespół domyślny. Nie można odebrać członkostwa'],
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Zespół domyślny. Nie można usunąć użytkownika z zespołu'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Zespół domyślny. Zawiera wszystkich użytkowników'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Przełożony'],
   [

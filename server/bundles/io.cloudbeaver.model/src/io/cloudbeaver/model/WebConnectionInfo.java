@@ -26,6 +26,7 @@ import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
+import org.eclipse.core.runtime.IAdaptable;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -33,6 +34,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.access.DBAAuthModelExternal;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
+import org.jkiss.dbeaver.model.access.DBAUserPasswordManager;
 import org.jkiss.dbeaver.model.admin.sessions.DBAServerSessionManager;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
@@ -68,6 +70,7 @@ public class WebConnectionInfo {
 
     private static final String FEATURE_HAS_TOOLS = "hasTools";
     private static final String FEATURE_CONNECTED = "connected";
+    private static final String FEATURE_USER_PASSWORD_CHANGE = "userPasswordChange";
     private static final String FEATURE_VIRTUAL = "virtual";
     private static final String FEATURE_TEMPORARY = "temporary";
     private static final String FEATURE_READ_ONLY = "readOnly";
@@ -269,6 +272,12 @@ public class WebConnectionInfo {
 
         if (dataSourceContainer.isConnected()) {
             features.add(FEATURE_CONNECTED);
+            DBPDataSource dataSource = dataSourceContainer.getDataSource();
+            if (dataSource instanceof IAdaptable adaptable
+                && adaptable.getAdapter(DBAUserPasswordManager.class) != null
+            ) {
+                features.add(FEATURE_USER_PASSWORD_CHANGE);
+            }
             if (!getTools().isEmpty()) {
                 features.add(FEATURE_HAS_TOOLS);
             }

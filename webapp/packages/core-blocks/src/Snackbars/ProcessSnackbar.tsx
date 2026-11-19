@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
   const translate = useTranslate();
   const details = useErrorDetails(error);
   const [delayState, setDelayState] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const displayedReal = notification.state.deleteDelay === 0;
   const displayed = useStateDelay(delayState, displayDelay);
 
@@ -49,6 +50,17 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
   }, [displayedReal]);
 
   useActivationDelay(status === ENotificationType.Success, closeDelay, notification.close);
+
+  async function cancel() {
+    setCancelling(true);
+
+    try {
+      await onCancel?.();
+    } catch (exception) {
+      setCancelling(false);
+      throw exception;
+    }
+  }
 
   if (!displayed) {
     return null;
@@ -70,7 +82,11 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
             </Button>
           )}
 
-          {onCancel && status === ENotificationType.Loading && <Button onClick={onCancel}>{translate('ui_processing_cancel')}</Button>}
+          {onCancel && status === ENotificationType.Loading && (
+            <Button disabled={cancelling} onClick={cancel}>
+              {translate(cancelling ? 'ui_processing_canceling' : 'ui_processing_cancel')}
+            </Button>
+          )}
         </SnackbarFooter>
       </SnackbarContent>
     </SnackbarWrapper>

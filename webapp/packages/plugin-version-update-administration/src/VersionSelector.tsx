@@ -1,18 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Select, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { type IVersion, VersionResource } from '@cloudbeaver/core-version';
+import { type IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
+import { ProductInfoService } from '@cloudbeaver/plugin-product-information-administration';
 
 import { VersionInfo } from './VersionInfo.js';
 import styles from './VersionSelector.module.css';
@@ -23,33 +24,33 @@ interface Props {
 
 export const VersionSelector = observer<Props>(function VersionSelector({ versions }) {
   const versionUpdateService = useService(VersionUpdateService);
+  const administrationScreenService = useService(AdministrationScreenService);
+  const versionService = useService(VersionService);
   const versionResource = useService(VersionResource);
   const serverConfigResource = useService(ServerConfigResource);
   const translate = useTranslate();
   const style = useS(styles);
 
-  const [selected, setSelected] = useState('');
+  const version =
+    versions.find(v => v.number === administrationScreenService.activeScreen?.param) ??
+    versions.find(v => v.number === versionResource.latest?.number) ??
+    versions[0];
 
-  useEffect(() => {
-    if (versionResource.latest?.number) {
-      setSelected(versionResource.latest.number);
-    }
-  }, [versionResource.latest?.number]);
-
-  const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.versionInstructionGetter?.();
   const instructionLink = versionUpdateService.instructionLink;
 
   return (
-    <Container gap>
+    <Container gap large>
       <Group className={s(style, { group: true })} gap large>
         <Select
           items={versions}
           keySelector={value => value.number}
-          valueSelector={value => value.number}
-          value={selected}
+          valueSelector={value =>
+            versionService.isPatch(value.number) ? `${value.number} · ${translate('plugin_version_update_administration_patch_label')}` : value.number
+          }
+          value={version?.number ?? ''}
           tiny
-          onSelect={value => setSelected(value)}
+          onSelect={value => administrationScreenService.navigateToItemSub(ProductInfoService.PAGE_NAME, 'version-update', value)}
         >
           {translate('plugin_version_update_administration_version_selector_label')}
         </Select>

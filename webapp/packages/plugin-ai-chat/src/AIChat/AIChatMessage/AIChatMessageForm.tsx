@@ -100,6 +100,7 @@ export const AIChatMessageForm = observer<PropsWithChildren<Props>>(function AIC
           </Suspense>
           <AutoResizeTextarea
             ref={textareaRef}
+            writingsuggestions="false"
             className={s(styles, { textarea: true })}
             placeholder={getPlaceholder()}
             value={state.prompt}

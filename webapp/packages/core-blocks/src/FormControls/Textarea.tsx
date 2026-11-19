@@ -33,6 +33,7 @@ type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChan
     embedded?: boolean;
     cursorInitiallyAtEnd?: boolean;
     uploadable?: boolean;
+    writingsuggestions?: 'true' | 'false';
   };
 
 export type TextareaControlledProps = BaseProps & {

@@ -178,6 +178,11 @@ export class NavNodeContextMenuService extends Bootstrap {
     this.menuService.setHandler({
       id: 'menu-navigation-tree-create',
       menus: [MENU_NAVIGATION_TREE_CREATE],
+      isDisabled: context => this.menuService.isEmpty(context),
+      getInfo: (context, menu) => ({
+        ...menu.info,
+        tooltip: this.menuService.isEmpty(context) ? 'plugin_navigation_tree_create_menu_empty' : menu.info.tooltip,
+      }),
     });
 
     this.menuService.setHandler({
