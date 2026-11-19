@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 
 import { AdministrationPageContent, AdministrationPageHeader, AdministrationPageTitle } from '@cloudbeaver/core-administration';
 import { Button, Filter, IconOrImage, ToolbarAction, ToolbarActions, useResource, useTranslate } from '@cloudbeaver/core-blocks';
@@ -35,9 +36,14 @@ export const AIProfilesPanel = observer(function AIProfilesPanel() {
   const settingsLoaded = aiSettingsResource.isLoaded();
   const defaultProfileId = aiSettingsResource.data?.defaultConfiguration;
 
-  const selection = useTableSelection(
-    filters.filteredProfiles.filter(profile => settingsLoaded && profile.id !== defaultProfileId).map(profile => profile.id),
+  const filteredProfiles = filters.filteredProfiles;
+  // Keep keys stable: a new array invalidates selection.selected, which this panel observes, causing a render loop.
+  const selectionKeys = useMemo(
+    () => filteredProfiles.filter(profile => settingsLoaded && profile.id !== defaultProfileId).map(profile => profile.id),
+    [filteredProfiles, settingsLoaded, defaultProfileId],
   );
+
+  const selection = useTableSelection(selectionKeys);
 
   const table = useAIProfilesTable(selection);
 
