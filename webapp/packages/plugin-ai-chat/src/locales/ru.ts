@@ -54,6 +54,7 @@ export default [
   ['plugin_ai_chat_conversation_history_date_group_over_week_ago', 'Более недели назад'],
 
   ['plugin_ai_chat_conversation_cancel_failed', 'Не удалось отменить разговор'],
+  ['plugin_ai_chat_conversation_cancelling', 'Отмена запроса…'],
 
   ['plugin_ai_chat_settings', 'Настройки чата'],
   ['plugin_ai_chat_settings_metrics_enable', 'Включить метрики'],

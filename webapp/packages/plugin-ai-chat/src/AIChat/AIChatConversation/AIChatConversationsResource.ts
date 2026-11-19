@@ -101,6 +101,13 @@ export class AIChatConversationsResource extends CachedMapResource<string, AICha
 
   async cancelConversation(conversationId: string): Promise<boolean> {
     const { result } = await this.graphQLService.sdk.cancelConversation({ conversationId });
+
+    if (result) {
+      // Reload waitingForResponse after cancellation so the chat unlocks
+      // without waiting for a cancellation message or stream-completion event.
+      await this.refresh(conversationId);
+    }
+
     return result;
   }
 

@@ -54,6 +54,7 @@ export default [
   ['plugin_ai_chat_conversation_history_date_group_over_week_ago', 'Over a week ago'],
 
   ['plugin_ai_chat_conversation_cancel_failed', 'Failed to cancel the conversation'],
+  ['plugin_ai_chat_conversation_cancelling', 'Cancelling request…'],
 
   ['plugin_ai_chat_settings', 'Chat settings'],
   ['plugin_ai_chat_settings_metrics_enable', 'Enable metrics'],
