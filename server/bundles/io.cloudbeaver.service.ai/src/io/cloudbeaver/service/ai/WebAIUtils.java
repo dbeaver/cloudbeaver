@@ -22,6 +22,7 @@ import io.cloudbeaver.service.ai.model.WebAIChatConversation;
 import io.cloudbeaver.service.ai.model.WebAIMessage;
 import io.cloudbeaver.service.ai.model.WebAISendChatMessageInfo;
 import io.cloudbeaver.service.ai.model.WebAiChatResponseConsumer;
+import io.cloudbeaver.service.ai.model.events.WSAiChatMessageChunkEvent;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.eclipse.core.runtime.IStatus;
@@ -148,6 +149,7 @@ public class WebAIUtils {
             @NotNull
             @Override
             protected IStatus run(@NotNull DBRProgressMonitor monitor) {
+                conversation.startConversation();
                 try {
                     AIConfigurationProfile selectedProfile = conversation.getProfile();
                     if (selectedProfile == null) {
@@ -246,6 +248,16 @@ public class WebAIUtils {
                     WSAiChatMessageEvent event = new WSAiChatMessageEvent(confirmationMessage);
                     webSession.addSessionEvent(event);
                 }
+            }
+
+            @Override
+            public void conversationCanceled(@NotNull AIChatConversation conversation) {
+                webSession.addSessionEvent(new WSAiChatMessageChunkEvent(
+                    conversation.getId(),
+                    conversation.getNextMessageId(),
+                    null,
+                    true
+                ));
             }
         });
         webSession.setAttribute(AI_CHAT_ATTR, aiChatSession);

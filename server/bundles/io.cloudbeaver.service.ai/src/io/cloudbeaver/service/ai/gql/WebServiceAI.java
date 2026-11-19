@@ -27,7 +27,6 @@ import io.cloudbeaver.service.ai.WebAIDeviceAuthorizationService;
 import io.cloudbeaver.service.ai.WebAIProfileUtils;
 import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.*;
-import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
 import io.cloudbeaver.service.ai.model.inputs.*;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
@@ -43,7 +42,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.ai.*;
 import org.jkiss.dbeaver.model.ai.engine.*;
-import org.jkiss.dbeaver.model.ai.internal.AIChatMessages;
 import org.jkiss.dbeaver.model.ai.prompt.AIPromptGenerateSql;
 import org.jkiss.dbeaver.model.ai.registry.*;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -453,24 +451,16 @@ public class WebServiceAI implements DBWServiceAI {
         @NotNull String conversationId
     ) throws DBWebException {
         WebAIUtils.validateAiPluginEnabled();
+        AIChatSession chatSession = WebAIUtils.getAiChatSession(webSession);
         AIChatConversation conversation = WebAIUtils.getAiChatConversation(webSession, conversationId);
         synchronized (conversation) {
-            boolean completionStarted = conversation.isActive();
             conversation.cancelConversation();
-            boolean hadPendingJob = false;
             if (webSession.getAttribute(WebAIUtils.getWaitingAttr(conversation)) instanceof AbstractJob job) {
-                hadPendingJob = true;
                 job.cancel();
             }
             webSession.removeAttribute(WebAIUtils.getWaitingAttr(conversation));
-            if (hadPendingJob && !completionStarted) {
-                // The completion job was still queued, so its response consumer will not be called.
-                // We need to add a cancellation message to the conversation and notify the client.
-                AIChatMessage cancelMessage = conversation.addMessage(
-                    AIMessage.warningMessage(AIChatMessages.ai_chat_conversation_cancelled));
-                webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(cancelMessage, conversation)));
-            }
         }
+        chatSession.notifyListeners(AIChatListener::conversationCanceled, conversation);
         return true;
     }
 
