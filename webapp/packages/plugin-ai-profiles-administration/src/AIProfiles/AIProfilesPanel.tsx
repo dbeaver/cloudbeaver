@@ -15,14 +15,13 @@ import { useService } from '@cloudbeaver/core-di';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { AISettingsResource } from '@cloudbeaver/plugin-ai';
-import { AIProfilesResource } from '@cloudbeaver/plugin-ai-profiles';
+import { AIProfilesResource, useAIProfilesTableFilters } from '@cloudbeaver/plugin-ai-profiles';
 import { TableSelectionContext, useTableSelection } from '@cloudbeaver/plugin-data-grid';
 import { isDefined } from '@dbeaver/js-helpers';
 
 import { AIProfileFormService } from './AIProfileForm/AIProfileFormService.js';
 import { AIProfilesAdministrationTable } from './AIProfilesAdministrationTable.js';
 import { useAIProfilesTable } from './useAIProfilesTable.js';
-import { useAIProfilesTableFilters } from './useAIProfilesTableFilters.js';
 
 export const AIProfilesPanel = observer(function AIProfilesPanel() {
   const translate = useTranslate();
