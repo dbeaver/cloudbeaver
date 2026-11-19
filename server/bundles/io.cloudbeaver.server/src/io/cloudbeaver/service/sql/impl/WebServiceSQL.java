@@ -351,6 +351,8 @@ public class WebServiceSQL implements DBWServiceSQL {
                 generatorInstance.setShowFullDdl(true);
                 generatorInstance.setShowComments(true);
                 generatorInstance.setShowPermissions(true);
+                // Include CREATE TABLE ... PARTITION OF for every partition level (multi-level partitioning)
+                generatorInstance.setShowPartitionsDDL(true);
             }
             generatorInstance.run(monitor);
             return generatorInstance.getResult();
