@@ -459,8 +459,8 @@ public class WebServiceAI implements DBWServiceAI {
                 job.cancel();
             }
             webSession.removeAttribute(WebAIUtils.getWaitingAttr(conversation));
+            chatSession.notifyListeners(AIChatListener::conversationCanceled, conversation);
         }
-        chatSession.notifyListeners(AIChatListener::conversationCanceled, conversation);
         return true;
     }
 
