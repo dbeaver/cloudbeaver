@@ -24,7 +24,6 @@ import org.jkiss.dbeaver.model.ai.*;
 import org.jkiss.dbeaver.model.ai.prompt.AIPromptGenerateSql;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,18 +36,18 @@ import static org.mockito.Mockito.*;
 
 public class WebAiChatResponseConsumerTest {
     private final Map<String, Object> attributes = new HashMap<>();
-    private final WebSession webSession = Mockito.mock(WebSession.class);
-    private final AIChatSession chatSession = Mockito.mock(AIChatSession.class);
+    private final WebSession webSession = mock(WebSession.class);
+    private final AIChatSession chatSession = mock(AIChatSession.class);
     private final AIChatConversation conversation = new AIChatConversation(
         UUID.randomUUID(), "Test", new AIPromptGenerateSql(), List.of(), null, 0, null
     );
 
     @BeforeEach
     void setUp() {
-        Mockito.when(webSession.getAttribute(Mockito.anyString()))
+        when(webSession.getAttribute(anyString()))
             .thenAnswer(invocation -> attributes.get(invocation.getArgument(0)));
-        Mockito.doAnswer(invocation -> attributes.remove(invocation.getArgument(0)))
-            .when(webSession).removeAttribute(Mockito.anyString());
+        doAnswer(invocation -> attributes.remove(invocation.getArgument(0)))
+            .when(webSession).removeAttribute(anyString());
     }
 
     @Test
@@ -61,7 +60,7 @@ public class WebAiChatResponseConsumerTest {
         assertEquals(1, conversation.getMessages().size());
         assertEquals(AIMessageType.WARNING, conversation.getMessages().getFirst().message().getRole());
         assertFalse(attributes.containsKey(WebAIUtils.getResponseAttr(conversation)));
-        verify(webSession, times(1)).addSessionEvent(Mockito.argThat(
+        verify(webSession, times(1)).addSessionEvent(argThat(
             event -> event instanceof WSAiChatMessageEvent message && message.getRole().equals("WARNING")
         ));
     }
