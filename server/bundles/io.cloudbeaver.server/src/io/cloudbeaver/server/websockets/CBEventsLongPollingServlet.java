@@ -26,7 +26,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.http.HttpHeader;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -176,25 +175,20 @@ public class CBEventsLongPollingServlet extends HttpServlet {
     }
 
     private void addCorsHeaders(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) {
-        String origin = req.getHeader(CBConstants.HEADER_ORIGIN);
+        String origin = req.getHeader("Origin");
         if (origin == null) {
             return;
         }
 
-        resp.addHeader(HttpHeader.VARY.asString(), CBConstants.HEADER_ORIGIN);
-        if (!CBEventOriginFilter.isAllowedOrigin(req)) {
-            return;
-        }
+        resp.setHeader("Access-Control-Allow-Origin", origin);
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
 
-        resp.setHeader(HttpConstants.HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-        resp.setHeader(HttpConstants.HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-
-        String reqHeaders = req.getHeader(HttpConstants.HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
+        String reqHeaders = req.getHeader("Access-Control-Request-Headers");
         if (reqHeaders != null) {
-            resp.setHeader(HttpConstants.HEADER_ACCESS_CONTROL_ALLOW_HEADERS, reqHeaders);
+            resp.setHeader("Access-Control-Allow-Headers", reqHeaders);
         }
 
-        resp.setHeader(HttpConstants.HEADER_ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     }
 
     @Nullable
