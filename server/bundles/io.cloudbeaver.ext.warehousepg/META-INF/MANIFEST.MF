@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cloudbeaver EDB WarehousePG Model
+Bundle-SymbolicName: io.cloudbeaver.ext.warehousepg;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Release-Date: 20261130
+Bundle-Vendor: DBeaver Corp
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Fragment-Host: org.jkiss.dbeaver.ext.greenplum
+Automatic-Module-Name: io.cloudbeaver.ext.warehousepg

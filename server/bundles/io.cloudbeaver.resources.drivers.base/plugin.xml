@@ -9,6 +9,7 @@
         <resource name="drivers/mariadb"/>
         <resource name="drivers/oracle"/>
         <resource name="drivers/postgresql"/>
+        <resource name="drivers/postgis"/>
         <resource name="drivers/clickhouse"/>
         <resource name="drivers/clickhouse_com"/>
         <resource name="drivers/jaybird"/>
@@ -52,6 +53,8 @@
         <driver id="mysql:mariaDB"/>
         <driver id="oracle:oracle_thin"/>
         <driver id="postgresql:postgres-jdbc"/>
+        <driver id="greenplum:greenplum-jdbc"/>
+        <driver id="warehousepg:warehousepg-jdbc"/>
         <driver id="jaybird:jaybird"/>
         <driver id="clickhouse:yandex_clickhouse"/>
         <driver id="clickhouse:com_clickhouse"/>

@@ -30,6 +30,7 @@
         <module>mariadb</module>
         <module>oracle</module>
         <module>postgresql</module>
+        <module>postgis</module>
         <module>sqlite</module>
         <module>sqlserver</module>
         <module>trino</module>

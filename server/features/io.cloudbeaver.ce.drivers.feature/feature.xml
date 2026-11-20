@@ -6,5 +6,7 @@
       provider-name="DBeaver Corp">
 
    <plugin id="io.cloudbeaver.resources.drivers.base" version="0.0.0"/>
+   <!-- EDB WarehousePG support (fragment of org.jkiss.dbeaver.ext.greenplum) -->
+   <plugin id="io.cloudbeaver.ext.warehousepg" version="0.0.0" fragment="true"/>
 
 </feature>
