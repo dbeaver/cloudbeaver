@@ -11,6 +11,7 @@ export * from './FEATURE_GROUP_CONNECTIONS_ID.js';
 export * from './ConnectionExecutionContext/ConnectionExecutionContext.js';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextResource.js';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextService.js';
+export * from './ConnectionExecutionContext/ConnectionExecutionContextNotificationService.js';
 export * from './ConnectionExecutionContext/IConnectionExecutionContext.js';
 
 export * from './DataContexts/DATA_CONTEXT_CONNECTION.js';

@@ -5,6 +5,7 @@ export default [
   ['core_connections_connection_save_error', 'Ошибка при сохранении подключения'],
   ['core_connections_connection_access_empty', 'Нет доступных пользователей и подключений'],
   ['core_connections_connection_no_information', 'Нет доступной информации'],
+  ['core_connections_execution_context_closing', 'Закрытие...'],
   ['connections_database_authentication', 'Авторизация в базу данных'],
   ['connections_connection_edit_not_own_deny', 'У вас нет прав на изменение этого подключения.'],
   ['connections_connection_connect', 'Подключиться'],
