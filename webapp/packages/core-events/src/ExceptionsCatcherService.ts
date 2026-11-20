@@ -35,8 +35,7 @@ export class ExceptionsCatcherService extends Bootstrap {
 
   private readonly catcher = (event: Event | string, source?: string, lineno?: number, colno?: number, _error?: Error) => {
     if (_error) {
-      this.notificationService.logException(_error, 
-      _error.name || this.messageTitle);
+      this.notificationService.logException(_error, _error.name || this.messageTitle);
     } else {
       const message = String(event);
       this.notificationService.logError({
@@ -46,7 +45,9 @@ export class ExceptionsCatcherService extends Bootstrap {
       });
     }
 
-    console.error(_error);
+    if (_error || !this.ignored.includes(String(event))) {
+      console.error(_error);
+    }
 
     if (this.baseCatcher) {
       return this.baseCatcher(event, source, lineno, colno, _error);
