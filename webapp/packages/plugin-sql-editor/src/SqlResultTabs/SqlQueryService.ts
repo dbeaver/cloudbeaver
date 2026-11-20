@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable, when } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
@@ -116,41 +116,6 @@ export class SqlQueryService {
 
   getStatistics(tabId: string): IQueryExecutionStatistics | undefined {
     return this.statisticsMap.get(tabId);
-  }
-
-  async cancelQueries(editorState: ISqlEditorTabState): Promise<void> {
-    const modelIds = new Set(editorState.resultGroups.map(group => group.modelId));
-
-    for (const tab of editorState.statisticsTabs) {
-      const modelId = this.getStatistics(tab.tabId)?.modelId;
-
-      if (modelId) {
-        modelIds.add(modelId);
-      }
-    }
-
-    const sources: QueryDataSource[] = [];
-
-    for (const modelId of modelIds) {
-      const source = this.tableViewerStorageService.get<IDatabaseDataModel<QueryDataSource>>(modelId)?.source;
-
-      if (source?.isLoading()) {
-        sources.push(source);
-      }
-    }
-
-    await Promise.all(sources.map(source => source.cancel()));
-
-    const context = this.sqlDataSourceService.get(editorState.editorId)?.executionContext;
-
-    if (context) {
-      await this.connectionExecutionContextService.get(context.id)?.cancel();
-    }
-
-    // Cancellation may reject the running request. Let it settle before close guards run.
-    await when(
-      () => sources.every(source => !source.isLoading()) && editorState.statisticsTabs.every(tab => !this.getStatistics(tab.tabId)?.modelId),
-    );
   }
 
   initDatabaseDataModels(editorState: ISqlEditorTabState) {
