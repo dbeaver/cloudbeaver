@@ -58,14 +58,41 @@ public class CBEventOriginFilterTest {
 
     @Test
     public void testSameAuthorityWithDifferentScheme() {
+        Mockito.when(request.getHeader("Sec-Fetch-Site")).thenReturn("same-origin");
         Mockito.when(request.getHeader("Origin")).thenReturn("https://app.example.com:8080");
         assertTrue(CBEventOriginFilter.isAllowedOrigin(request));
     }
 
     @Test
     public void testSameAuthorityWithDifferentSchemesAndDefaultPorts() {
+        Mockito.when(request.getHeader("Sec-Fetch-Site")).thenReturn("same-origin");
         Mockito.when(request.getServerPort()).thenReturn(80);
         Mockito.when(request.getHeader("Origin")).thenReturn("https://app.example.com");
+
+        assertTrue(CBEventOriginFilter.isAllowedOrigin(request));
+    }
+
+    @Test
+    public void testSameAuthorityWithoutFetchMetadata() {
+        Mockito.when(request.getHeader("Origin")).thenReturn("https://app.example.com:8080");
+
+        assertTrue(CBEventOriginFilter.isAllowedOrigin(request));
+    }
+
+    @Test
+    public void testNonSameOriginFetchSite() {
+        Mockito.when(request.getHeader("Sec-Fetch-Site")).thenReturn("cross-site", "same-site", "none");
+        Mockito.when(request.getHeader("Origin")).thenReturn("http://app.example.com:8080");
+
+        assertFalse(CBEventOriginFilter.isAllowedOrigin(request));
+        assertFalse(CBEventOriginFilter.isAllowedOrigin(request));
+        assertFalse(CBEventOriginFilter.isAllowedOrigin(request));
+    }
+
+    @Test
+    public void testUnknownFetchSite() {
+        Mockito.when(request.getHeader("Sec-Fetch-Site")).thenReturn("future-value");
+        Mockito.when(request.getHeader("Origin")).thenReturn("http://app.example.com:8080");
 
         assertTrue(CBEventOriginFilter.isAllowedOrigin(request));
     }

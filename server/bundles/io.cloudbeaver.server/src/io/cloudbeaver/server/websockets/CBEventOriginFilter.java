@@ -27,11 +27,14 @@ import org.jkiss.code.Nullable;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Rejects browser event connections from origins other than the effective request origin.
  */
 public class CBEventOriginFilter implements Filter {
+    private static final Set<String> REJECTED_FETCH_SITES = Set.of("cross-site", "same-site", "none");
+
     @Override
     public void doFilter(
         @NotNull ServletRequest request,
@@ -49,6 +52,11 @@ public class CBEventOriginFilter implements Filter {
     }
 
     public static boolean isAllowedOrigin(@NotNull HttpServletRequest request) {
+        String fetchSite = request.getHeader(CBConstants.HEADER_SEC_FETCH_SITE);
+        if (fetchSite != null && REJECTED_FETCH_SITES.contains(fetchSite)) {
+            return false;
+        }
+
         String origin = request.getHeader(CBConstants.HEADER_ORIGIN);
         if (origin == null) {
             // Non-browser clients do not necessarily send an Origin header.
@@ -58,7 +66,10 @@ public class CBEventOriginFilter implements Filter {
         try {
             Origin browserOrigin = parseOrigin(origin);
             Origin requestOrigin = getRequestOrigin(request);
-            return browserOrigin != null && requestOrigin != null && browserOrigin.matches(requestOrigin);
+            if (browserOrigin == null || requestOrigin == null) {
+                return false;
+            }
+            return browserOrigin.matchesAuthority(requestOrigin);
         } catch (IllegalArgumentException e) {
             return false;
         }
@@ -75,7 +86,7 @@ public class CBEventOriginFilter implements Filter {
         }
 
         Origin forwardedOrigin = getForwardedOrigin(request);
-        if (parsedProxyOrigin != null && forwardedOrigin != null && !parsedProxyOrigin.matches(forwardedOrigin)) {
+        if (parsedProxyOrigin != null && forwardedOrigin != null && !parsedProxyOrigin.equals(forwardedOrigin)) {
             return null;
         }
         if (parsedProxyOrigin != null) {
@@ -110,7 +121,7 @@ public class CBEventOriginFilter implements Filter {
         if (!isValidPort(parsedPort)) {
             return null;
         }
-        return new Origin(origin.host(), parsedPort);
+        return new Origin(origin.scheme(), origin.host(), parsedPort);
     }
 
     private static boolean hasForwardedOrigin(@Nullable String scheme, @Nullable String host) {
@@ -153,13 +164,14 @@ public class CBEventOriginFilter implements Filter {
             return null;
         }
         return new Origin(
+            httpScheme.asString(),
             host.toLowerCase(Locale.ENGLISH),
             port == -1 ? httpScheme.getDefaultPort() : port
         );
     }
 
-    private record Origin(@NotNull String host, int port) {
-        private boolean matches(@NotNull Origin other) {
+    private record Origin(@NotNull String scheme, @NotNull String host, int port) {
+        private boolean matchesAuthority(@NotNull Origin other) {
             return host.equals(other.host) && normalizePort(port) == normalizePort(other.port);
         }
 

@@ -64,6 +64,7 @@ public class CBConstants {
     public static final String ENV_CB_HOME = "CLOUDBEAVER_HOME";
 
     public static final String HEADER_ORIGIN = "Origin";
+    public static final String HEADER_SEC_FETCH_SITE = "Sec-Fetch-Site";
     public static final String HEADER_X_ORIGIN = "X-Origin";
     public static final String HEADER_X_FORWARDED_SCHEME = "X-Forwarded-Scheme";
     public static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
