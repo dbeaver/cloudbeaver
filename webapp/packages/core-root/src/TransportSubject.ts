@@ -7,17 +7,17 @@
  */
 
 import { catchError, EMPTY, Observable, shareReplay, Subject, Subscriber, Subscription, take, throwError } from 'rxjs';
-import { webSocket } from 'rxjs/webSocket';
 
 import type { EnvironmentService } from '@cloudbeaver/core-sdk';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 import { longPolling } from './longPolling.js';
+import { TicketedWebSocketSubject } from './TicketedWebSocketSubject.js';
 
 export class TransportSubject<T> extends Subject<T> {
   readonly ready$: Observable<void>;
 
-  private ws: ReturnType<typeof webSocket<T>>;
+  private ws: TicketedWebSocketSubject<T>;
   private poll: ReturnType<typeof longPolling<T>>;
 
   private ready: Subject<void>;
@@ -36,15 +36,18 @@ export class TransportSubject<T> extends Subject<T> {
 
     this.sub = null;
 
-    this.ws = webSocket<T>({
-      url: environmentService.wsEndpoint,
-      openObserver: { next: () => this.ready.next() },
-      closeObserver: {
-        next: event => {
-          console.warn(`Websocket closed (${event.code}): ${event.reason}`);
+    this.ws = new TicketedWebSocketSubject<T>(
+      {
+        url: environmentService.wsEndpoint,
+        openObserver: { next: () => this.ready.next() },
+        closeObserver: {
+          next: event => {
+            console.warn(`Websocket closed (${event.code}): ${event.reason}`);
+          },
         },
       },
-    });
+      GlobalConstants.absoluteServiceHTTPUrl('ws-ticket'),
+    );
 
     this.poll = longPolling<T>({
       url: GlobalConstants.absoluteServiceHTTPUrl('events'),

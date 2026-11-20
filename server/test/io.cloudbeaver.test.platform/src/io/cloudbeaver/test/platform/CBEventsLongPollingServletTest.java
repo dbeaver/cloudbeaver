@@ -133,6 +133,7 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
     @Test
     public void testCorsHeadersForHttpsOriginBehindHttpProxy() {
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(request.getHeader("Sec-Fetch-Site")).thenReturn("same-origin");
         Mockito.when(request.getHeader("Origin")).thenReturn("https://app.example.com");
         Mockito.when(request.getScheme()).thenReturn("http");
         Mockito.when(request.getServerName()).thenReturn("app.example.com");
@@ -142,6 +143,21 @@ public class CBEventsLongPollingServletTest extends CloudbeaverMockTest {
 
         Mockito.verify(response).setHeader("Access-Control-Allow-Origin", "https://app.example.com");
         Mockito.verify(response).setHeader("Access-Control-Allow-Credentials", "true");
+    }
+
+    @Test
+    public void testCorsHeadersNotReflectedForCrossSiteFetch() {
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(request.getHeader("Sec-Fetch-Site")).thenReturn("cross-site");
+        Mockito.when(request.getHeader("Origin")).thenReturn("http://app.example.com:8080");
+        Mockito.when(request.getScheme()).thenReturn("http");
+        Mockito.when(request.getServerName()).thenReturn("app.example.com");
+        Mockito.when(request.getServerPort()).thenReturn(8080);
+
+        new TestServlet().options(request, response);
+
+        Mockito.verify(response, Mockito.never()).setHeader(Mockito.eq("Access-Control-Allow-Origin"), Mockito.anyString());
+        Mockito.verify(response, Mockito.never()).setHeader(Mockito.eq("Access-Control-Allow-Credentials"), Mockito.anyString());
     }
 
     @Test
