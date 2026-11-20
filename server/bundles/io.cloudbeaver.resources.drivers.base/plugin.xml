@@ -17,6 +17,7 @@
         <resource name="drivers/h2_v3"/>
         <resource name="drivers/sqlite/xerial"/>
         <resource name="drivers/libsql"/>
+        <resource name="drivers/cloudflare/d1"/>
         <resource name="drivers/mssql/new"/>
         <resource name="drivers/trino"/>
         <resource name="drivers/kyuubi"/>
@@ -39,6 +40,7 @@
         <bundle id="drivers.h2_v3" label="H2 v3 drivers"/>
         <bundle id="drivers.sqlite.xerial" label="SQLite drivers"/>
         <bundle id="drivers.libsql" label="LibSQL drivers"/>
+        <bundle id="drivers.cloudflare.d1" label="Cloudflare D1 drivers"/>
         <bundle id="drivers.mssql.new" label="SQL Server drivers"/>
         <bundle id="drivers.trino" label="Trino drivers"/>
         <bundle id="drivers.kyuubi" label="Apache Kyuubi drivers"/>
@@ -60,6 +62,7 @@
         <driver id="h2:h2_embedded_v3"/>
         <driver id="sqlite:sqlite_jdbc"/>
         <driver id="sqlite:libsql_jdbc"/>
+        <driver id="cloudflare_d1:cloudflare_d1_jdbc"/>
         <driver id="sqlserver:microsoft"/>
         <driver id="generic:trino_jdbc"/>
         <driver id="duckdb:duckdb_jdbc"/>
