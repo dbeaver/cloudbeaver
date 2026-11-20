@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.ai.model;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.ai.WebAIUtils;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageChunkEvent;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageErrorEvent;
 import io.cloudbeaver.service.ai.model.events.WSAiChatMessageEvent;
@@ -47,73 +48,98 @@ public class WebAiChatResponseConsumer implements AIChatResponseConsumer {
 
     @Override
     public void nextMessageChunk(@NotNull String item) {
-        if (CommonUtils.isEmpty(item)) {
-            return;
+        synchronized (conversation) {
+            if (!isCurrent() || CommonUtils.isEmpty(item)) {
+                return;
+            }
+            if (responseBuilder.isEmpty()) {
+                var chatMessage = new AIChatMessage(conversation.getNextMessageId(), AIMessage.assistantMessage("", null));
+                webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(chatMessage, conversation)));
+            }
+            responseBuilder.append(item);
+            webSession.addSessionEvent(new WSAiChatMessageChunkEvent(
+                conversation.getId(),
+                conversation.getNextMessageId(),
+                item,
+                false
+            ));
         }
-        if (responseBuilder.isEmpty()) {
-            var chatMessage = new AIChatMessage(conversation.getNextMessageId(), AIMessage.assistantMessage("", null));
-            webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(chatMessage, conversation)));
-        }
-        responseBuilder.append(item);
-        webSession.addSessionEvent(new WSAiChatMessageChunkEvent(
-            conversation.getId(),
-            conversation.getNextMessageId(),
-            item,
-            false
-        ));
     }
 
     @Override
     public void processFunctionCall(@NotNull AIMessage fcMessage) {
-        // Send function call to front-end over web sockets
-        AIChatMessage chatMessage = conversation.addMessage(fcMessage);
-        WebAIMessage webMessage = new WebAIMessage(chatMessage, conversation);
-        webSession.addSessionEvent(new WSAiChatMessageEvent(webMessage));
-        chatSession.notifyMessageAdd(conversation, chatMessage);
+        synchronized (conversation) {
+            if (!isCurrent()) {
+                return;
+            }
+            // Send function call to front-end over web sockets
+            AIChatMessage chatMessage = conversation.addMessage(fcMessage);
+            WebAIMessage webMessage = new WebAIMessage(chatMessage, conversation);
+            webSession.addSessionEvent(new WSAiChatMessageEvent(webMessage));
+            chatSession.notifyMessageAdd(conversation, chatMessage);
+        }
     }
 
     @Override
     public void warning(@NotNull String message) {
-        AIChatMessage chatMessage = conversation.addMessage(AIMessage.warningMessage(message));
-        webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(chatMessage, conversation)));
+        synchronized (conversation) {
+            if (!isCurrent()) {
+                return;
+            }
+            AIChatMessage chatMessage = conversation.addMessage(AIMessage.warningMessage(message));
+            webSession.addSessionEvent(new WSAiChatMessageEvent(new WebAIMessage(chatMessage, conversation)));
+            chatSession.notifyMessageAdd(conversation, chatMessage);
+        }
     }
 
     @Override
     public void error(@NotNull Throwable throwable) {
+        synchronized (conversation) {
+            if (!isCurrent()) {
+                return;
+            }
+            AIMessage aiMessage = throwable instanceof CancellationException cancellationException
+                ? AIMessage.warningMessage(cancellationException.getMessage())
+                : AIMessage.errorMessage(throwable);
 
-        AIMessage aiMessage = throwable instanceof CancellationException cancellationException
-            ? AIMessage.warningMessage(cancellationException.getMessage())
-            : AIMessage.errorMessage(throwable);
-
-        AIChatMessage errorMessage = conversation.addMessage(aiMessage);
-        if (responseBuilder.isEmpty()) {
-            webSession.addSessionEvent(
-                new WSAiChatMessageEvent(new WebAIMessage(errorMessage, conversation)));
-        } else {
-            webSession.addSessionEvent(
-                new WSAiChatMessageErrorEvent(
-                    conversation.getId(),
-                    conversation.getNextMessageId(),
-                    throwable
-                ));
+            AIChatMessage errorMessage = conversation.addMessage(aiMessage);
+            if (responseBuilder.isEmpty()) {
+                webSession.addSessionEvent(
+                    new WSAiChatMessageEvent(new WebAIMessage(errorMessage, conversation)));
+            } else {
+                webSession.addSessionEvent(
+                    new WSAiChatMessageErrorEvent(
+                        conversation.getId(),
+                        conversation.getNextMessageId(),
+                        throwable
+                    ));
+            }
+            chatSession.notifyMessageAdd(conversation, errorMessage);
         }
-        chatSession.notifyMessageAdd(conversation, errorMessage);
     }
 
     @Override
     public void complete(@NotNull List<AIMessageMeta> meta, boolean finishConversation, boolean isCanceled) {
-        if (responseBuilder.isEmpty()) {
+        synchronized (conversation) {
+            if (!isCurrent()) {
+                return;
+            }
+            if (!responseBuilder.isEmpty()) {
+                AIChatMessage responseMessage = conversation.addMessage(AIMessage.assistantMessage(responseBuilder.toString(), meta));
+                responseBuilder.setLength(0);
+                chatSession.notifyMessageAdd(conversation, responseMessage);
+                webSession.addSessionEvent(new WSAiChatMessageChunkEvent(conversation.getId(), responseMessage.id(), null, true));
+            }
             if (isCanceled) {
                 warning(AIChatMessages.ai_chat_conversation_cancelled);
             }
-            return;
+            if (finishConversation || isCanceled) {
+                webSession.removeAttribute(WebAIUtils.getResponseAttr(conversation));
+            }
         }
-        AIChatMessage responseMessage = conversation.addMessage(AIMessage.assistantMessage(responseBuilder.toString(), meta));
-        chatSession.notifyMessageAdd(conversation, responseMessage);
-        webSession.addSessionEvent(new WSAiChatMessageChunkEvent(conversation.getId(), responseMessage.id(), null, true));
+    }
 
-        if (isCanceled) {
-            warning(AIChatMessages.ai_chat_conversation_cancelled);
-        }
+    private boolean isCurrent() {
+        return webSession.getAttribute(WebAIUtils.getResponseAttr(conversation)) == this;
     }
 }

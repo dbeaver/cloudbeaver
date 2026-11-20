@@ -63,6 +63,12 @@ public class CBConstants {
 
     public static final String ENV_CB_HOME = "CLOUDBEAVER_HOME";
 
+    public static final String HEADER_ORIGIN = "Origin";
+    public static final String HEADER_X_ORIGIN = "X-Origin";
+    public static final String HEADER_X_FORWARDED_SCHEME = "X-Forwarded-Scheme";
+    public static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
+    public static final String HEADER_X_FORWARDED_HOST = "X-Forwarded-Host";
+    public static final String HEADER_X_FORWARDED_PORT = "X-Forwarded-Port";
 
     public static final String VAR_CB_LOCAL_HOST_ADDR = "CB_LOCAL_HOST_ADDR";
     public static final String VAR_HOST_DOCKER_INTERNAL = "host.docker.internal";

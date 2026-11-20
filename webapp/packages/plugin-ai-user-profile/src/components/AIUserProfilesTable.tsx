@@ -41,31 +41,38 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
     }
   }
 
+  function getAuthentication(profile: AIProfile) {
+    return translate(!profile.global && profile.accountAuthentication ? 'plugin_ai_credentials_subscription' : 'plugin_ai_credentials_token');
+  }
+
+  function getStatus(profile: AIProfile) {
+    if (profile.global) {
+      return translate('plugin_ai_user_profile_status_managed');
+    }
+
+    if (profile.accountAuthentication) {
+      return profile.account
+        ? `${translate('plugin_ai_account_connected')}${profile.account.email ? `: ${profile.account.email}` : ''}`
+        : translate('plugin_ai_account_not_connected');
+    }
+
+    return translate(profile.credentialsSaved ? 'plugin_ai_user_profile_status_configured' : 'plugin_ai_user_profile_status_not_configured');
+  }
+
   const columns: IAIProfilesTableColumn[] = [
     {
       key: 'authentication',
       label: 'plugin_ai_credentials_method',
       width: 180,
-      render: profile =>
-        translate(!profile.global && profile.accountAuthentication ? 'plugin_ai_credentials_subscription' : 'plugin_ai_credentials_token'),
+      render: getAuthentication,
+      compare: (a, b) => getAuthentication(a).localeCompare(getAuthentication(b)),
     },
     {
       key: 'status',
       label: 'plugin_ai_user_profile_column_status',
       width: 'auto',
-      render: profile => {
-        if (profile.global) {
-          return translate('plugin_ai_user_profile_status_managed');
-        }
-
-        if (profile.accountAuthentication) {
-          return profile.account
-            ? `${translate('plugin_ai_account_connected')}${profile.account.email ? `: ${profile.account.email}` : ''}`
-            : translate('plugin_ai_account_not_connected');
-        }
-
-        return translate(profile.credentialsSaved ? 'plugin_ai_user_profile_status_configured' : 'plugin_ai_user_profile_status_not_configured');
-      },
+      render: getStatus,
+      compare: (a, b) => getStatus(a).localeCompare(getStatus(b)),
     },
   ];
 
@@ -74,7 +81,7 @@ export const AIUserProfilesTable = observer<Props>(function AIUserProfilesTable(
       profiles={profiles}
       nameLabel="plugin_ai_user_profile_column_profile"
       engineLabel="plugin_ai_user_profile_column_engine"
-      emptyPlaceholder="plugin_ai_user_profile_empty"
+      emptyPlaceholder="ui_not_found"
       additionalColumns={columns}
       processing={aiDefaultProfileService.saving}
       getProfileBadge={profile =>

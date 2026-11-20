@@ -20,6 +20,7 @@ package io.cloudbeaver.test.platform;
 import io.cloudbeaver.WebConnectionConfigInputHandlerTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.WebConnectionInfoTest;
+import io.cloudbeaver.model.navigator.WebDatabaseObjectInfoTest;
 import io.cloudbeaver.model.navigator.WebNavigatorNodeInfoTest;
 import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.local.LocalResourceControllerTest;
@@ -33,6 +34,7 @@ import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
+import io.cloudbeaver.test.platform.admin.AdminTeamPermissionsTest;
 import io.cloudbeaver.test.platform.admin.AdminUserTeamGrantTest;
 import io.cloudbeaver.test.platform.admin.UserTeamGrantMigrationTest;
 import io.cloudbeaver.test.platform.fs.FileSystemMutationTest;
@@ -52,6 +54,7 @@ import org.junit.platform.suite.api.Suite;
         SQLQueryTranslatorTest.class,
         AuthenticationTest.class,
         WebAuthUtilsTest.class,
+        TrustedTeamsUtilsTest.class,
         LdapAuthenticationTest.class,
         LdapProfileFillTest.class,
         ResourceManagerTest.class,
@@ -62,6 +65,8 @@ import org.junit.platform.suite.api.Suite;
         ConfigurationModeAccessTest.class,
         FileSystemMutationTest.class,
         FileSystemSecurityTest.class,
+        CBEventOriginFilterTest.class,
+        CBEventsLongPollingServletTest.class,
         CBSecretControllerEmbeddedTest.class,
         WebSessionTest.class,
         WebSessionProjectTest.class,
@@ -70,12 +75,14 @@ import org.junit.platform.suite.api.Suite;
         WebDataSourceUtilsTest.class,
         WSEventHandlerWorkspaceConfigUpdateTest.class,
         WebNavigatorNodeInfoTest.class,
+        WebDatabaseObjectInfoTest.class,
         AIProfileCopyTest.class,
         WebAIConfigurationProfileTest.class,
         WebAIProfileUtilsTest.class,
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
+        AdminTeamPermissionsTest.class,
         AdminUserTeamGrantTest.class,
         UserTeamGrantMigrationTest.class,
         BlankLineDelimiterTest.class,
