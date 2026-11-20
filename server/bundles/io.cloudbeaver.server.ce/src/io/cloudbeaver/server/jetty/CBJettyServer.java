@@ -31,6 +31,8 @@ import io.cloudbeaver.server.websockets.CBEventOriginFilter;
 import io.cloudbeaver.server.websockets.CBEventsLongPollingServlet;
 import io.cloudbeaver.server.websockets.CBEventsWebSocket;
 import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
+import io.cloudbeaver.server.websockets.CBWebSocketTicketFilter;
+import io.cloudbeaver.server.websockets.CBWebSocketTicketServlet;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
 import jakarta.servlet.DispatcherType;
@@ -131,6 +133,10 @@ public class CBJettyServer {
 
                 ServletHolder eventsServletHolder = new ServletHolder("events", new CBEventsLongPollingServlet());
                 servletContextHandler.addServlet(eventsServletHolder, serverConfiguration.getServicesURI() + "events/*");
+                servletContextHandler.addServlet(
+                    new ServletHolder("websocket-ticket", new CBWebSocketTicketServlet()),
+                    serverConfiguration.getServicesURI() + "ws-ticket"
+                );
 
                 GraphQLEndpoint endpoint = application.createGraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application));
                 application.addApplicationContextValue(GraphQL.class.getName(), endpoint.getGraphQL());
@@ -175,6 +181,14 @@ public class CBJettyServer {
                 // Jetty prepends its WebSocket upgrade filter. Register it first so that origin validation
                 // runs before the upgrade rather than being bypassed by a successful handshake.
                 WebSocketUpgradeFilter.ensureFilter(servletContextHandler.getServletContext());
+                FilterHolder ticketFilter = new FilterHolder(new CBWebSocketTicketFilter());
+                ticketFilter.setName("cb-websocket-ticket");
+                FilterMapping ticketMapping = new FilterMapping();
+                ticketMapping.setFilterName(ticketFilter.getName());
+                ticketMapping.setPathSpec(serverConfiguration.getServicesURI() + "ws");
+                ticketMapping.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST));
+                servletContextHandler.getServletHandler().prependFilter(ticketFilter);
+                servletContextHandler.getServletHandler().prependFilterMapping(ticketMapping);
                 FilterHolder eventOriginFilter = new FilterHolder(new CBEventOriginFilter());
                 eventOriginFilter.setName("cb-event-origin");
                 FilterMapping eventOriginMapping = new FilterMapping();
