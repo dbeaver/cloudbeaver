@@ -10,8 +10,8 @@ import { autorun, type IReactionDisposer, makeObservable, observable } from 'mob
 import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
-import type { GraphQLService, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
+import { type AsyncTask, AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import type { GraphQLService, SqlExecuteInfo, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
@@ -53,6 +53,7 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
   totalCountRequestTask: ITask<number> | null;
   private keepExecutionContextOnDispose: boolean;
   private readonly closingResults = new Set<string>();
+  private readonly resultTasks = new Map<string, AsyncTask>();
   private readonly persistConstraintsDisposer: IReactionDisposer;
 
   constructor(
@@ -162,17 +163,24 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
 
   override setResults(results: IDatabaseResultSet[]): this {
     this.closeResults(this.results.filter(result => !results.some(r => r.id === result.id)));
-    return super.setResults(results);
+    super.setResults(results);
+    void this.releaseResultTasks();
+
+    return this;
   }
 
   override async dispose(): Promise<void> {
     this.persistConstraintsDisposer();
     await super.dispose();
 
-    if (this.keepExecutionContextOnDispose) {
-      await this.closeResults(this.results);
-    } else {
-      await this.executionContext?.destroy();
+    try {
+      if (this.keepExecutionContextOnDispose) {
+        await this.closeResults(this.results);
+      } else {
+        await this.executionContext?.destroy();
+      }
+    } finally {
+      await this.releaseResultTasks([]);
     }
   }
 
@@ -198,6 +206,23 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
       state: (data?.rowIdentifierState as SqlRowIdentifierState | undefined) ?? null,
       identifier: (data?.rowIdentifier as SqlRowIdentifier | undefined) ?? null,
     };
+  }
+
+  protected async readTaskResults(task: AsyncTask): Promise<SqlExecuteInfo> {
+    const info = await this.asyncTaskInfoService.run(task);
+    const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
+
+    if (result.results.some(result => result.resultSet?.id)) {
+      this.resultTasks.set(info.id, task);
+    }
+
+    return result;
+  }
+
+  protected async releaseTask(task: AsyncTask): Promise<void> {
+    if (!task.info || !this.resultTasks.has(task.info.id)) {
+      await this.asyncTaskInfoService.remove(task.id);
+    }
   }
 
   protected getPreviousResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
@@ -229,6 +254,23 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
     for (const result of results) {
       await this.closeResult(result);
     }
+  }
+
+  protected async releaseResultTasks(results: IDatabaseResultSet[] = this.results): Promise<void> {
+    const taskIds = new Set(results.map(result => result.taskId));
+    const tasks = Array.from(this.resultTasks).filter(([taskId]) => !taskIds.has(taskId));
+
+    await Promise.all(
+      tasks.map(async ([taskId, task]) => {
+        this.resultTasks.delete(taskId);
+
+        try {
+          await this.asyncTaskInfoService.remove(task.id);
+        } catch (exception: unknown) {
+          console.warn(`Error closing result task (${taskId}):`, exception);
+        }
+      }),
+    );
   }
 
   private async closeResult(result: IDatabaseResultSet): Promise<void> {

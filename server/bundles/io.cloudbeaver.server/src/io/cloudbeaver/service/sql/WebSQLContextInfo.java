@@ -196,13 +196,19 @@ public class WebSQLContextInfo implements WebSessionProvider {
     }
 
     public boolean closeResult(@NotNull String resultId) {
-        return resultInfoMap.remove(resultId) != null;
+        WebSQLResultsInfo result = resultInfoMap.remove(resultId);
+        if (result == null) {
+            return false;
+        }
+        result.close();
+        return true;
     }
 
     ///////////////////////////////////////////////////////
     // Async model
 
     void dispose() {
+        resultInfoMap.values().forEach(WebSQLResultsInfo::close);
         resultInfoMap.clear();
     }
 

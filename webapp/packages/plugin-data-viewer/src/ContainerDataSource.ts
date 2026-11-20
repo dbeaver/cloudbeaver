@@ -77,14 +77,9 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     const task = await this.getRequestTask(prevResults, context);
 
     this.currentTask = executionContext.run(
-      async () => {
-        const info = await this.asyncTaskInfoService.run(task);
-        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
-
-        return result;
-      },
+      () => this.readTaskResults(task),
       () => this.asyncTaskInfoService.cancel(task.id),
-      () => this.asyncTaskInfoService.remove(task.id),
+      () => this.releaseTask(task),
     );
 
     try {
@@ -101,8 +96,9 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
 
       this.clearError();
 
-      return this.transformResults(executionContext.context!, response.results, limit);
+      return this.transformResults(executionContext.context!, response.results, limit, task.info?.id);
     } catch (exception: any) {
+      await this.releaseResultTasks();
       this.error = exception;
       throw exception;
     }
@@ -247,9 +243,15 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     return this;
   }
 
-  private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
+  private transformResults(
+    executionContextInfo: IConnectionExecutionContextInfo,
+    results: SqlQueryResults[],
+    limit: number,
+    taskId?: string,
+  ): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || '0',
+      taskId,
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.dataFormat}_${index}`,
       projectId: executionContextInfo.projectId,
       connectionId: executionContextInfo.connectionId,
