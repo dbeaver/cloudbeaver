@@ -136,12 +136,6 @@ When writing or reviewing user-facing text, read and follow `.agents/skills/clea
 
 Review changed user-visible interface text for punctuation and tone. Apply these rules to titles, headings, labels, controls, commands, messages, descriptions, and helper text. Do not apply them to technical documentation or release notes unless the text is presented in the interface.
 
-#### Ellipses
-
-Use the single ellipsis character `…`, not three periods, at the end of a command label only when the user must enter information, make a choice, or confirm an action before it takes effect. Do not use an ellipsis when opening a window or page completes the command, even if the user can make optional changes there.
-
-For example, use `Export Data…` and `New Database Connection…`. A command can have different labels depending on its flow: use `Delete…` when the user must confirm the deletion, and use `Delete` when the deletion takes effect immediately. Do not use an ellipsis for `Preferences`, `Properties`, or `View Details` because opening those pages completes the command.
-
 #### Periods
 
 Do not use periods in titles, headings, labels, controls, commands, or other text that names an interface element or action. In messages, descriptions, and other explanatory prose, use normal sentence punctuation: end complete sentences with a period, including standalone messages, and do not add a period to a fragment.
