@@ -29,6 +29,7 @@ import { ConnectionInfoEventHandler } from './ConnectionInfoEventHandler.js';
 import { ConnectionInfoCustomOptionsResource } from './ConnectionInfoCustomOptionsResource.js';
 import { ConnectionFolderResource } from './ConnectionFolderResource.js';
 import { ConnectionExecutionContextService } from './ConnectionExecutionContext/ConnectionExecutionContextService.js';
+import { ConnectionExecutionContextNotificationService } from './ConnectionExecutionContext/ConnectionExecutionContextNotificationService.js';
 import { ConnectionFolderEventHandler } from './ConnectionFolderEventHandler.js';
 import { ConnectionExecutionContextResource } from './ConnectionExecutionContext/ConnectionExecutionContextResource.js';
 import { ConnectionDialectResource } from './ConnectionDialectResource.js';
@@ -42,6 +43,7 @@ export default ModuleRegistry.add({
   configure: serviceCollection => {
     serviceCollection
       .addSingleton(Bootstrap, ConnectionsLocaleService)
+      .addSingleton(Bootstrap, proxy(ConnectionExecutionContextNotificationService))
       .addSingleton(Dependency, proxy(ConnectionsSettingsService))
       .addSingleton(Dependency, proxy(ConnectionDialectResource))
       .addSingleton(Dependency, proxy(DBDriverResource))
@@ -84,6 +86,7 @@ export default ModuleRegistry.add({
       .addSingleton(ConnectionInfoCustomOptionsResource)
       .addSingleton(ConnectionFolderResource)
       .addSingleton(ConnectionExecutionContextService)
+      .addSingleton(ConnectionExecutionContextNotificationService)
       .addSingleton(ConnectionFolderEventHandler)
       .addSingleton(ConnectionExecutionContextResource)
       .addSingleton(ConnectionTypeResource)

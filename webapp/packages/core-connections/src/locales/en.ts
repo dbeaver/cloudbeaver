@@ -5,6 +5,7 @@ export default [
   ['core_connections_connection_save_error', 'Save connection error'],
   ['core_connections_connection_access_empty', 'No available users and teams'],
   ['core_connections_connection_no_information', 'No information available'],
+  ['core_connections_execution_context_closing', 'Closing...'],
 
   ['connections_database_authentication', 'Database Authentication'],
   ['connections_connection_edit_not_own_deny', 'You have no access to edit this connection.'],

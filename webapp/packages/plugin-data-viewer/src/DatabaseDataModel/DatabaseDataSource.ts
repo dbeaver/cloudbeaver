@@ -346,7 +346,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   async canSafelyDispose(): Promise<boolean> {
     try {
+      await this.activeOperation?.catch(() => {});
+
       const result = await this.tryExecuteOperation(DatabaseDataSourceOperation.Request, () => Promise.resolve(true));
+
       return result || false;
     } catch {
       return false;

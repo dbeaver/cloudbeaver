@@ -9,6 +9,7 @@ import { action, makeObservable, runInAction } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   CachedMapAllKey,
   CachedMapResource,
@@ -35,6 +36,8 @@ export type IConnectionExecutionContextInfo = SqlContextInfo & {
 
 @injectable(() => [GraphQLService, ConnectionInfoResource, UserInfoResource, AppAuthService])
 export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
+  readonly onDestroy: SyncExecutor<{ contextId: string; stage: 'before' | 'after' }>;
+
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -42,6 +45,8 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     appAuthService: AppAuthService,
   ) {
     super();
+    this.onDestroy = new SyncExecutor();
+
     this.sync(
       connectionInfoResource,
       () => ConnectionInfoActiveProjectKey,
@@ -125,25 +130,31 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   async destroy(contextId: string): Promise<void> {
-    await this.performUpdate(contextId, [], async () => {
-      const context = this.get(contextId);
+    this.onDestroy.execute({ contextId, stage: 'before' });
 
-      if (!context) {
-        return;
-      }
+    try {
+      await this.performUpdate(contextId, [], async () => {
+        const context = this.get(contextId);
 
-      await this.graphQLService.sdk.executionContextDestroy({
-        contextId: context.id,
-        connectionId: context.connectionId,
-        projectId: context.projectId,
+        if (!context) {
+          return;
+        }
+
+        await this.graphQLService.sdk.executionContextDestroy({
+          contextId: context.id,
+          connectionId: context.connectionId,
+          projectId: context.projectId,
+        });
+
+        this.delete(contextId);
       });
 
-      this.delete(contextId);
-    });
-
-    runInAction(() => {
-      this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
-    });
+      runInAction(() => {
+        this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
+      });
+    } finally {
+      this.onDestroy.execute({ contextId, stage: 'after' });
+    }
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, IConnectionExecutionContextInfo>> {
