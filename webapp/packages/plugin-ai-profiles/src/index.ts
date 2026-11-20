@@ -18,4 +18,5 @@ export { AIProfileCredentialsFields } from './AIProfileCredentials/AIProfileCred
 export * from './AIProfilesResource.js';
 export * from './AIDefaultProfileService.js';
 export { AIProfilesTable } from './AIProfilesTableLazy.js';
+export { useAIProfilesTableFilters } from './useAIProfilesTableFilters.js';
 export type { IAIProfilesTableColumn, IAIProfilesTableProps } from './AIProfilesTable.js';

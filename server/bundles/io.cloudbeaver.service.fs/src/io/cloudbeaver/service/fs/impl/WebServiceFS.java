@@ -27,6 +27,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystems;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPath;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -179,7 +180,7 @@ public class WebServiceFS implements DBWServiceFS {
             Path filePath = WebFSUtils.resolveSafeChild(parentNode.getPath(), fileName);
             Files.createFile(filePath);
             parentNode.addChildResource(filePath);
-            return new FSFile(parentNode.getChild(filePath));
+            return makeFileResult(parentNode, filePath);
         } catch (Exception e) {
             throw new DBWebException("Failed to create file: " + e.getMessage(), e);
         }
@@ -205,7 +206,7 @@ public class WebServiceFS implements DBWServiceFS {
             // apply changes in navigator node
             oldParentNode.removeChildResource(oldNode.getPath());
             parentNode.addChildResource(to);
-            return new FSFile(parentNode.getChild(to));
+            return makeFileResult(parentNode, to);
         } catch (NoSuchFileException e) {
             throw new DBWebException("File not found. Please refresh the catalog and check if file exists.");
         } catch (Exception e) {
@@ -247,7 +248,7 @@ public class WebServiceFS implements DBWServiceFS {
             }
             Path to = Files.copy(oldNode.getPath(), parentPath.resolve(fileName));
             parentNode.addChildResource(to);
-            return new FSFile(parentNode.getChild(to));
+            return makeFileResult(parentNode, to);
         } catch (Exception e) {
             throw new DBWebException("Failed to copy file: " + e.getMessage(), e);
         }
@@ -269,7 +270,7 @@ public class WebServiceFS implements DBWServiceFS {
             Path folderPath = WebFSUtils.resolveSafeChild(parentNode.getPath(), folderName);
             Files.createDirectory(folderPath);
             parentNode.addChildResource(folderPath);
-            return new FSFile(parentNode.getChild(folderPath));
+            return makeFileResult(parentNode, folderPath);
         } catch (Exception e) {
             throw new DBWebException("Failed to create folder: " + e.getMessage(), e);
         }
@@ -291,6 +292,13 @@ public class WebServiceFS implements DBWServiceFS {
         } catch (Exception e) {
             throw new DBWebException("Failed to create folder: " + e.getMessage(), e);
         }
+    }
+
+    @NotNull
+    private FSFile makeFileResult(@NotNull DBNPathBase parentNode, @NotNull Path path) {
+        DBNPathBase child = parentNode.getChild(path);
+        // An unloaded parent ignores addChildResource; build the response without initializing its cache.
+        return new FSFile(child == null ? new DBNPath(parentNode, path) : child);
     }
 
     private void validateFilename(@NotNull String filename) throws DBWebException {
