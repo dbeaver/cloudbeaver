@@ -48,6 +48,8 @@ import java.net.http.WebSocketHandshakeException;
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,10 +57,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CBWebSocketTicketIntegrationTest {
     private static final String PUBLIC_ORIGIN = "https://public.example";
     private static final AtomicInteger UPGRADED = new AtomicInteger();
+    private static CountDownLatch opened = new CountDownLatch(1);
 
     @Test
     public void testTicketGateBeforeRealJettyUpgradeBehindRewritingProxy() throws Exception {
         UPGRADED.set(0);
+        opened = new CountDownLatch(1);
         Server server = new Server(0);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
@@ -102,8 +106,13 @@ public class CBWebSocketTicketIntegrationTest {
             URI ticketSocket = URI.create(socket + "?ticket=" + response.body());
             assertRejected(otherSession, ticketSocket);
             WebSocket connected = connect(client, ticketSocket).join();
-            assertEquals(1, UPGRADED.get());
-            connected.abort();
+            try {
+                // Receiving 101 on the client does not imply that Jetty has finished onOpen.
+                assertTrue(opened.await(5, TimeUnit.SECONDS), "Jetty did not invoke WebSocket onOpen");
+                assertEquals(1, UPGRADED.get());
+            } finally {
+                connected.abort();
+            }
             assertRejected(client, ticketSocket);
             assertEquals(1, UPGRADED.get());
 
@@ -154,6 +163,7 @@ public class CBWebSocketTicketIntegrationTest {
         @Override
         public void onOpen(@NotNull Session session, @NotNull EndpointConfig config) {
             UPGRADED.incrementAndGet();
+            opened.countDown();
         }
     }
 }
