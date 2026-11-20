@@ -107,6 +107,7 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
             functionCall: data.functionCall,
             functionResult: data.functionResult,
             functionConfirmation: data.functionConfirmation,
+            functionConfirmationRequired: data.functionConfirmationRequired,
           };
 
           runInAction(() => {
@@ -119,7 +120,11 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
             }
           });
 
-          if (isFunctionConfirmationMessage(message) && !this.isExternalFunction(param)) {
+          if (
+            isFunctionConfirmationMessage(message) &&
+            !message.functionConfirmation?.functionCalls.some(call => this.aiChatFunctionRegistryService.isInteraction(call.functionName)) &&
+            !this.isFunctionConfirmationRequired(param)
+          ) {
             this.processFunctionCall(param, true);
           }
         }
@@ -220,6 +225,10 @@ export class AIChatMessagesResource extends CachedMapResource<string, AiMessage[
         }
       }
     });
+  }
+
+  isFunctionConfirmationRequired(param: IMessageParam): boolean {
+    return this.getMessage(param)?.functionConfirmationRequired ?? this.isExternalFunction(param);
   }
 
   isExternalFunction(param: IMessageParam): boolean {
