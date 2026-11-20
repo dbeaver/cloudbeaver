@@ -1,0 +1,175 @@
+/*
+ * DBeaver - Universal Database Manager
+ * Copyright (C) 2010-2026 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.cloudbeaver.service.navigator;
+
+import io.cloudbeaver.BaseWebProjectImpl;
+import io.cloudbeaver.DBWebException;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPObjectSettingsProvider;
+import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.auth.SMObjectType;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.navigator.DBNDatabaseNode;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
+import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.FilterSerializer;
+import org.jkiss.dbeaver.registry.RegistryConstants;
+import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Map;
+
+/**
+ * Reads connection and personal filter settings independently, preserving the existing runtime filter mechanism.
+ */
+public final class WebNavigatorFilterUtils {
+    private WebNavigatorFilterUtils() {
+    }
+
+    @Nullable
+    public static DBSObjectFilter getUserFilter(
+        @NotNull DBNDatabaseNode node,
+        @Nullable DBXTreeItem itemsMeta
+    ) {
+        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
+        if (childClass == null || !(node.getDataSourceContainer() instanceof DataSourceDescriptor dataSource)) {
+            return null;
+        }
+        FilterLookupDataSource filters = readUserFilters(dataSource);
+        return filters == null ? null : filters.getObjectFilter(childClass, node.getFilterObject(), true);
+    }
+
+    @Nullable
+    public static DBSObjectFilter getConnectionFilter(
+        @NotNull DBNDatabaseNode node,
+        @Nullable DBXTreeItem itemsMeta
+    ) throws DBException {
+        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
+        if (childClass == null || !(node.getDataSourceContainer() instanceof DataSourceDescriptor dataSource)) {
+            return null;
+        }
+        if (dataSource.isHidden() || dataSource.getProject().isInMemory()) {
+            // Draft/session-only connections have no saved configuration to query. Never return a personal
+            // runtime filter as a connection filter.
+            DBSObjectFilter filter = node.getNodeFilter(itemsMeta, true);
+            return filter == null || filter.isUserFilter() ? null : new DBSObjectFilter(filter);
+        }
+        if (!(dataSource.getProject() instanceof BaseWebProjectImpl project)) {
+            throw new DBWebException("Cannot read connection filters for navigator node '" + node.getNodeUri() + "'");
+        }
+        // Read the canonical configuration through RM, not the user's overlaid session registry. Deserialize
+        // only the filters; do not copy credentials or install any settings in the live datasource.
+        String configuration = project.getResourceController().getProjectsDataSources(
+            project.getId(), new String[] {dataSource.getId()});
+        Map<String, Object> root = JSONUtils.parseMap(JSONUtils.GSON, new StringReader(configuration));
+        Map<String, Object> connection = JSONUtils.getObject(JSONUtils.getObject(root, "connections"), dataSource.getId());
+        if (JSONUtils.getObjectList(connection, RegistryConstants.TAG_FILTERS).isEmpty()) {
+            return null;
+        }
+        FilterLookupDataSource filters = new FilterLookupDataSource(dataSource);
+        FilterSerializer<DataSourceDescriptor> serializer = new FilterSerializer<>();
+        for (Map<String, Object> filter : JSONUtils.getObjectList(connection, RegistryConstants.TAG_FILTERS)) {
+            filters.addFilter(serializer.deserializeObjectFilterConfig(filter));
+        }
+        return filters.getObjectFilter(childClass, node.getFilterObject(), true);
+    }
+
+    public static void setUserFilter(
+        @NotNull DBNDatabaseNode node,
+        @Nullable DBXTreeItem itemsMeta,
+        @Nullable DBSObjectFilter filter
+    ) throws DBException {
+        Class<?> childClass = node.getChildrenOrFolderClass(itemsMeta);
+        if (childClass == null ||
+            !(node.getDataSourceContainer() instanceof DataSourceDescriptor dataSource)
+        ) {
+            throw new DBWebException("Navigator node '" + node.getNodeUri() + "' does not support object filters");
+        }
+        if (filter == null) {
+            // Remove from saved personal settings, not from the overlaid runtime mapping. The runtime
+            // filter may be shared, disabled, or different from the saved personal filter.
+            FilterLookupDataSource filters = readUserFilters(dataSource);
+            if (filters == null || filters.getObjectFilter(childClass, node.getFilterObject(), true) == null) {
+                return;
+            }
+            filters.setObjectFilter(childClass, node.getFilterObject(), null);
+            saveUserFilters(filters);
+            return;
+        }
+        DBPObjectSettingsProvider settings = DBUtils.getAdapter(DBPObjectSettingsProvider.class, dataSource.getProject());
+        if (settings == null) {
+            throw new DBWebException("Personal settings are not available for navigator node '" + node.getNodeUri() + "'");
+        }
+        // The runtime mapping can omit saved personal filters that were overwritten by shared filters.
+        // Update only the requested entry in the saved settings; callbacks reapply them after a successful save.
+        FilterLookupDataSource filters = readUserFilters(dataSource);
+        if (filters == null) {
+            filters = new FilterLookupDataSource(dataSource);
+        }
+        filter.setUserFilter(true);
+        filters.setObjectFilter(childClass, node.getFilterObject(), filter);
+        saveUserFilters(filters);
+    }
+
+    @Nullable
+    private static FilterLookupDataSource readUserFilters(@NotNull DataSourceDescriptor dataSource) {
+        DBPObjectSettingsProvider provider = DBUtils.getAdapter(DBPObjectSettingsProvider.class, dataSource.getProject());
+        Map<String, String> settings = provider == null ? null
+            : provider.getObjectSettings(SMObjectType.datasource, dataSource.getId());
+        if (settings == null ||
+            settings.keySet().stream().noneMatch(key -> key.startsWith(UserDBSObjectFilterUtils.USER_FILTER_KEY))
+        ) {
+            return null;
+        }
+        FilterLookupDataSource filters = new FilterLookupDataSource(dataSource);
+        UserDBSObjectFilterUtils.setUserObjectFilters(filters, settings);
+        return filters;
+    }
+
+    private static void saveUserFilters(@NotNull DataSourceDescriptor dataSource) throws DBException {
+        try {
+            String serialized = new FilterSerializer<DataSourceDescriptor>().serializeCustomUserFilters(dataSource);
+            if (serialized.isEmpty() || "[]".equals(serialized)) {
+                // Existing settings callbacks reload the saved connection configuration and restore its filters.
+                UserDBSObjectFilterUtils.clearUserObjectFilters(dataSource);
+            } else {
+                UserDBSObjectFilterUtils.updateUserObjectFilters(dataSource);
+            }
+        } catch (IOException e) {
+            throw new DBWebException("Error serializing personal navigator filters", e);
+        }
+    }
+
+    /** Unregistered, credential-free filter mapping that reuses the core's type and parent lookup rules. */
+    private static class FilterLookupDataSource extends DataSourceDescriptor {
+        private FilterLookupDataSource(@NotNull DataSourceDescriptor source) {
+            super(source.getRegistry(), source.getConfigurationStorage(), source.getOrigin(), source.getId(),
+                source.getDriver(), new DBPConnectionConfiguration());
+        }
+
+        private void addFilter(@NotNull FilterSerializer.FilterConfiguration configuration) {
+            if (configuration.typeNamePresent()) {
+                setObjectFilter(configuration.typeName(), configuration.objectID(), configuration.filter());
+            }
+        }
+    }
+}

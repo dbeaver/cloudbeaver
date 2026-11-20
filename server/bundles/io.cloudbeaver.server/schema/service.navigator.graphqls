@@ -99,8 +99,10 @@ type NavigatorNodeInfo {
     navigable: Boolean!
     filtered: Boolean!
 
-    "Reads node filter. Expensive invocation, read only when it is really needed"
+    "Reads the saved connection-level filter defined on this node, before personal settings are applied. Expensive invocation, read only when it is really needed"
     filter: NavigatorNodeFilter
+    "Reads the current user's filter defined on this node, without global fallback. Expensive invocation, read only when it is really needed"
+    userFilter: NavigatorNodeFilter @since(version: "26.2.4")
 }
 
 type NavigatorNodeFilter {
@@ -169,5 +171,18 @@ extend type Mutation {
     Node must be refreshed after applying filters. Node children can be changed
     """
     navSetFolderFilter( nodePath: ID!, include: [String!], exclude: [String!]): Boolean!
+
+    """
+    Sets the current user's filter for the folder node. If both include and exclude are null then filter is removed.
+    Node must be refreshed after applying filters. Node children can be changed.
+    """
+    navSetUserFolderFilter( nodePath: ID!, include: [String!], exclude: [String!]): Boolean! @since(version: "26.2.4")
+
+    """
+    Removes the current user's filter defined on nodePath when provided; the node must belong to the specified connection.
+    Does not remove filters of other nodes or inherited filters. When nodePath is omitted or null, removes all current
+    user filters for the connection. Affected navigator nodes must be refreshed afterwards.
+    """
+    navResetUserFilters( projectId: ID!, connectionId: ID!, nodePath: ID): Boolean! @since(version: "26.2.4")
 
 }

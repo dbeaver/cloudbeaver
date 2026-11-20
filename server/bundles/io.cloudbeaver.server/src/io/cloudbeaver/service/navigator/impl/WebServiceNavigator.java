@@ -23,10 +23,7 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.service.navigator.DBWServiceNavigator;
-import io.cloudbeaver.service.navigator.WebCatalog;
-import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
-import io.cloudbeaver.service.navigator.WebStructContainers;
+import io.cloudbeaver.service.navigator.*;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
@@ -55,6 +52,7 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
+import org.jkiss.dbeaver.registry.UserDBSObjectFilterUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -254,6 +252,82 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             throw new DBWebException("Error changing navigator node '"  + nodePath + "' filters", e);
         }
         return true;
+    }
+
+    @Override
+    public boolean setUserNavigatorNodeFilter(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @Nullable List<String> include,
+        @Nullable List<String> exclude
+    ) throws DBWebException {
+        try {
+            DBNDatabaseNode dbNode = getDatabaseNode(webSession, nodePath);
+            DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), dbNode);
+            WebNavigatorFilterUtils.setUserFilter(dbNode, itemsMeta, createFilter(include, exclude));
+            return true;
+        } catch (DBException e) {
+            if (e instanceof DBWebException) {
+                throw (DBWebException) e;
+            }
+            throw new DBWebException("Error changing navigator node '" + nodePath + "' user filters", e);
+        }
+    }
+
+    @Override
+    public boolean resetUserNavigatorFilters(
+        @NotNull WebSession webSession,
+        @NotNull WebConnectionInfo connectionInfo,
+        @Nullable String nodePath
+    ) throws DBWebException {
+        try {
+            if (nodePath == null) {
+                UserDBSObjectFilterUtils.clearUserObjectFilters(connectionInfo.getDataSourceContainer());
+            } else {
+                DBNDatabaseNode node = getDatabaseNode(webSession, nodePath);
+                DBPDataSourceContainer dataSource = node.getDataSourceContainer();
+                DBPDataSourceContainer connection = connectionInfo.getDataSourceContainer();
+                if (!dataSource.getId().equals(connection.getId()) ||
+                    !dataSource.getProject().getId().equals(connection.getProject().getId())
+                ) {
+                    throw new DBWebException("Navigator node '" + nodePath + "' does not belong to the specified connection");
+                }
+                DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), node);
+                WebNavigatorFilterUtils.setUserFilter(node, itemsMeta, null);
+            }
+            return true;
+        } catch (DBException e) {
+            if (e instanceof DBWebException) {
+                throw (DBWebException) e;
+            }
+            throw new DBWebException("Error resetting user filters for connection '" + connectionInfo.getId() + "'", e);
+        }
+    }
+
+    @NotNull
+    private DBNDatabaseNode getDatabaseNode(@NotNull WebSession webSession, @NotNull String nodePath) throws DBException {
+        DBNNode node = webSession.getNavigatorModelOrThrow().getNodeByPath(webSession.getProgressMonitor(), nodePath);
+        if (node == null) {
+            throw new DBWebException("Navigator node '" + nodePath + "' not found");
+        }
+        if (!(node instanceof DBNDatabaseNode dbNode)) {
+            throw new DBWebException("Navigator node '" + nodePath + "' does not support object filters");
+        }
+        return dbNode;
+    }
+
+    @Nullable
+    private DBSObjectFilter createFilter(
+        @Nullable List<String> include,
+        @Nullable List<String> exclude
+    ) {
+        if (CommonUtils.isEmpty(include) && CommonUtils.isEmpty(exclude)) {
+            return null;
+        }
+        DBSObjectFilter filter = new DBSObjectFilter();
+        filter.setInclude(include);
+        filter.setExclude(exclude);
+        return filter;
     }
 
     @Override
