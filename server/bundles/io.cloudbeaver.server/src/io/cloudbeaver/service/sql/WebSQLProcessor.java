@@ -377,7 +377,9 @@ public class WebSQLProcessor implements WebSessionProvider {
                     executeInfo.setFullQuery(statistics.getQueryText());
                     if (resultSet != null && resultSet.getRowsWithMetaData() != null && resultSet.getResultsInfo() != null) {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
-                        executeInfo.setStatusMessage(resultSet.getRowsWithMetaData().size() + " row(s) fetched");
+                        int rowCount = resultSet.getSourceRowCount() == null
+                            ? resultSet.getRowsWithMetaData().size() : resultSet.getSourceRowCount();
+                        executeInfo.setStatusMessage(rowCount + " row(s) fetched");
                     }
                 }
             }

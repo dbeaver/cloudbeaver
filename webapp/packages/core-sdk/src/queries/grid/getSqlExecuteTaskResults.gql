@@ -11,6 +11,7 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
       sourceQuery
       dataFormat
       resultSet {
+        sourceRowCount
         id
         readOnly
         columns {
