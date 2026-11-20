@@ -170,11 +170,11 @@ public class WebDatabaseObjectInfo {
     }
 
     private void getObjectFeatures(@NotNull DBSObject object, @NotNull List<String> features) {
-        if (object instanceof DBPScriptObject) {
+        if (object instanceof DBPScriptObject scriptObject && scriptObject.supportsObjectDefinition()) {
             features.add(OBJECT_FEATURE_SCRIPT);
-        }
-        if (object instanceof DBPScriptObjectExt) {
-            features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
+            if (object instanceof DBPScriptObjectExt) {
+                features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
+            }
         }
         if (object instanceof DBPScriptObjectExt2 scriptObjectExt2 && (
             scriptObjectExt2.supportsObjectDefinitionOption(DBPScriptObject.OPTION_INCLUDE_NESTED_OBJECTS)
