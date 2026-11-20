@@ -20,6 +20,7 @@ package io.cloudbeaver.test.platform;
 import io.cloudbeaver.WebConnectionConfigInputHandlerTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.WebConnectionInfoTest;
+import io.cloudbeaver.model.navigator.WebDatabaseObjectInfoTest;
 import io.cloudbeaver.model.navigator.WebNavigatorNodeInfoTest;
 import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.local.LocalResourceControllerTest;
@@ -74,6 +75,7 @@ import org.junit.platform.suite.api.Suite;
         WebDataSourceUtilsTest.class,
         WSEventHandlerWorkspaceConfigUpdateTest.class,
         WebNavigatorNodeInfoTest.class,
+        WebDatabaseObjectInfoTest.class,
         AIProfileCopyTest.class,
         WebAIConfigurationProfileTest.class,
         WebAIProfileUtilsTest.class,
