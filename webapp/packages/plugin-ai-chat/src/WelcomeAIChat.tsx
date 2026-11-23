@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { Cell, IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { ACTION_TOGGLE_AI_CHAT } from './actions/ACTION_TOGGLE_AI_CHAT.js';
+import { ACTION_OPEN_AI_CHAT } from './actions/ACTION_OPEN_AI_CHAT.js';
 import { AIChatTabService } from './AIChatTabService.js';
 
 export const WelcomeAIChat = observer(function WelcomeAIChat() {
@@ -20,14 +20,14 @@ export const WelcomeAIChat = observer(function WelcomeAIChat() {
 
   return (
     <Cell
-      before={<IconOrImage icon={ACTION_TOGGLE_AI_CHAT.info.icon ?? '/icons/ai.png'} />}
-      description={translate(ACTION_TOGGLE_AI_CHAT.info.tooltip)}
+      before={<IconOrImage icon={ACTION_OPEN_AI_CHAT.info.icon ?? '/icons/ai.png'} />}
+      description={translate(ACTION_OPEN_AI_CHAT.info.tooltip)}
       className="tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
-      aria-label={translate(ACTION_TOGGLE_AI_CHAT.info.tooltip)}
+      aria-label={translate(ACTION_OPEN_AI_CHAT.info.tooltip)}
       big
       onClick={() => aiChatTabService.open()}
     >
-      {translate(ACTION_TOGGLE_AI_CHAT.info.label)}
+      {translate(ACTION_OPEN_AI_CHAT.info.label)}
     </Cell>
   );
 });
