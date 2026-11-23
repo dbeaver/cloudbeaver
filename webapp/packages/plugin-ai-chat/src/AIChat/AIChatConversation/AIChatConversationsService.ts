@@ -104,15 +104,8 @@ export class AIChatConversationsService extends Disposable {
 
     this.reactionDisposer = reaction(
       () => [this.aiChatService.isActive, this.aiChatContextService.isContextReady, this.aiChatContextService.currentContext] as const,
-      ([active, ready, context]) => {
+      ([active, ready]) => {
         if (active && ready) {
-          this.aiChatContextService.initialize();
-
-          // A changed context triggers this reaction again.
-          if (context !== this.aiChatContextService.currentContext) {
-            return;
-          }
-
           this.ensureConversation().catch((exception: Error) => {
             this.notificationService.logException(exception, 'plugin_ai_chat_conversation_initialization_failed');
           });
