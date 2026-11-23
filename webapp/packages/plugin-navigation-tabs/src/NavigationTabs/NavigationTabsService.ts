@@ -39,6 +39,10 @@ const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 
 @injectable(() => [NotificationService, StorageService, UserInfoResource, ProjectsService, AdministrationScreenService, AppAuthService])
 export class NavigationTabsService extends View<ITab> {
+  get isInitialized(): boolean {
+    return this.initialized;
+  }
+
   get currentTab(): ITab | undefined {
     if (this.currentTabId) {
       return this.getTab(this.currentTabId);
@@ -112,6 +116,7 @@ export class NavigationTabsService extends View<ITab> {
   private readonly historyState: Map<string, INavigatorHistory>;
   private readonly tempHistoryState: TempMap<string, INavigatorHistory>;
   private readonly metadata: MetadataMap<string, ITabMetadata>;
+  private initialized = false;
 
   constructor(
     private readonly notificationService: NotificationService,
@@ -138,7 +143,9 @@ export class NavigationTabsService extends View<ITab> {
     this.navigationTabContext = (): ITabNavigationContext => new TabNavigationContext(this, this.userInfoResource);
     this.registerAction(ACTION_OPEN_IN_TAB);
 
-    makeObservable<NavigationTabsService, 'unloadTabs' | 'handlers' | 'tabsMap' | 'state' | 'historyState'>(this, {
+    makeObservable<NavigationTabsService, 'unloadTabs' | 'handlers' | 'tabsMap' | 'state' | 'historyState' | 'initialized'>(this, {
+      initialized: observable,
+      isInitialized: computed,
       handlers: observable,
       tabsMap: observable,
       state: observable,
@@ -404,6 +411,7 @@ export class NavigationTabsService extends View<ITab> {
     const unloadHandlers: Promise<void>[] = [];
 
     runInAction(() => {
+      this.initialized = false;
       this.onInit.execute(false);
 
       for (const tab of this.tabsMap.values()) {
@@ -460,6 +468,7 @@ export class NavigationTabsService extends View<ITab> {
         }
       }
 
+      this.initialized = true;
       this.onInit.execute(true);
     });
   }

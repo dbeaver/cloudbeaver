@@ -20,6 +20,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { UserConfigurationStorage, UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 export interface IAIChatContextInfo {
   connectionKey: IConnectionInfoParams;
@@ -38,6 +39,7 @@ interface ISettings {
   UserDataService,
   UserConfigurationStorage,
   ConnectionInfoResource,
+  NavigationTabsService,
 ])
 export class AIChatContextService extends Bootstrap {
   onContextChange: SyncExecutor<IAIChatContextInfo | null>;
@@ -64,7 +66,8 @@ export class AIChatContextService extends Bootstrap {
     return (
       this.userInfoResource.hasAccess() &&
       (!this.userConfigurationStorage.isAvailable() || this.userConfigurationStorage.isLoaded()) &&
-      this.connectionInfoResource.isLoaded(ConnectionInfoActiveProjectKey)
+      this.connectionInfoResource.isLoaded(ConnectionInfoActiveProjectKey) &&
+      (this.settings.context !== undefined || this.navigationTabsService.isInitialized)
     );
   }
 
@@ -81,6 +84,7 @@ export class AIChatContextService extends Bootstrap {
     private readonly userDataService: UserDataService,
     private readonly userConfigurationStorage: UserConfigurationStorage,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly navigationTabsService: NavigationTabsService,
   ) {
     super();
 
@@ -95,6 +99,12 @@ export class AIChatContextService extends Bootstrap {
 
   setContext(context: IAIChatContextInfo | null): void {
     this.settings.context = context;
+  }
+
+  initialize(): void {
+    if (this.isContextReady && this.settings.context === undefined) {
+      this.setContext(this.getContext());
+    }
   }
 
   getContext(): IAIChatContextInfo | null {
