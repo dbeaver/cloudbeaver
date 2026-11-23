@@ -1,6 +1,6 @@
 ---
 name: cloudbeaver-frontend-tests
-description: Add tests, write tests, or test a file in the CloudBeaver frontend. Use for any webapp core or plugin test request, especially when the package is missing Vitest scripts, dependencies, TypeScript references, DOM or DI setup, mocks, or previously disabled tests.
+description: Add tests, write tests, or test a file in the CloudBeaver frontend. Use for any webapp core or plugin test request, especially when the package is missing Vitest scripts, dependencies, TypeScript references, DOM or DI setup, mocks, or previously disabled tests. Apply only to frontend unit-test work under the owning CloudBeaver repository's webapp/, not backend or external QA/E2E tests.
 ---
 
 # CloudBeaver Frontend Tests

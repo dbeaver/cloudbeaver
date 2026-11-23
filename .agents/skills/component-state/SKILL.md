@@ -1,6 +1,6 @@
 ---
 name: component-state
-description: Guides state management, component logic, and hook composition in CloudBeaver React components. Use when creating, changing, reviewing, or extracting component behavior, state, or hooks.
+description: Guides state management, component logic, and hook composition in CloudBeaver React components. Use when creating, changing, reviewing, or extracting component behavior, state, or hooks. Apply only to frontend component work under the owning CloudBeaver repository's webapp/.
 ---
 
 # Component state
