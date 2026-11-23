@@ -172,11 +172,13 @@ public class WebSQLContextInfo implements WebSessionProvider {
         @NotNull DBCTrace trace,
         @NotNull DBDAttributeBinding[] attributes,
         @Nullable DBDAttributeBinding documentAttribute,
-        boolean singleRow
+        boolean singleRow,
+        @Nullable WebSQLResultSetExtension.Presentation presentation
     ) {
         WebSQLResultsInfo resultInfo = new WebSQLResultsInfo(
             dataContainer,
-            String.valueOf(resultId.incrementAndGet())
+            String.valueOf(resultId.incrementAndGet()),
+            presentation
         );
         resultInfo.setAttributes(attributes);
         resultInfo.setSingleRow(singleRow);
@@ -196,19 +198,13 @@ public class WebSQLContextInfo implements WebSessionProvider {
     }
 
     public boolean closeResult(@NotNull String resultId) {
-        WebSQLResultsInfo result = resultInfoMap.remove(resultId);
-        if (result == null) {
-            return false;
-        }
-        result.close();
-        return true;
+        return resultInfoMap.remove(resultId) != null;
     }
 
     ///////////////////////////////////////////////////////
     // Async model
 
     void dispose() {
-        resultInfoMap.values().forEach(WebSQLResultsInfo::close);
         resultInfoMap.clear();
     }
 

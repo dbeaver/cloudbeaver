@@ -12,6 +12,7 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
       dataFormat
       resultSet {
         id
+        availablePresentations
         readOnly
         columns {
           dataKind

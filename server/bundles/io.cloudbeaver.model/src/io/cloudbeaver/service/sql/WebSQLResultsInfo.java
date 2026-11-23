@@ -33,7 +33,7 @@ import java.util.Set;
 /**
  * Web query results info.
  */
-public class WebSQLResultsInfo implements AutoCloseable {
+public class WebSQLResultsInfo {
 
     @NotNull
     private final DBSDataContainer dataContainer;
@@ -49,11 +49,21 @@ public class WebSQLResultsInfo implements AutoCloseable {
     @Nullable
     private DBDDataFilter dataFilter;
     private String queryText;
-    private volatile boolean closed;
+    @Nullable
+    private final WebSQLResultSetExtension.Presentation presentation;
 
     public WebSQLResultsInfo(@NotNull DBSDataContainer dataContainer, @NotNull String id) {
+        this(dataContainer, id, null);
+    }
+
+    public WebSQLResultsInfo(
+        @NotNull DBSDataContainer dataContainer,
+        @NotNull String id,
+        @Nullable WebSQLResultSetExtension.Presentation presentation
+    ) {
         this.dataContainer = dataContainer;
         this.id = id;
+        this.presentation = presentation;
     }
 
     @NotNull
@@ -61,13 +71,9 @@ public class WebSQLResultsInfo implements AutoCloseable {
         return id;
     }
 
-    public boolean isClosed() {
-        return closed;
-    }
-
-    @Override
-    public void close() {
-        closed = true;
+    @Nullable
+    public WebSQLResultSetExtension.Presentation getPresentation() {
+        return presentation;
     }
 
     @NotNull

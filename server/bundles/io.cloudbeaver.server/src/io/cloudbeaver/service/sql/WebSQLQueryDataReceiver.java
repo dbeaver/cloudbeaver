@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
@@ -181,11 +180,11 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             log.error("Error binding attributes", e);
         }
 
-        Consumer<WebSQLResultsInfo> resultExtension = null;
+        WebSQLResultSetExtension.Presentation presentation = null;
         try {
             WebSQLResultSetExtension extension = GeneralUtils.adapt(dataContainer.getDataSource(), WebSQLResultSetExtension.class);
             if (extension != null) {
-                resultExtension = extension.prepare(
+                presentation = extension.prepare(
                     dataContainer,
                     bindings,
                     rows.stream().map(WebSQLQueryResultSetRow::getData).toArray(Object[][]::new)
@@ -224,18 +223,18 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setHasDynamicTrace(trace instanceof DBCTraceDynamic);
         webResultSet.setReadOnlyInfo(contextInfo.getProcessor().getExecutionContext());
 
-        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, documentAttribute, rows.size() == 1);
+        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(
+            dataContainer,
+            trace,
+            bindings,
+            documentAttribute,
+            rows.size() == 1,
+            presentation
+        );
         resultsInfo.setDocumentIdAttributeName(documentIdAttributeName);
         resultsInfo.setDataFilter(dataFilter);
         resultsInfo.setQueryText(resultSet.getSourceStatement().getQueryString());
         webResultSet.setResultsInfo(resultsInfo);
-        if (resultExtension != null) {
-            try {
-                resultExtension.accept(resultsInfo);
-            } catch (RuntimeException e) {
-                log.warn("Error attaching result extension", e);
-            }
-        }
 
         boolean isSingleEntity = DBExecUtils.detectSingleSourceTable(bindings) != null;
 

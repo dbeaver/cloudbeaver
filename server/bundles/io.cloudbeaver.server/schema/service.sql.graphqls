@@ -148,6 +148,8 @@ type DatabaseDocument {
 type SQLResultSet {
     "Result set ID"
     id: ID!
+    "IDs of optional presentations available for this result set"
+    availablePresentations: [ID!] @since(version: "26.3.0")
     "Returns list of columns in the result set"
     columns: [ SQLResultColumn ]
     "Returns list of rows in the result set. Each row is an array of column values"

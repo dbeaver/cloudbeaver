@@ -8,6 +8,8 @@
 package io.cloudbeaver.test.platform.sql;
 
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
+import io.cloudbeaver.service.sql.WebSQLQueryResultSet;
+import io.cloudbeaver.service.sql.WebSQLResultSetExtension;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import io.cloudbeaver.service.sql.WebSQLResultsRow;
 import io.cloudbeaver.service.sql.resultset.WebDBDResultSetDataModel;
@@ -20,6 +22,20 @@ import org.mockito.Mockito;
 import java.util.List;
 
 public class WebSQLResultsInfoTest {
+
+    @Test
+    public void advertisesOnlyThePresentationAttachedToThisResult() {
+        var container = Mockito.mock(DBSDataContainer.class);
+        var presentation = new WebSQLResultSetExtension.Presentation("test-presentation", new Object());
+        var graphResult = new WebSQLQueryResultSet();
+        var tableResult = new WebSQLQueryResultSet();
+        graphResult.setResultsInfo(new WebSQLResultsInfo(container, "1", presentation));
+        tableResult.setResultsInfo(new WebSQLResultsInfo(container, "2"));
+
+        Assertions.assertEquals(List.of("test-presentation"), graphResult.getAvailablePresentations());
+        Assertions.assertSame(presentation, graphResult.getResultsInfo().getPresentation());
+        Assertions.assertTrue(tableResult.getAvailablePresentations().isEmpty());
+    }
 
     @Test
     public void updateModelPreservesRowsAndAssignsTheirOrder() {

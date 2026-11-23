@@ -59,6 +59,13 @@ public class WebSQLQueryResultSet {
     }
 
     @Property
+    @NotNull
+    public List<String> getAvailablePresentations() {
+        var presentation = resultsInfo == null ? null : resultsInfo.getPresentation();
+        return presentation == null ? List.of() : List.of(presentation.id());
+    }
+
+    @Property
     public WebSQLQueryResultColumn[] getColumns() {
         return columns;
     }

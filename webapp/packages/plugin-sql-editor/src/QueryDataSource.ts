@@ -41,6 +41,7 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 import { DialogueStateResult, type CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { renderQueryParamsForConfirmation } from './renderQueryParamsForConfirmation.js';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
   query: string;
@@ -240,31 +241,31 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     this.currentQueryAsyncTask = task;
 
     this.currentTask = executionContext.run(
-      () => this.readTaskResults(task),
-      () => this.asyncTaskInfoService.cancel(task.id),
       async () => {
-        try {
-          await this.releaseTask(task);
-        } finally {
-          this.currentQueryAsyncTask = null;
-        }
+        const info = await this.asyncTaskInfoService.run(task);
+        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
+
+        return result;
+      },
+      () => this.asyncTaskInfoService.cancel(task.id),
+      () => {
+        this.asyncTaskInfoService.remove(task.id);
+        this.currentQueryAsyncTask = null;
       },
     );
 
     try {
       const response = await this.currentTask;
 
-      const results = this.innerGetResults(executionContextInfo, response, limit, task.info?.id);
+      const results = this.innerGetResults(executionContextInfo, response, limit);
       this.clearError();
 
       if (!results) {
-        await this.releaseResultTasks();
         return prevResults;
       }
 
       return results;
     } catch (exception: any) {
-      await this.releaseResultTasks();
       this.error = exception;
       throw exception;
     }
@@ -333,7 +334,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
       // TODO: this UI thing should be moved outside of the `plugin-sql-editor` package to use sql editor component for preview
       //       it is partially fixed, but still this UI code should be somewhere else
-      const { renderQueryParamsForConfirmation } = await import('./renderQueryParamsForConfirmation.js');
       const dialogPromise = this.commonDialogService.open(ConfirmationDialog, {
         title: queryParamsEvent.title,
         message: queryParamsEvent.message,
@@ -364,7 +364,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     executionContextInfo: IConnectionExecutionContextInfo,
     response: SqlExecuteInfo,
     limit: number,
-    taskId?: string,
   ): IDatabaseResultSet[] | null {
     this.requestInfo = {
       originalQuery: response.originalQuery || '',
@@ -380,18 +379,12 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       return null;
     }
 
-    return this.transformResults(executionContextInfo, response.results, limit, taskId);
+    return this.transformResults(executionContextInfo, response.results, limit);
   }
 
-  private transformResults(
-    executionContextInfo: IConnectionExecutionContextInfo,
-    results: SqlQueryResults[],
-    limit: number,
-    taskId?: string,
-  ): IDatabaseResultSet[] {
+  private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || null,
-      taskId,
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.dataFormat}_${index}`,
       projectId: executionContextInfo.projectId,
       connectionId: executionContextInfo.connectionId,

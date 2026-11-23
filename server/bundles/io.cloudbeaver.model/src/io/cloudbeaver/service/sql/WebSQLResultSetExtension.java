@@ -22,13 +22,14 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 
-import java.util.function.Consumer;
-
 public interface WebSQLResultSetExtension {
     @Nullable
-    Consumer<WebSQLResultsInfo> prepare(
+    Presentation prepare(
         @NotNull DBSDataContainer container,
         @NotNull DBDAttributeBinding[] bindings,
         @NotNull Object[][] rows
     ) throws DBException;
+
+    record Presentation(@NotNull String id, @NotNull Object data) {
+    }
 }
