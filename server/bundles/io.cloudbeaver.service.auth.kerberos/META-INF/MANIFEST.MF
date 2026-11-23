@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cloudbeaver Web Service - Kerberos delegation
+Bundle-Vendor: DBeaver Corp
+Bundle-SymbolicName: io.cloudbeaver.service.auth.kerberos;singleton:=true
+Bundle-Version: 1.0.1.qualifier
+Bundle-Release-Date: 20261130
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Bundle-ActivationPolicy: lazy
+Require-Bundle: io.cloudbeaver.model;visibility:=reexport,
+ org.jkiss.dbeaver.model.jdbc
+Bundle-Localization: OSGI-INF/l10n/bundle
+Export-Package: io.cloudbeaver.service.auth.kerberos
+Automatic-Module-Name: io.cloudbeaver.service.auth.kerberos

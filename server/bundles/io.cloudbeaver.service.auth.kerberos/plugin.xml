@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+    <extension point="org.jkiss.dbeaver.dataSourceAuth">
+        <authModel
+                id="oracle_kerberos_delegated"
+                label="%authModel.oracle_kerberos_delegated.label"
+                description="%authModel.oracle_kerberos_delegated.description"
+                class="io.cloudbeaver.service.auth.kerberos.OracleKerberosDelegationAuthModel"
+                icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.svg">
+            <datasource id="oracle"/>
+        </authModel>
+    </extension>
+</plugin>

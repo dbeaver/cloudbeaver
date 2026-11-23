@@ -31,6 +31,11 @@ import io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdateTest;
 import io.cloudbeaver.service.ai.AIProfileCopyTest;
 import io.cloudbeaver.service.ai.WebAIConfigurationProfileTest;
 import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
+import io.cloudbeaver.service.auth.kerberos.KerberosDelegationServiceTest;
+import io.cloudbeaver.service.auth.kerberos.KerberosDelegationSettingsTest;
+import io.cloudbeaver.service.auth.kerberos.KerberosPrincipalMapperTest;
+import io.cloudbeaver.service.auth.kerberos.OracleGssConnectionOpenerTest;
+import io.cloudbeaver.service.auth.kerberos.OracleKerberosDelegationAuthModelTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
@@ -77,6 +82,12 @@ import org.junit.platform.suite.api.Suite;
         AIProfileCopyTest.class,
         WebAIConfigurationProfileTest.class,
         WebAIProfileUtilsTest.class,
+        KerberosPrincipalMapperTest.class,
+        KerberosDelegationSettingsTest.class,
+        KerberosDelegationServiceTest.class,
+        OracleGssConnectionOpenerTest.class,
+        OracleKerberosDelegationAuthModelTest.class,
+        KerberosDelegationAuthModelTest.class,
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,
