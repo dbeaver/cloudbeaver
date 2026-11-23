@@ -1,11 +1,11 @@
 ---
 name: pre-push-checks
-description: Run ESLint and Prettier before pushing CloudBeaver CE or EE changes, including branch publication and PR pushes.
+description: Run ESLint and Prettier before pushing CloudBeaver CE or EE changes, including branch publication and PR pushes. Apply only when the owning repository's branch diff contains frontend files under webapp/ covered by its tooling; backend-only changes and unrelated repositories do not qualify.
 ---
 
 # Pre-push checks
 
-Apply these checks to each repository before a user-authorized push.
+Before a user-authorized push, select the applicable files as described in step 2. If the list is empty, skip this workflow before frontend setup; this does not block the push.
 
 ## 1. Prepare
 
@@ -15,9 +15,9 @@ Follow repository instructions and use its configured Node/Yarn versions. Run fr
 
 Use the actual PR base, or the repository's development branch unless the user specifies another target. Resolve missing refs explicitly. Record base and HEAD SHAs; compare the **whole branch** from their merge base:
 
-`git diff --name-only -z --diff-filter=ACMRT <merge-base> HEAD`
+`git diff --name-only -z --diff-filter=ACMRT <merge-base> HEAD -- ':(top,literal)webapp/'`
 
-For working-tree preflight, also include staged, unstaged and untracked non-ignored files. Deduplicate and keep existing regular files; handle nested repositories separately. Use NUL-delimited paths and argument arrays, batching as needed. Explicitly skip empty lists.
+For working-tree preflight, also include staged, unstaged and untracked non-ignored files under `webapp/`. Deduplicate and keep existing regular files; handle nested repositories separately. Use NUL-delimited paths and argument arrays, batching as needed. Explicitly skip empty lists.
 
 ## 3. Run both checks
 
