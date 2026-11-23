@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.WebServiceServletBase;
-import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,7 +40,6 @@ import java.util.regex.Pattern;
 public class WebSQLResultServlet extends WebServiceServletBase {
 
     private static final Log log = Log.getLog(WebSQLResultServlet.class);
-    private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.toAbsolutePath().toString());
 
     // context-id/result-id/row-number/attribute-name
     private static final Pattern URL_PATTERN = Pattern.compile("/?([\\w]+)/([0-9]+)/([0-9]+)/([0-9]+)/(.+)[/\\?]?");
@@ -63,13 +60,12 @@ public class WebSQLResultServlet extends WebServiceServletBase {
         if (!request.getMethod().equals("GET")) {
             return;
         }
-        Path dataFile = getDataFile(request);
+        Path dataFile = getDataFile(session, request);
         session.addInfoMessage("Download LOB file ...");
         response.setHeader(HttpConstants.HEADER_CONTENT_TYPE, "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getFileName().toString() + "\"");
         response.setHeader("Content-Length", String.valueOf(Files.size(dataFile)));
-        response.setDateHeader("Expires", System.currentTimeMillis() + CBConstants.STATIC_CACHE_SECONDS * 1000);
-        response.setHeader("Cache-Control", "public, max-age=" + CBConstants.STATIC_CACHE_SECONDS);
+        response.setHeader("Cache-Control", "private, no-store");
 
         try (InputStream is = Files.newInputStream(dataFile)) {
             IOUtils.copyStream(is, response.getOutputStream());
@@ -78,7 +74,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
     }
 
     @NotNull
-    private Path getDataFile(HttpServletRequest request) throws DBWebException {
+    private Path getDataFile(@NotNull WebSession session, @NotNull HttpServletRequest request) throws DBWebException {
         String valuePath = request.getPathInfo();
         if (CommonUtils.isEmpty(valuePath)) {
             throw new DBWebException("Result value ID not specified");
@@ -86,8 +82,12 @@ public class WebSQLResultServlet extends WebServiceServletBase {
         while (valuePath.startsWith("/")) {
             valuePath = valuePath.substring(1);
         }
-        Path dataFile = WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.resolve(valuePath).normalize();
-        if (!dataFile.startsWith(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER)) {
+        if (CommonUtils.isEmpty(valuePath) || valuePath.contains("/") || valuePath.contains("\\")) {
+            throw new DBWebException("Bad result value ID");
+        }
+        Path exportFolder = WebSQLDataLOBReceiver.getDataExportFolder(session);
+        Path dataFile = exportFolder.resolve(valuePath).normalize();
+        if (!exportFolder.equals(dataFile.getParent())) {
             throw new DBWebException("Bad result value ID");
         }
         return dataFile;

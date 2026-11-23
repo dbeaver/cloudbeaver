@@ -34,10 +34,6 @@ const ServerConfigurationSecurityPanel = importLazyComponent(() =>
   import('./ConfigurationWizard/ServerConfiguration/ServerConfigurationSecurityPanel.js').then(m => m.ServerConfigurationSecurityPanel),
 );
 
-const ServerConfigurationDriversPanel = importLazyComponent(() =>
-  import('./ConfigurationWizard/ServerConfiguration/ServerConfigurationDriversPanel.js').then(m => m.ServerConfigurationDriversPanel),
-);
-
 const ServerConfigurationConnectionFeatures = importLazyComponent(() =>
   import('./ConfigurationWizard/ServerConfiguration/Features/ServerConfigurationConnectionFeatures.js').then(
     m => m.ServerConfigurationConnectionFeatures,
@@ -97,13 +93,6 @@ export class PluginBootstrap extends Bootstrap {
       name: 'administration_configuration_wizard_configuration_security',
       order: 3,
       panel: () => ServerConfigurationSecurityPanel,
-    });
-
-    this.serverConfigurationFormService.parts.add({
-      key: 'drivers',
-      name: 'administration_server_configuration_tab_drivers',
-      order: 4,
-      panel: () => ServerConfigurationDriversPanel,
     });
 
     this.serverConfigurationConfigurationService.register();

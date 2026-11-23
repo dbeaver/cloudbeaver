@@ -1,4 +1,5 @@
 export default [
+  ['plugin_navigation_tree_create_menu_empty', 'No creation actions available'],
   ['plugin_navigation_tree_delete_success', 'Deletion completed successfully'],
   ['plugin_navigation_tree_delete_partial', 'Deletion partially completed'],
   ['plugin_navigation_tree_delete_result', 'Deleted: {arg:count} of {arg:total} selected objects.'],

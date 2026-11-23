@@ -8,7 +8,7 @@ CloudBeaver is an open-source, web-based database management application. Its mo
 
 ### Scope
 
-- These instructions apply to the frontend under `webapp/` in CloudBeaver Community Edition and to any other CloudBeaver edition or product that shares this frontend architecture.
+- These instructions apply to the frontend under `webapp/` in CloudBeaver Community Edition and to any other CloudBeaver edition or product that shares this frontend architecture. Apply frontend skills and checks only to the task's frontend targets; incidental reads during backend work do not qualify.
 - Do not modify `server/`, `deploy/`, or backend configuration unless the task explicitly requires it. Backend GraphQL schemas are an input to frontend code generation, not part of the default edit scope.
 - Treat `package.json`, `.yarnrc.yml`, and the frontend CI workflows as the source of truth for tool and runtime versions; do not duplicate their version numbers in documentation.
 
@@ -51,7 +51,11 @@ yarn validate-dependencies
 
 For a focused check, use a package's existing script, for example `yarn workspace @cloudbeaver/core-utils test` or `yarn workspace @cloudbeaver/plugin-sql-editor lint`. Do not invent a package script that is absent from its `package.json`.
 
-Before pushing CE or EE changes, read and follow `.agents/skills/pre-push-checks/SKILL.md` in this repository to run ESLint and Prettier on all changed files.
+Before an authorized push, check whether the owning repository's branch diff contains files under its `webapp/` covered by its frontend tooling. Only for a nonempty frontend scope, read and follow `.agents/skills/pre-push-checks/SKILL.md`. Backend-only pushes do not require frontend setup or checks.
+
+Before creating a pull request or writing/updating its description, read and follow `.agents/skills/file-pr/SKILL.md` in this repository.
+
+When writing or reviewing interface text owned by the frontend under `webapp/`, read and follow `.agents/skills/clean-copy/SKILL.md`.
 
 ### Working conventions
 
@@ -97,3 +101,9 @@ Before pushing CE or EE changes, read and follow `.agents/skills/pre-push-checks
 ### License header
 
 - Please use header from ../dbeaver/docs/license_header.txt for backend source files.
+
+### Deployment
+
+- CloudBeaver Community runs on embedded Jetty. The standalone Docker
+  image runs the application directly; cloud VM provisioning adds nginx
+  in front of it.

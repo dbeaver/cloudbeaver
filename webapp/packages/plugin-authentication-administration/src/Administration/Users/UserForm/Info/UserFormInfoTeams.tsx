@@ -43,7 +43,7 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
     const tooltip = `${getLabel(team)}${team.description ? '\n' + team.description : ''}`;
 
     if (team.teamId === defaultTeam) {
-      return `${tooltip}\n${translate('plugin_authentication_administration_team_grant_default_tooltip')}\n${translate('plugin_authentication_administration_user_team_default_readonly_tooltip')}`;
+      return `${tooltip}\n${translate('plugin_authentication_administration_user_team_default_readonly_tooltip')}`;
     }
 
     if (grant?.grantType === 'AUTH_PROVIDER') {
@@ -69,11 +69,18 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
           const isDefault = team.teamId === defaultTeam;
           const isGranted = isDefault || tabState.state.teams.includes(team.teamId);
           let grant: ITeamGrantSource | undefined;
+          let caption: string | undefined;
 
           if (isDefault) {
             grant = { grantType: 'DEFAULT' };
           } else if (isGranted) {
             grant = grantedTeams.data?.find(grant => grant.teamId === team.teamId) ?? { grantType: 'MANUAL' };
+          }
+
+          if (isDefault) {
+            caption = translate('plugin_authentication_administration_user_team_default_readonly_tooltip');
+          } else if (isGranted) {
+            caption = `${translate('authentication_administration_user_connections_access_granted_by')}: ${getGrantLabel(grant)}`;
           }
 
           return (
@@ -85,9 +92,7 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
               name="teams"
               state={tabState.state}
               value={team.teamId}
-              caption={
-                isGranted ? `${translate('authentication_administration_user_connections_access_granted_by')}: ${getGrantLabel(grant)}` : undefined
-              }
+              caption={caption}
               readOnly={isDefault}
               disabled={disabled}
             />

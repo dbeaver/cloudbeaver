@@ -1,6 +1,6 @@
 ---
 name: component-composition
-description: "Guides creation of CloudBeaver React components through children, slots, compound parts, and specialized components. Use when creating React components, designing their props, or choosing how callers supply content, actions, and layout regions."
+description: "Guides creation of CloudBeaver React components through children, slots, compound parts, and specialized components. Use when creating React components, designing their props, or choosing how callers supply content, actions, and layout regions. Apply only to frontend component work under the owning CloudBeaver repository's webapp/."
 ---
 
 # Component composition

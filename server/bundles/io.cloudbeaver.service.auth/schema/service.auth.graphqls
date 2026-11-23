@@ -187,8 +187,6 @@ extend type Query {
     "Returns result of federated authentication task"
     federatedAuthTaskResult(taskId: String!): FederatedAuthResult! @since(version: "25.0.3")
 
-    authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo! @deprecated
-
     "Same as authLogoutExtended but without additional information"
     authLogout(provider: ID, configuration: ID): Boolean @deprecated(reason: "use authLogoutExtended instead")
 

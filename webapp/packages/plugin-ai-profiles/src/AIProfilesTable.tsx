@@ -8,7 +8,7 @@
 
 import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { IconOrImage, s, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import {
@@ -28,6 +28,7 @@ import { AIProfileNameCell } from './AIProfileNameCell.js';
 
 export interface IAIProfilesTableColumn extends IAdministrationTableColumn {
   render: (profile: AIProfile) => ReactNode;
+  compare?: (a: AIProfile, b: AIProfile) => number;
 }
 
 type TableColumn = Omit<IAIProfilesTableColumn, 'render'> & { render?: IAIProfilesTableColumn['render'] };
@@ -80,10 +81,21 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   const selectable = !!isProfileSelectable;
   const columns: TableColumn[] = [
     ...(selectable ? [SELECT_COLUMN] : []),
-    { ...NAME_COLUMN, label: nameLabel },
-    { ...ENGINE_COLUMN, label: engineLabel },
+    { ...NAME_COLUMN, label: nameLabel, compare: (a, b) => a.name.localeCompare(b.name) },
+    {
+      ...ENGINE_COLUMN,
+      label: engineLabel,
+      compare: (a, b) =>
+        (enginesLoader.data.find(engine => engine.id === a.engineId)?.name ?? a.engineId).localeCompare(
+          enginesLoader.data.find(engine => engine.id === b.engineId)?.name ?? b.engineId,
+        ),
+    },
     ...additionalColumns,
   ];
+
+  const [sort, setSort] = useState<{ key: string; order: 'asc' | 'desc' } | null>(null);
+  const compare = columns.find(column => column.key === sort?.key)?.compare;
+  const sortedProfiles = sort && compare ? profiles.toSorted((a, b) => (sort.order === 'asc' ? compare(a, b) : compare(b, a))) : profiles;
 
   const columnCount = useCreateGridReactiveValue(() => columns.length, null, [columns]);
   const rowCount = useCreateGridReactiveValue(
@@ -93,7 +105,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   );
 
   function getCell(rowIdx: number, colIdx: number) {
-    const profile = profiles[rowIdx];
+    const profile = sortedProfiles[rowIdx];
     const column = columns[colIdx];
 
     if (!profile || !column) {
@@ -136,7 +148,7 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
   }
 
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
-    profiles,
+    sortedProfiles,
     columns,
     enginesLoader.data,
     additionalColumns,
@@ -176,6 +188,23 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
     translate,
   ]);
 
+  const columnSortable = useCreateGridReactiveValue((colIdx: number) => !!columns[colIdx]?.compare, null, [columns]);
+
+  function getColumnSortingState(colIdx: number) {
+    return sort?.key === columns[colIdx]?.key ? (sort?.order ?? null) : null;
+  }
+
+  const columnSortingState = useCreateGridReactiveValue(
+    getColumnSortingState,
+    (onValueChange, colIdx) => reaction(() => getColumnSortingState(colIdx), onValueChange),
+    [sort, columns],
+  );
+
+  function handleSort(colIdx: number, order: 'asc' | 'desc' | null) {
+    const column = columns[colIdx];
+    setSort(order && column?.compare ? { key: column.key, order } : null);
+  }
+
   if (!profiles.length) {
     return <TextPlaceholder>{translate(emptyPlaceholder)}</TextPlaceholder>;
   }
@@ -202,7 +231,10 @@ export const AIProfilesTable = observer<IAIProfilesTableProps>(function AIProfil
         getHeaderWidth={getHeaderWidth}
         getHeaderMinWidth={getHeaderMinWidth}
         cell={cell}
+        columnSortable={columnSortable}
+        columnSortingState={columnSortingState}
         className={s(styles, { table: true })}
+        onColumnSort={handleSort}
         onCellKeyDown={cellCopy.handleKeyDown}
       />
     </AdministrationTable>

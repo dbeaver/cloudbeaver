@@ -79,6 +79,7 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
               },
               '/api/ws': {
                 target: envServer?.replace('http:', 'ws:'),
+                changeOrigin: true,
                 ws: true,
                 rewriteWsOrigin: true,
                 secure: false,
