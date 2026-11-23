@@ -26,6 +26,9 @@ public class OracleDataSource {
     public static volatile Connection connectionToReturn;
     public static volatile SQLException failure;
 
+    private String url;
+    private Properties properties;
+
     public static void reset() {
         lastUrl = null;
         lastProperties = null;
@@ -33,9 +36,6 @@ public class OracleDataSource {
         connectionToReturn = null;
         failure = null;
     }
-
-    private String url;
-    private Properties properties;
 
     public void setURL(String url) {
         this.url = url;

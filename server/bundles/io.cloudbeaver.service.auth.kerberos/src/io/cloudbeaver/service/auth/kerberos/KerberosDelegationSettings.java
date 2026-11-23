@@ -79,17 +79,15 @@ public class KerberosDelegationSettings {
 
     @NotNull
     public static KerberosDelegationSettings fromConfig(@Nullable Map<String, Object> config) {
-        if (config == null) {
-            config = Map.of();
-        }
+        Map<String, Object> values = config == null ? Map.of() : config;
         return new KerberosDelegationSettings(
-            JSONUtils.getString(config, PROP_SERVICE_PRINCIPAL),
-            JSONUtils.getString(config, PROP_KEYTAB),
-            JSONUtils.getString(config, PROP_KRB5_CONF),
-            JSONUtils.getString(config, PROP_REALM),
-            JSONUtils.getString(config, PROP_USER_PRINCIPAL_TEMPLATE),
-            JSONUtils.getString(config, PROP_USER_PRINCIPAL_META_PARAMETER),
-            JSONUtils.getBoolean(config, PROP_DEBUG, false)
+            JSONUtils.getString(values, PROP_SERVICE_PRINCIPAL),
+            JSONUtils.getString(values, PROP_KEYTAB),
+            JSONUtils.getString(values, PROP_KRB5_CONF),
+            JSONUtils.getString(values, PROP_REALM),
+            JSONUtils.getString(values, PROP_USER_PRINCIPAL_TEMPLATE),
+            JSONUtils.getString(values, PROP_USER_PRINCIPAL_META_PARAMETER),
+            JSONUtils.getBoolean(values, PROP_DEBUG, false)
         );
     }
 
