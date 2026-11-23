@@ -88,7 +88,7 @@ export class AIChatContextService extends Bootstrap {
     this.reactionDisposer = null;
 
     makeObservable(this, {
-      currentContext: computed.struct,
+      currentContext: computed,
       isContextReady: computed,
     });
   }
