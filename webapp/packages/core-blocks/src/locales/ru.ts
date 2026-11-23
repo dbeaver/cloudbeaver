@@ -17,4 +17,6 @@ export default [
   ['core_blocks_export_image_dialog_format', 'Формат файла'],
   ['core_blocks_export_image_dialog_transparent_background', 'Прозрачный фон'],
   ['core_blocks_dialog_element_close_tooltip', 'Закрыть панель'],
+  ['core_blocks_split_collapse', 'Свернуть панель'],
+  ['core_blocks_split_expand', 'Развернуть панель'],
 ];
