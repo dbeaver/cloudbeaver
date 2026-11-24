@@ -35,12 +35,12 @@ export default {
     type: 'suggestion',
     docs: {
       description: 'Require each React component implementation to have its own file.',
-      url: 'https://github.com/dbeaver/cloudbeaver/blob/devel/.agents/skills/component-composition/SKILL.md',
+      url: 'https://github.com/dbeaver/cloudbeaver/blob/devel/.agents/skills/cloudbeaver-frontend-component-composition/SKILL.md',
     },
     schema: [],
     messages: {
       multipleComponents:
-        'Move component "{{name}}" to its own file. See the component-composition skill (.agents/skills/component-composition/SKILL.md).',
+        'Move component "{{name}}" to its own file. See the cloudbeaver-frontend-component-composition skill (.agents/skills/cloudbeaver-frontend-component-composition/SKILL.md).',
     },
   },
   create: function create(context) {
