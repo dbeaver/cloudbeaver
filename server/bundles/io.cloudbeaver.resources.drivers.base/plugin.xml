@@ -41,7 +41,6 @@
         <bundle id="drivers.sqlite.xerial" label="SQLite drivers"/>
         <bundle id="drivers.libsql" label="LibSQL drivers"/>
         <bundle id="drivers.cloudflare.d1" label="Cloudflare D1 drivers"/>
-        <bundle id="drivers.cloudflare.d1.included" label="Packaged Cloudflare D1 JDBC files"/>
         <bundle id="drivers.mssql.new" label="SQL Server drivers"/>
         <bundle id="drivers.trino" label="Trino drivers"/>
         <bundle id="drivers.kyuubi" label="Apache Kyuubi drivers"/>
