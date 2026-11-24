@@ -126,6 +126,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
 
     const results = [...prevResults];
+    let attemptedResultIndex = -1;
 
     try {
       for (const [index, result] of prevResults.entries()) {
@@ -186,6 +187,10 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           () => this.asyncTaskInfoService.remove(task.id),
         );
 
+        if (this.hasBatchRows(updateVariables)) {
+          attemptedResultIndex = index;
+        }
+
         const response = await this.currentTask;
 
         if (editor) {
@@ -203,10 +208,13 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           requestMessage: 'plugin_data_viewer_result_set_save_success',
           source: this.options.query,
         };
+
+        attemptedResultIndex = -1;
       }
 
       this.clearError();
     } catch (exception: any) {
+      this.publishFailedSaveResults(results, attemptedResultIndex);
       this.error = exception;
       throw exception;
     }

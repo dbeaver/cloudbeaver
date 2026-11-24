@@ -34,6 +34,7 @@ export interface IDataContainerOptions extends IDatabaseDataOptions {
 
 export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataContainerOptions> extends ResultSetDataSource<TOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
+  private refreshPresentationsAfterSave = false;
 
   override get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
@@ -101,7 +102,10 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
 
       this.clearError();
 
-      return this.transformResults(executionContext.context!, response.results, limit);
+      const results = this.transformResults(executionContext.context!, response.results, limit);
+      this.refreshPresentationsAfterSave = false;
+
+      return results;
     } catch (exception: any) {
       this.error = exception;
       throw exception;
@@ -112,6 +116,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     const executionContext = await this.ensureContextCreated();
     const results = [...prevResults];
     let presentationsInvalidated = false;
+    let attemptedResultIndex = -1;
 
     try {
       for (const [index, result] of prevResults.entries()) {
@@ -172,6 +177,10 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
           () => this.asyncTaskInfoService.remove(task.id),
         );
 
+        if (this.hasBatchRows(updateVariables)) {
+          attemptedResultIndex = index;
+        }
+
         const response = await this.currentTask;
 
         if (editor) {
@@ -191,14 +200,20 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
           requestMessage: 'plugin_data_viewer_result_set_save_success',
           source: null,
         };
+
+        attemptedResultIndex = -1;
       }
 
       this.clearError();
 
-      if (presentationsInvalidated) {
+      if (presentationsInvalidated || this.refreshPresentationsAfterSave) {
         this.setOutdated();
       }
     } catch (exception: any) {
+      if (this.publishFailedSaveResults(results, attemptedResultIndex)) {
+        this.refreshPresentationsAfterSave = true;
+      }
+
       this.error = exception;
       throw exception;
     }
