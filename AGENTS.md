@@ -8,13 +8,14 @@ CloudBeaver is an open-source, web-based database management application. Its mo
 
 ### Skill selection
 
-- Available skills are a catalog. Before loading a skill, match its description's repository scope and action trigger to the task's target files. Frontend skills apply to this repository's `webapp/`, or to a consuming repository's frontend when its instructions explicitly inherit these workflows.
+- Available skills are a catalog. Before loading a skill, match its action trigger to the requested operation and any repository or file restrictions to the relevant repository and target files. Frontend skills apply to this repository's `webapp/`, or to a consuming repository's frontend when its instructions explicitly inherit these workflows.
+- Workflows without target files, such as creating a GitHub ticket, may load matching skills based on the requested operation and repository context. They do not satisfy a skill's explicit frontend file restrictions.
 - Choose by the target work, regardless of developer role or starting directory. Backend-only tasks and incidental frontend reads do not activate frontend skills. For mixed tasks, apply them only to the frontend portion; for PR/push tasks, determine scope from the branch diff.
 - Discover matching skills through the harness catalog, or read descriptions from `.agents/skills/*/SKILL.md` when the harness does not expose them, then load only matching bodies. Resolve these paths from this repository root. New skills declare their own scope and triggers; no per-skill list is needed.
 
 ### Scope
 
-- These instructions apply to the frontend under `webapp/` in CloudBeaver Community Edition and to any other CloudBeaver edition or product that shares this frontend architecture. Apply frontend skills and checks only to the task's frontend targets; incidental reads during backend work do not qualify.
+- These frontend instructions apply to this repository's `webapp/` and to consuming repositories that explicitly inherit them. Sharing architecture, libraries, or tooling alone does not establish inheritance. Apply frontend skills and checks only to the task's frontend targets; incidental reads during backend work do not qualify.
 - Do not modify `server/`, `deploy/`, or backend configuration unless the task explicitly requires it. Backend GraphQL schemas are an input to frontend code generation, not part of the default edit scope.
 - Treat `package.json`, `.yarnrc.yml`, and the frontend CI workflows as the source of truth for tool and runtime versions; do not duplicate their version numbers in documentation.
 
