@@ -2199,6 +2199,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 }
             }
             permissions.addAll(getSubjectPermissions(userId));
+            // Preserve existing standalone read access without migrating stored permission grants.
+            permissions.add(DBWConstants.PERMISSION_READ_DATA_FROM_CONNECTION);
             return permissions;
         } catch (SQLException e) {
             throw new DBCException("Error reading user permissions", e);
@@ -2291,7 +2293,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     protected Set<String> getAnonymousUserPermissions() throws DBException {
         var anonymousUserTeam = application.getAppConfiguration().getAnonymousUserTeam();
-        return getSubjectPermissions(anonymousUserTeam);
+        var permissions = new HashSet<>(getSubjectPermissions(anonymousUserTeam));
+        permissions.add(DBWConstants.PERMISSION_READ_DATA_FROM_CONNECTION);
+        return permissions;
     }
 
     @NotNull
