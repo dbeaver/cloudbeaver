@@ -34,6 +34,7 @@ import elementsTreeToolsStyles from './ElementsTreeTools.module.css';
 import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId.js';
 import style from './NavigationTree.module.css';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter.js';
+import { navigationTreeNavigableFilter } from './navigationTreeNavigableFilter.js';
 import { NavigationTreeService } from './NavigationTreeService.js';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter.js';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare.js';
@@ -80,6 +81,7 @@ export const NavigationTree = observer(function NavigationTree() {
   );
 
   const duplicateFilter = useMemo(() => navigationTreeDuplicateFilter(navNodeViewService), [navNodeViewService]);
+  const navigableFilter = useMemo(() => navigationTreeNavigableFilter(navNodeInfoResource), [navNodeInfoResource]);
   const connectionRenderer = useMemo(() => navTreeConnectionRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsRendererRenderer = useMemo(() => navigationTreeProjectsRendererRenderer(navNodeInfoResource), [navNodeInfoResource]);
   const projectsExpandStateGetter = useMemo(
@@ -117,7 +119,7 @@ export const NavigationTree = observer(function NavigationTree() {
           ref={tree}
           root={root}
           localState={navigationTreeService.treeState}
-          filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
+          filters={[duplicateFilter, connectionGroupFilter, projectFilter, navigableFilter]}
           renderers={[projectsRendererRenderer, ...navigationTreeConnectionGroupRenderers, connectionRenderer]}
           navNodeFilterCompare={navigationTreeProjectSearchCompare}
           nodeInfoTransformers={[transformFilteredNode, transformDescriptionNode]}

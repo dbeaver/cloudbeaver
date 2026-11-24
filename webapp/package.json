@@ -34,7 +34,7 @@
     "less": ">=4.7.0",
     "browserslist": ">=4.28.7",
     "postcss-selector-parser": ">=7.1.3",
-    "vite": "7.3.5",
+    "vite": "7.3.7",
     "rollup": "4.61.1",
     "@wroud/vite-plugin-tsc": "0.12.3",
     "vite-plugin-pwa": "1.3.0",

@@ -6,19 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable, reaction, type IReactionDisposer } from 'mobx';
+import { comparer, computed, makeObservable, reaction, type IReactionDisposer } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import {
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoResource,
   createConnectionParam,
-  isConnectionInfoParamEqual,
   type IConnectionExecutionContextInfo,
   type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { UserConfigurationStorage, UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 
 export interface IAIChatContextInfo {
   connectionKey: IConnectionInfoParams;
@@ -26,51 +27,80 @@ export interface IAIChatContextInfo {
   schema?: string;
 }
 
-const SYNC_CONTEXT_DELAY = 500;
+interface ISettings {
+  context?: IAIChatContextInfo | null;
+}
 
-@injectable(() => [ConnectionSchemaManagerService, UserInfoResource, ProjectsService])
+@injectable(() => [
+  ConnectionSchemaManagerService,
+  UserInfoResource,
+  ProjectsService,
+  UserDataService,
+  UserConfigurationStorage,
+  ConnectionInfoResource,
+])
 export class AIChatContextService extends Bootstrap {
   onContextChange: SyncExecutor<IAIChatContextInfo | null>;
 
   get currentContext(): IAIChatContextInfo | null {
-    return this.context;
+    if (!this.isContextReady) {
+      return null;
+    }
+
+    const context = this.settings.context;
+
+    if (
+      context &&
+      this.projectsService.activeProjects.some(project => project.id === context.connectionKey.projectId) &&
+      this.connectionInfoResource.has(context.connectionKey)
+    ) {
+      return context;
+    }
+
+    return null;
   }
 
-  private context: IAIChatContextInfo | null = null;
+  get isContextReady(): boolean {
+    return (
+      this.userInfoResource.hasAccess() &&
+      (!this.userConfigurationStorage.isAvailable() || this.userConfigurationStorage.isLoaded()) &&
+      this.connectionInfoResource.isLoaded(ConnectionInfoActiveProjectKey)
+    );
+  }
+
+  private get settings(): ISettings {
+    return this.userDataService.withStorage(this.userConfigurationStorage).getUserData<ISettings>('ai-chat-context', () => ({}));
+  }
+
   private reactionDisposer: IReactionDisposer | null;
 
   constructor(
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
-    userInfoResource: UserInfoResource,
-    projectsService: ProjectsService,
+    private readonly userInfoResource: UserInfoResource,
+    private readonly projectsService: ProjectsService,
+    private readonly userDataService: UserDataService,
+    private readonly userConfigurationStorage: UserConfigurationStorage,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
 
     this.onContextChange = new SyncExecutor<IAIChatContextInfo | null>();
     this.reactionDisposer = null;
 
-    userInfoResource.onUserChange.addHandler(() => {
-      this.setContext(null);
-    });
-
-    projectsService.onActiveProjectChange.addHandler(data => {
-      if (data.type === 'after' && this.currentContext) {
-        const hasProject = data.projects.includes(this.currentContext.connectionKey.projectId);
-
-        if (!hasProject) {
-          this.setContext(null);
-        }
-      }
-    });
-
-    makeObservable<this, 'context'>(this, {
-      context: observable,
+    makeObservable(this, {
+      currentContext: computed,
+      isContextReady: computed,
     });
   }
 
   setContext(context: IAIChatContextInfo | null): void {
-    this.context = context;
-    this.onContextChange.execute(this.context);
+    this.settings.context = context;
+  }
+
+  initialize(): void {
+    if (this.isContextReady && !this.settings.context) {
+      this.setContext(this.getContext());
+    }
   }
 
   getContext(): IAIChatContextInfo | null {
@@ -85,29 +115,11 @@ export class AIChatContextService extends Bootstrap {
 
   override register(): void | Promise<void> {
     this.reactionDisposer = reaction(
-      () => this.connectionSchemaManagerService.activeExecutionContext,
-      context => {
-        if (context) {
-          const newContext = this.transformContext(context);
-
-          if (!this.context || !this.isContextsEqual(this.context, newContext)) {
-            this.setContext(newContext);
-          }
-        }
+      () => [this.userInfoResource.getId(), this.currentContext] as const,
+      ([, context]) => {
+        this.onContextChange.execute(context);
       },
-      {
-        delay: SYNC_CONTEXT_DELAY,
-        equals: (a, b) => {
-          if (!a || !b) {
-            return a === b;
-          }
-
-          const aContext = this.transformContext(a);
-          const bContext = this.transformContext(b);
-
-          return this.isContextsEqual(aContext, bContext);
-        },
-      },
+      { equals: comparer.shallow },
     );
   }
 
@@ -117,14 +129,6 @@ export class AIChatContextService extends Bootstrap {
       catalog: executionContext.defaultCatalog,
       schema: executionContext.defaultSchema,
     };
-  }
-
-  private isContextsEqual(contextA: IAIChatContextInfo, contextB: IAIChatContextInfo): boolean {
-    return (
-      isConnectionInfoParamEqual(contextA.connectionKey, contextB.connectionKey) &&
-      contextA.catalog === contextB.catalog &&
-      contextA.schema === contextB.schema
-    );
   }
 
   override dispose(): void {

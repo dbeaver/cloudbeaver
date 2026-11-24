@@ -5,14 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
+
 import { s } from '../s.js';
 import { useObjectRef } from '../useObjectRef.js';
 import { useS } from '../useS.js';
+import { useTranslate } from '../localization/useTranslate.js';
 import { SplitControlButton } from './SplitControlButton.js';
 import SplitControlsStyles from './SplitControls.module.css';
 import { useSplit } from './useSplit.js';
 
-export const SplitControls: React.FC = function SplitControls() {
+export const SplitControls = observer(function SplitControls() {
+  const translate = useTranslate();
   const split = useSplit();
   const styles = useS(SplitControlsStyles);
   const isResizeMode = split.state.mode === 'resize';
@@ -68,6 +72,7 @@ export const SplitControls: React.FC = function SplitControls() {
     >
       {split.state.mode !== 'minimize' && (
         <SplitControlButton
+          aria-label={translate(split.state.mode === 'maximize' ? 'ui_restore' : 'core_blocks_split_collapse')}
           className={s(styles, { resizeButton: isResizeMode })}
           mode={inverseMode}
           split={split.state.split}
@@ -77,6 +82,7 @@ export const SplitControls: React.FC = function SplitControls() {
       )}
       {split.state.mode !== 'maximize' && (
         <SplitControlButton
+          aria-label={translate(split.state.mode === 'minimize' ? 'ui_restore' : 'core_blocks_split_expand')}
           className={s(styles, { resizeButton: isResizeMode })}
           mode={inverseMode}
           split={split.state.split}
@@ -86,4 +92,4 @@ export const SplitControls: React.FC = function SplitControls() {
       )}
     </div>
   );
-};
+});

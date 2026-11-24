@@ -2379,14 +2379,16 @@ __metadata:
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    "@dbeaver/react-tests": "workspace:*"
     "@types/react": "npm:^19"
-    "@types/semver": "npm:^7"
+    compare-versions: "npm:^6"
     mobx: "npm:^6"
     react: "npm:^19"
     rimraf: "npm:^6"
-    semver: "npm:^7"
     tslib: "npm:^2"
     typescript: "npm:^5"
+    vitest: "npm:^4"
   languageName: unknown
   linkType: soft
 
@@ -5202,6 +5204,7 @@ __metadata:
   resolution: "@cloudbeaver/plugin-version-update-administration@workspace:packages/plugin-version-update-administration"
   dependencies:
     "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
@@ -5211,8 +5214,10 @@ __metadata:
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-version": "workspace:*"
     "@cloudbeaver/core-version-update": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-product-information-administration": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -9573,13 +9578,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7":
-  version: 7.8.0
-  resolution: "@types/semver@npm:7.8.0"
-  checksum: 10c0/46a1f38e36013448b279798e8b134e7e8de3b3630b1f40683903b9d57d36dd1d70838515570ed9a149fa09e9c381b9e39319b58d7b9f3b929b42ae2becff7aa3
-  languageName: node
-  linkType: hard
-
 "@types/set-cookie-parser@npm:^2.4.10":
   version: 2.4.10
   resolution: "@types/set-cookie-parser@npm:2.4.10"
@@ -11318,6 +11316,13 @@ __metadata:
     rimraf: "npm:^6"
   languageName: unknown
   linkType: soft
+
+"compare-versions@npm:^6":
+  version: 6.1.1
+  resolution: "compare-versions@npm:6.1.1"
+  checksum: 10c0/415205c7627f9e4f358f571266422980c9fe2d99086be0c9a48008ef7c771f32b0fbe8e97a441ffedc3910872f917a0675fe0fe3c3b6d331cda6d8690be06338
+  languageName: node
+  linkType: hard
 
 "concat-stream@npm:~1.5.0":
   version: 1.5.2
@@ -18455,7 +18460,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7, semver@npm:^7.3.5, semver@npm:^7.7.3":
+"semver@npm:^7.3.5, semver@npm:^7.7.3":
   version: 7.8.5
   resolution: "semver@npm:7.8.5"
   bin:
@@ -20072,11 +20077,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:7.3.5":
-  version: 7.3.5
-  resolution: "vite@npm:7.3.5"
+"vite@npm:7.3.7":
+  version: 7.3.7
+  resolution: "vite@npm:7.3.7"
   dependencies:
-    esbuild: "npm:^0.27.0"
+    esbuild: "npm:^0.27.0 || ^0.28.0"
     fdir: "npm:^6.5.0"
     fsevents: "npm:~2.3.3"
     picomatch: "npm:^4.0.3"
@@ -20123,7 +20128,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10c0/4ad700649ed2ebd1e726d32f3f6e41eecbec4e29bcb5977805f3d43a5659280518aa431b0fc61adc1879df4fe1978d7cfc7dbbe54cdf014022385052967721e8
+  checksum: 10c0/6a3f868a33b849383e29c4e39550155563cf0522b5b6504ab60ff5e44dd07ad472ff87a4d5d2c08f1f70cc6602357f95c38d27371b7612d84801cb790f325a7e
   languageName: node
   linkType: hard
 
