@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -346,7 +347,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat
     ) throws DBException {
-
+        if (!getWebSession().hasPermission(DBWConstants.PERMISSION_READ_DATA_FROM_CONNECTION)) {
+            throw new DBWebException("Permission denied");
+        }
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = DBUtils.getOrOpenDefaultContext(dataContainer, false);
