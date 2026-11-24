@@ -1,11 +1,11 @@
 ---
 name: cloudbeaver-frontend-form-parts
-description: "Only for CloudBeaver frontend code under the owning repository's webapp/, including repositories explicitly inheriting this workflow. Load when creating, changing, or reviewing the FormPart contract or its consumers, including tab parts, loaders, isOutdated, and isLoaded checks."
+description: "Only for CloudBeaver frontend code under the owning repository's webapp/, including repositories explicitly inheriting this workflow. Load when creating, changing, or reviewing a FormPart implementation or contract, or when work on a consumer directly involves the FormPart lifecycle, such as loader(), isOutdated(), or isLoaded()."
 ---
 
 # Form parts
 
-Apply this workflow only to frontend FormPart implementations and consumers in the scope declared above.
+Apply this workflow to FormPart implementations and to consumer changes that affect or depend on the FormPart lifecycle. UI work inside a form that leaves the lifecycle untouched is outside this workflow.
 
 A `FormPart` adds functionality to a form, usually a tab. It loads, processes, and stores its own state and participates in the form lifecycle.
 
