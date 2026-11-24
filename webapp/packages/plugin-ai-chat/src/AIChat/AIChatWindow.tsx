@@ -31,7 +31,7 @@ export const AIChatWindow = observer(function AIChatWindow() {
 
   const context = aiChatContextService.currentContext;
   const conversationId = aiChatConversationsService.currentConversationId;
-  const disabled = aiChatConversationsService.processing;
+  const disabled = !aiChatContextService.isContextReady || aiChatConversationsService.processing;
 
   useEffect(() => () => aiChatConversationsResource.markOutdated(), []);
 

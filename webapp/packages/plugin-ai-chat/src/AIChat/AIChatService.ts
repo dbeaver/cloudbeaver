@@ -56,13 +56,11 @@ export class AIChatService {
   }
 
   togglePanel(): void {
-    const wasActive = this.settings.active;
-
     runInAction(() => {
       this.settings.active = !this.settings.active;
 
-      if (!wasActive && !this.aiChatContextService.currentContext) {
-        this.aiChatContextService.setContext(this.aiChatContextService.getContext());
+      if (this.settings.active) {
+        this.aiChatContextService.initialize();
       }
     });
   }
