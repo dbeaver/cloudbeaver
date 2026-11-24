@@ -35,6 +35,10 @@ public class WebSQLResultsInfoTest {
         Assertions.assertEquals(List.of("test-presentation"), graphResult.getAvailablePresentations());
         Assertions.assertSame(presentation, graphResult.getResultsInfo().getPresentation());
         Assertions.assertTrue(tableResult.getAvailablePresentations().isEmpty());
+
+        graphResult.getResultsInfo().invalidatePresentation();
+        Assertions.assertEquals("1", graphResult.getId());
+        Assertions.assertTrue(graphResult.getAvailablePresentations().isEmpty());
     }
 
     @Test

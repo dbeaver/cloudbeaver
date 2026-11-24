@@ -109,6 +109,17 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
     }
   }
 
+  protected applySavedResultPresentations(result: IDatabaseResultSet, savedResult: IDatabaseResultSet): IDatabaseResultSet {
+    if (!result.data?.availablePresentations?.length || savedResult.data?.availablePresentations?.length) {
+      return result;
+    }
+
+    return {
+      ...result,
+      data: { ...result.data, availablePresentations: [] },
+    };
+  }
+
   async cancelLoadTotalCount(): Promise<ITask<number> | null> {
     await this.totalCountRequestTask?.cancel();
 

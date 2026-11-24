@@ -424,6 +424,10 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         ResultSetSaveSettings settings = new ResultSetSaveSettings();
         updater.prepareStatements(monitor, settings);
+        // A batch may change rows before it completes, including when a later statement fails.
+        if (!CommonUtils.isEmpty(updatedRows) || !CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
+            resultsInfo.invalidatePresentation();
+        }
         DBDResultSetDataUpdater.ExecutionResult executionResult =
             updater.executeSynchronously(monitor, false, settings, null);
         if (!executionResult.isSuccess()) {

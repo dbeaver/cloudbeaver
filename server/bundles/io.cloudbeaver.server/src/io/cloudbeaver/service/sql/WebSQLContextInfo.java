@@ -172,6 +172,17 @@ public class WebSQLContextInfo implements WebSessionProvider {
         @NotNull DBCTrace trace,
         @NotNull DBDAttributeBinding[] attributes,
         @Nullable DBDAttributeBinding documentAttribute,
+        boolean singleRow
+    ) {
+        return saveResult(dataContainer, trace, attributes, documentAttribute, singleRow, null);
+    }
+
+    @NotNull
+    public WebSQLResultsInfo saveResult(
+        @NotNull DBSDataContainer dataContainer,
+        @NotNull DBCTrace trace,
+        @NotNull DBDAttributeBinding[] attributes,
+        @Nullable DBDAttributeBinding documentAttribute,
         boolean singleRow,
         @Nullable WebSQLResultSetExtension.Presentation presentation
     ) {

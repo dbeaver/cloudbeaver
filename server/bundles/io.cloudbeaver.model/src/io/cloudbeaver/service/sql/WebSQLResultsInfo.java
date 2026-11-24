@@ -50,7 +50,7 @@ public class WebSQLResultsInfo {
     private DBDDataFilter dataFilter;
     private String queryText;
     @Nullable
-    private final WebSQLResultSetExtension.Presentation presentation;
+    private volatile WebSQLResultSetExtension.Presentation presentation;
 
     public WebSQLResultsInfo(@NotNull DBSDataContainer dataContainer, @NotNull String id) {
         this(dataContainer, id, null);
@@ -74,6 +74,10 @@ public class WebSQLResultsInfo {
     @Nullable
     public WebSQLResultSetExtension.Presentation getPresentation() {
         return presentation;
+    }
+
+    public void invalidatePresentation() {
+        presentation = null;
     }
 
     @NotNull

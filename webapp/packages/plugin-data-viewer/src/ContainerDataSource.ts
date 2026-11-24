@@ -110,9 +110,11 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
+    const results = [...prevResults];
+    let presentationsInvalidated = false;
 
     try {
-      for (const result of prevResults) {
+      for (const [index, result] of prevResults.entries()) {
         if (result.id === null) {
           continue;
         }
@@ -177,6 +179,9 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
 
           if (responseResult) {
             editor.applyUpdate(responseResult.id, responseResult.data?.rowsWithMetaData?.map(r => r.data) || []);
+            const updated = this.applySavedResultPresentations(result, responseResult);
+            results[index] = updated;
+            presentationsInvalidated ||= updated !== result;
           }
         }
 
@@ -189,12 +194,16 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
       }
 
       this.clearError();
+
+      if (presentationsInvalidated) {
+        this.setOutdated();
+      }
     } catch (exception: any) {
       this.error = exception;
       throw exception;
     }
 
-    return prevResults;
+    return results;
   }
 
   protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
