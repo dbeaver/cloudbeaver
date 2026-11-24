@@ -1,9 +1,11 @@
 ---
-name: extend-at-seams
-description: "Add new behavior through the product's existing plugin architecture and extension points instead of reshaping working code. Use when planning or implementing a feature, integration, action, screen, or background task, and whenever a change would add branches, flags, modes, or parameters to an existing module, contract, or component. Apply only to CloudBeaver frontend code under webapp/ using its frontend plugin and registration APIs."
+name: cloudbeaver-frontend-extend-at-seams
+description: "Only for CloudBeaver frontend code under the owning repository's webapp/ using frontend plugin and registration APIs, including repositories explicitly inheriting this workflow. Load when planning or implementing features or integrations, or extending existing modules, contracts, or components with branches, flags, modes, or parameters."
 ---
 
 # Extend at seams
+
+Apply this architectural workflow only to frontend targets in the scope declared above. Backend plugin systems and unrelated products do not activate it.
 
 Modules are open for extension and closed for modification. A feature arrives as new code plugged
 into a seam that already exists, so existing behavior keeps the shape it was reviewed and tested in,

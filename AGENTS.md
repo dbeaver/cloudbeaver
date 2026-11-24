@@ -6,6 +6,12 @@ CloudBeaver is an open-source, web-based database management application. Its mo
 
 ## Frontend
 
+### Skill selection
+
+- Available skills are a catalog. Before loading a skill, match its description's repository scope and action trigger to the task's target files. Frontend skills apply to this repository's `webapp/`, or to a consuming repository's frontend when its instructions explicitly inherit these workflows.
+- Choose by the target work, regardless of developer role or starting directory. Backend-only tasks and incidental frontend reads do not activate frontend skills. For mixed tasks, apply them only to the frontend portion; for PR/push tasks, determine scope from the branch diff.
+- Discover matching skills through the harness catalog, or read descriptions from `.agents/skills/*/SKILL.md` when the harness does not expose them, then load only matching bodies. Resolve these paths from this repository root. New skills declare their own scope and triggers; no per-skill list is needed.
+
 ### Scope
 
 - These instructions apply to the frontend under `webapp/` in CloudBeaver Community Edition and to any other CloudBeaver edition or product that shares this frontend architecture. Apply frontend skills and checks only to the task's frontend targets; incidental reads during backend work do not qualify.
@@ -50,12 +56,6 @@ yarn validate-dependencies
 ```
 
 For a focused check, use a package's existing script, for example `yarn workspace @cloudbeaver/core-utils test` or `yarn workspace @cloudbeaver/plugin-sql-editor lint`. Do not invent a package script that is absent from its `package.json`.
-
-Before an authorized push, check whether the owning repository's branch diff contains files under its `webapp/` covered by its frontend tooling. Only for a nonempty frontend scope, read and follow `.agents/skills/pre-push-checks/SKILL.md`. Backend-only pushes do not require frontend setup or checks.
-
-Before creating a pull request or writing/updating its description, read and follow `.agents/skills/file-pr/SKILL.md` in this repository.
-
-When writing or reviewing interface text owned by the frontend under `webapp/`, read and follow `.agents/skills/clean-copy/SKILL.md`.
 
 ### Working conventions
 

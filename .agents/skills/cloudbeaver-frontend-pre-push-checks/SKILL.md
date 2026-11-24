@@ -1,6 +1,6 @@
 ---
-name: pre-push-checks
-description: Run ESLint and Prettier before pushing CloudBeaver CE or EE changes, including branch publication and PR pushes. Apply only when the owning repository's branch diff contains frontend files under webapp/ covered by its tooling; backend-only changes and unrelated repositories do not qualify.
+name: cloudbeaver-frontend-pre-push-checks
+description: "Only for pushes whose branch diff contains CloudBeaver frontend files under the owning repository's webapp/ covered by its tooling, including repositories explicitly inheriting this workflow. Load before an authorized push, including branch publication and PR pushes. Backend-only pushes and unrelated repositories are outside this scope."
 ---
 
 # Pre-push checks
@@ -9,7 +9,7 @@ Before a user-authorized push, select the applicable files as described in step 
 
 ## 1. Prepare
 
-Follow repository instructions and use its configured Node/Yarn versions. Run from the owning `webapp/` with installed dependencies and the applicable ESLint/Prettier configurations and ignores. For CE/EE cross-repository changes, use the intended sibling revisions.
+Follow repository instructions and use its configured Node/Yarn versions. Run from the owning `webapp/` with installed dependencies and the applicable ESLint/Prettier configurations and ignores. For cross-repository frontend changes, check each owning repository using the intended dependency revisions.
 
 ## 2. Select changed files
 

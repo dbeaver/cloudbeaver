@@ -1,9 +1,11 @@
 ---
-name: cloudbeaver-form-parts
-description: Guides CloudBeaver FormPart state and lifecycle handling. Use when creating, changing, or reviewing form parts, including tab parts, their loaders, isOutdated, or isLoaded checks. Apply only to frontend code under CloudBeaver webapp/ implementing or consuming the FormPart contract.
+name: cloudbeaver-frontend-form-parts
+description: "Only for CloudBeaver frontend code under the owning repository's webapp/, including repositories explicitly inheriting this workflow. Load when creating, changing, or reviewing the FormPart contract or its consumers, including tab parts, loaders, isOutdated, and isLoaded checks."
 ---
 
 # Form parts
+
+Apply this workflow only to frontend FormPart implementations and consumers in the scope declared above.
 
 A `FormPart` adds functionality to a form, usually a tab. It loads, processes, and stores its own state and participates in the form lifecycle.
 
