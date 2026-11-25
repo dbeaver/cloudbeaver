@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 import type { IResultSetGroupingData } from '../DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING.js';
 import styles from './DVGroupingColumnEditorDialog.module.css';
-import { GroupingColumnEditorTable } from './GroupingColumnEditorTable.js';
+import { GroupingColumnEditor } from './GroupingColumnEditor.js';
 
 interface Payload {
   grouping: IResultSetGroupingData;
@@ -74,17 +74,17 @@ export const DVGroupingColumnEditorDialog = observer<DialogComponentProps<Payloa
       <CommonDialogBody>
         <Container>
           <Group box medium gap>
-            <GroupingColumnEditorTable
+            <GroupingColumnEditor
               title={translate('plugin_data_viewer_result_set_grouping_grouping_columns')}
               placeholder={translate('plugin_data_viewer_result_set_grouping_grouping_columns_placeholder')}
-              columns={columns}
+              items={columns}
               onAdd={addColumnHandler}
               onDelete={deleteColumnHandler}
             />
-            <GroupingColumnEditorTable
+            <GroupingColumnEditor
               title={translate('plugin_data_viewer_result_set_grouping_grouping_functions')}
               placeholder={translate('plugin_data_viewer_result_set_grouping_grouping_functions_placeholder')}
-              columns={functions}
+              items={functions}
               onAdd={addFunctionHandler}
               onDelete={deleteFunctionHandler}
             />
