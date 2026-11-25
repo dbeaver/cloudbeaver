@@ -103,8 +103,13 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
 
           if (presentation) {
             if (presentation.dataFormat !== undefined && presentation.dataFormat !== this.dataModel?.source.dataFormat) {
-              localActions.clearConstraints();
-              this.dataModel?.setDataFormat(presentation.dataFormat).reload();
+              if (this.dataModel?.source.dataFormat === ResultDataFormat.Timeseries) {
+                const { dataFormat } = presentation;
+                void this.dataModel.request(() => this.dataModel?.setDataFormat(dataFormat));
+              } else {
+                localActions.clearConstraints();
+                void this.dataModel?.setDataFormat(presentation.dataFormat).reload();
+              }
             }
 
             this.onPresentationChange(id);

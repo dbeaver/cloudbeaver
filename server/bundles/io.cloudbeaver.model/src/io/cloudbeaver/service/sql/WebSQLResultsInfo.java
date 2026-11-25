@@ -49,35 +49,15 @@ public class WebSQLResultsInfo {
     @Nullable
     private DBDDataFilter dataFilter;
     private String queryText;
-    @Nullable
-    private volatile WebSQLResultSetExtension.Presentation presentation;
 
     public WebSQLResultsInfo(@NotNull DBSDataContainer dataContainer, @NotNull String id) {
-        this(dataContainer, id, null);
-    }
-
-    public WebSQLResultsInfo(
-        @NotNull DBSDataContainer dataContainer,
-        @NotNull String id,
-        @Nullable WebSQLResultSetExtension.Presentation presentation
-    ) {
         this.dataContainer = dataContainer;
         this.id = id;
-        this.presentation = presentation;
     }
 
     @NotNull
     public String getId() {
         return id;
-    }
-
-    @Nullable
-    public WebSQLResultSetExtension.Presentation getPresentation() {
-        return presentation;
-    }
-
-    public void invalidatePresentation() {
-        presentation = null;
     }
 
     @NotNull

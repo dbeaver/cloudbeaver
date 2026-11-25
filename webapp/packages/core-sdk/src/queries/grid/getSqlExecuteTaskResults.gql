@@ -13,6 +13,17 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
       resultSet {
         id
         availablePresentations
+        timeSeriesData {
+          sourceRowCount
+          series {
+            id
+            label
+            points {
+              timestamp
+              value
+            }
+          }
+        }
         readOnly
         columns {
           dataKind

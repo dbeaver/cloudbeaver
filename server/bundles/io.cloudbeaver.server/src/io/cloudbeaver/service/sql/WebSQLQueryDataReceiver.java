@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLQueryDataReceiver.class);
+    private static final String TIME_SERIES_PRESENTATION_ID = "timeseries-graph";
 
     @NotNull
     private final WebSQLContextInfo contextInfo;
@@ -180,57 +181,34 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
             log.error("Error binding attributes", e);
         }
 
-        WebSQLResultSetExtension.Presentation presentation = null;
-        try {
-            WebSQLResultSetExtension extension = GeneralUtils.adapt(dataContainer.getDataSource(), WebSQLResultSetExtension.class);
-            if (extension != null) {
-                presentation = extension.prepare(
+        var timeSeriesAdapter = GeneralUtils.adapt(dataContainer.getDataSource(), WebTimeSeriesDataAdapter.class);
+        if (dataFormat == WebDataFormat.timeseries) {
+            if (timeSeriesAdapter == null) {
+                throw new DBCException("Time-series data is not supported by this data source");
+            }
+            try {
+                var graph = timeSeriesAdapter.build(
+                    session.getProgressMonitor(),
                     dataContainer,
                     bindings,
                     rows.stream().map(WebSQLQueryResultSetRow::getData).toArray(Object[][]::new)
                 );
+                webResultSet.setTimeSeriesData(graph, rows.size());
+                webResultSet.setAvailablePresentations(List.of(TIME_SERIES_PRESENTATION_ID));
+            } catch (DBException e) {
+                throw new DBCException("Error reading time-series data", e);
             }
-        } catch (DBException | RuntimeException e) {
-            log.warn("Error preparing result extension", e);
+        } else {
+            advertiseTimeSeries(timeSeriesAdapter);
+            formatGridRows(webSession, session);
         }
-
-        if (dataFormat != WebDataFormat.document) {
-            convertComplexValuesToRelationalView(session);
-        }
-        // Set proper order position
-        for (int i = 0; i < bindings.length; i++) {
-            DBDAttributeBinding binding = bindings[i];
-            if (binding instanceof DBDAttributeBindingType) {
-                // Type bindings are produced by dynamic map resolve
-                // Their positions are valid only within parent value
-                // In web we make plain list of attributes so we must reorder leaf attributes
-                ((DBDAttributeBindingType) binding).setOrdinalPosition(i);
-            }
-        }
-
-        // Convert row values
-        for (WebSQLQueryResultSetRow row : rows) {
-            for (int i = 0; i < bindings.length; i++) {
-                DBDAttributeBinding binding = bindings[i];
-                row.getData()[i] = WebSQLUtils.makeWebCellValue(webSession, binding, row.getData()[i], dataFormat);
-            }
-        }
-
         webResultSet.setColumns(bindings);
-        webResultSet.setRows(List.of(rows.toArray(new WebSQLQueryResultSetRow[0])));
         webResultSet.setHasChildrenCollection(resultSet instanceof DBDSubCollectionResultSet);
         webResultSet.setSupportsDataFilter(dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER));
         webResultSet.setHasDynamicTrace(trace instanceof DBCTraceDynamic);
         webResultSet.setReadOnlyInfo(contextInfo.getProcessor().getExecutionContext());
 
-        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(
-            dataContainer,
-            trace,
-            bindings,
-            documentAttribute,
-            rows.size() == 1,
-            presentation
-        );
+        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, documentAttribute, rows.size() == 1);
         resultsInfo.setDocumentIdAttributeName(documentIdAttributeName);
         resultsInfo.setDataFilter(dataFilter);
         resultsInfo.setQueryText(resultSet.getSourceStatement().getQueryString());
@@ -256,6 +234,44 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         } else {
             webResultSet.setRowIdentifierState(WebSQLResultSetRowIdentifierState.NONE);
         }
+    }
+
+    private void advertiseTimeSeries(@Nullable WebTimeSeriesDataAdapter adapter) {
+        if (adapter != null && (dataFormat == null || dataFormat == WebDataFormat.resultset)) {
+            try {
+                if (adapter.supportsResult(dataContainer, bindings)) {
+                    webResultSet.setAvailablePresentations(List.of(TIME_SERIES_PRESENTATION_ID));
+                }
+            } catch (RuntimeException e) {
+                log.warn("Error checking time-series availability", e);
+            }
+        }
+    }
+
+    private void formatGridRows(@NotNull WebSession webSession, @NotNull DBCSession session) throws DBCException {
+        if (dataFormat != WebDataFormat.document) {
+            convertComplexValuesToRelationalView(session);
+        }
+        // Set proper order position
+        for (int i = 0; i < bindings.length; i++) {
+            DBDAttributeBinding binding = bindings[i];
+            if (binding instanceof DBDAttributeBindingType) {
+                // Type bindings are produced by dynamic map resolve
+                // Their positions are valid only within parent value
+                // In web we make plain list of attributes so we must reorder leaf attributes
+                ((DBDAttributeBindingType) binding).setOrdinalPosition(i);
+            }
+        }
+
+        // Convert row values
+        for (WebSQLQueryResultSetRow row : rows) {
+            for (int i = 0; i < bindings.length; i++) {
+                DBDAttributeBinding binding = bindings[i];
+                row.getData()[i] = WebSQLUtils.makeWebCellValue(webSession, binding, row.getData()[i], dataFormat);
+            }
+        }
+
+        webResultSet.setRows(List.copyOf(rows));
     }
 
     private void convertComplexValuesToRelationalView(DBCSession session) {

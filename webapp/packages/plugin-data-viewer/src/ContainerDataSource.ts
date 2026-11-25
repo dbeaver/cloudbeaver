@@ -34,7 +34,6 @@ export interface IDataContainerOptions extends IDatabaseDataOptions {
 
 export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataContainerOptions> extends ResultSetDataSource<TOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
-  private refreshPresentationsAfterSave = false;
 
   override get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
@@ -102,10 +101,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
 
       this.clearError();
 
-      const results = this.transformResults(executionContext.context!, response.results, limit);
-      this.refreshPresentationsAfterSave = false;
-
-      return results;
+      return this.transformResults(executionContext.context!, response.results, limit);
     } catch (exception: any) {
       this.error = exception;
       throw exception;
@@ -114,12 +110,9 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
-    const results = [...prevResults];
-    let presentationsInvalidated = false;
-    let attemptedResultIndex = -1;
 
     try {
-      for (const [index, result] of prevResults.entries()) {
+      for (const result of prevResults) {
         if (result.id === null) {
           continue;
         }
@@ -177,10 +170,6 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
           () => this.asyncTaskInfoService.remove(task.id),
         );
 
-        if (this.hasBatchRows(updateVariables)) {
-          attemptedResultIndex = index;
-        }
-
         const response = await this.currentTask;
 
         if (editor) {
@@ -188,9 +177,6 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
 
           if (responseResult) {
             editor.applyUpdate(responseResult.id, responseResult.data?.rowsWithMetaData?.map(r => r.data) || []);
-            const updated = this.applySavedResultPresentations(result, responseResult);
-            results[index] = updated;
-            presentationsInvalidated ||= updated !== result;
           }
         }
 
@@ -200,25 +186,15 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
           requestMessage: 'plugin_data_viewer_result_set_save_success',
           source: null,
         };
-
-        attemptedResultIndex = -1;
       }
 
       this.clearError();
-
-      if (presentationsInvalidated || this.refreshPresentationsAfterSave) {
-        this.setOutdated();
-      }
     } catch (exception: any) {
-      if (this.publishFailedSaveResults(results, attemptedResultIndex)) {
-        this.refreshPresentationsAfterSave = true;
-      }
-
       this.error = exception;
       throw exception;
     }
 
-    return results;
+    return prevResults;
   }
 
   protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
@@ -272,19 +248,24 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
-    return results.map<IDatabaseResultSet>((result, index) => ({
-      id: result.resultSet?.id || '0',
-      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.dataFormat}_${index}`,
-      projectId: executionContextInfo.projectId,
-      connectionId: executionContextInfo.connectionId,
-      contextId: executionContextInfo.id,
-      dataFormat: result.dataFormat!,
-      updateRowCount: result.updateRowCount || 0,
-      loadedFully: (result.resultSet?.rowsWithMetaData?.length || 0) < limit,
-      count: result.resultSet?.rowsWithMetaData?.length || 0,
-      totalCount: null,
-      data: result.resultSet,
-    }));
+    return results.map<IDatabaseResultSet>((result, index) => {
+      const dataFormat = result.dataFormat === ResultDataFormat.Timeseries ? ResultDataFormat.Resultset : result.dataFormat!;
+      const count = result.resultSet?.timeSeriesData?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0;
+
+      return {
+        id: result.resultSet?.id || '0',
+        uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${dataFormat}_${index}`,
+        projectId: executionContextInfo.projectId,
+        connectionId: executionContextInfo.connectionId,
+        contextId: executionContextInfo.id,
+        dataFormat,
+        updateRowCount: result.updateRowCount || 0,
+        loadedFully: count < limit,
+        count,
+        totalCount: null,
+        data: result.resultSet,
+      };
+    });
   }
 
   private async ensureContextCreated(): Promise<IConnectionExecutionContext> {

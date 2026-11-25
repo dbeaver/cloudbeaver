@@ -17,19 +17,20 @@
 package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 
-public interface WebSQLResultSetExtension {
-    @Nullable
-    Presentation prepare(
+/** Converts raw result-set values to graph data for data sources that support time series. */
+public interface WebTimeSeriesDataAdapter {
+    boolean supportsResult(@NotNull DBSDataContainer container, @NotNull DBDAttributeBinding[] bindings);
+
+    @NotNull
+    Object build(
+        @NotNull DBRProgressMonitor monitor,
         @NotNull DBSDataContainer container,
         @NotNull DBDAttributeBinding[] bindings,
         @NotNull Object[][] rows
     ) throws DBException;
-
-    record Presentation(@NotNull String id, @NotNull Object data) {
-    }
 }

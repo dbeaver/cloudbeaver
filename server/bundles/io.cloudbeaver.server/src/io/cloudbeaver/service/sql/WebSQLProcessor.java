@@ -69,6 +69,7 @@ import org.jkiss.utils.CommonUtils;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -79,6 +80,7 @@ import java.util.stream.Collectors;
 public class WebSQLProcessor implements WebSessionProvider {
 
     private static final Log log = Log.getLog(WebSQLProcessor.class);
+    private static final Pattern SELECT_INTO = Pattern.compile("\\bINTO\\b", Pattern.CASE_INSENSITIVE);
 
     private static final int MAX_RESULTS_COUNT = 100;
 
@@ -184,6 +186,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             // Use default filter
             filter = new WebSQLDataFilter();
         }
+        String originalSql = sql;
         long startTime = System.currentTimeMillis();
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
@@ -203,6 +206,10 @@ public class WebSQLProcessor implements WebSessionProvider {
                     context.getDataSource(),
                     sql,
                     dataFilter);
+            }
+
+            if (dataFormat == WebDataFormat.timeseries && !canReloadAsTimeSeries(originalSql, sql)) {
+                throw new DBWebException("Time series requires a single read-only query without parameters");
             }
 
             final WebSQLDataFilter webDataFilter = filter;
@@ -322,6 +329,16 @@ public class WebSQLProcessor implements WebSessionProvider {
         } catch (DBException e) {
             throw new DBWebException("Error executing query", e);
         }
+        if (dataFormat == null || dataFormat == WebDataFormat.resultset) {
+            var results = executeInfo.getResults();
+            for (var result : results) {
+                var resultSet = result.getResultSet();
+                if (resultSet != null && !resultSet.getAvailablePresentations().isEmpty() &&
+                    (results.length != 1 || !canReloadAsTimeSeries(originalSql, sql))) {
+                    resultSet.setAvailablePresentations(List.of());
+                }
+            }
+        }
         DBCTransactionManager txnManager = DBUtils.getTransactionManager(context);
         if (txnManager != null && !txnManager.isAutoCommit()) {
             sendTransactionalEvent(contextInfo);
@@ -335,6 +352,28 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
 
         return executeInfo;
+    }
+
+    private boolean canReloadAsTimeSeries(@NotNull String originalSql, @NotNull String filteredSql) {
+        return isReplayableSelect(originalSql) && (originalSql.equals(filteredSql) || isReplayableSelect(filteredSql));
+    }
+
+    private boolean isReplayableSelect(@NotNull String sql) {
+        var dataSource = connection.getDataSource();
+        var parserContext = new SQLParserContext(dataSource, getSyntaxManager(), ruleManager, new Document(sql));
+        var statements = SQLScriptParser.extractScriptQueries(parserContext, 0, sql.length(), true, false, true);
+        if (statements.size() != 1 || !(statements.getFirst() instanceof SQLQuery query) || !CommonUtils.isEmpty(query.getParameters())) {
+            return false;
+        }
+
+        if (query.getType() == SQLQueryType.SELECT) {
+            return !query.isModifying();
+        }
+        // InfluxQL syntax such as FILL() can fall outside the SQL parser. INTO would write a measurement.
+        var dialect = dataSource.getSQLDialect();
+        return query.getType() == SQLQueryType.UNKNOWN &&
+            SQLConstants.KEYWORD_SELECT.equalsIgnoreCase(SQLUtils.getFirstKeyword(dialect, query.getText())) &&
+            !SELECT_INTO.matcher(query.getText()).find();
     }
 
     @NotNull
@@ -377,7 +416,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     executeInfo.setFullQuery(statistics.getQueryText());
                     if (resultSet != null && resultSet.getRowsWithMetaData() != null && resultSet.getResultsInfo() != null) {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
-                        executeInfo.setStatusMessage(resultSet.getRowsWithMetaData().size() + " row(s) fetched");
+                        executeInfo.setStatusMessage(resultSet.getFetchedRowCount() + " row(s) fetched");
                     }
                 }
             }
@@ -424,10 +463,6 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         ResultSetSaveSettings settings = new ResultSetSaveSettings();
         updater.prepareStatements(monitor, settings);
-        // A batch may change rows before it completes, including when a later statement fails.
-        if (!CommonUtils.isEmpty(updatedRows) || !CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
-            resultsInfo.invalidatePresentation();
-        }
         DBDResultSetDataUpdater.ExecutionResult executionResult =
             updater.executeSynchronously(monitor, false, settings, null);
         if (!executionResult.isSuccess()) {

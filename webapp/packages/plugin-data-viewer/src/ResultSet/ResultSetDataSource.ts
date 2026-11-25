@@ -11,7 +11,7 @@ import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } fro
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
-import type { AsyncUpdateResultsDataBatchMutationVariables, GraphQLService, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
+import type { GraphQLService, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
@@ -107,40 +107,6 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
     if (!this.hasElementIdentifier(0)) {
       this.setOutdated();
     }
-  }
-
-  protected applySavedResultPresentations(result: IDatabaseResultSet, savedResult: IDatabaseResultSet): IDatabaseResultSet {
-    return savedResult.data?.availablePresentations?.length ? result : this.withoutResultPresentations(result);
-  }
-
-  protected hasBatchRows({ addedRows, updatedRows, deletedRows }: AsyncUpdateResultsDataBatchMutationVariables): boolean {
-    return [addedRows, updatedRows, deletedRows].some(rows => (Array.isArray(rows) ? rows.length > 0 : rows != null));
-  }
-
-  protected publishFailedSaveResults(results: IDatabaseResultSet[], attemptedResultIndex: number): boolean {
-    const attemptedResult = results[attemptedResultIndex];
-
-    if (attemptedResult) {
-      results[attemptedResultIndex] = this.withoutResultPresentations(attemptedResult);
-    }
-
-    if (results.some((result, index) => result !== this.results[index])) {
-      this.setResults(results);
-      return true;
-    }
-
-    return false;
-  }
-
-  private withoutResultPresentations(result: IDatabaseResultSet): IDatabaseResultSet {
-    if (!result.data?.availablePresentations?.length) {
-      return result;
-    }
-
-    return {
-      ...result,
-      data: { ...result.data, availablePresentations: [] },
-    };
   }
 
   async cancelLoadTotalCount(): Promise<ITask<number> | null> {
