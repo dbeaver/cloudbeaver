@@ -73,6 +73,7 @@ export class AIChatContextService extends Bootstrap {
   }
 
   private reactionDisposer: IReactionDisposer | null;
+  private editorDisposer: IReactionDisposer | null;
 
   constructor(
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
@@ -86,6 +87,7 @@ export class AIChatContextService extends Bootstrap {
 
     this.onContextChange = new SyncExecutor<IAIChatContextInfo | null>();
     this.reactionDisposer = null;
+    this.editorDisposer = null;
 
     makeObservable(this, {
       currentContext: computed,
@@ -121,6 +123,35 @@ export class AIChatContextService extends Bootstrap {
       },
       { equals: comparer.shallow },
     );
+
+    let previousKey: IConnectionInfoParams | null | undefined;
+
+    this.editorDisposer = reaction(
+      () => ({
+        userId: this.userInfoResource.getId(),
+        ready: this.isContextReady,
+        // null means "No connection"; undefined means the active tab has no connection selector.
+        context: this.getContext() ?? (this.connectionSchemaManagerService.isConnectionChangeable ? null : undefined),
+      }),
+      ({ userId, ready, context }, previous) => {
+        if (!ready || userId !== previous?.userId) {
+          previousKey = undefined;
+        }
+
+        if (!ready || context === undefined) {
+          return;
+        }
+
+        const connectionKey = context?.connectionKey ?? null;
+
+        if (previousKey !== undefined && !comparer.structural(previousKey, connectionKey)) {
+          this.setContext(context);
+        }
+
+        previousKey = connectionKey;
+      },
+      { equals: comparer.structural, fireImmediately: true },
+    );
   }
 
   private transformContext(executionContext: IConnectionExecutionContextInfo): IAIChatContextInfo {
@@ -134,6 +165,10 @@ export class AIChatContextService extends Bootstrap {
   override dispose(): void {
     if (this.reactionDisposer) {
       this.reactionDisposer();
+    }
+
+    if (this.editorDisposer) {
+      this.editorDisposer();
     }
   }
 }
