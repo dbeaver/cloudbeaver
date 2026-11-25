@@ -35,4 +35,15 @@ public abstract class WebAsyncTaskProcessor<TYPE> extends DBRRunnableWithResult<
 
     public void cancel() {
     }
+
+    public boolean supportsUserCancellationResult() {
+        return false;
+    }
+
+    /**
+     * Prepare the result when a user cancels before the processor starts.
+     */
+    public void prepareUserCancellationResult() {
+        throw new UnsupportedOperationException();
+    }
 }

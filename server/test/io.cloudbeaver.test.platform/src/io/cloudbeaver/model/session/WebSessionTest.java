@@ -20,12 +20,15 @@ import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.app.ServletAuthApplication;
+import org.eclipse.core.runtime.jobs.Job;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.utils.function.ThrowableConsumer;
 import org.jkiss.utils.function.ThrowableFunction;
@@ -34,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -97,6 +101,52 @@ public class WebSessionTest extends CloudbeaverMockTest {
         session.asyncTaskCancel(taskInfo.getId());
 
         Mockito.verify(processor).cancel();
+    }
+
+    @Test
+    public void cancellingQueuedTaskPublishesResultWithoutRunningProcessor() throws Exception {
+        WebAsyncTaskProcessor<?> processor = Mockito.mock(WebAsyncTaskProcessor.class);
+        Mockito.when(processor.supportsUserCancellationResult()).thenReturn(true);
+        Object cancellationResult = new Object();
+        Mockito.when(processor.getExtendedResults()).thenReturn(cancellationResult);
+
+        Job.getJobManager().suspend();
+        try {
+            WebAsyncTaskInfo task = session.createAndRunAsyncTask("Queued test task", processor);
+            Assertions.assertTrue(session.asyncTaskCancel(task.getId()));
+            Assertions.assertTrue(session.asyncTaskCancel(task.getId()));
+
+            Assertions.assertFalse(task.isRunning());
+            Assertions.assertNull(task.getError());
+            Assertions.assertSame(cancellationResult, task.getExtendedResult());
+            Mockito.verify(processor).cancel();
+            Mockito.verify(processor).prepareUserCancellationResult();
+            Mockito.verify(processor, Mockito.never()).run(Mockito.any());
+        } finally {
+            Job.getJobManager().resume();
+        }
+    }
+
+    @Test
+    public void cancellingFinishedTaskPreservesResult() throws Exception {
+        WebAsyncTaskProcessor<String> processor = new WebAsyncTaskProcessor<>() {
+            @Override
+            public boolean supportsUserCancellationResult() {
+                return true;
+            }
+
+            @Override
+            public void run(DBRProgressMonitor monitor) {
+                this.result = "original result";
+            }
+        };
+        WebAsyncTaskInfo task = session.createAndRunAsyncTask("Finished test task", processor);
+        Assertions.assertTimeoutPreemptively(Duration.ofSeconds(10), () -> task.getJob().join());
+        Assertions.assertTrue(session.asyncTaskCancel(task.getId()));
+
+        Assertions.assertFalse(task.isUserCancellationRequested());
+        Assertions.assertNull(task.getError());
+        Assertions.assertEquals("original result", task.getResult());
     }
 
     @Test
@@ -199,6 +249,7 @@ public class WebSessionTest extends CloudbeaverMockTest {
         // Make configuration/anonymous checks safe for constructor
         Mockito.when(app.isAnonymousAccessEnabled()).thenReturn(false);
         Mockito.when(app.getEventController()).thenReturn(eventController);
+        Mockito.when(app.getAppConfiguration()).thenReturn(Mockito.mock(ServletAppConfiguration.class));
         return app;
     }
 

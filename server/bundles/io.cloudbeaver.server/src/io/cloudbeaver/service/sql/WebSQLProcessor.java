@@ -69,8 +69,10 @@ import org.jkiss.utils.CommonUtils;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -180,6 +182,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         boolean readLogs,
         boolean useEvents
     ) throws DBWebException, DBCException {
+        if (asyncTask.isUserCancellationRequested()) {
+            return WebSQLUtils.createUserCancellationResult(0);
+        }
         if (filter == null) {
             // Use default filter
             filter = new WebSQLDataFilter();
@@ -241,14 +246,25 @@ public class WebSQLProcessor implements WebSessionProvider {
                         dataContainer.getScriptContext().fillQueryParameters(mainQuery, () -> null, true) &&
                             confirmDangerousQueryIfNeeded(mainQuery.getScriptElements(), asyncTask, isGenerated);
                     if (!isConfirmed) {
+                        DBWebException parameterError = parametersProvider.getConfirmationError();
+                        if (parameterError != null) {
+                            throw parameterError;
+                        }
                         throw new DBWebException("Query execution was cancelled by user");
                     }
                 }
 
+                AtomicReference<DBException> lastAttemptFailure = new AtomicReference<>();
                 DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
+                    if (asyncTask.isUserCancellationRequested() && lastAttemptFailure.get() != null) {
+                        return;
+                    }
                     try (DBCSession session = context.openSession(monitor, resolveQueryPurpose(dataFilter), "Execute SQL")) {
                         List<SQLScriptElement> sqlQueries = mainQuery.getScriptElements();
                         for (SQLScriptElement sqlElement : sqlQueries) {
+                            if (asyncTask.isUserCancellationRequested()) {
+                                throw new UserCancelledException();
+                            }
                             if (!(sqlElement instanceof SQLQuery sqlQuery)) {
                                 log.error("Non-query script elements are not allowed: " + sqlElement);
                                 continue;
@@ -295,7 +311,19 @@ public class WebSQLProcessor implements WebSessionProvider {
                                     }
                                 }
 
-                                boolean hasResultSet = dbStat.executeStatement();
+                                if (asyncTask.isUserCancellationRequested()) {
+                                    throw new UserCancelledException();
+                                }
+                                boolean hasResultSet;
+                                try {
+                                    hasResultSet = dbStat.executeStatement();
+                                } catch (DBCException e) {
+                                    if (asyncTask.isUserCancellationRequested()
+                                        && DBExecUtils.isExecutionCanceled(session.getDataSource(), e)) {
+                                        throw new UserCancelledException();
+                                    }
+                                    throw e;
+                                }
 
                                 // Wait SqlLogStateJob, if its starts
                                 if (sqlOutputLogReaderJob != null) {
@@ -314,12 +342,33 @@ public class WebSQLProcessor implements WebSessionProvider {
                                 );
                             }
                         }
+                    } catch (UserCancelledException e) {
+                        if (lastAttemptFailure.get() == null) {
+                            throw e;
+                        }
+                        return;
+                    } catch (DBException e) {
+                        // Do not let a cancellation during recovery replace the original query failure.
+                        lastAttemptFailure.set(e);
+                        if (!asyncTask.isUserCancellationRequested()) {
+                            throw e;
+                        }
+                        return;
                     }
+                    lastAttemptFailure.set(null);
                 });
+                if (lastAttemptFailure.get() != null) {
+                    throw lastAttemptFailure.get();
+                }
             } else {
                 executeInfo.setResults(new WebSQLQueryResults[0]);
             }
+        } catch (UserCancelledException e) {
+            return WebSQLUtils.createUserCancellationResult(System.currentTimeMillis() - startTime);
         } catch (DBException e) {
+            if (asyncTask.isUserCancellationRequested() && e.getCause() instanceof CancellationException) {
+                return WebSQLUtils.createUserCancellationResult(System.currentTimeMillis() - startTime);
+            }
             throw new DBWebException("Error executing query", e);
         }
         DBCTransactionManager txnManager = DBUtils.getTransactionManager(context);
@@ -335,6 +384,12 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
 
         return executeInfo;
+    }
+
+    private static final class UserCancelledException extends DBCException {
+        private UserCancelledException() {
+            super("Canceled by the user");
+        }
     }
 
     @NotNull

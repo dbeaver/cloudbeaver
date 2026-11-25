@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ public class WebAsyncTaskInfo {
     private final String id;
     @NotNull
     private final String name;
-    private boolean running = false;
+    private volatile boolean running = false;
     private Object result;
     private Object extendedResult;
     private String status;
     private Throwable jobError;
 
-    private AbstractJob job;
-    private boolean cancelled = false;
+    private volatile AbstractJob job;
+    private volatile boolean userCancellationRequested;
 
     public WebAsyncTaskInfo(@NotNull String id, @NotNull String name) {
         this.id = id;
@@ -56,8 +56,20 @@ public class WebAsyncTaskInfo {
         return running;
     }
 
-    public void setRunning(boolean running) {
+    public synchronized void setRunning(boolean running) {
         this.running = running;
+    }
+
+    public synchronized boolean requestUserCancellation() {
+        if (!running || userCancellationRequested) {
+            return false;
+        }
+        userCancellationRequested = true;
+        return true;
+    }
+
+    public boolean isUserCancellationRequested() {
+        return userCancellationRequested;
     }
 
     public Object getTaskResult() {

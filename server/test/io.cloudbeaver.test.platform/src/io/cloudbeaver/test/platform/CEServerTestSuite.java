@@ -88,6 +88,7 @@ import org.junit.platform.suite.api.Suite;
         WebSQLDataUpdateTest.class,
         WebSQLQueryDataContainerTest.class,
         WebSQLResultsInfoTest.class,
+        WebSQLCancellationTest.class,
         WebSQLResultServletTest.class,
         RowIdResultSetTest.class,
         GroupingEndpointTest.class,

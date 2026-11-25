@@ -22,6 +22,7 @@ import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
+import io.cloudbeaver.service.sql.messages.WebSQLMessages;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
@@ -395,6 +396,18 @@ public class WebSQLUtils {
         final WebAsyncTaskInfo task = webSession.createAsyncTask("SQL execute");
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
+            public boolean supportsUserCancellationResult() {
+                return true;
+            }
+
+            @Override
+            public void prepareUserCancellationResult() {
+                WebSQLExecuteInfo cancellationResult = createUserCancellationResult(0);
+                this.extendedResults = cancellationResult;
+                this.result = cancellationResult.getStatusMessage();
+            }
+
+            @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Execute query", 1);
@@ -414,6 +427,15 @@ public class WebSQLUtils {
         return webSession.runAsyncTask(task, runnable);
     }
 
+    @NotNull
+    static WebSQLExecuteInfo createUserCancellationResult(long duration) {
+        WebSQLExecuteInfo result = new WebSQLExecuteInfo();
+        result.setStatusMessage(WebSQLMessages.model_web_sql_canceled_by_user);
+        result.setDuration(duration);
+        result.setResults(new WebSQLQueryResults[0]);
+        return result;
+    }
+
     @Nullable
     public static <T> T requestConfirmation(
         @NotNull WebSession webSession,
@@ -424,9 +446,12 @@ public class WebSQLUtils {
         String attributeName = WebSQLConstants.TASK_CONFIRMATION_ATTR_PREFIX + asyncTask.getId();
         webSession.setAttribute(attributeName, confirmationFuture);
 
-        webSession.addSessionEvent(confirmationEvent);
-
         try {
+            if (asyncTask.isUserCancellationRequested()) {
+                confirmationFuture.cancel(false);
+            } else {
+                webSession.addSessionEvent(confirmationEvent);
+            }
             return confirmationFuture.get(WebSQLConstants.TASK_CONFIRMATION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             throw new DBWebException("Query confirmation timeout");
