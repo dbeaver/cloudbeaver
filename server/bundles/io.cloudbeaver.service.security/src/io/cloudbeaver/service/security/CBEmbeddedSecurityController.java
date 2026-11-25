@@ -584,48 +584,54 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             return;
         }
         boolean changed;
+        Long userCreateTime;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 changed = setUserTeamsInternal(dbCon, userId, teamIds, grantorId, grantType);
+                userCreateTime = changed ? readUserCreateTime(dbCon, userId) : null;
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
         if (changed) {
-            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, userCreateTime);
         }
     }
 
     @Override
     public void addUserTeams(@NotNull String userId, @NotNull String[] teamIds, @NotNull String grantorId) throws DBCException {
         boolean changed;
+        Long userCreateTime;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 changed = addUserTeamsInternal(dbCon, userId, teamIds, grantorId);
+                userCreateTime = changed ? readUserCreateTime(dbCon, userId) : null;
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
         if (changed) {
-            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, userCreateTime);
         }
     }
 
     @Override
     public void deleteUserTeams(@NotNull String userId, @NotNull String[] teamIds) throws DBCException {
         boolean changed;
+        Long userCreateTime;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 changed = deleteUserTeamsInternal(dbCon, userId, teamIds);
+                userCreateTime = changed ? readUserCreateTime(dbCon, userId) : null;
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error delete user teams in database", e);
         }
         if (changed) {
-            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, userCreateTime);
         }
     }
 
@@ -980,7 +986,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 """
-                    SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE,U.CHANGE_DATE,U.DISABLED_BY,U.DISABLE_REASON,U.LAST_LOGIN_TIME
+                    SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE,U.CHANGE_DATE,U.DISABLED_BY,
+                    U.DISABLE_REASON,U.LAST_LOGIN_TIME,U.CREATE_TIME
                     FROM {table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S
                     WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID""")
             ) {
@@ -1054,7 +1061,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE,CHANGE_DATE,DISABLED_BY,"
-                    + "DISABLE_REASON,LAST_LOGIN_TIME FROM {table_prefix}CB_USER"
+                     + "DISABLE_REASON,LAST_LOGIN_TIME,CREATE_TIME FROM {table_prefix}CB_USER"
                     + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimitPart(filter))) {
                 setUsersFilterValues(dbStat, filter, 1);
 
@@ -1453,12 +1460,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         )) {
             throw new SMException("User cannot change his own role");
         }
-        try (Connection dbCon = database.openConnection()) {
+        Long userCreateTime;
+        try (Connection dbCon = database.openConnection(); JDBCTransaction txn = new JDBCTransaction(dbCon)) {
             setUserAuthRole(dbCon, userId, authRole);
+            userCreateTime = readUserCreateTime(dbCon, userId);
+            txn.commit();
         } catch (SQLException e) {
             throw new DBCException("Error while updating user authentication role", e);
         }
-        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, userCreateTime);
     }
 
     public void setUserAuthRole(@NotNull Connection dbCon, @NotNull String userId, @Nullable String authRole)
@@ -1962,6 +1972,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbResult.getString("DISABLE_REASON")
         );
         user.setLastLoginTime(lastLoginTime);
+        user.setCreateTime(dbResult.getTimestamp("CREATE_TIME").toInstant());
         return user;
     }
 
@@ -2116,8 +2127,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public void setSubjectPermissions(String subjectId, List<String> permissionIds, String grantorId) throws DBException {
 //        validatePermissions(SMConstants.SUBJECT_PERMISSION_SCOPE, permissionIds);
+        SMSubjectType subjectType;
+        Long subjectCreateTime;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                subjectType = CBAuthSubjectRepo.getInstance().getSubjectType(dbCon, subjectId);
+                subjectCreateTime = subjectType == SMSubjectType.user ? readUserCreateTime(dbCon, subjectId) : null;
                 JDBCUtils.executeStatement(dbCon,
                     "DELETE FROM {table_prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?",
                     subjectId);
@@ -2127,7 +2142,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error saving subject permissions in database", e);
         }
-        addSubjectPermissionsUpdateEvent(subjectId, null);
+        addSubjectPermissionsUpdateEvent(subjectId, subjectType, subjectCreateTime);
     }
 
 
@@ -3231,6 +3246,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean authoritative
     ) throws DBCException {
         boolean changed = false;
+        Long userCreateTime;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 lockUserTeamGrants(dbCon, userId);
@@ -3282,13 +3298,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         changed = true;
                     }
                 }
+                userCreateTime = changed ? readUserCreateTime(dbCon, userId) : null;
                 txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error synchronizing auth provider user teams", e);
         }
         if (changed) {
-            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+            addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user, userCreateTime);
         }
     }
 
@@ -3723,7 +3740,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String grantor
     ) throws DBException {
         if (CommonUtils.isEmpty(objectIds)) {
-            subjectIds.forEach(id -> addSubjectPermissionsUpdateEvent(id, null));
+            try (Connection dbCon = database.openConnection()) {
+                for (String subjectId : subjectIds) {
+                    var subjectType = CBAuthSubjectRepo.getInstance().getSubjectType(dbCon, subjectId);
+                    var subjectCreateTime = subjectType == SMSubjectType.user ? readUserCreateTime(dbCon, subjectId) : null;
+                    addSubjectPermissionsUpdateEvent(subjectId, subjectType, subjectCreateTime);
+                }
+            } catch (SQLException e) {
+                throw new DBCException("Error reading permission event subjects", e);
+            }
             return;
         } else if (CommonUtils.isEmpty(subjectIds)) {
             addObjectPermissionsUpdateEvent(objectIds, objectType);
@@ -3860,15 +3885,30 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
 
-    protected void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
-        if (subjectType == null) {
-            subjectType = getSubjectType(subjectId);
+    @Nullable
+    private Long readUserCreateTime(@NotNull Connection dbCon, @NotNull String userId) throws SQLException {
+        try (PreparedStatement statement = dbCon.prepareStatement("SELECT CREATE_TIME FROM {table_prefix}CB_USER WHERE USER_ID=?")) {
+            statement.setString(1, userId);
+            try (ResultSet result = statement.executeQuery()) {
+                return result.next() ? result.getTimestamp(1).toInstant().toEpochMilli() : null;
+            }
         }
+    }
+
+    protected void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
+        addSubjectPermissionsUpdateEvent(subjectId, subjectType == null ? getSubjectType(subjectId) : subjectType, null);
+    }
+
+    protected void addSubjectPermissionsUpdateEvent(
+        @NotNull String subjectId,
+        @Nullable SMSubjectType subjectType,
+        @Nullable Long subjectCreateTime
+    ) {
         if (subjectType == null) {
             log.error("Subject type is not found for subject '" + subjectId + "'");
             return;
         }
-        WebEventUtils.addSubjectPermissionsUpdateEvent(subjectId, subjectType, getSmSessionId(), getUserId());
+        WebEventUtils.addSubjectPermissionsUpdateEvent(subjectId, subjectType, subjectCreateTime, getSmSessionId(), getUserId());
     }
 
     private void addObjectPermissionsUpdateEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {

@@ -106,11 +106,22 @@ public class WebEventUtils {
         @Nullable String smSessionId,
         @Nullable String userId
     ) {
+        addSubjectPermissionsUpdateEvent(subjectId, subjectType, null, smSessionId, userId);
+    }
+
+    public static void addSubjectPermissionsUpdateEvent(
+        @NotNull String subjectId,
+        @NotNull SMSubjectType subjectType,
+        @Nullable Long subjectCreateTime,
+        @Nullable String smSessionId,
+        @Nullable String userId
+    ) {
         var event = WSSubjectPermissionEvent.update(
             smSessionId,
             userId,
             subjectType,
-            subjectId
+            subjectId,
+            subjectCreateTime
         );
         ServletAppUtils.getServletApplication().getEventController().addEvent(event);
     }

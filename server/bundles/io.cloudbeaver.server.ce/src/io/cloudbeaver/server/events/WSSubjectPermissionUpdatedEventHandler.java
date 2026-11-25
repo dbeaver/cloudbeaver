@@ -61,7 +61,12 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
         }
         var subjectId = event.getSubjectId();
         return switch (event.getSubjectType()) {
-            case user -> CommonUtils.equalObjects(user.getUserId(), subjectId);
+            case user -> {
+                var userCreateTime = user.getCreateTime();
+                var subjectCreateTime = event.getSubjectCreateTime();
+                yield CommonUtils.equalObjects(user.getUserId(), subjectId)
+                    && (userCreateTime == null || subjectCreateTime == null || userCreateTime.toEpochMilli() == subjectCreateTime);
+            }
             case team -> ArrayUtils.containsIgnoreCase(user.getTeams(), subjectId);
         };
     }

@@ -123,4 +123,9 @@ public class WebUser {
     public Instant getLastLoginTime() {
         return user.getLastLoginTime();
     }
+
+    @Nullable
+    public Instant getCreateTime() {
+        return user.getCreateTime();
+    }
 }
