@@ -103,7 +103,7 @@ export class AIChatMessageService {
 
   isFunctionConfirmationRequired(param: IMessageParam): boolean {
     const status = this.getFunctionStatus(param);
-    return this.aiChatMessagesResource.isExternalFunction(param) && status === EAiFunctionStatus.PENDING;
+    return this.aiChatMessagesResource.isFunctionConfirmationRequired(param) && status === EAiFunctionStatus.PENDING;
   }
 
   async processSendMessageAction<TContextData>(

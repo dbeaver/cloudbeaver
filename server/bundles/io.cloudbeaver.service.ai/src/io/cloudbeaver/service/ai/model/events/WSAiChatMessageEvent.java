@@ -50,6 +50,8 @@ public class WSAiChatMessageEvent extends WSAbstractSessionEvent {
     @Nullable
     private AIFunctionCallConfirmation functionConfirmation;
     @Nullable
+    private final Boolean functionConfirmationRequired;
+    @Nullable
     private final AIFunctionCall functionCall;
     @Nullable
     private final AIFunctionResult functionResult;
@@ -65,6 +67,7 @@ public class WSAiChatMessageEvent extends WSAbstractSessionEvent {
         this.attachments = message.getAttachments();
         this.functionCall = message.getFunctionCall();
         this.functionResult = message.getFunctionResult();
+        this.functionConfirmationRequired = message.getFunctionConfirmationRequired();
 
         if (message.getConfirmationFunctionCalls() != null) {
             this.functionConfirmation = new AIFunctionCallConfirmation(
@@ -109,6 +112,11 @@ public class WSAiChatMessageEvent extends WSAbstractSessionEvent {
     @Nullable
     public AIFunctionCallConfirmation getFunctionConfirmation() {
         return functionConfirmation;
+    }
+
+    @Nullable
+    public Boolean getFunctionConfirmationRequired() {
+        return functionConfirmationRequired;
     }
 
     @Nullable

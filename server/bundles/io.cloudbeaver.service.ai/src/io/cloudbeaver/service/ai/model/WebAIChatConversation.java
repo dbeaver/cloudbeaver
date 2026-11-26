@@ -25,6 +25,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.ai.AIChatConversation;
+import org.jkiss.dbeaver.model.ai.AIChatSession;
 import org.jkiss.dbeaver.model.ai.AIContextSettingsChatConversation;
 
 import java.time.LocalDateTime;
@@ -109,11 +110,14 @@ public class WebAIChatConversation {
 
     @NotNull
     public List<WebAIMessage> getMessages() throws DBException {
+        AIChatSession chatSession = WebAIUtils.getAiChatSession(webSession);
         if (!conversation.areImagesLoaded()) {
-            WebAIUtils.getAiChatSession(webSession).loadConversationImages(webSession.getProgressMonitor(), conversation);
+            chatSession.loadConversationImages(webSession.getProgressMonitor(), conversation);
         }
         return conversation.getMessages().stream()
-            .map(message -> new WebAIMessage(message, conversation))
+            .map(message -> new WebAIMessage(
+                message, conversation, chatSession.getAssistant().getToolboxManager()
+            ))
             .toList();
     }
 
