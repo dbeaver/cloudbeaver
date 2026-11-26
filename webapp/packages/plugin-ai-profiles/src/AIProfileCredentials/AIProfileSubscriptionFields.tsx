@@ -27,9 +27,15 @@ export const AIProfileSubscriptionFields = observer<Props>(function AIProfileSub
     return <PendingSubscription profile={profile} authorization={authorization.authorization} />;
   }
 
-  if (profile.account) {
+  if (profile.account && profile.accountAuthentication) {
     return <ConnectedSubscription profile={profile} disabled={formState.isDisabled} />;
   }
 
-  return <ConnectSubscription disabled={formState.isDisabled || !profile.deviceAuthorizationAvailable} onConnect={authorization.connect} />;
+  return (
+    <ConnectSubscription
+      provider={profile.accountProvider}
+      disabled={formState.isDisabled || !profile.deviceAuthorizationAvailable}
+      onConnect={authorization.connect}
+    />
+  );
 });
