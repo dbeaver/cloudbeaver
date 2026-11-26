@@ -98,6 +98,6 @@ ruleTester.run('one-component-per-file', rule, {
 it('registers one-component-per-file as a recommended error with composition guidance', () => {
   assert.equal(plugin.rules['one-component-per-file'], rule);
   assert.equal(plugin.configs.recommended.rules['@cloudbeaver/one-component-per-file'], 'error');
-  assert.match(rule.meta.messages.multipleComponents, /component-composition/);
-  assert.match(rule.meta.docs.url, /component-composition\/SKILL\.md$/);
+  assert.match(rule.meta.messages.multipleComponents, /\.agents\/skills\/cloudbeaver-frontend-component-composition\/SKILL\.md/);
+  assert.match(rule.meta.docs.url, /\/cloudbeaver-frontend-component-composition\/SKILL\.md$/);
 });

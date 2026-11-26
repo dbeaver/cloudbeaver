@@ -27,6 +27,10 @@ export class UserConfigurationStorage implements IUserDataStorage<UserConfigurat
     return this.userInfoResource.isAuthenticated();
   }
 
+  isLoaded(): boolean {
+    return this.userConfigurationResource.isLoaded();
+  }
+
   createStore(getUserId: () => string): UserConfigurationStore {
     return new UserConfigurationStore(
       getUserId,

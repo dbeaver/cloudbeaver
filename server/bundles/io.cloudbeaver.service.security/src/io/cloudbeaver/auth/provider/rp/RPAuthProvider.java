@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package io.cloudbeaver.auth.provider.rp;
 
 import io.cloudbeaver.DBWUserIdentity;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.auth.SMAuthProviderConfigurationValidator;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthSession;
@@ -35,10 +37,12 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMStandardMeta;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSignOutLinkProvider {
+public class RPAuthProvider
+    implements SMAuthProviderExternal<SMSession>, SMSignOutLinkProvider, SMAuthProviderConfigurationValidator {
 
     private static final Log log = Log.getLog(RPAuthProvider.class);
 
@@ -53,6 +57,19 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
     public static final String AUTH_PROVIDER = "reverseProxy";
     public static final String LOGOUT_URL = "logout-url";
     public static final String PARAM_AUTO_USER_PROVISIONING = "auto-user-provisioning";
+
+    @Override
+    public void validateConfiguration(
+        @NotNull Collection<SMAuthProviderCustomConfiguration> existingConfigurations,
+        @NotNull SMAuthProviderCustomConfiguration configuration
+    ) throws DBWebException {
+        if (!configuration.isDisabled() && existingConfigurations.stream().anyMatch(existingConfiguration ->
+            AUTH_PROVIDER.equals(existingConfiguration.getProvider()) &&
+                !existingConfiguration.isDisabled() &&
+                !configuration.getId().equals(existingConfiguration.getId()))) {
+            throw new DBWebException("Only one reverse proxy authentication configuration can be enabled at a time");
+        }
+    }
 
     @NotNull
     @Override

@@ -31,6 +31,7 @@ import io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdateTest;
 import io.cloudbeaver.service.ai.AIProfileCopyTest;
 import io.cloudbeaver.service.ai.WebAIConfigurationProfileTest;
 import io.cloudbeaver.service.ai.WebAIProfileUtilsTest;
+import io.cloudbeaver.test.platform.admin.AdminAuthProviderConfigurationTest;
 import io.cloudbeaver.test.platform.admin.AdminCreateUserTest;
 import io.cloudbeaver.test.platform.admin.AdminImportUsersTest;
 import io.cloudbeaver.test.platform.admin.AdminLastLoginTimeTest;
@@ -53,6 +54,7 @@ import org.junit.platform.suite.api.Suite;
 //        ConnectionsTest.class,
         SQLQueryTranslatorTest.class,
         AuthenticationTest.class,
+        ExternalUserTeamSynchronizationTest.class,
         WebAuthUtilsTest.class,
         TrustedTeamsUtilsTest.class,
         LdapAuthenticationTest.class,
@@ -77,6 +79,7 @@ import org.junit.platform.suite.api.Suite;
         AIProfileCopyTest.class,
         WebAIConfigurationProfileTest.class,
         WebAIProfileUtilsTest.class,
+        AdminAuthProviderConfigurationTest.class,
         AdminCreateUserTest.class,
         AdminImportUsersTest.class,
         AdminLastLoginTimeTest.class,

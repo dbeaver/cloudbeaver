@@ -1,9 +1,11 @@
 ---
-name: component-composition
-description: "Guides creation of CloudBeaver React components through children, slots, compound parts, and specialized components. Use when creating React components, designing their props, or choosing how callers supply content, actions, and layout regions. Apply only to frontend component work under the owning CloudBeaver repository's webapp/."
+name: cloudbeaver-frontend-component-composition
+description: "Only for CloudBeaver React components under the owning repository's webapp/, including repositories explicitly inheriting this workflow. Load when creating components, designing props, or choosing how callers supply content, actions, and layout regions."
 ---
 
 # Component composition
+
+Apply these component conventions only to frontend targets in the scope declared above, not to React code in unrelated products.
 
 Keep layout and behavior with the component; let its caller supply finished pieces of UI.
 Design the interface around the component's own responsibilities. Let callers compose content
