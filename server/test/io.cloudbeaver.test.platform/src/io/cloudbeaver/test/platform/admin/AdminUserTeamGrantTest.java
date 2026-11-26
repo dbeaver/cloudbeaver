@@ -225,18 +225,18 @@ public class AdminUserTeamGrantTest extends CloudbeaverMockTest {
         );
         securityController.addUserTeams(userId, new String[]{manualTeam}, ADMIN_USER);
         var sync = CBEmbeddedSecurityController.class.getDeclaredMethod(
-            "syncAuthProviderTeams", String.class, String.class, String[].class, boolean.class
+            "syncAuthProviderTeams", String.class, String.class, String[].class, boolean.class, boolean.class
         );
         sync.setAccessible(true);
         String defaultTeam = CEAppStarter.getTestApp().getAppConfiguration().getDefaultUserTeam();
-        sync.invoke(securityController, userId, PROVIDER_A, new String[]{providerTeamOne, manualTeam, defaultTeam}, false);
+        sync.invoke(securityController, userId, PROVIDER_A, new String[]{providerTeamOne, manualTeam, defaultTeam}, false, true);
 
         assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
         assertGrant(getGrants(), providerTeamTwo, SMTeamGrantType.UNKNOWN, userId);
         assertGrant(getGrants(), manualTeam, SMTeamGrantType.MANUAL, ADMIN_USER);
         assertGrant(getGrants(), defaultTeam, SMTeamGrantType.DEFAULT, userId);
 
-        sync.invoke(securityController, userId, PROVIDER_A, new String[0], false);
+        sync.invoke(securityController, userId, PROVIDER_A, new String[0], false, true);
         assertGrant(getGrants(), providerTeamOne, SMTeamGrantType.AUTH_PROVIDER, PROVIDER_A);
         assertGrant(getGrants(), providerTeamTwo, SMTeamGrantType.UNKNOWN, userId);
         assertGrant(getGrants(), manualTeam, SMTeamGrantType.MANUAL, ADMIN_USER);
