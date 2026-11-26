@@ -53,6 +53,7 @@ import org.junit.platform.suite.api.Suite;
 //        ConnectionsTest.class,
         SQLQueryTranslatorTest.class,
         AuthenticationTest.class,
+        ExternalUserTeamSynchronizationTest.class,
         WebAuthUtilsTest.class,
         TrustedTeamsUtilsTest.class,
         LdapAuthenticationTest.class,

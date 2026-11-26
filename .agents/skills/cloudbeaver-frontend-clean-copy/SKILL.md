@@ -1,9 +1,11 @@
 ---
-name: clean-copy
-description: Cut interface copy that shouldn't exist — captions that restate a label, hints that pre-empt a worry the user never had, warnings that are scar tissue from a fixed bug. Use when writing or reviewing any user-facing string (labels, hints, empty states, toasts, confirmations, button text), or when asked to clean up / tighten copy. Apply only to interface text owned by CloudBeaver frontend code under webapp/.
+name: cloudbeaver-frontend-clean-copy
+description: "Only for CloudBeaver frontend interface text under the owning repository's webapp/, including repositories explicitly inheriting this workflow. Load when writing, reviewing, or tightening labels, hints, empty states, toasts, confirmations, or button text."
 ---
 
 # Cleaning copy
+
+Apply this workflow only to frontend interface text in the scope declared above; backend messages and other products' copy are outside its scope.
 
 Most bad copy isn't badly written. It's copy that shouldn't be on the screen. Editing it for
 tone just makes the wrong thing read better. So the first question is never "how should this

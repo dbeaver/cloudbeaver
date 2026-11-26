@@ -20,6 +20,9 @@ import {
 } from '@cloudbeaver/core-connections';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { UserConfigurationStorage, UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
+import { SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
+import { isSQLEditorTab } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 export interface IAIChatContextInfo {
   connectionKey: IConnectionInfoParams;
@@ -38,6 +41,8 @@ interface ISettings {
   UserDataService,
   UserConfigurationStorage,
   ConnectionInfoResource,
+  NavigationTabsService,
+  SqlDataSourceService,
 ])
 export class AIChatContextService extends Bootstrap {
   onContextChange: SyncExecutor<IAIChatContextInfo | null>;
@@ -73,6 +78,7 @@ export class AIChatContextService extends Bootstrap {
   }
 
   private reactionDisposer: IReactionDisposer | null;
+  private editorDisposer: IReactionDisposer | null;
 
   constructor(
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
@@ -81,11 +87,14 @@ export class AIChatContextService extends Bootstrap {
     private readonly userDataService: UserDataService,
     private readonly userConfigurationStorage: UserConfigurationStorage,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly navigationTabsService: NavigationTabsService,
+    private readonly sqlDataSourceService: SqlDataSourceService,
   ) {
     super();
 
     this.onContextChange = new SyncExecutor<IAIChatContextInfo | null>();
     this.reactionDisposer = null;
+    this.editorDisposer = null;
 
     makeObservable(this, {
       currentContext: computed,
@@ -121,6 +130,46 @@ export class AIChatContextService extends Bootstrap {
       },
       { equals: comparer.shallow },
     );
+
+    let previousKey: IConnectionInfoParams | null | undefined;
+
+    this.editorDisposer = reaction(
+      () => ({
+        userId: this.userInfoResource.getId(),
+        ready: this.isContextReady,
+        context: this.getEditorContext(),
+      }),
+      ({ userId, ready, context }, previous) => {
+        if (!ready || userId !== previous?.userId) {
+          previousKey = undefined;
+        }
+
+        if (!ready || context === undefined) {
+          return;
+        }
+
+        const connectionKey = context?.connectionKey ?? null;
+
+        if (previousKey !== undefined && !comparer.structural(previousKey, connectionKey)) {
+          this.setContext(context);
+        }
+
+        previousKey = connectionKey;
+      },
+      { equals: comparer.structural, fireImmediately: true },
+    );
+  }
+
+  private getEditorContext(): IAIChatContextInfo | null | undefined {
+    const tab = this.navigationTabsService.currentTab;
+
+    // The datasource is removed before the closing editor stops being the active tab.
+    if (tab && isSQLEditorTab(tab) && !this.sqlDataSourceService.get(tab.handlerState.editorId)) {
+      return undefined;
+    }
+
+    // null means "No connection"; undefined means the active tab has no connection selector.
+    return this.getContext() ?? (this.connectionSchemaManagerService.isConnectionChangeable ? null : undefined);
   }
 
   private transformContext(executionContext: IConnectionExecutionContextInfo): IAIChatContextInfo {
@@ -134,6 +183,10 @@ export class AIChatContextService extends Bootstrap {
   override dispose(): void {
     if (this.reactionDisposer) {
       this.reactionDisposer();
+    }
+
+    if (this.editorDisposer) {
+      this.editorDisposer();
     }
   }
 }
