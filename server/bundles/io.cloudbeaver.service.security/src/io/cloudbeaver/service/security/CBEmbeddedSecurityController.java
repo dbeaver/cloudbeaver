@@ -534,7 +534,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @NotNull
-    private String extractUserId(SMUserProvisioning user) {
+    protected String extractUserId(SMUserProvisioning user) {
         String metaUserId = user.getMetaParameters().get(SMStandardMeta.META_USER_ID);
         if (CommonUtils.isNotEmpty(metaUserId)) {
             return metaUserId;
