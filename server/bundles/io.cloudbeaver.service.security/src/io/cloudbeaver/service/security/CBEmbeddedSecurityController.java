@@ -580,7 +580,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull SMTeamGrantType grantType
     ) throws DBCException {
         if (grantType == SMTeamGrantType.AUTH_PROVIDER) {
-            syncAuthProviderTeams(userId, grantorId, teamIds, true);
+            syncAuthProviderTeams(userId, grantorId, teamIds, true, true);
             return;
         }
         boolean changed;
@@ -3071,7 +3071,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     detectedAuthRole = autoAssign.getAuthRole();
                 }
 
-                var userIdFromCreds = findOrCreateExternalUserByCredentials(
+                var resolvedUser = findOrCreateExternalUserByCredentials(
                     authProvider,
                     authAttemptSessionInfo.getSessionParams(),
                     providerAuthData,
@@ -3082,18 +3082,20 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     providerConfig
                 );
 
-                if (userIdFromCreds == null) {
+                if (resolvedUser == null) {
                     var error = "Invalid user credentials";
                     updateAuthStatus(authId, SMAuthStatus.ERROR, dbStoredUserData, error, null);
                     return SMAuthInfo.error(authId, error, isMainAuthSession, null, authInfo.getAppSessionId());
                 }
+                String userIdFromCreds = resolvedUser.userId();
 
                 if (autoAssign != null && (autoAssign.isTeamAssignmentsAuthoritative()
                     || !CommonUtils.isEmpty(autoAssign.getExternalTeamIds()))) {
                     if (allTeams == null) {
                         allTeams = readAllTeams();
                     }
-                    autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams);
+                    // The new user's initial session already includes these team assignments.
+                    autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams, !resolvedUser.created());
                 }
 
                 if (activeUserId == null) {
@@ -3194,10 +3196,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     private void autoUpdateUserTeams(
-        WebAuthProviderDescriptor authProvider,
-        SMAutoAssign autoAssign,
-        String userId,
-        SMTeam[] allTeams
+        @NotNull WebAuthProviderDescriptor authProvider,
+        @NotNull SMAutoAssign autoAssign,
+        @NotNull String userId,
+        @NotNull SMTeam[] allTeams,
+        boolean publishPermissionUpdate
     ) throws DBException {
         if (!(authProvider.getInstance() instanceof SMAuthProviderAssigner authProviderAssigner)) {
             return;
@@ -3219,7 +3222,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 userId,
                 authProvider.getId(),
                 newTeamIds,
-                autoAssign.isTeamAssignmentsAuthoritative()
+                autoAssign.isTeamAssignmentsAuthoritative(),
+                publishPermissionUpdate
             );
         }
     }
@@ -3228,7 +3232,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String userId,
         @NotNull String authProviderId,
         @NotNull String[] teamIds,
-        boolean authoritative
+        boolean authoritative,
+        boolean publishPermissionUpdate
     ) throws DBCException {
         boolean changed = false;
         try (Connection dbCon = database.openConnection()) {
@@ -3287,7 +3292,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error synchronizing auth provider user teams", e);
         }
-        if (changed) {
+        if (changed && publishPermissionUpdate) {
             addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
         }
     }
@@ -3418,7 +3423,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private String findOrCreateExternalUserByCredentials(
+    @Nullable
+    private ExternalUserLookup findOrCreateExternalUserByCredentials(
         @NotNull WebAuthProviderDescriptor authProvider,
         @NotNull Map<String, Object> sessionParameters,
         @NotNull Map<String, Object> userCredentials,
@@ -3431,6 +3437,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
 
         String userId = findUserByCredentials(authProvider, userCredentials, true);
+        boolean created = false;
         String userIdFromCredentials;
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, providerConfig, userCredentials, userId);
@@ -3465,6 +3472,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     true,
                     resolveUserAuthRole(null, authRole)
                 );
+                created = true;
             }
             setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
@@ -3494,7 +3502,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 );
             }
         }
-        return userId;
+        return userId == null ? null : new ExternalUserLookup(userId, created);
+    }
+
+    private record ExternalUserLookup(@NotNull String userId, boolean created) {
     }
 
     @Nullable
