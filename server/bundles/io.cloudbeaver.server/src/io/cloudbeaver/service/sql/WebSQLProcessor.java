@@ -194,10 +194,11 @@ public class WebSQLProcessor implements WebSessionProvider {
         var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql, parametersProvider);
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
+        final WebSQLResultsInfo originalResult;
 
         try {
-            final DBDDataFilter dataFilter = filter.makeDataFilter(
-                monitor, (resultId == null ? null : contextInfo.getResults(resultId)));
+            originalResult = resultId == null ? null : contextInfo.getResults(resultId);
+            final DBDDataFilter dataFilter = filter.makeDataFilter(monitor, originalResult);
             if (dataFilter.hasFilters()) {
                 sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
                     monitor,
@@ -315,6 +316,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                                     webDataFilter,
                                     dataFilter,
                                     dataFormat,
+                                    dataFormat == WebDataFormat.timeseries ? originalResult : null,
                                     sqlElement.getOriginalText()
                                 );
                             }
@@ -327,17 +329,10 @@ public class WebSQLProcessor implements WebSessionProvider {
         } catch (DBException e) {
             throw new DBWebException("Error executing query", e);
         }
-        if (dataFormat == null || dataFormat == WebDataFormat.resultset) {
-            var results = executeInfo.getResults();
-            for (var result : results) {
-                var resultSet = result.getResultSet();
-                if (resultSet != null && resultSet.getAvailableReadFormats().contains(WebDataFormat.timeseries) &&
-                    (results.length != 1 || !canReloadAsTimeSeries(originalSql, sql))) {
-                    resultSet.setAvailableReadFormats(resultSet.getAvailableReadFormats().stream()
-                        .filter(format -> format != WebDataFormat.timeseries)
-                        .toList());
-                }
-            }
+        if (dataFormat == WebDataFormat.timeseries && originalResult != null) {
+            validateTimeSeriesReread(contextInfo, executeInfo.getResults());
+        } else if (dataFormat == null || dataFormat == WebDataFormat.resultset) {
+            restrictTimeSeriesReadFormats(dataContainer, originalSql, sql, executeInfo.getResults());
         }
         DBCTransactionManager txnManager = DBUtils.getTransactionManager(context);
         if (txnManager != null && !txnManager.isAutoCommit()) {
@@ -352,6 +347,67 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
 
         return executeInfo;
+    }
+
+    private void restrictTimeSeriesReadFormats(
+        @NotNull DBSDataContainer container,
+        @NotNull String originalSql,
+        @NotNull String sql,
+        @NotNull WebSQLQueryResults[] results
+    ) {
+        var eligible = Arrays.stream(results)
+            .map(WebSQLQueryResults::getResultSet)
+            .filter(result -> result != null && result.getAvailableReadFormats().contains(WebDataFormat.timeseries))
+            .toList();
+        if (eligible.isEmpty()) {
+            return;
+        }
+
+        boolean canReread = canReloadAsTimeSeries(originalSql, sql);
+        var adapter = canReread && results.length > 1
+            ? GeneralUtils.adapt(container.getDataSource(), WebTimeSeriesDataAdapter.class) : null;
+        for (var result : eligible) {
+            if (!canReread || results.length != 1 && getTimeSeriesGroupKey(adapter, result.getResultsInfo()) == null) {
+                result.setAvailableReadFormats(result.getAvailableReadFormats().stream()
+                    .filter(format -> format != WebDataFormat.timeseries)
+                    .toList());
+            }
+        }
+    }
+
+    @Nullable
+    private static Object getTimeSeriesGroupKey(@Nullable WebTimeSeriesDataAdapter adapter, @Nullable WebSQLResultsInfo result) {
+        if (adapter == null || result == null || result.getAttributes().length == 0) {
+            return null;
+        }
+        return adapter.getResultGroupKey(result.getDataContainer(), result.getAttributes()[0].getMetaAttribute());
+    }
+
+    @Nullable
+    private static Object getTimeSeriesGroupKey(
+        @NotNull WebTimeSeriesDataAdapter adapter,
+        @NotNull DBSDataContainer container,
+        @NotNull DBCResultSet result
+    ) throws DBCException {
+        var columns = result.getMeta().getAttributes();
+        return columns.isEmpty() ? null : adapter.getResultGroupKey(container, columns.getFirst());
+    }
+
+    private void validateTimeSeriesReread(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull WebSQLQueryResults[] results
+    ) throws DBWebException {
+        if (results.length == 1 && results[0].getResultSet() != null) {
+            return;
+        }
+
+        for (var result : results) {
+            var rejected = result.getResultSet();
+            if (rejected != null && rejected.getId() != null) {
+                contextInfo.closeResult(rejected.getId());
+            }
+        }
+        throw new DBWebException("The Time Series result changed. Refresh the query result and try again.");
     }
 
     private boolean canReloadAsTimeSeries(@NotNull String originalSql, @NotNull String filteredSql) {
@@ -888,33 +944,39 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLDataFilter webDataFilter,
         @NotNull DBDDataFilter dataFilter,
         @Nullable WebDataFormat dataFormat,
+        @Nullable WebSQLResultsInfo timeSeriesSource,
         @NotNull String originalQuery
     ) throws DBException {
 
+        var adapter = timeSeriesSource == null ? null
+            : GeneralUtils.adapt(dataContainer.getDataSource(), WebTimeSeriesDataAdapter.class);
+        var groupKey = getTimeSeriesGroupKey(adapter, timeSeriesSource);
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         int maxResultsCount = resolveMaxResultsCount(dataContainer.getDataSource());
         WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
         long rowsUpdated = 0;
         for (int i = 0; i < maxResultsCount; i++) {
             if (hasResultSet) {
-                WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);
                 try (DBCResultSet resultSet = dbStat.openResultSet()) {
                     if (resultSet == null) {
                         break;
                     }
-                    try (
-                        WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(
-                            contextInfo,
-                            dataContainer,
-                            dataFormat,
-                            dataFilter
-                        )
-                    ) {
-                        readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
-                        results.setResultSet(dataReceiver.getResultSet());
+                    if (groupKey == null || (adapter != null && groupKey.equals(getTimeSeriesGroupKey(adapter, dataContainer, resultSet)))) {
+                        try (
+                            WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(
+                                contextInfo,
+                                dataContainer,
+                                dataFormat,
+                                dataFilter
+                            )
+                        ) {
+                            readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
+                            var results = new WebSQLQueryResults(webSession, dataFormat);
+                            results.setResultSet(dataReceiver.getResultSet());
+                            resultList.add(results);
+                        }
                     }
                 }
-                resultList.add(results);
             } else {
                 long updateRowCount = dbStat.getUpdateRowCount();
                 if (updateRowCount >= 0) {
