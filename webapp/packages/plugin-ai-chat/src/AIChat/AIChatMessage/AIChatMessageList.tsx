@@ -45,7 +45,7 @@ export const AIChatMessageList = observer<Props>(function AIChatMessageList({ cu
       className="tw:flex-1 tw:overflow-y-auto tw:p-4"
       role="log"
       aria-label={translate('plugin_ai_chat_label')}
-      aria-relevant="additions"
+      aria-relevant="additions text"
       tabIndex={hasMessages ? 0 : undefined}
     >
       {messages?.map((message, index) => {
