@@ -74,7 +74,9 @@ public class RPSessionHandler implements DBWSessionHandler {
                     "Multiple reverse proxy authentication configurations are enabled. Disable all but one configuration"
                 );
             }
-            reverseProxyAuthentication(request, webSession, enabledConfigurations);
+            if (!enabledConfigurations.isEmpty()) {
+                reverseProxyAuthentication(request, webSession, enabledConfigurations.getFirst());
+            }
         }
         return false;
     }
@@ -82,7 +84,7 @@ public class RPSessionHandler implements DBWSessionHandler {
     private void reverseProxyAuthentication(
         @NotNull HttpServletRequest request,
         @NotNull WebSession webSession,
-        @NotNull List<SMAuthProviderCustomConfiguration> enabledConfigurations
+        @NotNull SMAuthProviderCustomConfiguration configuration
     ) throws DBException {
         SMController securityController = webSession.getSecurityController();
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(RPAuthProvider.AUTH_PROVIDER);
@@ -90,10 +92,6 @@ public class RPSessionHandler implements DBWSessionHandler {
             throw new DBWebException("Auth provider " + RPAuthProvider.AUTH_PROVIDER + " not found");
         }
         SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
-        if (enabledConfigurations.isEmpty()) {
-            return;
-        }
-        SMAuthProviderCustomConfiguration configuration = enabledConfigurations.getFirst();
         Map<String, Object> paramConfigMap = new HashMap<>();
         authProvider.getConfigurationParameters().forEach(p ->
             paramConfigMap.put(p.getId(), configuration.getParameters().get(p.getId())
