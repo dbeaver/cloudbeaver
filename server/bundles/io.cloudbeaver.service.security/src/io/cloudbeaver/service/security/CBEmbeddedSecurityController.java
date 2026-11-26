@@ -3041,7 +3041,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         SMTeam[] allTeams = null;
         SMAuthProviderCustomConfiguration providerConfig = null;
         String detectedAuthRole = null;
-        String provisionedUserId = null;
         for (SMAuthConfigurationReference authConfiguration : authProviderIds) {
             String authProviderId = authConfiguration.getAuthProviderId();
             WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
@@ -3089,9 +3088,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     return SMAuthInfo.error(authId, error, isMainAuthSession, null, authInfo.getAppSessionId());
                 }
                 String userIdFromCreds = resolvedUser.userId();
-                if (resolvedUser.created()) {
-                    provisionedUserId = userIdFromCreds;
-                }
 
                 if (autoAssign != null && (autoAssign.isTeamAssignmentsAuthoritative()
                     || !CommonUtils.isEmpty(autoAssign.getExternalTeamIds()))) {
@@ -3099,9 +3095,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         allTeams = readAllTeams();
                     }
                     // The new user's initial session already includes these team assignments.
-                    autoUpdateUserTeams(
-                        authProvider, autoAssign, userIdFromCreds, allTeams, !userIdFromCreds.equals(provisionedUserId)
-                    );
+                    autoUpdateUserTeams(authProvider, autoAssign, userIdFromCreds, allTeams, !resolvedUser.created());
                 }
 
                 if (activeUserId == null) {
