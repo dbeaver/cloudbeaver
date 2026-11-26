@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model.session;
 
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableWithResult;
 
 /**
@@ -34,6 +36,11 @@ public abstract class WebAsyncTaskProcessor<TYPE> extends DBRRunnableWithResult<
     }
 
     public void cancel() {
+    }
+
+    @Nullable
+    public ISchedulingRule getSchedulingRule() {
+        return null;
     }
 
     public boolean supportsUserCancellationResult() {

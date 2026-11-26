@@ -18,6 +18,7 @@ package io.cloudbeaver.test.platform.sql;
 
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
+import io.cloudbeaver.service.sql.WebSQLExecuteInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLQueryDataContainer;
 import io.cloudbeaver.service.sql.WebSQLUtils;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static io.cloudbeaver.test.platform.util.GraphQLTestConstant.GQL_ASYNC_TASK_INFO;
@@ -67,6 +69,86 @@ public class WebSQLCancellationTest extends CloudbeaverDBTest {
     @Test
     public void cancelledQueryPublishesResultsOnlyAfterExecutionStops() throws Exception {
         assertCancellationResult(executeFailingStatement(new SQLException("Operation cancelled", SQLState.SQL_HY008.getCode()), true));
+    }
+
+    @Test
+    public void cancellingQueuedQueryDoesNotWaitForRunningQuery() throws Exception {
+        var entered = new CountDownLatch(1);
+        var resume = new CountDownLatch(1);
+        var executions = new AtomicInteger();
+        WebSQLProcessor processor = Mockito.spy(WebServiceBindingSQL.getSQLProcessor(webConnectionInfo));
+        WebSQLContextInfo firstContext = Mockito.mock(WebSQLContextInfo.class);
+        WebSQLContextInfo secondContext = Mockito.mock(WebSQLContextInfo.class);
+        Mockito.when(firstContext.getProcessor()).thenReturn(processor);
+        Mockito.when(secondContext.getProcessor()).thenReturn(processor);
+        Mockito.doAnswer(invocation -> {
+            executions.incrementAndGet();
+            entered.countDown();
+            Assertions.assertTrue(resume.await(10, TimeUnit.SECONDS));
+            return new WebSQLExecuteInfo();
+        }).when(processor).processQuery(
+            Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.any(),
+            Mockito.any(), Mockito.eq(webSession), Mockito.any(), Mockito.eq(false), Mockito.eq(false)
+        );
+        var first = WebSQLUtils.createAsyncTaskExecuteSqlQuery(
+            webSession, firstContext, "SELECT 1", null, null, null, false, false
+        );
+        try {
+            Assertions.assertTrue(entered.await(10, TimeUnit.SECONDS));
+            var second = WebSQLUtils.createAsyncTaskExecuteSqlQuery(
+                webSession, secondContext, "SELECT 2", null, null, null, false, false
+            );
+            try {
+                // Give the scheduler a chance to start a conflicting task if it has no scheduling rule.
+                Thread.sleep(200);
+                Assertions.assertTrue(webSession.asyncTaskCancel(second.getId()));
+                Assertions.assertTimeoutPreemptively(Duration.ofSeconds(2), () -> second.getJob().join());
+                Assertions.assertFalse(second.isRunning());
+                Assertions.assertTrue(first.isRunning(), "Cancelling a queued query must not cancel the running query");
+                Assertions.assertEquals(1, executions.get(), "Queries sharing a physical context must not run concurrently");
+                assertCancellationResult(client.sendQuery(
+                    GQL_ASYNC_TASK_INFO, Map.of("id", second.getId(), "removeOnFinish", false)
+                ));
+            } finally {
+                resume.countDown();
+                second.getJob().join();
+            }
+        } finally {
+            resume.countDown();
+            first.getJob().join();
+        }
+    }
+
+    @Test
+    public void queriesOnDifferentPhysicalContextsRunConcurrently() throws Exception {
+        var entered = new CountDownLatch(2);
+        var resume = new CountDownLatch(1);
+        WebSQLProcessor processor = Mockito.spy(WebServiceBindingSQL.getSQLProcessor(webConnectionInfo));
+        WebSQLContextInfo context = Mockito.mock(WebSQLContextInfo.class);
+        Mockito.when(context.getProcessor()).thenReturn(processor);
+        Mockito.doReturn(Mockito.mock(DBCExecutionContext.class), Mockito.mock(DBCExecutionContext.class))
+            .when(processor).getExecutionContext();
+        Mockito.doAnswer(invocation -> {
+            entered.countDown();
+            Assertions.assertTrue(resume.await(10, TimeUnit.SECONDS));
+            return new WebSQLExecuteInfo();
+        }).when(processor).processQuery(
+            Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.any(), Mockito.any(),
+            Mockito.any(), Mockito.eq(webSession), Mockito.any(), Mockito.eq(false), Mockito.eq(false)
+        );
+        var first = WebSQLUtils.createAsyncTaskExecuteSqlQuery(
+            webSession, context, "SELECT 1", null, null, null, false, false
+        );
+        var second = WebSQLUtils.createAsyncTaskExecuteSqlQuery(
+            webSession, context, "SELECT 2", null, null, null, false, false
+        );
+        try {
+            Assertions.assertTrue(entered.await(2, TimeUnit.SECONDS), "Independent connections must not block each other");
+        } finally {
+            resume.countDown();
+            first.getJob().join();
+            second.getJob().join();
+        }
     }
 
     @Test
