@@ -32,6 +32,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, SyncExecutor } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavNodeInfoResource, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
 import { getCachedMapResourceLoaderState, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
@@ -70,6 +71,7 @@ const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(
   ContainerResource,
   CommonDialogService,
   SqlEditorModelService,
+  LocalizationService,
 ])
 export class SqlEditorTabService extends Bootstrap {
   get sqlEditorTabs(): ITab<ISqlEditorTabState>[] {
@@ -94,6 +96,7 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly containerResource: ContainerResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly sqlEditorModelService: SqlEditorModelService,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
 
@@ -520,8 +523,9 @@ export class SqlEditorTabService extends Bootstrap {
     try {
       if (context && executionContext?.executing) {
         const { status } = await this.commonDialogService.open(ConfirmationDialog, {
-          title: 'plugin_sql_editor_navigation_tab_close_confirmation_title',
-          subTitle: getSqlEditorName(editorTab.handlerState, dataSource),
+          title: this.localizationService.translate('plugin_sql_editor_navigation_tab_close_confirmation_title', undefined, {
+            name: getSqlEditorName(editorTab.handlerState, dataSource),
+          }),
           message: 'plugin_sql_editor_navigation_tab_close_confirmation_message',
           confirmActionText: 'ui_close',
         });
