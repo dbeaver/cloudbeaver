@@ -383,7 +383,7 @@ extend type Query {
         query: String!
     ): String!
 
-    "Returns suported operations for the specified attribute index in the results"
+    "Returns supported operations for the specified attribute index in the results"
     sqlSupportedOperations(
         projectId: ID,
         connectionId: ID!,
