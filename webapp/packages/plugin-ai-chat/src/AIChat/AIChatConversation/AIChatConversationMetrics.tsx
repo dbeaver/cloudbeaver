@@ -24,8 +24,8 @@ export const AIChatConversationMetrics = observer<Props>(function AIChatConversa
   const output = aiChatConversationMetricsResource.data?.metrics?.totalOutputTokens ?? 0;
 
   return (
-    <div className="tw:px-4 tw:py-0.5 theme-border-color-background tw:border-b">
-      <div className="tw:flex tw:items-center tw:gap-1">
+    <div className="tw:px-4 tw:py-0.5 theme-border-color-background tw:border-b" role="status">
+      <div className="tw:flex tw:items-center tw:gap-1" aria-hidden="true">
         <div className="tw:flex">
           <div>{input}↑</div>
           <span>/</span>
@@ -33,6 +33,7 @@ export const AIChatConversationMetrics = observer<Props>(function AIChatConversa
         </div>
         <span>{translate('plugin_ai_chat_settings_metrics_tokens')}</span>
       </div>
+      <span className="tw:sr-only">{translate('plugin_ai_chat_settings_metrics_tokens_usage', undefined, { input, output })}</span>
     </div>
   );
 });

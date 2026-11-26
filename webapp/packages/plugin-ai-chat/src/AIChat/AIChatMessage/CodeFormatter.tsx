@@ -11,7 +11,7 @@ import { useContext } from 'react';
 
 import { clsx } from '@dbeaver/ui-kit';
 import { ActionIconButton, getComputed, useClipboard, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
+import { EditorView, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SQLCodeEditor, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-codemirror';
 import { useService } from '@cloudbeaver/core-di';
 import { ConnectionDialectResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
@@ -37,7 +37,7 @@ export const CodeFormatter = observer<Props>(function CodeFormatter({ code, conv
   });
 
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
-  const extensions = useCodemirrorExtensions();
+  const extensions = useCodemirrorExtensions(undefined, EditorView.contentAttributes.of({ 'aria-label': language.toUpperCase() }));
   const copy = useClipboard();
 
   if (sqlDialect) {
@@ -53,15 +53,19 @@ export const CodeFormatter = observer<Props>(function CodeFormatter({ code, conv
   }
 
   const disabled = aiChatMessageActionsService.isDisabled || context.disabled || language !== 'sql';
+  const executeLabel = translate('plugin_ai_chat_query_execute');
+  const insertLabel = translate('plugin_ai_chat_query_insert');
+  const copyLabel = translate('plugin_ai_chat_query_copy');
 
   return (
     <div className={clsx('tw:flex tw:flex-wrap tw:border tw:border-[var(--theme-background)]', className)}>
       <div className="tw:flex tw:w-full tw:flex-wrap tw:items-center tw:justify-between tw:gap-1 tw:border-b tw:border-[var(--theme-background)] tw:px-2 tw:bg-[var(--theme-surface)]">
         <code className="tw:text-(--theme-text-hint-on-light)">{language}</code>
-        <div className="tw:justify-end">
+        <div className="tw:justify-end tw:*:focus-visible:outline-2! tw:*:focus-visible:outline-solid! tw:*:focus-visible:outline-(--theme-primary)!">
           <ActionIconButton
             name="/icons/sql_exec.svg"
-            title={translate('plugin_ai_chat_query_execute')}
+            title={executeLabel}
+            aria-label={executeLabel}
             hidden={!aiChatMessageActionsService.isAllowed(connectionKey)}
             disabled={disabled}
             img
@@ -69,12 +73,13 @@ export const CodeFormatter = observer<Props>(function CodeFormatter({ code, conv
           />
           <ActionIconButton
             name="/icons/ai_insert_query.svg"
-            title={translate('plugin_ai_chat_query_insert')}
+            title={insertLabel}
+            aria-label={insertLabel}
             disabled={disabled}
             img
             onClick={insertInEditor}
           />
-          <ActionIconButton name="/icons/ai_copy_query.svg" title={translate('plugin_ai_chat_query_copy')} img onClick={() => copy(code, true)} />
+          <ActionIconButton name="/icons/ai_copy_query.svg" title={copyLabel} aria-label={copyLabel} img onClick={() => copy(code, true)} />
         </div>
       </div>
 

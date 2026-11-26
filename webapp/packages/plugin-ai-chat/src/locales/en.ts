@@ -59,6 +59,7 @@ export default [
   ['plugin_ai_chat_settings', 'Chat settings'],
   ['plugin_ai_chat_settings_metrics_enable', 'Enable metrics'],
   ['plugin_ai_chat_settings_metrics_tokens', 'Tokens'],
+  ['plugin_ai_chat_settings_metrics_tokens_usage', 'Input tokens: {arg:input}. Output tokens: {arg:output}.'],
 
   ['plugin_ai_chat_function_parameters', 'Parameters'],
   ['plugin_ai_chat_function_result', 'Result'],

@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { isValidElement, type ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -42,20 +43,29 @@ export const MarkdownFormatter = observer<Props>(function MarkdownFormatter({ co
         ),
         tr: ({ node, ...props }) => <tr className="tw:border-b tw:border-[var(--theme-background)]" {...props} />,
         td: ({ node, ...props }) => <td className="tw:border tw:border-[var(--theme-background)] tw:px-2 tw:py-1" {...props} />,
-        code: ({ node, ...props }) => {
-          const match = /language-(\w+)/.exec(props.className ?? '');
-          const language = match ? match[1] : undefined;
+        pre: ({ children }) => {
+          if (isValidElement<{ className?: string; children?: ReactNode }>(children)) {
+            const language = /language-(\w+)/.exec(children.props.className ?? '')?.[1];
 
-          if (language) {
-            return (
-              <Loader suspense inline>
-                <CodeFormatter className="tw:mb-2 tw:mt-2" language={language} code={String(props.children)} conversationId={conversationId} />
-              </Loader>
-            );
+            if (language) {
+              return (
+                <Loader suspense inline>
+                  <CodeFormatter
+                    className="tw:mb-2 tw:mt-2"
+                    language={language}
+                    code={String(children.props.children ?? '')}
+                    conversationId={conversationId}
+                  />
+                </Loader>
+              );
+            }
           }
 
-          return <code className="tw:whitespace-pre-wrap tw:bg-[var(--theme-secondary)] tw:rounded tw:px-1 tw:py-0.5 tw:text-sm" {...props} />;
+          return <pre>{children}</pre>;
         },
+        code: ({ node, ...props }) => (
+          <code className="tw:whitespace-pre-wrap tw:bg-[var(--theme-secondary)] tw:rounded tw:px-1 tw:py-0.5 tw:text-sm" {...props} />
+        ),
       }}
     >
       {content}

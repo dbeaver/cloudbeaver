@@ -27,6 +27,7 @@ export const AIChatMessageList = observer<Props>(function AIChatMessageList({ cu
   const aiChatConversationsResource = useResource(AIChatMessageList, AIChatConversationsResource, currentConversationId);
 
   const messages = aiChatMessagesResource.data;
+  const hasMessages = !!messages?.length;
   const lastMessage = messages?.[messages.length - 1];
 
   useLayoutEffect(() => {
@@ -38,24 +39,29 @@ export const AIChatMessageList = observer<Props>(function AIChatMessageList({ cu
     }
   }, [currentConversationId, lastMessage?.id]);
 
-  if (!messages?.length) {
-    return (
-      <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:px-4 tw:text-center">
-        {translate('plugin_ai_chat_no_messages_placeholder')}
-      </div>
-    );
-  }
-
   return (
-    <div ref={ref} className="tw:flex-1 tw:overflow-y-auto tw:p-4">
-      {messages.map((message, index) => {
+    <div
+      ref={ref}
+      className="tw:flex-1 tw:overflow-y-auto tw:p-4"
+      role="log"
+      aria-label={translate('plugin_ai_chat_label')}
+      aria-relevant="additions"
+      tabIndex={hasMessages ? 0 : undefined}
+    >
+      {messages?.map((message, index) => {
         const pinned = index >= messages.length - 2;
         return (
           <AIChatMessage key={message.id} data-pin-actions={pinned} data-hide-actions={disabled} message={message} className="tw:group/message" />
         );
       })}
 
-      {aiChatConversationsResource.data?.waitingForResponse && (
+      {!hasMessages && (
+        <div className="tw:flex tw:h-full tw:items-center tw:justify-center tw:text-center">
+          {translate('plugin_ai_chat_no_messages_placeholder')}
+        </div>
+      )}
+
+      {hasMessages && aiChatConversationsResource.data?.waitingForResponse && (
         <Loader className="tw:mx-auto tw:justify-center!" message={translate('plugin_ai_chat_genegate_message_placeholder')} inline small />
       )}
     </div>
