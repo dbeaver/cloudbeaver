@@ -46,6 +46,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class RPSessionHandler implements DBWSessionHandler {
 
@@ -72,19 +73,28 @@ public class RPSessionHandler implements DBWSessionHandler {
             throw new DBWebException("Auth provider " + RPAuthProvider.AUTH_PROVIDER + " not found");
         }
         SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
-        SMAuthProviderCustomConfiguration configuration = ServletAppUtils.getAuthApplication()
+        Set<SMAuthProviderCustomConfiguration> authConfigurations = ServletAppUtils.getAuthApplication()
             .getAuthConfiguration()
-            .getAuthCustomConfigurations()
-            .stream()
-            .filter(p -> p.getProvider().equals(authProvider.toString()))
-            .findFirst()
-            .orElse(null);
-        Map<String, Object> paramConfigMap = new HashMap<>();
-        if (configuration != null) {
-            authProvider.getConfigurationParameters().forEach(p ->
-                paramConfigMap.put(p.getId(), configuration.getParameters().get(p.getId())
-                ));
+            .getAuthCustomConfigurations();
+        List<SMAuthProviderCustomConfiguration> enabledConfigurations;
+        synchronized (authConfigurations) {
+            enabledConfigurations = authConfigurations.stream()
+                .filter(configuration ->
+                    authProvider.getId().equals(configuration.getProvider()) && !configuration.isDisabled())
+                .toList();
         }
+        if (enabledConfigurations.isEmpty()) {
+            return;
+        }
+        if (enabledConfigurations.size() > 1) {
+            log.warn("Multiple reverse proxy authentication configurations are enabled; authentication is skipped");
+            return;
+        }
+        SMAuthProviderCustomConfiguration configuration = enabledConfigurations.getFirst();
+        Map<String, Object> paramConfigMap = new HashMap<>();
+        authProvider.getConfigurationParameters().forEach(p ->
+            paramConfigMap.put(p.getId(), configuration.getParameters().get(p.getId())
+            ));
         String userName = request.getHeader(
             resolveParam(paramConfigMap.get(RPConstants.PARAM_USER), RPAuthProvider.X_USER)
         );
@@ -100,11 +110,9 @@ public class RPSessionHandler implements DBWSessionHandler {
         String fullName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FULL_NAME), RPAuthProvider.X_FULL_NAME));
         String logoutUrl =  null;
         String teamDelimiter = DEFAULT_TEAM_DELIMITER;
-        if (configuration != null) {
-            logoutUrl = configuration.getParameter(RPConstants.PARAM_LOGOUT_URL);
-            teamDelimiter = resolveParam(JSONUtils.getString(configuration.getParameters(),
-                RPConstants.PARAM_TEAM_DELIMITER), DEFAULT_TEAM_DELIMITER);
-        }
+        logoutUrl = configuration.getParameter(RPConstants.PARAM_LOGOUT_URL);
+        teamDelimiter = resolveParam(JSONUtils.getString(configuration.getParameters(),
+            RPConstants.PARAM_TEAM_DELIMITER), DEFAULT_TEAM_DELIMITER);
         List<String> userTeams = teams == null ? null : (teams.isEmpty() ? List.of() : List.of(teams.split(teamDelimiter)));
         if (userName != null) {
             try {

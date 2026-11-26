@@ -21,6 +21,7 @@ import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.auth.WebAsyncAuthJob;
 import io.cloudbeaver.test.WebGQLClient;
@@ -28,12 +29,14 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.utils.SecurityUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AuthenticationTest extends CloudbeaverMockTest {
     private static final String TEST_UI_SETTING = "authenticationTest";
@@ -177,6 +180,71 @@ public class AuthenticationTest extends CloudbeaverMockTest {
 
         Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
         Assertions.assertEquals(testUserId, JSONUtils.getString(activeUser, "userId"));
+    }
+
+    @Test
+    public void testReverseProxyUsesEnabledConfiguration() throws Exception {
+        CBAppConfig appConfig = CEAppStarter.getTestApp().getAppConfiguration();
+        Set<SMAuthProviderCustomConfiguration> originalConfigurations =
+            new LinkedHashSet<>(appConfig.getAuthCustomConfigurations());
+        try {
+            SMAuthProviderCustomConfiguration disabledConfiguration = createReverseProxyConfiguration(
+                "disabled-reverse-proxy",
+                true,
+                Map.of()
+            );
+            SMAuthProviderCustomConfiguration enabledConfiguration = createReverseProxyConfiguration(
+                "enabled-reverse-proxy",
+                false,
+                Map.of()
+            );
+            setReverseProxyConfigurations(appConfig, List.of(disabledConfiguration, enabledConfiguration));
+
+            String testUserId = "enabledReverseProxyTestUser";
+            WebGQLClient client = CEAppStarter.createClient();
+            Map<String, Object> sessionInfo = client.sendQueryWithHeaders(
+                GQL_OPEN_SESSION,
+                null,
+                Map.of(RPAuthProvider.X_USER, testUserId)
+            );
+            Assertions.assertTrue(JSONUtils.getBoolean(sessionInfo, "valid"));
+
+            Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
+            Assertions.assertEquals(testUserId, JSONUtils.getString(activeUser, "userId"));
+        } finally {
+            appConfig.setAuthProvidersConfigurations(originalConfigurations);
+        }
+    }
+
+    @Test
+    public void testReverseProxySkipsAuthenticationWithoutEnabledConfiguration() throws Exception {
+        CBAppConfig appConfig = CEAppStarter.getTestApp().getAppConfiguration();
+        Set<SMAuthProviderCustomConfiguration> originalConfigurations =
+            new LinkedHashSet<>(appConfig.getAuthCustomConfigurations());
+        try {
+            setReverseProxyConfigurations(appConfig, List.of(
+                createReverseProxyConfiguration("disabled-reverse-proxy", true, Map.of())
+            ));
+            assertReverseProxyAuthenticationSkipped("disabledReverseProxyTestUser");
+        } finally {
+            appConfig.setAuthProvidersConfigurations(originalConfigurations);
+        }
+    }
+
+    @Test
+    public void testReverseProxySkipsAuthenticationWithMultipleEnabledConfigurations() throws Exception {
+        CBAppConfig appConfig = CEAppStarter.getTestApp().getAppConfiguration();
+        Set<SMAuthProviderCustomConfiguration> originalConfigurations =
+            new LinkedHashSet<>(appConfig.getAuthCustomConfigurations());
+        try {
+            setReverseProxyConfigurations(appConfig, List.of(
+                createReverseProxyConfiguration("first-reverse-proxy", false, Map.of()),
+                createReverseProxyConfiguration("second-reverse-proxy", false, Map.of())
+            ));
+            assertReverseProxyAuthenticationSkipped("ambiguousReverseProxyTestUser");
+        } finally {
+            appConfig.setAuthProvidersConfigurations(originalConfigurations);
+        }
     }
 
     @Test
@@ -385,6 +453,49 @@ public class AuthenticationTest extends CloudbeaverMockTest {
             DBException writeError = Assertions.assertThrows(DBException.class, () -> updateUISettings(client, settings));
             Assertions.assertTrue(writeError.getMessage().contains("Access denied"), writeError.getMessage());
         }
+    }
+
+    private static void assertReverseProxyAuthenticationSkipped(@NotNull String userId) throws Exception {
+        WebGQLClient client = CEAppStarter.createClient();
+        Map<String, Object> sessionInfo = client.sendQueryWithHeaders(
+            GQL_OPEN_SESSION,
+            null,
+            Map.of(RPAuthProvider.X_USER, userId)
+        );
+        Assertions.assertTrue(JSONUtils.getBoolean(sessionInfo, "valid"));
+
+        Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
+        Assertions.assertTrue(
+            activeUser == null || !userId.equals(JSONUtils.getString(activeUser, "userId")),
+            "Reverse proxy authentication must be skipped"
+        );
+    }
+
+    @NotNull
+    private static SMAuthProviderCustomConfiguration createReverseProxyConfiguration(
+        @NotNull String id,
+        boolean disabled,
+        @NotNull Map<String, Object> parameters
+    ) {
+        SMAuthProviderCustomConfiguration configuration = new SMAuthProviderCustomConfiguration(id);
+        configuration.setProvider(RPAuthProvider.AUTH_PROVIDER);
+        configuration.setDisplayName(id);
+        configuration.setDisabled(disabled);
+        Map<String, Object> configurationParameters = new HashMap<>(parameters);
+        configurationParameters.put(RPAuthProvider.PARAM_AUTO_USER_PROVISIONING, true);
+        configuration.setParameters(configurationParameters);
+        return configuration;
+    }
+
+    private static void setReverseProxyConfigurations(
+        @NotNull CBAppConfig appConfig,
+        @NotNull Collection<SMAuthProviderCustomConfiguration> reverseProxyConfigurations
+    ) {
+        List<SMAuthProviderCustomConfiguration> configurations = appConfig.getAuthCustomConfigurations().stream()
+            .filter(configuration -> !RPAuthProvider.AUTH_PROVIDER.equals(configuration.getProvider()))
+            .collect(Collectors.toCollection(ArrayList::new));
+        configurations.addAll(reverseProxyConfigurations);
+        appConfig.setAuthProvidersConfigurations(configurations);
     }
 
     @NotNull
