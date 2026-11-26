@@ -63,6 +63,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
 import org.jkiss.dbeaver.registry.confirmation.ConfirmationConstants;
 import org.jkiss.dbeaver.registry.confirmation.ConfirmationDescriptor;
 import org.jkiss.dbeaver.registry.confirmation.ConfirmationRegistry;
+import org.jkiss.dbeaver.runtime.DBInterruptedException;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -401,13 +402,20 @@ public class WebSQLProcessor implements WebSessionProvider {
             return;
         }
 
+        closeTimeSeriesRereadResults(contextInfo, Arrays.asList(results));
+        throw new DBWebException("The Time Series result changed. Refresh the query result and try again.");
+    }
+
+    private void closeTimeSeriesRereadResults(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull List<WebSQLQueryResults> results
+    ) {
         for (var result : results) {
             var rejected = result.getResultSet();
             if (rejected != null && rejected.getId() != null) {
                 contextInfo.closeResult(rejected.getId());
             }
         }
-        throw new DBWebException("The Time Series result changed. Refresh the query result and try again.");
     }
 
     private boolean canReloadAsTimeSeries(@NotNull String originalSql, @NotNull String filteredSql) {
@@ -955,7 +963,12 @@ public class WebSQLProcessor implements WebSessionProvider {
         int maxResultsCount = resolveMaxResultsCount(dataContainer.getDataSource());
         WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
         long rowsUpdated = 0;
-        for (int i = 0; i < maxResultsCount; i++) {
+        // A keyed reread may find the original group beyond the display limit.
+        for (int i = 0; groupKey != null || i < maxResultsCount; i++) {
+            if (groupKey != null && dbStat.getSession().getProgressMonitor().isCanceled()) {
+                closeTimeSeriesRereadResults(contextInfo, resultList);
+                throw new DBInterruptedException("Time Series read canceled");
+            }
             if (hasResultSet) {
                 try (DBCResultSet resultSet = dbStat.openResultSet()) {
                     if (resultSet == null) {
@@ -974,6 +987,9 @@ public class WebSQLProcessor implements WebSessionProvider {
                             var results = new WebSQLQueryResults(webSession, dataFormat);
                             results.setResultSet(dataReceiver.getResultSet());
                             resultList.add(results);
+                            if (groupKey != null && resultList.size() > 1) {
+                                break;
+                            }
                         }
                     }
                 }
