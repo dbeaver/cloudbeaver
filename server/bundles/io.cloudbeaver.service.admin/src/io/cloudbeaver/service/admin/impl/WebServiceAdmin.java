@@ -17,8 +17,8 @@
 package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.*;
+import io.cloudbeaver.auth.SMAuthProviderConfigurationValidator;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
-import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -624,12 +624,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         var appConfiguration = CBApplication.getInstance().getAppConfiguration();
         Set<SMAuthProviderCustomConfiguration> authConfigurations = appConfiguration.getAuthCustomConfigurations();
         synchronized (authConfigurations) {
-            if (RPAuthProvider.AUTH_PROVIDER.equals(providerId) && !disabled &&
-                authConfigurations.stream().anyMatch(configuration ->
-                    RPAuthProvider.AUTH_PROVIDER.equals(configuration.getProvider()) &&
-                        !configuration.isDisabled() &&
-                        !id.equals(configuration.getId()))) {
-                throw new DBWebException("Only one reverse proxy authentication configuration can be enabled at a time");
+            if (authProvider.getInstance() instanceof SMAuthProviderConfigurationValidator validator) {
+                try {
+                    validator.validateConfiguration(authConfigurations, providerConfig);
+                } catch (DBWebException e) {
+                    throw e;
+                } catch (DBException e) {
+                    throw new DBWebException("Error validating authentication provider configuration", e);
+                }
             }
             appConfiguration.addAuthProviderConfiguration(providerConfig);
         }

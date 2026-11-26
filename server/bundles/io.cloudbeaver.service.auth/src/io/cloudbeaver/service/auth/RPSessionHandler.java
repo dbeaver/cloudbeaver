@@ -61,43 +61,36 @@ public class RPSessionHandler implements DBWSessionHandler {
             .getAppConfiguration();
         boolean isReverseProxyAuthEnabled = appConfiguration.isAuthProviderEnabled(RPAuthProvider.AUTH_PROVIDER);
         if (!configMode && isReverseProxyAuthEnabled) {
-            reverseProxyAuthentication(request, webSession);
+            Set<SMAuthProviderCustomConfiguration> authConfigurations = appConfiguration.getAuthCustomConfigurations();
+            List<SMAuthProviderCustomConfiguration> enabledConfigurations;
+            synchronized (authConfigurations) {
+                enabledConfigurations = authConfigurations.stream()
+                    .filter(configuration ->
+                        RPAuthProvider.AUTH_PROVIDER.equals(configuration.getProvider()) && !configuration.isDisabled())
+                    .toList();
+            }
+            if (enabledConfigurations.size() > 1) {
+                throw new DBWebException(
+                    "Multiple reverse proxy authentication configurations are enabled. Disable all but one configuration"
+                );
+            }
+            reverseProxyAuthentication(request, webSession, enabledConfigurations);
         }
         return false;
     }
 
-    public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBException {
+    private void reverseProxyAuthentication(
+        @NotNull HttpServletRequest request,
+        @NotNull WebSession webSession,
+        @NotNull List<SMAuthProviderCustomConfiguration> enabledConfigurations
+    ) throws DBException {
         SMController securityController = webSession.getSecurityController();
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(RPAuthProvider.AUTH_PROVIDER);
         if (authProvider == null) {
             throw new DBWebException("Auth provider " + RPAuthProvider.AUTH_PROVIDER + " not found");
         }
         SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
-        Set<SMAuthProviderCustomConfiguration> authConfigurations = ServletAppUtils.getAuthApplication()
-            .getAuthConfiguration()
-            .getAuthCustomConfigurations();
-        List<SMAuthProviderCustomConfiguration> enabledConfigurations;
-        synchronized (authConfigurations) {
-            enabledConfigurations = authConfigurations.stream()
-                .filter(configuration ->
-                    authProvider.getId().equals(configuration.getProvider()) && !configuration.isDisabled())
-                .toList();
-        }
         if (enabledConfigurations.isEmpty()) {
-            return;
-        }
-        if (enabledConfigurations.size() > 1) {
-            boolean hasReverseProxyCredentials = enabledConfigurations.stream()
-                .map(configuration -> resolveParam(
-                    configuration.getParameter(RPConstants.PARAM_USER),
-                    RPAuthProvider.X_USER
-                ))
-                .anyMatch(header -> request.getHeader(header) != null);
-            if (hasReverseProxyCredentials) {
-                throw new DBWebException(
-                    "Multiple reverse proxy authentication configurations are enabled. Disable all but one configuration"
-                );
-            }
             return;
         }
         SMAuthProviderCustomConfiguration configuration = enabledConfigurations.getFirst();

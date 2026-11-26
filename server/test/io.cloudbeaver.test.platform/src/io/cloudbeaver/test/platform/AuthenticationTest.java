@@ -249,11 +249,7 @@ public class AuthenticationTest extends CloudbeaverMockTest {
                 createReverseProxyConfiguration("second-reverse-proxy", false, Map.of())
             ));
             WebGQLClient client = CEAppStarter.createClient();
-            Map<String, Object> sessionInfo = client.sendQueryWithHeaders(
-                GQL_OPEN_SESSION,
-                null,
-                Map.of(RPAuthProvider.X_USER, "ambiguousReverseProxyTestUser")
-            );
+            Map<String, Object> sessionInfo = client.sendQuery(GQL_OPEN_SESSION, null);
             Assertions.assertTrue(JSONUtils.getBoolean(sessionInfo, "valid"));
             List<Map<String, Object>> sessionLog = client.sendQuery(GQL_SESSION_LOG, null);
             Assertions.assertTrue(sessionLog.stream().anyMatch(entry ->
@@ -261,10 +257,6 @@ public class AuthenticationTest extends CloudbeaverMockTest {
                     String.valueOf(entry.get("message"))
                         .contains("Multiple reverse proxy authentication configurations are enabled")
             ));
-
-            WebGQLClient localClient = CEAppStarter.createClient();
-            Map<String, Object> localSessionInfo = localClient.sendQuery(GQL_OPEN_SESSION, null);
-            Assertions.assertTrue(JSONUtils.getBoolean(localSessionInfo, "valid"));
         } finally {
             appConfig.setAuthProvidersConfigurations(originalConfigurations);
         }
