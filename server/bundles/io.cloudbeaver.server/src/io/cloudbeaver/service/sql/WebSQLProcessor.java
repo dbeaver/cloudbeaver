@@ -69,7 +69,6 @@ import org.jkiss.utils.CommonUtils;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -80,7 +79,6 @@ import java.util.stream.Collectors;
 public class WebSQLProcessor implements WebSessionProvider {
 
     private static final Log log = Log.getLog(WebSQLProcessor.class);
-    private static final Pattern SELECT_INTO = Pattern.compile("\\bINTO\\b", Pattern.CASE_INSENSITIVE);
 
     private static final int MAX_RESULTS_COUNT = 100;
 
@@ -369,11 +367,11 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (query.getType() == SQLQueryType.SELECT) {
             return !query.isModifying();
         }
-        // InfluxQL syntax such as FILL() can fall outside the SQL parser. INTO would write a measurement.
-        var dialect = dataSource.getSQLDialect();
-        return query.getType() == SQLQueryType.UNKNOWN &&
-            SQLConstants.KEYWORD_SELECT.equalsIgnoreCase(SQLUtils.getFirstKeyword(dialect, query.getText())) &&
-            !SELECT_INTO.matcher(query.getText()).find();
+        if (query.getType() != SQLQueryType.UNKNOWN) {
+            return false;
+        }
+        var adapter = GeneralUtils.adapt(dataSource, WebTimeSeriesDataAdapter.class);
+        return adapter != null && adapter.supportsUnparsedRead(parserContext, query);
     }
 
     @NotNull

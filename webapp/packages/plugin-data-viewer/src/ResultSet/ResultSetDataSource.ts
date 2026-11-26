@@ -10,8 +10,8 @@ import { autorun, type IReactionDisposer, makeObservable, observable } from 'mob
 import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
-import type { GraphQLService, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
+import { type AsyncTask, AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import type { GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlRowIdentifier, SqlRowIdentifierState } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
@@ -160,6 +160,47 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
     return this.totalCountRequestTask;
   }
 
+  /** Read another format of an open result without replacing the source's current data. */
+  abstract readResultInFormat?(result: IDatabaseResultSet, format: ResultDataFormat): ITask<SqlExecuteInfo> | null;
+
+  protected runResultRead(
+    executionContext: IConnectionExecutionContext,
+    sourceResult: IDatabaseResultSet,
+    createTask: () => AsyncTask,
+  ): ITask<SqlExecuteInfo> {
+    let activeTask: AsyncTask | undefined;
+    return executionContext.run(
+      async () => {
+        const task = createTask();
+        activeTask = task;
+
+        try {
+          const info = await this.asyncTaskInfoService.run(task);
+          const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
+
+          for (const item of result.results) {
+            const id = item.resultSet?.id;
+
+            if (id && id !== sourceResult.id) {
+              await this.closeResult({
+                id,
+                projectId: sourceResult.projectId,
+                connectionId: sourceResult.connectionId,
+                contextId: sourceResult.contextId,
+              });
+            }
+          }
+
+          return result;
+        } finally {
+          activeTask = undefined;
+          await this.asyncTaskInfoService.remove(task.id);
+        }
+      },
+      () => (activeTask?.pending ? this.asyncTaskInfoService.cancel(activeTask.id) : undefined),
+    );
+  }
+
   override setResults(results: IDatabaseResultSet[]): this {
     this.closeResults(this.results.filter(result => !results.some(r => r.id === result.id)));
     return super.setResults(results);
@@ -231,7 +272,7 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
     }
   }
 
-  private async closeResult(result: IDatabaseResultSet): Promise<void> {
+  private async closeResult(result: Pick<IDatabaseResultSet, 'id' | 'projectId' | 'connectionId' | 'contextId'>): Promise<void> {
     const context = this.executionContext?.context;
     const { id: resultId, projectId, connectionId, contextId } = result;
 

@@ -74,7 +74,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     const executionContext = await this.ensureContextCreated();
     const context = executionContext.context!;
     const limit = this.count;
-    const task = await this.getRequestTask(prevResults, context);
+    const task = this.getRequestTask(prevResults, context);
 
     this.currentTask = executionContext.run(
       async () => {
@@ -106,6 +106,17 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
       this.error = exception;
       throw exception;
     }
+  }
+
+  override readResultInFormat(result: IDatabaseResultSet, format: ResultDataFormat): ITask<SqlExecuteInfo> | null {
+    const executionContext = this.executionContext;
+    const context = executionContext?.context;
+
+    if (!executionContext || !context || !this.getPreviousResultId([result], context)) {
+      return null;
+    }
+
+    return this.runResultRead(executionContext, result, () => this.getRequestTask([result], context, format));
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -197,7 +208,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     return prevResults;
   }
 
-  protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
+  protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo, format = this.dataFormat) {
     const options = this.options;
 
     if (!options) {
@@ -222,19 +233,17 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
         anyConstraint: options.anyConstraint,
         shouldUseDisjunctive: options.shouldUseDisjunctive,
       },
-      dataFormat: this.dataFormat,
+      dataFormat: format,
     };
   }
 
-  protected async getRequestTask(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo): Promise<AsyncTask> {
-    const task = this.asyncTaskInfoService.create(async () => {
-      const config = this.getConfig(prevResults, context);
+  protected getRequestTask(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo, format = this.dataFormat): AsyncTask {
+    return this.asyncTaskInfoService.create(async () => {
+      const config = this.getConfig(prevResults, context, format);
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
 
       return taskInfo;
     });
-
-    return task;
   }
 
   override setExecutionContext(context: IConnectionExecutionContext | null): this {
@@ -248,24 +257,19 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
-    return results.map<IDatabaseResultSet>((result, index) => {
-      const dataFormat = result.dataFormat === ResultDataFormat.Timeseries ? ResultDataFormat.Resultset : result.dataFormat!;
-      const count = result.resultSet?.timeSeriesData?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0;
-
-      return {
-        id: result.resultSet?.id || '0',
-        uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${dataFormat}_${index}`,
-        projectId: executionContextInfo.projectId,
-        connectionId: executionContextInfo.connectionId,
-        contextId: executionContextInfo.id,
-        dataFormat,
-        updateRowCount: result.updateRowCount || 0,
-        loadedFully: count < limit,
-        count,
-        totalCount: null,
-        data: result.resultSet,
-      };
-    });
+    return results.map<IDatabaseResultSet>((result, index) => ({
+      id: result.resultSet?.id || '0',
+      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.dataFormat}_${index}`,
+      projectId: executionContextInfo.projectId,
+      connectionId: executionContextInfo.connectionId,
+      contextId: executionContextInfo.id,
+      dataFormat: result.dataFormat!,
+      updateRowCount: result.updateRowCount || 0,
+      loadedFully: (result.resultSet?.rowsWithMetaData?.length || 0) < limit,
+      count: result.resultSet?.rowsWithMetaData?.length || 0,
+      totalCount: null,
+      data: result.resultSet,
+    }));
   }
 
   private async ensureContextCreated(): Promise<IConnectionExecutionContext> {

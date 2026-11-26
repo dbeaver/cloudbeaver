@@ -20,11 +20,18 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLQuery;
+import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 
 /** Converts raw result-set values to graph data for data sources that support time series. */
 public interface WebTimeSeriesDataAdapter {
     boolean supportsResult(@NotNull DBSDataContainer container, @NotNull DBDAttributeBinding[] bindings);
+
+    /** Dialect-specific classification when the common parser cannot classify the statement. */
+    default boolean supportsUnparsedRead(@NotNull SQLParserContext context, @NotNull SQLQuery query) {
+        return false;
+    }
 
     @NotNull
     Object build(

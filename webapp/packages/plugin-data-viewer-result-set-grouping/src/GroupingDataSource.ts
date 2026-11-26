@@ -38,6 +38,7 @@ export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
     options: IDataGroupingOptions,
     currentResultsId: string | undefined,
     limit: number,
+    format = this.dataFormat,
   ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.asyncSqlGroupingResultSet({
       projectId: executionContextInfo.projectId,
@@ -55,7 +56,7 @@ export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
         where: options.whereFilter || undefined,
         anyConstraint: options.anyConstraint,
       },
-      dataFormat: this.dataFormat,
+      dataFormat: format,
     });
 
     return taskInfo;

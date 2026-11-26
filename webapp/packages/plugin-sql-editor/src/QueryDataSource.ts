@@ -214,10 +214,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   override setOptions(options: TOptions): this {
     if (this.options?.query !== options.query) {
       this.resetQueryParameters();
-
-      if (this.dataFormat === ResultDataFormat.Timeseries) {
-        this.setDataFormat(ResultDataFormat.Resultset);
-      }
     }
 
     return super.setOptions(options);
@@ -274,6 +270,23 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
   }
 
+  override readResultInFormat(result: IDatabaseResultSet, format: ResultDataFormat): ITask<SqlExecuteInfo> | null {
+    const executionContext = this.executionContext;
+    const context = executionContext?.context;
+    const options = this.prevOptions;
+    const resultId = context ? this.getPreviousResultId([result], context) : undefined;
+
+    if (!executionContext || !context || !options || !resultId) {
+      return null;
+    }
+
+    const limit = this.count;
+
+    return this.runResultRead(executionContext, result, () =>
+      this.asyncTaskInfoService.create(() => this.executeQuery(context, options, resultId, limit, format)),
+    );
+  }
+
   resetQueryParameters(): void {
     this.previousQueryParameters = this.currentQueryParameters || this.previousQueryParameters;
     this.currentQueryParameters = null;
@@ -284,6 +297,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     options: TOptions,
     firstResultId: string | undefined,
     limit: number,
+    format = this.dataFormat,
   ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
       projectId: executionContextInfo.projectId,
@@ -298,7 +312,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         where: options.whereFilter || undefined,
         anyConstraint: options.anyConstraint,
       },
-      dataFormat: this.dataFormat,
+      dataFormat: format,
       readLogs: options.readLogs,
       isInteractive: true,
     });
@@ -387,25 +401,20 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
-    return results.map<IDatabaseResultSet>((result, index) => {
-      const dataFormat = result.dataFormat === ResultDataFormat.Timeseries ? ResultDataFormat.Resultset : result.dataFormat!;
-      const count = result.resultSet?.timeSeriesData?.sourceRowCount ?? result.resultSet?.rowsWithMetaData?.length ?? 0;
-
-      return {
-        id: result.resultSet?.id || null,
-        uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${dataFormat}_${index}`,
-        projectId: executionContextInfo.projectId,
-        connectionId: executionContextInfo.connectionId,
-        contextId: executionContextInfo.id,
-        dataFormat,
-        updateRowCount: result.updateRowCount || 0,
-        loadedFully: count < limit,
-        count,
-        totalCount: null,
-        // allays returns false
-        // || !result.resultSet?.hasMoreData,
-        data: result.resultSet,
-      };
-    });
+    return results.map<IDatabaseResultSet>((result, index) => ({
+      id: result.resultSet?.id || null,
+      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.dataFormat}_${index}`,
+      projectId: executionContextInfo.projectId,
+      connectionId: executionContextInfo.connectionId,
+      contextId: executionContextInfo.id,
+      dataFormat: result.dataFormat!,
+      updateRowCount: result.updateRowCount || 0,
+      loadedFully: (result.resultSet?.rowsWithMetaData?.length || 0) < limit,
+      count: result.resultSet?.rowsWithMetaData?.length || 0,
+      totalCount: null,
+      // allays returns false
+      // || !result.resultSet?.hasMoreData,
+      data: result.resultSet,
+    }));
   }
 }
