@@ -521,8 +521,10 @@ public class WebConnectionInfo {
     }
 
     @Property
+    @NotNull
     public Map<String, String> getProviderProperties() {
-        return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
+        return dataSourceContainer.getDriver().getDataSourceProvider()
+            .getConnectionProviderProperties(dataSourceContainer.getConnectionConfiguration());
     }
 
     @Override
