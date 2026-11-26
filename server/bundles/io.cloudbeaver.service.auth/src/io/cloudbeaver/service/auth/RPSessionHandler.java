@@ -87,7 +87,17 @@ public class RPSessionHandler implements DBWSessionHandler {
             return;
         }
         if (enabledConfigurations.size() > 1) {
-            log.warn("Multiple reverse proxy authentication configurations are enabled; authentication is skipped");
+            boolean hasReverseProxyCredentials = enabledConfigurations.stream()
+                .map(configuration -> resolveParam(
+                    configuration.getParameter(RPConstants.PARAM_USER),
+                    RPAuthProvider.X_USER
+                ))
+                .anyMatch(header -> request.getHeader(header) != null);
+            if (hasReverseProxyCredentials) {
+                throw new DBWebException(
+                    "Multiple reverse proxy authentication configurations are enabled. Disable all but one configuration"
+                );
+            }
             return;
         }
         SMAuthProviderCustomConfiguration configuration = enabledConfigurations.getFirst();

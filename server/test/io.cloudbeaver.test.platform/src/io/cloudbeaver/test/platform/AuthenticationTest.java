@@ -53,6 +53,13 @@ public class AuthenticationTest extends CloudbeaverMockTest {
             userId
           }
         }""";
+    private static final String GQL_SESSION_LOG = """
+        query readSessionLog {
+          result: readSessionLog(clearEntries: true) {
+            type
+            message
+          }
+        }""";
     private static final String GQL_AUTH_LOGOUT = """
         query authLogoutExtended($provider: ID, $configuration: ID) {
           result: authLogoutExtended(provider: $provider, configuration: $configuration) {
@@ -232,7 +239,7 @@ public class AuthenticationTest extends CloudbeaverMockTest {
     }
 
     @Test
-    public void testReverseProxySkipsAuthenticationWithMultipleEnabledConfigurations() throws Exception {
+    public void testReverseProxyReportsMultipleEnabledConfigurations() throws Exception {
         CBAppConfig appConfig = CEAppStarter.getTestApp().getAppConfiguration();
         Set<SMAuthProviderCustomConfiguration> originalConfigurations =
             new LinkedHashSet<>(appConfig.getAuthCustomConfigurations());
@@ -241,7 +248,23 @@ public class AuthenticationTest extends CloudbeaverMockTest {
                 createReverseProxyConfiguration("first-reverse-proxy", false, Map.of()),
                 createReverseProxyConfiguration("second-reverse-proxy", false, Map.of())
             ));
-            assertReverseProxyAuthenticationSkipped("ambiguousReverseProxyTestUser");
+            WebGQLClient client = CEAppStarter.createClient();
+            Map<String, Object> sessionInfo = client.sendQueryWithHeaders(
+                GQL_OPEN_SESSION,
+                null,
+                Map.of(RPAuthProvider.X_USER, "ambiguousReverseProxyTestUser")
+            );
+            Assertions.assertTrue(JSONUtils.getBoolean(sessionInfo, "valid"));
+            List<Map<String, Object>> sessionLog = client.sendQuery(GQL_SESSION_LOG, null);
+            Assertions.assertTrue(sessionLog.stream().anyMatch(entry ->
+                "ERROR".equals(entry.get("type")) &&
+                    String.valueOf(entry.get("message"))
+                        .contains("Multiple reverse proxy authentication configurations are enabled")
+            ));
+
+            WebGQLClient localClient = CEAppStarter.createClient();
+            Map<String, Object> localSessionInfo = localClient.sendQuery(GQL_OPEN_SESSION, null);
+            Assertions.assertTrue(JSONUtils.getBoolean(localSessionInfo, "valid"));
         } finally {
             appConfig.setAuthProvidersConfigurations(originalConfigurations);
         }
