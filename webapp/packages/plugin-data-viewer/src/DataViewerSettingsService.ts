@@ -24,6 +24,7 @@ const FETCH_MAX = 5000;
 const DEFAULT_FETCH_SIZE = 200;
 
 const defaultSettings = schema.object({
+  'plugin.data-viewer.disableDataEditorRead': schemaExtra.stringedBoolean().default(false),
   'plugin.data-viewer.disableEdit': schemaExtra.stringedBoolean().default(false),
   'plugin.data-viewer.disableCopyData': schemaExtra.stringedBoolean().default(false),
   'plugin.data-viewer.fetchMax': schema.coerce.number().min(FETCH_MIN).default(FETCH_MAX),
@@ -42,6 +43,10 @@ export type DataViewerSettings = schema.infer<DataViewerSettingsSchema>;
   ServerSettingsManagerService,
 ])
 export class DataViewerSettingsService {
+  get disableDataEditorRead(): boolean {
+    return this.settings.getValue('plugin.data-viewer.disableDataEditorRead');
+  }
+
   get disableEdit(): boolean {
     return this.settings.getValue('plugin.data-viewer.disableEdit');
   }
@@ -81,6 +86,10 @@ export class DataViewerSettingsService {
     this.settingsResolverService.addResolver(
       HIGHEST_SETTINGS_LAYER,
       createSettingsOverrideResolver<DataViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
+        'plugin.data-viewer.disableDataEditorRead': {
+          key: 'permission.data-editor.read',
+          map: value => !value,
+        },
         'plugin.data-viewer.disableEdit': {
           key: 'permission.data-editor.editing',
           map: value => !value,

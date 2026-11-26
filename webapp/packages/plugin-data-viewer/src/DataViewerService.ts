@@ -25,6 +25,10 @@ export interface IErrorActionsContainerData {
 export class DataViewerService {
   readonly errorActionsContainer: PlaceholderContainer<IErrorActionsContainerData>;
 
+  get canReadDataEditor(): boolean {
+    return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableDataEditorRead;
+  }
+
   get canCopyData() {
     return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableCopyData;
   }

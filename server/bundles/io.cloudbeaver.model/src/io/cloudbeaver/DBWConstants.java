@@ -31,7 +31,7 @@ public interface DBWConstants {
     String PERMISSION_SECRET_MANAGER = "secret-manager";
     String PERMISSION_SQL_RESULT_UPDATE = "sql-result-update";
     String PERMISSION_SQL_EXECUTE_QUERY = "sql-execute-query";
-    String PERMISSION_READ_DATA_FROM_CONNECTION = "read-data-from-connection";
+    String PERMISSION_READ_DATA_FROM_CONNECTION = "permission.data-editor.read";
 
     String PERMISSION_FS_RESOURCE_EDIT = "fs-resource-edit";
 

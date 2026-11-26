@@ -22,10 +22,11 @@ import {
 } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from './IDataViewerPageState.js';
+import { DataViewerService } from './DataViewerService.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
 const DataViewerTab = importLazyComponent(() => import('./DataViewerPage/DataViewerTab.js').then(module => module.DataViewerTab));
-const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataViewerPanel.js').then(module => module.DataViewerPanel));
+const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataViewerPanelAccess.js').then(module => module.DataViewerPanelAccess));
 
 @injectable(() => [
   NavNodeManagerService,
@@ -36,6 +37,7 @@ const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataV
   NavigationTabsService,
   ConnectionInfoResource,
   TableViewerStorageService,
+  DataViewerService,
 ])
 export class DataViewerTabService {
   readonly page: ObjectPage<IDataViewerPageState>;
@@ -49,6 +51,7 @@ export class DataViewerTabService {
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly tableViewerStorageService: TableViewerStorageService,
+    private readonly dataViewerService: DataViewerService,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -100,6 +103,10 @@ export class DataViewerTabService {
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
+    if (!this.dataViewerService.canReadDataEditor) {
+      return;
+    }
+
     try {
       const { nodeInfo, tabInfo, initTab, trySwitchPage } = contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 
