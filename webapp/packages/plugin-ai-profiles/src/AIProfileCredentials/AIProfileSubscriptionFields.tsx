@@ -27,7 +27,7 @@ export const AIProfileSubscriptionFields = observer<Props>(function AIProfileSub
     return <PendingSubscription profile={profile} authorization={authorization.authorization} />;
   }
 
-  if (profile.account && profile.accountAuthentication) {
+  if (profile.account) {
     return <ConnectedSubscription profile={profile} disabled={formState.isDisabled} />;
   }
 

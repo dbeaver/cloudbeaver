@@ -31,6 +31,8 @@ export default [
   ['plugin_ai_account_connect', 'Подключить аккаунт'],
   ['plugin_ai_credentials_done', 'Готово'],
   ['plugin_ai_account_connect_provider', 'Подключить {arg:provider}'],
+  ['plugin_ai_account_use', 'Использовать сохранённый аккаунт'],
+  ['plugin_ai_account_use_provider', 'Использовать аккаунт {arg:provider}'],
   ['plugin_ai_account_provider_connected', '{arg:provider} подключён'],
   ['plugin_ai_account_connected', 'Аккаунт подключён'],
   ['plugin_ai_account_disconnected', 'Аккаунт отключён'],

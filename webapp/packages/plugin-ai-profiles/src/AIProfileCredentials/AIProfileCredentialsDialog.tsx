@@ -58,6 +58,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const authorization = useAIProfileAuthorization(formState, payload.onSuccess);
   const isAuthorizing = accountAuthentication && authorization.processing;
   const isAuthorized = accountAuthentication && !authorization.processing && !!profile?.account && profile.accountAuthentication;
+  const canUseAccount = accountAuthentication && !authorization.processing && !!profile?.account && !profile.accountAuthentication;
   const error = getFirstException(formState.exception);
   const isSaving = !!formState.savingPromise;
   const form = useForm({
@@ -134,6 +135,16 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           <Fill />
           <Button type="button" onClick={() => close(resolveDialog)}>
             {translate('plugin_ai_credentials_done')}
+          </Button>
+        </CommonDialogFooter>
+      )}
+      {canUseAccount && (
+        <CommonDialogFooter>
+          <Fill />
+          <Button type="button" disabled={formState.isDisabled || isSaving} onClick={() => formState.save()}>
+            {profile.accountProvider
+              ? translate('plugin_ai_account_use_provider', undefined, { provider: profile.accountProvider })
+              : translate('plugin_ai_account_use')}
           </Button>
         </CommonDialogFooter>
       )}
