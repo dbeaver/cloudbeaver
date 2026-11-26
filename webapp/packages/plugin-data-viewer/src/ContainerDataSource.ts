@@ -74,7 +74,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     const executionContext = await this.ensureContextCreated();
     const context = executionContext.context!;
     const limit = this.count;
-    const task = this.getRequestTask(prevResults, context);
+    const task = await this.getRequestTask(prevResults, context);
 
     this.currentTask = executionContext.run(
       async () => {
@@ -237,13 +237,19 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     };
   }
 
-  protected getRequestTask(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo, format = this.dataFormat): AsyncTask {
-    return this.asyncTaskInfoService.create(async () => {
+  protected getRequestTask(
+    prevResults: IDatabaseResultSet[],
+    context: IConnectionExecutionContextInfo,
+    format = this.dataFormat,
+  ): AsyncTask | Promise<AsyncTask> {
+    const task = this.asyncTaskInfoService.create(async () => {
       const config = this.getConfig(prevResults, context, format);
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
 
       return taskInfo;
     });
+
+    return Promise.resolve(task);
   }
 
   override setExecutionContext(context: IConnectionExecutionContext | null): this {

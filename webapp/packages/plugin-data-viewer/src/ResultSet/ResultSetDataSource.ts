@@ -169,15 +169,21 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
   protected runResultRead(
     executionContext: IConnectionExecutionContext,
     sourceResult: IDatabaseResultSet,
-    createTask: () => AsyncTask,
+    createTask: () => AsyncTask | Promise<AsyncTask>,
   ): ITask<SqlExecuteInfo> {
     let activeTask: AsyncTask | undefined;
+    let cancelled = false;
+
     return executionContext.run(
       async () => {
-        const task = createTask();
+        const task = await createTask();
         activeTask = task;
 
         try {
+          if (cancelled) {
+            throw new Error('Task was cancelled');
+          }
+
           const info = await this.asyncTaskInfoService.run(task);
           const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
 
@@ -200,7 +206,10 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
           await this.asyncTaskInfoService.remove(task.id);
         }
       },
-      () => (activeTask?.pending ? this.asyncTaskInfoService.cancel(activeTask.id) : undefined),
+      () => {
+        cancelled = true;
+        return activeTask?.pending ? this.asyncTaskInfoService.cancel(activeTask.id) : undefined;
+      },
     );
   }
 
