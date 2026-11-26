@@ -161,7 +161,10 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
   }
 
   /** Read another format of an open result without replacing the source's current data. */
-  abstract readResultInFormat?(result: IDatabaseResultSet, format: ResultDataFormat): ITask<SqlExecuteInfo> | null;
+  readResultInFormat(result: IDatabaseResultSet, format: ResultDataFormat): ITask<SqlExecuteInfo> | null;
+  readResultInFormat(): null {
+    return null;
+  }
 
   protected runResultRead(
     executionContext: IConnectionExecutionContext,
