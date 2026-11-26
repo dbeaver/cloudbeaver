@@ -46,7 +46,6 @@ import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLQueryDataReceiver.class);
-    private static final String TIME_SERIES_PRESENTATION_ID = "timeseries-graph";
 
     @NotNull
     private final WebSQLContextInfo contextInfo;
@@ -194,7 +193,6 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                     rows.stream().map(WebSQLQueryResultSetRow::getData).toArray(Object[][]::new)
                 );
                 webResultSet.setTimeSeriesData(graph, rows.size());
-                webResultSet.setAvailablePresentations(List.of(TIME_SERIES_PRESENTATION_ID));
             } catch (DBException e) {
                 throw new DBCException("Error reading time-series data", e);
             }
@@ -240,7 +238,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         if (adapter != null && (dataFormat == null || dataFormat == WebDataFormat.resultset)) {
             try {
                 if (adapter.supportsResult(dataContainer, bindings)) {
-                    webResultSet.setAvailablePresentations(List.of(TIME_SERIES_PRESENTATION_ID));
+                    webResultSet.setAvailableReadFormats(List.of(WebDataFormat.timeseries));
                 }
             } catch (RuntimeException e) {
                 log.warn("Error checking time-series availability", e);

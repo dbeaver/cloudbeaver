@@ -331,9 +331,11 @@ public class WebSQLProcessor implements WebSessionProvider {
             var results = executeInfo.getResults();
             for (var result : results) {
                 var resultSet = result.getResultSet();
-                if (resultSet != null && !resultSet.getAvailablePresentations().isEmpty() &&
+                if (resultSet != null && resultSet.getAvailableReadFormats().contains(WebDataFormat.timeseries) &&
                     (results.length != 1 || !canReloadAsTimeSeries(originalSql, sql))) {
-                    resultSet.setAvailablePresentations(List.of());
+                    resultSet.setAvailableReadFormats(resultSet.getAvailableReadFormats().stream()
+                        .filter(format -> format != WebDataFormat.timeseries)
+                        .toList());
                 }
             }
         }

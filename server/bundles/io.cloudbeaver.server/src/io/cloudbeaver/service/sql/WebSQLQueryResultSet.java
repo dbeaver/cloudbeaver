@@ -49,7 +49,7 @@ public class WebSQLQueryResultSet {
     private boolean hasDynamicTrace;
     private boolean readOnly;
     private String readOnlyStatus;
-    private List<String> availablePresentations = List.of();
+    private List<WebDataFormat> availableReadFormats = List.of();
     private Object timeSeriesData;
     private int timeSeriesSourceRowCount;
 
@@ -63,12 +63,12 @@ public class WebSQLQueryResultSet {
 
     @Property
     @NotNull
-    public List<String> getAvailablePresentations() {
-        return availablePresentations;
+    public List<WebDataFormat> getAvailableReadFormats() {
+        return availableReadFormats;
     }
 
-    public void setAvailablePresentations(@NotNull List<String> availablePresentations) {
-        this.availablePresentations = availablePresentations;
+    public void setAvailableReadFormats(@NotNull List<WebDataFormat> availableReadFormats) {
+        this.availableReadFormats = availableReadFormats;
     }
 
     @Property

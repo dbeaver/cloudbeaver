@@ -152,7 +152,7 @@ type SQLTimeSeriesData @since(version: "26.3.0") {
 }
 
 type SQLTimeSeriesSeries @since(version: "26.3.0") {
-    id: String!
+    id: ID!
     label: String!
     points: [SQLTimeSeriesPoint!]!
 }
@@ -166,8 +166,8 @@ type SQLTimeSeriesPoint @since(version: "26.3.0") {
 type SQLResultSet {
     "Result set ID"
     id: ID!
-    "IDs of optional presentations available for this result set"
-    availablePresentations: [ID!] @since(version: "26.3.0")
+    "Additional formats available when reading this result again"
+    availableReadFormats: [ResultDataFormat!]! @since(version: "26.3.0")
     "Normalized series, returned only for the timeseries result format."
     timeSeriesData: SQLTimeSeriesData @since(version: "26.3.0")
     "Returns list of columns in the result set"

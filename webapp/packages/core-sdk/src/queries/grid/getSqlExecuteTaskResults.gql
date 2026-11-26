@@ -12,7 +12,7 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
       dataFormat
       resultSet {
         id
-        availablePresentations
+        availableReadFormats
         timeSeriesData {
           sourceRowCount
           series {
