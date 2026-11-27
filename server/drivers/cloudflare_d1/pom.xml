@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>drivers.cloudflare_d1</artifactId>
+    <version>1.0.0</version>
+    <parent>
+        <groupId>io.cloudbeaver</groupId>
+        <artifactId>drivers</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../</relativePath>
+    </parent>
+    <packaging>pom</packaging>
+
+    <properties>
+        <deps.output.dir>cloudflare/d1</deps.output.dir>
+        <!-- Keep the published D1 release's API and utils instead of the reactor SNAPSHOTs. -->
+        <dbeaver.common.version>2.9.0</dbeaver.common.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.dbeaver.jdbc</groupId>
+            <artifactId>com.dbeaver.jdbc.driver.d1</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+
+</project>
