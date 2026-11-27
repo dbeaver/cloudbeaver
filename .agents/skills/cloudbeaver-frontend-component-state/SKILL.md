@@ -1,9 +1,11 @@
 ---
-name: component-state
-description: Guides state management, component logic, and hook composition in CloudBeaver React components. Use when creating, changing, reviewing, or extracting component behavior, state, or hooks. Apply only to frontend component work under the owning CloudBeaver repository's webapp/.
+name: cloudbeaver-frontend-component-state
+description: "Only for CloudBeaver React components under the owning repository's webapp/, including repositories explicitly inheriting this workflow. Load when creating, changing, reviewing, or extracting component behavior, state, or hooks."
 ---
 
 # Component state
+
+Apply these state and hook conventions only to frontend targets in the scope declared above, not to React code in unrelated products.
 
 Keep components easy to read: call hooks, connect their results, render UI.
 

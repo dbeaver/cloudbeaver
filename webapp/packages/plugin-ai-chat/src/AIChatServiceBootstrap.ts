@@ -17,7 +17,6 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { AIChatService } from './AIChat/AIChatService.js';
 import { ACTION_OPEN_AI_CHAT } from './actions/ACTION_OPEN_AI_CHAT.js';
-import { ACTION_TOGGLE_AI_CHAT } from './actions/ACTION_TOGGLE_AI_CHAT.js';
 import { AIChatTabService } from './AIChatTabService.js';
 import { AIChatFunctionsService } from './AIChatFunctionsService.js';
 import { AIChatAttachmentsService } from './AIChatAttachments/AIChatAttachmentsService.js';
@@ -64,40 +63,22 @@ export class AIChatServiceBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
-      getItems: (context, items) => [...items, ACTION_TOGGLE_AI_CHAT],
+      getItems: (context, items) => [...items, ACTION_OPEN_AI_CHAT],
     });
 
     this.actionService.addHandler({
       id: 'ai-chat-base',
-      actions: [ACTION_TOGGLE_AI_CHAT, ACTION_OPEN_AI_CHAT],
+      actions: [ACTION_OPEN_AI_CHAT],
       isHidden: () => !this.aiChatService.isEnabled,
-      isChecked: (context, action) => action === ACTION_TOGGLE_AI_CHAT && this.aiChatService.isActive,
       getLoader: () => [getCachedDataResourceLoaderState(this.userInfoResource, () => undefined)],
       getActionInfo: (context, action) => {
-        if (action === ACTION_TOGGLE_AI_CHAT) {
-          const menu = context.get(DATA_CONTEXT_MENU);
-
-          if (menu === MENU_APP_ACTIONS) {
-            return { ...action.info, label: '', icon: '/icons/ai_toggle.svg' };
-          }
-
-          return action.info;
+        if (context.get(DATA_CONTEXT_MENU) === MENU_APP_ACTIONS) {
+          return { ...action.info, label: '', icon: '/icons/ai_toggle.svg' };
         }
 
         return action.info;
       },
-      handler: (context, action) => {
-        switch (action) {
-          case ACTION_OPEN_AI_CHAT: {
-            this.aiChatTabService.open();
-            break;
-          }
-          case ACTION_TOGGLE_AI_CHAT: {
-            this.aiChatTabService.toggleTab();
-            break;
-          }
-        }
-      },
+      handler: () => this.aiChatTabService.open(),
     });
 
     this.menuService.addCreator({

@@ -17,4 +17,6 @@ export default [
   ['core_blocks_export_image_dialog_format', 'File Format'],
   ['core_blocks_export_image_dialog_transparent_background', 'Transparent background'],
   ['core_blocks_dialog_element_close_tooltip', 'Close panel'],
+  ['core_blocks_split_collapse', 'Collapse panel'],
+  ['core_blocks_split_expand', 'Expand panel'],
 ];

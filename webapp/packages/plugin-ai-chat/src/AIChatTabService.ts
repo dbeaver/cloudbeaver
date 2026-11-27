@@ -38,18 +38,6 @@ export class AIChatTabService {
     });
   }
 
-  toggleTab(): void {
-    if (!this.aiChatService.isEnabled) {
-      return;
-    }
-
-    this.aiChatService.togglePanel();
-
-    if (this.aiChatService.isActive) {
-      this.selectTab();
-    }
-  }
-
   open(): void {
     if (!this.aiChatService.isEnabled) {
       return;

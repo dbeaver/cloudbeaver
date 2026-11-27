@@ -53,6 +53,7 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
         <Input
           ref={ref}
           title={translate('plugin_data_viewer_fetch_size')}
+          aria-label={translate('plugin_data_viewer_fetch_size')}
           className={s(style, { input: true })}
           type="number"
           value={limit}
