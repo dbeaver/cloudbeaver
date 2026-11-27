@@ -84,10 +84,17 @@ export class AsyncTaskInfoService extends Disposable {
   override dispose(): void {
     this.connection?.unsubscribe();
     this.onEventUnsubscribe?.();
+
+    for (const task of this.tasks.values()) {
+      task.dispose();
+    }
   }
 
   create(getter: () => Promise<AsyncTaskInfo>): AsyncTask {
-    const task = new AsyncTask(getter, this.cancelTask.bind(this));
+    const task = new AsyncTask(getter, this.cancelTask.bind(this), async taskId => {
+      const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({ taskId, removeOnFinish: false });
+      return taskInfo;
+    });
 
     this.tasks.set(task.id, task);
     task.onStatusChange.addHandler(info => {
@@ -161,6 +168,7 @@ export class AsyncTaskInfoService extends Disposable {
       throw new Error('Cant remove unfinished task');
     }
 
+    task.dispose();
     this.tasks.delete(task.id);
 
     if (task.info) {
