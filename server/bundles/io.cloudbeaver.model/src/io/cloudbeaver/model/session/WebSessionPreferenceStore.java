@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.impl.preferences.AbstractUserPreferenceStore;
@@ -24,11 +25,13 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
 
     @NotNull
     private final WebUserContext userContext;
+    private final ListenerList<Runnable> preferenceUpdateListeners = new ListenerList<>();
 
     public WebSessionPreferenceStore(
         @NotNull WebUserContext userContext,
@@ -43,17 +46,37 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
         return userPreferences;
     }
 
+    public void addPreferenceUpdateListener(@NotNull Runnable listener) {
+        preferenceUpdateListeners.add(listener);
+    }
+
+    public void removePreferenceUpdateListener(@NotNull Runnable listener) {
+        preferenceUpdateListeners.remove(listener);
+    }
+
+    @Override
+    public void updateAllUserPreferences(@NotNull Map<String, Object> newUserPreferences) {
+        if (!userPreferences.equals(newUserPreferences)) {
+            super.updateAllUserPreferences(newUserPreferences);
+            preferenceUpdateListeners.forEach(Runnable::run);
+        }
+    }
+
     // to avoid redundant sm api call
     public void updatePreferenceValues(@NotNull Map<String, Object> newValues) throws DBException {
         if (userContext.getUser() != null) {
             userContext.getSecurityController().setCurrentUserParameters(newValues);
         }
+        boolean changed = false;
         for (Map.Entry<String, Object> entry : newValues.entrySet()) {
-            if (entry.getValue() == null) {
-                userPreferences.remove(entry.getKey());
-            } else {
-                userPreferences.put(entry.getKey(), entry.getValue());
-            }
+            Object value = entry.getValue();
+            Object previousValue = value == null
+                ? userPreferences.remove(entry.getKey())
+                : userPreferences.put(entry.getKey(), value);
+            changed |= !Objects.equals(previousValue, value);
+        }
+        if (changed) {
+            preferenceUpdateListeners.forEach(Runnable::run);
         }
     }
 

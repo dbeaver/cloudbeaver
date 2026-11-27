@@ -39,6 +39,7 @@ public class SQLParameterPreferencesTest extends CloudbeaverDBTest {
         var savedPreferences = new HashMap<String, Object>();
         savedPreferences.put(ModelPreferences.SQL_PARAMETERS_ENABLED, userPreferences.get(ModelPreferences.SQL_PARAMETERS_ENABLED));
         savedPreferences.put(ModelPreferences.SQL_VARIABLES_ENABLED, userPreferences.get(ModelPreferences.SQL_VARIABLES_ENABLED));
+        savedPreferences.put(ModelPreferences.SQL_NAMED_PARAMETERS_PREFIX, userPreferences.get(ModelPreferences.SQL_NAMED_PARAMETERS_PREFIX));
         String parameterQuery = "SELECT :val";
         String variableQuery = "SELECT '${name_var}'";
         Map<String, Object> disabledPreferences = Map.of(
@@ -69,6 +70,10 @@ public class SQLParameterPreferencesTest extends CloudbeaverDBTest {
             Assertions.assertEquals(1, countParameters(enabledContext, parameterQuery));
             Assertions.assertEquals(1, countParameters(enabledContext, variableQuery));
             Assertions.assertEquals(0, countParameters(disabledContext, parameterQuery));
+
+            store.updatePreferenceValues(Map.of(ModelPreferences.SQL_NAMED_PARAMETERS_PREFIX, "@"));
+            var updatedPrefixContext = new WebSQLCompletionContext(context);
+            Assertions.assertEquals("@", updatedPrefixContext.getSyntaxManager().getNamedParameterPrefixes()[0]);
 
             store.updatePreferenceValues(disabledPreferences);
             var updatedContext = new WebSQLCompletionContext(context);

@@ -34,8 +34,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ModelPreferences;
-import org.jkiss.dbeaver.ModelPreferences.SQLScriptStatementDelimiterMode;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -52,7 +50,6 @@ import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
@@ -119,18 +116,17 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     @NotNull
     ParserConfiguration getParserConfiguration() {
-        var preferences = connection.getDataSourceContainer().getPreferenceStore();
         var configuration = parserConfiguration;
-        if (configuration != null && configuration.matches(preferences)) {
+        if (configuration != null) {
             return configuration;
         }
 
         synchronized (this) {
             configuration = parserConfiguration;
-            if (configuration == null || !configuration.matches(preferences)) {
+            if (configuration == null) {
                 var dataSource = connection.getDataSource();
                 var syntaxManager = new SQLSyntaxManager();
-                syntaxManager.init(dataSource.getSQLDialect(), preferences);
+                syntaxManager.init(dataSource.getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
                 var ruleManager = new SQLRuleManager(syntaxManager);
                 ruleManager.loadRules(dataSource, false);
                 configuration = new ParserConfiguration(syntaxManager, ruleManager);
@@ -140,12 +136,11 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
     }
 
+    synchronized void invalidateParserConfiguration() {
+        parserConfiguration = null;
+    }
+
     record ParserConfiguration(@NotNull SQLSyntaxManager syntaxManager, @NotNull SQLRuleManager ruleManager) {
-        boolean matches(@NotNull DBPPreferenceStore preferences) {
-            return syntaxManager.isParametersEnabled() == preferences.getBoolean(ModelPreferences.SQL_PARAMETERS_ENABLED)
-                && syntaxManager.isVariablesEnabled() == preferences.getBoolean(ModelPreferences.SQL_VARIABLES_ENABLED)
-                && syntaxManager.getStatementDelimiterMode() == SQLScriptStatementDelimiterMode.fromPreferences(preferences);
-        }
     }
 
     public DBCExecutionContext getExecutionContext() {
