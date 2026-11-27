@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.*;
+import io.cloudbeaver.auth.SMAuthProviderConfigurationValidator;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -620,7 +621,20 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             }
         }
         providerConfig.setParameters(parameters);
-        CBApplication.getInstance().getAppConfiguration().addAuthProviderConfiguration(providerConfig);
+        var appConfiguration = CBApplication.getInstance().getAppConfiguration();
+        Set<SMAuthProviderCustomConfiguration> authConfigurations = appConfiguration.getAuthCustomConfigurations();
+        synchronized (authConfigurations) {
+            if (authProvider.getInstance() instanceof SMAuthProviderConfigurationValidator validator) {
+                try {
+                    validator.validateConfiguration(authConfigurations, providerConfig);
+                } catch (DBWebException e) {
+                    throw e;
+                } catch (DBException e) {
+                    throw new DBWebException("Error validating authentication provider configuration", e);
+                }
+            }
+            appConfiguration.addAuthProviderConfiguration(providerConfig);
+        }
         try {
             CBApplication.getInstance().flushConfiguration(webSession);
         } catch (DBException e) {
