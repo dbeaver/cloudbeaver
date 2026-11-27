@@ -7,6 +7,7 @@
  */
 
 import { observer } from 'mobx-react-lite';
+import { useId } from 'react';
 
 import { Icon, TableColumnValue, TableItem, useTranslate } from '@cloudbeaver/core-blocks';
 import { IconButton } from '@dbeaver/ui-kit';
@@ -20,15 +21,23 @@ interface Props {
 
 export const GroupingTableItem = observer<Props>(function GroupingTableItem({ id, name, className, onDelete }) {
   const translate = useTranslate();
+  const nameId = useId();
+  const removeId = useId();
 
   return (
     <TableItem className={className} item={id} title={name}>
-      <TableColumnValue width="100%" flex>
+      <TableColumnValue id={nameId} width="100%" flex>
         {name}
       </TableColumnValue>
       <TableColumnValue>
-        <IconButton size='small' aria-label={translate('ui_remove')} onClick={() => onDelete(id)}>
-          <Icon name='cross-bold' width={16} height={16} />
+        <IconButton
+          id={removeId}
+          size="small"
+          aria-label={translate('ui_remove')}
+          aria-labelledby={`${removeId} ${nameId}`}
+          onClick={() => onDelete(id)}
+        >
+          <Icon name="cross-bold" width={16} height={16} />
         </IconButton>
       </TableColumnValue>
     </TableItem>
