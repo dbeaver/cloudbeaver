@@ -25,7 +25,6 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.service.sql.messages.WebSQLMessages;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -396,13 +395,6 @@ public class WebSQLUtils {
     ) {
         final WebAsyncTaskInfo task = webSession.createAsyncTask("SQL execute");
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
-            @Nullable
-            @Override
-            public ISchedulingRule getSchedulingRule() {
-                DBCExecutionContext context = contextInfo.getProcessor().getExecutionContext();
-                return context == null ? null : new QueryExecutionRule(context);
-            }
-
             @Override
             public boolean supportsUserCancellationResult() {
                 return true;
@@ -433,23 +425,6 @@ public class WebSQLUtils {
             }
         };
         return webSession.runAsyncTask(task, runnable);
-    }
-
-    /**
-     * SQL tabs can share a physical connection. Keep their jobs outside the driver until the
-     * previous query has also closed its session, so cancellation cannot be blocked by another
-     * query's JDBC cleanup. Waiting jobs can be cancelled without entering the driver.
-     */
-    private record QueryExecutionRule(@NotNull DBCExecutionContext context) implements ISchedulingRule {
-        @Override
-        public boolean contains(@NotNull ISchedulingRule rule) {
-            return rule instanceof QueryExecutionRule other && context == other.context;
-        }
-
-        @Override
-        public boolean isConflicting(@NotNull ISchedulingRule rule) {
-            return contains(rule);
-        }
     }
 
     @NotNull

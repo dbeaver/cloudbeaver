@@ -761,7 +761,6 @@ public class WebSession extends BaseWebSession
                 }
             });
         }
-        job.setRule(runnable.getSchedulingRule());
         asyncTask.setJob(job);
         asyncTask.setRunning(true);
         job.schedule();
