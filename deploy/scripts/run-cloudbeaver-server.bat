@@ -37,7 +37,6 @@ java %JAVA_OPTS% ^
     --add-opens=java.base/sun.security.util=ALL-UNNAMED ^
     --add-opens=java.security.jgss/sun.security.jgss=ALL-UNNAMED ^
     --add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED ^
-    --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED ^
     --add-opens=java.sql/java.sql=ALL-UNNAMED ^
     -jar  %launcherJar% ^
     -product io.cloudbeaver.product.ce.product ^
