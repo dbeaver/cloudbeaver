@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import io.cloudbeaver.service.sql.messages.WebSQLMessages;
 import io.cloudbeaver.websocket.event.task.WSSessionTaskQueryParamsConfirmationEvent;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.sql.SQLParametersProviderBase;
@@ -39,15 +38,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class WebSQLParametersProvider extends SQLParametersProviderBase {
-    private static final Log log = Log.getLog(WebSQLParametersProvider.class);
     @NotNull
     private final WebSession webSession;
     @NotNull
     private final WebAsyncTaskInfo taskInfo;
+    @Nullable
+    private DBWebException confirmationError;
 
     public WebSQLParametersProvider(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo) {
         this.webSession = webSession;
         this.taskInfo = taskInfo;
+    }
+
+    @Nullable
+    DBWebException getConfirmationError() {
+        return confirmationError;
     }
 
     @Nullable
@@ -91,7 +96,7 @@ public class WebSQLParametersProvider extends SQLParametersProviderBase {
             return true;
 
         } catch (DBWebException e) {
-            log.error("Error getting SQL parameter values: " + e.getMessage(), e);
+            confirmationError = e;
             return false;
         }
     }

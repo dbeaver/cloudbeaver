@@ -31,7 +31,8 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContextProvider, SyncExecutor } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavNodeInfoResource, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
 import { getCachedMapResourceLoaderState, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
@@ -40,6 +41,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { type ITab, type ITabOptions, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 import {
   ESqlDataSourceFeatures,
+  getSqlEditorName,
   type ISQLDatasourceUpdateData,
   type ISqlEditorTabState,
   SQL_EDITOR_TAB_STATE_SCHEMA,
@@ -69,6 +71,7 @@ const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(
   ContainerResource,
   CommonDialogService,
   SqlEditorModelService,
+  LocalizationService,
 ])
 export class SqlEditorTabService extends Bootstrap {
   get sqlEditorTabs(): ITab<ISqlEditorTabState>[] {
@@ -77,6 +80,7 @@ export class SqlEditorTabService extends Bootstrap {
 
   readonly tabHandler: TabHandler<ISqlEditorTabState>;
   readonly onCanClose: Executor<ITab<ISqlEditorTabState>>;
+  readonly onClose: SyncExecutor<{ tab: ITab<ISqlEditorTabState>; stage: 'before' | 'after' }>;
 
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
@@ -92,10 +96,12 @@ export class SqlEditorTabService extends Bootstrap {
     private readonly containerResource: ContainerResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly sqlEditorModelService: SqlEditorModelService,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
 
     this.onCanClose = new Executor();
+    this.onClose = new SyncExecutor();
 
     this.tabHandler = this.navigationTabsService.registerTabHandler<ISqlEditorTabState>({
       key: sqlEditorTabHandlerKey,
@@ -494,54 +500,85 @@ export class SqlEditorTabService extends Bootstrap {
           continue;
         }
 
-        const canDisconnect = await this.handleCanTabClose(tab);
+        try {
+          const canDisconnect = await this.handleCanTabClose(tab);
 
-        if (!canDisconnect) {
-          ExecutorInterrupter.interrupt(contexts);
-          return;
+          if (!canDisconnect) {
+            ExecutorInterrupter.interrupt(contexts);
+            return;
+          }
+        } finally {
+          this.onClose.execute({ tab, stage: 'after' });
         }
       }
     }
   }
 
   private async handleCanTabClose(editorTab: ITab<ISqlEditorTabState>) {
-    const canCloseTabs = await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
-
-    if (!canCloseTabs) {
-      return false;
-    }
-
-    const contexts = await this.onCanClose.execute(editorTab);
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return false;
-    }
-
     const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
+    const context = dataSource?.executionContext;
+    const executionContext = context && this.connectionExecutionContextService.get(context.id);
+    let canClose = false;
 
-    if (dataSource?.isSaved === false && !dataSource?.isReadonly()) {
-      const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
-        title: 'plugin_sql_editor_navigation_tab_data_source_save_confirmation_title',
-        subTitle: dataSource.name ?? undefined,
-        message: 'plugin_sql_editor_navigation_tab_data_source_save_confirmation_message',
-        confirmActionText: 'ui_yes',
-        showExtraAction: true,
-      });
+    try {
+      if (context && executionContext?.executing) {
+        const { status } = await this.commonDialogService.open(ConfirmationDialog, {
+          title: this.localizationService.translate('plugin_sql_editor_navigation_tab_close_confirmation_title', undefined, {
+            name: getSqlEditorName(editorTab.handlerState, dataSource),
+          }),
+          message: 'plugin_sql_editor_navigation_tab_close_confirmation_message',
+          confirmActionText: 'ui_close',
+        });
 
-      if (status === DialogueStateResult.Rejected) {
-        if (result?.isExtraAction) {
-          await dataSource.reset();
-        } else {
+        if (status !== DialogueStateResult.Resolved) {
           return false;
         }
-      } else {
-        await dataSource.save();
+
+        this.onClose.execute({ tab: editorTab, stage: 'before' });
+
+        await executionContext.cancel();
+      }
+
+      const canCloseTabs = await this.sqlResultTabsService.canCloseResultTabs(editorTab.handlerState);
+
+      if (!canCloseTabs) {
+        return false;
+      }
+
+      const contexts = await this.onCanClose.execute(editorTab);
+
+      if (ExecutorInterrupter.isInterrupted(contexts)) {
+        return false;
+      }
+
+      if (dataSource?.isSaved === false && !dataSource?.isReadonly()) {
+        const { status, result } = await this.commonDialogService.open(ConfirmationDialog, {
+          title: 'plugin_sql_editor_navigation_tab_data_source_save_confirmation_title',
+          subTitle: dataSource.name ?? undefined,
+          message: 'plugin_sql_editor_navigation_tab_data_source_save_confirmation_message',
+          confirmActionText: 'ui_yes',
+          showExtraAction: true,
+        });
+
+        if (status === DialogueStateResult.Rejected) {
+          if (result?.isExtraAction) {
+            await dataSource.reset();
+          } else {
+            return false;
+          }
+        } else {
+          await dataSource.save();
+        }
+      }
+
+      canClose = await this.sqlDataSourceService.canDestroy(editorTab.handlerState.editorId);
+
+      return canClose;
+    } finally {
+      if (!canClose) {
+        this.onClose.execute({ tab: editorTab, stage: 'after' });
       }
     }
-
-    const canDestroyDatasource = await this.sqlDataSourceService.canDestroy(editorTab.handlerState.editorId);
-
-    return canDestroyDatasource;
   }
 
   private async handleTabUnload(editorTab: ITab<ISqlEditorTabState>) {
@@ -564,15 +601,19 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabClose(editorTab: ITab<ISqlEditorTabState>) {
-    await this.sqlEditorModelService.destroy(editorTab.handlerState.editorId);
+    try {
+      await this.sqlEditorModelService.destroy(editorTab.handlerState.editorId);
 
-    const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
+      const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
 
-    if (dataSource?.executionContext) {
-      await this.sqlEditorService.destroyContext(dataSource.executionContext);
+      if (dataSource?.executionContext) {
+        await this.sqlEditorService.destroyContext(dataSource.executionContext);
+      }
+
+      await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
+    } finally {
+      this.onClose.execute({ tab: editorTab, stage: 'after' });
     }
-
-    await this.sqlDataSourceService.destroy(editorTab.handlerState.editorId);
   }
 }
 

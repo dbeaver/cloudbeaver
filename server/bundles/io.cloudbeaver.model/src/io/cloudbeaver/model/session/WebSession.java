@@ -29,6 +29,8 @@ import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.WebEventUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -634,7 +636,9 @@ public class WebSession extends BaseWebSession
             if (taskInfo == null) {
                 throw new DBWebException("Task '" + taskId + "' not found");
             }
-            if (removeOnFinish && !taskInfo.isRunning()) {
+            // Read the completion flag even when keeping the task, so its result is visible to this caller.
+            boolean running = taskInfo.isRunning();
+            if (removeOnFinish && !running) {
                 asyncTasks.remove(taskId);
             }
             return taskInfo;
@@ -689,9 +693,16 @@ public class WebSession extends BaseWebSession
 
     @NotNull
     public WebAsyncTaskInfo runAsyncTask(@NotNull WebAsyncTaskInfo asyncTask, @NotNull WebAsyncTaskProcessor<?> runnable) {
+        boolean supportsUserCancellationResult = runnable.supportsUserCancellationResult();
         AbstractJob job = new AbstractCancelableJob(asyncTask.getName()) {
             @Override
             public void cancelJob(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo) {
+                if (supportsUserCancellationResult) {
+                    if (taskInfo.requestUserCancellation()) {
+                        runnable.cancel();
+                    }
+                    return;
+                }
                 try {
                     runnable.cancel();
                 } finally {
@@ -707,6 +718,12 @@ public class WebSession extends BaseWebSession
                 DBRProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, WebSession.this, asyncTask);
 
                 try {
+                    if (asyncTask.isUserCancellationRequested()) {
+                        runnable.prepareUserCancellationResult();
+                        storeAsyncTaskResult(asyncTask, runnable);
+                        return Status.OK_STATUS;
+                    }
+
                     Number queryLimit = application.getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_QUERY_LIMIT);
                     if (queryLimit != null && curTaskCount > queryLimit.intValue()) {
                         throw new DBQuotaException(
@@ -714,9 +731,7 @@ public class WebSession extends BaseWebSession
                     }
 
                     runnable.run(taskMonitor);
-                    asyncTask.setResult(runnable.getResult());
-                    asyncTask.setExtendedResult(runnable.getExtendedResults());
-                    asyncTask.setStatus(DBWConstants.TASK_STATUS_FINISHED);
+                    storeAsyncTaskResult(asyncTask, runnable);
                 } catch (InvocationTargetException e) {
                     addSessionError(e.getTargetException());
                     asyncTask.setJobError(e.getTargetException());
@@ -731,10 +746,31 @@ public class WebSession extends BaseWebSession
             }
         };
 
+        if (supportsUserCancellationResult) {
+            job.addJobChangeListener(new JobChangeAdapter() {
+                @Override
+                public void done(@NotNull IJobChangeEvent event) {
+                    // Eclipse can cancel a queued job without invoking run().
+                    if (event.getResult().getSeverity() == IStatus.CANCEL && asyncTask.isRunning()
+                        && asyncTask.isUserCancellationRequested()) {
+                        runnable.prepareUserCancellationResult();
+                        storeAsyncTaskResult(asyncTask, runnable);
+                        asyncTask.setRunning(false);
+                        WebEventUtils.sendAsyncTaskEvent(WebSession.this, asyncTask);
+                    }
+                }
+            });
+        }
         asyncTask.setJob(job);
         asyncTask.setRunning(true);
         job.schedule();
         return asyncTask;
+    }
+
+    private static void storeAsyncTaskResult(@NotNull WebAsyncTaskInfo task, @NotNull WebAsyncTaskProcessor<?> runnable) {
+        task.setResult(runnable.getResult());
+        task.setExtendedResult(runnable.getExtendedResults());
+        task.setStatus(DBWConstants.TASK_STATUS_FINISHED);
     }
 
     public void addSessionError(@NotNull Throwable exception) {

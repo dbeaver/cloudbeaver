@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ public class WebSQLMessages extends NLS {
     public static String model_web_ai_query_confirmation_title;
     public static String model_web_ai_query_confirmation_message;
     public static String model_web_dialog_sql_param_title;
+    public static String model_web_sql_canceled_by_user;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, WebSQLMessages.class);

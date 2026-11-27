@@ -4,4 +4,6 @@ export default [
   ['plugin_sql_editor_navigation_tab_action_sql_editor_new_tooltip_context', 'Open SQL Editor for {arg:connection}'],
   ['plugin_sql_editor_navigation_tab_data_source_save_confirmation_title', 'Save changes'],
   ['plugin_sql_editor_navigation_tab_data_source_save_confirmation_message', 'Do you want to save changes?'],
+  ['plugin_sql_editor_navigation_tab_close_confirmation_title', 'Close “{arg:name}”?'],
+  ['plugin_sql_editor_navigation_tab_close_confirmation_message', 'Closing this tab will cancel query execution.'],
 ];
