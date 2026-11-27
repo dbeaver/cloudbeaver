@@ -162,8 +162,16 @@ export class CustomGraphQLClient extends GraphQLClient {
         throw new CanceledError('ui_processing_canceled');
       }
 
-      if (isAxiosError(error) && error.response?.data.message) {
-        throw new ServerInternalError({ ...error, message: error.response.data.message });
+      if (isAxiosError(error)) {
+        const data = error.response?.data;
+
+        if (typeof data?.message === 'string' && data.message) {
+          throw new ServerInternalError(data);
+        }
+
+        if (error.response?.status === 403) {
+          throw new ServerInternalError({ message: 'root_permission_denied' });
+        }
       }
 
       if (isClientError(error)) {
