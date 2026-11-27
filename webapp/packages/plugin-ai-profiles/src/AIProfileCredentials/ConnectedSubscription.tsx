@@ -54,7 +54,9 @@ export const ConnectedSubscription = observer<Props>(function ConnectedSubscript
   return (
     <>
       <div role="status">
-        {translate('plugin_ai_account_connected')}
+        {profile.accountProvider
+          ? translate('plugin_ai_account_provider_connected', undefined, { provider: profile.accountProvider })
+          : translate('plugin_ai_account_connected')}
         {profile.account?.email ? `: ${profile.account.email}` : ''}
       </div>
       <Container className="tw:self-start" keepSize>
