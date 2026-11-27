@@ -41,15 +41,17 @@ public class SQLParameterPreferencesTest extends CloudbeaverDBTest {
         savedPreferences.put(ModelPreferences.SQL_VARIABLES_ENABLED, userPreferences.get(ModelPreferences.SQL_VARIABLES_ENABLED));
         String parameterQuery = "SELECT :val";
         String variableQuery = "SELECT '${name_var}'";
+        Map<String, Object> disabledPreferences = Map.of(
+            ModelPreferences.SQL_PARAMETERS_ENABLED, false,
+            ModelPreferences.SQL_VARIABLES_ENABLED, false
+        );
 
         try {
-            store.updatePreferenceValues(Map.of(
-                ModelPreferences.SQL_PARAMETERS_ENABLED, false,
-                ModelPreferences.SQL_VARIABLES_ENABLED, false
-            ));
+            store.updatePreferenceValues(disabledPreferences);
             var processor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
             var context = processor.createContext(null, "PUBLIC", globalProject.getId());
             var disabledContext = new WebSQLCompletionContext(context);
+            store.updatePreferenceValues(disabledPreferences);
             var repeatedContext = new WebSQLCompletionContext(context);
 
             Assertions.assertSame(disabledContext.getSyntaxManager(), repeatedContext.getSyntaxManager());
@@ -68,10 +70,7 @@ public class SQLParameterPreferencesTest extends CloudbeaverDBTest {
             Assertions.assertEquals(1, countParameters(enabledContext, variableQuery));
             Assertions.assertEquals(0, countParameters(disabledContext, parameterQuery));
 
-            store.updatePreferenceValues(Map.of(
-                ModelPreferences.SQL_PARAMETERS_ENABLED, false,
-                ModelPreferences.SQL_VARIABLES_ENABLED, false
-            ));
+            store.updatePreferenceValues(disabledPreferences);
             var updatedContext = new WebSQLCompletionContext(context);
             Assertions.assertEquals(0, countParameters(updatedContext, parameterQuery));
             Assertions.assertEquals(0, countParameters(updatedContext, variableQuery));

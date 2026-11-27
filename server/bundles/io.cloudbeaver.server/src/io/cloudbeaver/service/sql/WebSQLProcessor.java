@@ -34,6 +34,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.ModelPreferences.SQLScriptStatementDelimiterMode;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -51,6 +52,7 @@ import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
@@ -117,37 +119,32 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     @NotNull
     ParserConfiguration getParserConfiguration() {
-        var userStore = webSession.getUserPreferenceStore();
-        var connectionStore = connection.getDataSourceContainer().getPreferenceStore();
+        var preferences = connection.getDataSourceContainer().getPreferenceStore();
         var configuration = parserConfiguration;
-        if (configuration != null && configuration.matches(
-            userStore.getRevision(), SQLScriptStatementDelimiterMode.fromPreferences(connectionStore)
-        )) {
+        if (configuration != null && configuration.matches(preferences)) {
             return configuration;
         }
 
-        // Preference updates use the same lock so both managers see the completed batch.
-        synchronized (userStore) {
+        synchronized (this) {
             configuration = parserConfiguration;
-            long revision = userStore.getRevision();
-            if (configuration == null || !configuration.matches(
-                revision, SQLScriptStatementDelimiterMode.fromPreferences(connectionStore)
-            )) {
+            if (configuration == null || !configuration.matches(preferences)) {
                 var dataSource = connection.getDataSource();
                 var syntaxManager = new SQLSyntaxManager();
-                syntaxManager.init(dataSource.getSQLDialect(), connectionStore);
+                syntaxManager.init(dataSource.getSQLDialect(), preferences);
                 var ruleManager = new SQLRuleManager(syntaxManager);
                 ruleManager.loadRules(dataSource, false);
-                configuration = new ParserConfiguration(revision, syntaxManager, ruleManager);
+                configuration = new ParserConfiguration(syntaxManager, ruleManager);
                 parserConfiguration = configuration;
             }
             return configuration;
         }
     }
 
-    record ParserConfiguration(long revision, @NotNull SQLSyntaxManager syntaxManager, @NotNull SQLRuleManager ruleManager) {
-        boolean matches(long revision, @NotNull SQLScriptStatementDelimiterMode delimiterMode) {
-            return this.revision == revision && syntaxManager.getStatementDelimiterMode() == delimiterMode;
+    record ParserConfiguration(@NotNull SQLSyntaxManager syntaxManager, @NotNull SQLRuleManager ruleManager) {
+        boolean matches(@NotNull DBPPreferenceStore preferences) {
+            return syntaxManager.isParametersEnabled() == preferences.getBoolean(ModelPreferences.SQL_PARAMETERS_ENABLED)
+                && syntaxManager.isVariablesEnabled() == preferences.getBoolean(ModelPreferences.SQL_VARIABLES_ENABLED)
+                && syntaxManager.getStatementDelimiterMode() == SQLScriptStatementDelimiterMode.fromPreferences(preferences);
         }
     }
 
