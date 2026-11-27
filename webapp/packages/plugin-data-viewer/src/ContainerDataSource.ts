@@ -241,7 +241,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     prevResults: IDatabaseResultSet[],
     context: IConnectionExecutionContextInfo,
     format = this.dataFormat,
-  ): AsyncTask | Promise<AsyncTask> {
+  ): Promise<AsyncTask> {
     const task = this.asyncTaskInfoService.create(async () => {
       const config = this.getConfig(prevResults, context, format);
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
