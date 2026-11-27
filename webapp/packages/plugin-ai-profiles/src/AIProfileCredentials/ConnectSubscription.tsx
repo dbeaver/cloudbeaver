@@ -11,16 +11,17 @@ import { observer } from 'mobx-react-lite';
 import { Button, Container, useTranslate } from '@cloudbeaver/core-blocks';
 
 interface Props {
+  provider?: string | null;
   disabled: boolean;
   onConnect: () => Promise<void>;
 }
 
-export const ConnectSubscription = observer<Props>(function ConnectSubscription({ disabled, onConnect }) {
+export const ConnectSubscription = observer<Props>(function ConnectSubscription({ provider, disabled, onConnect }) {
   const translate = useTranslate();
   return (
     <Container className="tw:self-start" keepSize>
       <Button type="button" disabled={disabled} onClick={onConnect}>
-        {translate('plugin_ai_account_connect')}
+        {provider ? translate('plugin_ai_account_connect_provider', undefined, { provider }) : translate('plugin_ai_account_connect')}
       </Button>
     </Container>
   );

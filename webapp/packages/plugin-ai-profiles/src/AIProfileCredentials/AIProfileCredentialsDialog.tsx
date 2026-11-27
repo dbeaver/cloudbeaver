@@ -33,6 +33,7 @@ import { AIProfileCredentialsFields } from './AIProfileCredentialsFields.js';
 import { useAIProfileAuthorization } from './useAIProfileAuthorization.js';
 import { AIProfilesResource } from '../AIProfilesResource.js';
 import type { IAIProfileCredentialsFormState } from './IAIProfileCredentialsFormState.js';
+import { getAIProfileCredentialsFormPart } from './getAIProfileCredentialsFormPart.js';
 
 export interface IAIProfileCredentialsDialogPayload {
   formState: IFormState<IAIProfileCredentialsFormState>;
@@ -51,12 +52,21 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
   const aiProfilesResource = useService(AIProfilesResource);
   const aiEnginesResource = useService(AiEnginesResource);
   const profile = aiProfilesResource.get(formState.state.profileId);
+  const part = getAIProfileCredentialsFormPart(formState);
+  const accountAuthentication = !!profile?.deviceAuthorizationAvailable && part.state.accountAuthentication;
   const engine = aiEnginesResource.data.find(engine => engine.id === profile?.engineId);
   const authorization = useAIProfileAuthorization(formState, payload.onSuccess);
+  const isAuthorizing = accountAuthentication && authorization.processing;
+  const isAuthorized = accountAuthentication && !authorization.processing && !!profile?.account && profile.accountAuthentication;
+  const canUseAccount = accountAuthentication && !authorization.processing && !!profile?.account && !profile.accountAuthentication;
   const error = getFirstException(formState.exception);
   const isSaving = !!formState.savingPromise;
   const form = useForm({
     onSubmit: async function onSubmit() {
+      if (accountAuthentication) {
+        return;
+      }
+
       const saved = await formState.save();
       const exception = getFirstException(formState.exception);
 
@@ -73,12 +83,12 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     },
   });
 
-  async function close(): Promise<void> {
+  async function close(onClose: () => void = rejectDialog): Promise<void> {
     if (isSaving) {
       return;
     }
 
-    if (formState.isChanged) {
+    if (formState.isChanged && (!accountAuthentication || part.state.token !== part.initialState.token)) {
       const { status } = await commonDialogService.open(ConfirmationDialog, {
         title: 'ui_discard_changes',
         message: 'ui_discard_changes_message',
@@ -92,7 +102,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
     }
 
     if (await authorization.confirmLeave()) {
-      rejectDialog();
+      onClose();
     }
   }
 
@@ -102,7 +112,7 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
         title="plugin_ai_credentials_dialog_title"
         subTitle="plugin_ai_credentials_dialog_description"
         icon={engine?.icon}
-        onReject={isSaving ? undefined : close}
+        onReject={isSaving ? undefined : () => close()}
       />
       <CommonDialogBody>
         <Form context={form} contents>
@@ -112,15 +122,43 @@ export const AIProfileCredentialsDialog: DialogComponent<IAIProfileCredentialsDi
           </Container>
         </Form>
       </CommonDialogBody>
-      <CommonDialogFooter>
-        <Fill />
-        <Button type="button" variant="secondary" disabled={isSaving} onClick={close}>
-          {translate('ui_processing_cancel')}
-        </Button>
-        <Button type="button" disabled={formState.isDisabled || isSaving || !formState.isChanged} onClick={() => form.submit()}>
-          {translate('ui_processing_save')}
-        </Button>
-      </CommonDialogFooter>
+      {isAuthorizing && (
+        <CommonDialogFooter>
+          <Fill />
+          <Button type="button" variant="secondary" onClick={() => authorization.confirmLeave()}>
+            {translate('plugin_ai_device_cancel_authorization')}
+          </Button>
+        </CommonDialogFooter>
+      )}
+      {isAuthorized && (
+        <CommonDialogFooter>
+          <Fill />
+          <Button type="button" onClick={() => close(resolveDialog)}>
+            {translate('plugin_ai_credentials_done')}
+          </Button>
+        </CommonDialogFooter>
+      )}
+      {canUseAccount && (
+        <CommonDialogFooter>
+          <Fill />
+          <Button type="button" disabled={formState.isDisabled || isSaving} onClick={() => formState.save()}>
+            {profile.accountProvider
+              ? translate('plugin_ai_account_use_provider', undefined, { provider: profile.accountProvider })
+              : translate('plugin_ai_account_use')}
+          </Button>
+        </CommonDialogFooter>
+      )}
+      {!accountAuthentication && (
+        <CommonDialogFooter>
+          <Fill />
+          <Button type="button" variant="secondary" disabled={isSaving} onClick={() => close()}>
+            {translate('ui_processing_cancel')}
+          </Button>
+          <Button type="button" disabled={formState.isDisabled || isSaving || !formState.isChanged} onClick={() => form.submit()}>
+            {translate('ui_processing_save')}
+          </Button>
+        </CommonDialogFooter>
+      )}
     </CommonDialogWrapper>
   );
 });

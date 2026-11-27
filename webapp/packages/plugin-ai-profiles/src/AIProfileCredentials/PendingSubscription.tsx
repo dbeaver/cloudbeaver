@@ -25,7 +25,16 @@ export const PendingSubscription = observer<Props>(function PendingSubscription(
   return (
     <>
       <div role="status">
-        <Loader message="plugin_ai_device_waiting" hideMessage={false} inline small />
+        <Loader
+          message={
+            profile.accountProvider
+              ? translate('plugin_ai_device_waiting_provider', undefined, { provider: profile.accountProvider })
+              : 'plugin_ai_device_waiting'
+          }
+          hideMessage={false}
+          inline
+          small
+        />
       </div>
       {authorization && (
         <>
