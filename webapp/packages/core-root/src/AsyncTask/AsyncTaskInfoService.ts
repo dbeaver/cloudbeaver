@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { catchError, EMPTY, exhaustMap, from, Subscription, timer } from 'rxjs';
+import type { Subscription } from 'rxjs';
 
 import { Disposable, injectable } from '@cloudbeaver/core-di';
 import { type AsyncTaskInfo, GraphQLService, type WsAsyncTaskInfo } from '@cloudbeaver/core-sdk';
@@ -31,7 +31,6 @@ export class AsyncTaskInfoService extends Disposable {
   private readonly pendingEvents: Map<string, IBaseAsyncTaskEvent[]>;
   private connection: Subscription | null;
   private onEventUnsubscribe: Unsubscribe | null;
-  private readonly polling = new Subscription();
 
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -83,7 +82,6 @@ export class AsyncTaskInfoService extends Disposable {
   }
 
   override dispose(): void {
-    this.polling.unsubscribe();
     this.connection?.unsubscribe();
     this.onEventUnsubscribe?.();
   }
@@ -149,35 +147,7 @@ export class AsyncTaskInfoService extends Disposable {
       await task.run();
     }
 
-    // A task can finish while its topic subscription is being re-established.
-    // Recover missed completion events without delaying normal WebSocket updates.
-    const polling = timer(5000, 5000)
-      .pipe(
-        exhaustMap(() => {
-          if (!task.info?.running) {
-            return EMPTY;
-          }
-
-          const taskId = task.info.id;
-
-          return from(
-            this.graphQLService.sdk.getAsyncTaskInfo({ taskId, removeOnFinish: false }).then(async ({ taskInfo }) => {
-              if (!polling.closed && !taskInfo.running && task.info?.running) {
-                await task.updateInfoAsync(() => Promise.resolve(taskInfo));
-              }
-            }),
-          ).pipe(catchError(() => EMPTY));
-        }),
-      )
-      .subscribe();
-
-    this.polling.add(polling);
-
-    try {
-      return await task.promise;
-    } finally {
-      polling.unsubscribe();
-    }
+    return task.promise;
   }
 
   async remove(taskId: string): Promise<void> {
