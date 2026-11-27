@@ -191,9 +191,9 @@ type ServerConfig {
     "Defines if secret manager is enabled"
     secretManagerEnabled: Boolean!  @since(version: "24.3.2")
 
-    "Defines is it is possible to save user database credentials"
+    "Defines if it is possible to save user database credentials"
     publicCredentialsSaveEnabled: Boolean!
-    "Defines is it is possible to save global database credentials"
+    "Defines if it is possible to save global database credentials"
     adminCredentialsSaveEnabled: Boolean!
 
     "Enables database user password changes."
@@ -349,7 +349,7 @@ type DriverInfo {
     Driver properties.
     Note: it is expensive property and it may produce database server roundtrips.
     Call it only when you really need it.
-    These properties are for advanced users in usually shouldn't be specified for new connections.
+    These properties are for advanced users and usually shouldn't be specified for new connections.
     """
     driverProperties: [ObjectPropertyInfo!]!
     "Driver parameters (map name->value)"
@@ -729,7 +729,7 @@ input NetworkHandlerConfigInput {
     id: ID!
     "Defines if the network handler should be enabled"
     enabled: Boolean
-    "Network handler type (TUNNEL, PROXY, CONFIG)"
+    "SSH network handler auth type (PASSWORD, PUBLIC_KEY, AGENT)"
     authType: NetworkHandlerAuthType @deprecated (reason: "use properties")
     "Sets user name for the network handler (SSH)"
     userName: String
@@ -776,13 +776,13 @@ input ConnectionConfig {
     properties: Object
 
     "Set keep-alive interval"
-    keepAliveInterval: Int @deprecated(reason: "25.2.1 use expertPropertyValues instead")
+    keepAliveInterval: Int @deprecated(reason: "25.2.1 use expertSettingsValues instead")
 
     "Sets auto-commit connection state"
-    autocommit: Boolean @deprecated(reason: "25.2.1 use expertPropertyValues instead")
+    autocommit: Boolean @deprecated(reason: "25.2.1 use expertSettingsValues instead")
 
     "Sets read-only connection state"
-    readOnly: Boolean @deprecated(reason: "25.2.1 use expertPropertyValues instead")
+    readOnly: Boolean @deprecated(reason: "25.2.1 use expertSettingsValues instead")
 
     # User credentials
 
@@ -818,9 +818,9 @@ input ConnectionConfig {
     "Configuration type (MANUAL, URL)"
     configurationType: DriverConfigurationType
     "Sets catalog name for the connection"
-    defaultCatalogName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
+    defaultCatalogName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertSettingsValues instead")
     "Sets schema name for the connection"
-    defaultSchemaName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
+    defaultSchemaName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertSettingsValues instead")
     "Default user settings for connection"
     defaultUserPreferences: Object @since(version: "26.0.2")
 
