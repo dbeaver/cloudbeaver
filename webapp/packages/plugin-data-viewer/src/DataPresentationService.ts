@@ -100,12 +100,12 @@ export class DataPresentationService {
     if (presentationId) {
       const presentation = this.dataPresentations.get(presentationId);
 
-      if (presentation) {
-        if (presentation.hidden?.(dataFormat, model, resultIndex)) {
-          return null;
-        }
-
+      if (presentation && !presentation.hidden?.(dataFormat, model, resultIndex)) {
         return presentation;
+      }
+
+      if (presentation && type === DataPresentationType.toolsPanel) {
+        return null;
       }
     }
 

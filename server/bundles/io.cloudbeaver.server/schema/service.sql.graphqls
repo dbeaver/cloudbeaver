@@ -145,9 +145,31 @@ type DatabaseDocument {
     data: Object
 }
 
+type SQLTimeSeriesData @since(version: "26.3.0") {
+    "Number of source rows fetched, independent of the number of graph points"
+    sourceRowCount: Int!
+    series: [SQLTimeSeriesSeries!]!
+}
+
+type SQLTimeSeriesSeries @since(version: "26.3.0") {
+    id: ID!
+    label: String!
+    points: [SQLTimeSeriesPoint!]!
+}
+
+type SQLTimeSeriesPoint @since(version: "26.3.0") {
+    "Unix epoch milliseconds"
+    timestamp: Float!
+    value: Float!
+}
+
 type SQLResultSet {
     "Result set ID"
     id: ID!
+    "Additional formats available when reading this result again"
+    availableReadFormats: [ResultDataFormat!]! @since(version: "26.3.0")
+    "Normalized series, returned only for the timeseries result format."
+    timeSeriesData: SQLTimeSeriesData @since(version: "26.3.0")
     "Returns list of columns in the result set"
     columns: [ SQLResultColumn ]
     "Returns list of rows in the result set. Each row is an array of column values"

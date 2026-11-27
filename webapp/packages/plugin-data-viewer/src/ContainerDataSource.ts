@@ -108,6 +108,17 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     }
   }
 
+  override readResultInFormat(result: IDatabaseResultSet, format: ResultDataFormat): ITask<SqlExecuteInfo> | null {
+    const executionContext = this.executionContext;
+    const context = executionContext?.context;
+
+    if (!executionContext || !context || !this.getPreviousResultId([result], context)) {
+      return null;
+    }
+
+    return this.runResultRead(executionContext, result, () => this.getRequestTask([result], context, format));
+  }
+
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
 
@@ -197,7 +208,7 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
     return prevResults;
   }
 
-  protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
+  protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo, format = this.dataFormat) {
     const options = this.options;
 
     if (!options) {
@@ -222,19 +233,23 @@ export class ContainerDataSource<TOptions extends IDataContainerOptions = IDataC
         anyConstraint: options.anyConstraint,
         shouldUseDisjunctive: options.shouldUseDisjunctive,
       },
-      dataFormat: this.dataFormat,
+      dataFormat: format,
     };
   }
 
-  protected async getRequestTask(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo): Promise<AsyncTask> {
+  protected getRequestTask(
+    prevResults: IDatabaseResultSet[],
+    context: IConnectionExecutionContextInfo,
+    format = this.dataFormat,
+  ): Promise<AsyncTask> {
     const task = this.asyncTaskInfoService.create(async () => {
-      const config = this.getConfig(prevResults, context);
+      const config = this.getConfig(prevResults, context, format);
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
 
       return taskInfo;
     });
 
-    return task;
+    return Promise.resolve(task);
   }
 
   override setExecutionContext(context: IConnectionExecutionContext | null): this {

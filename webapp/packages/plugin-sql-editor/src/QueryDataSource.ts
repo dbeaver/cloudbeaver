@@ -41,7 +41,6 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 import { DialogueStateResult, type CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import { renderQueryParamsForConfirmation } from './renderQueryParamsForConfirmation.js';
 
 export interface IDataQueryOptions extends IDatabaseDataOptions {
   query: string;
@@ -271,6 +270,23 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
   }
 
+  override readResultInFormat(result: IDatabaseResultSet, format: ResultDataFormat): ITask<SqlExecuteInfo> | null {
+    const executionContext = this.executionContext;
+    const context = executionContext?.context;
+    const options = this.prevOptions;
+    const resultId = context ? this.getPreviousResultId([result], context) : undefined;
+
+    if (!executionContext || !context || !options || !resultId) {
+      return null;
+    }
+
+    const limit = this.count;
+
+    return this.runResultRead(executionContext, result, () =>
+      this.asyncTaskInfoService.create(() => this.executeQuery(context, options, resultId, limit, format)),
+    );
+  }
+
   resetQueryParameters(): void {
     this.previousQueryParameters = this.currentQueryParameters || this.previousQueryParameters;
     this.currentQueryParameters = null;
@@ -281,6 +297,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     options: TOptions,
     firstResultId: string | undefined,
     limit: number,
+    format = this.dataFormat,
   ): Promise<AsyncTaskInfo> {
     const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
       projectId: executionContextInfo.projectId,
@@ -295,7 +312,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         where: options.whereFilter || undefined,
         anyConstraint: options.anyConstraint,
       },
-      dataFormat: this.dataFormat,
+      dataFormat: format,
       readLogs: options.readLogs,
       isInteractive: true,
     });
@@ -334,6 +351,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
       // TODO: this UI thing should be moved outside of the `plugin-sql-editor` package to use sql editor component for preview
       //       it is partially fixed, but still this UI code should be somewhere else
+      const { renderQueryParamsForConfirmation } = await import('./renderQueryParamsForConfirmation.js');
       const dialogPromise = this.commonDialogService.open(ConfirmationDialog, {
         title: queryParamsEvent.title,
         message: queryParamsEvent.message,

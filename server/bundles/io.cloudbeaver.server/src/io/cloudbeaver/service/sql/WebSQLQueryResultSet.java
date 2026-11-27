@@ -49,6 +49,9 @@ public class WebSQLQueryResultSet {
     private boolean hasDynamicTrace;
     private boolean readOnly;
     private String readOnlyStatus;
+    private List<WebDataFormat> availableReadFormats = List.of();
+    private Object timeSeriesData;
+    private int timeSeriesSourceRowCount;
 
     public WebSQLQueryResultSet() {
     }
@@ -56,6 +59,31 @@ public class WebSQLQueryResultSet {
     @Property
     public String getId() {
         return resultsInfo == null ? null : resultsInfo.getId();
+    }
+
+    @Property
+    @NotNull
+    public List<WebDataFormat> getAvailableReadFormats() {
+        return availableReadFormats;
+    }
+
+    public void setAvailableReadFormats(@NotNull List<WebDataFormat> availableReadFormats) {
+        this.availableReadFormats = availableReadFormats;
+    }
+
+    @Property
+    @Nullable
+    public Object getTimeSeriesData() {
+        return timeSeriesData;
+    }
+
+    public void setTimeSeriesData(@NotNull Object timeSeriesData, int sourceRowCount) {
+        this.timeSeriesData = timeSeriesData;
+        this.timeSeriesSourceRowCount = sourceRowCount;
+    }
+
+    public int getFetchedRowCount() {
+        return timeSeriesData == null ? rows.size() : timeSeriesSourceRowCount;
     }
 
     @Property
@@ -173,7 +201,7 @@ public class WebSQLQueryResultSet {
 
     @Property
     public boolean isReadOnly() {
-        return readOnly;
+        return readOnly || timeSeriesData != null;
     }
 
     @Property
