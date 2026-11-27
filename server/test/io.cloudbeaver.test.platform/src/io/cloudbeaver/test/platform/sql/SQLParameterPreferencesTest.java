@@ -17,7 +17,6 @@
 package io.cloudbeaver.test.platform.sql;
 
 import io.cloudbeaver.service.sql.WebSQLCompletionContext;
-import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import io.cloudbeaver.test.platform.CloudbeaverDBTest;
 import org.eclipse.jface.text.Document;
@@ -50,30 +49,38 @@ public class SQLParameterPreferencesTest extends CloudbeaverDBTest {
             ));
             var processor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
             var context = processor.createContext(null, "PUBLIC", globalProject.getId());
+            var disabledContext = new WebSQLCompletionContext(context);
+            var repeatedContext = new WebSQLCompletionContext(context);
 
-            Assertions.assertEquals(0, countParameters(context, parameterQuery));
-            Assertions.assertEquals(0, countParameters(context, variableQuery));
+            Assertions.assertSame(disabledContext.getSyntaxManager(), repeatedContext.getSyntaxManager());
+            Assertions.assertSame(disabledContext.getRuleManager(), repeatedContext.getRuleManager());
+            Assertions.assertEquals(0, countParameters(disabledContext, parameterQuery));
+            Assertions.assertEquals(0, countParameters(disabledContext, variableQuery));
 
             store.updatePreferenceValues(Map.of(
                 ModelPreferences.SQL_PARAMETERS_ENABLED, true,
                 ModelPreferences.SQL_VARIABLES_ENABLED, true
             ));
-            Assertions.assertEquals(1, countParameters(context, parameterQuery));
-            Assertions.assertEquals(1, countParameters(context, variableQuery));
+            var enabledContext = new WebSQLCompletionContext(context);
+            Assertions.assertNotSame(disabledContext.getSyntaxManager(), enabledContext.getSyntaxManager());
+            Assertions.assertNotSame(disabledContext.getRuleManager(), enabledContext.getRuleManager());
+            Assertions.assertEquals(1, countParameters(enabledContext, parameterQuery));
+            Assertions.assertEquals(1, countParameters(enabledContext, variableQuery));
+            Assertions.assertEquals(0, countParameters(disabledContext, parameterQuery));
 
             store.updatePreferenceValues(Map.of(
                 ModelPreferences.SQL_PARAMETERS_ENABLED, false,
                 ModelPreferences.SQL_VARIABLES_ENABLED, false
             ));
-            Assertions.assertEquals(0, countParameters(context, parameterQuery));
-            Assertions.assertEquals(0, countParameters(context, variableQuery));
+            var updatedContext = new WebSQLCompletionContext(context);
+            Assertions.assertEquals(0, countParameters(updatedContext, parameterQuery));
+            Assertions.assertEquals(0, countParameters(updatedContext, variableQuery));
         } finally {
             store.updatePreferenceValues(savedPreferences);
         }
     }
 
-    private static int countParameters(@NotNull WebSQLContextInfo context, @NotNull String query) {
-        var completionContext = new WebSQLCompletionContext(context);
+    private static int countParameters(@NotNull WebSQLCompletionContext completionContext, @NotNull String query) {
         var parserContext = new SQLParserContext(
             completionContext.getDataSource(),
             completionContext.getSyntaxManager(),

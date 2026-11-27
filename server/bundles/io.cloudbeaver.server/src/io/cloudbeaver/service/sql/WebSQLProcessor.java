@@ -34,6 +34,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences.SQLScriptStatementDelimiterMode;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -84,6 +85,7 @@ public class WebSQLProcessor implements WebSessionProvider {
     private final WebSession webSession;
     private final WebConnectionInfo connection;
     private final Map<String, WebSQLContextInfo> contexts = new LinkedHashMap<>();
+    private volatile ParserConfiguration parserConfiguration;
 
     private final AtomicInteger contextId = new AtomicInteger();
 
@@ -110,18 +112,43 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     @NotNull
     public SQLSyntaxManager getSyntaxManager() {
-        // The processor outlives preference updates and may be used by multiple SQL tasks.
-        SQLSyntaxManager syntaxManager = new SQLSyntaxManager();
-        syntaxManager.init(
-            connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
-        return syntaxManager;
+        return getParserConfiguration().syntaxManager();
     }
 
     @NotNull
-    SQLRuleManager createRuleManager(@NotNull SQLSyntaxManager syntaxManager) {
-        SQLRuleManager ruleManager = new SQLRuleManager(syntaxManager);
-        ruleManager.loadRules(connection.getDataSource(), false);
-        return ruleManager;
+    ParserConfiguration getParserConfiguration() {
+        var userStore = webSession.getUserPreferenceStore();
+        var connectionStore = connection.getDataSourceContainer().getPreferenceStore();
+        var configuration = parserConfiguration;
+        if (configuration != null && configuration.matches(
+            userStore.getRevision(), SQLScriptStatementDelimiterMode.fromPreferences(connectionStore)
+        )) {
+            return configuration;
+        }
+
+        // Preference updates use the same lock so both managers see the completed batch.
+        synchronized (userStore) {
+            configuration = parserConfiguration;
+            long revision = userStore.getRevision();
+            if (configuration == null || !configuration.matches(
+                revision, SQLScriptStatementDelimiterMode.fromPreferences(connectionStore)
+            )) {
+                var dataSource = connection.getDataSource();
+                var syntaxManager = new SQLSyntaxManager();
+                syntaxManager.init(dataSource.getSQLDialect(), connectionStore);
+                var ruleManager = new SQLRuleManager(syntaxManager);
+                ruleManager.loadRules(dataSource, false);
+                configuration = new ParserConfiguration(revision, syntaxManager, ruleManager);
+                parserConfiguration = configuration;
+            }
+            return configuration;
+        }
+    }
+
+    record ParserConfiguration(long revision, @NotNull SQLSyntaxManager syntaxManager, @NotNull SQLRuleManager ruleManager) {
+        boolean matches(long revision, @NotNull SQLScriptStatementDelimiterMode delimiterMode) {
+            return this.revision == revision && syntaxManager.getStatementDelimiterMode() == delimiterMode;
+        }
     }
 
     public DBCExecutionContext getExecutionContext() {
@@ -185,7 +212,8 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         WebSQLParametersProvider parametersProvider = new WebSQLParametersProvider(webSession, asyncTask);
 
-        SQLSyntaxManager syntaxManager = getSyntaxManager();
+        var parserConfiguration = getParserConfiguration();
+        var syntaxManager = parserConfiguration.syntaxManager();
         var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql, parametersProvider);
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
@@ -209,7 +237,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             SQLParserContext parserContext = new SQLParserContext(
                 context.getDataSource(),
                 syntaxManager,
-                createRuleManager(syntaxManager),
+                parserConfiguration.ruleManager(),
                 document);
 
             SQLScriptElement element = SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());

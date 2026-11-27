@@ -38,14 +38,11 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
     private static final Log log = Log.getLog(WebSQLCompletionContext.class);
 
     private final WebSQLContextInfo sqlContext;
-    private final SQLSyntaxManager syntaxManager;
-    private final SQLRuleManager ruleManager;
+    private final WebSQLProcessor.ParserConfiguration parserConfiguration;
 
     public WebSQLCompletionContext(@NotNull WebSQLContextInfo context) {
         this.sqlContext = context;
-        var processor = context.getProcessor();
-        this.syntaxManager = processor.getSyntaxManager();
-        this.ruleManager = processor.createRuleManager(syntaxManager);
+        this.parserConfiguration = context.getProcessor().getParserConfiguration();
     }
 
     @Override
@@ -63,13 +60,13 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
     @NotNull
     @Override
     public SQLSyntaxManager getSyntaxManager() {
-        return syntaxManager;
+        return parserConfiguration.syntaxManager();
     }
 
     @NotNull
     @Override
     public SQLRuleManager getRuleManager() {
-        return ruleManager;
+        return parserConfiguration.ruleManager();
     }
 
     @Override

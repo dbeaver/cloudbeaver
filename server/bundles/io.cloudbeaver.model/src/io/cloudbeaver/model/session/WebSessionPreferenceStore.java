@@ -29,6 +29,7 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
 
     @NotNull
     private final WebUserContext userContext;
+    private volatile long revision;
 
     public WebSessionPreferenceStore(
         @NotNull WebUserContext userContext,
@@ -43,8 +44,18 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
         return userPreferences;
     }
 
+    public long getRevision() {
+        return revision;
+    }
+
+    @Override
+    public synchronized void updateAllUserPreferences(@NotNull Map<String, Object> newUserPreferences) {
+        super.updateAllUserPreferences(newUserPreferences);
+        revision++;
+    }
+
     // to avoid redundant sm api call
-    public void updatePreferenceValues(@NotNull Map<String, Object> newValues) throws DBException {
+    public synchronized void updatePreferenceValues(@NotNull Map<String, Object> newValues) throws DBException {
         if (userContext.getUser() != null) {
             userContext.getSecurityController().setCurrentUserParameters(newValues);
         }
@@ -55,6 +66,7 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
                 userPreferences.put(entry.getKey(), entry.getValue());
             }
         }
+        revision++;
     }
 
     @Override
