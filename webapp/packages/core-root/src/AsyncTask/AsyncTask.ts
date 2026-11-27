@@ -44,8 +44,14 @@ export class AsyncTask {
   private readonly init: () => Promise<AsyncTaskInfo>;
   private readonly cancel: (id: string) => Promise<void>;
   private initPromise: Promise<void> | null;
+  private pollTimeout: ReturnType<typeof setTimeout> | undefined;
+  private disposed = false;
 
-  constructor(init: () => Promise<AsyncTaskInfo>, cancel: (id: string) => Promise<void>) {
+  constructor(
+    init: () => Promise<AsyncTaskInfo>,
+    cancel: (id: string) => Promise<void>,
+    private readonly getInfo?: (id: string) => Promise<AsyncTaskInfo>,
+  ) {
     this._id = uuid();
     this.init = init;
     this.cancel = cancel;
@@ -79,6 +85,10 @@ export class AsyncTask {
   }
 
   async updateInfoAsync(getter: (task: AsyncTask) => Promise<AsyncTaskInfo>): Promise<void> {
+    if (this.disposed) {
+      return;
+    }
+
     const init = this.info === null;
 
     if (this.updatingAsync) {
@@ -92,6 +102,7 @@ export class AsyncTask {
       return;
     }
 
+    clearTimeout(this.pollTimeout);
     this.updatingAsync = true;
 
     try {
@@ -100,6 +111,11 @@ export class AsyncTask {
       }
 
       const info = await getter(this);
+
+      if (this.disposed) {
+        return;
+      }
+
       this.updateInfo(info);
 
       if (init && this._cancelled) {
@@ -107,7 +123,26 @@ export class AsyncTask {
       }
     } finally {
       this.updatingAsync = false;
+      this.schedulePoll();
     }
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    clearTimeout(this.pollTimeout);
+  }
+
+  private schedulePoll(): void {
+    if (this.disposed || !this.getInfo || !this.info?.running) {
+      return;
+    }
+
+    // A completion event can be missed while the task topic is being subscribed.
+    this.pollTimeout = setTimeout(() => {
+      this.updateInfoAsync(task => this.getInfo!(task.info!.id)).catch(error => {
+        console.error('Failed to refresh async task status', error);
+      });
+    }, 5000);
   }
 
   async cancelAsync(): Promise<void> {
