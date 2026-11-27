@@ -34,7 +34,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ModelPreferences.SQLScriptStatementDelimiterMode;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -84,8 +83,6 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private final WebSession webSession;
     private final WebConnectionInfo connection;
-    private final SQLSyntaxManager syntaxManager;
-    private final SQLRuleManager ruleManager;
     private final Map<String, WebSQLContextInfo> contexts = new LinkedHashMap<>();
 
     private final AtomicInteger contextId = new AtomicInteger();
@@ -93,13 +90,6 @@ public class WebSQLProcessor implements WebSessionProvider {
     WebSQLProcessor(@NotNull WebSession webSession, @NotNull WebConnectionInfo connection) {
         this.webSession = webSession;
         this.connection = connection;
-
-        syntaxManager = new SQLSyntaxManager();
-        syntaxManager.init(
-            connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
-
-        ruleManager = new SQLRuleManager(syntaxManager);
-        ruleManager.loadRules(connection.getDataSource(), false);
     }
 
     void dispose() {
@@ -118,13 +108,19 @@ public class WebSQLProcessor implements WebSessionProvider {
         return webSession;
     }
 
+    @NotNull
     public SQLSyntaxManager getSyntaxManager() {
-        syntaxManager.setStatementDelimiterMode(SQLScriptStatementDelimiterMode.fromPreferences(
-            connection.getDataSourceContainer().getPreferenceStore()));
+        // The processor outlives preference updates and may be used by multiple SQL tasks.
+        SQLSyntaxManager syntaxManager = new SQLSyntaxManager();
+        syntaxManager.init(
+            connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
         return syntaxManager;
     }
 
-    SQLRuleManager getRuleManager() {
+    @NotNull
+    SQLRuleManager createRuleManager(@NotNull SQLSyntaxManager syntaxManager) {
+        SQLRuleManager ruleManager = new SQLRuleManager(syntaxManager);
+        ruleManager.loadRules(connection.getDataSource(), false);
         return ruleManager;
     }
 
@@ -213,7 +209,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             SQLParserContext parserContext = new SQLParserContext(
                 context.getDataSource(),
                 syntaxManager,
-                ruleManager,
+                createRuleManager(syntaxManager),
                 document);
 
             SQLScriptElement element = SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());

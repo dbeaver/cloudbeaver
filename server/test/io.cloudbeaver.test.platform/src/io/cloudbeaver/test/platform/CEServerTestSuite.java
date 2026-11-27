@@ -87,6 +87,7 @@ import org.junit.platform.suite.api.Suite;
         AdminUserTeamGrantTest.class,
         UserTeamGrantMigrationTest.class,
         BlankLineDelimiterTest.class,
+        SQLParameterPreferencesTest.class,
         GenerateSQLResultSetTest.class,
         WebSQLDataUpdateTest.class,
         WebSQLQueryDataContainerTest.class,

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,14 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
     private static final Log log = Log.getLog(WebSQLCompletionContext.class);
 
     private final WebSQLContextInfo sqlContext;
+    private final SQLSyntaxManager syntaxManager;
+    private final SQLRuleManager ruleManager;
 
-    public WebSQLCompletionContext(WebSQLContextInfo context) {
+    public WebSQLCompletionContext(@NotNull WebSQLContextInfo context) {
         this.sqlContext = context;
+        var processor = context.getProcessor();
+        this.syntaxManager = processor.getSyntaxManager();
+        this.ruleManager = processor.createRuleManager(syntaxManager);
     }
 
     @Override
@@ -55,14 +60,16 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
             false);
     }
 
+    @NotNull
     @Override
     public SQLSyntaxManager getSyntaxManager() {
-        return sqlContext.getProcessor().getSyntaxManager();
+        return syntaxManager;
     }
 
+    @NotNull
     @Override
     public SQLRuleManager getRuleManager() {
-        return sqlContext.getProcessor().getRuleManager();
+        return ruleManager;
     }
 
     @Override
