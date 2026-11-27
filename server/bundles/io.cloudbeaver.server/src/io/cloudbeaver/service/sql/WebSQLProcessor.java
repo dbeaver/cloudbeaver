@@ -34,7 +34,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ModelPreferences.SQLScriptStatementDelimiterMode;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -84,22 +83,14 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private final WebSession webSession;
     private final WebConnectionInfo connection;
-    private final SQLSyntaxManager syntaxManager;
-    private final SQLRuleManager ruleManager;
     private final Map<String, WebSQLContextInfo> contexts = new LinkedHashMap<>();
+    private volatile ParserConfiguration parserConfiguration;
 
     private final AtomicInteger contextId = new AtomicInteger();
 
     WebSQLProcessor(@NotNull WebSession webSession, @NotNull WebConnectionInfo connection) {
         this.webSession = webSession;
         this.connection = connection;
-
-        syntaxManager = new SQLSyntaxManager();
-        syntaxManager.init(
-            connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
-
-        ruleManager = new SQLRuleManager(syntaxManager);
-        ruleManager.loadRules(connection.getDataSource(), false);
     }
 
     void dispose() {
@@ -118,14 +109,38 @@ public class WebSQLProcessor implements WebSessionProvider {
         return webSession;
     }
 
+    @NotNull
     public SQLSyntaxManager getSyntaxManager() {
-        syntaxManager.setStatementDelimiterMode(SQLScriptStatementDelimiterMode.fromPreferences(
-            connection.getDataSourceContainer().getPreferenceStore()));
-        return syntaxManager;
+        return getParserConfiguration().syntaxManager();
     }
 
-    SQLRuleManager getRuleManager() {
-        return ruleManager;
+    @NotNull
+    ParserConfiguration getParserConfiguration() {
+        var configuration = parserConfiguration;
+        if (configuration != null) {
+            return configuration;
+        }
+
+        synchronized (this) {
+            configuration = parserConfiguration;
+            if (configuration == null) {
+                var dataSource = connection.getDataSource();
+                var syntaxManager = new SQLSyntaxManager();
+                syntaxManager.init(dataSource.getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
+                var ruleManager = new SQLRuleManager(syntaxManager);
+                ruleManager.loadRules(dataSource, false);
+                configuration = new ParserConfiguration(syntaxManager, ruleManager);
+                parserConfiguration = configuration;
+            }
+            return configuration;
+        }
+    }
+
+    synchronized void invalidateParserConfiguration() {
+        parserConfiguration = null;
+    }
+
+    record ParserConfiguration(@NotNull SQLSyntaxManager syntaxManager, @NotNull SQLRuleManager ruleManager) {
     }
 
     public DBCExecutionContext getExecutionContext() {
@@ -189,7 +204,8 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         WebSQLParametersProvider parametersProvider = new WebSQLParametersProvider(webSession, asyncTask);
 
-        SQLSyntaxManager syntaxManager = getSyntaxManager();
+        var parserConfiguration = getParserConfiguration();
+        var syntaxManager = parserConfiguration.syntaxManager();
         var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql, parametersProvider);
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
@@ -213,7 +229,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             SQLParserContext parserContext = new SQLParserContext(
                 context.getDataSource(),
                 syntaxManager,
-                ruleManager,
+                parserConfiguration.ruleManager(),
                 document);
 
             SQLScriptElement element = SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());

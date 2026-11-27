@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionPreferenceStore;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServletContext;
@@ -302,8 +303,12 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
     }
 
     @NotNull
-    public static WebSQLConfiguration getSQLConfiguration(WebSession webSession) {
-        return webSession.getAttribute("sqlConfiguration", cfg -> new WebSQLConfiguration(), WebSQLConfiguration::dispose);
+    public static WebSQLConfiguration getSQLConfiguration(@NotNull WebSession webSession) {
+        return webSession.getAttribute(
+            "sqlConfiguration",
+            cfg -> new WebSQLConfiguration(webSession.getUserPreferenceStore()),
+            WebSQLConfiguration::dispose
+        );
     }
 
     @NotNull
@@ -377,8 +382,24 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
 
     public static class WebSQLConfiguration {
         private final Map<WebConnectionInfo, WebSQLProcessor> processors = new HashMap<>();
+        private final WebSessionPreferenceStore preferenceStore;
+        private final Runnable preferenceUpdateListener = this::invalidateParserConfigurations;
 
-        public WebSQLConfiguration() {
+        private WebSQLConfiguration(@NotNull WebSessionPreferenceStore preferenceStore) {
+            this.preferenceStore = preferenceStore;
+            preferenceStore.addPreferenceUpdateListener(preferenceUpdateListener);
+        }
+
+        private void invalidateParserConfigurations() {
+            synchronized (processors) {
+                processors.values().forEach(WebSQLProcessor::invalidateParserConfiguration);
+            }
+        }
+
+        private void removeProcessor(@NotNull WebConnectionInfo connectionInfo) {
+            synchronized (processors) {
+                processors.remove(connectionInfo);
+            }
         }
 
         @NotNullWhen("connect")
@@ -397,7 +418,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                 WebSQLProcessor processor = processors.get(connectionInfo);
                 if (processor == null) {
                     processor = new WebSQLProcessor(connectionInfo.getSession(), connectionInfo);
-                    connectionInfo.addCloseListener(processors::remove);
+                    connectionInfo.addCloseListener(this::removeProcessor);
                     processors.put(connectionInfo, processor);
                 }
                 return processor;
@@ -406,6 +427,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
 
         @NotNull
         public WebSQLConfiguration dispose() {
+            preferenceStore.removePreferenceUpdateListener(preferenceUpdateListener);
             synchronized (processors) {
                 processors.forEach((connectionInfo, processor) -> processor.dispose());
                 processors.clear();
