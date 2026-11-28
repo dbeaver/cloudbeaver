@@ -16,6 +16,6 @@ export default [
     'Эти учетные данные будут использоваться для автоматического подключения для всех пользователей с доступом',
   ],
   ['plugin_network_handlers_ssh_tunnel_enable', 'Использовать SSH Тунель'],
-  ['plugin_network_handlers_ssh_test_fail', 'Не удалось установить соединение'],
-  ['plugin_network_handlers_ssh_test_success', 'Соединение установлено'],
+  ['plugin_network_handlers_ssh_test_fail', 'Не удалось установить подключение'],
+  ['plugin_network_handlers_ssh_test_success', 'Подключение установлено'],
 ];

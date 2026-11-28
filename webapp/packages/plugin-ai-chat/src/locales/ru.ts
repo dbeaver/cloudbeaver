@@ -16,11 +16,11 @@ export default [
   ['plugin_ai_chat_attachment_image_format', 'Используйте изображение в формате PNG, JPEG, GIF или WebP.'],
   ['plugin_ai_chat_attachment_image_limit', 'Прикрепите не более 10 изображений общим размером не более 20 МиБ.'],
   ['plugin_ai_chat_attachment_read_error', 'Не удалось прочитать изображение'],
-  ['plugin_ai_chat_no_context', 'Без соединения'],
+  ['plugin_ai_chat_no_context', 'Без подключения'],
   ['plugin_ai_chat_metadata_transfer_confirmation_title', 'Передача информации поставщику AI'],
   [
     'plugin_ai_chat_metadata_transfer_confirmation_message',
-    'Чтобы использовать функции AI, CloudBeaver должен передать информацию о метаданных вашей базы данных (имена таблиц и столбцов) в API поставщика AI.\n\nВы подтверждаете это для этого соединения?',
+    'Чтобы использовать функции AI, CloudBeaver должен передать информацию о метаданных вашей базы данных (имена таблиц и столбцов) в API поставщика AI.\n\nВы подтверждаете это для этого подключения?',
   ],
   ['plugin_ai_chat_metadata_transfer_rejection', 'Передача метаданных была отклонена'],
   ['plugin_ai_chat_metadata_transfer_confirmation', 'Передать'],

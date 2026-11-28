@@ -1,1 +1,1 @@
-export default [['plugin_connection_administration_label', 'Соединения']];
+export default [['plugin_connection_administration_label', 'Подключения']];
